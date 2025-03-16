@@ -5,11 +5,11 @@ import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgAudioElementController from "./lib/FgAudioElementController";
 import {
-  ExtenalSVGsType,
   FgAudioElementContainerOptionsType,
   Settings,
 } from "./lib/typeConstant";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 
 export default function FgAudioElement({
   svgRef,
@@ -24,7 +24,6 @@ export default function FgAudioElement({
   doubleClickFunction,
   fgAudioElementContainerOptions,
   settings,
-  externalSVGs,
 }: {
   svgRef: React.MutableRefObject<SVGSVGElement | null>;
   audioStream?: MediaStream;
@@ -41,8 +40,9 @@ export default function FgAudioElement({
   doubleClickFunction?: (() => void) | undefined;
   fgAudioElementContainerOptions: FgAudioElementContainerOptionsType;
   settings: Settings;
-  externalSVGs: ExtenalSVGsType;
 }) {
+  const { userMedia } = useMediaContext();
+
   const [movingY, setMovingY] = useState<number[]>(
     Array(settings.numFixedPoints.value - 1).fill(50)
   );
@@ -206,14 +206,15 @@ export default function FgAudioElement({
       className='w-full h-full'
       contentFunction={() =>
         (localMute.current || clientMute.current) &&
-        externalSVGs.find((value) => value.id === settings.muteStyle.value) !==
-          undefined ? (
-          <FgSVG
+        Object.entries(userMedia.current.svg).find(
+          ([svgId]) => svgId === settings.muteStyle.value
+        ) !== undefined ? (
+          <FgSVGElement
             externalRef={svgRef}
             src={
-              externalSVGs.find(
-                (value) => value.id === settings.muteStyle.value
-              )!.url
+              Object.entries(userMedia.current.svg).find(
+                ([svgId]) => svgId === settings.muteStyle.value
+              )?.[1].blobURL ?? ""
             }
             className='h-full w-full'
             attributes={[

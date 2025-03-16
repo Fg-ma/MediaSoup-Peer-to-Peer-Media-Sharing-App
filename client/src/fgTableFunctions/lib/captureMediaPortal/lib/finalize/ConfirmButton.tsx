@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import CaptureMediaController from "../CaptureMediaController";
 
@@ -21,7 +21,7 @@ export default function ConfirmButton({
         captureMediaController.confirmCapture();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={checkIcon}
           className='w-[75%] aspect-square flex items-center justify-center'
           attributes={[

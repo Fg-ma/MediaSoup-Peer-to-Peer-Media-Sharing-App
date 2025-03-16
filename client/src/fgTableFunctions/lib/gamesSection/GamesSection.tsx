@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPanel from "../../../elements/fgPanel/FgPanel";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LazyScrollingContainer from "../../../elements/lazyScrollingContainer/LazyScrollingContainer";
@@ -49,7 +49,7 @@ export default function GamesSection({
         className='flex h-full aspect-square items-center justify-center'
         contentFunction={() => {
           return (
-            <FgSVG
+            <FgSVGElement
               src={joystickIcon}
               className='h-full aspect-square'
               attributes={[
@@ -91,7 +91,7 @@ export default function GamesSection({
                   scrollingContainerRef={gamesSectionRef}
                   className='flex border-gray-300 items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
                   contentFunction={() => (
-                    <FgSVG
+                    <FgSVGElement
                       src={snakeGameIcon}
                       className='h-full aspect-square'
                       attributes={[

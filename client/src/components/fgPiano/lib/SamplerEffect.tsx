@@ -3,7 +3,7 @@ import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { SamplerEffectType } from "./SamplerEffectsToolbar";
 import FgKnobButton from "../../../elements/fgKnobButton/FgKnobButton";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import {
   AudioMixEffectsType,
@@ -125,7 +125,7 @@ export default function SamplerEffect({
           ></div>
         )}
         {Object.keys(effect.options).length > 1 && effect.labelIcon && (
-          <FgSVG
+          <FgSVGElement
             src={effect.labelIcon}
             attributes={[
               { key: "width", value: "1rem" },

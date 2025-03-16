@@ -47,6 +47,7 @@ export function EffectsContextProvider({
     audio: structuredClone(defaultAudioStreamEffects),
     video: {},
     image: {},
+    svg: {},
     application: {},
     soundClip: {},
   });
@@ -58,6 +59,7 @@ export function EffectsContextProvider({
     audio: structuredClone(defaultAudioEffectsStyles),
     video: {},
     image: {},
+    svg: {},
     application: {},
     soundClip: {},
   });

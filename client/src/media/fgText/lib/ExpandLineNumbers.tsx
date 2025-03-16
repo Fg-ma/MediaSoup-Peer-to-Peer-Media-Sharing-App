@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -50,7 +50,7 @@ export default function ExpandLineNumbers({
               style={{ right: "calc(100% - 0.5rem)" }}
               pointerDownFunction={handleClick}
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   className='flex items-center justify-center'
                   src={navigateForward}
                   attributes={[

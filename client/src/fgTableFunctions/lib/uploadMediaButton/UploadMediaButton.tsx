@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -59,7 +59,7 @@ export default function UploadMediaButton() {
         className='flex h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
         clickFunction={clickFunction}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={uploadIcon}
             className='h-[75%] aspect-square flex justify-center items-center'
             attributes={[

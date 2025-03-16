@@ -3,7 +3,7 @@ import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import ScreenSectionController from "./lib/ScreenSectionController";
@@ -60,7 +60,7 @@ export default function ScreenSection({
         contentFunction={() => {
           if (screenActive) {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={removeScreenIcon}
                 className='h-[80%] aspect-square'
                 attributes={[
@@ -72,7 +72,7 @@ export default function ScreenSection({
             );
           } else {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={shareScreenIcon}
                 className='h-[80%] aspect-square'
                 attributes={[
@@ -99,7 +99,7 @@ export default function ScreenSection({
           screenActive ? "visible" : "hidden"
         } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={shareScreenIcon}
             className='h-[80%] aspect-square'
             attributes={[

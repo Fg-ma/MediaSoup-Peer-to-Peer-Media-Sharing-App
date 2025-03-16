@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgButton from "../../fgButton/FgButton";
 import FgImageElement from "../../fgImageElement/FgImageElement";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgSVGElement from "../../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 import {
   categories,
@@ -117,7 +117,7 @@ export default function BackgroundSelectorPanel({
                   className='h-full aspect-square border-4 border-fg-red-dark hover:border-fg-red-light rounded'
                   contentFunction={() => {
                     return (
-                      <FgSVG
+                      <FgSVGElement
                         src={additionIcon}
                         attributes={[
                           { key: "width", value: "100%" },
@@ -181,7 +181,7 @@ export default function BackgroundSelectorPanel({
                       }}
                       contentFunction={() => {
                         return (
-                          <FgSVG
+                          <FgSVGElement
                             src={categoryMetadata.url}
                             className='flex items-center justify-center'
                             attributes={[
@@ -300,7 +300,7 @@ export default function BackgroundSelectorPanel({
                 className='flex items-center justify-center h-4/5 aspect-square relative'
                 contentFunction={() => {
                   return (
-                    <FgSVG
+                    <FgSVGElement
                       src={navigateBack}
                       attributes={[
                         { key: "width", value: "100%" },

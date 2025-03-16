@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { FgBackground, categories } from "./lib/typeConstant";
 import BackgroundSelectorPanel from "./lib/BackgroundSelectorPanel";
@@ -91,7 +91,7 @@ export default function FgBackgroundSelector({
         externalRef={backgroundSelectorBtnRef}
         contentFunction={() => {
           return (
-            <FgSVG
+            <FgSVGElement
               src={
                 backgroundSelectorPanelActive
                   ? chooseBackgroundOffIcon

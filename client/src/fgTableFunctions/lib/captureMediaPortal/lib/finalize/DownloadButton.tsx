@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import CaptureMediaController from "../CaptureMediaController";
 
@@ -21,7 +21,7 @@ export default function DownloadButton({
         captureMediaController.downloadCapture();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={downloadIcon}
           className='w-[85%] aspect-square flex items-center justify-center'
           attributes={[

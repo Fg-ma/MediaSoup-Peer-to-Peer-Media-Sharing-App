@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import BezierController from "../BezierController";
 
@@ -37,7 +37,7 @@ export default function PointControlsSection({
           bezierController.deleteSelectedAndHovering();
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={trashIcon}
             className='h-[60%] w-full stroke-fg-white'
             attributes={[
@@ -64,7 +64,7 @@ export default function PointControlsSection({
           bezierController.swapControlType("inline");
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={inlineControlsIcon}
             className='h-full w-full stroke-fg-white'
             attributes={[
@@ -91,7 +91,7 @@ export default function PointControlsSection({
           bezierController.swapControlType("inlineSymmetric");
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={inlineSymmetricControlsIcon}
             className='h-full w-full stroke-fg-white'
             attributes={[
@@ -121,7 +121,7 @@ export default function PointControlsSection({
           bezierController.swapControlType("free");
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={freeControlsIcon}
             className='h-full w-full stroke-fg-white'
             attributes={[

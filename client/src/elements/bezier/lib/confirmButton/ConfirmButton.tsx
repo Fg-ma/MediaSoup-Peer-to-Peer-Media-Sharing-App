@@ -1,7 +1,7 @@
 import React from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import BezierController from "../BezierController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -33,7 +33,7 @@ export default function ConfirmButton({
         }
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={checkIcon}
           className='h-[70%] aspect-square'
           attributes={[

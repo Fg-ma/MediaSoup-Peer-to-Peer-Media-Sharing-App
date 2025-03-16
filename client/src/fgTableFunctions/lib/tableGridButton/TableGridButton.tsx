@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -24,7 +24,7 @@ export default function TableGridButton({
         const src = gridActive ? gridOffIcon : gridIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={src}
             attributes={[
               { key: "width", value: "100%" },

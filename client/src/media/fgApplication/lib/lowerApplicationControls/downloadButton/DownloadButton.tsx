@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerApplicationController from "../LowerApplicationController";
 import { Settings } from "../../typeConstant";
@@ -41,7 +41,7 @@ export default function DownloadButton({
             : recordIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={src}
             attributes={[
               { key: "width", value: "85%" },

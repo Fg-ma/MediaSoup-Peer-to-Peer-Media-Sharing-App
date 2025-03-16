@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
@@ -84,7 +84,7 @@ export default function FiltersPage({
         <FgButton
           className='h-full aspect-square'
           contentFunction={() => (
-            <FgSVG
+            <FgSVGElement
               src={navigateBackIcon}
               attributes={[
                 { key: "width", value: "95%" },

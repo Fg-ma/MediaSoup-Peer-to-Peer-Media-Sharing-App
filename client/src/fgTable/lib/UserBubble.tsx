@@ -10,7 +10,7 @@ import OpenKidsTableButton from "./tableUserFunctions/OpenKidsTableButton";
 import KickFromTableButton from "./tableUserFunctions/KickFromTableButton";
 import SilenceButton from "./tableUserFunctions/SilenceButton";
 import HideContentFromButton from "./tableUserFunctions/HideContentFromButton";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
 import SwapSeatsbutton from "./tableUserFunctions/SwapSeatsButton";
 
@@ -110,7 +110,7 @@ export default function UserBubble({
               )
             }
             contentFunction={() => (
-              <FgSVG
+              <FgSVGElement
                 src={navigateBack}
                 style={{ width: "100%", aspectRatio: "1 / 1" }}
                 attributes={[
@@ -141,7 +141,7 @@ export default function UserBubble({
               )
             }
             contentFunction={() => (
-              <FgSVG
+              <FgSVGElement
                 src={navigateForward}
                 style={{ width: "100%", aspectRatio: "1 / 1" }}
                 attributes={[

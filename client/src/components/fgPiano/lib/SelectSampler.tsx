@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgButton from "../../../elements/fgButton/FgButton";
 import FgSelectionButton from "../../../elements/fgSelectionButton/FgSelectionButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { navTransition, navVar } from "./SamplerToolbar";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
@@ -675,7 +675,7 @@ export default function SelectSampler({
       <FgButton
         className='w-6 aspect-square rounded-full flex items-center justify-center pr-0.5'
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={navigateBack}
             attributes={[
               { key: "height", value: "1rem" },
@@ -733,7 +733,7 @@ export default function SelectSampler({
       <FgButton
         className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={navigateForward}
             attributes={[
               { key: "height", value: "1rem" },

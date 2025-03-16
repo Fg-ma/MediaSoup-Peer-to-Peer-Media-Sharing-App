@@ -12,7 +12,7 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./lib/typeConstant";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgTriToggleButton from "../../elements/fgTriToggleButton/FgTriToggleButton";
 import "./lib/soundBoard.css";
 
@@ -166,7 +166,7 @@ export default function FgSoundBoard({
                 contentFunction={() => (
                   <>
                     <div className='sound-board-btn-alt-1'>
-                      <FgSVG
+                      <FgSVGElement
                         src={additionIcon}
                         attributes={[
                           { key: "width", value: "90%" },

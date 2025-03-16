@@ -11,6 +11,7 @@ import FgVideo from "../media/fgVideo/FgVideo";
 import FgImage from "../media/fgImage/FgImage";
 import FgApplication from "../media/fgApplication/FgApplication";
 import FgText from "../media/fgText/FgText";
+import FgSvg from "../media/fgSvg/FgSvg";
 
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
@@ -110,6 +111,17 @@ export default function SharedBundle({
           <Suspense key={imageId} fallback={<div>Loading...</div>}>
             <FgImage
               imageId={imageId}
+              bundleRef={sharedBundleRef}
+              tableRef={tableRef}
+            />
+          </Suspense>
+        ))}
+      {userMedia.current.svg &&
+        Object.keys(userMedia.current.svg).length !== 0 &&
+        Object.keys(userMedia.current.svg).map((svgId) => (
+          <Suspense key={svgId} fallback={<div>Loading...</div>}>
+            <FgSvg
+              svgId={svgId}
               bundleRef={sharedBundleRef}
               tableRef={tableRef}
             />

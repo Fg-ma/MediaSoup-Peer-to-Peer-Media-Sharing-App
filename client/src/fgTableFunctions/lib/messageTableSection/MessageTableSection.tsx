@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -41,7 +41,7 @@ export default function MessageTableSection() {
         }}
         contentFunction={() => (
           <>
-            <FgSVG
+            <FgSVGElement
               src={navigateForward}
               attributes={[
                 { key: "width", value: "80%" },
@@ -58,7 +58,7 @@ export default function MessageTableSection() {
                   : { transform: "rotate(-90deg)" }),
               }}
             />
-            <FgSVG
+            <FgSVGElement
               src={navigateForward}
               attributes={[
                 { key: "width", value: "80%" },

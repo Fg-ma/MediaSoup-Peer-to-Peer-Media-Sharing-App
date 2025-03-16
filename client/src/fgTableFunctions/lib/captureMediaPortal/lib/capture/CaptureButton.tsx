@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import CaptureMediaController from "../CaptureMediaController";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
@@ -23,7 +23,7 @@ export default function CaptureButton({
         captureMediaController.handleCapture();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={recordOffIcon}
           attributes={[
             { key: "fill", value: "#f2f2f2" },

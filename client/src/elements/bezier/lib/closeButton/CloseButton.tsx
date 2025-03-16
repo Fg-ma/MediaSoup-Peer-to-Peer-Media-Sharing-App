@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -21,7 +21,7 @@ export default function CloseButton({
       } flex shadow z-20 aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto`}
       clickFunction={closeFunction}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={closeIcon}
           className='w-[50%] aspect-square'
           attributes={[

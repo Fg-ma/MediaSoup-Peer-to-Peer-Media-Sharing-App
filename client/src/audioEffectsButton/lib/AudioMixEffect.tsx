@@ -1,5 +1,5 @@
 import React from "react";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgSlider, { SliderChangeEvent } from "../../elements/fgSlider/FgSlider";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import {
@@ -97,7 +97,7 @@ export default function AudioMixEffect({
         `}
       >
         {staticMixEffect.labelIcon && (
-          <FgSVG
+          <FgSVGElement
             src={staticMixEffect.labelIcon}
             attributes={[
               { key: "width", value: "1.25rem" },

@@ -8,16 +8,15 @@ import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import ImageMedia from "../ImageMedia";
+import SvgMedia from "../SvgMedia";
 
-class ImageController {
+class SvgController {
   constructor(
     private imageId: string,
     private imageMedia: ImageMedia,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private tintColor: React.MutableRefObject<string>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 

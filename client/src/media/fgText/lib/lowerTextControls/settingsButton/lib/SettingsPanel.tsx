@@ -5,7 +5,7 @@ import FgHoverContentStandard from "../../../../../../elements/fgHoverContentSta
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import { Settings, ActivePages } from "../../../typeConstant";
 import ColorsPage from "./ColorsPage";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FontStylePage from "./FontStylePage";
 import LowerTextController from "../../LowerTextController";
 
@@ -243,7 +243,7 @@ export default function SettingsPanel({
                   className='h-full'
                   clickFunction={() => handleFontSizeChange("increment", 1)}
                   contentFunction={() => (
-                    <FgSVG
+                    <FgSVGElement
                       src={additionIcon}
                       className='h-full aspect-square'
                       attributes={[
@@ -282,7 +282,7 @@ export default function SettingsPanel({
                   className='h-full'
                   clickFunction={() => handleFontSizeChange("decrement", 1)}
                   contentFunction={() => (
-                    <FgSVG
+                    <FgSVGElement
                       src={minusIcon}
                       className='h-full aspect-square'
                       attributes={[

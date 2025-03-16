@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 
@@ -23,7 +23,7 @@ export default function SwapSeatsbutton({
         tableSocket.current?.swapSeats(username);
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={swapIcon}
           attributes={[
             { key: "width", value: "95%" },

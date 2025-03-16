@@ -15,6 +15,7 @@ class MetadataController {
     const { table_id, username, instance } = event.header;
 
     const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(table_id);
+    const svgs = await tableTopMongo.tableSvgs?.gets.getAllBy_TID(table_id);
     const videos = await tableTopMongo.tableVideos?.gets.getAllBy_TID(table_id);
     const text = await tableTopMongo.tableText?.gets.getAllBy_TID(table_id);
     const audio = await tableTopMongo.tableSoundClips?.gets.getAllBy_TID(
@@ -25,7 +26,7 @@ class MetadataController {
 
     this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "responsedCatchUpTableData",
-      data: { images, videos, text, audio, applications },
+      data: { images, svgs, videos, text, audio, applications },
     });
   };
 

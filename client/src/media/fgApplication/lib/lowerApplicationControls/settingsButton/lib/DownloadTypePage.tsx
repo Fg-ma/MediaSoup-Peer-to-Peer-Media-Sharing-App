@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
@@ -62,7 +62,7 @@ export default function DownloadTypePage({
           <FgButton
             className='h-full aspect-square'
             contentFunction={() => (
-              <FgSVG
+              <FgSVGElement
                 src={navigateBackIcon}
                 attributes={[
                   { key: "width", value: "95%" },

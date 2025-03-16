@@ -20,7 +20,7 @@ import CloseButton from "./lib/closeButton/CloseButton";
 import FgInput from "../fgInput/FgInput";
 import FgButton from "../fgButton/FgButton";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import "./lib/bezier.css";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -454,7 +454,7 @@ export default function Bezier({
                 />
               </g>
 
-              {selectionBox.active && (
+              {!getNamePopupActive && selectionBox.active && (
                 <rect
                   x={Math.min(
                     selectionBox.x,
@@ -475,7 +475,7 @@ export default function Bezier({
                 />
               )}
 
-              {(pathHovered || selectionBox.active) && (
+              {!getNamePopupActive && (pathHovered || selectionBox.active) && (
                 <>
                   {/* Control handle lines */}
                   {points.map(
@@ -637,91 +637,92 @@ export default function Bezier({
                 </>
               )}
             </svg>
-            {(inBezier ||
-              settingsActive ||
-              bezierController.isOneSelected(points) ||
-              bezierController.isOneInSelectionBox(points) ||
-              bezierController.isOneHovered(points)) && (
-              <motion.div
-                variants={BezierVar}
-                initial='init'
-                animate='animate'
-                exit='init'
-                transition={BezierTransition}
-              >
-                <div
-                  className={`${
-                    largestDim === "width"
-                      ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
-                      : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
-                  } absolute flex items-center justify-center z-20 pointer-events-none`}
+            {!getNamePopupActive &&
+              (inBezier ||
+                settingsActive ||
+                bezierController.isOneSelected(points) ||
+                bezierController.isOneInSelectionBox(points) ||
+                bezierController.isOneHovered(points)) && (
+                <motion.div
+                  variants={BezierVar}
+                  initial='init'
+                  animate='animate'
+                  exit='init'
+                  transition={BezierTransition}
                 >
-                  {largestDim === "height" && (
-                    <>
-                      <ResetButton
-                        bezierController={bezierController}
-                        largestDim={largestDim}
-                      />
-                      <CloseButton
-                        closeFunction={closeFunction}
-                        largestDim={largestDim}
-                      />
-                    </>
+                  <div
+                    className={`${
+                      largestDim === "width"
+                        ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
+                        : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
+                    } absolute flex items-center justify-center z-20 pointer-events-none`}
+                  >
+                    {largestDim === "height" && (
+                      <>
+                        <ResetButton
+                          bezierController={bezierController}
+                          largestDim={largestDim}
+                        />
+                        <CloseButton
+                          closeFunction={closeFunction}
+                          largestDim={largestDim}
+                        />
+                      </>
+                    )}
+                    <ConfirmButton
+                      bezierController={bezierController}
+                      largestDim={largestDim}
+                      needsName={needsName}
+                      setGetNamePopupActive={setGetNamePopupActive}
+                    />
+                    {largestDim === "width" && (
+                      <>
+                        <CloseButton
+                          closeFunction={closeFunction}
+                          largestDim={largestDim}
+                        />
+                        <ResetButton
+                          bezierController={bezierController}
+                          largestDim={largestDim}
+                        />
+                      </>
+                    )}
+                  </div>
+                  {(bezierController.isOneSelectedExcludeEndPoints(points) ||
+                    bezierController.isOneHoveredExcludeEndPoints(points)) && (
+                    <PointControlsSection
+                      bezierController={bezierController}
+                      largestDim={largestDim}
+                    />
                   )}
-                  <ConfirmButton
-                    bezierController={bezierController}
-                    largestDim={largestDim}
-                    needsName={needsName}
-                    setGetNamePopupActive={setGetNamePopupActive}
-                  />
-                  {largestDim === "width" && (
-                    <>
-                      <CloseButton
-                        closeFunction={closeFunction}
-                        largestDim={largestDim}
-                      />
-                      <ResetButton
-                        bezierController={bezierController}
-                        largestDim={largestDim}
-                      />
-                    </>
-                  )}
-                </div>
-                {(bezierController.isOneSelectedExcludeEndPoints(points) ||
-                  bezierController.isOneHoveredExcludeEndPoints(points)) && (
-                  <PointControlsSection
-                    bezierController={bezierController}
-                    largestDim={largestDim}
-                  />
-                )}
-                <div
-                  className={`${
-                    largestDim === "width"
-                      ? "bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
-                      : "bottom-full left-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
-                  } absolute flex items-center justify-center z-20 pointer-events-none`}
-                >
-                  <CopyButton
-                    bezierController={bezierController}
-                    copied={copied}
-                    largestDim={largestDim}
-                  />
-                  <DownloadButton
-                    bezierController={bezierController}
-                    largestDim={largestDim}
-                  />
-                  <SettingsButton
-                    settingsActive={settingsActive}
-                    setSettingsActive={setSettingsActive}
-                    activePages={activePages}
-                    setActivePages={setActivePages}
-                    settings={settings}
-                    setSettings={setSettings}
-                    largestDim={largestDim}
-                  />
-                </div>
-              </motion.div>
-            )}
+                  <div
+                    className={`${
+                      largestDim === "width"
+                        ? "bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
+                        : "bottom-full left-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
+                    } absolute flex items-center justify-center z-20 pointer-events-none`}
+                  >
+                    <CopyButton
+                      bezierController={bezierController}
+                      copied={copied}
+                      largestDim={largestDim}
+                    />
+                    <DownloadButton
+                      bezierController={bezierController}
+                      largestDim={largestDim}
+                    />
+                    <SettingsButton
+                      settingsActive={settingsActive}
+                      setSettingsActive={setSettingsActive}
+                      activePages={activePages}
+                      setActivePages={setActivePages}
+                      settings={settings}
+                      setSettings={setSettings}
+                      largestDim={largestDim}
+                    />
+                  </div>
+                </motion.div>
+              )}
             {getNamePopupActive && (
               <div className='absolute z-100 top-0 left-0 w-full h-full pointer-events-auto'>
                 <motion.div
@@ -755,7 +756,7 @@ export default function Bezier({
                         setGetNamePopupActive(false);
                       }}
                       contentFunction={() => (
-                        <FgSVG
+                        <FgSVGElement
                           src={checkIcon}
                           className='w-[75%] h-[75%]'
                           attributes={[
@@ -783,7 +784,7 @@ export default function Bezier({
                       className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
                       clickFunction={() => setGetNamePopupActive(false)}
                       contentFunction={() => (
-                        <FgSVG
+                        <FgSVGElement
                           src={closeIcon}
                           className='w-[55%] h-[55%]'
                           attributes={[

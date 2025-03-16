@@ -18,14 +18,11 @@ class LowerImageController {
     private setImageEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private tintColor: React.MutableRefObject<string>,
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
-    private recording: React.MutableRefObject<boolean>,
-    private downloadRecordingReady: React.MutableRefObject<boolean>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined

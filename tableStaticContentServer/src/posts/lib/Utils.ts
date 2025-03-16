@@ -60,16 +60,65 @@ class Utils {
     });
   };
 
-  sanitizeFilename = (filename: string) => {
-    const baseName = path.basename(filename);
+  /**
+   * Sanitizes a string by removing unsafe characters.
+   *
+   * @param input - The string to sanitize
+   * @returns A sanitized and safe string
+   */
+  sanitizeString = (input: string) => {
+    // Normalize and remove unsafe characters
+    let sanitized = input.normalize("NFKC").replace(/[^a-zA-Z0-9._-]/g, "_");
 
-    let sanitized = baseName.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-    if (sanitized.length > 255) {
-      sanitized = sanitized.substring(0, 255);
+    // Prevent empty or hidden strings
+    if (!sanitized || sanitized.startsWith(".")) {
+      sanitized = "i_heart_table_top";
     }
 
     return sanitized;
+  };
+
+  ALLOWED_MIME_TYPES = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/bmp",
+    "image/tiff",
+    "image/svg+xml",
+    "video/mp4",
+    "video/mpeg",
+    "video/webm",
+    "video/ogg",
+    "video/x-msvideo",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/wav",
+    "audio/webm",
+    "application/pdf",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain",
+  ] as const);
+
+  /**
+   * Sanitizes and validates a MIME type against the allowed list.
+   *
+   * @param mimeType - The MIME type to check
+   * @returns A valid MIME type or `null` if invalid
+   */
+  sanitizeMimeType = (mimeType: string) => {
+    // Normalize input by trimming whitespace
+    const sanitized = mimeType.trim().toLowerCase();
+
+    // Check if it's in the allowed list
+    return this.ALLOWED_MIME_TYPES.has(sanitized as any)
+      ? sanitized
+      : undefined;
   };
 }
 

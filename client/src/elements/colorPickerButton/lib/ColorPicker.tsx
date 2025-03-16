@@ -3,7 +3,7 @@ import { HexColorPicker } from "react-colorful";
 import FgPanel from "../../fgPanel/FgPanel";
 import FgSlider from "../../fgSlider/FgSlider";
 import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgSVGElement from "../../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -419,7 +419,7 @@ export default function ColorPicker({
               className='flex h-10 w-10 bg-fg-red rounded-full items-center justify-center'
               clickFunction={handleAcceptColor}
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={checkIcon}
                   className='w-[75%] h-[75%]'
                   attributes={[
@@ -444,7 +444,7 @@ export default function ColorPicker({
               className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
               clickFunction={handleCancelColor}
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={closeIcon}
                   className='w-[55%] h-[55%]'
                   attributes={[

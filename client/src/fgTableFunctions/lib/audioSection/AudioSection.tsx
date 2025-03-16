@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
@@ -82,7 +82,7 @@ export default function AudioSection({
         contentFunction={() => {
           if (audioActive) {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={removeAudioIcon}
                 className='h-[80%] aspect-square'
                 attributes={[
@@ -94,7 +94,7 @@ export default function AudioSection({
             );
           } else {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={shareAudioIcon}
                 className='h-[80%] aspect-square'
                 attributes={[

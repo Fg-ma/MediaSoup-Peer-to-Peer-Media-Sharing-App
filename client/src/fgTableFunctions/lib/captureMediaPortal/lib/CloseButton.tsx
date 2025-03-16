@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import TableFunctionsController from "../../TableFunctionsController";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import CaptureMediaController from "./CaptureMediaController";
@@ -33,7 +33,7 @@ export default function CloseButton({
           : tableFunctionsController.stopVideo();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={closeIcon}
           className='w-[50%] aspect-square'
           attributes={[

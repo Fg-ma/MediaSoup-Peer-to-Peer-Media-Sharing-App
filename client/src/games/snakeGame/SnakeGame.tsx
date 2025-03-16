@@ -3,7 +3,7 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import FgGame from "../../elements/fgGame/FgGame";
 import FgButton from "../../elements/fgButton/FgButton";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgImageElement from "../../elements/fgImageElement/FgImageElement";
 import SnakeGameController from "./lib/SnakeGameController";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
@@ -182,7 +182,7 @@ function SnakeGame({
                       setSnakeColorPanelActive((prev) => !prev)
                     }
                     contentFunction={() => (
-                      <FgSVG
+                      <FgSVGElement
                         src={snakeColorChangeIcon}
                         attributes={[
                           { key: "width", value: "100%" },
@@ -222,7 +222,7 @@ function SnakeGame({
                       const src = gridSizePanelActive ? gridOffIcon : gridIcon;
 
                       return (
-                        <FgSVG
+                        <FgSVGElement
                           src={src}
                           attributes={[
                             { key: "width", value: "100%" },

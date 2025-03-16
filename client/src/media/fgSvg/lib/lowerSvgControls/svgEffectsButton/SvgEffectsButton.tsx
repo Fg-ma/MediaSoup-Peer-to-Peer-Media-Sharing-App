@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerImageController from "../LowerImageController";
 
@@ -9,7 +9,7 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const effectIcon = nginxAssetServerBaseUrl + "svgs/effectIcon.svg";
 const effectOffIcon = nginxAssetServerBaseUrl + "svgs/effectOffIcon.svg";
 
-export default function ImageEffectsButton({
+export default function SvgEffectsButton({
   lowerImageController,
   imageEffectsActive,
   settingsActive,
@@ -29,7 +29,7 @@ export default function ImageEffectsButton({
         const iconSrc = imageEffectsActive ? effectOffIcon : effectIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={iconSrc}
             attributes={[
               { key: "width", value: "100%" },

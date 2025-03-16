@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../../../fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 
@@ -20,7 +20,7 @@ export default function CloseButton({
       }}
       contentFunction={() => {
         return (
-          <FgSVG
+          <FgSVGElement
             src={closeIcon}
             className='flex items-center justify-start'
             attributes={[

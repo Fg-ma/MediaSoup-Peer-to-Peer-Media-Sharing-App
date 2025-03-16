@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
   MuteStyleTypes,
   muteStylesMeta,
-  ExtenalSVGsType,
 } from "../../typeConstant";
+import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -18,14 +18,14 @@ export default function MuteStylePage({
   settings,
   setSettings,
   setIsBezierCurveEditor,
-  externalSVGs,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
-  externalSVGs: ExtenalSVGsType;
 }) {
+  const { userMedia } = useMediaContext();
+
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const setMuteStyle = (muteStyle: MuteStyleTypes | string) => {
@@ -54,7 +54,7 @@ export default function MuteStylePage({
         <FgButton
           className='h-full aspect-square'
           contentFunction={() => (
-            <FgSVG
+            <FgSVGElement
               src={navigateBackIcon}
               attributes={[
                 { key: "width", value: "95%" },
@@ -88,23 +88,23 @@ export default function MuteStylePage({
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
-          {externalSVGs.map((data) => (
+          {Object.entries(userMedia.current.svg).map(([svgId, svgMedia]) => (
             <FgButton
-              key={data.id}
+              key={svgId}
               className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                data.id === settings.muteStyle.value
+                svgId === settings.muteStyle.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
               contentFunction={() => (
                 <div
                   className={`${
-                    data.name ? "justify-between" : "justify-start"
+                    svgMedia.filename ? "justify-between" : "justify-start"
                   } flex w-full bg-opacity-75 px-2 items-center text-lg`}
                 >
-                  <>{data.name}</>
-                  <FgSVG
-                    src={data.url}
+                  <>{svgMedia.filename}</>
+                  <FgSVGElement
+                    src={svgMedia.blobURL ?? ""}
                     className='h-6 aspect-square'
                     attributes={[
                       { key: "height", value: "100%" },
@@ -114,7 +114,7 @@ export default function MuteStylePage({
                 </div>
               )}
               clickFunction={() => {
-                setMuteStyle(data.id);
+                setMuteStyle(svgId);
               }}
             />
           ))}
@@ -134,7 +134,7 @@ export default function MuteStylePage({
                 >
                   <>{meta.title}</>
                   {meta.url && (
-                    <FgSVG
+                    <FgSVGElement
                       src={meta.url}
                       className='stroke-fg-white h-6 aspect-square'
                       attributes={[

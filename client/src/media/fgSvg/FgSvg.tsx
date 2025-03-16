@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import ImageController from "./lib/ImageController";
-import LowerImageController from "./lib/lowerImageControls/LowerImageController";
+import SvgController from "./lib/SvgController";
+import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
 import {
   ActivePages,
   defaultActiveSettingsPages,
@@ -11,19 +11,18 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
-import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
-import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
-import DownloadButton from "./lib/lowerImageControls/downloadButton/DownloadButton";
-import SettingsButton from "./lib/lowerImageControls/settingsButton/SettingsButton";
-import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/DownloadRecordingButton";
-import "./lib/fgImageStyles.css";
+import SvgEffectsButton from "./lib/lowerSvgControls/svgEffectsButton/SvgEffectsButton";
+import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
+import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton";
+import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
+import "./lib/fgSvgStyles.css";
 
-export default function FgImage({
-  imageId,
+export default function FgSvg({
+  svgId,
   bundleRef,
   tableRef,
 }: {
-  imageId: string;
+  svgId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -31,21 +30,19 @@ export default function FgImage({
   const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const imageMedia = userMedia.current.image[imageId];
+  const svgMedia = userMedia.current.svg[svgId];
 
-  const [imageEffectsActive, setImageEffectsActive] = useState(false);
+  const [svgEffectsActive, setSvgEffectsActive] = useState(false);
 
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(imageMedia.initPositioning);
+  }>(svgMedia.initPositioning);
 
-  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
-  const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
-
-  const tintColor = useRef(userEffectsStyles.current.image[imageId].tint.color);
+  const rightLowerSvgControlsRef = useRef<HTMLDivElement>(null);
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -60,36 +57,29 @@ export default function FgImage({
     defaultActiveSettingsPages
   );
 
-  const recording = useRef(false);
-  const downloadRecordingReady = useRef(false);
-
-  const lowerImageController = new LowerImageController(
-    imageId,
-    imageMedia,
-    imageContainerRef,
+  const lowerSvgController = new LowerSvgController(
+    svgId,
+    svgMedia,
+    svgContainerRef,
     shiftPressed,
     controlPressed,
-    setImageEffectsActive,
-    tintColor,
+    setSvgEffectsActive,
     userStreamEffects,
     userEffectsStyles,
     userMedia,
     setSettingsActive,
     settings,
-    recording,
-    downloadRecordingReady,
     setRerender,
     tableStaticContentSocket,
     setSettings
   );
 
-  const imageController = new ImageController(
-    imageId,
-    imageMedia,
+  const svgController = new SvgController(
+    svgId,
+    svgMedia,
     setSettingsActive,
     userStreamEffects,
     userEffectsStyles,
-    tintColor,
     setRerender
   );
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, ReactNode } from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import "./lib/scrollingContainer.css";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -161,7 +161,7 @@ export default function ScrollingContainer({
             <FgButton
               className='w-8 aspect-square rounded-full flex items-center justify-center pr-0.5'
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={navigateBack}
                   attributes={[
                     { key: "height", value: "1.25rem" },
@@ -215,7 +215,7 @@ export default function ScrollingContainer({
             <FgButton
               className='w-8 aspect-square rounded-full flex items-center justify-center pl-0.5'
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={navigateForward}
                   attributes={[
                     { key: "height", value: "1.25rem" },

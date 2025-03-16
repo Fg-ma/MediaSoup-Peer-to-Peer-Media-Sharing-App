@@ -2,7 +2,7 @@ import React from "react";
 import { Settings } from "../../typeConstant";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSlider from "../../../../../elements/fgSlider/FgSlider";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -153,7 +153,7 @@ export default function MixGaussianEnvelopeSection({
             className='absolute top-[154px] left-1/2 -translate-x-1/2 flex h-6 w-[95%] hover:bg-fg-white hover:text-fg-tone-black-1 rounded-sm items-center justify-center hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 fill-fg-white stroke-fg-white'
             clickFunction={() => handleRemoveGaussian(index)}
             contentFunction={() => (
-              <FgSVG
+              <FgSVGElement
                 className='flex h-full aspect-square items-center justify-center'
                 src={minusIcon}
                 attributes={[
@@ -170,7 +170,7 @@ export default function MixGaussianEnvelopeSection({
         style={{ marginTop: "1rem" }}
         clickFunction={handleAddGaussian}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             className='flex h-full aspect-square items-center justify-center'
             src={additionIcon}
             attributes={[

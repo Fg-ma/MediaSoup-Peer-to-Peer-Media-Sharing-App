@@ -5,7 +5,7 @@ import SelectSampler, { samplerBackgroundMap } from "./SelectSampler";
 import SamplerVolume from "./SamplerVolume";
 import OctaveSelection from "./OctaveSelection";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgPianoController from "./FgPianoController";
 import SamplerMetronome from "./SamplerMetronome";
@@ -117,7 +117,7 @@ export default function SamplerToolbar({
               : keyVisualizerIcon;
 
             return (
-              <FgSVG
+              <FgSVGElement
                 src={iconSrc}
                 attributes={[
                   { key: "height", value: "95%" },
@@ -156,7 +156,7 @@ export default function SamplerToolbar({
             const iconSrc = samplerEffectsActive ? effectOffIcon : effectIcon;
 
             return (
-              <FgSVG
+              <FgSVGElement
                 src={iconSrc}
                 attributes={[
                   { key: "height", value: "95%" },

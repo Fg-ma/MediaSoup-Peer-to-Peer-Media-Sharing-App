@@ -35,37 +35,44 @@ class Posts {
       const bb = busboy({ headers });
 
       bb.on("file", (name, file, info) => {
-        const { mimeType } = info;
+        const { mimeType, filename } = info;
 
-        const extension =
-          mimeToExtension[mimeType as StaticMimeTypes] || ".bin";
-        const filename = `${contentId}${extension}`;
+        const sanitizedFilename = utils.sanitizeString(filename);
+        const sanitizedMimeType = utils.sanitizeMimeType(mimeType);
+
+        const completeFilename = `${sanitizedFilename}${
+          mimeToExtension[sanitizedMimeType as StaticMimeTypes]
+        }`;
         const staticContentType =
-          mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
+          mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
 
         tableTopCeph
-          .uploadFile(contentTypeBucketMap[staticContentType], filename, file)
+          .uploadFile(
+            contentTypeBucketMap[staticContentType],
+            completeFilename,
+            file
+          )
           .then(async () => {
             if (staticContentType === "video") {
               await this.handleVideoUploads(
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename
+                completeFilename
               );
             } else if (staticContentType === "image") {
               await this.handleImageUploads(
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename
+                completeFilename
               );
             } else if (staticContentType === "svg") {
               await this.handleSvgUploads(
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename,
+                completeFilename,
                 visible === "false" ? false : true
               );
             } else if (staticContentType === "soundClip") {
@@ -73,21 +80,21 @@ class Posts {
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename
+                completeFilename
               );
             } else if (staticContentType === "application") {
               await this.handleApplicationUploads(
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename
+                completeFilename
               );
             } else if (staticContentType === "text") {
               await this.handleTextUploads(
                 table_id,
                 contentId,
                 mimeType as StaticMimeTypes,
-                filename
+                completeFilename
               );
             } else {
               console.warn(`Unsupported file type uploaded: ${mimeType}`);
@@ -95,7 +102,7 @@ class Posts {
           });
 
         file.on("error", (err) => {
-          console.error(`Error writing file ${info.filename}:`, err);
+          console.error(`Error writing file ${completeFilename}:`, err);
         });
       });
 

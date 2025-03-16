@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerApplicationController from "../LowerApplicationController";
 
@@ -27,7 +27,7 @@ export default function ApplicationEffectsButton({
         const iconSrc = applicationEffectsActive ? effectOffIcon : effectIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={iconSrc}
             attributes={[
               { key: "width", value: "100%" },

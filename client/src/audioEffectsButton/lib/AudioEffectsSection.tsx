@@ -4,7 +4,7 @@ import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgPanel from "../../elements/fgPanel/FgPanel";
 import FgButton from "../../elements/fgButton/FgButton";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import AudioEffectButton from "./AudioEffectButton";
 import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
@@ -369,7 +369,7 @@ export default function AudioEffectsSection({
                 }}
                 contentFunction={() => {
                   return (
-                    <FgSVG
+                    <FgSVGElement
                       src={
                         audioMixEffectsActive
                           ? mixAudioEffectsOffIcon
@@ -424,7 +424,7 @@ export default function AudioEffectsSection({
                   }}
                   contentFunction={() => {
                     return (
-                      <FgSVG
+                      <FgSVGElement
                         src={panioActive ? pianoOffIcon : pianoIcon}
                         className='flex items-center justify-center'
                         attributes={[
@@ -457,7 +457,7 @@ export default function AudioEffectsSection({
                   }}
                   contentFunction={() => {
                     return (
-                      <FgSVG
+                      <FgSVGElement
                         src={
                           soundBoardActive ? soundBoardOffIcon : soundBoardIcon
                         }
@@ -494,7 +494,7 @@ export default function AudioEffectsSection({
                   }}
                   contentFunction={() => {
                     return (
-                      <FgSVG
+                      <FgSVGElement
                         src={
                           backgroundMusicActive
                             ? backgroundMusicOffIcon

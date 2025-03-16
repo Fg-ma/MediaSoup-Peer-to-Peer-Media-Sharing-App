@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -35,7 +35,7 @@ export default function ClearAllButton({
       className='h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
       clickFunction={clickFunction}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={closeIcon}
           className='flex h-full w-full items-center justify-center'
           attributes={[

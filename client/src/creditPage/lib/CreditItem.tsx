@@ -1,7 +1,7 @@
 import React from "react";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -49,7 +49,7 @@ export default function CreditItem({
           window.open(link, "_blank");
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={linkIcon}
             className='flex items-center justify-center pr-0.75 pt-0.5'
             attributes={[

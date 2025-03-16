@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import ColorPickerButton from "../colorPickerButton/ColorPickerButton";
 
@@ -46,7 +46,7 @@ export default function TintSection({
         }}
         contentFunction={() => {
           return (
-            <FgSVG
+            <FgSVGElement
               src={streamEffects ? tintOffIcon : tintIcon}
               className='flex h-full w-full items-center justify-center'
               attributes={[

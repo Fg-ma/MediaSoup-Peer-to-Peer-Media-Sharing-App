@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import CaptureMediaController from "../../CaptureMediaController";
 import { captureMediaTypeMeta, CaptureMediaTypes } from "../../typeConstant";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
@@ -65,7 +65,7 @@ export default function TypeButton({
       }}
       contentFunction={() =>
         mediaType === "camera" || (mediaType === "video" && !recording) ? (
-          <FgSVG
+          <FgSVGElement
             src={captureMediaTypeMeta[mediaType].icon}
             className='h-full aspect-square'
             attributes={[

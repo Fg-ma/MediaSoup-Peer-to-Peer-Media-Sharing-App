@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Transition, Variants, motion, AnimatePresence } from "framer-motion";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SamplerMetronomeVolume from "./SamplerMetronomeVolume";
 
@@ -113,7 +113,7 @@ export default function SamplerMetronome() {
           const iconSrc = metronomeActive ? metronomeOffIcon : metronomeIcon;
 
           return (
-            <FgSVG
+            <FgSVGElement
               src={iconSrc}
               attributes={[
                 { key: "height", value: "95%" },

@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
 
@@ -21,7 +21,7 @@ export default function CloseButton({
       }}
       contentFunction={() => {
         return (
-          <FgSVG
+          <FgSVGElement
             src={closeIcon}
             attributes={[
               { key: "width", value: "60%" },

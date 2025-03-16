@@ -3,7 +3,7 @@ import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import CameraSectionController from "./lib/cameraSectionController";
@@ -60,7 +60,7 @@ export default function CameraSection({
         contentFunction={() => {
           if (cameraActive) {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={removeCameraIcon}
                 className='h-[80%] aspect-square'
                 attributes={[
@@ -72,7 +72,7 @@ export default function CameraSection({
             );
           } else {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={shareCameraIcon}
                 className='h-[80%] aspect-square'
                 attributes={[
@@ -99,7 +99,7 @@ export default function CameraSection({
           cameraActive ? "" : "hidden"
         } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={shareCameraIcon}
             className='h-[80%] aspect-square'
             attributes={[

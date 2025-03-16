@@ -24,7 +24,6 @@ import {
   defaultActiveSettingsPages,
   defaultFgAudioElementContainerOptions,
   defaultSettings,
-  ExtenalSVGsType,
   Settings,
 } from "./lib/typeConstant";
 import SettingsButton from "./lib/settingsButton/SettingsButton";
@@ -124,8 +123,6 @@ export default function FgAudioElementContainer({
   );
 
   const [isBezierCurveEditor, setIsBezierCurveEditor] = useState(false);
-
-  const [externalSVGs, setExternalSVGs] = useState<ExtenalSVGsType>([]);
 
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -299,7 +296,7 @@ export default function FgAudioElementContainer({
     const url = `https://localhost:8045/upload/${table_id}/${uuidv4()}/false`;
     const formData = new FormData();
 
-    formData.append("file", blob, `${name ? name : "image"}.svg`);
+    formData.append("file", blob, `${name ? name : "image"}`);
 
     try {
       const xhr = new XMLHttpRequest();
@@ -522,7 +519,6 @@ export default function FgAudioElementContainer({
         }
         fgAudioElementContainerOptions={fgAudioElementContainerOptions}
         settings={settings}
-        externalSVGs={externalSVGs}
       />
       {popupVisible && (
         <Suspense fallback={<div>Loading...</div>}>
@@ -568,7 +564,6 @@ export default function FgAudioElementContainer({
                   setSettings={setSettings}
                   scrollingContainerRef={audioEffectsSectionRef}
                   setIsBezierCurveEditor={setIsBezierCurveEditor}
-                  externalSVGs={externalSVGs}
                 />,
                 <ReactButton
                   className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
@@ -587,20 +582,9 @@ export default function FgAudioElementContainer({
         )}
       {isBezierCurveEditor && (
         <Bezier
-          confirmBezierCurveFunction={(url, svg, _d, blob, name) => {
-            const id = uuidv4();
-
+          confirmBezierCurveFunction={(_url, _svg, _d, blob, name) => {
             handleFileUpload(blob, name);
 
-            // setExternalSVGs((prev) => [...prev, { id, url, svg, name }]);
-
-            // setSettings((prev) => {
-            //   const newSettings = { ...prev };
-
-            //   newSettings.muteStyle.value = id;
-
-            //   return newSettings;
-            // });
             setIsBezierCurveEditor(false);
           }}
           closeFunction={() => setIsBezierCurveEditor(false)}

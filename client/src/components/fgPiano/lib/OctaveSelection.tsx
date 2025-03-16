@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { Octaves } from "../FgPiano";
 import { navTransition, navVar } from "./SamplerToolbar";
@@ -62,7 +62,7 @@ export default function OctaveSelection({
             <FgButton
               className='w-6 aspect-square rounded-full flex items-center justify-center pr-0.5'
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={navigateBack}
                   attributes={[
                     { key: "height", value: "1rem" },
@@ -117,7 +117,7 @@ export default function OctaveSelection({
             <FgButton
               className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'
               contentFunction={() => (
-                <FgSVG
+                <FgSVGElement
                   src={navigateForward}
                   attributes={[
                     { key: "height", value: "1rem" },

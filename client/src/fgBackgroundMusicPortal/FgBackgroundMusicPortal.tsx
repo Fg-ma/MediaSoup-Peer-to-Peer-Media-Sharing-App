@@ -4,7 +4,7 @@ import FgButton from "../elements/fgButton/FgButton";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
 import FgImageElement from "../elements/fgImageElement/FgImageElement";
-import FgSVG from "../elements/fgSVG/FgSVG";
+import FgSVGElement from "../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { backgroundMusicStatic } from "./lib/typeConstant";
 import LazyScrollingContainer from "../elements/lazyScrollingContainer/LazyScrollingContainer";
@@ -244,7 +244,7 @@ export default function FgBackgroundMusicPortal({
               <FgButton
                 contentFunction={() => (
                   <div className='flex bg-white items-center justify-center min-w-12 max-w-24 aspect-square rounded border-2 border-fg-red-dark border-opacity-75 hover:border-3 hover:border-fg-red-light hover:border-opacity-100'>
-                    <FgSVG
+                    <FgSVGElement
                       src={additionIcon}
                       attributes={[
                         { key: "width", value: "100%" },
@@ -333,7 +333,7 @@ export default function FgBackgroundMusicPortal({
                           data-background-music-effects-button-value={key}
                         />
                       ) : (
-                        <FgSVG
+                        <FgSVGElement
                           src={
                             backgroundMusicStatic[key as BackgroundMusicTypes]
                               .icon ?? ""

@@ -22,7 +22,7 @@ const defaultFgSVGOptions: {
   hoverType: "above",
 };
 
-export default function FgSVG({
+export default function FgSVGElement({
   externalRef,
   src,
   attributes,

@@ -1,0 +1,43 @@
+.svg-container.paused .pan-btn,
+.svg-container.paused .scale-btn,
+.svg-container.paused .rotate-btn,
+.svg-container.in-effects .pan-btn,
+.svg-container.in-effects .scale-btn,
+.svg-container.in-effects .rotate-btn,
+.svg-container.in-settings .pan-btn,
+.svg-container.in-settings .scale-btn,
+.svg-container.in-settings .rotate-btn,
+.svg-container.in-audio-effects .pan-btn,
+.svg-container.in-audio-effects .scale-btn,
+.svg-container.in-audio-effects .rotate-btn {
+  display: block;
+}
+
+.svg-container.paused .media-controls-container,
+.svg-container.paused .media-upper-controls,
+.svg-container.paused .controls-gradient,
+.svg-container.in-effects .media-controls-container,
+.svg-container.in-effects .media-upper-controls,
+.svg-container.in-effects .controls-gradient,
+.svg-container.in-settings .media-controls-container,
+.svg-container.in-settings .media-upper-controls,
+.svg-container.in-settings .controls-gradient,
+.svg-container.in-audio-effects .media-controls-container,
+.svg-container.in-audio-effects .media-upper-controls,
+.svg-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+}
+
+.svg-container.paused,
+.svg-container.in-effects,
+.svg-container.in-settings,
+.svg-container.in-audio-effects {
+  cursor: auto;
+}
+
+/* mini-player */
+.svg-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}

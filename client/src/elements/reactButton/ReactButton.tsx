@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgPanel from "../fgPanel/FgPanel";
@@ -93,7 +93,7 @@ export default function ReactButton({
           const src = reactionsPanelActive ? reactionsOffIcon : reactionsIcon;
 
           return (
-            <FgSVG
+            <FgSVGElement
               src={src}
               className='flex w-full h-full items-center justify-center'
               attributes={[
@@ -151,7 +151,7 @@ export default function ReactButton({
                     }
                     contentFunction={() =>
                       meta.type === "svg" ? (
-                        <FgSVG
+                        <FgSVGElement
                           src={meta.src}
                           className='flex items-center justify-center'
                           attributes={[

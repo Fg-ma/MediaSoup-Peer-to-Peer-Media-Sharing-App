@@ -58,7 +58,7 @@ const EffectSectionTransition: Transition = {
   },
 };
 
-export default function ImageEffectsSection({
+export default function SvgEffectsSection({
   imageId,
   lowerImageController,
   tintColor,

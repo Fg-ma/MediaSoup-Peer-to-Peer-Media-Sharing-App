@@ -278,7 +278,7 @@ export type onResponsedCatchUpTableDataType = {
     svgs:
       | {
           table_id: string;
-          imageId: string;
+          svgId: string;
           filename: string;
           mimeType: string;
           positioning: {

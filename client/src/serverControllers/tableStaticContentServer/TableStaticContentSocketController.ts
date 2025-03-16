@@ -17,6 +17,7 @@ import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
 import VideoMedia from "../../media/fgVideo/VideoMedia";
 import ImageMedia from "../../media/fgImage/ImageMedia";
+import SvgMedia from "../../media/fgSvg/SvgMedia";
 import TextMedia from "../../media/fgText/TextMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import {
@@ -25,12 +26,10 @@ import {
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
   onResponsedCatchUpTableDataType,
-  onSvgReadyType,
   OutGoingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "./lib/typeConstant";
 import { StaticContentTypes } from "../../../../universal/typeConstant";
-import { TableSvgsType } from "../../context/tableStaticContentContext/lib/typeConstant";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -47,8 +46,7 @@ class TableStaticContentSocketController {
     private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
-    private tableSvgs: React.MutableRefObject<TableSvgsType>
+    private deadbanding: Deadbanding
   ) {
     this.connect(this.url);
   }
@@ -273,30 +271,15 @@ class TableStaticContentSocketController {
       case "respondedCatchUpVideoPosition":
         this.onRespondedCatchUpVideoPosition(message);
         break;
-      case "svgReady":
-        this.onSvgReady(message);
-        break;
       default:
         break;
     }
   };
 
-  private onSvgReady = (event: onSvgReadyType) => {
-    const { contentId } = event.header;
-    const { filename, visible } = event.data;
-
-    this.tableSvgs.current[contentId] = {
-      url: "",
-      name: "",
-      filename,
-      visible,
-    };
-  };
-
   private onResponsedCatchUpTableData = (
     event: onResponsedCatchUpTableDataType
   ) => {
-    const { images, videos, text, applications, audio } = event.data;
+    const { images, svgs, videos, text, applications, audio } = event.data;
 
     if (videos) {
       for (const video of videos) {
@@ -355,6 +338,22 @@ class TableStaticContentSocketController {
           this.deadbanding,
           this.userMedia,
           image.positioning
+        );
+      }
+    }
+    if (svgs) {
+      for (const svg of svgs) {
+        this.userMedia.current.svg[svg.svgId] = new SvgMedia(
+          svg.svgId,
+          svg.filename,
+          svg.mimeType as TableTopStaticMimeType,
+          svg.visible,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.getFile,
+          this.addMessageListener,
+          this.removeMessageListener,
+          svg.positioning
         );
       }
     }

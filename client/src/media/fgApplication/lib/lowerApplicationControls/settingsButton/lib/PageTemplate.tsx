@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -25,7 +25,7 @@ export default function PageTemplate({
         <FgButton
           className='h-full aspect-square'
           contentFunction={() => (
-            <FgSVG
+            <FgSVGElement
               src={navigateBackIcon}
               attributes={[
                 { key: "width", value: "95%" },

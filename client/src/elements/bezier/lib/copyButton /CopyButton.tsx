@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import FgButton from "../../../fgButton/FgButton";
 import FgHoverContentStandard from "../../../fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../../../fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import BezierController from "../BezierController";
 import FgPortal from "../../../fgPortal/FgPortal";
 
@@ -32,7 +32,7 @@ export default function CopyButton({
           bezierController.copyToClipBoardBezierCurve();
         }}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={copyIcon}
             attributes={[
               { key: "fill", value: "#f2f2f2" },

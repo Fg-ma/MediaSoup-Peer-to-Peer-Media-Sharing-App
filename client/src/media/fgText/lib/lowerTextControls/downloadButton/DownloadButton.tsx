@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerTextController from "../LowerTextController";
 
@@ -23,7 +23,7 @@ export default function DownloadButton({
         lowerTextController.handleDownload();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={downloadIcon}
           attributes={[
             { key: "width", value: "85%" },

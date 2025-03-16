@@ -50,13 +50,6 @@ export const defaultFgAudioElementContainerOptions: FgAudioElementContainerOptio
     noiseThreshold: 0.2,
   };
 
-export type ExtenalSVGsType = {
-  id: string;
-  url: string;
-  svg: string;
-  name?: string;
-}[];
-
 export interface ActivePages {
   envelopeType: {
     active: boolean;

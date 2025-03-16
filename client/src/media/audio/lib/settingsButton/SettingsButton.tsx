@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { Settings, ActivePages, ExtenalSVGsType } from "../typeConstant";
+import { Settings, ActivePages } from "../typeConstant";
 
 type RecursiveObject = {
   active?: boolean;
@@ -18,7 +18,6 @@ export default function SettingsButton({
   setSettings,
   scrollingContainerRef,
   setIsBezierCurveEditor,
-  externalSVGs,
 }: {
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +27,6 @@ export default function SettingsButton({
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
-  externalSVGs: ExtenalSVGsType;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -144,7 +142,6 @@ export default function SettingsButton({
             secondaryMuteColor: secondaryMuteColorPickerRef,
           }}
           setIsBezierCurveEditor={setIsBezierCurveEditor}
-          externalSVGs={externalSVGs}
         />
       )}
     </>

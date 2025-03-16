@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -31,7 +31,7 @@ export default function ScaleButton({
       referenceDragElement={bundleRef}
       contentFunction={() => {
         return (
-          <FgSVG
+          <FgSVGElement
             src={scaleIcon}
             attributes={[
               { key: "width", value: "100%" },

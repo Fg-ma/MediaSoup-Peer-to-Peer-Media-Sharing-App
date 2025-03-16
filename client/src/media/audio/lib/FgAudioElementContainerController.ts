@@ -200,6 +200,7 @@ class FgAudioElementContainerController {
   ) => {
     switch (event.type) {
       case "svgReady":
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

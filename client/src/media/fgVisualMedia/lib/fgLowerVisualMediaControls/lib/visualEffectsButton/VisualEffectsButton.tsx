@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
 
@@ -29,7 +29,7 @@ export default function VisualEffectsButton({
         const iconSrc = visualEffectsActive ? effectOffIcon : effectIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={iconSrc}
             className='flex items-center justify-center'
             attributes={[

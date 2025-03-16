@@ -11,6 +11,7 @@ import {
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
 import TextMedia from "../../media/fgText/TextMedia";
+import SvgMedia from "../../media/fgSvg/SvgMedia";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -118,6 +119,38 @@ class SharedBundleController extends SharedBundleSocket {
               this.userDevice,
               this.deadbanding,
               this.userMedia,
+              {
+                position: {
+                  left: 50,
+                  top: 50,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              }
+            );
+          }
+          this.setRerender((prev) => !prev);
+        }
+        break;
+      case "svgReady":
+        {
+          const { contentId } = message.header;
+          const { filename, mimeType, visible } = message.data;
+
+          if (this.tableStaticContentSocket.current) {
+            this.userMedia.current.svg[contentId] = new SvgMedia(
+              contentId,
+              filename,
+              mimeType,
+              visible,
+              this.userEffectsStyles,
+              this.userStreamEffects,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener,
               {
                 position: {
                   left: 50,

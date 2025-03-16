@@ -1,7 +1,7 @@
 import React from "react";
 import FgButton from "../../../fgButton/FgButton";
 import FgHoverContentStandard from "../../../fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../../../fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import BezierController from "../BezierController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -25,7 +25,7 @@ export default function DownloadButton({
         bezierController.downloadBezierCurve();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={downloadIcon}
           attributes={[
             { key: "fill", value: "#f2f2f2" },

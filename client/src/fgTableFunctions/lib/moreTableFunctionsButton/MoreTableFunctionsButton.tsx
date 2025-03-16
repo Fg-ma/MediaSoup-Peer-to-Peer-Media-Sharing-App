@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";
 import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
@@ -82,7 +82,7 @@ export default function MoreTableFunctionsButton({
         clickFunction={() => setMoreTableFunctionsActive((prev) => !prev)}
         contentFunction={() => {
           return (
-            <FgSVG
+            <FgSVGElement
               src={additionIcon}
               className='flex h-full aspect-square items-center justify-center'
               attributes={[

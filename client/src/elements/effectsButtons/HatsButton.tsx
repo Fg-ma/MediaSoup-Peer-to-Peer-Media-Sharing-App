@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { HatsEffectTypes } from "../../context/effectsContext/typeConstant";
 import FgButton from "../fgButton/FgButton";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { hatsEffects, hatsLabels } from "./typeConstant";
@@ -77,7 +77,7 @@ export default function HatsButton({
 
           if (iconSrc) {
             return (
-              <FgSVG
+              <FgSVGElement
                 src={iconSrc}
                 className='flex h-full w-full items-center justify-center'
                 attributes={[

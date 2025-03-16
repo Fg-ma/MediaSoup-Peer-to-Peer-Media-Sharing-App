@@ -11,7 +11,6 @@ import {
   EnvelopeOptionTypes,
   envelopeTypesSliderOptions,
   muteStylesMeta,
-  ExtenalSVGsType,
   muteStyleTypes,
   MuteStyleTypes,
 } from "../../typeConstant";
@@ -21,6 +20,7 @@ import ColorPickerButton from "../../../../../elements/colorPickerButton/ColorPi
 import FgInput from "../../../../../elements/fgInput/FgInput";
 import PageTemplate from "./PageTemplate";
 import FgSlider from "../../../../../elements/fgSlider/FgSlider";
+import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -68,7 +68,6 @@ export default function SettingsPanel({
   setSettings,
   colorPickerRefs,
   setIsBezierCurveEditor,
-  externalSVGs,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -80,8 +79,9 @@ export default function SettingsPanel({
     [colorSettingsType in ColorSettingsTypes]: React.RefObject<HTMLDivElement>;
   };
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
-  externalSVGs: ExtenalSVGsType;
 }) {
+  const { userMedia } = useMediaContext();
+
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
     bottom: number;
@@ -284,9 +284,9 @@ export default function SettingsPanel({
                       ? muteStylesMeta[
                           settings.muteStyle.value as MuteStyleTypes
                         ].title
-                      : externalSVGs.find(
-                          (value) => value.id === settings.muteStyle.value
-                        )?.name ?? ""}
+                      : Object.entries(userMedia.current.svg).find(
+                          ([svgId]) => svgId === settings.muteStyle.value
+                        )?.[1].filename ?? ""}
                   </div>
                 </div>
               )}
@@ -346,7 +346,6 @@ export default function SettingsPanel({
                 settings={settings}
                 setSettings={setSettings}
                 setIsBezierCurveEditor={setIsBezierCurveEditor}
-                externalSVGs={externalSVGs}
               />
             </motion.div>
           )}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import TableGridSizePanel from "./lib/TableGridSizePanel";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
@@ -33,7 +33,7 @@ export default function TableGridSizeButton({
         className='h-full aspect-square'
         clickFunction={() => setGridSizePanelActive((prev) => !prev)}
         contentFunction={() => (
-          <FgSVG
+          <FgSVGElement
             src={distanceIcon}
             attributes={[
               { key: "width", value: "100%" },

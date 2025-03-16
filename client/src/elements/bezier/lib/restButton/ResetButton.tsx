@@ -1,7 +1,7 @@
 import React from "react";
 import FgButton from "../../../fgButton/FgButton";
 import FgHoverContentStandard from "../../../fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../../../fgSVG/FgSVG";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
 import BezierController from "../BezierController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -25,7 +25,7 @@ export default function ResetButton({
         bezierController.handleReset();
       }}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={resetIcon}
           className='flex h-[75%] aspect-square items-center justify-center'
           attributes={[

@@ -2,7 +2,7 @@ import React, { Suspense, useRef } from "react";
 import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../elements/fgButton/FgButton";
-import FgSVG from "../elements/fgSVG/FgSVG";
+import FgSVGElement from "../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -106,7 +106,7 @@ export default function AudioEffectsButton({
         }}
         contentFunction={() => {
           return (
-            <FgSVG
+            <FgSVGElement
               src={audioEffectsActive ? audioEffectOffIcon : audioEffectIcon}
               attributes={[
                 { key: "width", value: "95%" },

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import CaptureMedia from "../../../../../../media/capture/CaptureMedia";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { captureMediaTypeMeta, CaptureMediaTypes } from "../../typeConstant";
 
@@ -152,7 +152,7 @@ export default function TypeSection({
               }
             }}
             contentFunction={() => (
-              <FgSVG
+              <FgSVGElement
                 src={meta.icon}
                 className='flex h-full w-full items-center justify-center'
                 attributes={[

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import FgButton from "../fgButton/FgButton";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
-import FgSVG from "../fgSVG/FgSVG";
+import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import { defaultInputOptions, InputOptionsType } from "./lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -62,7 +62,7 @@ export default function FgInput({
           className='h-[90%] aspect-square rounded-full border-fg-red flex items-center justify-center pl-[1%] mr-1'
           style={{ borderWidth: "1px" }}
           contentFunction={() => (
-            <FgSVG
+            <FgSVGElement
               src={navigateForward}
               className='w-[95%] h-[95%] flex items-center justify-center'
               attributes={[

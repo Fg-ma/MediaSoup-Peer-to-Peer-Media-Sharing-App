@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../fgButton/FgButton";
-import FgSVG from "../../fgSVG/FgSVG";
+import FgSVGElement from "../../fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -17,7 +17,7 @@ export default function EndGameButton({
       className='h-[60%] aspect-square rounded pb-3 pr-2'
       clickFunction={closeGameFunction}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           className='flex items-center justify-center h-full aspect-square'
           src={closeIcon}
           attributes={[

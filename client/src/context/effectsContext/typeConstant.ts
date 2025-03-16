@@ -81,6 +81,17 @@ export type ImageEffectTypes =
   | "hats"
   | "pets";
 
+export type SvgEffectTypes =
+  | "shadow"
+  | "blur"
+  | "grayscale"
+  | "saturate"
+  | "edgeDetection"
+  | "colorOverlay"
+  | "waveDistortion"
+  | "crackedGlass"
+  | "neonGlow";
+
 export type ApplicationEffectTypes = "postProcess" | "blur" | "tint";
 
 export type CaptureEffectTypes =
@@ -118,6 +129,11 @@ export type UserStreamEffectsType = {
   image: {
     [imageId: string]: {
       [effectType in ImageEffectTypes]: boolean;
+    };
+  };
+  svg: {
+    [svgId: string]: {
+      [effectType in SvgEffectTypes]: boolean;
     };
   };
   application: {
@@ -404,6 +420,40 @@ export type ImageEffectStylesType = {
   };
 };
 
+export type SvgEffectStylesType = {
+  shadow: {
+    shadowColor: string;
+    strength: number;
+    offsetX: number;
+    offsetY: number;
+  };
+  blur: {
+    strength: number;
+  };
+  grayscale: {
+    scale: number;
+  };
+  saturate: {
+    saturation: number;
+  };
+  edgeDetection: {};
+  colorOverlay: {
+    overlayColor: string;
+  };
+  waveDistortion: {
+    frequency: number;
+    strength: number;
+  };
+  crackedGlass: {
+    density: number;
+    detail: number;
+    strength: number;
+  };
+  neonGlow: {
+    neonColor: string;
+  };
+};
+
 export type ApplicationEffectStylesType = {
   tint: {
     color: string;
@@ -496,6 +546,9 @@ export type UserEffectsStylesType = {
   };
   image: {
     [imageId: string]: ImageEffectStylesType;
+  };
+  svg: {
+    [svgId: string]: SvgEffectStylesType;
   };
   application: {
     [applicationId: string]: ApplicationEffectStylesType;
@@ -611,6 +664,20 @@ export const defaultImageStreamEffects: {
   masks: false,
   hats: false,
   pets: false,
+});
+
+export const defaultSvgStreamEffects: {
+  [effect in SvgEffectTypes]: boolean;
+} = Object.freeze({
+  shadow: false,
+  blur: false,
+  grayscale: false,
+  saturate: false,
+  edgeDetection: false,
+  colorOverlay: false,
+  waveDistortion: false,
+  crackedGlass: false,
+  neonGlow: false,
 });
 
 export const defaultApplicationStreamEffects: {
@@ -758,6 +825,40 @@ export const defaultImageEffectsStyles: ImageEffectStylesType = Object.freeze({
   pets: Object.freeze({
     style: defaultPet,
   }),
+});
+
+export const defaultSvgEffectsStyles: SvgEffectStylesType = Object.freeze({
+  shadow: {
+    shadowColor: "#f2f2f2",
+    strength: 0.75,
+    offsetX: 0.25,
+    offsetY: 0.5,
+  },
+  blur: {
+    strength: 2,
+  },
+  grayscale: {
+    scale: 0,
+  },
+  saturate: {
+    saturation: 2,
+  },
+  edgeDetection: {},
+  colorOverlay: {
+    overlayColor: "#d40213",
+  },
+  waveDistortion: {
+    frequency: 0.05,
+    strength: 30,
+  },
+  crackedGlass: {
+    density: 0.2,
+    detail: 2,
+    strength: 15,
+  },
+  neonGlow: {
+    neonColor: "#d40213",
+  },
 });
 
 export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =

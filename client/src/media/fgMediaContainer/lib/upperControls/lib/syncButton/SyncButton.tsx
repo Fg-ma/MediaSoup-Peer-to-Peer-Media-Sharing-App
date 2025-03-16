@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
 
@@ -26,7 +26,7 @@ export default function SyncButton({
         const src = desync ? syncIcon : desyncIcon;
 
         return (
-          <FgSVG
+          <FgSVGElement
             src={src}
             attributes={[
               { key: "width", value: "80%" },

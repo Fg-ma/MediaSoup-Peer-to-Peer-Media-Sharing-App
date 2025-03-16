@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { KaldiRecognizer, Model } from "vosk-browser";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
@@ -115,7 +115,7 @@ export default function CaptionButton({
         contentFunction={() => {
           return (
             <>
-              <FgSVG
+              <FgSVGElement
                 src={captionsIcon}
                 className='flex items-center justify-center'
                 attributes={[

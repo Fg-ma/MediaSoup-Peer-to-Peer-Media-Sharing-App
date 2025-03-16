@@ -1,6 +1,6 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVG from "../../../../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
@@ -51,7 +51,7 @@ export default function DownloadsVideoOptionsPage({
         <FgButton
           className='h-full aspect-square'
           contentFunction={() => (
-            <FgSVG
+            <FgSVGElement
               src={navigateBackIcon}
               attributes={[
                 { key: "width", value: "95%" },
@@ -105,7 +105,7 @@ export default function DownloadsVideoOptionsPage({
                           option as keyof typeof downloadVideoOptionsArrays
                         ].value}
                   </div>
-                  <FgSVG
+                  <FgSVGElement
                     src={navigateForwardIcon}
                     attributes={[
                       { key: "width", value: "1.25rem" },

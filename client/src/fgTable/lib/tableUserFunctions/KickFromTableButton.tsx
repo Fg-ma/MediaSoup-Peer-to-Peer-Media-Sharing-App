@@ -1,7 +1,7 @@
 import React from "react";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVG from "../../../elements/fgSVG/FgSVG";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -21,7 +21,7 @@ export default function KickFromTableButton({
     <FgButton
       clickFunction={() => tableSocket.current?.kickFromTable(username)}
       contentFunction={() => (
-        <FgSVG
+        <FgSVGElement
           src={kickIcon}
           attributes={[
             { key: "width", value: "95%" },
