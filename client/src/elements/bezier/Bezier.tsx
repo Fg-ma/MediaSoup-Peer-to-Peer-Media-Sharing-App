@@ -389,7 +389,9 @@ export default function Bezier({
                   <feTurbulence
                     type='fractalNoise'
                     baseFrequency={settings.filters.crackedGlass.density.value}
-                    numOctaves={settings.filters.crackedGlass.detail.value}
+                    numOctaves={Math.round(
+                      settings.filters.crackedGlass.detail.value
+                    )}
                     result='turbulence'
                   />
                   <feDisplacementMap

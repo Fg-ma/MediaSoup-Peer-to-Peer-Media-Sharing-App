@@ -173,6 +173,105 @@ class SvgMedia {
     link.click();
     document.body.removeChild(link);
   };
+
+  // copyToClipBoardBezierCurve = () => {
+  //   let svg = this.getCurrentDownloadableSVG();
+
+  //   if (this.settings.downloadOptions.compression.value === "Minified")
+  //     svg = this.minifySVG(svg);
+
+  //   navigator.clipboard.writeText(svg).then(() => {
+  //     this.setCopied(true);
+
+  //     if (this.copiedTimeout.current) {
+  //       clearTimeout(this.copiedTimeout.current);
+  //       this.copiedTimeout.current = undefined;
+  //     }
+
+  //     this.copiedTimeout.current = setTimeout(() => {
+  //       this.setCopied(false);
+  //     }, 2250);
+  //   });
+  // };
+
+  // private getCurrentDownloadableSVG = () => {
+  //   const { size } = this.settings.downloadOptions;
+  //   const svgWidth = size.value;
+  //   const svgHeight = size.value;
+
+  //   return `
+  //   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${svgWidth}" height="${svgHeight}" style="background-color: ${
+  //     this.settings.backgroundColor.value
+  //   };">
+  //     ${this.isFilter() ? this.getFilters() : ""}
+  //     ${this.isFilter() ? `<g filter="${this.getFilterURLs()}">` : ""}
+  //       <path
+  //         d="${this.getPathData()}"
+  //         stroke="${this.settings.color.value}"
+  //         fill="none"
+  //         stroke-width="4"
+  //         stroke-linecap="round"
+  //         stroke-linejoin="round"
+  //       />
+  //     ${this.isFilter() ? "</g>" : ""}
+  //   </svg>
+  // `;
+  // };
+
+  // downloadBezierCurve = () => {
+  //   const { mimeType, compression } = this.settings.downloadOptions;
+
+  //   // Construct the SVG string
+  //   let SVG = this.getCurrentDownloadableSVG();
+
+  //   switch (compression.value) {
+  //     case "Minified":
+  //       SVG = this.minifySVG(SVG);
+  //       break;
+  //     case "Zipped":
+  //       return this.convertToSVGZ(SVG);
+  //     case "Plain":
+  //     default:
+  //       break;
+  //   }
+
+  //   const blob = new Blob([SVG], { type: "image/svg+xml" });
+  //   const url = URL.createObjectURL(blob);
+
+  //   switch (mimeType.value) {
+  //     case "svg":
+  //     case "svgz":
+  //       this.downloadFile(
+  //         url,
+  //         `${this.name.current ? this.name.current : "download"}.${
+  //           mimeType.value
+  //         }`
+  //       );
+  //       break;
+  //     case "png":
+  //     case "jpg":
+  //     case "webp":
+  //     case "tiff":
+  //     case "heic":
+  //       this.convertSVGToImage(SVG, mimeType.value);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
+  // private minifySVG = (svgString: string) => {
+  //   return svgString.replace(/\s+/g, " ").trim();
+  // };
+
+  // private downloadFile = (url: string, filename: string) => {
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = filename;
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 }
 
 export default SvgMedia;

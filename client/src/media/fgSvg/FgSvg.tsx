@@ -16,6 +16,7 @@ import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
 import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton";
 import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
 import "./lib/fgSvgStyles.css";
+import CopyButton from "./lib/lowerSvgControls/copyButton /CopyButton";
 
 export default function FgSvg({
   svgId,
@@ -56,6 +57,7 @@ export default function FgSvg({
   const [activePages, setActivePages] = useState<ActivePages>(
     structuredClone(defaultActivePages)
   );
+  const [copied, setCopied] = useState(false);
 
   const lowerSvgController = new LowerSvgController(
     svgId,
@@ -159,6 +161,11 @@ export default function FgSvg({
           settingsActive={settingsActive}
           scrollingContainerRef={rightLowerSvgControlsRef}
         />,
+        <CopyButton
+          svgMedia={svgMedia}
+          copied={copied}
+          scrollingContainerRef={rightLowerSvgControlsRef}
+        />,
         <SvgEffectsButton
           lowerSvgController={lowerSvgController}
           svgEffectsActive={svgEffectsActive}
@@ -172,7 +179,7 @@ export default function FgSvg({
       externalMediaContainerRef={svgContainerRef}
       externalSubContainerRef={subContainerRef}
       externalRightLowerControlsRef={rightLowerSvgControlsRef}
-      options={{ gradient: false }}
+      options={{ gradient: false, adjustmentAnimation: false }}
     />
   );
 }

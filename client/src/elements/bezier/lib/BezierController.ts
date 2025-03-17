@@ -661,8 +661,8 @@ class BezierController {
   };
 
   handleReset = () => {
-    this.setPoints(defaultPoints);
-    this.setSettings(defaultSettings);
+    this.setPoints(structuredClone(defaultPoints));
+    this.setSettings(structuredClone(defaultSettings));
   };
 
   deleteSelectedAndHovering = () => {
@@ -1045,7 +1045,9 @@ class BezierController {
           <feTurbulence
             type='fractalNoise'
             baseFrequency="${this.settings.filters.crackedGlass.density.value}"
-            numOctaves="${this.settings.filters.crackedGlass.detail.value}"
+            numOctaves="${Math.round(
+              this.settings.filters.crackedGlass.detail.value
+            )}"
             result='turbulence'
           />
           <feDisplacementMap

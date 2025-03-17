@@ -3,6 +3,7 @@ export interface MediaContainerOptions {
   gradient?: boolean;
   controlsPlacement?: "outside" | "inside";
   resizeType?: "aspect" | "any";
+  adjustmentAnimation?: boolean;
 }
 
 export const defaultMediaContainerOptions: {
@@ -10,9 +11,11 @@ export const defaultMediaContainerOptions: {
   gradient: boolean;
   controlsPlacement: "outside" | "inside";
   resizeType: "aspect" | "any";
+  adjustmentAnimation: boolean;
 } = {
   controlsVanishTime: 1250,
   gradient: true,
   controlsPlacement: "inside",
   resizeType: "aspect",
+  adjustmentAnimation: true,
 };

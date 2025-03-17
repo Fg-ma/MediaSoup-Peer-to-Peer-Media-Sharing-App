@@ -195,18 +195,6 @@ class FgAudioElementContainerController {
     }
   };
 
-  handleTableStaticContentMessage = (
-    event: IncomingTableStaticContentMessages
-  ) => {
-    switch (event.type) {
-      case "svgReady":
-        this.setRerender((prev) => !prev);
-        break;
-      default:
-        break;
-    }
-  };
-
   handleToggleAudioEffectsSection = () => {
     this.setAudioEffectsSectionVisible((prev) => !prev);
   };

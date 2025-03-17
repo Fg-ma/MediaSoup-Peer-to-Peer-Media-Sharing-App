@@ -331,7 +331,7 @@ export default function FgMediaContainer({
         aspectRatio={aspectRatio}
         mediaContainerOptions={mediaContainerOptions}
       />
-      {adjustingDimensions && (
+      {mediaContainerOptions.adjustmentAnimation && adjustingDimensions && (
         <>
           <div className='animated-border-box-glow'></div>
           <div className='animated-border-box'></div>

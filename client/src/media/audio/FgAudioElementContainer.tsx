@@ -212,9 +212,6 @@ export default function FgAudioElementContainer({
       });
     }
 
-    tableStaticContentSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleTableStaticContentMessage
-    );
     mediasoupSocket.current?.addMessageListener(
       fgAudioElementContainerController.handleMediasoupMessage
     );
@@ -236,9 +233,6 @@ export default function FgAudioElementContainer({
         Object.values(userListners).forEach((removeListener) =>
           removeListener()
         )
-      );
-      tableStaticContentSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleTableStaticContentMessage
       );
       mediasoupSocket.current?.removeMessageListener(
         fgAudioElementContainerController.handleMediasoupMessage
