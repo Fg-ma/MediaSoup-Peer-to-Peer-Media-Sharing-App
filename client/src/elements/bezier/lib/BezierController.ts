@@ -1,11 +1,10 @@
-import pako from "pako";
+import JSZip from "jszip";
 import {
   BezierPoint,
   ControlTypes,
   cycleControlTypeMap,
   defaultPoints,
   defaultSettings,
-  DownloadMimeTypes,
   Settings,
 } from "./typeConstant";
 
@@ -1136,46 +1135,52 @@ class BezierController {
   `;
   };
 
-  downloadBezierCurve = () => {
+  private zipBlob = async (blob: Blob): Promise<Blob> => {
+    const zip = new JSZip();
+    zip.file("compressed-image", blob);
+    return await zip.generateAsync({ type: "blob" });
+  };
+
+  downloadBezierCurve = async () => {
     const { mimeType, compression } = this.settings.downloadOptions;
 
     // Construct the SVG string
-    let SVG = this.getCurrentDownloadableSVG();
+    let svgString = this.getCurrentDownloadableSVG();
 
-    switch (compression.value) {
-      case "Minified":
-        SVG = this.minifySVG(SVG);
-        break;
-      case "Zipped":
-        return this.convertToSVGZ(SVG);
-      case "Plain":
-      default:
-        break;
+    // Apply compression if needed
+    if (compression.value === "Minified") {
+      svgString = this.minifySVG(svgString);
     }
 
-    const blob = new Blob([SVG], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
+    // Convert SVG to a Blob
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const filename = this.name.current ? this.name.current : "download";
 
-    switch (mimeType.value) {
-      case "svg":
-      case "svgz":
-        this.downloadFile(
-          url,
-          `${this.name.current ? this.name.current : "download"}.${
-            mimeType.value
-          }`
-        );
-        break;
-      case "png":
-      case "jpg":
-      case "webp":
-      case "tiff":
-      case "heic":
-        this.convertSVGToImage(SVG, mimeType.value);
-        break;
-      default:
-        break;
+    // Handle SVGZ (Zipped SVG)
+    if (
+      mimeType.value === "svgz" ||
+      (mimeType.value === "svg" && compression.value === "Zipped")
+    ) {
+      const compressedBlob = await this.zipBlob(svgBlob);
+      const zipUrl = URL.createObjectURL(compressedBlob);
+      this.downloadFile(zipUrl, `${filename}.svgz`);
+      return;
     }
+
+    // Handle standard SVG download
+    if (mimeType.value === "svg") {
+      const url = URL.createObjectURL(svgBlob);
+      this.downloadFile(url, `${filename}.svg`);
+      return;
+    }
+
+    // Convert SVG to an image format
+    this.convertSVGToImage(
+      svgString,
+      mimeType.value,
+      compression.value,
+      filename
+    );
   };
 
   private minifySVG = (svgString: string) => {
@@ -1191,49 +1196,59 @@ class BezierController {
     document.body.removeChild(link);
   };
 
-  private convertSVGToImage = (
+  convertSVGToImage = async (
     svgString: string,
-    format: DownloadMimeTypes
+    format: string,
+    compression: string,
+    filename: string
   ) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
     const img = new Image();
     const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
     const url = URL.createObjectURL(svgBlob);
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = this.settings.downloadOptions.size.value;
-      canvas.height = this.settings.downloadOptions.size.value;
-      const ctx = canvas.getContext("2d");
+    img.onload = async () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0, img.width, img.height);
 
-      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const mimeTypeMap: Record<string, string> = {
+        jpg: "image/jpeg",
+        png: "image/png",
+        webp: "image/webp",
+        tiff: "image/tiff",
+        heic: "image/heic",
+      };
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          console.error("Failed to create image blob.");
+          return;
+        }
+
+        // Handle Zipped compression for raster images
+        if (compression === "Zipped") {
+          const compressedBlob = await this.zipBlob(blob);
+          const zipUrl = URL.createObjectURL(compressedBlob);
+          this.downloadFile(zipUrl, `${filename}.${format}.zip`);
+          return;
+        }
+
+        // Normal image download
+        const imageUrl = URL.createObjectURL(blob);
+        this.downloadFile(imageUrl, `${filename}.${format}`);
+      }, mimeTypeMap[format]);
+
       URL.revokeObjectURL(url);
+    };
 
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return;
-
-          const imageUrl = URL.createObjectURL(blob);
-          this.downloadFile(
-            imageUrl,
-            `${this.name.current ? this.name.current : "download"}.${format}`
-          );
-          URL.revokeObjectURL(imageUrl);
-        },
-        `image/${format === "jpg" ? "jpeg" : format}`,
-        1.0
-      );
+    img.onerror = () => {
+      console.error("Failed to load SVG into an image.");
     };
 
     img.src = url;
-  };
-
-  private convertToSVGZ = (svgString: string) => {
-    const compressed = pako.gzip(svgString, { level: 9 });
-    const blob = new Blob([compressed], { type: "application/gzip" });
-
-    const url = URL.createObjectURL(blob);
-    this.downloadFile(url, "download.svgz");
-    URL.revokeObjectURL(url);
   };
 
   confirmBezierCurve = () => {
