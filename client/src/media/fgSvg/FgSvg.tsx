@@ -13,10 +13,9 @@ import {
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import SvgEffectsButton from "./lib/lowerSvgControls/svgEffectsButton/SvgEffectsButton";
 import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
-import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton";
 import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
+import SvgEditor from "../../elements/svgEditor/SvgEditor";
 import "./lib/fgSvgStyles.css";
-import CopyButton from "./lib/lowerSvgControls/copyButton /CopyButton";
 
 export default function FgSvg({
   svgId,
@@ -30,6 +29,8 @@ export default function FgSvg({
   const { userMedia } = useMediaContext();
   const { userStreamEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
+
+  const [editing, setEditing] = useState(false);
 
   const svgMedia = userMedia.current.svg[svgId];
 
@@ -57,7 +58,6 @@ export default function FgSvg({
   const [activePages, setActivePages] = useState<ActivePages>(
     structuredClone(defaultActivePages)
   );
-  const [copied, setCopied] = useState(false);
 
   const lowerSvgController = new LowerSvgController(
     svgId,
@@ -73,7 +73,8 @@ export default function FgSvg({
     settings,
     setRerender,
     tableStaticContentSocket,
-    setSettings
+    setSettings,
+    setEditing
   );
 
   const svgController = new SvgController(
@@ -129,64 +130,63 @@ export default function FgSvg({
   }, [tableStaticContentSocket.current]);
 
   return (
-    <FgMediaContainer
-      mediaId={svgId}
-      filename={svgMedia.filename}
-      kind='svg'
-      rootMedia={svgMedia.svg}
-      bundleRef={bundleRef}
-      backgroundMedia={settings.background.value}
-      className='svg-container'
-      popupElements={[
-        svgEffectsActive ? (
-          <SvgEffectsSection
-            svgId={svgId}
+    <>
+      <FgMediaContainer
+        mediaId={svgId}
+        filename={svgMedia.filename}
+        kind='svg'
+        rootMedia={svgMedia.svg}
+        bundleRef={bundleRef}
+        backgroundMedia={settings.background.value}
+        className='svg-container'
+        popupElements={[
+          svgEffectsActive ? (
+            <SvgEffectsSection
+              svgId={svgId}
+              svgMedia={svgMedia}
+              lowerSvgController={lowerSvgController}
+              svgContainerRef={svgContainerRef}
+            />
+          ) : null,
+        ]}
+        rightLowerControls={[
+          <SettingsButton
             svgMedia={svgMedia}
+            effectsActive={svgEffectsActive}
+            containerRef={svgContainerRef}
+            settingsActive={settingsActive}
+            setSettingsActive={setSettingsActive}
+            activePages={activePages}
+            setActivePages={setActivePages}
+            settings={settings}
+            setSettings={setSettings}
+            scrollingContainerRef={rightLowerSvgControlsRef}
             lowerSvgController={lowerSvgController}
-            svgContainerRef={svgContainerRef}
-          />
-        ) : null,
-      ]}
-      leftLowerControls={[]}
-      rightLowerControls={[
-        <SettingsButton
-          svgMedia={svgMedia}
-          effectsActive={svgEffectsActive}
-          containerRef={svgContainerRef}
-          settingsActive={settingsActive}
-          setSettingsActive={setSettingsActive}
-          activePages={activePages}
-          setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
-          scrollingContainerRef={rightLowerSvgControlsRef}
-          lowerSvgController={lowerSvgController}
-        />,
-        <DownloadButton
-          lowerSvgController={lowerSvgController}
-          svgEffectsActive={svgEffectsActive}
-          settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerSvgControlsRef}
-        />,
-        <CopyButton
-          lowerSvgController={lowerSvgController}
-          copied={copied}
-          scrollingContainerRef={rightLowerSvgControlsRef}
-        />,
-        <SvgEffectsButton
-          lowerSvgController={lowerSvgController}
-          svgEffectsActive={svgEffectsActive}
-          settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerSvgControlsRef}
-        />,
-      ]}
-      inMediaVariables={[svgEffectsActive, settingsActive]}
-      preventLowerLabelsVariables={[settingsActive, svgEffectsActive]}
-      externalPositioning={positioning}
-      externalMediaContainerRef={svgContainerRef}
-      externalSubContainerRef={subContainerRef}
-      externalRightLowerControlsRef={rightLowerSvgControlsRef}
-      options={{ gradient: false, adjustmentAnimation: false }}
-    />
+          />,
+          <SvgEffectsButton
+            lowerSvgController={lowerSvgController}
+            svgEffectsActive={svgEffectsActive}
+            settingsActive={settingsActive}
+            scrollingContainerRef={rightLowerSvgControlsRef}
+          />,
+        ]}
+        inMediaVariables={[svgEffectsActive, settingsActive]}
+        preventLowerLabelsVariables={[settingsActive, svgEffectsActive]}
+        externalPositioning={positioning}
+        externalMediaContainerRef={svgContainerRef}
+        externalSubContainerRef={subContainerRef}
+        externalRightLowerControlsRef={rightLowerSvgControlsRef}
+        options={{ gradient: false, adjustmentAnimation: false }}
+      />
+      {/* {editing && svgMedia.svg && (
+        <SvgEditor
+          initSvg={svgMedia.svg}
+          closeFunction={() => setEditing(false)}
+          confirmFunction={(url, svg, d, blob, name, filters) => {
+            console.log(url, svg, d, blob, name, filters);
+          }}
+        />
+      )} */}
+    </>
   );
 }

@@ -6,39 +6,38 @@ import LowerController from "../../../lowerControls/lib/LowerController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
-const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
+const tableTopReducedIcon =
+  nginxAssetServerBaseUrl + "svgs/tableTopReducedIcon.svg";
+const tableTopReducedTippedIcon =
+  nginxAssetServerBaseUrl + "svgs/tableTopReducedTippedIcon.svg";
 
-export default function SyncButton({
-  desync,
+export default function TabledButton({
+  tabled,
   lowerController,
 }: {
-  desync: boolean;
+  tabled: boolean;
   lowerController: LowerController;
 }) {
   return (
     <FgButton
       className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
       clickFunction={() => {
-        lowerController.handleDesync();
+        lowerController.handleTable();
       }}
       contentFunction={() => {
-        const src = desync ? syncIcon : desyncIcon;
-
         return (
           <FgSVGElement
-            src={src}
+            src={tabled ? tableTopReducedTippedIcon : tableTopReducedIcon}
             attributes={[
-              { key: "width", value: "80%" },
-              { key: "height", value: "80%" },
-              { key: "fill", value: "#f2f2f2" },
+              { key: "width", value: "90%" },
+              { key: "height", value: "90%" },
             ]}
           />
         );
       }}
       hoverContent={
         <FgHoverContentStandard
-          content={desync ? "Sync content (H)" : "Desync content (H)"}
+          content={tabled ? "Untable (t)" : "Table (t)"}
           style='light'
         />
       }

@@ -1,21 +1,20 @@
 import JSZip from "jszip";
 import {
-  BezierPoint,
+  SvgEditorPoint,
   ControlTypes,
   cycleControlTypeMap,
-  defaultPoints,
   defaultSettings,
   Settings,
 } from "./typeConstant";
 
-class BezierController {
+class SvgEditorController {
   constructor(
-    private points: BezierPoint[],
-    private setPoints: React.Dispatch<React.SetStateAction<BezierPoint[]>>,
-    private bezierContainerRef: React.RefObject<HTMLDivElement>,
-    private bezierBackgroundContainerRef: React.RefObject<HTMLDivElement>,
+    private points: SvgEditorPoint[][],
+    private setPoints: React.Dispatch<React.SetStateAction<SvgEditorPoint[][]>>,
+    private svgEditorContainerRef: React.RefObject<HTMLDivElement>,
+    private svgEditorBackgroundContainerRef: React.RefObject<HTMLDivElement>,
     private svgRef: React.RefObject<SVGSVGElement>,
-    private setInBezier: React.Dispatch<React.SetStateAction<boolean>>,
+    private setInSvgEditor: React.Dispatch<React.SetStateAction<boolean>>,
     private setLargestDim: React.Dispatch<
       React.SetStateAction<"height" | "width">
     >,
@@ -32,7 +31,7 @@ class BezierController {
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private copiedTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setCopied: React.Dispatch<React.SetStateAction<boolean>>,
-    private confirmBezierCurveFunction:
+    private confirmFunction:
       | ((
           url: string,
           svg: string,
@@ -57,9 +56,7 @@ class BezierController {
         height: number;
         active: boolean;
       }>
-    >,
-    private name: React.MutableRefObject<string | undefined>,
-    private handles: boolean
+    >
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -106,10 +103,10 @@ class BezierController {
         this.controlPressed.current = true;
         break;
       case "d":
-        this.downloadBezierCurve();
+        this.downloadSvgEditorCurve();
         break;
       case "c":
-        this.copyToClipBoardBezierCurve();
+        this.copyToClipBoardSvgEditorCurve();
         break;
       case "s":
         this.setSettingsActive((prev) => !prev);
@@ -155,22 +152,22 @@ class BezierController {
   };
 
   handlePointerMove = () => {
-    this.setInBezier(true);
+    this.setInSvgEditor(true);
 
-    if (this.bezierContainerRef.current) {
+    if (this.svgEditorContainerRef.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }
 
     this.movementTimeout.current = setTimeout(() => {
-      this.setInBezier(false);
+      this.setInSvgEditor(false);
     }, 3500);
   };
 
-  handlePointerEnterBezier = () => {
-    this.setInBezier(true);
+  handlePointerEnterSvgEditor = () => {
+    this.setInSvgEditor(true);
 
-    this.bezierContainerRef.current?.addEventListener(
+    this.svgEditorContainerRef.current?.addEventListener(
       "pointermove",
       this.handlePointerMove
     );
@@ -181,19 +178,19 @@ class BezierController {
     }
   };
 
-  handlePointerLeaveBezier = () => {
-    this.bezierContainerRef.current?.removeEventListener(
+  handlePointerLeaveSvgEditor = () => {
+    this.svgEditorContainerRef.current?.removeEventListener(
       "pointermove",
       this.handlePointerMove
     );
 
-    if (this.bezierContainerRef.current) {
+    if (this.svgEditorContainerRef.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }
 
     this.leaveTimer.current = setTimeout(() => {
-      this.setInBezier(false);
+      this.setInSvgEditor(false);
       clearTimeout(this.leaveTimer.current);
       this.leaveTimer.current = undefined;
     }, 2500);
@@ -630,20 +627,20 @@ class BezierController {
     return Math.max(0, Math.min(100, value));
   };
 
-  handleDeselectAllPoints = (points: BezierPoint[]) => {
+  handleDeselectAllPoints = (points: SvgEditorPoint[]) => {
     return points.map((point) => ({ ...point, selected: false }));
   };
 
-  handleUnhoverAllPoints = (points: BezierPoint[]) => {
+  handleUnhoverAllPoints = (points: SvgEditorPoint[]) => {
     return points.map((point) => ({ ...point, hovering: false }));
   };
 
   handleResize = () => {
-    if (!this.bezierBackgroundContainerRef.current) return;
+    if (!this.svgEditorBackgroundContainerRef.current) return;
 
     if (
-      this.bezierBackgroundContainerRef.current.clientHeight >
-      this.bezierBackgroundContainerRef.current.clientWidth
+      this.svgEditorBackgroundContainerRef.current.clientHeight >
+      this.svgEditorBackgroundContainerRef.current.clientWidth
     ) {
       this.setLargestDim("height");
     } else {
@@ -651,8 +648,8 @@ class BezierController {
     }
 
     const aspect =
-      this.bezierBackgroundContainerRef.current.clientWidth /
-      this.bezierBackgroundContainerRef.current.clientHeight;
+      this.svgEditorBackgroundContainerRef.current.clientWidth /
+      this.svgEditorBackgroundContainerRef.current.clientHeight;
     if (aspect > 0.85 && aspect < 1.15) {
       this.setAspectSquarish(true);
     } else {
@@ -661,7 +658,6 @@ class BezierController {
   };
 
   handleReset = () => {
-    this.setPoints(structuredClone(defaultPoints));
     this.setSettings(structuredClone(defaultSettings));
   };
 
@@ -723,6 +719,8 @@ class BezierController {
       if (selectedIndices.length === 0) return newPoints;
 
       selectedIndices.forEach((index) => {
+        if (!newPoints[index].controls.controlOne) return;
+
         newPoints[index].controlType = controlType;
         const x = newPoints[index].controls.controlOne.x;
         const y = newPoints[index].controls.controlOne.y;
@@ -796,6 +794,8 @@ class BezierController {
       if (indicesToUpdate.length === 0) return newPoints;
 
       indicesToUpdate.forEach((index) => {
+        if (!newPoints[index].controls.controlOne) return;
+
         newPoints[index].controlType =
           cycleControlTypeMap[newPoints[index].controlType];
 
@@ -874,42 +874,42 @@ class BezierController {
     });
   };
 
-  isOneSelected = (points: BezierPoint[]): boolean => {
+  isOneSelected = (points: SvgEditorPoint[]): boolean => {
     return points.some((point) => point.selected);
   };
 
-  isOneInSelectionBox = (points: BezierPoint[]): boolean => {
+  isOneInSelectionBox = (points: SvgEditorPoint[]): boolean => {
     return points.some((point) => point.inSelectionBox);
   };
 
-  isOneHovered = (points: BezierPoint[]): boolean => {
+  isOneHovered = (points: SvgEditorPoint[]): boolean => {
     return points.some((point) => point.hovering);
   };
 
-  isOneDragging = (points: BezierPoint[]): boolean => {
+  isOneDragging = (points: SvgEditorPoint[]): boolean => {
     return points.some(
       (point) =>
         point.dragging ||
-        point.controls.controlOne.dragging ||
+        point.controls.controlOne?.dragging ||
         point.controls.controlTwo?.dragging
     );
   };
 
-  isOneSelectedExcludeEndPoints = (points: BezierPoint[]): boolean => {
+  isOneSelectedExcludeEndPoints = (points: SvgEditorPoint[]): boolean => {
     return points.slice(1, points.length - 1).some((point) => point.selected);
   };
 
-  isOneHoveredExcludeEndPoints = (points: BezierPoint[]): boolean => {
+  isOneHoveredExcludeEndPoints = (points: SvgEditorPoint[]): boolean => {
     return points.slice(1, points.length - 1).some((point) => point.hovering);
   };
 
-  isOneDraggingExcludeEndPoints = (points: BezierPoint[]): boolean => {
+  isOneDraggingExcludeEndPoints = (points: SvgEditorPoint[]): boolean => {
     return points
       .slice(1, points.length - 1)
       .some(
         (point) =>
           point.dragging ||
-          point.controls.controlOne.dragging ||
+          point.controls.controlOne?.dragging ||
           point.controls.controlTwo?.dragging
       );
   };
@@ -918,7 +918,7 @@ class BezierController {
     return Object.values(this.settings.filters).some((entry) => entry.value);
   };
 
-  copyToClipBoardBezierCurve = () => {
+  copyToClipBoardSvgEditorCurve = () => {
     let svg = this.getCurrentDownloadableSVG();
 
     if (this.settings.downloadOptions.compression.value === "Minified")
@@ -943,7 +943,7 @@ class BezierController {
       <defs>
         ${
           this.settings.filters.shadow.value
-            ? `<filter id='bezierShadowFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorShadowFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feGaussianBlur
             in='SourceAlpha'
             stdDeviation="${this.settings.filters.shadow.strength.value}"
@@ -970,7 +970,7 @@ class BezierController {
 
         ${
           this.settings.filters.blur.value
-            ? `<filter id='bezierBlurFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorBlurFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feGaussianBlur in='SourceGraphic' stdDeviation="${this.settings.filters.blur.strength.value}" />
         </filter>`
             : ""
@@ -978,7 +978,7 @@ class BezierController {
 
         ${
           this.settings.filters.grayscale.value
-            ? `<filter id='bezierGrayscaleFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorGrayscaleFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feColorMatrix type='saturate' values="${this.settings.filters.grayscale.scale.value}" />
         </filter>`
             : ""
@@ -986,7 +986,7 @@ class BezierController {
 
         ${
           this.settings.filters.saturate.value
-            ? `<filter id='bezierSaturateFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorSaturateFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feColorMatrix type='saturate' values="${this.settings.filters.saturate.saturation.value}" />
         </filter>`
             : ""
@@ -994,7 +994,7 @@ class BezierController {
 
         ${
           this.settings.filters.edgeDetection.value
-            ? `<filter id='bezierEdgeDetectionFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorEdgeDetectionFilter' x='-2000' y='-2000' width='4000' height='4000'>
                   <feConvolveMatrix
                     order='3'
                     kernelMatrix=' -1 -1 -1 -1 8 -1 -1 -1 -1 '
@@ -1006,7 +1006,7 @@ class BezierController {
 
         ${
           this.settings.filters.colorOverlay.value
-            ? `<filter id='bezierColorOverlayFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorColorOverlayFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feFlood flood-color='${this.settings.filters.colorOverlay.overlayColor.value}' result='flood' />
           <feComposite
             in2='SourceAlpha'
@@ -1024,7 +1024,7 @@ class BezierController {
 
         ${
           this.settings.filters.waveDistortion.value
-            ? `<filter id='bezierWaveDistortionFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorWaveDistortionFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feTurbulence
             type='fractalNoise'
             baseFrequency="${this.settings.filters.waveDistortion.frequency.value}"
@@ -1041,7 +1041,7 @@ class BezierController {
 
         ${
           this.settings.filters.crackedGlass.value
-            ? `<filter id='bezierCrackedGlassFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorCrackedGlassFilter' x='-2000' y='-2000' width='4000' height='4000'>
           <feTurbulence
             type='fractalNoise'
             baseFrequency="${this.settings.filters.crackedGlass.density.value}"
@@ -1061,7 +1061,7 @@ class BezierController {
 
         ${
           this.settings.filters.neonGlow.value
-            ? `<filter id='bezierNeonGlowFilter' x='-2000' y='-2000' width='4000' height='4000'>
+            ? `<filter id='svgEditorNeonGlowFilter' x='-2000' y='-2000' width='4000' height='4000'>
                   <feGaussianBlur
                     in='SourceAlpha'
                     stdDeviation='3'
@@ -1084,31 +1084,35 @@ class BezierController {
 
   getFilterURLs = () => {
     return `${
-      this.settings.filters.shadow.value ? "url(#bezierShadowFilter)" : ""
-    }${this.settings.filters.blur.value ? " url(#bezierBlurFilter)" : ""}${
+      this.settings.filters.shadow.value ? "url(#svgEditorShadowFilter)" : ""
+    }${this.settings.filters.blur.value ? " url(#svgEditorBlurFilter)" : ""}${
       this.settings.filters.grayscale.value
-        ? " url(#bezierGrayscaleFilter)"
+        ? " url(#svgEditorGrayscaleFilter)"
         : ""
     }${
-      this.settings.filters.saturate.value ? " url(#bezierSaturateFilter)" : ""
+      this.settings.filters.saturate.value
+        ? " url(#svgEditorSaturateFilter)"
+        : ""
     }${
       this.settings.filters.edgeDetection.value
-        ? " url(#bezierEdgeDetectionFilter)"
+        ? " url(#svgEditorEdgeDetectionFilter)"
         : ""
     }${
       this.settings.filters.colorOverlay.value
-        ? " url(#bezierColorOverlayFilter)"
+        ? " url(#svgEditorColorOverlayFilter)"
         : ""
     }${
       this.settings.filters.waveDistortion.value
-        ? " url(#bezierWaveDistortionFilter)"
+        ? " url(#svgEditorWaveDistortionFilter)"
         : ""
     }${
       this.settings.filters.crackedGlass.value
-        ? " url(#bezierCrackedGlassFilter)"
+        ? " url(#svgEditorCrackedGlassFilter)"
         : ""
     }${
-      this.settings.filters.neonGlow.value ? " url(#bezierNeonGlowFilter)" : ""
+      this.settings.filters.neonGlow.value
+        ? " url(#svgEditorNeonGlowFilter)"
+        : ""
     }`;
   };
 
@@ -1142,7 +1146,7 @@ class BezierController {
     return await zip.generateAsync({ type: "blob" });
   };
 
-  downloadBezierCurve = async () => {
+  downloadSvgEditorCurve = async () => {
     const { mimeType, compression } = this.settings.downloadOptions;
 
     // Construct the SVG string
@@ -1155,7 +1159,7 @@ class BezierController {
 
     // Convert SVG to a Blob
     const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
-    const filename = this.name.current ? this.name.current : "download";
+    const filename = "download";
 
     // Handle SVGZ (Zipped SVG)
     if (
@@ -1252,7 +1256,7 @@ class BezierController {
     img.src = url;
   };
 
-  confirmBezierCurve = () => {
+  confirmSvgEditorCurve = () => {
     const d = this.getPathData();
     const filters = this.isFilter() ? this.getFilters() : undefined;
 
@@ -1261,23 +1265,14 @@ class BezierController {
     const blob = new Blob([svg], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
 
-    if (this.confirmBezierCurveFunction)
-      this.confirmBezierCurveFunction(
-        url,
-        svg,
-        d,
-        blob,
-        this.name.current,
-        filters
-      );
+    if (this.confirmFunction)
+      this.confirmFunction(url, svg, d, blob, "download", filters);
   };
 
   getPathData = () => {
     if (this.points.length < 2) return "";
 
-    let d = `${this.handles ? "M 8 50 16 50 " : ""}M ${this.points[0].x} ${
-      this.points[0].y
-    }`;
+    let d = `M ${this.points[0].x} ${this.points[0].y}`;
 
     for (let i = 0; i < this.points.length - 1; i++) {
       const p1 = this.points[i];
@@ -1289,10 +1284,8 @@ class BezierController {
       d += ` C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p2.x} ${p2.y}`;
     }
 
-    if (this.handles) d += " L 92 50";
-
     return d;
   };
 }
 
-export default BezierController;
+export default SvgEditorController;

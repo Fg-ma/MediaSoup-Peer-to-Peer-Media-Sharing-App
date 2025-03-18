@@ -25,7 +25,8 @@ class LowerSvgController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
+    private setEditing: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
 
   handleSvgEffects = () => {
@@ -66,6 +67,9 @@ class LowerSvgController {
         break;
       case "b":
         this.handleSetAsBackground();
+        break;
+      case "h":
+        this.handleSync();
         break;
       default:
         break;
@@ -132,6 +136,20 @@ class LowerSvgController {
 
       return newSettings;
     });
+  };
+
+  handleSync = () => {
+    this.setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      newSettings.synced.value = !newSettings.synced.value;
+
+      return newSettings;
+    });
+  };
+
+  handleEdit = () => {
+    this.setEditing((prev) => !prev);
   };
 
   handleDownload = () => {

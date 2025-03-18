@@ -32,7 +32,8 @@ export interface Settings {
 }
 
 export const defaultSettings: Settings = Object.freeze({
-  background: Object.freeze({ value: "false" }),
+  background: Object.freeze({ value: false }),
+  synced: Object.freeze({ value: true }),
   downloadOptions: Object.freeze({
     mimeType: Object.freeze({
       value: "svg",

@@ -1,12 +1,12 @@
 import React from "react";
 import LowerController from "../lowerControls/lib/LowerController";
 import CloseButton from "./lib/closeButton/CloseButton";
-import SyncButton from "./lib/syncButton/SyncButton";
 import { MediaContainerOptions } from "../typeConstant";
 import ReactButton from "../../../../elements/reactButton/ReactButton";
+import TabledButton from "./lib/tabledButton/TabledButton";
 
 export default function UpperControls({
-  desync,
+  tabled,
   reactionsPanelActive,
   setReactionsPanelActive,
   lowerController,
@@ -16,7 +16,7 @@ export default function UpperControls({
   fullscreen,
   backgroundMedia,
 }: {
-  desync: boolean;
+  tabled: boolean;
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   lowerController: LowerController;
@@ -36,7 +36,8 @@ export default function UpperControls({
           : "bottom-full"
       } absolute w-full h-[12%] max-h-12 min-h-6 items-center justify-between z-20`}
     >
-      <div>
+      <div className='flex h-full w-max items-center justify-center'>
+        <TabledButton tabled={tabled} lowerController={lowerController} />
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}
       </div>
       <div className='flex grow h-full items-center justify-end space-x-2'>
@@ -49,7 +50,6 @@ export default function UpperControls({
           clickFunction={lowerController.handleReact}
           reactionFunction={lowerController.reactController.handleReaction}
         />
-        <SyncButton desync={desync} lowerController={lowerController} />
         <CloseButton lowerController={lowerController} />
       </div>
     </div>

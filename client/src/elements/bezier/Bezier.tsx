@@ -66,6 +66,7 @@ export default function Bezier({
   confirmBezierCurveFunction,
   closeFunction,
   needsName = false,
+  handles = false,
 }: {
   confirmBezierCurveFunction?: (
     url: string,
@@ -77,6 +78,7 @@ export default function Bezier({
   ) => void;
   closeFunction?: () => void;
   needsName?: boolean;
+  handles?: boolean;
 }) {
   const [points, setPoints] = useState<BezierPoint[]>(
     structuredClone(defaultPoints)
@@ -145,7 +147,8 @@ export default function Bezier({
     confirmBezierCurveFunction,
     selectionBox,
     setSelectionBox,
-    name
+    name,
+    handles
   );
 
   useEffect(() => {

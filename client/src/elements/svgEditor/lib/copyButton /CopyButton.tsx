@@ -1,22 +1,22 @@
 import React, { useRef } from "react";
-import FgButton from "../../../../../elements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
-import FgPortal from "../../../../../elements/fgPortal/FgPortal";
-import LowerSvgController from "../LowerSvgController";
+import FgButton from "../../../fgButton/FgButton";
+import FgHoverContentStandard from "../../../fgHoverContentStandard/FgHoverContentStandard";
+import FgSVGElement from "../../../fgSVGElement/FgSVGElement";
+import SvgEditorController from "../SvgEditorController";
+import FgPortal from "../../../fgPortal/FgPortal";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const copyIcon = nginxAssetServerBaseUrl + "svgs/copyIcon.svg";
 
 export default function CopyButton({
-  lowerSvgController,
+  svgEditorController,
   copied,
-  scrollingContainerRef,
+  largestDim,
 }: {
-  lowerSvgController: LowerSvgController;
+  svgEditorController: SvgEditorController;
   copied: boolean;
-  scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  largestDim: "width" | "height";
 }) {
   const copiedButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -24,8 +24,13 @@ export default function CopyButton({
     <>
       <FgButton
         externalRef={copiedButtonRef}
-        className='h-[75%] flex aspect-square pointer-events-auto items-center justify-center'
-        clickFunction={lowerSvgController.handleCopyToClipBoard}
+        className={`${
+          largestDim === "width" ? "w-[75%]" : "h-[75%]"
+        } flex aspect-square pointer-events-auto items-center justify-center`}
+        clickFunction={(event) => {
+          event.stopPropagation();
+          svgEditorController.copyToClipBoardSvgEditorCurve();
+        }}
         contentFunction={() => (
           <FgSVGElement
             src={copyIcon}
@@ -45,7 +50,6 @@ export default function CopyButton({
             />
           ) : undefined
         }
-        scrollingContainerRef={scrollingContainerRef}
         options={{
           hoverSpacing: 4,
           hoverTimeoutDuration: 1750,

@@ -39,7 +39,6 @@ class LowerController {
     private aspectRatio: React.MutableRefObject<number | undefined>,
     private setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
     private mediaContainerOptions: MediaContainerOptions,
-    private setDesync: React.Dispatch<React.SetStateAction<boolean>>,
     private setReactionsPanelActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -83,6 +82,9 @@ class LowerController {
       case "x":
         this.handleClose();
         break;
+      case "t":
+        this.handleTable();
+        break;
       case "delete":
         this.handleClose();
         break;
@@ -123,9 +125,6 @@ class LowerController {
           document.addEventListener("pointerdown", this.rotateFunctionEnd);
         }
         break;
-      case "h":
-        this.handleDesync();
-        break;
       case "f":
         this.handleFullScreen();
         break;
@@ -135,10 +134,6 @@ class LowerController {
       default:
         break;
     }
-  };
-
-  handleDesync = () => {
-    this.setDesync((prev) => !prev);
   };
 
   scaleFunctionEnd = () => {
@@ -296,6 +291,8 @@ class LowerController {
       this.filename
     );
   };
+
+  handleTable = () => {};
 
   handleFullScreen = () => {
     if (document.fullscreenElement) {

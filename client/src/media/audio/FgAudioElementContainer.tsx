@@ -594,6 +594,7 @@ export default function FgAudioElementContainer({
           }}
           closeFunction={() => setIsBezierCurveEditor(false)}
           needsName={true}
+          handles={true}
         />
       )}
     </div>

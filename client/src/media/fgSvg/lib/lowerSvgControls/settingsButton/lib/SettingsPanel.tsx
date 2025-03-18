@@ -9,6 +9,17 @@ import SizePage from "./SizePage";
 import CompressionPage from "./CompressionPage";
 import DownloadOptionsPage from "./DownloadOptionsPage";
 import SvgMedia from "../../../../../fgSvg/SvgMedia";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
+const editIcon = nginxAssetServerBaseUrl + "svgs/editIcon.svg";
+const copyIcon = nginxAssetServerBaseUrl + "svgs/copyIcon.svg";
+const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
+const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
+const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -178,15 +189,151 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div
                   className={`${
-                    settings.background.value
-                      ? "bg-fg-white text-fg-tone-black-1"
-                      : ""
-                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                    settings.synced.value
+                      ? "bg-fg-white text-fg-tone-black-1 fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                      : "fill-fg-white stroke-fg-white"
+                  } flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1`}
                 >
-                  Set as background (b)
+                  <FgSVGElement
+                    src={settings.synced.value ? desyncIcon : syncIcon}
+                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    attributes={[
+                      { key: "width", value: "80%" },
+                      { key: "height", value: "80%" },
+                    ]}
+                  />
+                  {settings.synced.value ? "Desync" : "Sync"}
+                </div>
+              )}
+              clickFunction={lowerSvgController.handleSync}
+              hoverContent={
+                <FgHoverContentStandard
+                  content={settings.synced.value ? "Desync (h)" : "Sync (h)"}
+                  style='light'
+                />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
+            />
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div
+                  className={`${
+                    settings.background.value
+                      ? "bg-fg-white text-fg-tone-black-1 fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                      : "fill-fg-white stroke-fg-white"
+                  } flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1`}
+                >
+                  <FgSVGElement
+                    src={backgroundIcon}
+                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    attributes={[
+                      { key: "width", value: "80%" },
+                      { key: "height", value: "80%" },
+                    ]}
+                  />
+                  Set as background
                 </div>
               )}
               clickFunction={lowerSvgController.handleSetAsBackground}
+              hoverContent={
+                <FgHoverContentStandard
+                  content='Set as background (b)'
+                  style='light'
+                />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
+            />
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                  <FgSVGElement
+                    src={editIcon}
+                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    attributes={[
+                      { key: "width", value: "80%" },
+                      { key: "height", value: "80%" },
+                    ]}
+                  />
+                  Edit
+                </div>
+              )}
+              clickFunction={lowerSvgController.handleEdit}
+              hoverContent={
+                <FgHoverContentStandard content='Edit (q)' style='light' />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
+            />
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                  <FgSVGElement
+                    src={downloadIcon}
+                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    attributes={[
+                      { key: "width", value: "85%" },
+                      { key: "height", value: "85%" },
+                    ]}
+                  />
+                  Download
+                </div>
+              )}
+              clickFunction={lowerSvgController.handleDownload}
+              hoverContent={
+                <FgHoverContentStandard content='Download (d)' style='light' />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
+            />
+            <FgButton
+              className='w-full h-7'
+              contentFunction={() => (
+                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                  <FgSVGElement
+                    src={copyIcon}
+                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    attributes={[
+                      { key: "width", value: "100%" },
+                      { key: "height", value: "100%" },
+                    ]}
+                  />
+                  Copy to clipboard
+                </div>
+              )}
+              clickFunction={lowerSvgController.handleCopyToClipBoard}
+              hoverContent={
+                <FgHoverContentStandard
+                  content='Copy to clipboard (c)'
+                  style='light'
+                />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+                hoverZValue: 500000000000,
+              }}
             />
             <FgButton
               className='w-full'

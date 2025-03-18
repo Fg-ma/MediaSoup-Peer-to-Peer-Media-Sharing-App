@@ -142,9 +142,9 @@ export default function FgMediaContainer({
       rotation: 0,
     });
 
-  const [desync, setDesync] = useState(false);
-
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
+
+  const [tabled, setTabled] = useState(false);
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
@@ -168,7 +168,6 @@ export default function FgMediaContainer({
     aspectRatio,
     setFullScreen,
     mediaContainerOptions,
-    setDesync,
     setReactionsPanelActive,
     behindEffectsContainerRef,
     frontEffectsContainerRef,
@@ -342,7 +341,7 @@ export default function FgMediaContainer({
         !backgroundMedia && (
           <>
             <UpperControls
-              desync={desync}
+              tabled={tabled}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}
@@ -393,7 +392,7 @@ export default function FgMediaContainer({
           backgroundMedia) && (
           <>
             <UpperControls
-              desync={desync}
+              tabled={tabled}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}
