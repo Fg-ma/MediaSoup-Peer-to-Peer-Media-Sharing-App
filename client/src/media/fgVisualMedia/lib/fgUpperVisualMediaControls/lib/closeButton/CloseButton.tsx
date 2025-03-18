@@ -32,7 +32,9 @@ export default function CloseButton({
           />
         );
       }}
-      hoverContent={<FgHoverContentStandard content='Close (x)' />}
+      hoverContent={
+        <FgHoverContentStandard content='Close (x)' style='light' />
+      }
       className='flex items-center justify-end h-full aspect-square pointer-events-auto'
       options={{ hoverType: "below" }}
     />

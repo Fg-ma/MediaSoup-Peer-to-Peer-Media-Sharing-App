@@ -2,30 +2,30 @@ import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import { Settings } from "../../typeConstant";
-import SvgMedia from "../../../../../media/fgSvg/SvgMedia";
+import LowerSvgController from "../LowerSvgController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
 
 export default function DownloadButton({
-  svgMedia,
+  lowerSvgController,
   svgEffectsActive,
   settingsActive,
   scrollingContainerRef,
 }: {
-  svgMedia: SvgMedia;
+  lowerSvgController: LowerSvgController;
   svgEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
-      clickFunction={svgMedia.downloadSvg}
+      clickFunction={lowerSvgController.handleDownload}
       contentFunction={() => (
         <FgSVGElement
           src={downloadIcon}
+          className='flex h-full aspect-square items-center justify-center'
           attributes={[
             { key: "width", value: "85%" },
             { key: "height", value: "85%" },
@@ -36,7 +36,7 @@ export default function DownloadButton({
       )}
       hoverContent={
         !svgEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Download (d)' style='dark' />
+          <FgHoverContentStandard content='Download (d)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

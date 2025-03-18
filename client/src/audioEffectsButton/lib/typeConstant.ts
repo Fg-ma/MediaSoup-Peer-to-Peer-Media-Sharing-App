@@ -257,18 +257,18 @@ export type AudioEffectTemplates = {
 };
 
 export const oneSliderPossibleSizes: PossibleSizesType = {
-  vertical: [108, 240],
-  horizontal: [240, 108],
+  vertical: [92, 240],
+  horizontal: [240, 92],
 };
 
 export const twoSlidersPossibleSizes: PossibleSizesType = {
-  vertical: [172, 240],
-  horizontal: [240, 172],
+  vertical: [156, 240],
+  horizontal: [240, 156],
 };
 
 export const threeSlidersPossibleSizes: PossibleSizesType = {
-  vertical: [236, 240],
-  horizontal: [240, 236],
+  vertical: [220, 240],
+  horizontal: [240, 220],
 };
 
 export const staticMixEffects: {

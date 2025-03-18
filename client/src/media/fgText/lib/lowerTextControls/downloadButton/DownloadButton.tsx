@@ -35,7 +35,7 @@ export default function DownloadButton({
       )}
       hoverContent={
         !settingsActive ? (
-          <FgHoverContentStandard content='Download (d)' style='dark' />
+          <FgHoverContentStandard content='Download (d)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

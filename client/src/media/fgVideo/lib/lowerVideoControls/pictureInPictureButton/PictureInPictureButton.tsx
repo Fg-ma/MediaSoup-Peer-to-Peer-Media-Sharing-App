@@ -43,7 +43,7 @@ export default function PictureInPictureButton({
         !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content='Picture in picture (i)'
-            style='dark'
+            style='light'
           />
         ) : undefined
       }

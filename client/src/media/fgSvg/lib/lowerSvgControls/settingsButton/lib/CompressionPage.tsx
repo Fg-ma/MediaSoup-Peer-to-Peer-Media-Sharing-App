@@ -72,7 +72,7 @@ export default function CompressionPage({
         </div>
         <div></div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className='w-[95%] h-0.5 rounded-full bg-fg-white'></div>
       <div
         ref={scrollingContainerRef}
         className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
@@ -80,7 +80,7 @@ export default function CompressionPage({
         {downloadOptionsArrays.compression.map((compression) => (
           <div
             key={compression}
-            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+            className={`w-full text-nowrap flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
               compression === settings.downloadOptions.compression.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
@@ -89,7 +89,7 @@ export default function CompressionPage({
             <FgButton
               className='flex items-center justify-center grow'
               contentFunction={() => (
-                <div className='flex w-full bg-opacity-75 px-2 items-start'>
+                <div className='flex w-full px-2 items-start'>
                   {compression}
                 </div>
               )}

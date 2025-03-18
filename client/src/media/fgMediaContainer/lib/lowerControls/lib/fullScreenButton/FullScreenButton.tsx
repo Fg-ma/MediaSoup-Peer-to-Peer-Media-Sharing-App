@@ -44,7 +44,7 @@ export default function FullScreenButton({
       }}
       hoverContent={
         !preventLowerLabelsVariables?.some(Boolean) ? (
-          <FgHoverContentStandard content='Full screen (f)' style='dark' />
+          <FgHoverContentStandard content='Full screen (f)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

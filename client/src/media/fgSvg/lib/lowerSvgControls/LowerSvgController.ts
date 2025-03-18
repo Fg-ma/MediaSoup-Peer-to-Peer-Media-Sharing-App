@@ -56,7 +56,10 @@ class LowerSvgController {
         this.handleSvgEffects();
         break;
       case "d":
-        this.svgMedia.downloadSvg();
+        this.handleDownload();
+        break;
+      case "c":
+        this.handleCopyToClipBoard();
         break;
       case "u":
         this.handleSettings();
@@ -125,14 +128,25 @@ class LowerSvgController {
     this.setSettings((prev) => {
       const newSettings = { ...prev };
 
-      if (newSettings.background.value === "true") {
-        newSettings.background.value = "false";
-      } else {
-        newSettings.background.value = "true";
-      }
+      newSettings.background.value = !newSettings.background.value;
 
       return newSettings;
     });
+  };
+
+  handleDownload = () => {
+    this.svgMedia.downloadSvg(
+      this.settings.downloadOptions.mimeType.value,
+      this.settings.downloadOptions.size.width.value,
+      this.settings.downloadOptions.size.height.value,
+      this.settings.downloadOptions.compression.value
+    );
+  };
+
+  handleCopyToClipBoard = () => {
+    this.svgMedia.copyToClipboard(
+      this.settings.downloadOptions.compression.value
+    );
   };
 }
 

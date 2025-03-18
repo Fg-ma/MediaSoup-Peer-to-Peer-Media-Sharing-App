@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  Suspense,
+  CSSProperties,
+} from "react";
 import { motion, AnimatePresence, Variants, Transition } from "framer-motion";
 
 const SliderValuePortal = React.lazy(() => import("./lib/SliderValuePortal"));
@@ -67,6 +73,7 @@ export interface SliderChangeEvent {
 
 export default function FgSlider({
   className,
+  style,
   externalValue,
   externalStyleValue,
   onValueChange,
@@ -74,6 +81,7 @@ export default function FgSlider({
   options,
 }: {
   className?: string;
+  style?: CSSProperties;
   externalValue?: number;
   externalStyleValue?: number;
   onValueChange?: (event: SliderChangeEvent) => void;
@@ -296,19 +304,16 @@ export default function FgSlider({
     <div
       id={fgSliderOptions.id}
       className={`${className} flex items-center justify-center relative flex-col
-        ${fgSliderOptions.orientation === "vertical" ? "w-16 h-full" : ""}
-        ${fgSliderOptions.orientation === "horizontal" ? "h-16 w-full" : ""}`}
+        ${fgSliderOptions.orientation === "vertical" ? "w-max h-full" : ""}
+        ${fgSliderOptions.orientation === "horizontal" ? "h-max w-full" : ""}`}
+      style={style}
     >
       {fgSliderOptions.topLabel && (
         <div
           className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
             ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
-            ${
-              fgSliderOptions.orientation === "horizontal"
-                ? "text-start absolute top-0.5"
-                : ""
-            }
+            ${fgSliderOptions.orientation === "horizontal" ? "text-start" : ""}
           `}
           style={{ color: fgSliderOptions.labelsColor }}
         >
@@ -512,11 +517,7 @@ export default function FgSlider({
           className={`text-base font-K2D w-full max-w-full overflow-wrap-break-word break-words hyphens-auto flex justify-center items-center
             ${disabled ? "text-opacity-75" : ""}
             ${fgSliderOptions.orientation === "vertical" ? "text-center" : ""}
-            ${
-              fgSliderOptions.orientation === "horizontal"
-                ? "text-start absolute bottom-0.5"
-                : ""
-            }
+            ${fgSliderOptions.orientation === "horizontal" ? "text-start" : ""}
           `}
           style={{ color: fgSliderOptions.labelsColor }}
         >

@@ -702,7 +702,9 @@ class Deadbanding {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     }
   ) => {
-    if (mediaType !== "capture" && !this.deadbandingMap[mediaType][id]) {
+    if (mediaType === "capture" && !this.deadbandingMap.capture) {
+      this.deadbandingMap.capture = defaultDeadbandingValues;
+    } else if (mediaType !== "capture" && !this.deadbandingMap[mediaType][id]) {
       this.deadbandingMap[mediaType][id] = defaultDeadbandingValues;
     }
     for (const type in deadbandingValues) {

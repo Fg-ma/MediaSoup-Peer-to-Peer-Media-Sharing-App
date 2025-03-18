@@ -39,6 +39,7 @@ export default function SyncButton({
       hoverContent={
         <FgHoverContentStandard
           content={desync ? "Sync content (H)" : "Desync content (H)"}
+          style='light'
         />
       }
       options={{ hoverType: "below" }}

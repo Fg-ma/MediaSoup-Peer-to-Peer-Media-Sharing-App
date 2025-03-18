@@ -8,6 +8,7 @@ import MimeTypePage from "./MimeTypePage";
 import SizePage from "./SizePage";
 import CompressionPage from "./CompressionPage";
 import DownloadOptionsPage from "./DownloadOptionsPage";
+import SvgMedia from "../../../../../fgSvg/SvgMedia";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -47,6 +48,7 @@ const panelVariants: Variants = {
 };
 
 export default function SettingsPanel({
+  svgMedia,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -55,6 +57,7 @@ export default function SettingsPanel({
   setSettings,
   lowerSvgController,
 }: {
+  svgMedia: SvgMedia;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -150,7 +153,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black bg-opacity-75 font-K2D text-base text-white pointer-events-auto'
+      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black font-K2D text-base text-white pointer-events-auto'
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -175,7 +178,7 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div
                   className={`${
-                    settings.background.value === "true"
+                    settings.background.value
                       ? "bg-fg-white text-fg-tone-black-1"
                       : ""
                   } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
@@ -188,7 +191,7 @@ export default function SettingsPanel({
             <FgButton
               className='w-full'
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center'>
+                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg'>
                   Download options
                 </div>
               )}
@@ -196,7 +199,7 @@ export default function SettingsPanel({
             />
           </motion.div>
         )}
-      </AnimatePresence>{" "}
+      </AnimatePresence>
       {/* Download options page */}
       <AnimatePresence>
         {activePages.downloadOptions.active &&
@@ -244,6 +247,7 @@ export default function SettingsPanel({
             exit='exit'
           >
             <SizePage
+              svgMedia={svgMedia}
               setActivePages={setActivePages}
               settings={settings}
               setSettings={setSettings}

@@ -39,7 +39,7 @@ export default function DownloadRecordingButton({
         !imageEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content='Download recording (h)'
-            style='dark'
+            style='light'
           />
         ) : undefined
       }

@@ -7,27 +7,30 @@ import {
   downloadOptionsArrays,
 } from "../../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
+import SvgMedia from "../../../../../fgSvg/SvgMedia";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function SizePage({
+  svgMedia,
   setActivePages,
   settings,
   setSettings,
 }: {
+  svgMedia: SvgMedia;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
-  const setSize = (size: number) => {
+  const setSize = (type: "width" | "height", value: number) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
 
-      newSettings.downloadOptions.size.value = size;
+      newSettings.downloadOptions.size[type].value = value;
 
       return newSettings;
     });
@@ -41,6 +44,24 @@ export default function SizePage({
         !newActivePages.downloadOptions.size.active;
 
       return newActivePages;
+    });
+  };
+
+  const handleToggleAspect = () => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      if (newSettings.downloadOptions.size.value === "free") {
+        newSettings.downloadOptions.size.value = "aspect";
+        setSize(
+          "height",
+          newSettings.downloadOptions.size.width.value / (svgMedia.aspect ?? 1)
+        );
+      } else {
+        newSettings.downloadOptions.size.value = "free";
+      }
+
+      return newSettings;
     });
   };
 
@@ -72,51 +93,100 @@ export default function SizePage({
         </div>
         <div></div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className='w-[95%] h-0.5 rounded-full bg-fg-white'></div>
       <div
         ref={scrollingContainerRef}
-        className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className='small-vertical-scroll-bar w-full flex items-start justify-center overflow-y-auto h-max max-h-[11.375rem]'
       >
-        <FgSlider
-          className='h-10'
-          externalValue={settings.downloadOptions.size.value}
-          externalStyleValue={settings.downloadOptions.size.value}
-          onValueChange={(value) => {
-            setSize(value.value);
-          }}
-          options={{
-            initValue: settings.downloadOptions.size.value,
-            ticks: 7,
-            rangeMax: 32768,
-            rangeMin: 1,
-            orientation: "horizontal",
-            tickLabels: false,
-            precision: 0,
-            snapToWholeNum: true,
-          }}
-        />
-        {downloadOptionsArrays.size.map((size) => (
-          <div
-            key={size}
-            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              parseInt(size) === settings.downloadOptions.size.value
-                ? "bg-fg-white text-fg-tone-black-1"
-                : ""
-            }`}
-          >
-            <FgButton
-              className='flex items-center justify-center grow'
-              contentFunction={() => (
-                <div className='flex w-full bg-opacity-75 px-2 items-start'>
-                  {size}
-                </div>
-              )}
-              clickFunction={() => {
-                setSize(parseInt(size));
-              }}
-            />
-          </div>
-        ))}
+        <div className='flex w-full flex-col space-y-1 px-2 h-max'>
+          <FgButton
+            className='w-full h-7'
+            contentFunction={() => (
+              <div
+                className={`${
+                  settings.downloadOptions.size.value === "aspect"
+                    ? "bg-fg-white text-fg-tone-black-1"
+                    : ""
+                } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+              >
+                {settings.downloadOptions.size.value === "aspect"
+                  ? "Disable aspect"
+                  : "Enable aspect"}
+              </div>
+            )}
+            clickFunction={handleToggleAspect}
+          />
+          <FgSlider
+            style={{ height: "2.5rem" }}
+            externalValue={settings.downloadOptions.size.width.value}
+            externalStyleValue={settings.downloadOptions.size.width.value}
+            onValueChange={(value) => {
+              setSize("width", value.value);
+              if (settings.downloadOptions.size.value === "aspect") {
+                setSize("height", value.value / (svgMedia.aspect ?? 1));
+              }
+            }}
+            options={{
+              initValue: settings.downloadOptions.size.width.value,
+              ticks: 7,
+              rangeMax: 32768,
+              rangeMin: 1,
+              orientation: "horizontal",
+              tickLabels: false,
+              precision: 0,
+              snapToWholeNum: true,
+              topLabel: "Width",
+              labelsColor: "#f2f2f2",
+            }}
+          />
+          <FgSlider
+            style={{ height: "2.5rem" }}
+            externalValue={settings.downloadOptions.size.height.value}
+            externalStyleValue={settings.downloadOptions.size.height.value}
+            onValueChange={(value) => {
+              setSize("height", value.value);
+              if (settings.downloadOptions.size.value === "aspect") {
+                setSize("width", value.value * (svgMedia.aspect ?? 1));
+              }
+            }}
+            options={{
+              initValue: settings.downloadOptions.size.height.value,
+              ticks: 7,
+              rangeMax: 32768,
+              rangeMin: 1,
+              orientation: "horizontal",
+              tickLabels: false,
+              precision: 0,
+              snapToWholeNum: true,
+              topLabel: "Height",
+              labelsColor: "#f2f2f2",
+            }}
+          />
+          {downloadOptionsArrays.size.map((size) => (
+            <div
+              key={size}
+              className={`w-full text-nowrap flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                parseInt(size) === settings.downloadOptions.size.width.value &&
+                settings.downloadOptions.size.value === "aspect"
+                  ? "bg-fg-white text-fg-tone-black-1"
+                  : ""
+              }`}
+            >
+              <FgButton
+                className='flex items-center justify-center grow'
+                contentFunction={() => (
+                  <div className='flex w-full px-2 items-start'>
+                    {size}x{parseInt(size) / (svgMedia.aspect ?? 1)}
+                  </div>
+                )}
+                clickFunction={() => {
+                  setSize("width", parseInt(size));
+                  setSize("height", parseInt(size) / (svgMedia.aspect ?? 1));
+                }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

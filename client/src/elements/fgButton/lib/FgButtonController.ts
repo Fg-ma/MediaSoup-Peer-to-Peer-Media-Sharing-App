@@ -52,8 +52,6 @@ class FgButtonController {
   ) {}
 
   handlePointerDown = (event: React.PointerEvent) => {
-    event.preventDefault();
-
     window.addEventListener("pointerup", this.handlePointerUp);
 
     this.isClicked.current = true;
@@ -152,11 +150,6 @@ class FgButtonController {
       }, this.fgButtonOptions.hoverTimeoutDuration);
 
       document.addEventListener("pointermove", this.handlePointerMove);
-      if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
-        this.scrollingContainerRef.current.addEventListener("scroll", (event) =>
-          this.handlePointerMove(event as unknown as PointerEvent)
-        );
-      }
     }
   };
 
@@ -171,12 +164,6 @@ class FgButtonController {
       }
 
       document.removeEventListener("pointermove", this.handlePointerMove);
-      if (this.scrollingContainerRef && this.scrollingContainerRef.current) {
-        this.scrollingContainerRef.current.removeEventListener(
-          "scroll",
-          (event) => this.handlePointerMove(event as unknown as PointerEvent)
-        );
-      }
     }
   };
 
@@ -214,6 +201,12 @@ class FgButtonController {
   handleVisibilityChange = () => {
     clearTimeout(this.hoverTimeout.current);
     this.setIsHover(false);
+  };
+
+  handleScrollingContainerScroll = (event: Event) => {
+    this.setIsHeld(false);
+    this.setIsHeldToggle(false);
+    this.handlePointerMove(event as unknown as PointerEvent);
   };
 }
 

@@ -1,17 +1,32 @@
 import VideoMedia from "../../media/fgVideo/VideoMedia";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { IncomingTableStaticContentMessages } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import {
+  IncomingTableStaticContentMessages,
+  onResponsedCatchUpTableDataType,
+  TableTopStaticMimeType,
+} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import SharedBundleSocket from "./SharedBundleSocket";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import {
+  ApplicationEffectStylesType,
+  ApplicationEffectTypes,
+  defaultAudioEffectsStyles,
+  defaultAudioStreamEffects,
+  defaultVideoEffectsStyles,
+  defaultVideoStreamEffects,
+  ImageEffectStylesType,
+  ImageEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
+  VideoEffectStylesType,
+  VideoEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
 import TextMedia from "../../media/fgText/TextMedia";
 import SvgMedia from "../../media/fgSvg/SvgMedia";
+import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -48,12 +63,139 @@ class SharedBundleController extends SharedBundleSocket {
     }
   };
 
+  private onResponsedCatchUpTableData = (
+    event: onResponsedCatchUpTableDataType
+  ) => {
+    if (!this.tableStaticContentSocket.current) return;
+
+    const { images, svgs, videos, text, applications, audio } = event.data;
+
+    if (videos) {
+      for (const video of videos) {
+        if (!this.userStreamEffects.current.video[video.videoId]) {
+          this.userStreamEffects.current.video[video.videoId] = {
+            video: structuredClone(defaultVideoStreamEffects),
+            audio: structuredClone(defaultAudioStreamEffects),
+          };
+        }
+        this.userStreamEffects.current.video[video.videoId].video =
+          video.effects as { [effectType in VideoEffectTypes]: boolean };
+        if (!this.userEffectsStyles.current.video[video.videoId]) {
+          this.userEffectsStyles.current.video[video.videoId] = {
+            video: structuredClone(defaultVideoEffectsStyles),
+            audio: structuredClone(defaultAudioEffectsStyles),
+          };
+        }
+        this.userEffectsStyles.current.video[video.videoId].video =
+          video.effectStyles as VideoEffectStylesType;
+
+        this.userMedia.current.video[video.videoId] = new VideoMedia(
+          video.videoId,
+          video.filename,
+          video.mimeType as TableTopStaticMimeType,
+          this.userDevice,
+          this.deadbanding,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.userMedia,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener,
+          video.positioning,
+          this.tableStaticContentSocket.current.requestCatchUpVideoPosition
+        );
+      }
+    }
+    if (images) {
+      for (const image of images) {
+        this.userStreamEffects.current.image[image.imageId] = image.effects as {
+          [effectType in ImageEffectTypes]: boolean;
+        };
+        this.userEffectsStyles.current.image[image.imageId] =
+          image.effectStyles as ImageEffectStylesType;
+
+        this.userMedia.current.image[image.imageId] = new ImageMedia(
+          image.imageId,
+          image.filename,
+          image.mimeType as TableTopStaticMimeType,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener,
+          this.userDevice,
+          this.deadbanding,
+          this.userMedia,
+          image.positioning
+        );
+      }
+    }
+    if (svgs) {
+      for (const svg of svgs) {
+        this.userMedia.current.svg[svg.svgId] = new SvgMedia(
+          svg.svgId,
+          svg.filename,
+          svg.mimeType as TableTopStaticMimeType,
+          svg.visible,
+          this.userEffectsStyles,
+          this.userStreamEffects,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener,
+          svg.positioning
+        );
+      }
+    }
+    if (text) {
+      for (const textItem of text) {
+        this.userMedia.current.text[textItem.textId] = new TextMedia(
+          textItem.textId,
+          textItem.filename,
+          textItem.mimeType as TableTopStaticMimeType,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener,
+          textItem.positioning
+        );
+      }
+    }
+    if (applications) {
+      for (const application of applications) {
+        this.userStreamEffects.current.application[application.applicationId] =
+          application.effects as {
+            [effectType in ApplicationEffectTypes]: boolean;
+          };
+        this.userEffectsStyles.current.application[application.applicationId] =
+          application.effectStyles as ApplicationEffectStylesType;
+
+        this.userMedia.current.application[application.applicationId] =
+          new ApplicationMedia(
+            application.applicationId,
+            application.filename,
+            application.mimeType as TableTopStaticMimeType,
+            this.userEffectsStyles,
+            this.userStreamEffects,
+            this.tableStaticContentSocket.current.getFile,
+            this.tableStaticContentSocket.current.addMessageListener,
+            this.tableStaticContentSocket.current.removeMessageListener,
+            this.userDevice,
+            this.userMedia,
+            application.positioning
+          );
+      }
+    }
+
+    setTimeout(() => {
+      this.setRerender((prev) => !prev);
+    }, 100);
+  };
+
   handleTableStaticContentMessage = (
     message: IncomingTableStaticContentMessages
   ) => {
     switch (message.type) {
       case "responsedCatchUpTableData":
-        this.setRerender((prev) => !prev);
+        this.onResponsedCatchUpTableData(message);
         break;
       case "originalVideoReady":
         {

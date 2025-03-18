@@ -14,13 +14,16 @@ export interface ActivePages {
 }
 
 export interface Settings {
-  background: { value: "true" | "false" };
+  background: { value: boolean };
+  synced: { value: boolean };
   downloadOptions: {
     mimeType: {
       value: DownloadMimeTypes;
     };
     size: {
-      value: number;
+      value: "aspect" | "free";
+      width: { value: number };
+      height: { value: number };
     };
     compression: {
       value: DownloadCompressionTypes;
@@ -35,7 +38,9 @@ export const defaultSettings: Settings = Object.freeze({
       value: "svg",
     }),
     size: Object.freeze({
-      value: 1024,
+      value: "aspect",
+      width: Object.freeze({ value: 1024 }),
+      height: Object.freeze({ value: 1024 }),
     }),
     compression: Object.freeze({
       value: "Plain",

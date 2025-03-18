@@ -3,18 +3,18 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgPortal from "../../../../../elements/fgPortal/FgPortal";
-import SvgMedia from "../../../../../media/fgSvg/SvgMedia";
+import LowerSvgController from "../LowerSvgController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const copyIcon = nginxAssetServerBaseUrl + "svgs/copyIcon.svg";
 
 export default function CopyButton({
-  svgMedia,
+  lowerSvgController,
   copied,
   scrollingContainerRef,
 }: {
-  svgMedia: SvgMedia;
+  lowerSvgController: LowerSvgController;
   copied: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -25,10 +25,7 @@ export default function CopyButton({
       <FgButton
         externalRef={copiedButtonRef}
         className='h-[75%] flex aspect-square pointer-events-auto items-center justify-center'
-        clickFunction={(event) => {
-          event.stopPropagation();
-          // svgMedia.copyToClipBoardBezierCurve();
-        }}
+        clickFunction={lowerSvgController.handleCopyToClipBoard}
         contentFunction={() => (
           <FgSVGElement
             src={copyIcon}

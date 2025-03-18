@@ -44,7 +44,7 @@ export default function PlayPauseButton({
         !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={pausedState ? "Play (k)" : "Pause (k)"}
-            style='dark'
+            style='light'
           />
         ) : undefined
       }

@@ -65,7 +65,7 @@ export default function DownloadButton({
                 ? "Stop recording (d)"
                 : "Start recording (d)"
             }
-            style='dark'
+            style='light'
           />
         ) : undefined
       }

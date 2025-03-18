@@ -46,7 +46,7 @@ export default function FullScreenButton({
       }}
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Full screen (f)' style='dark' />
+          <FgHoverContentStandard content='Full screen (f)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

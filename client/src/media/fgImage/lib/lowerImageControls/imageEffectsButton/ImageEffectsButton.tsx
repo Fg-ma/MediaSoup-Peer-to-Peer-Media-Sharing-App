@@ -42,7 +42,7 @@ export default function ImageEffectsButton({
       }}
       hoverContent={
         !imageEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='dark' />
+          <FgHoverContentStandard content='Effects (e)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

@@ -86,9 +86,13 @@ export default function FgSvg({
   );
 
   useEffect(() => {
-    svgMedia.addDownloadCompleteListener(() => {
-      if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
-    });
+    if (svgMedia.svg) {
+      subContainerRef.current?.appendChild(svgMedia.svg);
+    } else {
+      svgMedia.addDownloadCompleteListener(() => {
+        if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
+      });
+    }
 
     document.addEventListener("keydown", lowerSvgController.handleKeyDown);
 
@@ -131,11 +135,13 @@ export default function FgSvg({
       kind='svg'
       rootMedia={svgMedia.svg}
       bundleRef={bundleRef}
-      backgroundMedia={settings.background.value === "true"}
+      backgroundMedia={settings.background.value}
       className='svg-container'
       popupElements={[
         svgEffectsActive ? (
           <SvgEffectsSection
+            svgId={svgId}
+            svgMedia={svgMedia}
             lowerSvgController={lowerSvgController}
             svgContainerRef={svgContainerRef}
           />
@@ -144,6 +150,7 @@ export default function FgSvg({
       leftLowerControls={[]}
       rightLowerControls={[
         <SettingsButton
+          svgMedia={svgMedia}
           effectsActive={svgEffectsActive}
           containerRef={svgContainerRef}
           settingsActive={settingsActive}
@@ -156,13 +163,13 @@ export default function FgSvg({
           lowerSvgController={lowerSvgController}
         />,
         <DownloadButton
-          svgMedia={svgMedia}
+          lowerSvgController={lowerSvgController}
           svgEffectsActive={svgEffectsActive}
           settingsActive={settingsActive}
           scrollingContainerRef={rightLowerSvgControlsRef}
         />,
         <CopyButton
-          svgMedia={svgMedia}
+          lowerSvgController={lowerSvgController}
           copied={copied}
           scrollingContainerRef={rightLowerSvgControlsRef}
         />,

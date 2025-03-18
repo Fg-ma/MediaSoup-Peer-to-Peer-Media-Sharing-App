@@ -37,7 +37,9 @@ class SmoothLandmarksUtils {
 
     if (
       Math.abs(deltaValue) <
-      this.deadbanding.getDeadbandingMapById(this.type, this.id)[featureType]
+      (this.deadbanding.getDeadbandingMapById(this.type, this.id)?.[
+        featureType
+      ] ?? Infinity)
     ) {
       return previousValue;
     }

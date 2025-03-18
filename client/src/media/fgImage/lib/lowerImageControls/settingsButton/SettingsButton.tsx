@@ -121,7 +121,7 @@ export default function SettingsButton({
         )}
         hoverContent={
           !effectsActive && !settingsActive ? (
-            <FgHoverContentStandard content='Settings (U)' style='dark' />
+            <FgHoverContentStandard content='Settings (U)' style='light' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}

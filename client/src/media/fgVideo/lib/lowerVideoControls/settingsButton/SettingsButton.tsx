@@ -120,7 +120,7 @@ export default function SettingsButton({
         )}
         hoverContent={
           !videoEffectsActive && !settingsActive ? (
-            <FgHoverContentStandard content='Settings' style='dark' />
+            <FgHoverContentStandard content='Settings' style='light' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}

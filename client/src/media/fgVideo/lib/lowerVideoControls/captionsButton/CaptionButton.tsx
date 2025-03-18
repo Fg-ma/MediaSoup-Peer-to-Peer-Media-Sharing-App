@@ -130,7 +130,7 @@ export default function CaptionButton({
         }}
         hoverContent={
           !videoEffectsActive && !settingsActive ? (
-            <FgHoverContentStandard content='Captions (c)' style='dark' />
+            <FgHoverContentStandard content='Captions (c)' style='light' />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}

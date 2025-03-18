@@ -71,6 +71,7 @@ export default function FgButton({
   closeHoldToggle,
   setCloseHoldToggle,
   setExternalClickToggleState,
+  holdToggleExclusionRefs,
   className,
   style,
   type = "button",
@@ -100,6 +101,7 @@ export default function FgButton({
   closeHoldToggle?: boolean;
   setCloseHoldToggle?: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalClickToggleState?: React.Dispatch<React.SetStateAction<boolean>>;
+  holdToggleExclusionRefs?: React.RefObject<HTMLDivElement>[];
   className?: string;
   style?: React.CSSProperties;
   type?: "button" | "submit" | "reset";
@@ -144,8 +146,10 @@ export default function FgButton({
   const toggleHold = useCallback(
     (event: PointerEvent) => {
       if (
-        !holdContentRef.current ||
-        !holdContentRef.current.contains(event.target as Node)
+        !holdContentRef.current?.contains(event.target as Node) &&
+        !holdToggleExclusionRefs?.some((ref) =>
+          ref.current?.contains(event.target as Node)
+        )
       ) {
         window.removeEventListener("pointerdown", toggleHold);
         setIsHeldToggle(false);
@@ -229,6 +233,24 @@ export default function FgButton({
     };
   }, [isHover]);
 
+  useEffect(() => {
+    if (scrollingContainerRef && scrollingContainerRef.current) {
+      scrollingContainerRef.current.addEventListener(
+        "scroll",
+        fgButtonController.handleScrollingContainerScroll
+      );
+    }
+
+    return () => {
+      if (scrollingContainerRef && scrollingContainerRef.current) {
+        scrollingContainerRef.current.removeEventListener(
+          "scroll",
+          fgButtonController.handleScrollingContainerScroll
+        );
+      }
+    };
+  }, [scrollingContainerRef?.current]);
+
   const ButtonComponent = animationOptions ? motion.button : "button";
 
   return (
@@ -289,7 +311,7 @@ export default function FgButton({
           )}
         </AnimatePresence>
       )}
-      {holdFunction && holdContent && (
+      {holdContent && (
         <AnimatePresence>
           {(isHeld || isHeldToggle) && (
             <Suspense fallback={<div>Loading...</div>}>
@@ -299,6 +321,7 @@ export default function FgButton({
                 externalRef={externalRef ? externalRef : buttonRef}
                 externalPortalRef={holdContentRef}
                 zValue={9999999999}
+                spacing={fgButtonOptions.holdSpacing}
               />
             </Suspense>
           )}

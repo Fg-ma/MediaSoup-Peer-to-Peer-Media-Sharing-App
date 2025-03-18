@@ -68,7 +68,7 @@ export default function DownloadOptionsPage({
           Download options
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className='w-[95%] h-0.5 rounded-full bg-fg-white'></div>
       <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
         {Object.keys(downloadOptionsArrays).map((option) => (
           <FgButton
@@ -90,9 +90,15 @@ export default function DownloadOptionsPage({
                   <div className='flex space-x-1 items-center justify-center'>
                     <div>
                       {option === "size"
-                        ? parseFloat(
-                            settings.downloadOptions[option].value.toFixed(2)
-                          )
+                        ? `${parseFloat(
+                            settings.downloadOptions[
+                              option
+                            ].width.value.toFixed(2)
+                          )}x${parseFloat(
+                            settings.downloadOptions[
+                              option
+                            ].height.value.toFixed(2)
+                          )}`
                         : settings.downloadOptions[
                             option as keyof typeof downloadOptionsArrays
                           ].value}

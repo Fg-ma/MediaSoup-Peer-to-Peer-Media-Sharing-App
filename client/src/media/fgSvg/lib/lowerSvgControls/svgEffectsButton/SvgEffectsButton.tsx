@@ -38,7 +38,7 @@ export default function SvgEffectsButton({
       )}
       hoverContent={
         !svgEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='dark' />
+          <FgHoverContentStandard content='Effects (e)' style='light' />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

@@ -106,7 +106,7 @@ export default function ReactButton({
         }}
         hoverContent={
           !reactionsPanelActive ? (
-            <FgHoverContentStandard content={"Open reactions (Q)"} />
+            <FgHoverContentStandard content={"Open reactions (q)"} />
           ) : undefined
         }
         options={{

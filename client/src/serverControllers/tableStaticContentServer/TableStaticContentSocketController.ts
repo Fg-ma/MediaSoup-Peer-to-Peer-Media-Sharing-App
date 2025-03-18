@@ -1,33 +1,19 @@
 import {
   ApplicationEffectStylesType,
-  ApplicationEffectTypes,
-  defaultAudioEffectsStyles,
-  defaultAudioStreamEffects,
-  defaultVideoEffectsStyles,
-  defaultVideoStreamEffects,
   ImageEffectStylesType,
-  ImageEffectTypes,
   UserEffectsStylesType,
   UserStreamEffectsType,
   VideoEffectStylesType,
-  VideoEffectTypes,
 } from "../../context/effectsContext/typeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
-import VideoMedia from "../../media/fgVideo/VideoMedia";
-import ImageMedia from "../../media/fgImage/ImageMedia";
-import SvgMedia from "../../media/fgSvg/SvgMedia";
-import TextMedia from "../../media/fgText/TextMedia";
-import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import {
   IncomingTableStaticContentMessages,
   onContentDeletedType,
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
-  onResponsedCatchUpTableDataType,
   OutGoingTableStaticContentMessages,
-  TableTopStaticMimeType,
 } from "./lib/typeConstant";
 import { StaticContentTypes } from "../../../../universal/typeConstant";
 
@@ -259,9 +245,6 @@ class TableStaticContentSocketController {
     message: { type: undefined } | IncomingTableStaticContentMessages
   ) => {
     switch (message.type) {
-      case "responsedCatchUpTableData":
-        this.onResponsedCatchUpTableData(message);
-        break;
       case "contentDeleted":
         this.onContentDeleted(message);
         break;
@@ -273,127 +256,6 @@ class TableStaticContentSocketController {
         break;
       default:
         break;
-    }
-  };
-
-  private onResponsedCatchUpTableData = (
-    event: onResponsedCatchUpTableDataType
-  ) => {
-    const { images, svgs, videos, text, applications, audio } = event.data;
-
-    if (videos) {
-      for (const video of videos) {
-        if (!this.userStreamEffects.current.video[video.videoId]) {
-          this.userStreamEffects.current.video[video.videoId] = {
-            video: structuredClone(defaultVideoStreamEffects),
-            audio: structuredClone(defaultAudioStreamEffects),
-          };
-        }
-        this.userStreamEffects.current.video[video.videoId].video =
-          video.effects as { [effectType in VideoEffectTypes]: boolean };
-        if (!this.userEffectsStyles.current.video[video.videoId]) {
-          this.userEffectsStyles.current.video[video.videoId] = {
-            video: structuredClone(defaultVideoEffectsStyles),
-            audio: structuredClone(defaultAudioEffectsStyles),
-          };
-        }
-        this.userEffectsStyles.current.video[video.videoId].video =
-          video.effectStyles as VideoEffectStylesType;
-
-        this.userMedia.current.video[video.videoId] = new VideoMedia(
-          video.videoId,
-          video.filename,
-          video.mimeType as TableTopStaticMimeType,
-          this.userDevice,
-          this.deadbanding,
-          this.userEffectsStyles,
-          this.userStreamEffects,
-          this.userMedia,
-          this.getFile,
-          this.addMessageListener,
-          this.removeMessageListener,
-          video.positioning,
-          this.requestCatchUpVideoPosition
-        );
-      }
-    }
-    if (images) {
-      for (const image of images) {
-        this.userStreamEffects.current.image[image.imageId] = image.effects as {
-          [effectType in ImageEffectTypes]: boolean;
-        };
-        this.userEffectsStyles.current.image[image.imageId] =
-          image.effectStyles as ImageEffectStylesType;
-
-        this.userMedia.current.image[image.imageId] = new ImageMedia(
-          image.imageId,
-          image.filename,
-          image.mimeType as TableTopStaticMimeType,
-          this.userEffectsStyles,
-          this.userStreamEffects,
-          this.getFile,
-          this.addMessageListener,
-          this.removeMessageListener,
-          this.userDevice,
-          this.deadbanding,
-          this.userMedia,
-          image.positioning
-        );
-      }
-    }
-    if (svgs) {
-      for (const svg of svgs) {
-        this.userMedia.current.svg[svg.svgId] = new SvgMedia(
-          svg.svgId,
-          svg.filename,
-          svg.mimeType as TableTopStaticMimeType,
-          svg.visible,
-          this.userEffectsStyles,
-          this.userStreamEffects,
-          this.getFile,
-          this.addMessageListener,
-          this.removeMessageListener,
-          svg.positioning
-        );
-      }
-    }
-    if (text) {
-      for (const textItem of text) {
-        this.userMedia.current.text[textItem.textId] = new TextMedia(
-          textItem.textId,
-          textItem.filename,
-          textItem.mimeType as TableTopStaticMimeType,
-          this.getFile,
-          this.addMessageListener,
-          this.removeMessageListener,
-          textItem.positioning
-        );
-      }
-    }
-    if (applications) {
-      for (const application of applications) {
-        this.userStreamEffects.current.application[application.applicationId] =
-          application.effects as {
-            [effectType in ApplicationEffectTypes]: boolean;
-          };
-        this.userEffectsStyles.current.application[application.applicationId] =
-          application.effectStyles as ApplicationEffectStylesType;
-
-        this.userMedia.current.application[application.applicationId] =
-          new ApplicationMedia(
-            application.applicationId,
-            application.filename,
-            application.mimeType as TableTopStaticMimeType,
-            this.userEffectsStyles,
-            this.userStreamEffects,
-            this.getFile,
-            this.addMessageListener,
-            this.removeMessageListener,
-            this.userDevice,
-            this.userMedia,
-            application.positioning
-          );
-      }
     }
   };
 

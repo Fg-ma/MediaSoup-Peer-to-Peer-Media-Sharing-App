@@ -129,6 +129,14 @@ export default function AudioMixEffect({
         {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider
             key={index}
+            style={{
+              height: `${
+                dynamicMixEffect.orientation === "horizontal" ? "3.5rem" : ""
+              }`,
+              width: `${
+                dynamicMixEffect.orientation === "horizontal" ? "" : "3.5rem"
+              }`,
+            }}
             externalValue={sliderValues[effect][key as MixEffectsOptionsType]}
             externalStyleValue={
               sliderValues[effect][key as MixEffectsOptionsType]

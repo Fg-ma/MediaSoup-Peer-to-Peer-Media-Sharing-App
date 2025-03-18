@@ -133,7 +133,7 @@ class FgMic {
       updates.map((update) => {
         switch (update.option) {
           case "order":
-            this.chebyshev!.order = update.value;
+            this.chebyshev!.order = Math.round(update.value);
             break;
           default:
             break;
