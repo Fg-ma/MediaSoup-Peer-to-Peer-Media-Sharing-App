@@ -28,6 +28,7 @@ import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 import CreditPage from "./creditPage/CreditPage";
 import "./scrollbar.css";
 import "./fontStyles.css";
+import MethodSvgEditor from "./methodSvgEditor/MethodSvgEditor";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -374,6 +375,7 @@ export default function Main() {
         cleanupController={cleanupController}
         setRerender={setRerender}
       />
+      <MethodSvgEditor />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import webpack from "webpack";
 import fs from "fs";
 import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 // Get the current directory using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
@@ -62,9 +63,13 @@ export default {
         exclude: /node_modules/,
         use: "babel-loader",
       },
+      // {
+      //   test: /\.css$/i,
+      //   use: ["style-loader", "css-loader", "postcss-loader"],
+      // },
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
       },
       {
         test: /\.svg$/,
@@ -124,5 +129,8 @@ export default {
       "process.env": JSON.stringify(process.env),
     }),
     new NodePolyfillPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "all.css",
+    }),
   ],
 };

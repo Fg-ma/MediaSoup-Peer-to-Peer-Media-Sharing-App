@@ -5,8 +5,14 @@ import pluginReact from "eslint-plugin-react";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  { languageOptions: { globals: globals.browser } },
+  {
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+  },
+  {
+    languageOptions: {
+      globals: globals.browser, // Replacing env with languageOptions.globals
+    },
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
@@ -27,11 +33,20 @@ export default [
     },
   },
   {
-    env: {
-      node: true,
+    languageOptions: {
+      globals: {
+        process: "readonly",
+      },
     },
-    globals: {
-      process: "readonly",
-    },
+  },
+  {
+    overrides: [
+      {
+        files: ["src/methodSvgEditor/**/*.js"],
+        rules: {
+          "no-console": "off",
+        },
+      },
+    ],
   },
 ];
