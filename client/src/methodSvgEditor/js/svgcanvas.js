@@ -1233,6 +1233,7 @@ $.SvgCanvas = function (container, config) {
           };
         }
 
+        if (!changes.d[0]) return;
         var len = changes.d.length,
           firstseg = changes.d[0],
           currentpt = remap(firstseg.x, firstseg.y);
@@ -1336,7 +1337,6 @@ $.SvgCanvas = function (container, config) {
               break;
           }
         }
-
         selected.setAttribute("d", dstr);
         break;
     }

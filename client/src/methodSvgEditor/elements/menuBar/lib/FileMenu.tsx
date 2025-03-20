@@ -3,7 +3,7 @@ import React from "react";
 export default function FileMenu() {
   return (
     <div className='menu'>
-      <div className='menu_title'>File</div>
+      <div className='menu_title font-Josefin'>File</div>
       <div className='menu_list inverted-undo' id='file_menu'>
         <div data-action='clear' id='tool_clear' className='menu_item'>
           New Document

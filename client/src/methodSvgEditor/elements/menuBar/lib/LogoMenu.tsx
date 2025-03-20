@@ -29,9 +29,6 @@ export default function LogoMenu() {
         <div id='modal_shortcuts' className='menu_item' data-action='shortcuts'>
           Keyboard Shortcuts...
         </div>
-        <div id='modal_donate' className='menu_item' data-action='donate'>
-          Donate or sponsor...
-        </div>
       </div>
     </a>
   );

@@ -38,7 +38,8 @@
 }
 
 #shape_cats div:hover {
-  color: var(--z0);
+  color: #f2f2f2;
+  background: #090909;
 }
 
 #shape_cats div.current {
@@ -56,7 +57,7 @@
   left: var(--x12);
   top: 230px;
   height: 312px;
-  background: var(--z15);
+  background: #f2f2f2;
   border-radius: var(--x1);
   box-shadow: var(--shadow);
 }
@@ -70,14 +71,14 @@
 
 /* Necessary to keep the flyouts sized properly */
 #shape_buttons {
-  background: var(--z15);
+  background: #f2f2f2;
   border-radius: 0 3px 3px 0;
   padding: 10px;
 }
 
 .tools_flyout .tool_button,
 .tools_flyout .tool_flyout {
-  background: var(--z15);
+  background: #f2f2f2;
   width: var(--x10);
   height: var(--x10);
   margin: var(--x1);

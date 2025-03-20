@@ -23,7 +23,6 @@ import "./css/select.css";
 import "./css/panel.css";
 import "./css/align_buttons.css";
 import "./css/text.css";
-import "./css/sponsors.css";
 import "./css/zoom-dropdown.css";
 import "./css/loading.css";
 import Rulers from "./elements/rulers/Rulers";
@@ -113,7 +112,6 @@ export default function MethodSvgEditor() {
         for (let script of scripts) {
           await loadScript(script);
         }
-        console.log("All scripts loaded successfully.");
       } catch (error) {
         console.error("Error loading script:", error);
       }
@@ -133,7 +131,7 @@ export default function MethodSvgEditor() {
 
   return (
     <div
-      className='w-full h-full absolute top-0 left-0 bg-fg-tone-black-1 z-[500000000000] pointer-events-auto'
+      className='w-full h-full absolute top-0 left-0 bg-fg-tone-black-1 z-[10000] pointer-events-auto font-K2D'
       style={{ marginTop: "0px" }}
     >
       <div id='method-draw' className='app'>

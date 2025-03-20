@@ -3,16 +3,14 @@ import React from "react";
 export default function Zoom() {
   return (
     <>
-      <select id='zoom_select'>
+      <select id='zoom_select' defaultValue='100'>
         <option value='6'>6%</option>
         <option value='12'>12%</option>
         <option value='16'>16%</option>
         <option value='25'>25%</option>
         <option value='50'>50%</option>
         <option value='75'>75%</option>
-        <option value='100' selected>
-          100%
-        </option>
+        <option value='100'>100%</option>
         <option value='150'>150%</option>
         <option value='200'>200%</option>
         <option value='300'>300%</option>

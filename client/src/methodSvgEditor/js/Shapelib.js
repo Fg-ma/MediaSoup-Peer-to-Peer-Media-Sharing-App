@@ -74,7 +74,7 @@ MD.Shapelib = function () {
   };
 
   var cur_lib = library.basic;
-  current_d = cur_lib.data.star_points_5;
+  current_d = cur_lib.data.Star;
 
   var mode_id = "shapelib";
 

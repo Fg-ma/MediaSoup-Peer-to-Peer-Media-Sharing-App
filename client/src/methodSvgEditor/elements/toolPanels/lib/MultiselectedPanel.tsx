@@ -3,7 +3,7 @@ import React from "react";
 export default function MultiselectedPanel() {
   return (
     <div id='multiselected_panel' className='context_panel clearfix'>
-      <h4 className='hidable'>Multiple Elements</h4>
+      <h4 className='hidable !font-Josefin'>Multiple Elements</h4>
 
       <div className='toolset align_buttons'>
         <label id='tool_align_relative'>
@@ -116,11 +116,11 @@ export default function MultiselectedPanel() {
         </div>
       </div>
       <div className='clearfix'></div>
-      <div className='button full' id='button_group'>
+      <div className='button full !font-K2D' id='button_group'>
         Group Elements
       </div>
       <div
-        className='button full'
+        className='button full !font-K2D'
         id='tool_text_on_path'
         title='Place text on path'
       >

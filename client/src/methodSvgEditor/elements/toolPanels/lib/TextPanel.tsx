@@ -3,14 +3,14 @@ import React from "react";
 export default function TextPanel() {
   return (
     <div id='text_panel' className='context_panel'>
-      <h4>Text</h4>
+      <h4 className='!font-Josefin'>Text</h4>
       <div className='draginputs'>
         <label
           className='draginput twocol textcontent hidden'
           data-title='Change Content'
         >
           <input id='text' type='text' autoComplete='off' />
-          <span>Content</span>
+          <span className='!font-Josefin'>Content</span>
         </label>
         <label>
           <input
@@ -20,7 +20,7 @@ export default function TextPanel() {
             data-attr='x'
             pattern='[0-9]*'
           />
-          <span>X</span>
+          <span className='!font-Josefin'>X</span>
         </label>
         <label>
           <input
@@ -30,10 +30,10 @@ export default function TextPanel() {
             data-attr='y'
             pattern='[0-9]*'
           />
-          <span>Y</span>
+          <span className='!font-Josefin'>Y</span>
         </label>
         <div className='toolset draginput twocol' id='tool_font_family'>
-          <span>Font</span>
+          <span className='!font-Josefin'>Font</span>
           <div id='preview_font' style={{ fontFamily: "sans-serif" }}>
             sans-serif
           </div>
@@ -47,7 +47,7 @@ export default function TextPanel() {
           <select id='font_family_dropdown'></select>
         </div>
         <div className='draginput font_style'>
-          <span>Font Style</span>
+          <span className='!font-Josefin'>Font Style</span>
           <div id='tool_bold' data-title='Bold Text [B]'>
             B
           </div>
@@ -56,8 +56,8 @@ export default function TextPanel() {
           </div>
         </div>
         <label id='tool_font_size' data-title='Change Font Size'>
-          <input id='font_size' value='0' />
-          <span id='font_sizeLabel' className='icon_label'>
+          <input id='font_size' className='attr_changer' defaultValue={0} />
+          <span id='font_sizeLabel' className='icon_label !font-Josefin'>
             Font Size
           </span>
         </label>

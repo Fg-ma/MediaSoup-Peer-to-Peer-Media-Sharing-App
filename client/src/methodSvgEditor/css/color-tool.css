@@ -4,24 +4,13 @@
   left: 0;
 }
 
-#color_tools #tool_fill .color_block #fill_bg,  #color_tools #tool_stroke .color_block #stroke_bg {
+#color_tools #tool_fill .color_block #fill_bg,
+#color_tools #tool_stroke .color_block #stroke_bg {
   position: absolute;
   top: 1px;
   left: 1px;
   bottom: 1px;
   right: 1px;
-}
-
-#stroke_color:after {
-  content: '';
-  position: absolute;
-  display: block;
-  left: var(--x1);
-  right: var(--x1);
-  top: var(--x1);
-  bottom: var(--x1);
-  background: var(--z1);
-  box-shadow: 0 0 0 1px var(--z13);
 }
 
 #tool_switch {
@@ -31,7 +20,7 @@
   position: absolute;
   top: -5px;
   right: 0;
-  cursor: nwse-resize
+  cursor: nwse-resize;
 }
 
 #tool_switch svg {
@@ -39,11 +28,7 @@
 }
 
 #tool_switch:hover svg {
-    fill: var(--z15);
-}
-
-#stroke_color:hover:after {
-  box-shadow: 0 0 0 1px var(--z15);
+  fill: var(--z15);
 }
 
 .color_block {
@@ -51,7 +36,7 @@
   height: var(--x5);
   overflow: hidden;
   border: solid var(--z12) 1px;
-  cursor:  pointer;
+  cursor: pointer;
 }
 
 .color_block svg {
@@ -59,7 +44,7 @@
   height: 22px;
 }
 
- #tool_stroke .color_block > div {
+#tool_stroke .color_block > div {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -84,7 +69,7 @@
   z-index: 1;
 }
 
-#tool_fill.active, 
+#tool_fill.active,
 #tool_stroke.active {
   z-index: 2;
 }
@@ -94,7 +79,9 @@
   left: 14px;
 }
 
-#tool_fill, #tool_stroke, #tool_canvas {
+#tool_fill,
+#tool_stroke,
+#tool_canvas {
   box-shadow: 0 0 0 1px var(--z0);
   position: absolute;
 }
@@ -108,4 +95,3 @@
   width: auto;
   height: auto;
 }
-

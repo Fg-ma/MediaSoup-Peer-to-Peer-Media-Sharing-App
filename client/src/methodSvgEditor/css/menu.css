@@ -12,8 +12,7 @@
 
 .menu {
   position: relative;
-  z-index: 5;
-  color: var(--z3);
+  z-index: 100;
   display: inline-block;
 }
 
@@ -42,16 +41,16 @@
   left: 0;
   top: var(--x8);
   white-space: nowrap;
-  background: var(--z15);
+  background: var(--a0);
   padding: var(--x2) 0;
   border-radius: 0 var(--x2) var(--x2) var(--x2);
-  box-shadow:  var(--shadow);
+  box-shadow: var(--shadow);
+  z-index: 100;
 }
 
-
 #menu_bar.active .menu.open .menu_title {
-  background: var(--z15);
-  color: var(--z1);
+  background: var(--a0);
+  color: #090909;
 }
 
 .inverted #menu_bar.active .menu.open .menu_title {
@@ -70,10 +69,14 @@
   line-height: var(--x6);
   padding: var(--x1) var(--x16) var(--x1) var(--x6);
   cursor: pointer;
-  color: var(--z3);
+  color: var(--a1);
 }
 
-.menu_list input[type=file] {
+.menu_list .menu_item .shortcut {
+  color: var(--a2);
+}
+
+.menu_list input[type="file"] {
   -webkit-appearance: none;
   position: absolute;
   opacity: 0;
@@ -87,7 +90,6 @@
   z-index: 100;
 }
 
-
 .menu_list .menu_item.tool_button {
   background: transparent;
   border: none;
@@ -95,31 +97,26 @@
   padding: var(--x1) var(--x16) var(--x1) var(--x6);
   height: auto;
   width: auto;
+  color: var(--a2);
 }
 
 .menu_list .menu_item.push_button_pressed:before {
-  content: '✔';
+  content: "✔";
   position: absolute;
   display: block;
   left: 6px;
   top: var(--x1);
 }
 
-.menu_list .menu_item:hover,
-.menu_list .menu_item.push_button_pressed:hover {
+.menu_list .menu_item:not(.disabled):hover,
+.menu_list .menu_item.push_button_pressed:not(.disabled):hover {
   background: var(--accent15);
-  color: #000;
-}
-
-.menu_list .menu_item.disabled:hover,
-.menu_list .menu_item.push_button_pressed.disabled:hover {
-  background: transparent;
-  color: var(--z3);
+  color: #d6d6d6;
 }
 
 .menu_list .menu_item.push_button_pressed {
   background: transparent;
-  border: none; 
+  border: none;
   width: auto;
   height: auto;
   margin: 0;
@@ -138,14 +135,12 @@
   line-height: var(--x6);
   border-radius: var(--x1);
   font-weight: 600;
+  color: #d6d6d6;
 }
 
 .menu_list .menu_item:not(.disabled):hover span {
   background: var(--accent13);
-}
-
-#modal_donate {
-  display: none;
+  color: #d6d6d6;
 }
 
 .menu-right {
@@ -167,15 +162,19 @@
 }
 
 .menu-right button:hover svg {
-  fill:  var(--z12);
+  fill: var(--z12);
 }
 
 .menu-right svg {
-  fill:  var(--z5);
+  fill: var(--z5);
 }
 
 .inverted .menu-right svg {
-  fill:  var(--z10);
+  fill: var(--z10);
+}
+
+#logo {
+  height: 100%;
 }
 
 #logo svg {
@@ -185,14 +184,13 @@
 }
 
 #logo svg path:last-child {
-  fill:  var(--z13);
+  fill: var(--z13);
 }
 
 #logo:hover svg {
-  fill:  var(--z9);
+  fill: var(--z9);
 }
 
 #logo svg path:last-child {
-  fill:  var(--z15);
+  fill: var(--z15);
 }
-

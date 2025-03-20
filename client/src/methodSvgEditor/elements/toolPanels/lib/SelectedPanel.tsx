@@ -11,15 +11,15 @@ export default function SelectedPanel() {
         >
           <input
             id='angle'
-            className='attr_changer'
+            className='attr_changer !font-K2D'
             size={2}
-            value='0'
+            defaultValue='0'
             data-attr='transform'
             data-min='-180'
             data-max='180'
             type='text'
           />
-          <span className='icon_label'>Rotation</span>
+          <span className='icon_label !font-Josefin'>Rotation</span>
           <div id='tool_angle_indicator' className='angle'>
             <div
               id='tool_angle_indicator_cursor'
@@ -31,21 +31,29 @@ export default function SelectedPanel() {
         <label id='tool_opacity' data-title='Change selected item opacity'>
           <input
             id='group_opacity'
-            className='attr_changer'
+            className='attr_changer !font-K2D'
             data-attr='opacity'
-            value='100'
+            defaultValue='100'
             step='5'
             min='0'
             max='100'
           />
-          <span id='group_opacityLabel' className='icon_label'>
+          <span id='group_opacityLabel' className='icon_label !font-Josefin'>
             Opacity
           </span>
         </label>
 
         <label id='tool_blur' data-title='Change gaussian blur value'>
-          <input id='blur' size={2} value='0' step='.1' min='0' max='10' />
-          <span className='icon_label'>Blur</span>
+          <input
+            id='blur'
+            className='attr_changer !font-K2D'
+            size={2}
+            defaultValue='0'
+            step='.1'
+            min='0'
+            max='10'
+          />
+          <span className='icon_label !font-Josefin'>Blur</span>
         </label>
 
         <label
@@ -54,18 +62,18 @@ export default function SelectedPanel() {
         >
           <input
             id='rect_rx'
-            value='0'
+            defaultValue='0'
             data-attr='rx'
-            className='attr_changer'
+            className='attr_changer !font-K2D'
             type='text'
             pattern='[0-9]*'
           />
-          <span className='icon_label'>Roundness</span>
+          <span className='icon_label !font-Josefin'>Roundness</span>
         </label>
       </div>
 
       <div id='align_tools'>
-        <h4>Align to canvas</h4>
+        <h4 className='!font-Josefin'>Align to canvas</h4>
         <div className='toolset align_buttons' id='tool_position'>
           <label>
             <div className='col last clear' id='position_opts'>

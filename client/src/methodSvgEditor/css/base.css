@@ -1,21 +1,21 @@
 /* prettier-ignore */
 :root, .inverted-undo { 
---z0: #1a1a1a;  --a0: #2a1c26; --b0: #2a2429;  --c0: #162730; 
---z1: #1e2433;  --a1: #421f24; --b1: #45322a;  --c1: #1c3b3b; 
---z2: #313131;  --a2: #5a2122; --b2: #60422b;  --c2: #1f4f47; 
---z3: red;  --a3: #71231f; --b3: #7b522a;  --c3: #226452; 
---z4: #474c59;  --a4: #89221c; --b4: #976328;  --c4: #227a5e; 
---z5: #565a66;  --a5: #a22018; --b5: #b47424;  --c5: #20906a; 
---z6: #656974;  --a6: #bb1b13; --b6: #d1861d;  --c6: #1ba776; 
---z7: #747782;  --a7: #d4100b; --b7: #f0990f;  --c7: #0ebf82; 
---z8: #848790;  --a8: #e62b18; --b8: #ffa723;  --c8: #31ce8f; 
---z9: #94969f;  --a9: #ee5035; --b9: #ffb146;  --c9: #59d49c; 
---z10: #a4a6ae; --a10: #f66d50;--b10: #ffbc63; --c10: #76dbaa; 
---z11: #b4b7bd; --a11: #fb866c;--b11: #ffc67d; --c11: #8fe0b7; 
---z12: #c5c7cc; --a12: #ff9f88;--b12: #ffd197; --c12: #a7e6c5; 
---z13: #d6d8db; --a13: #ffb7a5;--b13: #ffdbb1; --c13: #bdecd3; 
---z14: #e7e9eb; --a14: #ffcfc3;--b14: #ffe6cb; --c14: #d2f1e1; 
---z15: #f9fafb; --a15: #fee6e1;--b15: #fef1e5; --c15: #e8f6ef; 
+--z0: #1a1a1a;  --a0: #f2f2f2;  --b0: #2a2429;  --c0: #162730; 
+--z1: #313131;  --a1: #161616;  --b1: #45322a;  --c1: #1c3b3b; 
+--z2: #313131;  --a2: #f2f2f2;  --b2: #60422b;  --c2: #1f4f47; 
+--z3: #d6d6d6;  --a3: #71231f;  --b3: #7b522a;  --c3: #226452; 
+--z4: #090909;  --a4: #89221c;  --b4: #976328;  --c4: #227a5e; 
+--z5: #d6d6d6;  --a5: #a22018;  --b5: #b47424;  --c5: #20906a; 
+--z6: #d6d6d6;  --a6: #bb1b13;  --b6: #d1861d;  --c6: #1ba776; 
+--z7: #747782;  --a7: #d4100b;  --b7: #f0990f;  --c7: #0ebf82; 
+--z8: #d6d6d6;  --a8: #e62b18;  --b8: #ffa723;  --c8: #31ce8f; 
+--z9: #d6d6d6;  --a9: #ee5035;  --b9: #ffb146;  --c9: #59d49c; 
+--z10: #d6d6d6; --a10: #f66d50; --b10: #ffbc63; --c10: #76dbaa; 
+--z11: #b4b7bd; --a11: #fb866c; --b11: #ffc67d; --c11: #8fe0b7; 
+--z12: #d6d6d6; --a12: #ff9f88; --b12: #ffd197; --c12: #a7e6c5; 
+--z13: #d6d6d6; --a13: #ffb7a5; --b13: #ffdbb1; --c13: #bdecd3; 
+--z14: #1a1a1a; --a14: #ffcfc3; --b14: #ffe6cb; --c14: #d2f1e1; 
+--z15: #d6d6d6; --a15: #fee6e1; --b15: #fef1e5; --c15: #e8f6ef; 
 
 --d0: #152239;  --e0: #181e39; --f0: #1f1d39;  --g0: #291d30; 
 --d1: #1a3050;  --e1: #202651; --f1: #2f2251;  --g1: #43223b; 
@@ -44,15 +44,15 @@
 --accent4:  var(--d4);  --comp4:  var(--g4);
 --accent5:  var(--d5);  --comp5:  var(--g5);
 --accent6:  var(--d6);  --comp6:  var(--g6);
---accent7:  var(--d7);  --comp7:  var(--g7);
---accent8:  var(--d8);  --comp8:  var(--g8);
---accent9:  var(--d9);  --comp9:  var(--g9);
---accent10: var(--d10); --comp10: var(--g10);
+--accent7:  #d40213;    --comp7:  #e62833;
+--accent8:  #e62833;    --comp8:  #e62833;
+--accent9:  #e62833;    --comp9:  #e62833;
+--accent10: #e62833;    --comp10: #e62833;
 --accent11: var(--d11); --comp11: var(--g11);
 --accent12: var(--d12); --comp12: var(--g12);
---accent13: var(--d13); --comp13: var(--g13);
+--accent13: #090909;    --comp13: #090909;
 --accent14: var(--d14); --comp14: var(--g14);
---accent15: var(--d15); --comp15: var(--g15);
+--accent15: #313131;    --comp15: #313131;
 }
 
 /* prettier-ignore */
@@ -130,10 +130,6 @@
   --x14: 56px;
   --x15: 60px;
   --x16: 64px;
-  --mono-font: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
-  --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --panel-width: calc(var(--x10) * 2 * 2 + var(--x1));
   --transition-duration: 200ms;
   --transition: all var(--transition-duration) ease;

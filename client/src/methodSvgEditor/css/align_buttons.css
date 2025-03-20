@@ -20,26 +20,38 @@
   text-align: center;
   cursor: pointer;
   position: relative;
+  flex: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .align_button:hover {
-  background-color: var(--z0);
+  background-color: #313131;
   border-color: var(--z3);
 }
 
 .align_button svg {
-  fill: var(--z10);
+  fill: #d6d6d6;
 }
 
 .align_button:hover svg {
-  fill: var(--z15);
+  fill: #f2f2f2;
   transition: none;
 }
 
-.align_button:nth-child(1) {border-radius: var(--x1) 0 0 0;}
-.align_button:nth-child(3) {border-radius: 0 var(--x1) 0 0;}
-.align_button:nth-child(4) {border-radius: 0 0 0 var(--x1);}
-.align_button:nth-child(6) {border-radius: 0 0 var(--x1) 0;}
+.align_button:nth-child(1) {
+  border-radius: var(--x1) 0 0 0;
+}
+.align_button:nth-child(3) {
+  border-radius: 0 var(--x1) 0 0;
+}
+.align_button:nth-child(4) {
+  border-radius: 0 0 0 var(--x1);
+}
+.align_button:nth-child(6) {
+  border-radius: 0 0 var(--x1) 0;
+}
 
 .align_buttons .push_button {
   display: block;

@@ -3,7 +3,7 @@ import React from "react";
 export default function EditMenu() {
   return (
     <div className='menu'>
-      <div className='menu_title'>Edit</div>
+      <div className='menu_title font-Josefin'>Edit</div>
       <div className='menu_list inverted-undo' id='edit_menu'>
         <div data-action='undo' className='menu_item' id='tool_undo'>
           Undo <span className='shortcut'>⌘Z</span>

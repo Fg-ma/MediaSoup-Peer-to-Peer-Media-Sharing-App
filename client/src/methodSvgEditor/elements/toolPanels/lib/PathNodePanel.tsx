@@ -3,7 +3,7 @@ import React from "react";
 export default function PathNodePanel() {
   return (
     <div id='path_node_panel' className='context_panel clearfix'>
-      <h4>Edit Path</h4>
+      <h4 className='!font-Josefin'>Edit Path</h4>
 
       <div className='draginputs'>
         <label id='tool_node_x'>
@@ -13,7 +13,7 @@ export default function PathNodePanel() {
             data-title="Change node's x coordinate"
             data-attr='x'
           />
-          <span>X</span>
+          <span className='!font-Josefin'>X</span>
         </label>
         <label id='tool_node_y'>
           <input
@@ -22,13 +22,17 @@ export default function PathNodePanel() {
             data-title="Change node's y coordinate"
             data-attr='y'
           />
-          <span>Y</span>
+          <span className='!font-Josefin'>Y</span>
         </label>
 
         <div id='segment_type' className='draginput label'>
-          <span>Seg Type</span>
-          <select id='seg_type' data-title='Change Segment type'>
-            <option id='straight_segments' selected value='4'>
+          <span className='!font-Josefin'>Seg Type</span>
+          <select
+            id='seg_type'
+            data-title='Change Segment type'
+            defaultValue='4'
+          >
+            <option id='straight_segments' value='4'>
               Straight
             </option>
             <option id='curve_segments' value='6'>

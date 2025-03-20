@@ -955,8 +955,6 @@ window.methodDraw = function() {
       var sides = ['top', 'left', 'bottom', 'right'];
     
       elems.each(function() {
-//          console.log('go', scale);
-
         // Handled in CSS
         // this.style[ua_prefix + 'Transform'] = 'scale(' + scale + ')';
       
@@ -1681,8 +1679,8 @@ window.methodDraw = function() {
     });
   
     
-    $('#canvas_height').dragInput({ min: 10,   max: null,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         }); 
-    $('#canvas_width') .dragInput({ min: 10,   max: null,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         });                         
+    $('#canvas_height').dragInput({ min: 1,   max: 10000,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         }); 
+    $('#canvas_width') .dragInput({ min: 1,   max: 10000,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         });                         
     $('#rect_width')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         }); 
     $('#rect_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_cx')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });

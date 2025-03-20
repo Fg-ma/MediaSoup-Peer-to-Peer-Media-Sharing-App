@@ -1,7 +1,7 @@
 .modal {
-  background: rgba(50,50,50,0.8);
+  background: rgba(50, 50, 50, 0.8);
   position: absolute;
-  z-index: 1000;
+  z-index: 10001;
   top: 0;
   left: 0;
   right: 0;
@@ -12,6 +12,8 @@
   opacity: 1;
   font-size: 16px;
   line-height: 150%;
+  width: 100%;
+  height: 100%;
 }
 
 .modal.hidden {
@@ -21,25 +23,97 @@
 }
 
 .modal-item {
-  background-color: white;
-  position: relative;
-  border-radius: var(--x1);
-  padding: var(--x12);
-  max-width: 600px;
-  margin: 32px;
-}
-
-.modal-item.modal-item-wide {
-  max-width: none;
-  width: 900px;
-}
-
-.modal-item.modal-item-source {
-  height: 504px;
-  max-width: none;
-  width: 704px;
+  width: max-content;
+  height: max-content;
 }
 
 .modal h1:first-child {
   margin-top: 0;
+}
+
+.aboutModal {
+  position: absolute;
+  width: 90%;
+  background: #f2f2f2;
+  max-height: 80%;
+  border-radius: 0.75rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.aboutModal h1 {
+  font-size: 3rem;
+  line-height: 3.25rem;
+  font-family: Josefin, sans;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.aboutModal p {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.aboutModal a {
+  color: #d40213;
+  text-decoration: underline;
+}
+
+.configureModal {
+  position: absolute;
+  width: 90%;
+  background: #f2f2f2;
+  max-height: 80%;
+  border-radius: 0.75rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.configureModal h1 {
+  font-size: 2.5rem;
+  line-height: 2.75rem;
+  font-family: Josefin, sans;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+#configuration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shortcutModal {
+  position: absolute;
+  width: 90%;
+  background: #f2f2f2;
+  max-height: 80%;
+  border-radius: 0.75rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.shortcutModal h1 {
+  font-size: 2.5rem;
+  line-height: 2.75rem;
+  font-family: Josefin, sans;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }

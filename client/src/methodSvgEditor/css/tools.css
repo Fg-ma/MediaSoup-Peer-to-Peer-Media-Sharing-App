@@ -15,6 +15,9 @@
   line-height: 60px;
   text-align: center;
   transform: scale(0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .inverted .tool_button svg {
@@ -46,7 +49,6 @@
   fill: var(--accent7);
 }
 
-
 .tool_button.disabled svg {
   background-color: #aaa;
   cursor: not-allowed;
@@ -57,7 +59,7 @@
 #tool_rect svg {
   position: relative;
   top: -1px;
-  left:  1px;
+  left: 1px;
 }
 
 #tool_ellipse svg {

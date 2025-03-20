@@ -1,4 +1,4 @@
- #panels {
+#panels {
   position: absolute;
   box-sizing: border-box;
   width: var(--panel-width);
@@ -8,6 +8,10 @@
   border-bottom: none;
   overflow: auto;
   padding: 0;
+}
+
+#canvas_title {
+  z-index: 0;
 }
 
 .context_panel {

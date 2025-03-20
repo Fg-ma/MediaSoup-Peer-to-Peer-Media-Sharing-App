@@ -1,46 +1,76 @@
 #svg_source_editor {
+  position: absolute;
+  width: 90%;
+  height: 80%;
+  z-index: 10001;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#svg_source_editor_container {
   position: relative;
-  width: 800px;
-  height: 600px;
-  margin: -48px;
-  z-index: 500000000001;
+  width: 100%;
+  height: 100%;
 }
 
 #svg_source_container {
-  width: 800px;
+  width: 100%;
   position: relative;
   height: 100%;
+  background-color: #090909;
+  border-radius: 8px;
 }
 
 #svg_source_editor form {
   position: absolute;
-  top: 0;
+  top: 0.5rem;
   bottom: 55px;
-  left: 0;
-  right: 0;
+  left: 0.5rem;
+  right: 0.5rem;
   font-size: 14px;
-  background-color: var(--z14);
-  border-radius: 8px 8px 0 0;
+  background-color: #f2f2f2;
+  border-radius: 8px;
 }
 
 #svg_source_textarea {
-  width: calc(100% - 64px);
-  height: calc(100% - 64px);
+  width: 100%;
+  height: 100%;
   line-height: 140%;
-  font-family: var(--mono-font);
+  font-family: B612Mono, monospace !important;
   font-size: 14px;
-  color: var(--z4);
+  color: #090909;
   border: none;
   padding: 32px;
   background-color: transparent;
 }
 
+#svg_source_textarea:focus {
+  outline: none;
+}
+
 #svg_source_editor #tool_source_back {
   position: absolute;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   bottom: 0;
   left: 0;
   right: 0;
   padding: var(--x2) var(--x2);
+}
+
+#tool_source_cancel {
+  margin-bottom: 0.25rem;
+  margin-right: 0.5rem;
+  height: 2rem;
+  width: 7rem;
+  color: #0d0d0d;
+}
+
+#tool_source_save {
+  margin-bottom: 0.25rem;
+  margin-left: 0.5rem;
+  height: 2rem;
+  width: 7rem;
+  background: #d40213;
 }
