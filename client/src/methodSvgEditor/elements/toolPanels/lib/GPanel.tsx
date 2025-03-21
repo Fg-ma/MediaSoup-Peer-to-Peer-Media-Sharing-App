@@ -27,7 +27,7 @@ export default function GPanel() {
         </label>
       </div>
       <div
-        className='button full !font-K2D'
+        className='button !font-K2D border-none hover:bg-fg-tone-black-6 w-full flex items-center justify-center'
         title='Ungroup Elements'
         id='button_ungroup'
       >

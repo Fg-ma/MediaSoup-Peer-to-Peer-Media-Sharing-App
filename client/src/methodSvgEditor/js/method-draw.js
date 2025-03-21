@@ -267,6 +267,16 @@ window.methodDraw = function() {
       $("#stroke_style_label").html(this.options[this.selectedIndex].text)
     });
     
+    $('#stroke_join').change(function(){
+      svgCanvas.setStrokeAttr('stroke-linejoin', $(this).val());
+      $("#stroke_join_label").html(this.options[this.selectedIndex].text)
+    });
+    
+    $('#stroke_cap').change(function(){
+      svgCanvas.setStrokeAttr('stroke-linecap', $(this).val());
+      $("#stroke_cap_label").html(this.options[this.selectedIndex].text)
+    });
+    
     $('#seg_type').change(function() {
       svgCanvas.setSegType($(this).val());
       $("#seg_type_label").html(this.options[this.selectedIndex].text)

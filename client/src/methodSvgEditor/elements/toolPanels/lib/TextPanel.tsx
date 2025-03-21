@@ -44,7 +44,7 @@ export default function TextPanel() {
             size={12}
             type='hidden'
           />
-          <select id='font_family_dropdown'></select>
+          <select id='font_family_dropdown' className='p-2'></select>
         </div>
         <div className='draginput font_style'>
           <span className='!font-Josefin'>Font Style</span>

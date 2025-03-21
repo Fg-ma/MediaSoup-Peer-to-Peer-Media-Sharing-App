@@ -80,7 +80,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_posleft'
-                title='Align Left'
+                title='Align left'
                 data-align='left'
               >
                 <svg
@@ -95,7 +95,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_poscenter'
-                title='Align Center'
+                title='Align center'
                 data-align='center'
               >
                 <svg
@@ -110,7 +110,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_posright'
-                title='Align Right'
+                title='Align right'
                 data-align='right'
               >
                 <svg
@@ -125,7 +125,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_postop'
-                title='Align Top'
+                title='Align top'
                 data-align='top'
               >
                 <svg
@@ -140,7 +140,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_posmiddle'
-                title='Align Middle'
+                title='Align middle'
                 data-align='middle'
               >
                 <svg
@@ -155,7 +155,7 @@ export default function SelectedPanel() {
               <div
                 className='align_button'
                 id='tool_posbottom'
-                title='Align Bottom'
+                title='Align bottom'
                 data-align='bottom'
               >
                 <svg

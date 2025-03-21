@@ -7771,7 +7771,7 @@ $.SvgCanvas = function (container, config) {
   //
   // Parameters:
   // elem - The element to check the blur value for
-  this.getBlur = function (elem) {
+  var getBlur = (this.getBlur = function (elem) {
     var val = 0;
 
     if (elem) {
@@ -7783,7 +7783,7 @@ $.SvgCanvas = function (container, config) {
       }
     }
     return val;
-  };
+  });
 
   (function () {
     var cur_command = null;
@@ -8209,7 +8209,7 @@ $.SvgCanvas = function (container, config) {
 
   // Group: Element manipulation
 
-  // Function: setSegType
+  // Function: setPointType
   // Sets the new segment type to the selected segment(s).
   //
   // Parameters:
@@ -8792,9 +8792,9 @@ $.SvgCanvas = function (container, config) {
       }
 
       if (gattrs.filter) {
-        var cblur = this.getBlur(elem);
+        var cblur = getBlur(elem);
         var orig_cblur = cblur;
-        if (!gblur) gblur = this.getBlur(g);
+        if (!gblur) gblur = getBlur(g);
         if (cblur) {
           // Is this formula correct?
           cblur = gblur - 0 + (cblur - 0);

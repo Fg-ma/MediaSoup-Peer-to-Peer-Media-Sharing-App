@@ -49,6 +49,7 @@ h2.jGraduate_Title {
 }
 
 .jGraduate_tabs {
+  font-family: Josefin, sans !important;
   padding: var(--x4);
   --neg: calc(var(--x4) * -1);
   margin: var(--neg) var(--neg) 0 var(--neg);

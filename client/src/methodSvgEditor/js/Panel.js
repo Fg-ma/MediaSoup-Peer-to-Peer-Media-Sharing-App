@@ -289,11 +289,36 @@ MD.Panel = function () {
     );
   });
 
+  // Paint order
+
+  $(".paint_order_buttons .paint_order_button").on("click", function () {
+    let paintOrderValue = this.getAttribute("data-paint-order");
+    if (!paintOrderValue) return;
+    svgCanvas.setStrokeAttr("paint-order", paintOrderValue);
+
+    $(".paint_order_button").removeClass("active");
+    $(this).addClass("active");
+  });
+
   // Stroke dash
 
   $("#stroke_style").change(function () {
     svgCanvas.setStrokeAttr("stroke-dasharray", $(this).val());
     $("#stroke_style_label").html(this.options[this.selectedIndex].text);
+  });
+
+  // Storke join
+
+  $("#stroke_join").change(function () {
+    svgCanvas.setStrokeAttr("stroke-linejoin", $(this).val());
+    $("#stroke_join_label").html(this.options[this.selectedIndex].text);
+  });
+
+  // Storke cap
+
+  $("#stroke_cap").change(function () {
+    svgCanvas.setStrokeAttr("stroke-linecap", $(this).val());
+    $("#stroke_cap_label").html(this.options[this.selectedIndex].text);
   });
 
   // Segment type
@@ -339,11 +364,13 @@ MD.Panel = function () {
 
     const tagName = elem.tagName;
     $("#" + tagName + "_panel").show();
+
     const strokeWidth =
       elem.getAttribute("stroke") && !elem.getAttribute("stroke-width")
         ? 1
         : elem.getAttribute("stroke-width") || 0;
     $("#stroke_width").val(strokeWidth);
+
     const dash = elem.getAttribute("stroke-dasharray") || "none";
     $("#stroke_style option").removeAttr("selected");
     $('#stroke_style option[value="' + dash + '"]').attr(
@@ -352,39 +379,24 @@ MD.Panel = function () {
     );
     $("#stroke_style").trigger("change");
 
+    const cap = elem.getAttribute("stroke-linecap") || "none";
+    $("#stroke_cap option").removeAttr("selected");
+    $('#stroke_cap option[value="' + cap + '"]').attr("selected", "selected");
+    $("#stroke_cap").trigger("change");
+
+    const join = elem.getAttribute("stroke-linejoin") || "none";
+    $("#stroke_join option").removeAttr("selected");
+    $('#stroke_join option[value="' + join + '"]').attr("selected", "selected");
+    $("#stroke_join").trigger("change");
+
+    const paintOrder = elem.getAttribute("paint-order");
+    if (paintOrder) {
+      $(".paint_order_button").removeClass("active");
+      $(`#tool_${paintOrder.split(" ").join("_")}`).addClass("active");
+    }
+
     $.fn.dragInput.updateCursor($("#stroke_width")[0]);
     $.fn.dragInput.updateCursor($("#blur")[0]);
-  }
-
-  function pathEditContext() {
-    $(".context_panel").hide();
-    $("#path_node_panel").show();
-    $("#stroke_panel").hide();
-    var point = svgCanvas.pathActions.getNodePoint();
-    $("#tool_add_subpath")
-      .removeClass("push_button_pressed")
-      .addClass("tool_button");
-    $("#tool_node_delete").toggleClass(
-      "disabled",
-      !svgCanvas.pathActions.canDeleteNodes
-    );
-    if (point) {
-      var seg_type = $("#seg_type");
-      point.x = svgedit.units.convertUnit(point.x);
-      point.y = svgedit.units.convertUnit(point.y);
-      $("#path_node_x").val(Math.round(point.x));
-      $("#path_node_y").val(Math.round(point.y));
-      if (point.type) {
-        seg_type.val(point.type).removeAttr("disabled");
-        $("#seg_type_label").html(point.type === 4 ? "Straight" : "Curve");
-      } else {
-        seg_type.val(4).attr("disabled", "disabled");
-      }
-    }
-    $("#panels").removeClass("multiselected");
-    $("#stroke_panel").hide();
-    $("#canvas_panel").hide();
-    return;
   }
 
   function canPutTextOnPath(elems) {
@@ -457,6 +469,25 @@ MD.Panel = function () {
         "5,2,2,2,2,2": "-··-",
       };
       $("#stroke_style_label").html(strokeStyles[strokeStyle] || "—");
+      const strokeCap = elem.getAttribute("stroke-linecap") || "butt";
+      const strokeCaps = {
+        butt: "Butt",
+        round: "Round",
+        square: "Square",
+      };
+      $("#stroke_cap_label").html(strokeCaps[strokeCap] || "Butt");
+      const strokeJoin = elem.getAttribute("stroke-linejoin") || "miter";
+      const strokeJoins = {
+        miter: "Miter",
+        round: "Round",
+        bevel: "Bevel",
+      };
+      $("#stroke_join_label").html(strokeJoins[strokeJoin] || "Miter");
+      const paintOrder = elem.getAttribute("paint-order");
+      if (paintOrder) {
+        $(".paint_order_button").removeClass("active");
+        $(`#tool_${paintOrder.split(" ").join("_")}`).addClass("active");
+      }
       var elname = elem.nodeName;
       var angle = svgCanvas.getRotationAngle(elem);
       $("#angle").val(Math.round(angle));
@@ -692,7 +723,14 @@ MD.Panel = function () {
       $("#path_node_y").val(Math.round(point.y));
       if (point.type) {
         seg_type.val(point.type).removeAttr("disabled");
-        $("#seg_type_label").html(point.type === 4 ? "Straight" : "Curve");
+        const segLabelMap = {
+          4: "Straight",
+          6: "Curve",
+          7: "Smooth",
+          8: "Symmetric",
+          9: "Auto-smooth",
+        };
+        $("#seg_type_label").html(segLabelMap[point.type]);
       } else {
         seg_type.val(4).attr("disabled", "disabled");
       }

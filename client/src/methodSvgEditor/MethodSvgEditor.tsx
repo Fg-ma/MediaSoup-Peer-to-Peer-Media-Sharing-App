@@ -47,6 +47,9 @@ const loadScript = (src: string) => {
 };
 
 export default function MethodSvgEditor() {
+  const workAreaRef = useRef<HTMLDivElement>(null);
+  const svgCanvasRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const scripts = [
       "./src/methodSvgEditor/js/loading.js",
@@ -125,9 +128,6 @@ export default function MethodSvgEditor() {
       scriptTags.forEach((script) => script.remove());
     };
   }, []);
-
-  const workAreaRef = useRef<HTMLDivElement>(null);
-  const svgCanvasRef = useRef<HTMLDivElement>(null);
 
   return (
     <div

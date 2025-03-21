@@ -30,13 +30,22 @@ export default function PathNodePanel() {
           <select
             id='seg_type'
             data-title='Change Segment type'
-            defaultValue='4'
+            defaultValue='8'
           >
             <option id='straight_segments' value='4'>
               Straight
             </option>
             <option id='curve_segments' value='6'>
               Curve
+            </option>
+            <option id='curve_segments' value='7'>
+              Smooth
+            </option>
+            <option id='curve_segments' value='8'>
+              Symmetric
+            </option>
+            <option id='curve_segments' value='9'>
+              Auto-smooth
             </option>
           </select>
           <div className='caret'></div>

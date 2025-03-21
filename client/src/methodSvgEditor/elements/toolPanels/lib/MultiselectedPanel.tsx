@@ -5,9 +5,10 @@ export default function MultiselectedPanel() {
     <div id='multiselected_panel' className='context_panel clearfix'>
       <h4 className='hidable !font-Josefin'>Multiple Elements</h4>
 
-      <div className='toolset align_buttons'>
+      <div className='toolset align_buttons relative'>
+        <div className='caret'></div>
         <label id='tool_align_relative'>
-          <div className='select-input'>
+          <div className='align_relative_to_container select-input'>
             <select
               id='align_relative_to'
               title='Align relative to ...'
@@ -116,7 +117,10 @@ export default function MultiselectedPanel() {
         </div>
       </div>
       <div className='clearfix'></div>
-      <div className='button full !font-K2D' id='button_group'>
+      <div
+        className='button !font-K2D border-none hover:bg-fg-tone-black-6 w-full flex items-center justify-center'
+        id='button_group'
+      >
         Group Elements
       </div>
       <div

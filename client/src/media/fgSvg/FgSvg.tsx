@@ -14,7 +14,6 @@ import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import SvgEffectsButton from "./lib/lowerSvgControls/svgEffectsButton/SvgEffectsButton";
 import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
 import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
-import SvgEditor from "../../elements/svgEditor/SvgEditor";
 import "./lib/fgSvgStyles.css";
 
 export default function FgSvg({
