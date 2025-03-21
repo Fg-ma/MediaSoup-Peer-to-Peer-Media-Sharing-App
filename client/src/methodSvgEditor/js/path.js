@@ -134,8 +134,8 @@ var svgedit = svgedit || {};
       svgedit.utilities.assignAttributes(pointGrip, {
         id: "pathpointgrip_" + index,
         display: "none",
-        width: svgedit.browser.isTouch() ? 30 : 10,
-        height: svgedit.browser.isTouch() ? 30 : 10,
+        width: svgedit.browser.isTouch() ? 30 : 15,
+        height: svgedit.browser.isTouch() ? 30 : 15,
         fill: "#f2f2f2",
         stroke: "#f6630f",
         "shape-rendering": "crispEdges",
@@ -155,8 +155,8 @@ var svgedit = svgedit || {};
     if (x && y) {
       // set up the point grip element and display it
       svgedit.utilities.assignAttributes(pointGrip, {
-        x: x - (svgedit.browser.isTouch() ? 15 : 5),
-        y: y - (svgedit.browser.isTouch() ? 15 : 5),
+        x: x - (svgedit.browser.isTouch() ? 15 : 7.5),
+        y: y - (svgedit.browser.isTouch() ? 15 : 7.5),
         display: "inline",
       });
     }
@@ -181,7 +181,7 @@ var svgedit = svgedit || {};
     svgedit.utilities.assignAttributes(pointGrip, {
       id: "ctrlpointgrip_" + id,
       display: "none",
-      r: svgedit.browser.isTouch() ? 15 : 6,
+      r: svgedit.browser.isTouch() ? 15 : 8,
       fill: "#1d69ca",
       stroke: "#1d69ca",
       "stroke-opacity": 0,
@@ -215,8 +215,8 @@ var svgedit = svgedit || {};
     if (update) {
       var pt = svgedit.path.getGripPt(seg);
       svgedit.utilities.assignAttributes(pointGrip, {
-        x: pt.x - (svgedit.browser.isTouch() ? 15 : 5),
-        y: pt.y - (svgedit.browser.isTouch() ? 15 : 5),
+        x: pt.x - (svgedit.browser.isTouch() ? 15 : 7.5),
+        y: pt.y - (svgedit.browser.isTouch() ? 15 : 7.5),
         display: "inline",
       });
     }
@@ -439,7 +439,7 @@ var svgedit = svgedit || {};
   svgedit.path.Segment.prototype.update = function (full) {
     if (this.ptgrip) {
       var pt = svgedit.path.getGripPt(this);
-      var reposition = svgedit.browser.isTouch() ? 15 : 5;
+      var reposition = svgedit.browser.isTouch() ? 15 : 7.5;
       var properties =
         this.ptgrip.nodeName === "rect"
           ? { x: pt.x - reposition, y: pt.y - reposition }
@@ -584,7 +584,7 @@ var svgedit = svgedit || {};
       segment.path = this;
       this.segs.push(segment);
     }
-
+    console.log(this.segs);
     var segs = this.segs;
     var start_i = null;
 

@@ -30,7 +30,7 @@ export default function PathNodePanel() {
           <select
             id='seg_type'
             data-title='Change Segment type'
-            defaultValue='8'
+            defaultValue='4'
           >
             <option id='straight_segments' value='4'>
               Straight
