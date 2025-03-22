@@ -281,6 +281,10 @@ MD.PaintBox = function (container, type) {
     editor.paintBox.canvas.colorPicker($("#canvas_color"));
   });
 
+  $("#tool_text_color").on("click touchstart", function () {
+    editor.paintBox.canvas.colorPicker($("#text_color"));
+  });
+
   $("#tool_switch").on("click touchstart", function () {
     editor.switchPaint();
   });

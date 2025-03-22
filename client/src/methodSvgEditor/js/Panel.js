@@ -30,14 +30,14 @@ MD.Panel = function () {
     cursor: false,
   });
   $("#ellipse_cx").dragInput({
-    min: 1,
+    min: null,
     max: null,
     step: 1,
     callback: editor.changeAttribute,
     cursor: false,
   });
   $("#ellipse_cy").dragInput({
-    min: 1,
+    min: null,
     max: null,
     step: 1,
     callback: editor.changeAttribute,
@@ -251,7 +251,7 @@ MD.Panel = function () {
   });
   $("#font_size").dragInput({
     min: 1,
-    max: 250,
+    max: 500,
     step: 1,
     callback: editor.text.changeFontSize,
     cursor: true,
@@ -268,7 +268,7 @@ MD.Panel = function () {
   });
   $("#blur").dragInput({
     min: 0,
-    max: 10,
+    max: 20,
     step: 0.1,
     callback: editor.changeBlur,
     cursor: true,
@@ -535,7 +535,7 @@ MD.Panel = function () {
         $("#g_panel").show();
       }
 
-      if (elem && elem.parentNode.tagName === "a") {
+      if (elem && elem.parentNode && elem.parentNode.tagName === "a") {
         if (!$(elem).siblings().length) {
           $("#a_panel").show();
           link_href = svgCanvas.getHref(elem.parentNode);
@@ -694,6 +694,9 @@ MD.Panel = function () {
         "#delete,#cut,#copy,#move_front,#move_up,#move_down,#move_back"
       );
     }
+
+    populateObjectsPanel(svgCanvas.getSvgString());
+    folderPadding();
   }
 
   $("#cur_context_panel").delegate("a", "click", function () {
@@ -741,6 +744,133 @@ MD.Panel = function () {
     return;
   }
 
+  function openObjectsPanels() {
+    populateObjectsPanel(svgCanvas.getSvgString());
+    $(this).addClass("active");
+    $("#objects_panels").addClass("active");
+    $("#editing_panel_button").removeClass("active");
+    $("#editing_panels").removeClass("active");
+    folderPadding();
+  }
+
+  function openEditingPanels() {
+    $(this).addClass("active");
+    $("#editing_panels").addClass("active");
+    $("#objects_panel_button").removeClass("active");
+    $("#objects_panels").removeClass("active");
+  }
+
+  function folderPadding() {
+    $(".folder-item").each(function () {
+      // Count the number of parent divs with the class .object-folder.folder-open
+      var parentDivCount = $(this).parents(".object-folder.folder-open").length;
+
+      // Set padding left to be 1.5 * the number of parent divs
+      $(this).css("padding-left", 1.5 * parentDivCount + "rem");
+    });
+
+    $(".folder-name").each(function () {
+      // Count the number of parent divs with the class .object-folder.folder-open
+      var parentDivs = $(this).parents(".object-folder");
+
+      if (parentDivs.length === 1)
+        $(parentDivs.first()).css("border-radius", "0.25rem");
+
+      $(this).css(
+        "padding-left",
+        Math.max(
+          0.5,
+          1.5 *
+            ($(this).parents(".object-folder.folder-open").length -
+              (parentDivs.first().hasClass("folder-open") ? 1 : 0))
+        ) + "rem"
+      );
+    });
+  }
+
+  function populateObjectsPanel(svgString) {
+    // Parse the SVG string into a DOM structure
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, "image/svg+xml");
+    const svgElement = $(doc.documentElement); // Convert to jQuery object
+
+    // Function to process each element correctly
+    function renderSVGToObjects(element, isFirstFolder = false) {
+      let $element = $(element);
+      let tagName = element.tagName.toLowerCase();
+      let children = Array.from(element.children).filter(
+        (child) => child.tagName.toLowerCase() !== "title"
+      ); // Ignore <title> elements
+
+      if (tagName === "g") {
+        // If this is the first folder, add extra handling
+        const folderHTML = $("<div>", {
+          class: "object-folder folder-open",
+        }).append(
+          $("<div>", {
+            class: "folder-name",
+            text: !isFirstFolder ? $element.attr("id") || "Unnamed" : "Page",
+          })
+        );
+
+        // Create folder content separately
+        const folderContent = $("<div>", { class: "folder-content" });
+
+        // Recursively process only actual children
+        children.forEach((child) => {
+          folderContent.append(renderSVGToObjects(child)); // Pass along to the recursion
+        });
+
+        // Append the folder content to the folderHTML after all children are processed
+        folderHTML.append(folderContent);
+
+        return folderHTML;
+      } else {
+        // Create an item for non-group elements
+        return $("<div>", {
+          class: "folder-item",
+          text: $element.attr("id") || tagName,
+        });
+      }
+    }
+
+    // Generate the structured HTML, making sure top-level elements are properly separated
+    let objectsPanelHTML = $("#objects_panels");
+    objectsPanelHTML.empty();
+
+    // **Important:** Only process direct children of the root <svg>
+    let firstFolderAppended = false;
+    Array.from(svgElement[0].children).forEach((child) => {
+      // For the first group (g), set the flag to true and call with isFirstFolder = true
+      if (child.tagName.toLowerCase() === "g" && !firstFolderAppended) {
+        objectsPanelHTML.append(renderSVGToObjects(child, true)); // Append the first folder
+        firstFolderAppended = true; // Ensure only the first folder is appended
+      } else {
+        objectsPanelHTML.append(renderSVGToObjects(child)); // Regular processing for other elements
+      }
+    });
+
+    // Set the inner HTML of #objects_panels
+    $("#objects_panels").html(objectsPanelHTML.html());
+  }
+
+  $("#objects_panels")
+    .off("click", ".folder-name")
+    .on("click", ".folder-name", function () {
+      var parentDiv = $(this).closest(".object-folder");
+      parentDiv.toggleClass("folder-open");
+      folderPadding();
+    });
+
+  $("#objects_panel_button").on("click", openObjectsPanels);
+
+  $("#editing_panel_button").on("click", openEditingPanels);
+
+  $(".folder-item").on("click", function () {
+    svgCanvas.addToSelection();
+  });
+
+  openObjectsPanels();
   this.show = show;
   this.updateContextPanel = updateContextPanel;
 };

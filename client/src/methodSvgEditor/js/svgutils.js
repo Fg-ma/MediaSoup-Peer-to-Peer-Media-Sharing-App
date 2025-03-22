@@ -635,6 +635,8 @@ var svgedit = svgedit || {};
     suspendLength,
     unitCheck
   ) {
+    if (!node) return;
+
     for (var i in attrs) {
       if (attrs[i] === NaN || attrs[i] === null) continue;
       var ns =

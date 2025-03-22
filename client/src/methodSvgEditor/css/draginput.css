@@ -221,6 +221,7 @@
   text-align: left;
   white-space: nowrap;
   z-index: 1;
+  pointer-events: none;
 }
 
 .draginput.stroke_tool {

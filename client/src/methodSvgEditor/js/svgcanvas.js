@@ -45,11 +45,11 @@ $.SvgCanvas = function (container, config) {
     show_outside_canvas: true,
     selectNew: true,
     dimensions: [800, 600],
-    initFill: { color: "fff", opacity: 1 },
-    initStroke: { width: 1, color: "000", opacity: 1 },
+    initFill: { color: "f2f2f2", opacity: 1 },
+    initStroke: { width: 2, color: "090909", opacity: 1 },
     imgPath: "./src/methodSvgEditor/images/",
     baseUnit: "px",
-    defaultFont: "Noto Sans JP",
+    defaultFont: "K2D",
   };
 
   // Update config with new one if given
@@ -1233,7 +1233,6 @@ $.SvgCanvas = function (container, config) {
           };
         }
 
-        if (!changes.d[0]) return;
         var len = changes.d.length,
           firstseg = changes.d[0],
           currentpt = remap(firstseg.x, firstseg.y);
@@ -2666,6 +2665,11 @@ $.SvgCanvas = function (container, config) {
           break;
         case "text":
           started = true;
+          console.log(
+            cur_text.stroke_width,
+            cur_text.font_size,
+            cur_text.font_family
+          );
           var newText = addSvgElementFromJson({
             element: "text",
             curStyles: true,
@@ -2682,7 +2686,6 @@ $.SvgCanvas = function (container, config) {
               opacity: cur_shape.opacity,
             },
           });
-          //          newText.textContent = "text";
           break;
         case "path":
         // Fall through
@@ -3112,7 +3115,6 @@ $.SvgCanvas = function (container, config) {
         case "pathedit":
           x *= current_zoom;
           y *= current_zoom;
-
           if (curConfig.gridSnapping) {
             x = snapToGrid(x);
             y = snapToGrid(y);
@@ -3360,7 +3362,6 @@ $.SvgCanvas = function (container, config) {
             }
           }
           return;
-          break;
         case "zoom":
           if (rubberBox != null) {
             rubberBox.setAttribute("display", "none");
@@ -5490,12 +5491,14 @@ $.SvgCanvas = function (container, config) {
     // keep calling it until there are none to remove
     while (removeUnusedDefElems() > 0) {}
 
-    pathActions.clear(true);
+    const last_current_group = current_group;
+
+    // pathActions.clear(true);
 
     // Move out of in-group editing mode
-    if (current_group) {
+    if (last_current_group) {
       leaveContext();
-      selectOnly([current_group]);
+      selectOnly([last_current_group]);
     }
 
     //hide grid, otherwise shows a black canvas
@@ -8605,7 +8608,8 @@ $.SvgCanvas = function (container, config) {
 
       var nextSibling = t.nextSibling;
       var elem = parent.removeChild(t);
-      selectedCopy.push(selected); //for the copy
+      selectedCopy.push(selected); // for the copy
+
       selectedElements[i] = null;
       batchCmd.addSubCommand(
         new RemoveElementCommand(elem, nextSibling, parent)
@@ -8714,12 +8718,16 @@ $.SvgCanvas = function (container, config) {
     var batchCmd = new BatchCommand(cmd_str);
 
     // create and insert the group element
+    const oldPrefix = getCurrentDrawing().getIdPrefix();
+    getCurrentDrawing().setIdPrefix("g_");
     var g = addSvgElementFromJson({
       element: type,
       attr: {
         id: getNextId(),
       },
     });
+    getCurrentDrawing().setIdPrefix(oldPrefix);
+
     if (type === "a") {
       setHref(g, url);
     }
@@ -8948,6 +8956,10 @@ $.SvgCanvas = function (container, config) {
   // significant recalculations to apply group's transforms, etc to its children
   this.ungroupSelectedElement = function () {
     var g = selectedElements[0];
+    const oldPrefix = getCurrentDrawing().getIdPrefix();
+    getCurrentDrawing().setIdPrefix("g_");
+    getCurrentDrawing().releaseId(g.id);
+    getCurrentDrawing().setIdPrefix(oldPrefix);
     if ($(g).data("gsvg") || $(g).data("symbol")) {
       // Is svg, so actually convert to group
 

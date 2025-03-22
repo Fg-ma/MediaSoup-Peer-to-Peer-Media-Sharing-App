@@ -105,7 +105,10 @@ MD.Keyboard = function () {
   };
 
   document.addEventListener("keydown", function (e) {
-    const exceptions = $(":focus").length || $("#color_picker").is(":visible");
+    const exceptions =
+      $(":focus").length ||
+      $("#color_picker").is(":visible") ||
+      svgCanvas.getMode() === "textedit";
     if (exceptions) return false;
     const modKey = !svgedit.browser.isMac() ? "ctrlKey" : "metaKey";
     const cmd = e[modKey] ? "cmd_" : "";
@@ -128,7 +131,8 @@ MD.Keyboard = function () {
   });
 
   document.addEventListener("keyup", function (e) {
-    if ($("#color_picker").is(":visible")) return e;
+    if ($("#color_picker").is(":visible") || svgCanvas.getMode() === "textedit")
+      return e;
     const canvasMode = state.get("canvasMode");
     const key = e.key.toLowerCase();
     const keys = {

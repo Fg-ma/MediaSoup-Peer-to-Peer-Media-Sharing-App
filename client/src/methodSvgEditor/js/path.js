@@ -584,7 +584,6 @@ var svgedit = svgedit || {};
       segment.path = this;
       this.segs.push(segment);
     }
-    console.log(this.segs);
     var segs = this.segs;
     var start_i = null;
 
@@ -642,6 +641,8 @@ var svgedit = svgedit || {};
         }
       }
     }
+
+    console.log(this.segs);
     return this;
   };
 
@@ -853,6 +854,70 @@ var svgedit = svgedit || {};
       cur.setType(new_type, points);
     }
   };
+
+  // svgedit.path.Path.prototype.setPtType = function (new_type) {
+  //   this.storeD();
+  //   var i = this.selected_pts.length;
+  //   var text;
+  //   while (i--) {
+  //     var sel_pt = this.selected_pts[i];
+
+  //     // Selected seg
+  //     var cur = this.segs[sel_pt];
+  //     var next = cur.next;
+  //     if (!next) continue;
+
+  //     if (!new_type) {
+  //       // double-click, so just toggle
+  //       text = "Toggle Path Segment Type";
+
+  //       // Toggle segment to curve/straight line
+  //       var old_type = cur.type;
+
+  //       new_type = old_type == 6 ? 4 : 6;
+  //     }
+
+  //     new_type = new_type - 0;
+
+  //     var cur_x = cur.item.x;
+  //     var cur_y = cur.item.y;
+  //     var next_x = next.item.x;
+  //     var next_y = next.item.y;
+  //     var points;
+  //     switch (new_type) {
+  //       case 6:
+  //         if (cur.olditem) {
+  //           var old = cur.olditem;
+  //           points = [cur_x, cur_y, old.x1, old.y1, old.x2, old.y2];
+  //         } else {
+  //           var diff_x = next_x - cur_x;
+  //           var diff_y = next_y - cur_y;
+  //           // get control points from straight line segment
+  //           /*
+  //       var ct1_x = (prev_x + (diff_y/2));
+  //       var ct1_y = (prev_y - (diff_x/2));
+  //       var ct2_x = (cur_x + (diff_y/2));
+  //       var ct2_y = (cur_y - (diff_x/2));
+  //       */
+  //           //create control points on the line to preserve the shape (WRS)
+  //           var ct1_x = next_x + diff_x / 3;
+  //           var ct1_y = next_y + diff_y / 3;
+  //           var ct2_x = cur_x - diff_x / 3;
+  //           var ct2_y = cur_y - diff_y / 3;
+  //           points = [cur_x, cur_y, ct1_x, ct1_y, ct2_x, ct2_y];
+  //         }
+  //         break;
+  //       case 4:
+  //         points = [cur_x, cur_y];
+
+  //         // Store original prevve segment nums
+  //         cur.olditem = cur.item;
+  //         break;
+  //     }
+
+  //     cur.setType(new_type, points);
+  //   }
+  // };
 
   svgedit.path.Path.prototype.selectPt = function (pt, ctrl_num) {
     this.clearSelection();

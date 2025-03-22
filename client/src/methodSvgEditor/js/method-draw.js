@@ -1274,6 +1274,10 @@ window.methodDraw = function() {
     
     $('#tool_canvas').on("click touchstart", function(){
         colorPicker($('#canvas_color'));
+    }); 
+    
+    $('#tool_text_color').on("click touchstart", function(){
+        colorPicker($('#text_color'));
     });
     
     $('#tool_stroke').on("touchstart", function(){
@@ -1693,8 +1697,8 @@ window.methodDraw = function() {
     $('#canvas_width') .dragInput({ min: 1,   max: 10000,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         });                         
     $('#rect_width')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         }); 
     $('#rect_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#ellipse_cx')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#ellipse_cy')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#ellipse_cx')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#ellipse_cy')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_rx')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_ry')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $("#image_height") .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
@@ -1715,18 +1719,18 @@ window.methodDraw = function() {
     $('#path_y')       .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#rect_x')       .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#rect_y')       .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#g_x')      .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#g_y')      .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#g_x')          .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#g_y')          .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#image_x')      .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#text_y')       .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#text_x')       .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#image_y')      .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#rect_rx')      .dragInput({ min: 0,    max: 100,   step:  1,  callback: changeAttribute,    cursor: true                          });
+    $('#rect_rx')      .dragInput({ min: 0,    max: 100,   step:  1,  callback: changeAttribute,     cursor: true                          });
     $('#stroke_width') .dragInput({ min: 0,    max: 99,    step:  1,  callback: changeStrokeWidth,   cursor: true, smallStep: 0.1, start: 1.5          });
     $('#angle')        .dragInput({ min: -180, max: 180,   step:  1,  callback: changeRotationAngle, cursor: false, dragAdjust: 0.5      });
-    $('#font_size')    .dragInput({ min: 1, max: 250, step: 1, callback: changeFontSize,             cursor: false, stepfunc: stepFontSize, dragAdjust: .15 });
-    $('#group_opacity').dragInput({ min: 0,    max: 100,   step:  5,  callback: changeAttribute,       cursor: true,  start: 100             });
-    $('#blur')         .dragInput({ min: 0,    max: 10,    step: .1,  callback: changeBlur,          cursor: true,  start: 0               });
+    $('#font_size')    .dragInput({ min: 1,    max: 500,   step:  1,  callback: changeFontSize,      cursor: false, stepfunc: stepFontSize, dragAdjust: .15 });
+    $('#group_opacity').dragInput({ min: 0,    max: 100,   step:  5,  callback: changeAttribute,     cursor: true,  start: 100             });
+    $('#blur')         .dragInput({ min: 0,    max: 20,    step: .1,  callback: changeBlur,          cursor: true,  start: 0               });
       // Set default zoom 
     $('#zoom').val(svgCanvas.getZoom() * 100);
     

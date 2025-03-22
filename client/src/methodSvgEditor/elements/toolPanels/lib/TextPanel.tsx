@@ -55,8 +55,19 @@ export default function TextPanel() {
             i
           </div>
         </div>
+        <label data-title='Change text color' className='draginput'>
+          <span className='!font-Josefin'>Color</span>
+          <div id='color_text_tools'>
+            <div className='color_tool active' id='tool_text_color'>
+              <div className='color_block'>
+                <div id='text_bg'></div>
+                <div id='text_color'></div>
+              </div>
+            </div>
+          </div>
+        </label>
         <label id='tool_font_size' data-title='Change Font Size'>
-          <input id='font_size' className='attr_changer' defaultValue={0} />
+          <input id='font_size' className='attr_changer' defaultValue={24} />
           <span id='font_sizeLabel' className='icon_label !font-Josefin'>
             Font Size
           </span>

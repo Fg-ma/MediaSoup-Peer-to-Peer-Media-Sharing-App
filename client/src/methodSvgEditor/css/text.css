@@ -82,3 +82,20 @@
 #textpath-panel {
   display: none;
 }
+
+#color_text_tools,
+#text_bg {
+  background: var(--z15);
+}
+
+#color_text_tools {
+  width: 60px;
+  height: 40px;
+  margin: 23px 5px 5px 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+#color_text_tools {
+  display: block;
+}

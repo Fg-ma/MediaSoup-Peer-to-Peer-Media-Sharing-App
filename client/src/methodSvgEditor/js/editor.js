@@ -206,7 +206,8 @@ MD.Editor = function () {
     const mode = svgCanvas.getMode();
 
     // if the element changed was the svg, then it could be a resolution change
-    if (elems[0].tagName === "svg") return editor.canvas.update(true);
+    if (elems[0] && elems[0].tagName === "svg")
+      return editor.canvas.update(true);
 
     editor.panel.updateContextPanel(elems);
 
@@ -223,8 +224,9 @@ MD.Editor = function () {
     if (attr === "opacity") value *= 0.01;
     if (completed) {
       svgCanvas.changeSelectedAttribute(attr, value);
-      saveCanvas();
-    } else svgCanvas.changeSelectedAttributeNoUndo(attr, value);
+    } else {
+      svgCanvas.changeSelectedAttributeNoUndo(attr, value);
+    }
   }
 
   function elementTransition(window, elems) {

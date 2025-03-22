@@ -56,9 +56,11 @@ MD.Text = function () {
   $("#text")
     .keydown(function (e) {
       e.stopPropagation();
+      console.log(e);
     })
     .keyup(function (e) {
       e.stopPropagation();
+      console.log(111111, e);
       if (e.key === "Escape" || e.key === "Enter") {
         svgCanvas.textActions.toSelectMode();
         this.blur();
