@@ -289,12 +289,12 @@ window.methodDraw = function() {
       svgCanvas.setFontFamily(this.value);
     });
       
-    $('#text').keyup(function(e){
-      if (e.key === "Escape") {
-        return svgCanvas.textActions.toSelectMode()
-      }
-      svgCanvas.setTextContent(this.value);
-    });
+    // $('#text').keydown(function(e){
+      // if (e.key === "Escape") {
+        // return svgCanvas.textActions.toSelectMode()
+      // }
+      // svgCanvas.setTextContent(this.value);
+    // });
     
     changeAttribute = function(el, completed) {
       var attr = el.getAttribute("data-attr");

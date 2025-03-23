@@ -7,9 +7,9 @@ editor.text = new MD.Text();
 editor.panel = new MD.Panel();
 editor.zoom = new MD.Zoom();
 editor.paintBox = {
-  fill: new MD.PaintBox('#fill_color', 'fill'),
-  stroke: new MD.PaintBox('#stroke_color', 'stroke'),
-  canvas: new MD.PaintBox('#canvas_color', 'canvas')
+  fill: new MD.PaintBox("#fill_color", "fill"),
+  stroke: new MD.PaintBox("#stroke_color", "stroke"),
+  canvas: new MD.PaintBox("#canvas_color", "canvas"),
 };
 editor.palette = new MD.Palette();
 editor.pan = new MD.Pan();
@@ -29,25 +29,26 @@ svgCanvas.bind("contextset", editor.contextChanged);
 svgCanvas.bind("extension_added", editor.extensionAdded);
 svgCanvas.textActions.setInputElem($("#text")[0]);
 const shapeLib = svgCanvas.addExtension.apply(this, ["shapes", MD.Shapelib]);
-const eyedropper = svgCanvas.addExtension.apply(this, ["eyedropper", MD.Eyedropper]);
+const eyedropper = svgCanvas.addExtension.apply(this, [
+  "eyedropper",
+  MD.Eyedropper,
+]);
 state.set("canvasId", t("Untitled"));
 state.set("canvasMode", state.get("canvasMode"));
 
 // load from param
 if (!window.location.search.includes("?load=")) {
   svgCanvas.setSvgString(state.get("canvasContent"));
-}
-else {
-  
-  const error = function(err) {
-      console.log(err);
-      svgCanvas.setSvgString(state.get("canvasContent"));
-  }
+} else {
+  const error = function (err) {
+    console.log(err);
+    svgCanvas.setSvgString(state.get("canvasContent"));
+  };
 
   const url = utils.findGetParameter("load");
   fetch(url)
-    .then(r => r.text())
-    .then(text => {
+    .then((r) => r.text())
+    .then((text) => {
       if (text.includes("Error response")) return error("Error response");
       svgCanvas.setSvgString(text);
     })

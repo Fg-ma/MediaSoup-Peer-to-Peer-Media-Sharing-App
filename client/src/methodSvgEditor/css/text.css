@@ -26,11 +26,9 @@
 
 #tool_italic {
   border-right: solid var(--z1) 2px;
-  line-height: var(--x9);
   left: 0;
   font-weight: bold;
   font-style: italic;
-  font-size: 24px;
 }
 
 #tool_bold:hover,
@@ -98,4 +96,12 @@
 
 #color_text_tools {
   display: block;
+}
+
+.hide_text_input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  left: -1000000000%;
+  top: -1000000000%;
 }

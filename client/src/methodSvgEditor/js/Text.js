@@ -56,24 +56,33 @@ MD.Text = function () {
   $("#text")
     .keydown(function (e) {
       e.stopPropagation();
-      console.log(e);
+      if (e.key === "Escape" || e.key === "Enter") {
+        e.preventDefault();
+        editor.saveCanvas();
+        return editor.escapeMode();
+      } else if (e.key === "ArrowRight") {
+        svgCanvas.textActions.setCursor(
+          Math.min(
+            this.value.length,
+            svgCanvas.textActions.getCursorIndex() + 1
+          )
+        );
+      } else if (e.key === "ArrowLeft") {
+        svgCanvas.textActions.setCursor(
+          Math.max(0, svgCanvas.textActions.getCursorIndex() - 1)
+        );
+      }
+    })
+    .on("input", function () {
+      svgCanvas.setTextContent(this.value.replace(/[\n\r]+/g, ""));
+      var elems = svgCanvas.getSelectedElems();
+      svgCanvas.selectorManager.requestSelector(elems[0])?.reset(elems[0]);
     })
     .keyup(function (e) {
       e.stopPropagation();
-      console.log(111111, e);
       if (e.key === "Escape" || e.key === "Enter") {
-        svgCanvas.textActions.toSelectMode();
-        this.blur();
-        editor.saveCanvas();
-        return editor.escapeMode();
+        e.preventDefault();
       }
-      svgCanvas.setTextContent(this.value);
-      var elems = svgCanvas.getSelectedElems();
-      svgCanvas.selectorManager.requestSelector(elems[0]).reset(elems[0]);
-    })
-    .click(function (e) {
-      this.focus();
-      this.select();
     });
 
   function changeFontSize(attr, value, completed) {

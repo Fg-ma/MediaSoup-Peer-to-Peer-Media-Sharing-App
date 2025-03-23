@@ -2,16 +2,8 @@ import React from "react";
 
 export default function TextPanel() {
   return (
-    <div id='text_panel' className='context_panel'>
-      <h4 className='!font-Josefin'>Text</h4>
+    <div className='context_panel text_panel'>
       <div className='draginputs'>
-        <label
-          className='draginput twocol textcontent hidden'
-          data-title='Change Content'
-        >
-          <input id='text' type='text' autoComplete='off' />
-          <span className='!font-Josefin'>Content</span>
-        </label>
         <label>
           <input
             id='text_x'
@@ -46,15 +38,12 @@ export default function TextPanel() {
           />
           <select id='font_family_dropdown' className='p-2'></select>
         </div>
-        <div className='draginput font_style'>
-          <span className='!font-Josefin'>Font Style</span>
-          <div id='tool_bold' data-title='Bold Text [B]'>
-            B
-          </div>
-          <div id='tool_italic' data-title='Italic Text [I]'>
-            i
-          </div>
-        </div>
+        <label id='tool_font_size' data-title='Change Font Size'>
+          <input id='font_size' className='attr_changer' defaultValue={24} />
+          <span id='font_sizeLabel' className='icon_label !font-Josefin'>
+            Font Size
+          </span>
+        </label>
         <label data-title='Change text color' className='draginput'>
           <span className='!font-Josefin'>Color</span>
           <div id='color_text_tools'>
@@ -66,12 +55,15 @@ export default function TextPanel() {
             </div>
           </div>
         </label>
-        <label id='tool_font_size' data-title='Change Font Size'>
-          <input id='font_size' className='attr_changer' defaultValue={24} />
-          <span id='font_sizeLabel' className='icon_label !font-Josefin'>
-            Font Size
-          </span>
-        </label>
+        <div className='draginput font_style'>
+          <span className='!font-Josefin'>Font Style</span>
+          <div id='tool_bold' data-title='Bold Text [B]'>
+            B
+          </div>
+          <div id='tool_italic' data-title='Italic Text [I]'>
+            i
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -850,9 +850,6 @@ $.SvgCanvas = function (container, config) {
       if (events[event]) {
         return events[event](this, arg);
       }
-      //else {
-      //  console.log("event: " + event + " not found", events)
-      //}
     };
 
     // Function: bind
@@ -2210,6 +2207,13 @@ $.SvgCanvas = function (container, config) {
 
     // Make sure first elements are not null
     while (selectedElements[0] == null) selectedElements.shift(0);
+
+    selectedElements.forEach((elem) => {
+      if (elem) {
+        $(`#folder-item-${elem.id}`)?.addClass("active");
+        $(`#folder-name-${elem.id}`)?.addClass("active");
+      }
+    });
   });
 
   // Function: selectOnly()
@@ -2256,6 +2260,7 @@ $.SvgCanvas = function (container, config) {
         }
       }
     }
+
     // the copy becomes the master now
     selectedElements = newSelectedItems;
     call("selected", selectedElements);
@@ -2665,11 +2670,6 @@ $.SvgCanvas = function (container, config) {
           break;
         case "text":
           started = true;
-          console.log(
-            cur_text.stroke_width,
-            cur_text.font_size,
-            cur_text.font_family
-          );
           var newText = addSvgElementFromJson({
             element: "text",
             curStyles: true,
@@ -2731,6 +2731,7 @@ $.SvgCanvas = function (container, config) {
         container.parentNode.className =
           current_mode === "resize" ? evt.target.style.cursor : current_mode;
       }
+      editor.panel.updateContextPanel();
     };
 
     // in this function we do not record any state changes yet (but we do update
@@ -3700,6 +3701,7 @@ $.SvgCanvas = function (container, config) {
     var matrix;
     var last_x, last_y;
     var allow_dbl;
+    var curIndex;
 
     function setCursor(index) {
       var empty = textinput.value === "";
@@ -3714,6 +3716,8 @@ $.SvgCanvas = function (container, config) {
         }
       }
 
+      curIndex = index;
+
       var charbb;
       charbb = chardata[index];
       if (!charbb) return;
@@ -3727,6 +3731,7 @@ $.SvgCanvas = function (container, config) {
           id: "text_cursor",
           stroke: "#333",
           "stroke-width": 1,
+          "stroke-linecap": "round",
         });
         cursor = getElem("selectorParentGroup").appendChild(cursor);
       }
@@ -3778,7 +3783,7 @@ $.SvgCanvas = function (container, config) {
       var startbb = chardata[start];
       var endbb = chardata[end];
 
-      cursor.setAttribute("visibility", "hidden");
+      cursor?.setAttribute("visibility", "hidden");
 
       var tl = ptToScreen(startbb.x, textbb.y),
         tr = ptToScreen(startbb.x + (endbb.x - startbb.x), textbb.y),
@@ -3841,7 +3846,12 @@ $.SvgCanvas = function (container, config) {
     }
 
     function setCursorFromPoint(mouse_x, mouse_y) {
-      setCursor(getIndexFromPoint(mouse_x, mouse_y));
+      curIndex = getIndexFromPoint(mouse_x, mouse_y);
+      setCursor(curIndex);
+    }
+
+    function getCursorIndex() {
+      return curIndex;
     }
 
     function setEndSelectionFromPoint(x, y, apply) {
@@ -3964,6 +3974,7 @@ $.SvgCanvas = function (container, config) {
         }
       },
       setCursor: setCursor,
+      getCursorIndex: getCursorIndex,
       toEditMode: function (x, y) {
         selectOnly([curtext], false);
         allow_dbl = false;
@@ -3996,7 +4007,7 @@ $.SvgCanvas = function (container, config) {
         clearSelection();
         $(curtext).css("cursor", "move");
         call("selected", [curtext]);
-        addToSelection([curtext], true);
+        if (curtext) addToSelection([curtext], true);
         // no content, delete
         if (curtext && !curtext.textContent.length) {
           canvas.deleteSelectedElements();
@@ -4069,6 +4080,7 @@ $.SvgCanvas = function (container, config) {
       },
     };
   })());
+  this.textActions = textActions;
 
   // TODO: Migrate all of this code into path.js
   // Group: Path edit functions
@@ -4523,7 +4535,6 @@ $.SvgCanvas = function (container, config) {
           var angle_grip = Math.round(get_angle(grip, node), 0);
           var angle_pair = Math.round(get_angle(pair, node), 0);
           var is_complementary = Math.abs(angle_grip - angle_pair) == 180;
-          //console.log("distance: " + Math.abs(distance_between_node_grip - distance_between_pair_grip) + " angle = " + (Math.round(Math.abs(get_angle(grip, node)) + Math.abs(get_angle(pair, node)), 0)))
           if (
             Math.abs(distance_between_node_grip - distance_between_pair_grip) <
               5 &&
@@ -7611,7 +7622,6 @@ $.SvgCanvas = function (container, config) {
         setGradient(type);
         break;
       default:
-      //      console.log("none!");
     }
   };
 
@@ -8062,7 +8072,7 @@ $.SvgCanvas = function (container, config) {
   // val - String with the new text
   this.setTextContent = function (val) {
     const selected = selectedElements[0];
-    const textPath = selected.querySelector("textPath");
+    const textPath = selected?.querySelector("textPath");
     changeSelectedAttribute("#text", val, textPath ? [textPath] : null);
     textActions.init(val);
     textActions.setCursor();

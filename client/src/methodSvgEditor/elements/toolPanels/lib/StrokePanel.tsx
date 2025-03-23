@@ -35,7 +35,7 @@ export default function StrokePanel() {
           <label id='stroke_style_label'>—</label>
         </div>
 
-        <div className='stroke_tool draginput'>
+        <div id='stroke_join_tools' className='stroke_tool draginput'>
           <span className='icon_label !font-Josefin'>Stroke Join</span>
           <select
             id='stroke_join'
@@ -53,7 +53,7 @@ export default function StrokePanel() {
           </label>
         </div>
 
-        <div className='stroke_tool draginput'>
+        <div id='stroke_cap_tools' className='stroke_tool draginput'>
           <span className='icon_label !font-Josefin'>Stroke Cap</span>
           <select
             id='stroke_cap'

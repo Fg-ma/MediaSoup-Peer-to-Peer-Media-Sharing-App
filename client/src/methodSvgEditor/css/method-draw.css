@@ -19,8 +19,12 @@ body.inverted {
 }
 
 ::selection {
-  background: #000;
-  color: #fff; /* Safari */
+  background: #e62833;
+  color: #f2f2f2; /* Safari */
+}
+text::selection {
+  background: #e62833;
+  color: #f2f2f2;
 }
 ::-moz-selection {
   background: #000;

@@ -55,11 +55,11 @@
   display: block;
 }
 
-#editing_panels {
+.editing_panels {
   display: none;
 }
 
-#editing_panels.active {
+.editing_panels.active {
   display: block;
 }
 
@@ -81,6 +81,10 @@
   @apply w-full h-8 !font-Josefin text-xl hover:bg-fg-red-light pt-1 text-fg-red hover:text-fg-white;
 }
 
+.folder-name.active {
+  @apply bg-fg-red-light text-fg-white;
+}
+
 .object-folder {
   @apply w-full h-max text-fg-white overflow-hidden flex flex-col items-center justify-center bg-fg-tone-black-5;
 }
@@ -96,4 +100,8 @@
 
 .folder-item {
   @apply w-full h-8 !font-K2D hover:bg-fg-red-light text-base pt-0.75;
+}
+
+.folder-item.active {
+  @apply bg-fg-red-light;
 }

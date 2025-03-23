@@ -418,8 +418,8 @@ MD.Panel = function () {
   }
 
   function updateContextPanel(elems) {
-    if (!elems) elems = editor.selected;
-    var elem = elems[0] || editor.selected[0];
+    if (!elems) elems = svgCanvas.getSelectedElems();
+    var elem = elems[0] || svgCanvas.getSelectedElems()[0];
     const isNode = svgCanvas.pathActions.getNodePoint();
     // If element has just been deleted, consider it null
     if (!elem || !elem.parentNode) elem = null;
@@ -428,6 +428,15 @@ MD.Panel = function () {
 
     var currentLayerName = svgCanvas.getCurrentDrawing().getCurrentLayerName();
     var currentMode = svgCanvas.getMode();
+
+    var el_name = elem?.tagName;
+
+    if (
+      (el_name !== "text" || panelActive !== "editing") &&
+      !$("#text_input_label").hasClass("hide_text_input")
+    ) {
+      $("#text_input_label").addClass("hide_text_input");
+    }
 
     $(".context_panel").hide();
     $("#align_tools").toggle(elem && !multiselected);
@@ -450,10 +459,28 @@ MD.Panel = function () {
     if (!elem && !multiselected) {
       $("#stroke_panel").hide();
       $("#canvas_panel").show();
+      if (el_name === "text") {
+        $("#paint_order_tools").css("display", "none");
+        $("#stroke_join_tools").css("display", "none");
+        $("#stroke_cap_tools").css("display", "none");
+      } else {
+        $("#paint_order_tools").css("display", "block");
+        $("#stroke_join_tools").css("display", "block");
+        $("#stroke_cap_tools").css("display", "block");
+      }
     }
 
     if (elem !== null) {
       $("#stroke_panel").show();
+      if (el_name === "text") {
+        $("#paint_order_tools").css("display", "none");
+        $("#stroke_join_tools").css("display", "none");
+        $("#stroke_cap_tools").css("display", "none");
+      } else {
+        $("#paint_order_tools").css("display", "block");
+        $("#stroke_join_tools").css("display", "block");
+        $("#stroke_cap_tools").css("display", "block");
+      }
       const strokeWidth =
         elem.getAttribute("stroke") && !elem.getAttribute("stroke-width")
           ? 1
@@ -564,8 +591,6 @@ MD.Panel = function () {
         svg: [],
       };
 
-      var el_name = elem.tagName;
-
       if ($(elem).data("gsvg")) {
         $("#g_panel").show();
       }
@@ -606,7 +631,13 @@ MD.Panel = function () {
           var font_family = elem.getAttribute("font-family") || "default";
           var cleanFontFamily = font_family.split(",")[0].replace(/'/g, "");
           var select = document.getElementById("font_family_dropdown");
-          const axis = $("#text_panel").css("display", "inline");
+          $(".text_panel").css("display", "inline");
+          if (
+            panelActive === "editing" &&
+            $("#text_input_label").hasClass("hide_text_input")
+          ) {
+            $("#text_input_label").removeClass("hide_text_input");
+          }
           $("#font_family").val(font_family);
           $(select)
             .find(`option[value='${cleanFontFamily}']`)
@@ -620,9 +651,7 @@ MD.Panel = function () {
               cleanFontFamily === "default" ? "sans-serif" : cleanFontFamily
             );
           const textPath = elem.querySelector("textPath");
-          document
-            .getElementById("text_panel")
-            .classList.toggle("text-path", textPath);
+          $(".text_panel").toggleClass("text-path", textPath);
           $("#textPath_offset").val(
             textPath ? textPath.getAttribute("startOffset") : 0
           );
@@ -745,19 +774,25 @@ MD.Panel = function () {
   }
 
   function openObjectsPanels() {
+    panelActive = "object";
     populateObjectsPanel(svgCanvas.getSvgString());
     $(this).addClass("active");
     $("#objects_panels").addClass("active");
     $("#editing_panel_button").removeClass("active");
-    $("#editing_panels").removeClass("active");
+    $(".editing_panels").removeClass("active");
     folderPadding();
+    if (!$("#text_input_label").hasClass("hide_text_input")) {
+      $("#text_input_label").addClass("hide_text_input");
+    }
   }
 
   function openEditingPanels() {
+    panelActive = "editing";
     $(this).addClass("active");
-    $("#editing_panels").addClass("active");
+    $(".editing_panels").addClass("active");
     $("#objects_panel_button").removeClass("active");
     $("#objects_panels").removeClass("active");
+    updateContextPanel();
   }
 
   function folderPadding() {
@@ -806,10 +841,15 @@ MD.Panel = function () {
         // If this is the first folder, add extra handling
         const folderHTML = $("<div>", {
           class: "object-folder folder-open",
+          "data-element-id": $element.attr("id") || "",
         }).append(
           $("<div>", {
             class: "folder-name",
             text: !isFirstFolder ? $element.attr("id") || "Unnamed" : "Page",
+            id: !isFirstFolder
+              ? `folder-name-${$element.attr("id")}`
+              : "folder-name-page",
+            "data-element-id": $element.attr("id") || "",
           })
         );
 
@@ -829,7 +869,9 @@ MD.Panel = function () {
         // Create an item for non-group elements
         return $("<div>", {
           class: "folder-item",
+          id: `folder-item-${$element.attr("id") || tagName}`,
           text: $element.attr("id") || tagName,
+          "data-element-id": $element.attr("id") || "",
         });
       }
     }
@@ -852,13 +894,113 @@ MD.Panel = function () {
 
     // Set the inner HTML of #objects_panels
     $("#objects_panels").html(objectsPanelHTML.html());
+
+    $(".folder-item")
+      .off("click")
+      .on("click", function (e) {
+        var isShiftPressed = e.shiftKey;
+        var isCtrlPressed = e.ctrlKey;
+        var folderItem = $(this);
+        var closestFolder = folderItem.closest(".object-folder")[0];
+
+        var closestFolderElementId = $(closestFolder).attr("data-element-id");
+        if (closestFolderElementId) {
+          var closestFolderElement = $("#" + closestFolderElementId)[0];
+
+          var closestFolderSelected = svgCanvas
+            .getSelectedElems()
+            .includes(closestFolderElement);
+
+          if (closestFolderSelected) return;
+        }
+
+        var elementId = $(this).attr("data-element-id");
+
+        if (elementId) {
+          let targetElement = document.getElementById(elementId);
+          if (targetElement) {
+            if (isCtrlPressed) {
+              svgCanvas.addToSelection([targetElement], false);
+            } else {
+              svgCanvas.clearSelection();
+              svgCanvas.addToSelection([targetElement], true);
+            }
+          }
+        }
+      });
+
+    svgCanvas.getSelectedElems().forEach((elem) => {
+      if (elem) {
+        $(`#folder-item-${elem.id}`)?.addClass("active");
+        $(`#folder-name-${elem.id}`)?.addClass("active");
+      }
+    });
   }
 
   $("#objects_panels")
     .off("click", ".folder-name")
-    .on("click", ".folder-name", function () {
-      var parentDiv = $(this).closest(".object-folder");
-      parentDiv.toggleClass("folder-open");
+    .on("click", ".folder-name", function (e) {
+      var folderNameDiv = $(this);
+      var parentDiv = folderNameDiv.closest(".object-folder");
+      var isShiftPressed = e.shiftKey;
+      var isCtrlPressed = e.ctrlKey;
+
+      if (folderNameDiv.attr("id") !== "folder-name-page") {
+        var folderOpen = parentDiv.hasClass("folder-open");
+        var folderActive = folderNameDiv.hasClass("active");
+
+        if (folderOpen && folderActive) {
+          parentDiv.removeClass("folder-open");
+          folderNameDiv.removeClass("active");
+        } else {
+          var closestFolderItems = $(folderNameDiv.closest(".object-folder")[0])
+            .find(".folder-content")
+            .first()
+            .find(".folder-item");
+
+          closestFolderItems.each(function () {
+            var elem = $(this);
+            if (elem.hasClass("active")) {
+              elem.removeClass("active");
+              var itemsId = elem.attr("data-element-id");
+              if (itemsId) svgCanvas.removeFromSelection([$("#" + itemsId)[0]]);
+            }
+          });
+
+          if (folderOpen && !folderActive) {
+            folderNameDiv.addClass("active");
+            let elementId = $(this).attr("data-element-id");
+            if (elementId) {
+              let targetElement = document.getElementById(elementId);
+              if (targetElement) {
+                if (isCtrlPressed) {
+                  svgCanvas.addToSelection([targetElement], false);
+                } else {
+                  svgCanvas.clearSelection();
+                  svgCanvas.addToSelection([targetElement], true);
+                }
+              }
+            }
+          } else {
+            parentDiv.addClass("folder-open");
+            folderNameDiv.addClass("active");
+            let elementId = $(this).attr("data-element-id");
+            if (elementId) {
+              let targetElement = document.getElementById(elementId);
+              if (targetElement) {
+                if (isCtrlPressed) {
+                  svgCanvas.addToSelection([targetElement], false);
+                } else {
+                  svgCanvas.clearSelection();
+                  svgCanvas.addToSelection([targetElement], true);
+                }
+              }
+            }
+          }
+        }
+      } else {
+        parentDiv.toggleClass("folder-open");
+      }
       folderPadding();
     });
 
@@ -866,9 +1008,7 @@ MD.Panel = function () {
 
   $("#editing_panel_button").on("click", openEditingPanels);
 
-  $(".folder-item").on("click", function () {
-    svgCanvas.addToSelection();
-  });
+  var panelActive = "object";
 
   openObjectsPanels();
   this.show = show;
