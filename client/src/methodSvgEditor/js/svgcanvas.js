@@ -3758,6 +3758,21 @@ $.SvgCanvas = function (container, config) {
       if (selblock) selblock.setAttribute("d", "M 0 0");
     }
 
+    function wrapTextInTspan(textElement) {
+      const textContent = textElement.textContent;
+      textElement.textContent = ""; // Clear the existing text
+
+      // Wrap each character in a <tspan> element
+      for (let i = 0; i < textContent.length; i++) {
+        const tspan = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "tspan"
+        );
+        tspan.textContent = textContent[i];
+        textElement.appendChild(tspan);
+      }
+    }
+
     function setSelection(start, end, skipInput) {
       if (start === end) {
         setCursor(end);
@@ -3773,8 +3788,7 @@ $.SvgCanvas = function (container, config) {
         selblock = document.createElementNS(svgns, "path");
         assignAttributes(selblock, {
           id: "text_selectblock",
-          fill: "blue",
-          opacity: 0.5,
+          fill: "none",
           style: "pointer-events:none",
         });
         getElem("selectorParentGroup").appendChild(selblock);
@@ -3815,6 +3829,45 @@ $.SvgCanvas = function (container, config) {
       assignAttributes(selblock, {
         d: dstr,
         display: "inline",
+      });
+
+      wrapTextInTspan(curtext); // Wrap text in tspan elements
+
+      // Loop over each tspan in the text element and check if it's under the selection box
+      curtext.querySelectorAll("tspan").forEach((tspan, index) => {
+        // Get the bounding box for each tspan (character)
+        var charbb = chardata[index]; // Assuming `chardata` is the bounding box data
+        console.log(chardata);
+        if (!tspan || !charbb) return;
+
+        var charStartX = ptToScreen(charbb.x, textbb.y).x;
+        var charEndX = ptToScreen(charbb.x + charbb.width, textbb.y).x;
+
+        // Check if the character intersects with the selection box horizontally
+        var intersects =
+          (charStartX - 0.1 > tl.x && charStartX < tr.x) ||
+          (charEndX - 0.1 > tl.x && charEndX < tr.x);
+
+        if (intersects) {
+          // Change the fill color of the text under the selection box to white
+          tspan.setAttribute("fill", "#f2f2f2");
+          let bgRect = document.createElementNS(svgns, "rect");
+          assignAttributes(bgRect, {
+            x: charbb.x,
+            y: textbb.y,
+            width: charbb.width,
+            height: textbb.height,
+            fill: "#e62833", // Red background
+            opacity: 0.7,
+            class: "text-highlight-bg",
+          });
+
+          // Insert the rect before the text in the SVG
+          curtext.parentNode.insertBefore(bgRect, curtext);
+        } else {
+          // Restore the default fill color if the text is not under the selection
+          tspan.setAttribute("fill", "#000000");
+        }
       });
     }
 

@@ -835,22 +835,38 @@ MD.Panel = function () {
       let tagName = element.tagName.toLowerCase();
       let children = Array.from(element.children).filter(
         (child) => child.tagName.toLowerCase() !== "title"
-      ); // Ignore <title> elements
+      );
 
       if (tagName === "g") {
-        // If this is the first folder, add extra handling
         const folderHTML = $("<div>", {
           class: "object-folder folder-open",
           "data-element-id": $element.attr("id") || "",
         }).append(
           $("<div>", {
             class: "folder-name",
-            text: !isFirstFolder ? $element.attr("id") || "Unnamed" : "Page",
             id: !isFirstFolder
               ? `folder-name-${$element.attr("id")}`
               : "folder-name-page",
             "data-element-id": $element.attr("id") || "",
           })
+            .append(
+              !isFirstFolder
+                ? $("<svg>", {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 100 100",
+                    strokeWidth: "0.11875",
+                    html: '<path d="M 12,88 Q 8.08125,88 5.290625,85.20937 2.5,82.41875 2.5,78.5 v -57 Q 2.5,17.58125 5.290625,14.79062 8.08125,12 12,12 h 24.58125 q 1.9,0 3.62188,0.7125 1.72187,0.7125 3.02812,2.01875 L 50,21.5 h 38 q 3.91875,0 6.70937,2.79062 Q 97.5,27.08125 97.5,31 v 47.5 q 0,3.91875 -2.79063,6.70937 Q 91.91875,88 88,88 Z m 0,-9.5 H 88 V 31 H 46.08125 l -9.5,-9.5 H 12 Z m 0,0 v -57 z" style="stroke-width:0.11875"/>',
+                  })
+                : null
+            )
+            .append(
+              $("<div>", {
+                class: "folder-name-text",
+                text: !isFirstFolder
+                  ? $element.attr("id") || "Unnamed"
+                  : "Page",
+              })
+            )
         );
 
         // Create folder content separately
@@ -866,13 +882,74 @@ MD.Panel = function () {
 
         return folderHTML;
       } else {
-        // Create an item for non-group elements
         return $("<div>", {
           class: "folder-item",
           id: `folder-item-${$element.attr("id") || tagName}`,
-          text: $element.attr("id") || tagName,
           "data-element-id": $element.attr("id") || "",
-        });
+        })
+          .append(
+            tagName === "path"
+              ? $("<svg>", {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 100 100",
+                  style: "stroke-width:0.11875",
+                }).append(
+                  $("<path>", {
+                    d: "m 83.25,92.75 q -4.63125,0 -8.3125,-2.67187 Q 71.25625,87.40625 69.83125,83.25 H 45.25 q -7.8375,0 -13.41875,-5.58125 Q 26.25,72.0875 26.25,64.25 26.25,56.4125 31.83125,50.83125 37.4125,45.25 45.25,45.25 h 9.5 q 3.91875,0 6.70937,-2.79063 Q 64.25,39.66875 64.25,35.75 64.25,31.83125 61.45937,29.04062 58.66875,26.25 54.75,26.25 H 30.16875 Q 28.625,30.40625 25.00312,33.07813 21.38125,35.75 16.75,35.75 10.8125,35.75 6.65625,31.59375 2.5,27.4375 2.5,21.5 2.5,15.5625 6.65625,11.40625 10.8125,7.25 16.75,7.25 q 4.63125,0 8.25312,2.67188 3.62188,2.67187 5.16563,6.82812 H 54.75 q 7.8375,0 13.41875,5.58125 Q 73.75,27.9125 73.75,35.75 q 0,7.8375 -5.58125,13.41875 Q 62.5875,54.75 54.75,54.75 h -9.5 q -3.91875,0 -6.70937,2.79062 Q 35.75,60.33125 35.75,64.25 q 0,3.91875 2.79063,6.70938 Q 41.33125,73.75 45.25,73.75 H 69.83125 Q 71.375,69.59375 74.99687,66.92188 78.61875,64.25 83.25,64.25 q 5.9375,0 10.09375,4.15625 Q 97.5,72.5625 97.5,78.5 97.5,84.4375 93.34375,88.59375 89.1875,92.75 83.25,92.75 Z m -66.5,-66.5 q 2.01875,0 3.384375,-1.36563 Q 21.5,23.51875 21.5,21.5 21.5,19.48125 20.134375,18.11562 18.76875,16.75 16.75,16.75 q -2.01875,0 -3.384375,1.36562 Q 12,19.48125 12,21.5 12,23.51875 13.365625,24.88437 14.73125,26.25 16.75,26.25 Z",
+                  })
+                )
+              : tagName === "rect"
+              ? $("<svg>", {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 100 100",
+                  style: "stroke-width:0.11875",
+                }).append(
+                  $("<path>", {
+                    d: "M 12,88 Q 8.08125,88 5.290625,85.20937 2.5,82.41875 2.5,78.5 v -57 Q 2.5,17.58125 5.290625,14.79062 8.08125,12 12,12 h 76 q 3.91875,0 6.70937,2.79062 Q 97.5,17.58125 97.5,21.5 v 57 q 0,3.91875 -2.79063,6.70937 Q 91.91875,88 88,88 Z m 0,-9.5 h 76 v -57 H 12 Z m 0,0 v -57 z",
+                  })
+                )
+              : tagName === "ellipse"
+              ? $("<svg>", {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 100 100",
+                  style: "stroke-width:9",
+                }).append(
+                  $("<ellipse>", {
+                    fill: "none",
+                    cx: "50",
+                    cy: "50",
+                    rx: "43.846409",
+                    ry: "32.884869",
+                  })
+                )
+              : tagName === "text"
+              ? $("<svg>", {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 100 100",
+                  style: "stroke-width:2.4384",
+                }).append(
+                  $("<path>", {
+                    d: "M 81.613225,2.51463 V 14.460588 H 55.972979 V 97.5 H 43.444244 V 14.460588 H 18.386775 V 2.5 c 30.798678,0 31.333663,0.02438 63.22645,0.02438 z",
+                  })
+                )
+              : tagName === "line"
+              ? $("<svg>", {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  viewBox: "0 0 100 100",
+                  style: "stroke-width:10.0033;stroke-linecap:round",
+                }).append(
+                  $("<path>", {
+                    d: "M 7.5033155,50 H 92.496684",
+                  })
+                )
+              : null
+          )
+          .append(
+            $("<div>", {
+              class: "folder-item-text",
+              text: $element.attr("id") || tagName,
+            })
+          );
       }
     }
 
@@ -895,39 +972,7 @@ MD.Panel = function () {
     // Set the inner HTML of #objects_panels
     $("#objects_panels").html(objectsPanelHTML.html());
 
-    $(".folder-item")
-      .off("click")
-      .on("click", function (e) {
-        var isShiftPressed = e.shiftKey;
-        var isCtrlPressed = e.ctrlKey;
-        var folderItem = $(this);
-        var closestFolder = folderItem.closest(".object-folder")[0];
-
-        var closestFolderElementId = $(closestFolder).attr("data-element-id");
-        if (closestFolderElementId) {
-          var closestFolderElement = $("#" + closestFolderElementId)[0];
-
-          var closestFolderSelected = svgCanvas
-            .getSelectedElems()
-            .includes(closestFolderElement);
-
-          if (closestFolderSelected) return;
-        }
-
-        var elementId = $(this).attr("data-element-id");
-
-        if (elementId) {
-          let targetElement = document.getElementById(elementId);
-          if (targetElement) {
-            if (isCtrlPressed) {
-              svgCanvas.addToSelection([targetElement], false);
-            } else {
-              svgCanvas.clearSelection();
-              svgCanvas.addToSelection([targetElement], true);
-            }
-          }
-        }
-      });
+    $(".folder-item").off("click").on("click", handleFolderItemClick);
 
     svgCanvas.getSelectedElems().forEach((elem) => {
       if (elem) {
@@ -937,78 +982,261 @@ MD.Panel = function () {
     });
   }
 
-  $("#objects_panels")
-    .off("click", ".folder-name")
-    .on("click", ".folder-name", function (e) {
-      var folderNameDiv = $(this);
-      var parentDiv = folderNameDiv.closest(".object-folder");
-      var isShiftPressed = e.shiftKey;
-      var isCtrlPressed = e.ctrlKey;
+  function handleShiftSelect(startObject, finalObject) {
+    let items = $(".folder-item"); // Get all folder items
+    let startIndex = -1;
+    let endIndex = -1;
 
-      if (folderNameDiv.attr("id") !== "folder-name-page") {
-        var folderOpen = parentDiv.hasClass("folder-open");
-        var folderActive = folderNameDiv.hasClass("active");
+    let originalStartFolder;
+    let originalFinalFolder;
 
-        if (folderOpen && folderActive) {
-          parentDiv.removeClass("folder-open");
-          folderNameDiv.removeClass("active");
-        } else {
-          var closestFolderItems = $(folderNameDiv.closest(".object-folder")[0])
-            .find(".folder-content")
-            .first()
-            .find(".folder-item");
+    let selectedElements = [];
 
-          closestFolderItems.each(function () {
-            var elem = $(this);
-            if (elem.hasClass("active")) {
-              elem.removeClass("active");
-              var itemsId = elem.attr("data-element-id");
-              if (itemsId) svgCanvas.removeFromSelection([$("#" + itemsId)[0]]);
-            }
-          });
+    let folders = $(".folder-name");
+    folders.each(function (index) {
+      let folderId = $(this).attr("data-element-id");
+      if (folderId === startObject) {
+        originalStartFolder = startObject;
 
-          if (folderOpen && !folderActive) {
-            folderNameDiv.addClass("active");
-            let elementId = $(this).attr("data-element-id");
-            if (elementId) {
-              let targetElement = document.getElementById(elementId);
-              if (targetElement) {
-                if (isCtrlPressed) {
-                  svgCanvas.addToSelection([targetElement], false);
+        let targetElement = $("#" + startObject)[0];
+        if (targetElement) {
+          selectedElements.push(targetElement);
+          $(this).addClass("active");
+        }
+
+        // Find the first folder item that does not start with "g"
+        let firstFolderItem = $(this)
+          .closest(".object-folder")
+          .find(".folder-content")
+          .first()
+          .find(".folder-item")
+          .filter(function () {
+            return $(this).attr("data-element-id").split("_")[0] !== "g";
+          })
+          .first(); // Get the first item that matches the condition
+
+        if (firstFolderItem.length) {
+          startObject = firstFolderItem.attr("data-element-id");
+        }
+      }
+      if (folderId === finalObject) {
+        originalFinalFolder = finalObject;
+
+        let targetElement = $("#" + finalObject)[0];
+        if (targetElement) {
+          selectedElements.push(targetElement);
+          $(this).addClass("active");
+        }
+
+        // Find the first folder item that does not start with "g"
+        let firstFolderItem = $(this)
+          .closest(".object-folder")
+          .find(".folder-content")
+          .first()
+          .find(".folder-item")
+          .filter(function () {
+            return $(this).attr("data-element-id").split("_")[0] !== "g";
+          })
+          .first(); // Get the first item that matches the condition
+
+        if (firstFolderItem.length) {
+          finalObject = firstFolderItem.attr("data-element-id");
+        }
+      }
+    });
+
+    // Find the index positions of start and end objects
+    items.each(function (index) {
+      let itemId = $(this).attr("data-element-id");
+      if (itemId === startObject) {
+        startIndex = index;
+      }
+      if (itemId === finalObject) {
+        endIndex = index;
+      }
+    });
+
+    if (startIndex === -1 || endIndex === -1) return; // Ensure both items exist
+
+    // Ensure startIndex is always less than endIndex for proper selection
+    if (startIndex > endIndex) {
+      [startIndex, endIndex] = [endIndex, startIndex];
+    }
+
+    // Loop through items and select everything in between
+    items.slice(startIndex, endIndex + 1).each(function () {
+      let elementId = $(this).attr("data-element-id");
+      if (originalStartFolder || originalFinalFolder) {
+        var closestFolder = $(this)
+          .closest(".object-folder")
+          .attr("data-element-id");
+        if (
+          closestFolder === originalStartFolder ||
+          closestFolder === originalFinalFolder
+        )
+          return;
+      }
+      if (elementId) {
+        let targetElement = $("#" + elementId)[0];
+        if (targetElement) {
+          selectedElements.push(targetElement);
+          $(this).addClass("active"); // Add visual active state
+        }
+      }
+    });
+
+    // Apply selection in SVG Canvas
+    if (selectedElements.length > 0) {
+      svgCanvas.addToSelection(selectedElements, false);
+    }
+  }
+
+  function handleCtrlSelect(item, targetElement, elementId) {
+    if (item.hasClass("active")) {
+      svgCanvas.removeFromSelection([targetElement], false);
+    } else {
+      svgCanvas.addToSelection([targetElement], false);
+      lastItemPressed = elementId;
+    }
+  }
+
+  function handleFolderClick(e) {
+    var folderNameDiv = $(this);
+    var parentDiv = folderNameDiv.closest(".object-folder");
+    var isShiftPressed = e.shiftKey;
+    var isCtrlPressed = e.ctrlKey;
+
+    if (folderNameDiv.attr("id") !== "folder-name-page") {
+      var folderOpen = parentDiv.hasClass("folder-open");
+      var folderActive = folderNameDiv.hasClass("active");
+
+      if (folderOpen && folderActive) {
+        parentDiv.removeClass("folder-open");
+        folderNameDiv.removeClass("active");
+      } else {
+        var closestFolderItems = $(folderNameDiv.closest(".object-folder")[0])
+          .find(".folder-content")
+          .first()
+          .find(".folder-item");
+
+        closestFolderItems.each(function () {
+          var elem = $(this);
+          if (elem.hasClass("active")) {
+            elem.removeClass("active");
+            var itemsId = elem.attr("data-element-id");
+            if (itemsId) svgCanvas.removeFromSelection([$("#" + itemsId)[0]]);
+          }
+        });
+
+        if (folderOpen && !folderActive) {
+          folderNameDiv.addClass("active");
+          let elementId = $(this).attr("data-element-id");
+          if (elementId) {
+            let targetElement = document.getElementById(elementId);
+            if (targetElement) {
+              if (isCtrlPressed) {
+                svgCanvas.addToSelection([targetElement], false);
+                lastItemPressed = elementId;
+              } else if (isShiftPressed) {
+                if (!lastItemPressed) {
+                  lastItemPressed = elementId;
                 } else {
                   svgCanvas.clearSelection();
-                  svgCanvas.addToSelection([targetElement], true);
+                  handleShiftSelect(lastItemPressed, elementId);
                 }
+              } else {
+                svgCanvas.clearSelection();
+                svgCanvas.addToSelection([targetElement], true);
+                lastItemPressed = elementId;
               }
             }
-          } else {
-            parentDiv.addClass("folder-open");
-            folderNameDiv.addClass("active");
-            let elementId = $(this).attr("data-element-id");
-            if (elementId) {
-              let targetElement = document.getElementById(elementId);
-              if (targetElement) {
-                if (isCtrlPressed) {
-                  svgCanvas.addToSelection([targetElement], false);
+          }
+        } else {
+          parentDiv.addClass("folder-open");
+          folderNameDiv.addClass("active");
+          let elementId = $(this).attr("data-element-id");
+          if (elementId) {
+            let targetElement = document.getElementById(elementId);
+            if (targetElement) {
+              if (isCtrlPressed) {
+                svgCanvas.addToSelection([targetElement], false);
+                lastItemPressed = elementId;
+              } else if (isShiftPressed) {
+                if (!lastItemPressed) {
+                  lastItemPressed = elementId;
                 } else {
                   svgCanvas.clearSelection();
-                  svgCanvas.addToSelection([targetElement], true);
+                  handleShiftSelect(lastItemPressed, elementId);
                 }
+              } else {
+                svgCanvas.clearSelection();
+                svgCanvas.addToSelection([targetElement], true);
+                lastItemPressed = elementId;
               }
             }
           }
         }
-      } else {
-        parentDiv.toggleClass("folder-open");
       }
-      folderPadding();
-    });
+    } else {
+      parentDiv.toggleClass("folder-open");
+    }
+    folderPadding();
+  }
+
+  function handleFolderItemClick(e) {
+    var isShiftPressed = e.shiftKey;
+    var isCtrlPressed = e.ctrlKey;
+    var folderItem = $(this);
+    var closestFolder = folderItem.closest(".object-folder")[0];
+
+    var closestFolderElementId = $(closestFolder).attr("data-element-id");
+    if (closestFolderElementId) {
+      var closestFolderElement = $("#" + closestFolderElementId)[0];
+
+      var closestFolderSelected = svgCanvas
+        .getSelectedElems()
+        .includes(closestFolderElement);
+
+      if (closestFolderSelected) {
+        svgCanvas.removeFromSelection([closestFolderElement]);
+        $(closestFolderElement).removeClass("active");
+      }
+    }
+
+    var elementId = $(this).attr("data-element-id");
+
+    if (elementId) {
+      let targetElement = document.getElementById(elementId);
+      if (targetElement) {
+        if (isCtrlPressed) {
+          handleCtrlSelect($(this), targetElement, elementId);
+        } else if (isShiftPressed) {
+          if (!lastItemPressed) {
+            lastItemPressed = elementId;
+          } else {
+            svgCanvas.clearSelection();
+            handleShiftSelect(lastItemPressed, elementId);
+          }
+        } else {
+          svgCanvas.clearSelection();
+          svgCanvas.addToSelection([targetElement], true);
+          lastItemPressed = elementId;
+        }
+      }
+    }
+  }
+
+  $("#objects_panels")
+    .off("click", ".folder-name")
+    .on("click", ".folder-name", handleFolderClick);
 
   $("#objects_panel_button").on("click", openObjectsPanels);
 
   $("#editing_panel_button").on("click", openEditingPanels);
 
   var panelActive = "object";
+
+  var lastItemPressed = null;
 
   openObjectsPanels();
   this.show = show;

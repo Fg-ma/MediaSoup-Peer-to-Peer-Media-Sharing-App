@@ -78,7 +78,20 @@
 }
 
 .folder-name {
-  @apply w-full h-8 !font-Josefin text-xl hover:bg-fg-red-light pt-1 text-fg-red hover:text-fg-white;
+  @apply w-full h-8 !font-Josefin text-xl hover:bg-fg-red-light text-fg-red hover:text-fg-white flex items-center justify-start;
+}
+
+.folder-name-text {
+  @apply pt-1;
+}
+
+.folder-name svg {
+  @apply h-6 aspect-square fill-fg-white stroke-fg-white mr-2;
+  transition: all 0.1s ease;
+}
+
+.folder-name:hover svg {
+  @apply h-7 mr-1;
 }
 
 .folder-name.active {
@@ -99,9 +112,22 @@
 }
 
 .folder-item {
-  @apply w-full h-8 !font-K2D hover:bg-fg-red-light text-base pt-0.75;
+  @apply w-full h-8 !font-K2D hover:bg-fg-red-light text-base flex items-center justify-start;
 }
 
 .folder-item.active {
   @apply bg-fg-red-light;
+}
+
+.folder-item-text {
+  @apply pt-0.75;
+}
+
+.folder-item svg {
+  @apply h-5 aspect-square fill-fg-white stroke-fg-white mr-2;
+  transition: all 0.1s ease;
+}
+
+.folder-item:hover svg {
+  @apply h-6 mr-1;
 }

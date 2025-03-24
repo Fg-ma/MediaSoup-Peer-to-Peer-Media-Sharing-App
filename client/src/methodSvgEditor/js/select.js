@@ -53,8 +53,8 @@ var svgedit = svgedit || {};
         attr: {
           id: "selectedBox" + this.id,
           fill: "none",
-          stroke: "#4F80FF",
-          "stroke-width": "1",
+          stroke: "#e62833",
+          "stroke-width": "2",
           "shape-rendering": "crispEdges",
           style: "pointer-events:none",
         },
@@ -263,8 +263,8 @@ var svgedit = svgedit || {};
       nbax -= 15.75;
       nbay -= 15.75;
     } else {
-      nbax -= 4;
-      nbay -= 4;
+      nbax -= 5;
+      nbay -= 5;
     }
     this.gripCoords = {
       nw: [nbax, nbay].map(Math.round),
@@ -384,9 +384,9 @@ var svgedit = svgedit || {};
         element: "rect",
         attr: {
           id: "selectorGrip_resize_" + dir,
-          width: 8,
-          height: 8,
-          fill: "#4F80FF",
+          width: 10,
+          height: 10,
+          fill: "#e62833",
           stroke: "rgba(0,0,0,0)",
           "stroke-width": 1,
           style: "cursor:" + dir + "-resize",
