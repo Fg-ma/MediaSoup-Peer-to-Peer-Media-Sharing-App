@@ -33,7 +33,6 @@ MD.Pan = function () {
 
   $("#svgcanvas")
     .on("mousemove", move_pan)
-    .on("mousedown", start_pan)
     .on("mousedown", function (event) {
       if (event.button === 1) {
         event.stopPropagation();

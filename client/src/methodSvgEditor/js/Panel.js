@@ -29,6 +29,34 @@ MD.Panel = function () {
     callback: editor.changeAttribute,
     cursor: false,
   });
+  $("#path_width").dragInput({
+    min: 1,
+    max: null,
+    step: 1,
+    callback: editor.changeAttribute,
+    cursor: false,
+  });
+  $("#path_height").dragInput({
+    min: 1,
+    max: null,
+    step: 1,
+    callback: editor.changeAttribute,
+    cursor: false,
+  });
+  $("#ellipse_width").dragInput({
+    min: 1,
+    max: null,
+    step: 1,
+    callback: editor.changeAttribute,
+    cursor: false,
+  });
+  $("#ellipse_height").dragInput({
+    min: 1,
+    max: null,
+    step: 1,
+    callback: editor.changeAttribute,
+    cursor: false,
+  });
   $("#ellipse_cx").dragInput({
     min: null,
     max: null,
@@ -834,7 +862,10 @@ MD.Panel = function () {
       let $element = $(element);
       let tagName = element.tagName.toLowerCase();
       let children = Array.from(element.children).filter(
-        (child) => child.tagName.toLowerCase() !== "title"
+        (child) =>
+          child.tagName.toLowerCase() !== "title" &&
+          child.tagName.toLowerCase() !== "tspan" &&
+          !child.classList.contains("no-render")
       );
 
       if (tagName === "g") {

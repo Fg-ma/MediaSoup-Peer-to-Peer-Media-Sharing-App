@@ -2888,6 +2888,7 @@ $.SvgCanvas = function (container, config) {
             height = box.height,
             dx = x - start_x,
             dy = y - start_y;
+          console.log(dx, dy);
 
           if (curConfig.gridSnapping) {
             dx = snapToGrid(dx);
@@ -3565,6 +3566,7 @@ $.SvgCanvas = function (container, config) {
       var isNested =
         evt.target.tagName === "tspan" || evt.target.tagName === "textPath";
       var evt_target = isNested ? evt.target.closest("text") : evt.target;
+      if (!evt_target) return;
       var parent = evt_target.parentNode;
       var mouse_target = getMouseTarget(evt);
       var tagName = mouse_target.tagName;
@@ -3775,6 +3777,10 @@ $.SvgCanvas = function (container, config) {
 
     function setSelection(start, end, skipInput) {
       if (start === end) {
+        curtext.querySelectorAll("tspan").forEach((tspan, index) => {
+          tspan.setAttribute("fill", "#000000");
+        });
+
         setCursor(end);
         return;
       }
@@ -3788,10 +3794,21 @@ $.SvgCanvas = function (container, config) {
         selblock = document.createElementNS(svgns, "path");
         assignAttributes(selblock, {
           id: "text_selectblock",
-          fill: "none",
+          fill: "red",
           style: "pointer-events:none",
+          class: "no-render",
         });
         getElem("selectorParentGroup").appendChild(selblock);
+
+        let firstGElement = svgcontent.querySelector("g");
+        if (firstGElement) {
+          firstGElement.insertBefore(selblock, curtext);
+        }
+      } else {
+        let firstGElement = svgcontent.querySelector("g");
+        if (firstGElement && firstGElement.contains(selblock)) {
+          firstGElement.insertBefore(selblock, curtext);
+        }
       }
 
       var startbb = chardata[start];
@@ -3833,37 +3850,26 @@ $.SvgCanvas = function (container, config) {
 
       wrapTextInTspan(curtext); // Wrap text in tspan elements
 
+      let existingBg =
+        curtext.parentNode.querySelectorAll(".text-highlight-bg");
+      existingBg.forEach((bg) => bg.remove());
+
       // Loop over each tspan in the text element and check if it's under the selection box
       curtext.querySelectorAll("tspan").forEach((tspan, index) => {
         // Get the bounding box for each tspan (character)
         var charbb = chardata[index]; // Assuming `chardata` is the bounding box data
-        console.log(chardata);
+
         if (!tspan || !charbb) return;
 
         var charStartX = ptToScreen(charbb.x, textbb.y).x;
         var charEndX = ptToScreen(charbb.x + charbb.width, textbb.y).x;
 
         // Check if the character intersects with the selection box horizontally
-        var intersects =
-          (charStartX - 0.1 > tl.x && charStartX < tr.x) ||
-          (charEndX - 0.1 > tl.x && charEndX < tr.x);
+        var intersects = charStartX >= tl.x && charEndX <= tr.x;
 
         if (intersects) {
           // Change the fill color of the text under the selection box to white
           tspan.setAttribute("fill", "#f2f2f2");
-          let bgRect = document.createElementNS(svgns, "rect");
-          assignAttributes(bgRect, {
-            x: charbb.x,
-            y: textbb.y,
-            width: charbb.width,
-            height: textbb.height,
-            fill: "#e62833", // Red background
-            opacity: 0.7,
-            class: "text-highlight-bg",
-          });
-
-          // Insert the rect before the text in the SVG
-          curtext.parentNode.insertBefore(bgRect, curtext);
         } else {
           // Restore the default fill color if the text is not under the selection
           tspan.setAttribute("fill", "#000000");
@@ -4018,6 +4024,9 @@ $.SvgCanvas = function (container, config) {
 
         if (
           evt.target !== curtext &&
+          !Array.from(curtext.children).some((child) =>
+            child.isEqualNode(evt.target)
+          ) &&
           mouse_x < last_x + 2 &&
           mouse_x > last_x - 2 &&
           mouse_y < last_y + 2 &&

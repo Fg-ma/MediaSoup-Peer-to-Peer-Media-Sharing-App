@@ -1697,6 +1697,10 @@ window.methodDraw = function() {
     $('#canvas_width') .dragInput({ min: 1,   max: 10000,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         });                         
     $('#rect_width')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         }); 
     $('#rect_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#path_width')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#path_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#ellipse_width')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
+    $('#ellipse_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_cx')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_cy')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_rx')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });

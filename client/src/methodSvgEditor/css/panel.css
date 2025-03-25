@@ -120,7 +120,7 @@
 }
 
 .folder-item-text {
-  @apply pt-0.75;
+  @apply pb-0.5;
 }
 
 .folder-item svg {
