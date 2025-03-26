@@ -44,14 +44,20 @@ export default function TextPanel() {
             Font Size
           </span>
         </label>
-        <label data-title='Change text color' className='draginput'>
+        <label
+          id='text_color_section'
+          data-title='Change text color'
+          className='draginput'
+        >
           <span className='!font-Josefin'>Color</span>
           <div id='color_text_tools'>
-            <div className='color_tool active' id='tool_text_color'>
-              <div className='color_block'>
-                <div id='text_bg'></div>
-                <div id='text_color'></div>
-              </div>
+            <div
+              className='color_tool active'
+              id='tool_text_color'
+              style={{ width: "100%", height: "100%" }}
+            >
+              <div id='text_bg'></div>
+              <div id='text_color'></div>
             </div>
           </div>
         </label>

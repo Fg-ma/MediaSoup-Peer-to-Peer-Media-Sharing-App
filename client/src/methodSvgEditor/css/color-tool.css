@@ -5,7 +5,8 @@
 }
 
 #color_tools #tool_fill .color_block #fill_bg,
-#color_tools #tool_stroke .color_block #stroke_bg {
+#color_tools #tool_stroke .color_block #stroke_bg,
+#color_tools #tool_stroke #text_bg {
   position: absolute;
   top: 1px;
   left: 1px;

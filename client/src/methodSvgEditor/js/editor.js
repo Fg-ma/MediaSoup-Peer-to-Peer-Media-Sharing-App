@@ -169,6 +169,8 @@ MD.Editor = function () {
     _self.selected = elems.filter(Boolean);
     editor.paintBox.fill.update();
     editor.paintBox.stroke.update();
+    if (editor.selected[0]?.tagName?.toLowerCase() === "text")
+      editor.paintBox.text.update();
     editor.panel.updateContextPanel(_self.selected);
   }
 

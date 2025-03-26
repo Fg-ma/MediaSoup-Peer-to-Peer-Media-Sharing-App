@@ -211,6 +211,7 @@ MD.Shapelib = function () {
       var x = (start_x = opts.start_x);
       var y = (start_y = opts.start_y);
       var cur_style = canv.getStyle();
+      svgCanvas.getCurrentDrawing().setIdPrefix("path");
       cur_shape = canv.addSvgElementFromJson({
         element: "path",
         curStyles: true,

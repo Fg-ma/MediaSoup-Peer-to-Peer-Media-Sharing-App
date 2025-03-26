@@ -9,7 +9,7 @@ export default function RectanglePanel() {
           <input
             id='rect_x'
             className='attr_changer !font-K2D'
-            data-title='Change X coordinate'
+            data-title='Change x position'
             data-attr='x'
             pattern='[0-9]*'
           />
@@ -19,7 +19,7 @@ export default function RectanglePanel() {
           <input
             id='rect_y'
             className='attr_changer !font-K2D'
-            data-title='Change Y coordinate'
+            data-title='Change y position'
             data-attr='y'
             pattern='[0-9]*'
           />
@@ -28,7 +28,7 @@ export default function RectanglePanel() {
         <label
           className='draginput'
           id='rect_width_tool attr_changer'
-          data-title='Change rectangle width'
+          data-title='Change width'
         >
           <input
             id='rect_width'
@@ -42,7 +42,7 @@ export default function RectanglePanel() {
         <label
           className='draginput'
           id='rect_height_tool'
-          data-title='Change rectangle height'
+          data-title='Change height'
         >
           <input
             id='rect_height'

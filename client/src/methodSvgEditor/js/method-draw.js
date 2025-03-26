@@ -4,8 +4,9 @@ window.methodDraw = function() {
   var curConfig = {
     canvas_expansion: 1, 
     dimensions: [800,600], 
-    initFill: {color: 'fff', opacity: 1},
-    initStroke: {width: 1.5, color: '000', opacity: 1},
+    initFill: {color: 'f2f2f2', opacity: 1},
+    initStroke: {width: 1.5, color: '090909', opacity: 1},
+    initText: {color: '090909', opacity: 1},
     initOpacity: 1,
     imgPath: './src/methodSvgEditor/images/',
     extPath: 'extensions/',
@@ -41,7 +42,7 @@ window.methodDraw = function() {
 
 
     Editor.canvas = svgCanvas;
-    Editor.paintBox = {fill: null, stroke:null, canvas:null};
+    Editor.paintBox = {fill: null, stroke:null, canvas:null, text: null};
     var isMac = (navigator.platform.indexOf("Mac") >= 0),
       isWebkit = (navigator.userAgent.indexOf("AppleWebKit") >= 0),
       modKey = (isMac ? "meta+" : "ctrl+"), // ⌘
@@ -1095,7 +1096,7 @@ window.methodDraw = function() {
   
     var PaintBox = function(container, type) {
       var background = document.getElementById("canvas_background");
-      var cur = {color: "fff", opacity: 1}
+      var cur = {color: "f2f2f2", opacity: 1}
       if (type == "stroke") cur = curConfig['initStroke'];
       if (type == "fill") cur = curConfig['initFill'];
       if (type == "canvas" && background) {
@@ -1107,6 +1108,7 @@ window.methodDraw = function() {
               cur = {color: hex, opacity: 1}
             }
       }
+      if (type == "text" && background)  cur = curConfig.initText;
 
       // set up gradients to be used for the buttons
       var svgdocbox = new DOMParser().parseFromString(
@@ -1235,7 +1237,8 @@ window.methodDraw = function() {
     Editor.paintBox.fill = new PaintBox('#fill_color', 'fill');
     Editor.paintBox.stroke = new PaintBox('#stroke_color', 'stroke');
     Editor.paintBox.canvas = new PaintBox('#canvas_color', 'canvas');
-
+    Editor.paintBox.text = new PaintBox('#text_color', 'text');
+    console.log("why", Editor.paintBox)
     $('#stroke_width').val(curConfig.initStroke.width);
     $('#group_opacity').val(curConfig.initOpacity * 100);
     
@@ -1697,10 +1700,6 @@ window.methodDraw = function() {
     $('#canvas_width') .dragInput({ min: 1,   max: 10000,  step: 10,  callback: changeCanvasSize,    cursor: false, dragAdjust: .1         });                         
     $('#rect_width')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         }); 
     $('#rect_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#path_width')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#path_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#ellipse_width')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
-    $('#ellipse_height')  .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_cx')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_cy')   .dragInput({ min: null, max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
     $('#ellipse_rx')   .dragInput({ min: 1,    max: null,  step:  1,  callback: changeAttribute,     cursor: false                         });
@@ -1836,7 +1835,8 @@ window.methodDraw = function() {
               reader.onloadend = function(e) {
                 // lets insert the new image until we know its dimensions
                 insertNewImage = function(img_width, img_height){
-                    var newImage = svgCanvas.addSvgElementFromJson({
+                  svgCanvas.getCurrentDrawing().setIdPrefix("img");
+                  var newImage = svgCanvas.addSvgElementFromJson({
                     "element": "image",
                     "attr": {
                       "x": 0,
@@ -1847,6 +1847,7 @@ window.methodDraw = function() {
                       "style": "pointer-events:inherit"
                     }
                   });
+                    
                   svgCanvas.setHref(newImage, e.target.result);
                   svgCanvas.selectOnly([newImage])
                   svgCanvas.alignSelectedElements("m", "page")

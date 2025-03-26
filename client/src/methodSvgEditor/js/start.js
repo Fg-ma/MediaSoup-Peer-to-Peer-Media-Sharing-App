@@ -10,6 +10,7 @@ editor.paintBox = {
   fill: new MD.PaintBox("#fill_color", "fill"),
   stroke: new MD.PaintBox("#stroke_color", "stroke"),
   canvas: new MD.PaintBox("#canvas_color", "canvas"),
+  text: new MD.PaintBox("#text_color", "text"),
 };
 editor.palette = new MD.Palette();
 editor.pan = new MD.Pan();

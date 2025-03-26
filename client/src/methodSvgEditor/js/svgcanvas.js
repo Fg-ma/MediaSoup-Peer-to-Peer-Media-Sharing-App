@@ -47,9 +47,11 @@ $.SvgCanvas = function (container, config) {
     dimensions: [800, 600],
     initFill: { color: "f2f2f2", opacity: 1 },
     initStroke: { width: 2, color: "090909", opacity: 1 },
+    initText: { color: "090909", opacity: 1 },
     imgPath: "./src/methodSvgEditor/images/",
     baseUnit: "px",
     defaultFont: "K2D",
+    opacity: 1,
   };
 
   // Update config with new one if given
@@ -147,6 +149,7 @@ $.SvgCanvas = function (container, config) {
   };
 
   all_properties.text = $.extend(true, {}, all_properties.shape);
+
   $.extend(all_properties.text, {
     fill: "#000000",
     stroke_width: 0,
@@ -2560,6 +2563,7 @@ $.SvgCanvas = function (container, config) {
           d_attr = real_x + "," + real_y + " ";
           var stroke_w =
             cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
+          svgCanvas.getCurrentDrawing().setIdPrefix("path");
           addSvgElementFromJson({
             element: "polyline",
             curStyles: true,
@@ -2572,6 +2576,7 @@ $.SvgCanvas = function (container, config) {
               style: "pointer-events:none",
             },
           });
+
           freehand.minx = real_x;
           freehand.maxx = real_x;
           freehand.miny = real_y;
@@ -2579,6 +2584,7 @@ $.SvgCanvas = function (container, config) {
           break;
         case "image":
           started = true;
+          svgCanvas.getCurrentDrawing().setIdPrefix("img");
           var newImage = addSvgElementFromJson({
             element: "image",
             attr: {
@@ -2601,6 +2607,7 @@ $.SvgCanvas = function (container, config) {
           started = true;
           start_x = x;
           start_y = y;
+          svgCanvas.getCurrentDrawing().setIdPrefix("rect");
           addSvgElementFromJson({
             element: "rect",
             curStyles: true,
@@ -2618,6 +2625,7 @@ $.SvgCanvas = function (container, config) {
           started = true;
           var stroke_w =
             cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
+          svgCanvas.getCurrentDrawing().setIdPrefix("line");
           addSvgElementFromJson({
             element: "line",
             curStyles: true,
@@ -2641,6 +2649,7 @@ $.SvgCanvas = function (container, config) {
           break;
         case "circle":
           started = true;
+          svgCanvas.getCurrentDrawing().setIdPrefix("ellipse");
           addSvgElementFromJson({
             element: "circle",
             curStyles: true,
@@ -2655,6 +2664,7 @@ $.SvgCanvas = function (container, config) {
           break;
         case "ellipse":
           started = true;
+          svgCanvas.getCurrentDrawing().setIdPrefix("ellipse");
           addSvgElementFromJson({
             element: "ellipse",
             curStyles: true,
@@ -2670,6 +2680,7 @@ $.SvgCanvas = function (container, config) {
           break;
         case "text":
           started = true;
+          svgCanvas.getCurrentDrawing().setIdPrefix("txt");
           var newText = addSvgElementFromJson({
             element: "text",
             curStyles: true,
@@ -2888,7 +2899,6 @@ $.SvgCanvas = function (container, config) {
             height = box.height,
             dx = x - start_x,
             dy = y - start_y;
-          console.log(dx, dy);
 
           if (curConfig.gridSnapping) {
             dx = snapToGrid(dx);
@@ -3109,7 +3119,7 @@ $.SvgCanvas = function (container, config) {
         // break; missing on purpose
         case "fhpath":
           d_attr += +real_x + "," + real_y + " ";
-          shape.setAttributeNS(null, "points", d_attr);
+          shape?.setAttributeNS(null, "points", d_attr);
           break;
         // update path stretch line coordinates
         case "path":
@@ -3382,7 +3392,7 @@ $.SvgCanvas = function (container, config) {
           // causes problems.
           // Webkit ignores how we set the points attribute with commas and uses space
           // to separate all coordinates, see https://bugs.webkit.org/show_bug.cgi?id=29870
-          var coords = element.getAttribute("points");
+          var coords = element?.getAttribute("points");
           var commaIndex = coords.indexOf(",");
           if (commaIndex >= 0) {
             keep = coords.indexOf(",", commaIndex + 1) >= 0;
@@ -3418,6 +3428,7 @@ $.SvgCanvas = function (container, config) {
             freehand.maxx - freehand.minx > 0 &&
             freehand.maxy - freehand.miny > 0
           ) {
+            svgCanvas.getCurrentDrawing().setIdPrefix("ellipse");
             element = addSvgElementFromJson({
               element: "ellipse",
               curStyles: true,
@@ -3438,6 +3449,7 @@ $.SvgCanvas = function (container, config) {
             freehand.maxx - freehand.minx > 0 &&
             freehand.maxy - freehand.miny > 0
           ) {
+            svgCanvas.getCurrentDrawing().setIdPrefix("rect");
             element = addSvgElementFromJson({
               element: "rect",
               curStyles: true,
@@ -3776,9 +3788,11 @@ $.SvgCanvas = function (container, config) {
     }
 
     function setSelection(start, end, skipInput) {
+      var fontColor = curtext.fill;
+
       if (start === end) {
         curtext.querySelectorAll("tspan").forEach((tspan, index) => {
-          tspan.setAttribute("fill", "#000000");
+          tspan.setAttribute("fill", fontColor);
         });
 
         setCursor(end);
@@ -3794,7 +3808,7 @@ $.SvgCanvas = function (container, config) {
         selblock = document.createElementNS(svgns, "path");
         assignAttributes(selblock, {
           id: "text_selectblock",
-          fill: "red",
+          fill: "#e62833",
           style: "pointer-events:none",
           class: "no-render",
         });
@@ -3850,9 +3864,9 @@ $.SvgCanvas = function (container, config) {
 
       wrapTextInTspan(curtext); // Wrap text in tspan elements
 
-      let existingBg =
-        curtext.parentNode.querySelectorAll(".text-highlight-bg");
-      existingBg.forEach((bg) => bg.remove());
+      const margin = 2;
+      tl.x -= margin;
+      tr.x += margin;
 
       // Loop over each tspan in the text element and check if it's under the selection box
       curtext.querySelectorAll("tspan").forEach((tspan, index) => {
@@ -3872,7 +3886,7 @@ $.SvgCanvas = function (container, config) {
           tspan.setAttribute("fill", "#f2f2f2");
         } else {
           // Restore the default fill color if the text is not under the selection
-          tspan.setAttribute("fill", "#000000");
+          tspan.setAttribute("fill", fontColor);
         }
       });
     }
@@ -4260,6 +4274,7 @@ $.SvgCanvas = function (container, config) {
         d = d.join(" ");
 
         // create new path element
+        svgCanvas.getCurrentDrawing().setIdPrefix("path");
         element = addSvgElementFromJson({
           element: "path",
           curStyles: true,
@@ -4312,6 +4327,7 @@ $.SvgCanvas = function (container, config) {
           // if pts array is empty, create path element with M at current point
           if (!drawn_path) {
             d_attr = "M" + x + "," + y + " ";
+            svgCanvas.getCurrentDrawing().setIdPrefix("path");
             drawn_path = addSvgElementFromJson({
               element: "path",
               curStyles: true,
@@ -5578,6 +5594,17 @@ $.SvgCanvas = function (container, config) {
     $("#canvasGrid").attr("display", "none");
 
     var naked_svgs = [];
+
+    $(svgcontent).find(".no-render").remove();
+
+    $(svgcontent)
+      .find("text tspan")
+      .each(function () {
+        var $tspan = $(this);
+        var textContent = $tspan.text(); // Get the text inside <tspan>
+        var parentText = $tspan.parent(); // Get parent <text> element
+        $tspan.replaceWith(textContent); // Replace <tspan> with its text
+      });
 
     // Unwrap gsvg if it has no special attributes (only id and style)
     $(svgcontent)
@@ -7487,7 +7514,7 @@ $.SvgCanvas = function (container, config) {
     }
     if (elems.length > 0) {
       if (!preventUndo) {
-        changeSelectedAttribute(type, val, elems);
+        changeSelectedAttribute(type === "text" ? "fill" : type, val, elems);
         call("changed", elems);
       } else changeSelectedAttributeNoUndo(type, val, elems);
     }
@@ -8094,7 +8121,7 @@ $.SvgCanvas = function (container, config) {
 
   // Function: getFontColor
   // Returns the current font color
-  this.getFontSize = function () {
+  this.getFontColor = function () {
     return cur_text.fill;
   };
 
@@ -8589,7 +8616,7 @@ $.SvgCanvas = function (container, config) {
             setTimeout(function () {
               // Due to element replacement, this element may no longer
               // be part of the DOM
-              if (!elem.parentNode) return;
+              if (!elem || !elem.parentNode) return;
               selectorManager.requestSelector(elem).resize();
             }, 0);
           }
@@ -8790,15 +8817,13 @@ $.SvgCanvas = function (container, config) {
     var batchCmd = new BatchCommand(cmd_str);
 
     // create and insert the group element
-    const oldPrefix = getCurrentDrawing().getIdPrefix();
-    getCurrentDrawing().setIdPrefix("g_");
+    getCurrentDrawing().setIdPrefix("g");
     var g = addSvgElementFromJson({
       element: type,
       attr: {
         id: getNextId(),
       },
     });
-    getCurrentDrawing().setIdPrefix(oldPrefix);
 
     if (type === "a") {
       setHref(g, url);
@@ -9028,10 +9053,8 @@ $.SvgCanvas = function (container, config) {
   // significant recalculations to apply group's transforms, etc to its children
   this.ungroupSelectedElement = function () {
     var g = selectedElements[0];
-    const oldPrefix = getCurrentDrawing().getIdPrefix();
-    getCurrentDrawing().setIdPrefix("g_");
+    getCurrentDrawing().setIdPrefix("g");
     getCurrentDrawing().releaseId(g.id);
-    getCurrentDrawing().setIdPrefix(oldPrefix);
     if ($(g).data("gsvg") || $(g).data("symbol")) {
       // Is svg, so actually convert to group
 

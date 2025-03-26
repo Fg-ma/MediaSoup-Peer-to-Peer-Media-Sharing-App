@@ -149,14 +149,26 @@ var svgedit = svgedit || {};
     }
   };
 
-  svgedit.draw.Drawing.prototype.getElem_ = function (id) {
-    if (this.svgElem_.querySelector) {
-      // querySelector lookup
-      return this.svgElem_.querySelector("#" + id);
-    } else {
-      // jQuery lookup: twice as slow as xpath in FF
-      return $(this.svgElem_).find("[id=" + id + "]")[0];
+  var validPrefix = ["rect_", "path_", "ellipse_", "line_", "g_", "txt_"];
+
+  svgedit.draw.Drawing.prototype.getElem_ = function (objNum) {
+    for (let prefix of validPrefix) {
+      let id = this.nonce_
+        ? prefix + this.nonce_ + "_" + objNum
+        : prefix + objNum;
+
+      let elem;
+      if (this.svgElem_.querySelector) {
+        // querySelector lookup
+        elem = this.svgElem_.querySelector("#" + id);
+      } else {
+        // jQuery lookup: twice as slow as xpath in FF
+        elem = $(this.svgElem_).find("[id=" + id + "]")[0];
+      }
+
+      if (elem) return elem;
     }
+    return null;
   };
 
   svgedit.draw.Drawing.prototype.getSvgElem = function () {
@@ -190,7 +202,7 @@ var svgedit = svgedit || {};
    * Sets the idPrefix
    */
   svgedit.draw.Drawing.prototype.setIdPrefix = function (prefix) {
-    this.idPrefix = prefix;
+    this.idPrefix = prefix + "_";
   };
 
   /**
@@ -224,7 +236,7 @@ var svgedit = svgedit || {};
 
     // Ensure the ID does not exist.
     var id = this.getId();
-    while (this.getElem_(id)) {
+    while (this.getElem_(this.obj_num)) {
       if (restoreOldObjNum) {
         this.obj_num = oldObjNum;
         restoreOldObjNum = false;

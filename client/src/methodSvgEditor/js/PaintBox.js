@@ -3,7 +3,9 @@ MD.PaintBox = function (container, type) {
   var colorPicker = function (elem) {
     var picker = elem[0].id === "stroke_color" ? "stroke" : "fill";
     var is_background = elem[0].id === "canvas_color";
+    var is_text = elem[0].id === "text_color";
     if (is_background) picker = "canvas";
+    if (is_text) picker = "text";
     var paint = editor.paintBox[picker].paint;
 
     var title =
@@ -11,8 +13,16 @@ MD.PaintBox = function (container, type) {
         ? "Pick a Stroke Paint and Opacity"
         : "Pick a Fill Paint and Opacity";
     var was_none = false;
+    var textColorSection = $("#text_color_section");
+    var textColorSectionPos = textColorSection.offset() || { left: 0, top: 0 };
     var pos = is_background
       ? { right: 175, top: 50 }
+      : is_text
+      ? {
+          left: textColorSectionPos.left,
+          top: textColorSectionPos.top,
+          transform: "translate(-100%, -50%)",
+        }
       : { left: 48, bottom: 36 };
 
     $(document).on("mousedown", function (e) {
@@ -49,6 +59,7 @@ MD.PaintBox = function (container, type) {
           if (picker === "fill") state.set("canvasFill", paint);
           if (picker === "stroke") state.set("canvasStroke", paint);
           if (picker === "canvas") state.set("canvasBackground", paint);
+          if (picker === "text") state.set("canvasTextColor", paint);
           $("#color_picker").hide();
         },
         function (p) {
@@ -56,10 +67,12 @@ MD.PaintBox = function (container, type) {
         }
       );
   };
+
   var cur = { color: "fff", opacity: 1 };
-  if (type === "stroke") cur = { color: "000", opacity: 1 };
-  if (type === "fill") cur = { color: "fff", opacity: 1 };
-  if (type === "canvas") cur = { color: "fff", opacity: 1 };
+  if (type === "stroke") cur = { color: "090909", opacity: 1 };
+  if (type === "fill") cur = { color: "f2f2f2", opacity: 1 };
+  if (type === "canvas") cur = { color: "f2f2f2", opacity: 1 };
+  if (type === "text") cur = { color: "090909", opacity: 1 };
 
   // set up gradients to be used for the buttons
   var svgdocbox = new DOMParser().parseFromString(
@@ -152,6 +165,10 @@ MD.PaintBox = function (container, type) {
       if (fillAttr.indexOf("url") === -1) svgCanvas.setBackground(fillAttr);
     }
 
+    if (this.type === "text" && fillAttr.indexOf("url") === -1) {
+      svgCanvas.setFontColor(fillAttr);
+    }
+
     if (apply) {
       svgCanvas.setColor(this.type, fillAttr, true);
       svgCanvas.setPaintOpacity(this.type, opac, true);
@@ -228,7 +245,7 @@ MD.PaintBox = function (container, type) {
           paintOpacity = 1.0;
         }
 
-        var defColor = type === "fill" ? "black" : "none";
+        var defColor = type === "fill" || type === "text" ? "#090909" : "none";
         var paintColor = selectedElement.getAttribute(type) || defColor;
     }
     if (apply) {
@@ -240,6 +257,7 @@ MD.PaintBox = function (container, type) {
 
     var paint = this.getPaint(paintColor, paintOpacity, type);
     // update the rect inside #fill_color/#stroke_color
+
     this.setPaint(paint);
   };
 

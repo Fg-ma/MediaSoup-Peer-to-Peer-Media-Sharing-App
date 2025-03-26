@@ -9,7 +9,7 @@ export default function EllipsePanel() {
           <input
             id='ellipse_cx'
             className='attr_changer !font-K2D'
-            data-title="Change ellipse's cx coordinate"
+            data-title='Change x position'
             data-attr='cx'
             pattern='[0-9]*'
           />
@@ -19,7 +19,7 @@ export default function EllipsePanel() {
           <input
             id='ellipse_cy'
             className='attr_changer !font-K2D'
-            data-title="Change ellipse's cy coordinate"
+            data-title='Change y position'
             data-attr='cy'
             pattern='[0-9]*'
           />
@@ -29,7 +29,7 @@ export default function EllipsePanel() {
           <input
             id='ellipse_rx'
             className='attr_changer !font-K2D'
-            data-title="Change ellipse's x radius"
+            data-title='Change x radius'
             data-attr='rx'
             pattern='[0-9]*'
           />
@@ -39,7 +39,7 @@ export default function EllipsePanel() {
           <input
             id='ellipse_ry'
             className='attr_changer !font-K2D'
-            data-title="Change ellipse's y radius"
+            data-title='Change y radius'
             data-attr='ry'
             pattern='[0-9]*'
           />
