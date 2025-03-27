@@ -169,8 +169,6 @@ MD.Editor = function () {
     _self.selected = elems.filter(Boolean);
     editor.paintBox.fill.update();
     editor.paintBox.stroke.update();
-    if (editor.selected[0]?.tagName?.toLowerCase() === "text")
-      editor.paintBox.text.update();
     editor.panel.updateContextPanel(_self.selected);
   }
 
@@ -271,6 +269,28 @@ MD.Editor = function () {
       svgCanvas.setBlur(val, true);
     } else {
       svgCanvas.setBlurNoUndo(val);
+    }
+  }
+
+  function changeGrayscale(ctl, completed) {
+    // todo not receiving ctl
+    const val = Math.max(0.0001, $("#grayscale").val());
+
+    if (completed) {
+      svgCanvas.setGrayscale(val, true);
+    } else {
+      svgCanvas.setGrayscaleNoUndo(val);
+    }
+  }
+
+  function changeSaturation(ctl, completed) {
+    // todo not receiving ctl
+    const val = Math.max(0.0001, $("#saturation").val());
+
+    if (completed) {
+      svgCanvas.setSaturation(val, true);
+    } else {
+      svgCanvas.setSaturationNoUndo(val);
     }
   }
 
@@ -417,6 +437,8 @@ MD.Editor = function () {
   this.escapeMode = escapeMode;
   this.extensionAdded = extensionAdded;
   this.changeBlur = changeBlur;
+  this.changeGrayscale = changeGrayscale;
+  this.changeSaturation = changeSaturation;
   this.changeRotationAngle = changeRotationAngle;
   this.exportHandler = exportHandler;
   this.toggleWireframe = toggleWireframe;

@@ -27,7 +27,6 @@ export default function SelectedPanel() {
             ></div>
           </div>
         </label>
-
         <label id='tool_opacity' data-title='Change selected item opacity'>
           <input
             id='group_opacity'
@@ -41,19 +40,6 @@ export default function SelectedPanel() {
           <span id='group_opacityLabel' className='icon_label !font-Josefin'>
             Opacity
           </span>
-        </label>
-
-        <label id='tool_blur' data-title='Change gaussian blur value'>
-          <input
-            id='blur'
-            className='attr_changer !font-K2D'
-            size={2}
-            defaultValue='0'
-            step='.1'
-            min='0'
-            max='10'
-          />
-          <span className='icon_label !font-Josefin'>Blur</span>
         </label>
 
         <label

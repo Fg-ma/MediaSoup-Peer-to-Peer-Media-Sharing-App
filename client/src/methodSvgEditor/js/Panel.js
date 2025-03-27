@@ -274,6 +274,30 @@ MD.Panel = function () {
     cursor: true,
     start: 0,
   });
+  $("#grayscale").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeGrayscale,
+    cursor: true,
+    start: 1,
+  });
+  $("#saturation").dragInput({
+    min: 0,
+    max: 5,
+    step: 0.1,
+    callback: editor.changeSaturation,
+    cursor: true,
+    start: 1,
+  });
+  $("#tool_edge_detection").on("click", function () {
+    $(this).toggleClass("active");
+    if ($(this).hasClass("active")) {
+      svgCanvas.addEdgeDetection();
+    } else {
+      svgCanvas.removeEdgeDetection();
+    }
+  });
 
   // Align
 
@@ -526,8 +550,15 @@ MD.Panel = function () {
       var blurval = svgCanvas.getBlur(elem);
       $("#blur").val(blurval);
       $.fn.dragInput.updateCursor(document.getElementById("blur"));
+      var grayscaleval = svgCanvas.getGrayscale(elem);
+      $("#grayscale").val(grayscaleval);
+      $.fn.dragInput.updateCursor(document.getElementById("grayscale"));
+      var saturationval = svgCanvas.getSaturation(elem);
+      $("#saturation").val(saturationval);
+      $.fn.dragInput.updateCursor(document.getElementById("saturation"));
       if (!isNode && currentMode !== "pathedit") {
         $("#selected_panel").show();
+        $("#effects_panel").show();
         $(".action_selected").removeClass("disabled");
         // Elements in this array already have coord fields
         var x, y;
@@ -835,9 +866,11 @@ MD.Panel = function () {
     function renderSVGToObjects(element, isFirstFolder = false) {
       let $element = $(element);
       let tagName = element.tagName.toLowerCase();
+      if (tagName === "defs") return;
       let children = Array.from(element.children).filter(
         (child) =>
           child.tagName.toLowerCase() !== "title" &&
+          child.tagName.toLowerCase() !== "filter" &&
           child.tagName.toLowerCase() !== "tspan" &&
           !child.classList.contains("no-render")
       );

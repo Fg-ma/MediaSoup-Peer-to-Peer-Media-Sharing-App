@@ -395,3 +395,51 @@ input#angle {
 body.inverted.dragging .draginput .angle {
   background-color: var(--z1);
 }
+
+.toggleinput {
+  background-color: var(--z2);
+  border-radius: var(--x1);
+  width: calc(50% - var(--x2));
+  height: calc(var(--x9) * 2);
+  position: relative;
+  margin: 0 var(--x2) var(--x2) 0;
+  overflow: hidden;
+  transition: var(--transition);
+  box-shadow: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.toggleinput:hover {
+  background-color: #515151;
+  transition: none;
+  box-shadow: var(--shadow-bg);
+}
+
+.toggleinput:hover span,
+.toggleinput.active span {
+  color: var(--z15);
+}
+
+.toggleinput:hover input,
+.toggleinput.active input {
+  color: var(--accent8);
+}
+
+.toggleinput.active {
+  background-color: #515151;
+}
+
+.toggleinput.active:hover {
+  transition: none;
+  background-color: var(--z2);
+}
+
+.toggle_input_label {
+  width: 100%;
+  height: max-content;
+  white-space: normal;
+  text-align: center;
+}

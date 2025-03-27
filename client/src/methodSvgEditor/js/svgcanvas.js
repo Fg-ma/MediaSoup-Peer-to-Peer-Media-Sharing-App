@@ -5508,6 +5508,13 @@ $.SvgCanvas = function (container, config) {
 
   // Group: Serialization
 
+  var extractFilterIds = (this.extractFilterIds = function (filterString) {
+    if (!filterString || typeof filterString !== "string") return [];
+
+    const matches = filterString.match(/url\(#(.*?)\)/g) || [];
+    return matches.map((match) => match.replace(/url\(#(.*?)\)/, "$1"));
+  });
+
   // Function: removeUnusedDefElems
   // Looks at DOM elements inside the <defs> to see if they are referred to,
   // removes them from the DOM if they are not.
@@ -5517,8 +5524,6 @@ $.SvgCanvas = function (container, config) {
   var removeUnusedDefElems = (this.removeUnusedDefElems = function () {
     var defs = svgcontent.getElementsByTagNameNS(svgns, "defs");
     if (!defs || !defs.length) return 0;
-
-    //  if(!defs.firstChild) return;
 
     var defelem_uses = [],
       numRemoved = 0;
@@ -5539,9 +5544,15 @@ $.SvgCanvas = function (container, config) {
       var el = all_els[i];
       for (var j = 0; j < alen; j++) {
         if (el) {
-          var ref = getUrlFromAttr(el.getAttribute(attrs[j]));
-          if (ref) {
-            defelem_uses.push(ref.substr(1));
+          var attr = attrs[j];
+          if (attr !== "filter") {
+            var ref = getUrlFromAttr(el.getAttribute(attr));
+            if (ref) {
+              defelem_uses.push(ref.substr(1));
+            }
+          } else {
+            var filterIds = extractFilterIds(el.getAttribute(attr));
+            defelem_uses = [...defelem_uses, ...filterIds];
           }
         }
       }
@@ -5556,6 +5567,7 @@ $.SvgCanvas = function (container, config) {
     var defelems = $(defs).find(
       "linearGradient, radialGradient, filter, marker, svg, symbol"
     );
+
     (defelem_ids = []), (i = defelems.length);
     while (i--) {
       var defelem = defelems[i];
@@ -5567,7 +5579,6 @@ $.SvgCanvas = function (container, config) {
         numRemoved++;
       }
     }
-
     return numRemoved;
   });
 
@@ -6503,7 +6514,6 @@ $.SvgCanvas = function (container, config) {
       if (attrs.width <= 0) attrs.width = 200;
       if (attrs.height <= 0) attrs.height = 200;
 
-      content.attr(attrs);
       this.contentW = attrs["width"];
       this.contentH = attrs["height"];
 
@@ -7879,9 +7889,44 @@ $.SvgCanvas = function (container, config) {
     if (elem) {
       var filter_url = elem.getAttribute("filter");
       if (filter_url) {
-        const selector = filter_url.split("url(#")[1].slice(0, -1);
-        var blur = getElem(selector);
-        if (blur) val = blur.firstChild.getAttribute("stdDeviation");
+        var blur = getElem(elem.id + "_blur");
+        if (blur) val = blur.firstChild?.getAttribute("stdDeviation");
+      }
+    }
+    return val;
+  });
+
+  // Function: getGrayscale
+  // Gets the stdDeviation grayscale value of the given element
+  //
+  // Parameters:
+  // elem - The element to check the grayscale value for
+  var getGrayscale = (this.getGrayscale = function (elem) {
+    var val = 1;
+
+    if (elem) {
+      var filter_url = elem.getAttribute("filter");
+      if (filter_url) {
+        var grayscale = getElem(elem.id + "_grayscale");
+        if (grayscale) val = grayscale.firstChild.getAttribute("values");
+      }
+    }
+    return val;
+  });
+
+  // Function: getSaturation
+  // Gets the stdDeviation saturation value of the given element
+  //
+  // Parameters:
+  // elem - The element to check the saturation value for
+  var getSaturation = (this.getSaturation = function (elem) {
+    var val = 1;
+
+    if (elem) {
+      var filter_url = elem.getAttribute("filter");
+      if (filter_url) {
+        var saturation = getElem(elem.id + "_saturation");
+        if (saturation) val = saturation.firstChild.getAttribute("values");
       }
     }
     return val;
@@ -7903,21 +7948,166 @@ $.SvgCanvas = function (container, config) {
         return;
       }
       if (val === 0) {
-        // Don't change the StdDev, as that will hide the element.
-        // Instead, just remove the value for "filter"
-        changeSelectedAttributeNoUndo("filter", "");
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_blur)",
+          ""
+        );
+        changeSelectedAttributeNoUndo("filter", existingFilter.trim());
         filterHidden = true;
       } else {
         var elem = selectedElements[0];
         if (filterHidden) {
-          changeSelectedAttributeNoUndo("filter", "url(#" + elem.id + "_blur)");
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_blur)";
+
+          if (!existingFilter.includes(newFilter)) {
+            changeSelectedAttributeNoUndo(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
         }
         if (svgedit.browser.isWebkit()) {
-          elem.removeAttribute("filter");
-          elem.setAttribute("filter", "url(#" + elem.id + "_blur)");
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_blur)";
+
+          if (!existingFilter.includes(newFilter)) {
+            elem.setAttribute(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
         }
         changeSelectedAttributeNoUndo("stdDeviation", val, [filter.firstChild]);
         canvas.setBlurOffsets(filter, val);
+      }
+    };
+
+    // Function: setGrayscaleNoUndo
+    // Sets the stdDeviation grayscale value on the selected element without being undoable
+    //
+    // Parameters:
+    // val - The new grayscale saturation value
+    canvas.setGrayscaleNoUndo = function (val) {
+      if (!filter) {
+        canvas.setGrayscale(val);
+        return;
+      }
+      if (val === 1) {
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_grayscale)",
+          ""
+        );
+        changeSelectedAttributeNoUndo("filter", existingFilter.trim());
+        filterHidden = true;
+      } else {
+        var elem = selectedElements[0];
+        if (filterHidden) {
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_grayscale)";
+
+          if (!existingFilter.includes(newFilter)) {
+            changeSelectedAttributeNoUndo(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
+        }
+        if (svgedit.browser.isWebkit()) {
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_grayscale)";
+
+          if (!existingFilter.includes(newFilter)) {
+            elem.setAttribute(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
+        }
+        changeSelectedAttributeNoUndo("values", val, [filter.firstChild]);
+        canvas.setGrayscaleOffsets(filter, val);
+      }
+    };
+
+    // Function: setSaturationNoUndo
+    // Sets the stdDeviation saturation value on the selected element without being undoable
+    //
+    // Parameters:
+    // val - The new saturation saturation value
+    canvas.setSaturationNoUndo = function (val) {
+      if (!filter) {
+        canvas.setSaturation(val);
+        return;
+      }
+      if (val === 1) {
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_saturation)",
+          ""
+        );
+        changeSelectedAttributeNoUndo("filter", existingFilter.trim());
+        filterHidden = true;
+      } else {
+        var elem = selectedElements[0];
+        if (filterHidden) {
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_saturation)";
+
+          if (!existingFilter.includes(newFilter)) {
+            changeSelectedAttributeNoUndo(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
+        }
+        if (svgedit.browser.isWebkit()) {
+          var existingFilter = elem.getAttribute("filter") || "";
+          var newFilter = "url(#" + elem.id + "_saturation)";
+
+          if (!existingFilter.includes(newFilter)) {
+            elem.setAttribute(
+              "filter",
+              existingFilter ? existingFilter + " " + newFilter : newFilter
+            );
+          }
+        }
+        changeSelectedAttributeNoUndo("values", val, [filter.firstChild]);
+        canvas.setSaturationOffsets(filter, val);
+      }
+    };
+
+    // Function: setEdgeDetectionNoUndo
+    // Sets the stdDeviation edgeDetection value on the selected element without being undoable
+    canvas.setEdgeDetectionNoUndo = function () {
+      if (!filter) {
+        canvas.setEdgeDetection();
+        return;
+      }
+
+      var elem = selectedElements[0];
+      if (filterHidden) {
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + "_edge_detection)";
+
+        if (!existingFilter.includes(newFilter)) {
+          changeSelectedAttributeNoUndo(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
+      }
+      if (svgedit.browser.isWebkit()) {
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + "_edge_detection)";
+
+        if (!existingFilter.includes(newFilter)) {
+          elem.setAttribute(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
       }
     };
 
@@ -7958,6 +8148,44 @@ $.SvgCanvas = function (container, config) {
           filter.removeAttribute("height");
         }
       }
+    };
+
+    // Function: setGrayscaleOffsets
+    // Sets the x, y, with, height values of the filter element in order to
+    // make the grayscale not be clipped. Removes them if not neeeded
+    //
+    // Parameters:
+    // filter - The filter DOM element to update
+    canvas.setGrayscaleOffsets = function (filter, values) {
+      assignAttributes(
+        filter,
+        {
+          x: "-50%",
+          y: "-50%",
+          width: "200%",
+          height: "200%",
+        },
+        10
+      );
+    };
+
+    // Function: setSaturationOffsets
+    // Sets the x, y, with, height values of the filter element in order to
+    // make the saturation not be clipped. Removes them if not neeeded
+    //
+    // Parameters:
+    // filter - The filter DOM element to update
+    canvas.setSaturationOffsets = function (filter, values) {
+      assignAttributes(
+        filter,
+        {
+          x: "-50%",
+          y: "-50%",
+          width: "200%",
+          height: "200%",
+        },
+        10
+      );
     };
 
     // Function: setBlur
@@ -8012,11 +8240,28 @@ $.SvgCanvas = function (container, config) {
       var changes = { filter: elem.getAttribute("filter") };
 
       if (val === 0) {
-        elem.removeAttribute("filter");
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_blur)",
+          ""
+        );
+        if (existingFilter) {
+          changeSelectedAttributeNoUndo("filter", existingFilter.trim());
+        } else {
+          elem.removeAttribute("filter");
+        }
         batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
         return;
       } else {
-        changeSelectedAttribute("filter", "url(#" + elem_id + "_blur)");
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + "_blur)";
+
+        if (!existingFilter.includes(newFilter)) {
+          changeSelectedAttribute(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
 
         batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
 
@@ -8031,6 +8276,248 @@ $.SvgCanvas = function (container, config) {
         canvas.setBlurNoUndo(val);
         finishChange();
       }
+    };
+
+    // Function: setGrayscale
+    // Adds/updates the grayscale filter to the selected element
+    //
+    // Parameters:
+    // val - Float with the new stdDeviation grayscale value
+    // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
+    canvas.setGrayscale = function (val, complete) {
+      if (cur_command) {
+        finishChange();
+        return;
+      }
+
+      // Looks for associated grayscale, creates one if not found
+      var elem = selectedElements[0];
+      var elem_id = elem.id;
+      filter = getElem(elem_id + "_grayscale");
+
+      val -= 0;
+
+      var batchCmd = new BatchCommand();
+
+      // Grayscale found!
+      if (filter) {
+        if (val === 1) {
+          filter = null;
+        }
+      } else {
+        // Not found, so create
+        var newGrayscale = addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            type: "saturate",
+            values: val,
+          },
+        });
+
+        filter = addSvgElementFromJson({
+          element: "filter",
+          attr: {
+            id: elem_id + "_grayscale",
+          },
+        });
+
+        filter.appendChild(newGrayscale);
+        findDefs().appendChild(filter);
+
+        batchCmd.addSubCommand(new InsertElementCommand(filter));
+      }
+
+      var changes = { filter: elem.getAttribute("filter") };
+
+      if (val === 1) {
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_grayscale)",
+          ""
+        );
+        if (existingFilter) {
+          changeSelectedAttributeNoUndo("filter", existingFilter.trim());
+        } else {
+          elem.removeAttribute("filter");
+        }
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+        return;
+      } else {
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + "_grayscale)";
+
+        if (!existingFilter.includes(newFilter)) {
+          changeSelectedAttribute(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
+
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+
+        canvas.setGrayscaleOffsets(filter, val);
+      }
+
+      cur_command = batchCmd;
+      canvas.undoMgr.beginUndoableChange("values", [
+        filter ? filter.firstChild : null,
+      ]);
+      if (complete) {
+        canvas.setGrayscaleNoUndo(val);
+        finishChange();
+      }
+    };
+
+    // Function: setSaturation
+    // Adds/updates the saturation filter to the selected element
+    //
+    // Parameters:
+    // val - Float with the new stdDeviation saturation value
+    // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
+    canvas.setSaturation = function (val, complete) {
+      if (cur_command) {
+        finishChange();
+        return;
+      }
+
+      // Looks for associated saturation, creates one if not found
+      var elem = selectedElements[0];
+      var elem_id = elem.id;
+      filter = getElem(elem_id + "_saturation");
+
+      val -= 0;
+
+      var batchCmd = new BatchCommand();
+
+      // Saturation found!
+      if (filter) {
+        if (val === 1) {
+          filter = null;
+        }
+      } else {
+        // Not found, so create
+        var newSaturation = addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            type: "saturate",
+            values: val,
+          },
+        });
+
+        filter = addSvgElementFromJson({
+          element: "filter",
+          attr: {
+            id: elem_id + "_saturation",
+          },
+        });
+
+        filter.appendChild(newSaturation);
+        findDefs().appendChild(filter);
+
+        batchCmd.addSubCommand(new InsertElementCommand(filter));
+      }
+
+      var changes = { filter: elem.getAttribute("filter") };
+
+      if (val === 1) {
+        let existingFilter = elem.getAttribute("filter") || "";
+        existingFilter = existingFilter.replace(
+          "url(#" + elem.id + "_saturation)",
+          ""
+        );
+        if (existingFilter) {
+          changeSelectedAttributeNoUndo("filter", existingFilter.trim());
+        } else {
+          elem.removeAttribute("filter");
+        }
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+        return;
+      } else {
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + "_saturation)";
+
+        if (!existingFilter.includes(newFilter)) {
+          changeSelectedAttribute(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
+
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+
+        canvas.setSaturationOffsets(filter, val);
+      }
+
+      cur_command = batchCmd;
+      canvas.undoMgr.beginUndoableChange("values", [
+        filter ? filter.firstChild : null,
+      ]);
+      if (complete) {
+        canvas.setSaturationNoUndo(val);
+        finishChange();
+      }
+    };
+
+    // Function: addEdgeDetection
+    // Adds/updates the edgeDetection filter to the selected element
+    //
+    // Parameters:
+    // val - Float with the new stdDeviation edgeDetection value
+    // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
+    canvas.addEdgeDetection = function () {
+      if (cur_command) {
+        finishChange();
+        return;
+      }
+
+      // Looks for associated edgeDetection, creates one if not found
+      var elem = selectedElements[0];
+      var elem_id = elem.id;
+      filter = getElem(elem_id + "_edge_detection");
+
+      var batchCmd = new BatchCommand();
+
+      if (!filter) {
+        // Not found, so create
+        var newEdgeDetection = addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            order: "3",
+            kernelMatrix: " -1 -1 -1 -1 8 -1 -1 -1 -1 ",
+            result: "edgeDetected",
+          },
+        });
+
+        filter = addSvgElementFromJson({
+          element: "filter",
+          attr: {
+            id: elem_id + "_edge_detection",
+          },
+        });
+
+        filter.appendChild(newEdgeDetection);
+        findDefs().appendChild(filter);
+
+        batchCmd.addSubCommand(new InsertElementCommand(filter));
+      }
+
+      var changes = { filter: elem.getAttribute("filter") };
+
+      var existingFilter = elem.getAttribute("filter") || "";
+      var newFilter = "url(#" + elem.id + "_edge_detection)";
+
+      if (!existingFilter.includes(newFilter)) {
+        changeSelectedAttribute(
+          "filter",
+          existingFilter ? existingFilter + " " + newFilter : newFilter
+        );
+      }
+
+      batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+
+      cur_command = batchCmd;
+      canvas.setEdgeDetectionNoUndo();
+      finishChange();
     };
   })();
 
@@ -8880,22 +9367,22 @@ $.SvgCanvas = function (container, config) {
     var gangle = getRotationAngle(g);
 
     var gattrs = $(g).attr(["filter", "opacity"]);
-    var gfilter, gblur;
+
+    var gblurFilter, ggrayscaleFilter, gblur, ggrayscale;
 
     for (var i = 0; i < len; i++) {
       var elem = children[i];
-
       if (elem.nodeType !== 1) continue;
 
+      // Handle opacity
       if (gattrs.opacity !== null && gattrs.opacity !== 1) {
-        var c_opac = elem.getAttribute("opacity") || 1;
         var new_opac =
           Math.round(
             (elem.getAttribute("opacity") || 1) * gattrs.opacity * 100
           ) / 100;
         changeSelectedAttribute("opacity", new_opac, [elem]);
       }
-
+      // handle filters
       if (gattrs.filter) {
         var cblur = getBlur(elem);
         var orig_cblur = cblur;
@@ -8907,18 +9394,41 @@ $.SvgCanvas = function (container, config) {
           cblur = gblur;
         }
 
+        var cgrayscale = getGrayscale(elem);
+        var orig_cgrayscale = cgrayscale;
+        if (!ggrayscale) ggrayscale = getGrayscale(g);
+        if (cgrayscale) {
+          // Is this formula correct?
+          cgrayscale = ggrayscale - 0 + (cgrayscale - 0);
+        } else if (cgrayscale === 0) {
+          cgrayscale = ggrayscale;
+        }
+
         // If child has no current filter, get group's filter or clone it.
         if (!orig_cblur) {
           // Set group's filter to use first child's ID
-          if (!gfilter) {
-            gfilter = getRefElem(gattrs.filter);
+          if (!gblurFilter) {
+            gblurFilter = getRefElem(gattrs.filter);
           } else {
             // Clone the group's filter
-            gfilter = copyElem(gfilter);
-            findDefs().appendChild(gfilter);
+            gblurFilter = copyElem(gblurFilter);
+            findDefs().appendChild(gblurFilter);
           }
         } else {
-          gfilter = getRefElem(elem.getAttribute("filter"));
+          gblurFilter = getRefElem(elem.getAttribute("filter"));
+        }
+
+        if (!orig_cgrayscale) {
+          // Set group's filter to use first child's ID
+          if (!ggrayscaleFilter) {
+            ggrayscaleFilter = getRefElem(gattrs.filter);
+          } else {
+            // Clone the group's filter
+            ggrayscaleFilter = copyElem(ggrayscaleFilter);
+            findDefs().appendChild(ggrayscaleFilter);
+          }
+        } else {
+          ggrayscaleFilter = getRefElem(elem.getAttribute("filter"));
         }
 
         // Change this in future for different filters
@@ -8930,7 +9440,7 @@ $.SvgCanvas = function (container, config) {
         // Update blur value
         if (cblur) {
           changeSelectedAttribute("stdDeviation", cblur, [gfilter.firstChild]);
-          canvas.setBlurOffsets(gfilter, cblur);
+          canvas.setBlurOffsets(gblurFilter, cblur);
         }
       }
 

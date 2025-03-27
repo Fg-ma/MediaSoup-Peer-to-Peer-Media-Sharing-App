@@ -15,6 +15,7 @@ import PathPanel from "./lib/PathPanel";
 import RectanglePanel from "./lib/RectanglePanel";
 import CanvasPanel from "./lib/CanvasPanel";
 import ObjectsPanel from "./lib/ObjectsPanel";
+import EffectsPanel from "./lib/EffectsPanel";
 
 export default function ToolPanels() {
   return (
@@ -86,6 +87,8 @@ export default function ToolPanels() {
         <MultiselectedPanel />
 
         <StrokePanel />
+
+        <EffectsPanel />
       </div>
     </div>
   );

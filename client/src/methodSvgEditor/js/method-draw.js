@@ -261,6 +261,17 @@ window.methodDraw = function() {
       else {
         svgCanvas.setBlurNoUndo(val);
       }
+    } 
+    
+    var changeGrayscale = function(ctl, completed) {
+      val = ctl.value;
+      $('#grayscale').val(val);
+      if (completed) {
+        svgCanvas.setGrayscale(val, true);
+      }
+      else {
+        svgCanvas.setGrayscaleNoUndo(val);
+      }
     }
   
     $('#stroke_style').change(function(){
@@ -1237,8 +1248,7 @@ window.methodDraw = function() {
     Editor.paintBox.fill = new PaintBox('#fill_color', 'fill');
     Editor.paintBox.stroke = new PaintBox('#stroke_color', 'stroke');
     Editor.paintBox.canvas = new PaintBox('#canvas_color', 'canvas');
-    Editor.paintBox.text = new PaintBox('#text_color', 'text');
-    console.log("why", Editor.paintBox)
+
     $('#stroke_width').val(curConfig.initStroke.width);
     $('#group_opacity').val(curConfig.initOpacity * 100);
     
@@ -1278,10 +1288,6 @@ window.methodDraw = function() {
     $('#tool_canvas').on("click touchstart", function(){
         colorPicker($('#canvas_color'));
     }); 
-    
-    $('#tool_text_color').on("click touchstart", function(){
-        colorPicker($('#text_color'));
-    });
     
     $('#tool_stroke').on("touchstart", function(){
         $('#tool_stroke').addClass('active');
@@ -1734,6 +1740,7 @@ window.methodDraw = function() {
     $('#font_size')    .dragInput({ min: 1,    max: 500,   step:  1,  callback: changeFontSize,      cursor: false, stepfunc: stepFontSize, dragAdjust: .15 });
     $('#group_opacity').dragInput({ min: 0,    max: 100,   step:  5,  callback: changeAttribute,     cursor: true,  start: 100             });
     $('#blur')         .dragInput({ min: 0,    max: 20,    step: .1,  callback: changeBlur,          cursor: true,  start: 0               });
+    $('#grayscale')    .dragInput({ min: 0,    max: 1,     step:.01,  callback: changeGrayscale,     cursor: true,  start: 0               });
       // Set default zoom 
     $('#zoom').val(svgCanvas.getZoom() * 100);
     
