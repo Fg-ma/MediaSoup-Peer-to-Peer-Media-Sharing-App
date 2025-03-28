@@ -290,6 +290,46 @@ MD.Panel = function () {
     cursor: true,
     start: 1,
   });
+  $("#wave_distortion_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeWaveDistortionStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#wave_distortion_frequency").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeWaveDistortionFrequency,
+    cursor: true,
+    start: 0,
+  });
+  $("#cracked_glass_frequency").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeCrackedGlassFrequency,
+    cursor: true,
+    start: 0,
+  });
+  $("#cracked_glass_detail").dragInput({
+    min: 0,
+    max: 10,
+    step: 0.1,
+    callback: editor.changeCrackedGlassDetail,
+    cursor: true,
+    start: 0,
+  });
+  $("#cracked_glass_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeCrackedGlassStrength,
+    cursor: true,
+    start: 0,
+  });
   $("#tool_edge_detection").on("click", function () {
     $(this).toggleClass("active");
     if ($(this).hasClass("active")) {
@@ -512,6 +552,7 @@ MD.Panel = function () {
           ? 1
           : elem.getAttribute("stroke-width") || 0;
       $("#stroke_width").val(strokeWidth);
+      $.fn.dragInput.updateCursor($("#stroke_width")[0]);
       // stroke style
       const strokeStyle = elem.getAttribute("stroke-dasharray") || "none";
       const strokeStyles = {
@@ -547,15 +588,96 @@ MD.Panel = function () {
       $("#group_opacity").val(svgCanvas.getOpacity(elem) * 100 || 100);
       $.fn.dragInput.updateCursor(document.getElementById("group_opacity"));
       $("#tool_angle_indicator").css("transform", "rotate(" + angle + "deg)");
-      var blurval = svgCanvas.getBlur(elem);
+
+      var blurval = svgCanvas.getEffectAttr(
+        elem,
+        "_blur",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
       $("#blur").val(blurval);
       $.fn.dragInput.updateCursor(document.getElementById("blur"));
-      var grayscaleval = svgCanvas.getGrayscale(elem);
+      var grayscaleval = svgCanvas.getEffectAttr(
+        elem,
+        "_grayscale",
+        "feColorMatrix",
+        "values",
+        1
+      );
       $("#grayscale").val(grayscaleval);
       $.fn.dragInput.updateCursor(document.getElementById("grayscale"));
-      var saturationval = svgCanvas.getSaturation(elem);
+      var saturationval = svgCanvas.getEffectAttr(
+        elem,
+        "_saturation",
+        "feColorMatrix",
+        "values",
+        1
+      );
       $("#saturation").val(saturationval);
       $.fn.dragInput.updateCursor(document.getElementById("saturation"));
+      var edgeDetectionVal = svgCanvas.getEdgeDetection(elem);
+      var edgeDetectionTool = $("#tool_edge_detection");
+      if (edgeDetectionVal && !edgeDetectionTool.hasClass("active")) {
+        edgeDetectionTool.addClass("active");
+      } else if (!edgeDetectionVal && edgeDetectionTool.hasClass("active")) {
+        edgeDetectionTool.removeClass("active");
+      }
+      var waveDistortionStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_wave_distortion",
+        "feDisplacementMap",
+        "scale",
+        0
+      );
+      $("#wave_distortion_strength").val(waveDistortionStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("wave_distortion_strength")
+      );
+      var waveDistortionFrequencyVal = svgCanvas.getEffectAttr(
+        elem,
+        "_wave_distortion",
+        "feTurbulence",
+        "baseFrequency",
+        0
+      );
+      $("#wave_distortion_frequency").val(waveDistortionFrequencyVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("wave_distortion_frequency")
+      );
+      var crackedGlassFrequencyVal = svgCanvas.getEffectAttr(
+        elem,
+        "_cracked_glass",
+        "feTurbulence",
+        "baseFrequency",
+        0
+      );
+      $("#cracked_glass_frequency").val(crackedGlassFrequencyVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("cracked_glass_frequency")
+      );
+      var crackedGlassDetailVal = svgCanvas.getEffectAttr(
+        elem,
+        "_cracked_glass",
+        "feTurbulence",
+        "numOctaves",
+        0
+      );
+      $("#cracked_glass_detail").val(crackedGlassDetailVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("cracked_glass_detail")
+      );
+      var crackedGlassStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_cracked_glass",
+        "feDisplacementMap",
+        "scale"
+      );
+      $("#cracked_glass_strength").val(crackedGlassStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("cracked_glass_strength")
+      );
+
       if (!isNode && currentMode !== "pathedit") {
         $("#selected_panel").show();
         $("#effects_panel").show();

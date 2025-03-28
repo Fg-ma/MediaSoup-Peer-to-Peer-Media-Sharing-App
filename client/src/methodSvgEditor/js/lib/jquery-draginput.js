@@ -61,7 +61,10 @@ $.fn.dragInput = function (cfg) {
       if (max !== null) v = Math.min(v, max);
       if (min !== null) v = Math.max(v, min);
       if ($cursor) this.updateCursor(v);
-      this.value = v;
+
+      var fixed = (step.toString().split(".")[1] || "").length;
+      console.log(fixed, v);
+      this.value = v.toFixed(fixed);
       this.dragCfg.callback(attr, v, completed);
     };
 
@@ -76,8 +79,7 @@ $.fn.dragInput = function (cfg) {
       var deltaY = (e.pageY - lastY) * -1;
       lastY = e.pageY;
       val = deltaY * scale * dragAdjust;
-      var fixed = (step.toString().split(".")[1] || "").length;
-      this.adjustValue(val.toFixed(fixed));
+      this.adjustValue(val);
     };
 
     //when the mouse is released
@@ -215,7 +217,7 @@ $.fn.dragInput.updateCursor = function (el) {
   var value = parseFloat(el.value);
   var scale = parseFloat(el.getAttribute("data-scale"));
   var domain = parseFloat(el.getAttribute("data-domain"));
-  var pos = (value * -1) / scale + domain + "px";
+  var pos = (((value * -1) / scale + domain) / domain) * 100 + "%";
   var cursor = el.parentNode.lastChild;
   if (cursor.className === "draginput_cursor") cursor.style.top = pos;
 };

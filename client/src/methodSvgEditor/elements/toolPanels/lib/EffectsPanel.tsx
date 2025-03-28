@@ -92,37 +92,113 @@ export default function EffectsPanel() {
           <span className='icon_label !font-Josefin'>Color overlay</span>
         </label>
 
-        <label
-          id='tool_wave_distortion'
-          data-title='Change wave distortion value'
-          className='draginput'
-        >
-          <input
-            id='wave_distortion'
-            className='attr_changer !font-K2D'
-            step='0.1'
-            min='0'
-            max='1'
-            defaultValue='1'
-          />
-          <span className='icon_label !font-Josefin'>Wave distortion</span>
-        </label>
+        <div className='flex multidraginput_container flex-col items-center justify-center h-max'>
+          <div
+            className='multidraginput_label !font-Josefin text-fg-white w-full text-start'
+            style={{ font: "14px / 130% sans-serif" }}
+          >
+            Wave distortion
+          </div>
+          <div className='flex grow miltidraginput_items justify-between items-center'>
+            <label
+              id='tool_wave_distortion_strength'
+              data-title='Change wave distortion strength value'
+              className='draginput'
+            >
+              <input
+                id='wave_distortion_strength'
+                className='attr_changer !font-K2D'
+                step='0.1'
+                min='0'
+                max='50'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Strength</span>
+            </label>
 
-        <label
-          id='tool_cracked_glass'
-          data-title='Change cracked glass value'
-          className='draginput'
-        >
-          <input
-            id='cracked_glass'
-            className='attr_changer !font-K2D'
-            step='0.1'
-            min='0'
-            max='1'
-            defaultValue='1'
-          />
-          <span className='icon_label !font-Josefin'>Cracked glass</span>
-        </label>
+            <label
+              id='tool_wave_distortion_frequency'
+              data-title='Change wave distortion frequency value'
+              className='draginput'
+            >
+              <input
+                id='wave_distortion_frequency'
+                className='attr_changer !font-K2D'
+                step='0.01'
+                min='0'
+                max='1'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Frequency</span>
+            </label>
+          </div>
+        </div>
+
+        <div className='flex multidraginput_container flex-col items-center justify-center h-max'>
+          <div
+            className='multidraginput_label !font-Josefin text-fg-white w-full text-start'
+            style={{ font: "14px / 130% sans-serif" }}
+          >
+            Cracked glass
+          </div>
+          <div
+            className='flex grow miltidraginput_items justify-between items-center'
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              flexWrap: "wrap",
+            }}
+          >
+            <label
+              id='tool_cracked_glass_frequency'
+              data-title='Change cracked glass frequency value'
+              className='draginput'
+            >
+              <input
+                id='cracked_glass_frequency'
+                className='attr_changer !font-K2D'
+                step='0.01'
+                min='0'
+                max='1'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Frequency</span>
+            </label>
+
+            <label
+              id='tool_cracked_glass_strength'
+              data-title='Change cracked glass strength value'
+              className='draginput'
+            >
+              <input
+                id='cracked_glass_strength'
+                className='attr_changer !font-K2D'
+                step='0.1'
+                min='0'
+                max='50'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Strength</span>
+            </label>
+
+            <label
+              id='tool_cracked_glass_detail'
+              data-title='Change cracked glass detail value'
+              className='draginput'
+            >
+              <input
+                id='cracked_glass_detail'
+                className='attr_changer !font-K2D'
+                step='0.1'
+                min='0'
+                max='10'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Detail</span>
+            </label>
+          </div>
+        </div>
 
         <label
           id='tool_neon_glow'

@@ -262,36 +262,514 @@ MD.Editor = function () {
     if (func.callback) func.callback();
   }
 
-  function changeBlur(ctl, completed) {
+  function changeBlur() {
     // todo not receiving ctl
     const val = $("#blur").val();
-    if (completed) {
-      svgCanvas.setBlur(val, true);
-    } else {
-      svgCanvas.setBlurNoUndo(val);
-    }
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_blur",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feGaussianBlur",
+          attr: {
+            in: "SourceGraphic",
+            stdDeviation: val,
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feGaussianBlur",
+                  attr: {
+                    in: "SourceGraphic",
+                    stdDeviation: val,
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
   }
 
-  function changeGrayscale(ctl, completed) {
+  function changeGrayscale() {
     // todo not receiving ctl
     const val = Math.max(0.0001, $("#grayscale").val());
 
-    if (completed) {
-      svgCanvas.setGrayscale(val, true);
-    } else {
-      svgCanvas.setGrayscaleNoUndo(val);
-    }
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_grayscale",
+      "feColorMatrix",
+      "values",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            type: "saturate",
+            values: val,
+          },
+        }),
+      ],
+      1,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feColorMatrix",
+                  attr: {
+                    type: "saturate",
+                    values: val,
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
   }
 
-  function changeSaturation(ctl, completed) {
+  function changeSaturation() {
     // todo not receiving ctl
     const val = Math.max(0.0001, $("#saturation").val());
 
-    if (completed) {
-      svgCanvas.setSaturation(val, true);
-    } else {
-      svgCanvas.setSaturationNoUndo(val);
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_saturation",
+      "feColorMatrix",
+      "values",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            type: "saturate",
+            values: val,
+          },
+        }),
+      ],
+      1,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feColorMatrix",
+                  attr: {
+                    type: "saturate",
+                    values: val,
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeWaveDistortionStrength() {
+    // todo not receiving ctl
+    const val = $("#wave_distortion_strength").val();
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_wave_distortion",
+      "feDisplacementMap",
+      "scale",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feTurbulence",
+          attr: {
+            type: "fractalNoise",
+            baseFrequency: "0",
+            result: "turbulence",
+          },
+        }),
+        svgCanvas.addSvgElementFromJson({
+          element: "feDisplacementMap",
+          attr: {
+            in: "SourceGraphic",
+            in2: "turbulence",
+            scale: val,
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feTurbulence",
+                  attr: {
+                    type: "fractalNoise",
+                    baseFrequency: "0",
+                    result: "turbulence",
+                  },
+                }),
+                svgCanvas.addSvgElementFromJson({
+                  element: "feDisplacementMap",
+                  attr: {
+                    in: "SourceGraphic",
+                    in2: "turbulence",
+                    scale: val,
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeWaveDistortionFrequency() {
+    // todo not receiving ctl
+    const val = $("#wave_distortion_frequency").val();
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_wave_distortion",
+      "feTurbulence",
+      "baseFrequency",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feTurbulence",
+          attr: {
+            type: "fractalNoise",
+            baseFrequency: val,
+            result: "turbulence",
+          },
+        }),
+        svgCanvas.addSvgElementFromJson({
+          element: "feDisplacementMap",
+          attr: {
+            in: "SourceGraphic",
+            in2: "turbulence",
+            scale: "0",
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feTurbulence",
+                  attr: {
+                    type: "fractalNoise",
+                    baseFrequency: val,
+                    result: "turbulence",
+                  },
+                }),
+                svgCanvas.addSvgElementFromJson({
+                  element: "feDisplacementMap",
+                  attr: {
+                    in: "SourceGraphic",
+                    in2: "turbulence",
+                    scale: "0",
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeCrackedGlassFrequency() {
+    // todo not receiving ctl
+    const val = $("#cracked_glass_frequency").val();
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_cracked_glass",
+      "feTurbulence",
+      "baseFrequency",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feTurbulence",
+          attr: {
+            type: "fractalNoise",
+            baseFrequency: val,
+            numOctaves: "0",
+            result: "turbulence",
+          },
+        }),
+        svgCanvas.addSvgElementFromJson({
+          element: "feDisplacementMap",
+          attr: {
+            in: "SourceGraphic",
+            in2: "turbulence",
+            scale: "0",
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feTurbulence",
+                  attr: {
+                    type: "fractalNoise",
+                    baseFrequency: val,
+                    numOctaves: "0",
+                    result: "turbulence",
+                  },
+                }),
+                svgCanvas.addSvgElementFromJson({
+                  element: "feDisplacementMap",
+                  attr: {
+                    in: "SourceGraphic",
+                    in2: "turbulence",
+                    scale: "0",
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeCrackedGlassDetail() {
+    // todo not receiving ctl
+    var val = $("#cracked_glass_detail").val();
+
+    console.log(val);
+    if (!Number.isInteger(val)) {
+      val = Math.round(val);
+      $("#cracked_glass_detail").val(val);
     }
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_cracked_glass",
+      "feTurbulence",
+      "numOctaves",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feTurbulence",
+          attr: {
+            type: "fractalNoise",
+            baseFrequency: "0",
+            numOctaves: val,
+            result: "turbulence",
+          },
+        }),
+        svgCanvas.addSvgElementFromJson({
+          element: "feDisplacementMap",
+          attr: {
+            in: "SourceGraphic",
+            in2: "turbulence",
+            scale: "0",
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feTurbulence",
+                  attr: {
+                    type: "fractalNoise",
+                    baseFrequency: "0",
+                    numOctaves: val,
+                    result: "turbulence",
+                  },
+                }),
+                svgCanvas.addSvgElementFromJson({
+                  element: "feDisplacementMap",
+                  attr: {
+                    in: "SourceGraphic",
+                    in2: "turbulence",
+                    scale: "0",
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeCrackedGlassStrength() {
+    // todo not receiving ctl
+    const val = $("#cracked_glass_strength").val();
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_cracked_glass",
+      "feDisplacementMap",
+      "scale",
+      () => [
+        svgCanvas.addSvgElementFromJson({
+          element: "feTurbulence",
+          attr: {
+            type: "fractalNoise",
+            baseFrequency: "0",
+            numOctaves: "0",
+            result: "turbulence",
+          },
+        }),
+        svgCanvas.addSvgElementFromJson({
+          element: "feDisplacementMap",
+          attr: {
+            in: "SourceGraphic",
+            in2: "turbulence",
+            scale: val,
+          },
+        }),
+      ],
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => [
+                svgCanvas.addSvgElementFromJson({
+                  element: "feTurbulence",
+                  attr: {
+                    type: "fractalNoise",
+                    baseFrequency: "0",
+                    numOctaves: "0",
+                    result: "turbulence",
+                  },
+                }),
+                svgCanvas.addSvgElementFromJson({
+                  element: "feDisplacementMap",
+                  attr: {
+                    in: "SourceGraphic",
+                    in2: "turbulence",
+                    scale: val,
+                  },
+                }),
+              ],
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
   }
 
   function changeRotationAngle(ctl) {
@@ -439,6 +917,11 @@ MD.Editor = function () {
   this.changeBlur = changeBlur;
   this.changeGrayscale = changeGrayscale;
   this.changeSaturation = changeSaturation;
+  this.changeWaveDistortionStrength = changeWaveDistortionStrength;
+  this.changeWaveDistortionFrequency = changeWaveDistortionFrequency;
+  this.changeCrackedGlassFrequency = changeCrackedGlassFrequency;
+  this.changeCrackedGlassDetail = changeCrackedGlassDetail;
+  this.changeCrackedGlassStrength = changeCrackedGlassStrength;
   this.changeRotationAngle = changeRotationAngle;
   this.exportHandler = exportHandler;
   this.toggleWireframe = toggleWireframe;
