@@ -297,21 +297,19 @@ input[readonly="readonly"]:focus {
 #color_canvas_tools,
 #fill_bg,
 #stroke_bg,
-#text_bg {
+#color_shadow_tools {
   background: var(--z15)
     url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMAQMAAABsu86kAAAAA3NCSVQICAjb4U/gAAAABlBMVEXu7u7///8o06qaAAAACXBIWXMAAAsSAAALEgHS3X78AAAAFXRFWHRDcmVhdGlvbiBUaW1lADcvMjIvMTL7FNdCAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M1cbXjNgAAABFJREFUCJljYP7AgIb+MKAhAM8/C5vWL6zSAAAAAElFTkSuQmCC)
     top left repeat;
 }
 
-#color_canvas_tools {
+#color_canvas_tools,
+#color_shadow_tools {
   width: 60px;
   height: 40px;
   margin: 23px 5px 5px 5px;
   position: relative;
   overflow: hidden;
-}
-
-#color_canvas_tools {
   display: block;
 }
 

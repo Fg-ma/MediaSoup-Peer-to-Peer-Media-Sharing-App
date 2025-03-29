@@ -42,7 +42,7 @@ window.methodDraw = function() {
 
 
     Editor.canvas = svgCanvas;
-    Editor.paintBox = {fill: null, stroke:null, canvas:null, text: null};
+    Editor.paintBox = {fill: null, stroke:null, canvas:null};
     var isMac = (navigator.platform.indexOf("Mac") >= 0),
       isWebkit = (navigator.userAgent.indexOf("AppleWebKit") >= 0),
       modKey = (isMac ? "meta+" : "ctrl+"), // ⌘

@@ -54,7 +54,7 @@ function State() {
   this.canvasBackground = (paint) => {
     /* noop */
   };
-  this.canvasTextColor = (paint) => {
+  this.canvasShadow = (paint) => {
     /* noop */
   };
   this.darkmode = (isDark) => {

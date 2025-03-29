@@ -317,7 +317,7 @@ MD.Panel = function () {
   $("#cracked_glass_detail").dragInput({
     min: 0,
     max: 10,
-    step: 0.1,
+    step: 1,
     callback: editor.changeCrackedGlassDetail,
     cursor: true,
     start: 0,
@@ -327,6 +327,30 @@ MD.Panel = function () {
     max: 50,
     step: 0.1,
     callback: editor.changeCrackedGlassStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#shadow_x").dragInput({
+    min: null,
+    max: null,
+    step: 0.1,
+    callback: editor.changeShadowX,
+    cursor: false,
+    start: 0,
+  });
+  $("#shadow_y").dragInput({
+    min: null,
+    max: null,
+    step: 0.1,
+    callback: editor.changeShadowY,
+    cursor: false,
+    start: 5,
+  });
+  $("#shadow_strength").dragInput({
+    min: 0,
+    max: 10,
+    step: 0.1,
+    callback: editor.changeShadowStrength,
     cursor: true,
     start: 0,
   });
@@ -671,12 +695,39 @@ MD.Panel = function () {
         elem,
         "_cracked_glass",
         "feDisplacementMap",
-        "scale"
+        "scale",
+        0
       );
       $("#cracked_glass_strength").val(crackedGlassStrengthVal);
       $.fn.dragInput.updateCursor(
         document.getElementById("cracked_glass_strength")
       );
+      var shadowXVal = svgCanvas.getEffectAttr(
+        elem,
+        "_shadow",
+        "feOffset",
+        "dx",
+        0
+      );
+      $("#shadow_x").val(shadowXVal);
+      $.fn.dragInput.updateCursor(document.getElementById("shadow_x"));
+      var shadowYVal = svgCanvas.getEffectAttr(
+        elem,
+        "_shadow",
+        "feOffset",
+        "dy",
+        5
+      );
+      $("#shadow_y").val(shadowYVal);
+      $.fn.dragInput.updateCursor(document.getElementById("shadow_y"));
+      var shadowStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_shadow",
+        "feGaussianBlur",
+        "stdDeviation"
+      );
+      $("#shadow_strength").val(shadowStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("shadow_strength"));
 
       if (!isNode && currentMode !== "pathedit") {
         $("#selected_panel").show();
@@ -786,6 +837,7 @@ MD.Panel = function () {
           var font_family = elem.getAttribute("font-family") || "default";
           var cleanFontFamily = font_family.split(",")[0].replace(/'/g, "");
           var select = document.getElementById("font_family_dropdown");
+
           $(".text_panel").css("display", "inline");
           if (
             panelActive === "editing" &&

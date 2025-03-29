@@ -15,7 +15,7 @@
   display: none;
   background: var(--z1);
   width: calc(9 * var(--x15));
-  height: calc(6.75 * var(--x15));
+  height: calc(7 * var(--x15));
   border-radius: var(--x3);
   z-index: 5;
   box-shadow: var(--shadow);
@@ -235,7 +235,7 @@ div.jGraduate_stopPicker {
   padding: 20px;
   border-radius: 3px;
   width: 530px;
-  height: 352px;
+  height: 390px;
   box-shadow: 0 5px 25px black;
 }
 

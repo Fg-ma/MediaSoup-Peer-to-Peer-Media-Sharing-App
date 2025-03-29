@@ -12,6 +12,7 @@
 
 #canvas_title {
   z-index: 0;
+  width: 100%;
 }
 
 .context_panel {

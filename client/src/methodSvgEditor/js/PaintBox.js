@@ -1,18 +1,33 @@
-MD.PaintBox = function (container, type) {
+MD.PaintBox = function (container, type, setPaintCallback) {
   var _self = this;
   var colorPicker = function (elem) {
     var picker = elem[0].id === "stroke_color" ? "stroke" : "fill";
     var is_background = elem[0].id === "canvas_color";
     if (is_background) picker = "canvas";
+    var is_shadow = elem[0].id === "shadow_color";
+    if (is_shadow) picker = "shadow";
     var paint = editor.paintBox[picker].paint;
 
     var title =
       picker === "stroke"
-        ? "Pick a Stroke Paint and Opacity"
-        : "Pick a Fill Paint and Opacity";
+        ? "Pick a stroke paint and opacity"
+        : picker === "shadow"
+        ? "Pick a shadow color and opacity"
+        : "Pick a fill paint and opacity";
     var was_none = false;
+    var shadowColorSection = $("#shadow_color_section");
+    var shadowColorSectionPos = shadowColorSection.offset() || {
+      left: 0,
+      top: 0,
+    };
     var pos = is_background
       ? { right: 175, top: 50 }
+      : is_shadow
+      ? {
+          left: shadowColorSectionPos.left,
+          top: shadowColorSectionPos.top,
+          transform: "translate(-100%, -50%)",
+        }
       : { left: 48, bottom: 36 };
 
     $(document).on("mousedown", function (e) {
@@ -49,6 +64,7 @@ MD.PaintBox = function (container, type) {
           if (picker === "fill") state.set("canvasFill", paint);
           if (picker === "stroke") state.set("canvasStroke", paint);
           if (picker === "canvas") state.set("canvasBackground", paint);
+          if (picker === "shadow") state.set("canvasShadow", paint);
           $("#color_picker").hide();
         },
         function (p) {
@@ -57,10 +73,11 @@ MD.PaintBox = function (container, type) {
       );
   };
 
-  var cur = { color: "fff", opacity: 1 };
+  var cur = { color: "f2f2f2", opacity: 1 };
   if (type === "stroke") cur = { color: "090909", opacity: 1 };
   if (type === "fill") cur = { color: "f2f2f2", opacity: 1 };
-  if (type === "canvas") cur = { color: "f2f2f2", opacity: 1 };
+  if (type === "canvas") cur = { color: "f2f2f2", opacity: 0 };
+  if (type === "shadow") cur = { color: "d40213", opacity: 1 };
 
   // set up gradients to be used for the buttons
   var svgdocbox = new DOMParser().parseFromString(
@@ -108,6 +125,8 @@ MD.PaintBox = function (container, type) {
 
   this.setPaint = function (paint, apply, noUndo) {
     this.paint = paint;
+    console.log(paint);
+    if (setPaintCallback) setPaintCallback(paint);
     var fillAttr = "none";
     var ptype = paint.type;
     var opac = paint.alpha / 100;
@@ -229,7 +248,12 @@ MD.PaintBox = function (container, type) {
           paintOpacity = 1.0;
         }
 
-        var defColor = type === "fill" ? "#090909" : "none";
+        var defColor =
+          type === "fill" || type === "stroke"
+            ? "#090909"
+            : type === "shadow"
+            ? "d40213"
+            : "none";
         var paintColor = selectedElement.getAttribute(type) || defColor;
     }
     if (apply) {
@@ -281,6 +305,10 @@ MD.PaintBox = function (container, type) {
 
   $("#tool_canvas").on("click touchstart", function () {
     editor.paintBox.canvas.colorPicker($("#canvas_color"));
+  });
+
+  $("#tool_shadow_color").on("click touchstart", function () {
+    editor.paintBox.shadow.colorPicker($("#shadow_color"));
   });
 
   $("#tool_switch").on("click touchstart", function () {

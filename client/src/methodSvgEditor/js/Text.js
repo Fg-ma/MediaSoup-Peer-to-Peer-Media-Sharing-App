@@ -47,10 +47,12 @@ MD.Text = function () {
       const els = svgCanvas.getSelectedElems();
       els.forEach((el) => {
         var selector = svgCanvas.selectorManager.requestSelector(el);
-        selector.resize();
+        selector?.resize();
       });
       $("#tool_font_family").removeClass("loading");
     };
+
+    editor.panel.updateContextPanel();
   });
 
   $("#text")

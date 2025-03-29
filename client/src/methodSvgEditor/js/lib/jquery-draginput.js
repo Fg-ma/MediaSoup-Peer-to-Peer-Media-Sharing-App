@@ -63,23 +63,30 @@ $.fn.dragInput = function (cfg) {
       if ($cursor) this.updateCursor(v);
 
       var fixed = (step.toString().split(".")[1] || "").length;
-      console.log(fixed, v);
+
       this.value = v.toFixed(fixed);
       this.dragCfg.callback(attr, v, completed);
     };
 
     $label.toggleClass("draginput", $label.is("label"));
 
-    // when the mouse is down and moving
+    let accumulatedDelta = 0; // Store fractional changes
+
     this.move = function (e, oy, val) {
-      // just got started let's save for undo purposes
       if (lastY === 0) {
         lastY = oy;
       }
       var deltaY = (e.pageY - lastY) * -1;
       lastY = e.pageY;
-      val = deltaY * scale * dragAdjust;
-      this.adjustValue(val);
+
+      accumulatedDelta += deltaY * scale * dragAdjust;
+
+      if (Math.abs(accumulatedDelta) >= step) {
+        let stepsToApply = Math.floor(accumulatedDelta / step);
+        accumulatedDelta -= stepsToApply * step; // Retain the remainder for next move event
+        this.adjustValue(stepsToApply * step);
+      }
+      if ($cursor) this.updateCursor();
     };
 
     //when the mouse is released

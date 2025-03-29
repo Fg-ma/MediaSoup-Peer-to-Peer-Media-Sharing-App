@@ -5,21 +5,91 @@ export default function EffectsPanel() {
     <div id='effects_panel' className='context_panel'>
       <h4 className='!font-Josefin'>Effects</h4>
       <div className='draginputs'>
-        <label
-          id='tool_shadow'
-          data-title='Change shadow value'
-          className='draginput'
-        >
-          <input
-            id='shadow'
-            className='attr_changer !font-K2D'
-            step='0.1'
-            min='0'
-            max='1'
-            defaultValue='1'
-          />
-          <span className='icon_label !font-Josefin'>Shadow</span>
-        </label>
+        <div className='flex multidraginput_container flex-col items-center justify-center h-max'>
+          <div
+            className='multidraginput_label !font-Josefin text-fg-white w-full text-start'
+            style={{ font: "14px / 130% sans-serif" }}
+          >
+            Shadow
+          </div>
+          <div
+            className='flex grow miltidraginput_items justify-between items-center'
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              flexWrap: "wrap",
+            }}
+          >
+            <label
+              id='tool_shadow_x'
+              data-title='Change shadow x offset value'
+              className='draginput'
+            >
+              <input
+                id='shadow_x'
+                className='attr_changer !font-K2D'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>X</span>
+            </label>
+
+            <label
+              id='tool_shadow_y'
+              data-title='Change shadow y value'
+              className='draginput'
+            >
+              <input
+                id='shadow_y'
+                className='attr_changer !font-K2D'
+                defaultValue='5'
+              />
+              <span className='icon_label !font-Josefin'>Y</span>
+            </label>
+
+            <label
+              id='tool_shadow_strength'
+              data-title='Change shadow value'
+              className='draginput'
+            >
+              <input
+                id='shadow_strength'
+                className='attr_changer !font-K2D'
+                step='0.1'
+                min='0'
+                max='10'
+                defaultValue='0'
+              />
+              <span className='icon_label !font-Josefin'>Strength</span>
+            </label>
+
+            <label
+              data-title='Change shadow color'
+              className='draginput'
+              id='shadow_color_section'
+            >
+              <span className='!font-Josefin'>Color</span>
+              <div id='color_shadow_tools'>
+                <div
+                  className='color_tool active'
+                  id='tool_shadow_color'
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <div
+                    className='color_block'
+                    style={{ width: "100%", height: "100%" }}
+                  >
+                    <div id='shadow_bg'></div>
+                    <div
+                      id='shadow_color'
+                      style={{ width: "100%", height: "100%" }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
 
         <label id='tool_blur' data-title='Change gaussian blur value'>
           <input
@@ -190,9 +260,9 @@ export default function EffectsPanel() {
               <input
                 id='cracked_glass_detail'
                 className='attr_changer !font-K2D'
-                step='0.1'
+                step='1'
                 min='0'
-                max='10'
+                max='5'
                 defaultValue='0'
               />
               <span className='icon_label !font-Josefin'>Detail</span>

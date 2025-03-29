@@ -67,6 +67,7 @@ $.SvgCanvas = function (container, config) {
   // "document" element associated with the container (same as window.document using default svg-editor.js)
   // NOTE: This is not actually a SVG document, but a HTML document.
   var svgdoc = container.ownerDocument;
+  this.svgdoc = svgdoc;
 
   // This is a container for the document being edited, not the document itself.
   var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -7528,7 +7529,7 @@ $.SvgCanvas = function (container, config) {
 
   // Function: findDefs
   // Return the document's <defs> element, create it first if necessary
-  var findDefs = function () {
+  this.findDefs = findDefs = function () {
     var defs = svgcontent.getElementsByTagNameNS(svgns, "defs");
     if (defs.length > 0) {
       defs = defs[0];
@@ -7560,6 +7561,7 @@ $.SvgCanvas = function (container, config) {
     var duplicate_grad = findDuplicateGradient(grad);
     var defs = findDefs();
 
+    console.log("hiiaaaa", grad, canvas, duplicate_grad);
     // no duplicate found, so import gradient into defs
     if (!duplicate_grad) {
       var orig_grad = grad;
@@ -7893,10 +7895,10 @@ $.SvgCanvas = function (container, config) {
   };
 
   // Function: getEffectAttr
-  // Gets the cracked glass detail value of the given element
+  // Gets the value of the given element
   //
   // Parameters:
-  // elem - The element to check the cracked glass detail value for
+  // elem - The element to check the value for
   // extension - The filter extension to the element id
   // tagName - The tag name with the attr
   // attr - The attr looked for
@@ -7914,32 +7916,6 @@ $.SvgCanvas = function (container, config) {
 
           if (filter) {
             val = filter.getAttribute(attr) || val;
-          }
-        }
-      }
-    }
-    return val;
-  };
-
-  // Function: getCrackedGlassFrequency
-  // Gets the cracked glass frequency value of the given element
-  //
-  // Parameters:
-  // elem - The element to check the cracked glass frequency value for
-  this.getCrackedGlassFrequency = function (elem) {
-    var val = 0;
-
-    if (elem) {
-      var filter_url = elem.getAttribute("filter");
-      if (filter_url) {
-        var crackedGlass = getElem(elem.id + "_cracked_glass");
-        if (crackedGlass) {
-          var turbulence = Array.from(crackedGlass.children).find(
-            (child) => child.tagName === "feTurbulence"
-          );
-
-          if (turbulence) {
-            val = turbulence.getAttribute("baseFrequency") || val;
           }
         }
       }
@@ -8188,10 +8164,9 @@ $.SvgCanvas = function (container, config) {
 
       // Looks for associated Effect, creates one if not found
       var elem = selectedElements[0];
+      if (!elem) return;
       var elem_id = elem.id;
       filter = getElem(elem_id + extension);
-
-      val -= 0;
 
       var batchCmd = new BatchCommand();
 
@@ -8257,6 +8232,71 @@ $.SvgCanvas = function (container, config) {
         completeCallback(val, extension, tagName, attr, deleteValue);
         finishChange();
       }
+    };
+
+    // Function: setColorEffect
+    // Adds/updates the effect filter to the selected element
+    //
+    // Parameters:
+    // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
+    canvas.setColorEffect = function (
+      extension,
+      getFilterItems,
+      offsetsCallback
+    ) {
+      if (cur_command) {
+        finishChange();
+        return;
+      }
+
+      // Looks for associated Effect, creates one if not found
+      var elem = selectedElements[0];
+      if (!elem) return;
+      var elem_id = elem.id;
+      filter = getElem(elem_id + extension);
+
+      var batchCmd = new BatchCommand();
+
+      // Effect found!
+      if (filter) {
+        filter.remove();
+      }
+
+      if (getFilterItems) {
+        const filterItems = getFilterItems();
+
+        filter = addSvgElementFromJson({
+          element: "filter",
+          attr: {
+            id: elem_id + extension,
+          },
+        });
+
+        console.log(filterItems);
+        filterItems.map((filterItem) => filter.appendChild(filterItem));
+        findDefs().appendChild(filter);
+
+        batchCmd.addSubCommand(new InsertElementCommand(filter));
+
+        var changes = { filter: elem.getAttribute("filter") };
+
+        var existingFilter = elem.getAttribute("filter") || "";
+        var newFilter = "url(#" + elem.id + extension + ")";
+
+        if (!existingFilter.includes(newFilter)) {
+          changeSelectedAttribute(
+            "filter",
+            existingFilter ? existingFilter + " " + newFilter : newFilter
+          );
+        }
+
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+
+        offsetsCallback(filter);
+      }
+
+      cur_command = batchCmd;
+      finishChange();
     };
   })();
 
@@ -9855,6 +9895,7 @@ $.SvgCanvas = function (container, config) {
   // access to them to plugins.
   this.getPrivateMethods = function () {
     var obj = {
+      svgdoc: svgdoc,
       addCommandToHistory: addCommandToHistory,
       setGradient: setGradient,
       addSvgElementFromJson: addSvgElementFromJson,

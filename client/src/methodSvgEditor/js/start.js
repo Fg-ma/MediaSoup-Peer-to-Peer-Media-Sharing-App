@@ -10,6 +10,7 @@ editor.paintBox = {
   fill: new MD.PaintBox("#fill_color", "fill"),
   stroke: new MD.PaintBox("#stroke_color", "stroke"),
   canvas: new MD.PaintBox("#canvas_color", "canvas"),
+  shadow: new MD.PaintBox("#shadow_color", "shadow", editor.changeShadowColor),
 };
 editor.palette = new MD.Palette();
 editor.pan = new MD.Pan();
@@ -56,10 +57,6 @@ if (!window.location.search.includes("?load=")) {
 }
 
 state.set("canvasTitle", svgCanvas.getDocumentTitle());
-
-//editor.paintBox.fill.setPaint(state.get("canvasFill"));
-//editor.paintBox.stroke.setPaint(state.get("canvasStroke"));
-//editor.paintBox.canvas.setPaint(state.get("canvasBackground"));
 
 document.body.classList.remove("loading");
 document.getElementById("svgcanvas").removeAttribute("title");
