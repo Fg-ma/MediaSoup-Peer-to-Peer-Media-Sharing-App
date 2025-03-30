@@ -83,19 +83,25 @@
 #tool_fill,
 #tool_stroke,
 #tool_canvas,
-#tool_shadow {
+#tool_shadow,
+#tool_neon,
+#tool_overlay {
   box-shadow: 0 0 0 1px var(--z0);
   position: absolute;
 }
 
 #tool_canvas .color_block,
-#tool_shadow .color_block {
+#tool_shadow .color_block,
+#tool_neon .color_block,
+#tool_overlay .color_block {
   width: 60px;
   height: 40px;
 }
 
 #tool_canvas .color_block svg,
-#tool_shadow .color_block svg {
+#tool_shadow .color_block svg,
+#tool_neon .color_block svg,
+#tool_overlay .color_block svg {
   width: auto;
   height: auto;
 }

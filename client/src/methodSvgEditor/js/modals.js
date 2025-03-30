@@ -39,13 +39,19 @@ editor.modal = {
         "click",
         function () {
           var saveChanges = function () {
-            svgCanvas.clearSelection();
             $("#svg_source_textarea").blur();
             editor.zoom.multiply(1);
             editor.rulers.update();
             editor.paintBox.fill.prep();
             editor.paintBox.stroke.prep();
+            editor.paintBox.shadow.prep();
+            editor.paintBox.shadow.updateFromActual();
+            editor.paintBox.neon.prep();
+            editor.paintBox.neon.updateFromActual();
+            editor.paintBox.overlay.prep();
+            editor.paintBox.overlay.updateFromActual();
             editor.modal.source.close();
+            svgCanvas.clearSelection();
           };
 
           if (!svgCanvas.setSvgString($("#svg_source_textarea").val())) {

@@ -152,7 +152,7 @@ $.SvgCanvas = function (container, config) {
   all_properties.text = $.extend(true, {}, all_properties.shape);
 
   $.extend(all_properties.text, {
-    fill: "#000000",
+    fill: "#090909",
     stroke_width: 0,
     font_size: 24,
     font_family: curConfig.defaultFont,
@@ -7904,10 +7904,9 @@ $.SvgCanvas = function (container, config) {
   // attr - The attr looked for
   this.getEffectAttr = function (elem, extension, tagName, attr, defaultVal) {
     var val = defaultVal !== undefined ? defaultVal : 0;
-
     if (elem) {
       var filter_url = elem.getAttribute("filter");
-      if (filter_url) {
+      if (filter_url && filter_url.includes(elem.id + extension)) {
         var filter = getElem(elem.id + extension);
         if (filter) {
           var tag = Array.from(filter.children).find(
@@ -7915,7 +7914,7 @@ $.SvgCanvas = function (container, config) {
           );
 
           if (filter) {
-            val = filter.getAttribute(attr) || val;
+            val = tag.getAttribute(attr) || val;
           }
         }
       }
@@ -7967,18 +7966,20 @@ $.SvgCanvas = function (container, config) {
     // Parameters:
     // val - The new frequency value
     canvas.setEffectNoUndo = function (
-      val,
+      changes,
       extension,
-      tagName,
-      attr,
       deleteValue,
       noFilterCallback
     ) {
       if (!filter) {
-        noFilterCallback(val);
+        noFilterCallback(changes);
         return;
       }
-      if (val === deleteValue) {
+      if (
+        changes.some((change) => {
+          return change.val === deleteValue;
+        })
+      ) {
         let existingFilter = elem.getAttribute("filter") || "";
         existingFilter = existingFilter.replace(
           "url(#" + elem.id + extension + ")",
@@ -8011,11 +8012,15 @@ $.SvgCanvas = function (container, config) {
           }
         }
 
-        var filterItem = Array.from(filter.children).find(
-          (child) => child.tagName === tagName
-        );
+        changes.map((change) => {
+          var filterItem = findDeepChild(filter, change.tagName, change.id);
 
-        changeSelectedAttributeNoUndo(attr, val, [filterItem]);
+          if (filterItem) {
+            changeSelectedAttributeNoUndo(change.attr, change.val, [
+              filterItem,
+            ]);
+          }
+        });
         canvas.setOffsets(filter);
       }
     };
@@ -8040,16 +8045,15 @@ $.SvgCanvas = function (container, config) {
         {
           x: "-50%",
           y: "-50%",
-          width: "200%",
-          height: "200%",
+          width: "1000%",
+          height: "1000%",
         },
         100
       );
     };
 
-    // Function: addEdgeDetection
-    // Adds the edgeDetection filter to the selected element
-    canvas.addEdgeDetection = function () {
+    // Function: addEffect
+    canvas.addEffect = function (extension, getFilterItems) {
       if (cur_command) {
         finishChange();
         return;
@@ -8058,29 +8062,19 @@ $.SvgCanvas = function (container, config) {
       // Looks for associated edgeDetection, creates one if not found
       var elem = selectedElements[0];
       var elem_id = elem.id;
-      filter = getElem(elem_id + "_edge_detection");
+      filter = getElem(elem_id + extension);
 
       var batchCmd = new BatchCommand();
 
       if (!filter) {
-        // Not found, so create
-        var newEdgeDetection = addSvgElementFromJson({
-          element: "feConvolveMatrix",
-          attr: {
-            order: "3",
-            kernelMatrix: " -1 -1 -1 -1 8 -1 -1 -1 -1 ",
-            result: "edgeDetected",
-          },
-        });
-
         filter = addSvgElementFromJson({
           element: "filter",
           attr: {
-            id: elem_id + "_edge_detection",
+            id: elem_id + extension,
           },
         });
 
-        filter.appendChild(newEdgeDetection);
+        getFilterItems().map((filterItem) => filter.appendChild(filterItem));
         findDefs().appendChild(filter);
 
         batchCmd.addSubCommand(new InsertElementCommand(filter));
@@ -8089,7 +8083,7 @@ $.SvgCanvas = function (container, config) {
       var changes = { filter: elem.getAttribute("filter") };
 
       var existingFilter = elem.getAttribute("filter") || "";
-      var newFilter = "url(#" + elem.id + "_edge_detection)";
+      var newFilter = "url(#" + elem.id + extension + ")";
 
       if (!existingFilter.includes(newFilter)) {
         changeSelectedAttribute(
@@ -8105,9 +8099,8 @@ $.SvgCanvas = function (container, config) {
       finishChange();
     };
 
-    // Function: removeEdgeDetection
-    // Adds/updates the edge detection filter to the selected element
-    canvas.removeEdgeDetection = function () {
+    // Function: removeEffect
+    canvas.removeEffect = function (extension) {
       if (cur_command) {
         finishChange();
         return;
@@ -8116,7 +8109,7 @@ $.SvgCanvas = function (container, config) {
       // Looks for associated edge detection, creates one if not found
       var elem = selectedElements[0];
       var elem_id = elem.id;
-      filter = getElem(elem_id + "_edge_detection");
+      filter = getElem(elem_id + extension);
 
       var batchCmd = new BatchCommand();
 
@@ -8129,7 +8122,7 @@ $.SvgCanvas = function (container, config) {
 
       let existingFilter = elem.getAttribute("filter") || "";
       existingFilter = existingFilter.replace(
-        "url(#" + elem.id + "_edge_detection)",
+        "url(#" + elem.id + extension + ")",
         ""
       );
       if (existingFilter) {
@@ -8140,6 +8133,21 @@ $.SvgCanvas = function (container, config) {
       batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
     };
 
+    function findDeepChild(element, tagName, id) {
+      if (!element) return null;
+
+      if (element.tagName === tagName && (!id || element.id === id)) {
+        return element;
+      }
+
+      for (let child of element.children) {
+        const result = findDeepChild(child, tagName, id);
+        if (result) return result;
+      }
+
+      return null;
+    }
+
     // Function: setEffect
     // Adds/updates the effect filter to the selected element
     //
@@ -8147,13 +8155,11 @@ $.SvgCanvas = function (container, config) {
     // val - Float with the new effect value
     // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
     canvas.setEffect = function (
-      val,
+      changes,
       complete,
       extension,
-      tagName,
-      attr,
-      getFilterItems,
       deleteValue,
+      getFilterItems,
       offsetsCallback,
       completeCallback
     ) {
@@ -8172,9 +8178,11 @@ $.SvgCanvas = function (container, config) {
 
       // Effect found!
       if (filter) {
-        if (val === deleteValue) {
-          filter = null;
-        }
+        changes.some((change) => {
+          if (change.val === deleteValue) {
+            filter = null;
+          }
+        });
       } else {
         filter = addSvgElementFromJson({
           element: "filter",
@@ -8189,20 +8197,26 @@ $.SvgCanvas = function (container, config) {
         batchCmd.addSubCommand(new InsertElementCommand(filter));
       }
 
-      var changes = { filter: elem.getAttribute("filter") };
+      var filterChanges = { filter: elem.getAttribute("filter") };
 
-      if (val === deleteValue) {
+      if (
+        changes.some((change) => {
+          return change.val === deleteValue;
+        })
+      ) {
         let existingFilter = elem.getAttribute("filter") || "";
         existingFilter = existingFilter.replace(
           "url(#" + elem.id + extension + ")",
           ""
         );
+
         if (existingFilter) {
           changeSelectedAttributeNoUndo("filter", existingFilter.trim());
         } else {
           elem.removeAttribute("filter");
         }
-        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, filterChanges));
         return;
       } else {
         var existingFilter = elem.getAttribute("filter") || "";
@@ -8215,88 +8229,23 @@ $.SvgCanvas = function (container, config) {
           );
         }
 
-        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
+        batchCmd.addSubCommand(new ChangeElementCommand(elem, filterChanges));
 
         offsetsCallback(filter);
       }
 
       cur_command = batchCmd;
-      canvas.undoMgr.beginUndoableChange(attr, [
-        filter
-          ? Array.from(filter.children)?.find(
-              (child) => child.tagName === tagName
-            ) ?? null
-          : null,
-      ]);
+      changes.map((change) => {
+        canvas.undoMgr.beginUndoableChange(change.attr, [
+          filter
+            ? findDeepChild(filter, change.tagName, change.id) ?? null
+            : null,
+        ]);
+      });
       if (complete) {
-        completeCallback(val, extension, tagName, attr, deleteValue);
+        completeCallback(changes, extension, deleteValue);
         finishChange();
       }
-    };
-
-    // Function: setColorEffect
-    // Adds/updates the effect filter to the selected element
-    //
-    // Parameters:
-    // complete - Boolean indicating whether or not the action should be completed (to add to the undo manager)
-    canvas.setColorEffect = function (
-      extension,
-      getFilterItems,
-      offsetsCallback
-    ) {
-      if (cur_command) {
-        finishChange();
-        return;
-      }
-
-      // Looks for associated Effect, creates one if not found
-      var elem = selectedElements[0];
-      if (!elem) return;
-      var elem_id = elem.id;
-      filter = getElem(elem_id + extension);
-
-      var batchCmd = new BatchCommand();
-
-      // Effect found!
-      if (filter) {
-        filter.remove();
-      }
-
-      if (getFilterItems) {
-        const filterItems = getFilterItems();
-
-        filter = addSvgElementFromJson({
-          element: "filter",
-          attr: {
-            id: elem_id + extension,
-          },
-        });
-
-        console.log(filterItems);
-        filterItems.map((filterItem) => filter.appendChild(filterItem));
-        findDefs().appendChild(filter);
-
-        batchCmd.addSubCommand(new InsertElementCommand(filter));
-
-        var changes = { filter: elem.getAttribute("filter") };
-
-        var existingFilter = elem.getAttribute("filter") || "";
-        var newFilter = "url(#" + elem.id + extension + ")";
-
-        if (!existingFilter.includes(newFilter)) {
-          changeSelectedAttribute(
-            "filter",
-            existingFilter ? existingFilter + " " + newFilter : newFilter
-          );
-        }
-
-        batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
-
-        offsetsCallback(filter);
-      }
-
-      cur_command = batchCmd;
-      finishChange();
     };
   })();
 

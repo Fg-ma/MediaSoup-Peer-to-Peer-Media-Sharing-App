@@ -10,7 +10,9 @@ editor.paintBox = {
   fill: new MD.PaintBox("#fill_color", "fill"),
   stroke: new MD.PaintBox("#stroke_color", "stroke"),
   canvas: new MD.PaintBox("#canvas_color", "canvas"),
-  shadow: new MD.PaintBox("#shadow_color", "shadow", editor.changeShadowColor),
+  shadow: new MD.PaintBox("#shadow_color", "shadow"),
+  overlay: new MD.PaintBox("#overlay_color", "overlay"),
+  neon: new MD.PaintBox("#neon_color", "neon"),
 };
 editor.palette = new MD.Palette();
 editor.pan = new MD.Pan();

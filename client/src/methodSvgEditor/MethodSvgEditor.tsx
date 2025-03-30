@@ -108,6 +108,7 @@ export default function MethodSvgEditor() {
       "./src/methodSvgEditor/js/paste.js",
       "./src/methodSvgEditor/js/modals.js",
       "./src/methodSvgEditor/js/start.js",
+      "./src/methodSvgEditor/js/lib/tinycolor-min.js",
     ];
 
     const loadScripts = async () => {

@@ -170,6 +170,11 @@ MD.Editor = function () {
     editor.paintBox.fill.update();
     editor.paintBox.stroke.update();
     editor.paintBox.shadow.update();
+    editor.paintBox.shadow.updateFromActual();
+    editor.paintBox.neon.update();
+    editor.paintBox.neon.updateFromActual();
+    editor.paintBox.overlay.update();
+    editor.paintBox.overlay.updateFromActual();
     editor.panel.updateContextPanel(_self.selected);
   }
 
@@ -263,158 +268,141 @@ MD.Editor = function () {
     if (func.callback) func.callback();
   }
 
+  function alphaToHex(alpha) {
+    if (alpha < 0 || alpha > 100) return "ff";
+
+    // Convert percentage to 0-255 range
+    let hex = Math.round((alpha / 100) * 255)
+      .toString(16)
+      .toUpperCase();
+
+    // Ensure two-digit hex format
+    return hex.padStart(2, "0");
+  }
+
+  const getBlurFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        in: "SourceGraphic",
+        stdDeviation: val,
+      },
+    }),
+  ];
+
   function changeBlur() {
-    const val = $("#blur").val();
+    const val = parseFloat($("#blur").val());
 
     svgCanvas.setEffect(
-      val,
+      [{ val: val, tagName: "feGaussianBlur", attr: "stdDeviation" }],
       true,
       "_blur",
-      "feGaussianBlur",
-      "stdDeviation",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feGaussianBlur",
-          attr: {
-            in: "SourceGraphic",
-            stdDeviation: val,
-          },
-        }),
-      ],
       0,
+      getBlurFilterItems,
       svgCanvas.setOffsets,
-      (val, extension, tagName, attr, deleteValue) =>
-        svgCanvas.setEffectNoUndo(
-          val,
-          extension,
-          tagName,
-          attr,
-          deleteValue,
-          (val) =>
-            svgCanvas.setEffect(
-              val,
-              false,
-              extension,
-              tagName,
-              attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feGaussianBlur",
-                  attr: {
-                    in: "SourceGraphic",
-                    stdDeviation: val,
-                  },
-                }),
-              ],
-              deleteValue,
-              svgCanvas.setOffsets
-            )
+      (changes, extension, deleteValue) =>
+        svgCanvas.setEffectNoUndo(changes, extension, deleteValue, (changes) =>
+          svgCanvas.setEffect(
+            changes,
+            false,
+            extension,
+            deleteValue,
+            getBlurFilterItems,
+            svgCanvas.setOffsets
+          )
         )
     );
   }
+
+  const getGrayscaleFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        type: "saturate",
+        values: val,
+      },
+    }),
+  ];
 
   function changeGrayscale() {
-    const val = Math.max(0.0001, $("#grayscale").val());
+    const val = Math.max(0.0001, parseFloat($("#grayscale").val()));
 
     svgCanvas.setEffect(
-      val,
+      [{ val: val, attr: "values", tagName: "feColorMatrix" }],
       true,
       "_grayscale",
-      "feColorMatrix",
-      "values",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feColorMatrix",
-          attr: {
-            type: "saturate",
-            values: val,
-          },
-        }),
-      ],
       1,
+      getGrayscaleFilterItems,
       svgCanvas.setOffsets,
-      (val, extension, tagName, attr, deleteValue) =>
-        svgCanvas.setEffectNoUndo(
-          val,
-          extension,
-          tagName,
-          attr,
-          deleteValue,
-          (val) =>
-            svgCanvas.setEffect(
-              val,
-              false,
-              extension,
-              tagName,
-              attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feColorMatrix",
-                  attr: {
-                    type: "saturate",
-                    values: val,
-                  },
-                }),
-              ],
-              deleteValue,
-              svgCanvas.setOffsets
-            )
+      (changes, extension, deleteValue) =>
+        svgCanvas.setEffectNoUndo(changes, extension, deleteValue, (changes) =>
+          svgCanvas.setEffect(
+            changes,
+            false,
+            extension,
+            deleteValue,
+            getGrayscaleFilterItems,
+            svgCanvas.setOffsets
+          )
         )
     );
   }
+
+  const getSaturationFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        type: "saturate",
+        values: val,
+      },
+    }),
+  ];
 
   function changeSaturation() {
-    const val = Math.max(0.0001, $("#saturation").val());
+    const val = Math.max(0.0001, parseFloat($("#saturation").val()));
 
     svgCanvas.setEffect(
-      val,
+      [{ val: val, tagName: "feColorMatrix", attr: "values" }],
       true,
       "_saturation",
-      "feColorMatrix",
-      "values",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feColorMatrix",
-          attr: {
-            type: "saturate",
-            values: val,
-          },
-        }),
-      ],
       1,
+      getSaturationFilterItems,
       svgCanvas.setOffsets,
-      (val, extension, tagName, attr, deleteValue) =>
-        svgCanvas.setEffectNoUndo(
-          val,
-          extension,
-          tagName,
-          attr,
-          deleteValue,
-          (val) =>
-            svgCanvas.setEffect(
-              val,
-              false,
-              extension,
-              tagName,
-              attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feColorMatrix",
-                  attr: {
-                    type: "saturate",
-                    values: val,
-                  },
-                }),
-              ],
-              deleteValue,
-              svgCanvas.setOffsets
-            )
+      (changes, extension, deleteValue) =>
+        svgCanvas.setEffectNoUndo(changes, extension, deleteValue, (changes) =>
+          svgCanvas.setEffect(
+            changes,
+            false,
+            extension,
+            deleteValue,
+            getSaturationFilterItems,
+            svgCanvas.setOffsets
+          )
         )
     );
   }
 
+  const getWaveDistortionStrengthFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feTurbulence",
+      attr: {
+        type: "fractalNoise",
+        baseFrequency: "0",
+        result: "turbulence",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feDisplacementMap",
+      attr: {
+        in: "SourceGraphic",
+        in2: "turbulence",
+        scale: val,
+      },
+    }),
+  ];
+
   function changeWaveDistortionStrength() {
-    const val = $("#wave_distortion_strength").val();
+    const val = parseFloat($("#wave_distortion_strength").val());
 
     svgCanvas.setEffect(
       val,
@@ -422,24 +410,7 @@ MD.Editor = function () {
       "_wave_distortion",
       "feDisplacementMap",
       "scale",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feTurbulence",
-          attr: {
-            type: "fractalNoise",
-            baseFrequency: "0",
-            result: "turbulence",
-          },
-        }),
-        svgCanvas.addSvgElementFromJson({
-          element: "feDisplacementMap",
-          attr: {
-            in: "SourceGraphic",
-            in2: "turbulence",
-            scale: val,
-          },
-        }),
-      ],
+      getWaveDistortionStrengthFilterItems,
       0,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -456,24 +427,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feTurbulence",
-                  attr: {
-                    type: "fractalNoise",
-                    baseFrequency: "0",
-                    result: "turbulence",
-                  },
-                }),
-                svgCanvas.addSvgElementFromJson({
-                  element: "feDisplacementMap",
-                  attr: {
-                    in: "SourceGraphic",
-                    in2: "turbulence",
-                    scale: val,
-                  },
-                }),
-              ],
+              getWaveDistortionStrengthFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -481,8 +435,27 @@ MD.Editor = function () {
     );
   }
 
+  const getWaveDistortionFrequencyFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feTurbulence",
+      attr: {
+        type: "fractalNoise",
+        baseFrequency: val,
+        result: "turbulence",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feDisplacementMap",
+      attr: {
+        in: "SourceGraphic",
+        in2: "turbulence",
+        scale: "0",
+      },
+    }),
+  ];
+
   function changeWaveDistortionFrequency() {
-    const val = $("#wave_distortion_frequency").val();
+    const val = parseFloat($("#wave_distortion_frequency").val());
 
     svgCanvas.setEffect(
       val,
@@ -490,24 +463,7 @@ MD.Editor = function () {
       "_wave_distortion",
       "feTurbulence",
       "baseFrequency",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feTurbulence",
-          attr: {
-            type: "fractalNoise",
-            baseFrequency: val,
-            result: "turbulence",
-          },
-        }),
-        svgCanvas.addSvgElementFromJson({
-          element: "feDisplacementMap",
-          attr: {
-            in: "SourceGraphic",
-            in2: "turbulence",
-            scale: "0",
-          },
-        }),
-      ],
+      getWaveDistortionFrequencyFilterItems,
       0,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -524,24 +480,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feTurbulence",
-                  attr: {
-                    type: "fractalNoise",
-                    baseFrequency: val,
-                    result: "turbulence",
-                  },
-                }),
-                svgCanvas.addSvgElementFromJson({
-                  element: "feDisplacementMap",
-                  attr: {
-                    in: "SourceGraphic",
-                    in2: "turbulence",
-                    scale: "0",
-                  },
-                }),
-              ],
+              getWaveDistortionFrequencyFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -549,8 +488,28 @@ MD.Editor = function () {
     );
   }
 
+  const getCrackedGlassFrequencyFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feTurbulence",
+      attr: {
+        type: "fractalNoise",
+        baseFrequency: val,
+        numOctaves: "0",
+        result: "turbulence",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feDisplacementMap",
+      attr: {
+        in: "SourceGraphic",
+        in2: "turbulence",
+        scale: "0",
+      },
+    }),
+  ];
+
   function changeCrackedGlassFrequency() {
-    const val = $("#cracked_glass_frequency").val();
+    const val = parseFloat($("#cracked_glass_frequency").val());
 
     svgCanvas.setEffect(
       val,
@@ -558,25 +517,7 @@ MD.Editor = function () {
       "_cracked_glass",
       "feTurbulence",
       "baseFrequency",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feTurbulence",
-          attr: {
-            type: "fractalNoise",
-            baseFrequency: val,
-            numOctaves: "0",
-            result: "turbulence",
-          },
-        }),
-        svgCanvas.addSvgElementFromJson({
-          element: "feDisplacementMap",
-          attr: {
-            in: "SourceGraphic",
-            in2: "turbulence",
-            scale: "0",
-          },
-        }),
-      ],
+      getCrackedGlassFrequencyFilterItems,
       0,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -593,25 +534,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feTurbulence",
-                  attr: {
-                    type: "fractalNoise",
-                    baseFrequency: val,
-                    numOctaves: "0",
-                    result: "turbulence",
-                  },
-                }),
-                svgCanvas.addSvgElementFromJson({
-                  element: "feDisplacementMap",
-                  attr: {
-                    in: "SourceGraphic",
-                    in2: "turbulence",
-                    scale: "0",
-                  },
-                }),
-              ],
+              getCrackedGlassFrequencyFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -619,8 +542,28 @@ MD.Editor = function () {
     );
   }
 
+  const getCrackedGlassDetailFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feTurbulence",
+      attr: {
+        type: "fractalNoise",
+        baseFrequency: "0",
+        numOctaves: val,
+        result: "turbulence",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feDisplacementMap",
+      attr: {
+        in: "SourceGraphic",
+        in2: "turbulence",
+        scale: "0",
+      },
+    }),
+  ];
+
   function changeCrackedGlassDetail() {
-    var val = $("#cracked_glass_detail").val();
+    var val = parseFloat($("#cracked_glass_detail").val());
 
     svgCanvas.setEffect(
       val,
@@ -628,25 +571,7 @@ MD.Editor = function () {
       "_cracked_glass",
       "feTurbulence",
       "numOctaves",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feTurbulence",
-          attr: {
-            type: "fractalNoise",
-            baseFrequency: "0",
-            numOctaves: val,
-            result: "turbulence",
-          },
-        }),
-        svgCanvas.addSvgElementFromJson({
-          element: "feDisplacementMap",
-          attr: {
-            in: "SourceGraphic",
-            in2: "turbulence",
-            scale: "0",
-          },
-        }),
-      ],
+      getCrackedGlassDetailFilterItems,
       0,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -663,25 +588,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feTurbulence",
-                  attr: {
-                    type: "fractalNoise",
-                    baseFrequency: "0",
-                    numOctaves: val,
-                    result: "turbulence",
-                  },
-                }),
-                svgCanvas.addSvgElementFromJson({
-                  element: "feDisplacementMap",
-                  attr: {
-                    in: "SourceGraphic",
-                    in2: "turbulence",
-                    scale: "0",
-                  },
-                }),
-              ],
+              getCrackedGlassDetailFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -689,8 +596,28 @@ MD.Editor = function () {
     );
   }
 
+  const getCrackedGlassStrengthFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feTurbulence",
+      attr: {
+        type: "fractalNoise",
+        baseFrequency: "0",
+        numOctaves: "0",
+        result: "turbulence",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feDisplacementMap",
+      attr: {
+        in: "SourceGraphic",
+        in2: "turbulence",
+        scale: val,
+      },
+    }),
+  ];
+
   function changeCrackedGlassStrength() {
-    const val = $("#cracked_glass_strength").val();
+    const val = parseFloat($("#cracked_glass_strength").val());
 
     svgCanvas.setEffect(
       val,
@@ -698,25 +625,7 @@ MD.Editor = function () {
       "_cracked_glass",
       "feDisplacementMap",
       "scale",
-      () => [
-        svgCanvas.addSvgElementFromJson({
-          element: "feTurbulence",
-          attr: {
-            type: "fractalNoise",
-            baseFrequency: "0",
-            numOctaves: "0",
-            result: "turbulence",
-          },
-        }),
-        svgCanvas.addSvgElementFromJson({
-          element: "feDisplacementMap",
-          attr: {
-            in: "SourceGraphic",
-            in2: "turbulence",
-            scale: val,
-          },
-        }),
-      ],
+      getCrackedGlassStrengthFilterItems,
       0,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -733,25 +642,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => [
-                svgCanvas.addSvgElementFromJson({
-                  element: "feTurbulence",
-                  attr: {
-                    type: "fractalNoise",
-                    baseFrequency: "0",
-                    numOctaves: "0",
-                    result: "turbulence",
-                  },
-                }),
-                svgCanvas.addSvgElementFromJson({
-                  element: "feDisplacementMap",
-                  attr: {
-                    in: "SourceGraphic",
-                    in2: "turbulence",
-                    scale: val,
-                  },
-                }),
-              ],
+              getCrackedGlassStrengthFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -759,8 +650,70 @@ MD.Editor = function () {
     );
   }
 
+  const getShadowXFilterItems = (val) => {
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "coloredBlur",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: "0",
+          result: "blur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feOffset",
+        attr: {
+          in: "blur",
+          dx: val,
+          dy: "5",
+          result: "offsetBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feFlood",
+        attr: {
+          "flood-color": "#090909",
+          result: "colorBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "colorBlur",
+          in2: "offsetBlur",
+          operator: "in",
+          result: "coloredBlur",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
   function changeShadowX() {
-    const val = $("#shadow_x").val();
+    const val = parseFloat($("#shadow_x").val());
 
     svgCanvas.setEffect(
       val,
@@ -768,67 +721,7 @@ MD.Editor = function () {
       "_shadow",
       "feOffset",
       "dx",
-      () => {
-        const feMerge = svgCanvas.addSvgElementFromJson({
-          element: "feMerge",
-          attr: {},
-        });
-
-        feMerge.appendChild(
-          svgCanvas.addSvgElementFromJson({
-            element: "feMergeNode",
-            attr: {
-              in: "coloredBlur",
-            },
-          })
-        );
-
-        feMerge.appendChild(
-          svgCanvas.addSvgElementFromJson({
-            element: "feMergeNode",
-            attr: {
-              in: "SourceGraphic",
-            },
-          })
-        );
-
-        return [
-          svgCanvas.addSvgElementFromJson({
-            element: "feGaussianBlur",
-            attr: {
-              in: "SourceAlpha",
-              stdDeviation: "0",
-              result: "blur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feOffset",
-            attr: {
-              in: "blur",
-              dx: val,
-              dy: "5",
-              result: "offsetBlur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feFlood",
-            attr: {
-              "flood-color": "red",
-              result: "colorBlur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feComposite",
-            attr: {
-              in: "colorBlur",
-              in2: "offsetBlur",
-              operator: "in",
-              result: "coloredBlur",
-            },
-          }),
-          feMerge,
-        ];
-      },
+      getShadowXFilterItems,
       undefined,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -845,67 +738,7 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
-              () => {
-                const feMerge = svgCanvas.addSvgElementFromJson({
-                  element: "feMerge",
-                  attr: {},
-                });
-
-                feMerge.appendChild(
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feMergeNode",
-                    attr: {
-                      in: "coloredBlur",
-                    },
-                  })
-                );
-
-                feMerge.appendChild(
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feMergeNode",
-                    attr: {
-                      in: "SourceGraphic",
-                    },
-                  })
-                );
-
-                return [
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feGaussianBlur",
-                    attr: {
-                      in: "SourceAlpha",
-                      stdDeviation: "0",
-                      result: "blur",
-                    },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feOffset",
-                    attr: {
-                      in: "blur",
-                      dx: val,
-                      dy: "5",
-                      result: "offsetBlur",
-                    },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feFlood",
-                    attr: {
-                      "flood-color": "red",
-                      result: "colorBlur",
-                    },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feComposite",
-                    attr: {
-                      in: "colorBlur",
-                      in2: "offsetBlur",
-                      operator: "in",
-                      result: "coloredBlur",
-                    },
-                  }),
-                  feMerge,
-                ];
-              },
+              getShadowXFilterItems,
               deleteValue,
               svgCanvas.setOffsets
             )
@@ -913,8 +746,70 @@ MD.Editor = function () {
     );
   }
 
+  const getShadowYFilterItems = (val) => {
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "coloredBlur",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: "0",
+          result: "blur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feOffset",
+        attr: {
+          in: "blur",
+          dx: "0",
+          dy: val,
+          result: "offsetBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feFlood",
+        attr: {
+          "flood-color": "#090909",
+          result: "colorBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "colorBlur",
+          in2: "offsetBlur",
+          operator: "in",
+          result: "coloredBlur",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
   function changeShadowY() {
-    const val = $("#shadow_y").val();
+    const val = parseFloat($("#shadow_y").val());
 
     svgCanvas.setEffect(
       val,
@@ -922,67 +817,7 @@ MD.Editor = function () {
       "_shadow",
       "feOffset",
       "dy",
-      () => {
-        const feMerge = svgCanvas.addSvgElementFromJson({
-          element: "feMerge",
-          attr: {},
-        });
-
-        feMerge.appendChild(
-          svgCanvas.addSvgElementFromJson({
-            element: "feMergeNode",
-            attr: {
-              in: "coloredBlur",
-            },
-          })
-        );
-
-        feMerge.appendChild(
-          svgCanvas.addSvgElementFromJson({
-            element: "feMergeNode",
-            attr: {
-              in: "SourceGraphic",
-            },
-          })
-        );
-
-        return [
-          svgCanvas.addSvgElementFromJson({
-            element: "feGaussianBlur",
-            attr: {
-              in: "SourceAlpha",
-              stdDeviation: "0",
-              result: "blur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feOffset",
-            attr: {
-              in: "blur",
-              dx: "0",
-              dy: val,
-              result: "offsetBlur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feFlood",
-            attr: {
-              "flood-color": "red",
-              result: "colorBlur",
-            },
-          }),
-          svgCanvas.addSvgElementFromJson({
-            element: "feComposite",
-            attr: {
-              in: "colorBlur",
-              in2: "offsetBlur",
-              operator: "in",
-              result: "coloredBlur",
-            },
-          }),
-          feMerge,
-        ];
-      },
+      getShadowYFilterItems,
       undefined,
       svgCanvas.setOffsets,
       (val, extension, tagName, attr, deleteValue) =>
@@ -999,66 +834,584 @@ MD.Editor = function () {
               extension,
               tagName,
               attr,
+              getShadowYFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getShadowStrengthFilterItems = (val) => {
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "coloredBlur",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: val,
+          result: "blur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feOffset",
+        attr: {
+          in: "blur",
+          dx: "0",
+          dy: "5",
+          result: "offsetBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feFlood",
+        attr: {
+          "flood-color": "#090909",
+          result: "colorBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "colorBlur",
+          in2: "offsetBlur",
+          operator: "in",
+          result: "coloredBlur",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      getShadowStrengthFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getShadowStrengthFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getShadowColorFilterItems = (val) => {
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "coloredBlur",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: "0",
+          result: "blur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feOffset",
+        attr: {
+          in: "blur",
+          dx: "0",
+          dy: "5",
+          result: "offsetBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feFlood",
+        attr: {
+          "flood-color": val,
+          result: "colorBlur",
+        },
+      }),
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "colorBlur",
+          in2: "offsetBlur",
+          operator: "in",
+          result: "coloredBlur",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeShadowColor(paint) {
+    if (paint.type !== "solidColor" || paint.solidColor === "none") return;
+
+    if (paint.alpha) {
+      val = "#" + paint.solidColor + alphaToHex(paint.alpha);
+
+      svgCanvas.setEffect(
+        val,
+        true,
+        "_shadow",
+        "feFlood",
+        "flood-color",
+        getShadowColorFilterItems,
+        undefined,
+        svgCanvas.setOffsets,
+        (val, extension, tagName, attr, deleteValue) =>
+          svgCanvas.setEffectNoUndo(
+            val,
+            extension,
+            tagName,
+            attr,
+            deleteValue,
+            (val) =>
+              svgCanvas.setEffect(
+                val,
+                false,
+                extension,
+                tagName,
+                attr,
+                getShadowColorFilterItems,
+                deleteValue,
+                svgCanvas.setOffsets
+              )
+          )
+      );
+    } else {
+      svgCanvas.removeEffect("_shadow");
+      editor.paintBox.shadow.setPaint(
+        { alpha: 100, solidColor: "090909", type: "solidColor" },
+        true
+      );
+    }
+  }
+
+  const getOverlayColorFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        "flood-color": val,
+        result: "flood",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feComposite",
+      attr: {
+        in2: "SourceAlpha",
+        operator: "in",
+        result: "overlay",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feComposite",
+      attr: {
+        in: "overlay",
+        in2: "SourceGraphic",
+        operator: "over",
+      },
+    }),
+  ];
+
+  function changeOverlayColor(paint) {
+    if (paint.type !== "solidColor" || paint.solidColor === "none") return;
+
+    if (paint.alpha) {
+      val = "#" + paint.solidColor + alphaToHex(paint.alpha);
+
+      svgCanvas.setEffect(
+        val,
+        true,
+        "_overlay",
+        "feFlood",
+        "flood-color",
+        getOverlayColorFilterItems,
+        undefined,
+        svgCanvas.setOffsets,
+        (val, extension, tagName, attr, deleteValue) =>
+          svgCanvas.setEffectNoUndo(
+            val,
+            extension,
+            tagName,
+            attr,
+            deleteValue,
+            (val) =>
+              svgCanvas.setEffect(
+                val,
+                false,
+                extension,
+                tagName,
+                attr,
+                getOverlayColorFilterItems,
+                deleteValue,
+                svgCanvas.setOffsets
+              )
+          )
+      );
+    } else {
+      svgCanvas.removeEffect("_overlay");
+      editor.paintBox.shadow.setPaint(
+        { alpha: 100, solidColor: "d40213", type: "solidColor" },
+        true
+      );
+    }
+  }
+
+  const getNeonColorFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        in: "SourceAlpha",
+        stdDeviation: "5",
+        result: "blurred",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        "flood-color": val,
+        result: "glowColor",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feComposite",
+      attr: {
+        in: "glowColor",
+        in2: "blurred",
+        operator: "in",
+        result: "glow",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feComposite",
+      attr: {
+        in: "SourceGraphic",
+        in2: "glow",
+        operator: "over",
+      },
+    }),
+  ];
+
+  function changeNeonColor(paint) {
+    if (paint.type !== "solidColor" || paint.solidColor === "none") return;
+
+    if (paint.alpha) {
+      val = "#" + paint.solidColor + alphaToHex(paint.alpha);
+
+      svgCanvas.setEffect(
+        val,
+        true,
+        "_neon",
+        "feFlood",
+        "flood-color",
+        getNeonColorFilterItems,
+        undefined,
+        svgCanvas.setOffsets,
+        (val, extension, tagName, attr, deleteValue) =>
+          svgCanvas.setEffectNoUndo(
+            val,
+            extension,
+            tagName,
+            attr,
+            deleteValue,
+            (val) =>
+              svgCanvas.setEffect(
+                val,
+                false,
+                extension,
+                tagName,
+                attr,
+                getNeonColorFilterItems,
+                deleteValue,
+                svgCanvas.setOffsets
+              )
+          )
+      );
+    } else {
+      svgCanvas.removeEffect("_neon");
+      editor.paintBox.shadow.setPaint(
+        { alpha: 100, solidColor: "d40213", type: "solidColor" },
+        true
+      );
+    }
+  }
+
+  const getHueShiftFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        type: "hueRotate",
+        values: val,
+      },
+    }),
+  ];
+
+  function changeHueShift() {
+    const val = parseFloat($("#hue_shift").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_hue",
+      "feColorMatrix",
+      "values",
+      getHueShiftFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getHueShiftFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getColorHighlightFilterItems = (val) => {
+    const feComponentTransfer = svgCanvas.addSvgElementFromJson({
+      element: "feComponentTransfer",
+      attr: { in: "SourceGraphic" },
+    });
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncR",
+        attr: {
+          type: "table",
+          tableValues: val + " 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncG",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncB",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    return [feComponentTransfer];
+  };
+
+  function changeColorHighlightR() {
+    const val = parseFloat($("#color_highlight_r").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_color_highlight",
+      "feFuncR",
+      "tableValues",
+      getColorHighlightFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getColorHighlightFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getColorHighlightGFilterItems = (val) => {
+    const feComponentTransfer = svgCanvas.addSvgElementFromJson({
+      element: "feComponentTransfer",
+      attr: { in: "SourceGraphic" },
+    });
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncR",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncG",
+        attr: {
+          type: "table",
+          tableValues: val + " 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncB",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    return [feComponentTransfer];
+  };
+
+  function changeColorHighlightG() {
+    const val = parseFloat($("#color_highlight_g").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_color_highlight",
+      "feFuncG",
+      "tableValues",
+      getColorHighlightGFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
               () => {
-                const feMerge = svgCanvas.addSvgElementFromJson({
-                  element: "feMerge",
-                  attr: {},
+                const feComponentTransfer = svgCanvas.addSvgElementFromJson({
+                  element: "feComponentTransfer",
+                  attr: { in: "SourceGraphic" },
                 });
 
-                feMerge.appendChild(
+                feComponentTransfer.appendChild(
                   svgCanvas.addSvgElementFromJson({
-                    element: "feMergeNode",
+                    element: "feFuncR",
                     attr: {
-                      in: "coloredBlur",
+                      type: "table",
+                      tableValues: "1 0",
                     },
                   })
                 );
 
-                feMerge.appendChild(
+                feComponentTransfer.appendChild(
                   svgCanvas.addSvgElementFromJson({
-                    element: "feMergeNode",
+                    element: "feFuncG",
                     attr: {
-                      in: "SourceGraphic",
+                      type: "table",
+                      tableValues: val + " 0",
                     },
                   })
                 );
 
-                return [
+                feComponentTransfer.appendChild(
                   svgCanvas.addSvgElementFromJson({
-                    element: "feGaussianBlur",
+                    element: "feFuncB",
                     attr: {
-                      in: "SourceAlpha",
-                      stdDeviation: "0",
-                      result: "blur",
+                      type: "table",
+                      tableValues: "1 0",
                     },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feOffset",
-                    attr: {
-                      in: "blur",
-                      dx: "0",
-                      dy: val,
-                      result: "offsetBlur",
-                    },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feFlood",
-                    attr: {
-                      "flood-color": "red",
-                      result: "colorBlur",
-                    },
-                  }),
-                  svgCanvas.addSvgElementFromJson({
-                    element: "feComposite",
-                    attr: {
-                      in: "colorBlur",
-                      in2: "offsetBlur",
-                      operator: "in",
-                      result: "coloredBlur",
-                    },
-                  }),
-                  feMerge,
-                ];
+                  })
+                );
+
+                return [feComponentTransfer];
               },
               deleteValue,
               svgCanvas.setOffsets
@@ -1067,8 +1420,1385 @@ MD.Editor = function () {
     );
   }
 
+  const getColorHighlightBFilterItems = (val) => {
+    const feComponentTransfer = svgCanvas.addSvgElementFromJson({
+      element: "feComponentTransfer",
+      attr: { in: "SourceGraphic" },
+    });
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncR",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncG",
+        attr: {
+          type: "table",
+          tableValues: "1 0",
+        },
+      })
+    );
+
+    feComponentTransfer.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feFuncB",
+        attr: {
+          type: "table",
+          tableValues: val + " 0",
+        },
+      })
+    );
+
+    return [feComponentTransfer];
+  };
+
+  function changeColorHighlightB() {
+    const val = parseFloat($("#color_highlight_b").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_color_highlight",
+      "feFuncB",
+      "tableValues",
+      getColorHighlightBFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getColorHighlightBFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getGooeyStrengthFilterItems = (val) => [
+    svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        in: "SourceAlpha",
+        stdDeviation: val,
+        result: "blur",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        in: "blur",
+        mode: "matrix",
+        values: "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -10",
+        result: "gooey",
+      },
+    }),
+    svgCanvas.addSvgElementFromJson({
+      element: "feComposite",
+      attr: {
+        in: "SourceGraphic",
+        in2: "gooey",
+        operator: "atop",
+      },
+    }),
+  ];
+
+  function changeGooeyStrength() {
+    const val = parseFloat($("#gooey_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      getGooeyStrengthFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getGooeyStrengthFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getCyberpunkStrengthFilterItems = (val) => {
+    const feFlood = svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        "flood-color": "#00ffff",
+        "flood-opacity": "1",
+        result: "neonColor",
+      },
+    });
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          repeatCount: "indefinite",
+          dur: "3s",
+          values: "1;0.1;1",
+          attributeName: "flood-opacity",
+        },
+      })
+    );
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          repeatCount: "indefinite",
+          dur: "6s",
+          values: "#00ffff;#ff00ff;#00ffff",
+          attributeName: "flood-color",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "glow",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: val,
+          result: "blurred",
+        },
+      }),
+      feFlood,
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "neonColor",
+          in2: "blurred",
+          operator: "in",
+          result: "glow",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeCyberpunkStrength() {
+    const val = parseFloat($("#cyberpunk_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_cyberpunk",
+      "feGaussianBlur",
+      "stdDeviation",
+      getCyberpunkStrengthFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getCyberpunkStrengthFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getCyberpunkSpeedFilterItems = (val) => {
+    const feFlood = svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        "flood-color": "#00ffff",
+        "flood-opacity": "1",
+        result: "neonColor",
+      },
+    });
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          repeatCount: "indefinite",
+          dur: val + "s",
+          values: "1;0.1;1",
+          attributeName: "flood-opacity",
+        },
+      })
+    );
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          repeatCount: "indefinite",
+          dur: val + "s",
+          values: "#00ffff;#ff00ff;#00ffff",
+          attributeName: "flood-color",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "glow",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      svgCanvas.addSvgElementFromJson({
+        element: "feGaussianBlur",
+        attr: {
+          in: "SourceAlpha",
+          stdDeviation: "0",
+          result: "blurred",
+        },
+      }),
+      feFlood,
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          in: "neonColor",
+          in2: "blurred",
+          operator: "in",
+          result: "glow",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeCyberpunkSpeed() {
+    const val = parseFloat($("#cyberpunk_speed").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_cyberpunk",
+      "animate",
+      "dur",
+      getCyberpunkSpeedFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getCyberpunkSpeedFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getFireStrengthFilterItems = (val) => {
+    const feGaussianBlur = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurred",
+        stdDeviation: val,
+        in: "SourceAlpha",
+      },
+    });
+
+    feGaussianBlur.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          attributeName: "stdDeviation",
+          values: `${val};${val + 3};${val}`,
+          dur: "0.7s",
+          repeatCount: "indefinite",
+        },
+      })
+    );
+
+    const feFlood = svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        result: "glowColor",
+        "flood-opacity": "1",
+        "flood-color": "#ff6600",
+      },
+    });
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          attributeName: "flood-opacity",
+          values: "1;0.5;1",
+          dur: "0.7s",
+          repeatCount: "indefinite",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "glow",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      feGaussianBlur,
+      feFlood,
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          result: "glow",
+          operator: "in",
+          in2: "blurred",
+          in: "glowColor",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeFireStrength() {
+    const val = parseFloat($("#fire_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_fire",
+      "feGaussianBlur",
+      "stdDeviation",
+      getFireStrengthFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getFireStrengthFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getFireSpeedFilterItems = (val) => {
+    const feGaussianBlur = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurred",
+        stdDeviation: "5",
+        in: "SourceAlpha",
+      },
+    });
+
+    feGaussianBlur.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          attributeName: "stdDeviation",
+          values: "5;8;5",
+          dur: val,
+          repeatCount: "indefinite",
+        },
+      })
+    );
+
+    const feFlood = svgCanvas.addSvgElementFromJson({
+      element: "feFlood",
+      attr: {
+        result: "glowColor",
+        "flood-opacity": "1",
+        "flood-color": "#ff6600",
+      },
+    });
+
+    feFlood.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          attributeName: "flood-opacity",
+          values: "1;0.5;1",
+          dur: val,
+          repeatCount: "indefinite",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "glow",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      feGaussianBlur,
+      feFlood,
+      svgCanvas.addSvgElementFromJson({
+        element: "feComposite",
+        attr: {
+          result: "glow",
+          operator: "in",
+          in2: "blurred",
+          in: "glowColor",
+        },
+      }),
+      feMerge,
+    ];
+  };
+
+  function changeFireSpeed() {
+    const val = parseFloat($("#fire_speed").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_fire",
+      "animate",
+      "dur",
+      getFireSpeedFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getFireSpeedFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getGlitchStrengthFilterItems = (val) => {
+    const feColorMatrixBlue = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+        result: "glitchMatrixBlue",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 3 0 -0.5 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+        result: "glitchMatrixRed",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 3 0 0 0 -0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feOffsetBlue = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: "1.5",
+        dx: "5",
+        result: "offsetBlue",
+        in: "glitchMatrixBlue",
+      },
+    });
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "5; 0; 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "0.5; 0; 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feOffsetRed = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: "-1.5",
+        dx: "-3",
+        result: "offsetRed",
+        in: "glitchMatrixRed",
+      },
+    });
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "-4; 0; 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "-3; 0; 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredBlue",
+        stdDeviation: val,
+        in: "offsetBlue",
+      },
+    });
+
+    feGaussianBlurBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: "1.5s",
+          repeatCount: "indefinite",
+          values: `${val}; 0; 0; 0`,
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredRed",
+        stdDeviation: val,
+        in: "offsetRed",
+      },
+    });
+
+    feGaussianBlurRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: "1.5s",
+          repeatCount: "indefinite",
+          values: `${val}; 0; 0; 0`,
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredBlue",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredRed",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      feColorMatrixBlue,
+      feColorMatrixRed,
+      feOffsetBlue,
+      feOffsetRed,
+      feGaussianBlurBlue,
+      feGaussianBlurRed,
+      feMerge,
+    ];
+  };
+
+  function changeGlitchStrength() {
+    const val = parseFloat($("#glitch_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_glitch",
+      "feGaussianBlur",
+      "stdDeviation",
+      getGlitchStrengthFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getGlitchStrengthFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getGlitchOffsetFilterItems = (val) => {
+    const feColorMatrixBlue = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+        result: "glitchMatrixBlue",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 3 0 -0.5 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+        result: "glitchMatrixRed",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 3 0 0 0 -0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feOffsetBlue = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: val * 0.5,
+        dx: val * 5,
+        result: "offsetBlue",
+        in: "glitchMatrixBlue",
+      },
+    });
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: `${val * 5}; 0; 0`,
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: `${val * 0.5}; 0; 0`,
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feOffsetRed = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: val * -3,
+        dx: val * -4,
+        result: "offsetRed",
+        in: "glitchMatrixRed",
+      },
+    });
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: `${val * -4}; 0; 0`,
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: `${val * -3}; 0; 0`,
+          repeatCount: "indefinite",
+          dur: "1.5s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredBlue",
+        stdDeviation: "0",
+        in: "offsetBlue",
+      },
+    });
+
+    feGaussianBlurBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: "1.5s",
+          repeatCount: "indefinite",
+          values: "1.5; 0; 0; 0",
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredRed",
+        stdDeviation: "0",
+        in: "offsetRed",
+      },
+    });
+
+    feGaussianBlurRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: "1.5s",
+          repeatCount: "indefinite",
+          values: "1.5; 0; 0; 0",
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredBlue",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredRed",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      feColorMatrixBlue,
+      feColorMatrixRed,
+      feOffsetBlue,
+      feOffsetRed,
+      feGaussianBlurBlue,
+      feGaussianBlurRed,
+      feMerge,
+    ];
+  };
+
+  function changeGlitchOffset() {
+    const val = parseFloat($("#glitch_offset").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_glitch",
+      "feGaussianBlur",
+      "stdDeviation",
+      getGlitchOffsetFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getGlitchOffsetFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getGlitchSpeedFilterItems = (val) => {
+    const feColorMatrixBlue = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+        result: "glitchMatrixBlue",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 3 0 -0.5 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 1.5 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
+      element: "feColorMatrix",
+      attr: {
+        values: "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+        result: "glitchMatrixRed",
+        in: "SourceGraphic",
+        type: "matrix",
+      },
+    });
+
+    feColorMatrixRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .25,1,.75,0; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values:
+            "1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 3 0 0 0 -0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0; 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "values",
+        },
+      })
+    );
+
+    const feOffsetBlue = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: "0.5",
+        dx: "5",
+        result: "offsetBlue",
+        in: "glitchMatrixBlue",
+      },
+    });
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "5; 0; 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "0.5; 0; 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feOffsetRed = svgCanvas.addSvgElementFromJson({
+      element: "feOffset",
+      attr: {
+        dy: "-3",
+        dx: "-4",
+        result: "offsetRed",
+        in: "glitchMatrixRed",
+      },
+    });
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "-4; 0; 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "dx",
+        },
+      })
+    );
+
+    feOffsetRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          begin: "0.03s",
+          keySplines: ".42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          keyTimes: "0; 0.25; 1",
+          values: "-3; 0; 0",
+          repeatCount: "indefinite",
+          dur: val + "s",
+          attributeName: "dy",
+        },
+      })
+    );
+
+    const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredBlue",
+        stdDeviation: "0",
+        in: "offsetBlue",
+      },
+    });
+
+    feGaussianBlurBlue.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: val + "s",
+          repeatCount: "indefinite",
+          values: "0; 0; 0; 0",
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
+      element: "feGaussianBlur",
+      attr: {
+        result: "blurredRed",
+        stdDeviation: "0",
+        in: "offsetRed",
+      },
+    });
+
+    feGaussianBlurRed.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "animate",
+        attr: {
+          keySplines: ".42,0,.58,1; .42,0,.58,1; .42,0,.58,1",
+          calcMode: "spline",
+          attributeName: "stdDeviation",
+          dur: val + "s",
+          repeatCount: "indefinite",
+          values: "0; 0; 0; 0",
+          keyTimes: "0; 0.25; 0.75; 1",
+        },
+      })
+    );
+
+    const feMerge = svgCanvas.addSvgElementFromJson({
+      element: "feMerge",
+      attr: {},
+    });
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredBlue",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "blurredRed",
+        },
+      })
+    );
+
+    feMerge.appendChild(
+      svgCanvas.addSvgElementFromJson({
+        element: "feMergeNode",
+        attr: {
+          in: "SourceGraphic",
+        },
+      })
+    );
+
+    return [
+      feColorMatrixBlue,
+      feColorMatrixRed,
+      feOffsetBlue,
+      feOffsetRed,
+      feGaussianBlurBlue,
+      feGaussianBlurRed,
+      feMerge,
+    ];
+  };
+
+  function changeGlitchSpeed() {
+    const val = parseFloat($("#glitch_speed").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_glitch",
+      "feGaussianBlur",
+      "stdDeviation",
+      getGlitchSpeedFilterItems,
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              getGlitchSpeedFilterItems,
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  const getFilterItems = (val) => [];
+
   function changeShadowStrength() {
-    const val = $("#shadow_strength").val();
+    const val = parseFloat($("#shadow_strength").val());
 
     svgCanvas.setEffect(
       val,
@@ -1121,7 +2851,7 @@ MD.Editor = function () {
           svgCanvas.addSvgElementFromJson({
             element: "feFlood",
             attr: {
-              "flood-color": "red",
+              "flood-color": "#090909",
               result: "colorBlur",
             },
           }),
@@ -1198,7 +2928,7 @@ MD.Editor = function () {
                   svgCanvas.addSvgElementFromJson({
                     element: "feFlood",
                     attr: {
-                      "flood-color": "red",
+                      "flood-color": "#090909",
                       result: "colorBlur",
                     },
                   }),
@@ -1221,121 +2951,1543 @@ MD.Editor = function () {
     );
   }
 
-  function alphaToHex(alpha) {
-    if (alpha < 0 || alpha > 100) return "ff";
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
 
-    // Convert percentage to 0-255 range
-    let hex = Math.round((alpha / 100) * 255)
-      .toString(16)
-      .toUpperCase();
-
-    // Ensure two-digit hex format
-    return hex.padStart(2, "0");
-  }
-
-  function getColorEffectElements(paint, extension) {
-    if (paint.type === "solidColor") {
-      val = "#" + paint.solidColor + alphaToHex(paint.alpha);
-      return [
-        svgCanvas.addSvgElementFromJson({
-          element: "feFlood",
-          attr: {
-            "flood-color": val,
-            result: "colorBlur",
-          },
-        }),
-      ];
-    } else if (paint.type === "linearGradient") {
-      svgCanvas.setGradient("shadow");
-
-      // Create <feImage> and append the SVG element
-      let feImage = svgCanvas.addSvgElementFromJson({
-        element: "feImage",
-        attr: {
-          result: "colorBlur",
-          x: "0",
-          y: "0",
-          width: "100%",
-          height: "100%",
-          href: `url(#gradbox${extension})`,
-        },
-      });
-
-      return [];
-    } else {
-    }
-  }
-
-  function changeShadowColor(paint) {
-    var selected = svgCanvas.getSelectedElems()[0];
-    var shadowStrengthVal = selected
-      ? svgCanvas.getEffectAttr(
-          selected,
-          "_shadow",
-          "feGaussianBlur",
-          "stdDeviation"
-        )
-      : 0;
-    console.log(selected, shadowStrengthVal);
-    svgCanvas.setColorEffect(
+    svgCanvas.setEffect(
+      val,
+      true,
       "_shadow",
-      shadowStrengthVal
-        ? () => {
-            const feMerge = svgCanvas.addSvgElementFromJson({
-              element: "feMerge",
-              attr: {},
-            });
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
 
-            feMerge.appendChild(
-              svgCanvas.addSvgElementFromJson({
-                element: "feMergeNode",
-                attr: {
-                  in: "coloredBlur",
-                },
-              })
-            );
-            feMerge.appendChild(
-              svgCanvas.addSvgElementFromJson({
-                element: "feMergeNode",
-                attr: {
-                  in: "SourceGraphic",
-                },
-              })
-            );
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
 
-            return [
-              svgCanvas.addSvgElementFromJson({
-                element: "feGaussianBlur",
-                attr: {
-                  in: "SourceAlpha",
-                  stdDeviation: shadowStrengthVal,
-                  result: "blur",
-                },
-              }),
-              svgCanvas.addSvgElementFromJson({
-                element: "feOffset",
-                attr: {
-                  in: "blur",
-                  dx: "0",
-                  dy: "5",
-                  result: "offsetBlur",
-                },
-              }),
-              ...getColorEffectElements(paint, "_shadow"),
-              svgCanvas.addSvgElementFromJson({
-                element: "feComposite",
-                attr: {
-                  in: "colorBlur",
-                  in2: "offsetBlur",
-                  operator: "in",
-                  result: "coloredBlur",
-                },
-              }),
-              feMerge,
-            ];
-          }
-        : undefined,
-      svgCanvas.setOffsets
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
+    );
+  }
+
+  function changeShadowStrength() {
+    const val = parseFloat($("#shadow_strength").val());
+
+    svgCanvas.setEffect(
+      val,
+      true,
+      "_shadow",
+      "feGaussianBlur",
+      "stdDeviation",
+      () => {
+        const feMerge = svgCanvas.addSvgElementFromJson({
+          element: "feMerge",
+          attr: {},
+        });
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "coloredBlur",
+            },
+          })
+        );
+
+        feMerge.appendChild(
+          svgCanvas.addSvgElementFromJson({
+            element: "feMergeNode",
+            attr: {
+              in: "SourceGraphic",
+            },
+          })
+        );
+
+        return [
+          svgCanvas.addSvgElementFromJson({
+            element: "feGaussianBlur",
+            attr: {
+              in: "SourceAlpha",
+              stdDeviation: val,
+              result: "blur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feOffset",
+            attr: {
+              in: "blur",
+              dx: "0",
+              dy: "5",
+              result: "offsetBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feFlood",
+            attr: {
+              "flood-color": "#090909",
+              result: "colorBlur",
+            },
+          }),
+          svgCanvas.addSvgElementFromJson({
+            element: "feComposite",
+            attr: {
+              in: "colorBlur",
+              in2: "offsetBlur",
+              operator: "in",
+              result: "coloredBlur",
+            },
+          }),
+          feMerge,
+        ];
+      },
+      0,
+      svgCanvas.setOffsets,
+      (val, extension, tagName, attr, deleteValue) =>
+        svgCanvas.setEffectNoUndo(
+          val,
+          extension,
+          tagName,
+          attr,
+          deleteValue,
+          (val) =>
+            svgCanvas.setEffect(
+              val,
+              false,
+              extension,
+              tagName,
+              attr,
+              () => {
+                const feMerge = svgCanvas.addSvgElementFromJson({
+                  element: "feMerge",
+                  attr: {},
+                });
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "coloredBlur",
+                    },
+                  })
+                );
+
+                feMerge.appendChild(
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feMergeNode",
+                    attr: {
+                      in: "SourceGraphic",
+                    },
+                  })
+                );
+
+                return [
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feGaussianBlur",
+                    attr: {
+                      in: "SourceAlpha",
+                      stdDeviation: val,
+                      result: "blur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feOffset",
+                    attr: {
+                      in: "blur",
+                      dx: "0",
+                      dy: "5",
+                      result: "offsetBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feFlood",
+                    attr: {
+                      "flood-color": "#090909",
+                      result: "colorBlur",
+                    },
+                  }),
+                  svgCanvas.addSvgElementFromJson({
+                    element: "feComposite",
+                    attr: {
+                      in: "colorBlur",
+                      in2: "offsetBlur",
+                      operator: "in",
+                      result: "coloredBlur",
+                    },
+                  }),
+                  feMerge,
+                ];
+              },
+              deleteValue,
+              svgCanvas.setOffsets
+            )
+        )
     );
   }
 
@@ -1557,6 +4709,8 @@ MD.Editor = function () {
   this.changeShadowY = changeShadowY;
   this.changeShadowStrength = changeShadowStrength;
   this.changeShadowColor = changeShadowColor;
+  this.changeOverlayColor = changeOverlayColor;
+  this.changeNeonColor = changeNeonColor;
   this.changeRotationAngle = changeRotationAngle;
   this.exportHandler = exportHandler;
   this.toggleWireframe = toggleWireframe;

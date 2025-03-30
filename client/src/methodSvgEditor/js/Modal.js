@@ -1,5 +1,4 @@
-MD.Modal = function(config){
-
+MD.Modal = function (config) {
   const el = document.createElement("div");
   el.classList.add("modal", "hidden");
 
@@ -8,25 +7,23 @@ MD.Modal = function(config){
   item.classList.add("modal-item");
   el.appendChild(item);
 
-  el.addEventListener("click", close);
-  
-  item.addEventListener("click", function(e){
+  el.addEventListener("pointerdown", close);
+
+  item.addEventListener("pointerdown", function (e) {
     e.stopPropagation();
   });
 
   document.body.appendChild(el);
 
-
-
-  function open(){
+  function open() {
     el.classList.remove("hidden");
   }
 
-  function close(){
+  function close() {
     el.classList.add("hidden");
   }
 
-  function confirm(cb){
+  function confirm(cb) {
     if (cb) cb();
     close();
   }
@@ -34,7 +31,7 @@ MD.Modal = function(config){
   this.open = open;
   this.close = close;
   this.confirm = confirm;
-  this.cb = config.cb || function(){};
+  this.cb = config.cb || function () {};
   this.el = el;
 
   if (config.js) {
@@ -42,6 +39,5 @@ MD.Modal = function(config){
     config.js(el);
   }
 
-  return this
-
-}
+  return this;
+};

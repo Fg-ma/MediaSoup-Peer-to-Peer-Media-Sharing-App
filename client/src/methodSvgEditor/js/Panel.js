@@ -333,7 +333,7 @@ MD.Panel = function () {
   $("#shadow_x").dragInput({
     min: null,
     max: null,
-    step: 0.1,
+    step: 1,
     callback: editor.changeShadowX,
     cursor: false,
     start: 0,
@@ -341,7 +341,7 @@ MD.Panel = function () {
   $("#shadow_y").dragInput({
     min: null,
     max: null,
-    step: 0.1,
+    step: 1,
     callback: editor.changeShadowY,
     cursor: false,
     start: 5,
@@ -357,9 +357,34 @@ MD.Panel = function () {
   $("#tool_edge_detection").on("click", function () {
     $(this).toggleClass("active");
     if ($(this).hasClass("active")) {
-      svgCanvas.addEdgeDetection();
+      svgCanvas.addEffect("_edge_detection", () => [
+        addSvgElementFromJson({
+          element: "feConvolveMatrix",
+          attr: {
+            order: "3",
+            kernelMatrix: " -1 -1 -1 -1 8 -1 -1 -1 -1 ",
+            result: "edgeDetected",
+          },
+        }),
+      ]);
     } else {
-      svgCanvas.removeEdgeDetection();
+      svgCanvas.removeEffect("_edge_detection");
+    }
+  });
+  $("#tool_invert").on("click", function () {
+    $(this).toggleClass("active");
+    if ($(this).hasClass("active")) {
+      svgCanvas.addEffect("_invert", () => [
+        addSvgElementFromJson({
+          element: "feColorMatrix",
+          attr: {
+            type: "matrix",
+            values: "-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0",
+          },
+        }),
+      ]);
+    } else {
+      svgCanvas.removeEffect("_invert");
     }
   });
 

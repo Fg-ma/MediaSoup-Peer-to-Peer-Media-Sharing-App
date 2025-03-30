@@ -10,8 +10,7 @@ function State() {
 
   this.set = (key, val) => {
     key = key.split("-")[0] || key;
-    if (tenThousandThings.indexOf(key) === -1)
-      return console.warn(key + " not implemented");
+    if (tenThousandThings.indexOf(key) === -1) return;
     const archetype = dao.find((thing) => thing.name === key);
     val = _self.data[_getKey(key)] = archetype.clean(val);
     if (~saveableKeys.indexOf(key)) _save(_getKey(key), val);
@@ -55,6 +54,12 @@ function State() {
     /* noop */
   };
   this.canvasShadow = (paint) => {
+    /* noop */
+  };
+  this.canvasNeon = (paint) => {
+    /* noop */
+  };
+  this.canvasOverlay = (paint) => {
     /* noop */
   };
   this.darkmode = (isDark) => {

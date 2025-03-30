@@ -1,4 +1,4 @@
-MD.PaintBox = function (container, type, setPaintCallback) {
+MD.PaintBox = function (container, type) {
   var _self = this;
   var colorPicker = function (elem) {
     var picker = elem[0].id === "stroke_color" ? "stroke" : "fill";
@@ -6,29 +6,99 @@ MD.PaintBox = function (container, type, setPaintCallback) {
     if (is_background) picker = "canvas";
     var is_shadow = elem[0].id === "shadow_color";
     if (is_shadow) picker = "shadow";
+    var is_overlay = elem[0].id === "overlay_color";
+    if (is_overlay) picker = "overlay";
+    var is_neon = elem[0].id === "neon_color";
+    if (is_neon) picker = "neon";
     var paint = editor.paintBox[picker].paint;
 
-    var title =
-      picker === "stroke"
-        ? "Pick a stroke paint and opacity"
-        : picker === "shadow"
-        ? "Pick a shadow color and opacity"
-        : "Pick a fill paint and opacity";
-    var was_none = false;
-    var shadowColorSection = $("#shadow_color_section");
-    var shadowColorSectionPos = shadowColorSection.offset() || {
-      left: 0,
-      top: 0,
-    };
-    var pos = is_background
-      ? { right: 175, top: 50 }
-      : is_shadow
-      ? {
-          left: shadowColorSectionPos.left,
-          top: shadowColorSectionPos.top,
+    var title = "Pick a color and opacity";
+
+    var pos = { right: 0, top: 0 };
+
+    switch (picker) {
+      case "fill":
+        title = "Pick a fill paint and opacity";
+        var fillColor = $("#fill_color");
+        var offset = fillColor.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left + fillColor.width() + 10,
+          top: offset.top,
+          transform: "translate(0%, -50%)",
+        };
+        break;
+      case "stroke":
+        title = "Pick a stroke paint and opacity";
+        var strokeColor = $("#stroke_color");
+        var offset = strokeColor.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left + strokeColor.width() + 10,
+          top: offset.top,
+          transform: "translate(0%, -50%)",
+        };
+        break;
+      case "canvas":
+        title = "Pick a canvas color and opacity";
+        var toolCanvas = $("#tool_canvas");
+        console.log(toolCanvas, toolCanvas.offset());
+        var offset = toolCanvas.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left - 10,
+          top: offset.top,
           transform: "translate(-100%, -50%)",
-        }
-      : { left: 48, bottom: 36 };
+        };
+        break;
+      case "shadow":
+        title = "Pick a shadow color and opacity";
+        var shadowColorSection = $("#shadow_color_section");
+        var offset = shadowColorSection.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left - 10,
+          top: offset.top,
+          transform: "translate(-100%, -50%)",
+        };
+        break;
+      case "neon":
+        title = "Pick a neon color and opacity";
+        var neonColorSection = $("#neon_color_section");
+        var offset = neonColorSection.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left - 10,
+          top: offset.top,
+          transform: "translate(-100%, -50%)",
+        };
+        break;
+      case "overlay":
+        title = "Pick a overlay color and opacity";
+        var overlayColorSection = $("#overlay_color_section");
+        var offset = overlayColorSection.offset() || {
+          left: 0,
+          top: 0,
+        };
+        pos = {
+          left: offset.left - 10,
+          top: offset.top,
+          transform: "translate(-100%, -50%)",
+        };
+        break;
+      default:
+        break;
+    }
 
     $(document).on("mousedown", function (e) {
       if (!e.target.closest("#color_picker")) $("#color_picker").hide();
@@ -50,6 +120,7 @@ MD.PaintBox = function (container, type, setPaintCallback) {
         },
         function (p) {
           paint = new $.jGraduate.Paint(p);
+
           if (unsupportedGradient) {
             // remove current gradient stops
             while (unsupportedGradient.firstChild)
@@ -64,7 +135,18 @@ MD.PaintBox = function (container, type, setPaintCallback) {
           if (picker === "fill") state.set("canvasFill", paint);
           if (picker === "stroke") state.set("canvasStroke", paint);
           if (picker === "canvas") state.set("canvasBackground", paint);
-          if (picker === "shadow") state.set("canvasShadow", paint);
+          if (picker === "shadow") {
+            editor.changeShadowColor(paint);
+            state.set("canvasShadow", paint);
+          }
+          if (picker === "neon") {
+            editor.changeNeonColor(paint);
+            state.set("canvasNeon", paint);
+          }
+          if (picker === "overlay") {
+            editor.changeOverlayColor(paint);
+            state.set("canvasOverlay", paint);
+          }
           $("#color_picker").hide();
         },
         function (p) {
@@ -75,9 +157,11 @@ MD.PaintBox = function (container, type, setPaintCallback) {
 
   var cur = { color: "f2f2f2", opacity: 1 };
   if (type === "stroke") cur = { color: "090909", opacity: 1 };
-  if (type === "fill") cur = { color: "f2f2f2", opacity: 1 };
-  if (type === "canvas") cur = { color: "f2f2f2", opacity: 0 };
-  if (type === "shadow") cur = { color: "d40213", opacity: 1 };
+  else if (type === "fill") cur = { color: "f2f2f2", opacity: 1 };
+  else if (type === "canvas") cur = { color: "f2f2f2", opacity: 0 };
+  else if (type === "shadow") cur = { color: "090909", opacity: 1 };
+  else if (type === "overlay") cur = { color: "d40213", opacity: 0.65 };
+  else if (type === "neon") cur = { color: "d40213", opacity: 1 };
 
   // set up gradients to be used for the buttons
   var svgdocbox = new DOMParser().parseFromString(
@@ -125,8 +209,7 @@ MD.PaintBox = function (container, type, setPaintCallback) {
 
   this.setPaint = function (paint, apply, noUndo) {
     this.paint = paint;
-    console.log(paint);
-    if (setPaintCallback) setPaintCallback(paint);
+
     var fillAttr = "none";
     var ptype = paint.type;
     var opac = paint.alpha / 100;
@@ -248,12 +331,27 @@ MD.PaintBox = function (container, type, setPaintCallback) {
           paintOpacity = 1.0;
         }
 
-        var defColor =
-          type === "fill" || type === "stroke"
-            ? "#090909"
-            : type === "shadow"
-            ? "d40213"
-            : "none";
+        var defColor = "none";
+        switch (type) {
+          case "fill":
+            defColor = "#090909";
+            break;
+          case "stroke":
+            defColor = "#090909";
+            break;
+          case "shadow":
+            defColor = "#090909";
+            break;
+          case "neon":
+            defColor = "#d40213";
+            break;
+          case "overlay":
+            defColor = "#d40213";
+            break;
+          default:
+            break;
+        }
+
         var paintColor = selectedElement.getAttribute(type) || defColor;
     }
     if (apply) {
@@ -267,6 +365,134 @@ MD.PaintBox = function (container, type, setPaintCallback) {
     // update the rect inside #fill_color/#stroke_color
 
     this.setPaint(paint);
+  };
+
+  this.update = function (apply) {
+    const selectedElement = editor.selected[0];
+    if (!selectedElement) return;
+    var type = this.type;
+    switch (selectedElement.tagName) {
+      case "use":
+      case "image":
+      case "foreignObject":
+        // These elements don't have fill or stroke, so don't change
+        // the current value
+        return;
+      case "g":
+      case "a":
+        var gPaint = null;
+
+        var childs = selectedElement.getElementsByTagName("*");
+        for (var i = 0, len = childs.length; i < len; i++) {
+          var elem = childs[i];
+          var p = elem.getAttribute(type);
+          if (i === 0) {
+            gPaint = p;
+          } else if (gPaint !== p) {
+            gPaint = null;
+            break;
+          }
+        }
+        if (gPaint === null) {
+          // No common color, don't update anything
+          var paintColor = null;
+          return;
+        }
+        var paintColor = gPaint;
+
+        var paintOpacity = 1;
+        break;
+      default:
+        var paintOpacity = parseFloat(
+          selectedElement.getAttribute(type + "-opacity")
+        );
+        if (isNaN(paintOpacity)) {
+          paintOpacity = 1.0;
+        }
+
+        var defColor = "none";
+        switch (type) {
+          case "fill":
+            defColor = "#090909";
+            break;
+          case "stroke":
+            defColor = "#090909";
+            break;
+          case "shadow":
+            defColor = "#090909";
+            break;
+          case "neon":
+            defColor = "#d40213";
+            break;
+          case "overlay":
+            defColor = "#d40213";
+            break;
+          default:
+            break;
+        }
+
+        var paintColor = selectedElement.getAttribute(type) || defColor;
+    }
+    if (apply) {
+      svgCanvas.setColor(type, paintColor, true);
+      svgCanvas.setPaintOpacity(type, paintOpacity, true);
+    }
+
+    paintOpacity *= 100;
+
+    var paint = this.getPaint(paintColor, paintOpacity, type);
+    // update the rect inside #fill_color/#stroke_color
+
+    this.setPaint(paint);
+  };
+
+  function parseColor(color) {
+    const parsedColor = tinycolor(color);
+
+    if (!parsedColor.isValid()) {
+      return null;
+    }
+
+    const hex = parsedColor.toHex();
+
+    const alpha = Math.round(parsedColor.getAlpha() * 100);
+
+    return { color: hex, alpha };
+  }
+
+  this.updateFromActual = function () {
+    const selectedElement = editor.selected[0];
+
+    if (!selectedElement) return;
+
+    var extension;
+    if (this.type === "shadow") {
+      extension = "_shadow";
+    } else if (this.type === "neon") {
+      extension = "_neon";
+    } else if (this.type === "overlay") {
+      extension = "_overlay";
+    }
+
+    if (!extension) return;
+
+    var color = svgCanvas.getEffectAttr(
+      selectedElement,
+      extension,
+      "feFlood",
+      "flood-color",
+      undefined
+    );
+
+    if (color) {
+      var colorObj = parseColor(color);
+
+      this.setPaint({
+        alpha: colorObj.alpha,
+        type: "solidColor",
+        solidColor: colorObj.color,
+      });
+    }
   };
 
   this.prep = function () {
@@ -309,6 +535,14 @@ MD.PaintBox = function (container, type, setPaintCallback) {
 
   $("#tool_shadow_color").on("click touchstart", function () {
     editor.paintBox.shadow.colorPicker($("#shadow_color"));
+  });
+
+  $("#tool_neon_color").on("click touchstart", function () {
+    editor.paintBox.neon.colorPicker($("#neon_color"));
+  });
+
+  $("#tool_overlay_color").on("click touchstart", function () {
+    editor.paintBox.overlay.colorPicker($("#overlay_color"));
   });
 
   $("#tool_switch").on("click touchstart", function () {
