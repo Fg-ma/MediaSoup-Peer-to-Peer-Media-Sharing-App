@@ -7561,7 +7561,6 @@ $.SvgCanvas = function (container, config) {
     var duplicate_grad = findDuplicateGradient(grad);
     var defs = findDefs();
 
-    console.log("hiiaaaa", grad, canvas, duplicate_grad);
     // no duplicate found, so import gradient into defs
     if (!duplicate_grad) {
       var orig_grad = grad;
@@ -7902,25 +7901,54 @@ $.SvgCanvas = function (container, config) {
   // extension - The filter extension to the element id
   // tagName - The tag name with the attr
   // attr - The attr looked for
-  this.getEffectAttr = function (elem, extension, tagName, attr, defaultVal) {
+  // id - Optional might be undefined
+  this.getEffectAttr = function (
+    elem,
+    extension,
+    tagName,
+    attr,
+    defaultVal,
+    id
+  ) {
     var val = defaultVal !== undefined ? defaultVal : 0;
+
     if (elem) {
       var filter_url = elem.getAttribute("filter");
+
       if (filter_url && filter_url.includes(elem.id + extension)) {
         var filter = getElem(elem.id + extension);
-        if (filter) {
-          var tag = Array.from(filter.children).find(
-            (child) => child.tagName === tagName
-          );
 
-          if (filter) {
-            val = tag.getAttribute(attr) || val;
+        if (filter) {
+          // Recursive function to find the tag
+          function findTagRecursive(node) {
+            if (
+              node.tagName === tagName &&
+              node.hasAttribute(attr) &&
+              (!id || node.id === id) // Check id if provided, ignore if undefined
+            ) {
+              return node.getAttribute(attr);
+            }
+
+            for (let child of node.children) {
+              let result = findTagRecursive(child);
+              if (result !== null) {
+                return result;
+              }
+            }
+            return null;
+          }
+
+          // Start recursive search
+          var foundAttr = findTagRecursive(filter);
+          if (foundAttr !== null) {
+            val = foundAttr;
           }
         }
       }
     }
     return val;
   };
+
 
   (function () {
     var cur_command = null;
@@ -8013,13 +8041,12 @@ $.SvgCanvas = function (container, config) {
         }
 
         changes.map((change) => {
-          var filterItem = findDeepChild(filter, change.tagName, change.id);
+          const matches = findDeepChildren(filter, change.tagName, change.id);
 
-          if (filterItem) {
-            changeSelectedAttributeNoUndo(change.attr, change.val, [
-              filterItem,
-            ]);
-          }
+          if (matches)
+            matches.map((match) =>
+              changeSelectedAttributeNoUndo(change.attr, change.val, [match])
+            );
         });
         canvas.setOffsets(filter);
       }
@@ -8045,8 +8072,8 @@ $.SvgCanvas = function (container, config) {
         {
           x: "-50%",
           y: "-50%",
-          width: "1000%",
-          height: "1000%",
+          width: "300%",
+          height: "300%",
         },
         100
       );
@@ -8133,19 +8160,20 @@ $.SvgCanvas = function (container, config) {
       batchCmd.addSubCommand(new ChangeElementCommand(elem, changes));
     };
 
-    function findDeepChild(element, tagName, id) {
-      if (!element) return null;
+    function findDeepChildren(element, tagName, id) {
+      let results = [];
+
+      if (!element) return results;
 
       if (element.tagName === tagName && (!id || element.id === id)) {
-        return element;
+        results.push(element);
       }
 
       for (let child of element.children) {
-        const result = findDeepChild(child, tagName, id);
-        if (result) return result;
+        results = results.concat(findDeepChildren(child, tagName, id));
       }
 
-      return null;
+      return results;
     }
 
     // Function: setEffect
@@ -8236,11 +8264,12 @@ $.SvgCanvas = function (container, config) {
 
       cur_command = batchCmd;
       changes.map((change) => {
-        canvas.undoMgr.beginUndoableChange(change.attr, [
-          filter
-            ? findDeepChild(filter, change.tagName, change.id) ?? null
-            : null,
-        ]);
+        const matches = findDeepChildren(filter, change.tagName, change.id);
+
+        if (matches)
+          matches.map((match) =>
+            canvas.undoMgr.beginUndoableChange(change.attr, [match])
+          );
       });
       if (complete) {
         completeCallback(changes, extension, deleteValue);

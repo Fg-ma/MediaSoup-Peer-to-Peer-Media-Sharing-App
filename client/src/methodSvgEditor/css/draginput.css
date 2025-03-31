@@ -443,3 +443,28 @@ body.inverted.dragging .draginput .angle {
   white-space: normal;
   text-align: center;
 }
+
+.multidraginput_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: max-content;
+}
+
+.multidraginput_label {
+  font: "14px / 130% sans-serif";
+  font-family: Josefin, sans !important;
+  color: #f2f2f2;
+  width: 100%;
+  text-align: start;
+}
+
+.miltidraginput_items {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+}

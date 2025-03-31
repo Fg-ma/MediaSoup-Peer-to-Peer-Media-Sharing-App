@@ -316,7 +316,7 @@ MD.Panel = function () {
   });
   $("#cracked_glass_detail").dragInput({
     min: 0,
-    max: 10,
+    max: 8,
     step: 1,
     callback: editor.changeCrackedGlassDetail,
     cursor: true,
@@ -358,7 +358,7 @@ MD.Panel = function () {
     $(this).toggleClass("active");
     if ($(this).hasClass("active")) {
       svgCanvas.addEffect("_edge_detection", () => [
-        addSvgElementFromJson({
+        svgCanvas.addSvgElementFromJson({
           element: "feConvolveMatrix",
           attr: {
             order: "3",
@@ -375,7 +375,7 @@ MD.Panel = function () {
     $(this).toggleClass("active");
     if ($(this).hasClass("active")) {
       svgCanvas.addEffect("_invert", () => [
-        addSvgElementFromJson({
+        svgCanvas.addSvgElementFromJson({
           element: "feColorMatrix",
           attr: {
             type: "matrix",
@@ -386,6 +386,294 @@ MD.Panel = function () {
     } else {
       svgCanvas.removeEffect("_invert");
     }
+  });
+  $("#hue_shift").dragInput({
+    min: 0,
+    max: 360,
+    step: 1,
+    callback: editor.changeHueShift,
+    cursor: true,
+    start: 0,
+  });
+  $("#color_highlight_r").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeColorHighlightR,
+    cursor: true,
+    start: 0,
+  });
+  $("#color_highlight_g").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeColorHighlightG,
+    cursor: true,
+    start: 0,
+  });
+  $("#color_highlight_b").dragInput({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    callback: editor.changeColorHighlightB,
+    cursor: true,
+    start: 0,
+  });
+  $("#gooey_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeGooeyStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#cracked_glass_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeCrackedGlassStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#cyberpunk_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeCyberpunkStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#cyberpunk_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeCyberpunkSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#fire_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeFireStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#fire_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeFireSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#glitch_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeGlitchStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#glitch_offset").dragInput({
+    min: null,
+    max: null,
+    step: 1,
+    callback: editor.changeGlitchOffset,
+    cursor: true,
+    start: 0,
+  });
+  $("#glitch_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeGlitchSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#electricity_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeElectricityStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#electricity_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeElectricitySpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#wavy_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeWavyStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#wavy_frequency").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeWavyFrequency,
+    cursor: true,
+    start: 0,
+  });
+  $("#wavy_detail").dragInput({
+    min: 0,
+    max: 8,
+    step: 1,
+    callback: editor.changeWavyDetail,
+    cursor: true,
+    start: 0,
+  });
+  $("#wavy_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeWavySpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#signal_corrupt_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeSignalCorruptStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#signal_corrupt_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeSignalCorruptSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#heart_beat_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeHeartBeatStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#heart_beat_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeHeartBeatSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#fragment_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeFragmentStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#fragment_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeFragmentSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#sparks_strength").dragInput({
+    min: 0,
+    max: 200,
+    step: 1,
+    callback: editor.changeSparksStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#sparks_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeSparksSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#duo_pulse_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeDuoPulseStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#duo_pulse_offset").dragInput({
+    min: null,
+    max: null,
+    step: 1,
+    callback: editor.changeDuoPulseOffset,
+    cursor: true,
+    start: 0,
+  });
+  $("#duo_pulse_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeDuoPulseSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#wiggle_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeWiggleStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#wiggle_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeWiggleSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#chaos_machine_strength").dragInput({
+    min: 0,
+    max: 50,
+    step: 0.1,
+    callback: editor.changeChaosMachineStrength,
+    cursor: true,
+    start: 0,
+  });
+  $("#chaos_machine_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeChaosMachineSpeed,
+    cursor: true,
+    start: 0,
+  });
+  $("#three_dim_offset").dragInput({
+    min: null,
+    max: null,
+    step: 1,
+    callback: editor.changeThreeDimOffset,
+    cursor: true,
+    start: 0,
+  });
+  $("#three_dim_speed").dragInput({
+    min: 0,
+    max: 3,
+    step: 0.01,
+    callback: editor.changeThreeDimSpeed,
+    cursor: true,
+    start: 0,
   });
 
   // Align
@@ -753,6 +1041,294 @@ MD.Panel = function () {
       );
       $("#shadow_strength").val(shadowStrengthVal);
       $.fn.dragInput.updateCursor(document.getElementById("shadow_strength"));
+      var hueVal = svgCanvas.getEffectAttr(
+        elem,
+        "_hue",
+        "feColorMatrix",
+        "values",
+        0
+      );
+      $("#hue_shift").val(hueVal);
+      $.fn.dragInput.updateCursor(document.getElementById("hue_shift"));
+      var colorHighlightRVal = svgCanvas.getEffectAttr(
+        elem,
+        "_color_highlight",
+        "feFuncR",
+        "tableValues",
+        0
+      );
+      $("#color_highlight_r").val(colorHighlightRVal);
+      $.fn.dragInput.updateCursor(document.getElementById("color_highlight_r"));
+      var colorHighlightGVal = svgCanvas.getEffectAttr(
+        elem,
+        "_color_highlight",
+        "feFuncG",
+        "tableValues",
+        0
+      );
+      $("#color_highlight_g").val(colorHighlightGVal);
+      $.fn.dragInput.updateCursor(document.getElementById("color_highlight_g"));
+      var colorHighlightBVal = svgCanvas.getEffectAttr(
+        elem,
+        "_color_highlight",
+        "feFuncB",
+        "tableValues",
+        0
+      );
+      $("#color_highlight_b").val(colorHighlightBVal);
+      $.fn.dragInput.updateCursor(document.getElementById("color_highlight_b"));
+      var gooeyStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_gooey",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#gooey_strength").val(gooeyStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("gooey_strength"));
+      var cyberpunkStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_cyberpunk",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#cyberpunk_strength").val(cyberpunkStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("cyberpunk_strength")
+      );
+      var cyberpunkSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_cyberpunk", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#cyberpunk_speed").val(cyberpunkSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("cyberpunk_speed"));
+      var fireStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_fire",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#fire_strength").val(fireStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("fire_strength"));
+      var fireSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_fire", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#fire_speed").val(fireSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("fire_speed"));
+      var glitchStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_glitch",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#glitch_strength").val(glitchStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("glitch_strength"));
+      var glitchOffsetVal =
+        svgCanvas.getEffectAttr(
+          elem,
+          "_glitch",
+          "feOffset",
+          "dy",
+          0,
+          "blueOffset_glitch"
+        ) * 2;
+      $("#glitch_offset").val(glitchOffsetVal);
+      $.fn.dragInput.updateCursor(document.getElementById("glitch_offset"));
+      var glitchSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_glitch", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#glitch_speed").val(glitchSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("glitch_speed"));
+      var electricityStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_electricity",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#electricity_strength").val(electricityStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("electricity_strength")
+      );
+      var electricitySpeedVal = svgCanvas
+        .getEffectAttr(elem, "_electricity", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#electricity_speed").val(electricitySpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("electricity_speed"));
+      var wavyStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_wavy",
+        "feDisplacementMap",
+        "scale",
+        0
+      );
+      $("#wavy_strength").val(wavyStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wavy_strength"));
+      var wavyFrequencyVal = svgCanvas.getEffectAttr(
+        elem,
+        "_wavy",
+        "feTurbulence",
+        "baseFrequency",
+        0
+      );
+      $("#wavy_frequency").val(wavyFrequencyVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wavy_frequency"));
+      var wavyDetailVal = svgCanvas.getEffectAttr(
+        elem,
+        "_wavy",
+        "feTurbulence",
+        "numOctaves",
+        0
+      );
+      $("#wavy_detail").val(wavyDetailVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wavy_detail"));
+      var wavySpeedVal = svgCanvas
+        .getEffectAttr(elem, "_wavy", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#wavy_speed").val(wavySpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wavy_speed"));
+      var signalCorruptStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_signal_corrupt",
+        "feDisplacementMap",
+        "scale",
+        0
+      );
+      $("#signal_corrupt_strength").val(signalCorruptStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("signal_corrupt_strength")
+      );
+      var signalCorruptSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_signal_corrupt", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#signal_corrupt_speed").val(signalCorruptSpeedVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("signal_corrupt_speed")
+      );
+      var heartBeatStrengthVal = svgCanvas
+        .getEffectAttr(elem, "_heart_beat", "animate", "values", "  0  ")
+        .slice(2, -2);
+      $("#heart_beat_strength").val(heartBeatStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("heart_beat_strength")
+      );
+      var heartBeatSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_heart_beat", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#heart_beat_speed").val(heartBeatSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("heart_beat_speed"));
+      var fragmentStrengthVal =
+        svgCanvas.getEffectAttr(
+          elem,
+          "_fragment",
+          "feDisplacementMap",
+          "scale",
+          0
+        ) / 2;
+      $("#fragment_strength").val(fragmentStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("fragment_strength"));
+      var fragmentSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_fragment", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#fragment_speed").val(fragmentSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("fragment_speed"));
+      var sparksStrengthVal =
+        svgCanvas.getEffectAttr(
+          elem,
+          "_sparks",
+          "feDisplacementMap",
+          "scale",
+          0
+        ) * 3;
+      $("#sparks_strength").val(sparksStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("sparks_strength"));
+      var sparksSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_sparks", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#sparks_speed").val(sparksSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("sparks_speed"));
+      var duoPulseStrengthVal = svgCanvas.getEffectAttr(
+        elem,
+        "_duo_pulse",
+        "feGaussianBlur",
+        "stdDeviation",
+        0
+      );
+      $("#duo_pulse_strength").val(duoPulseStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("duo_pulse_strength")
+      );
+      var duoPulseOffsetVal =
+        svgCanvas.getEffectAttr(
+          elem,
+          "_duo_pulse",
+          "feOffset",
+          "dy",
+          0,
+          "blueOffset_duo_pulse"
+        ) / 1.5;
+      $("#duo_pulse_offset").val(duoPulseOffsetVal);
+      $.fn.dragInput.updateCursor(document.getElementById("duo_pulse_offset"));
+      var duoPulseSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_duo_pulse", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#duo_pulse_speed").val(duoPulseSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("duo_pulse_speed"));
+      var wiggleStrengthVal =
+        (svgCanvas.getEffectAttr(
+          elem,
+          "_wiggle",
+          "feDisplacementMap",
+          "scale",
+          0
+        ) /
+          2) *
+        3;
+      $("#wiggle_strength").val(wiggleStrengthVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wiggle_strength"));
+      var wiggleSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_wiggle", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#wiggle_speed").val(wiggleSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("wiggle_speed"));
+      var chaosMachineStrengthVal =
+        svgCanvas.getEffectAttr(
+          elem,
+          "_chaos_machine",
+          "feDisplacementMap",
+          "scale",
+          0
+        ) * 2;
+      $("#chaos_machine_strength").val(chaosMachineStrengthVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("chaos_machine_strength")
+      );
+      var chaosMachineSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_chaos_machine", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#chaos_machine_speed").val(chaosMachineSpeedVal);
+      $.fn.dragInput.updateCursor(
+        document.getElementById("chaos_machine_speed")
+      );
+      var threeDimOffsetVal = svgCanvas
+        .getEffectAttr(
+          elem,
+          "_three_dim",
+          "animate",
+          "values",
+          "  0  ",
+          "threeDimOffsetBlueAnimate_three_dim"
+        )
+        .slice(2, -2);
+      $("#three_dim_offset").val(threeDimOffsetVal);
+      $.fn.dragInput.updateCursor(document.getElementById("three_dim_offset"));
+      var threeDimSpeedVal = svgCanvas
+        .getEffectAttr(elem, "_three_dim", "animate", "dur", "0s")
+        .slice(0, -1);
+      $("#three_dim_speed").val(threeDimSpeedVal);
+      $.fn.dragInput.updateCursor(document.getElementById("three_dim_speed"));
 
       if (!isNode && currentMode !== "pathedit") {
         $("#selected_panel").show();
