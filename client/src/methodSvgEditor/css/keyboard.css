@@ -3,8 +3,11 @@
 }
 .shortcut-keys {
   display: flex;
-  margin: var(--x1) 0;
   break-inside: avoid;
+}
+
+.shortcut-keys .shortcut-name:last-child {
+  margin-left: 1rem;
 }
 
 .shortcut-key {
@@ -13,7 +16,7 @@
   border: solid var(--z4) 1px;
   border-radius: var(--x1);
   padding: 0 var(--x1);
-  margin: 2px;
+  margin-top: 0.25rem;
   font-size: 12px;
   font-weight: 600;
 }

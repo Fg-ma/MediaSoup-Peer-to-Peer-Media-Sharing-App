@@ -102,6 +102,7 @@ MD.Keyboard = function () {
     escape: { name: false, cb: () => editor.escapeMode() },
     enter: { name: false, cb: () => editor.escapeMode() },
     " ": { name: "Pan canvas", cb: (e) => editor.pan.startPan(e) },
+    tab: { name: "Switch panel", cb: editor.togglePanelActive },
   };
 
   document.addEventListener("keydown", function (e) {

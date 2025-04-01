@@ -34,11 +34,12 @@ import BottomTools from "./elements/bottomTools/BottomTools";
 import DialogBox from "./elements/dialogBox/DialogBox";
 import ContextMenu from "./elements/contentMenu/ContextMenu";
 import ShapeButtons from "./elements/ShapeButtons";
+import SplitBar from "./elements/splitBar/SplitBar";
 
 const loadScript = (src: string) => {
   const script = document.createElement("script");
   script.src = src;
-  script.async = true; // Make sure the script is loaded asynchronously
+  script.async = true;
   document.body.appendChild(script);
   return new Promise((resolve, reject) => {
     script.onload = resolve;
@@ -47,8 +48,7 @@ const loadScript = (src: string) => {
 };
 
 export default function MethodSvgEditor() {
-  const workAreaRef = useRef<HTMLDivElement>(null);
-  const svgCanvasRef = useRef<HTMLDivElement>(null);
+  const methodDrawRootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const scripts = [
@@ -132,13 +132,17 @@ export default function MethodSvgEditor() {
 
   return (
     <div
+      id='methodDrawRoot'
+      ref={methodDrawRootRef}
       className='w-full h-full absolute top-0 left-0 bg-fg-tone-black-1 z-[10000] pointer-events-auto font-K2D'
       style={{ marginTop: "0px" }}
     >
       <div id='method-draw' className='app'>
         <Rulers />
 
-        <WorkArea workAreaRef={workAreaRef} svgCanvasRef={svgCanvasRef} />
+        <WorkArea />
+
+        <SplitBar methodDrawRootRef={methodDrawRootRef} />
 
         <MenuBar />
 

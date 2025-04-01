@@ -1,15 +1,9 @@
 import React from "react";
 
-export default function WorkArea({
-  workAreaRef,
-  svgCanvasRef,
-}: {
-  workAreaRef: React.RefObject<HTMLDivElement>;
-  svgCanvasRef: React.RefObject<HTMLDivElement>;
-}) {
+export default function WorkArea() {
   return (
-    <div ref={workAreaRef} id='workarea'>
-      <div ref={svgCanvasRef} id='svgcanvas'></div>
+    <div id='workarea'>
+      <div id='svgcanvas'></div>
     </div>
   );
 }

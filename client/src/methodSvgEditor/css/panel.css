@@ -34,6 +34,7 @@
 
 #align_tools {
   display: none;
+  width: 156px;
 }
 
 #panels.multiselected #multiselected_panel {
@@ -125,10 +126,10 @@
 }
 
 .folder-item svg {
-  @apply h-5 aspect-square fill-fg-white stroke-fg-white mr-2;
+  @apply h-5 w-5 fill-fg-white stroke-fg-white mr-2;
   transition: all 0.1s ease;
 }
 
 .folder-item:hover svg {
-  @apply h-6 mr-1;
+  @apply h-6 w-6 mr-1;
 }

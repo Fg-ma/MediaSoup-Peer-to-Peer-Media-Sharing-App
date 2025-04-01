@@ -1,0 +1,137 @@
+.tip-top-dark,
+.tip-bottom-dark,
+.tip-right-dark,
+.tip-left-dark,
+.tip-top-left-dark,
+.tip-top-right-dark,
+.tip-bottom-right-dark,
+.tip-bottom-left-dark,
+.tip-top-light,
+.tip-bottom-light,
+.tip-right-light,
+.tip-left-light,
+.tip-top-left-light,
+.tip-top-right-light,
+.tip-bottom-right-light,
+.tip-bottom-left-light {
+  position: relative;
+}
+
+.tip-top-dark:hover::after,
+.tip-bottom-dark:hover::after,
+.tip-right-dark:hover::after,
+.tip-left-dark:hover::after,
+.tip-top-left-dark::after,
+.tip-top-right-dark::after,
+.tip-bottom-right-dark::after,
+.tip-bottom-left-dark::after,
+.tip-top-light:hover::after,
+.tip-bottom-light:hover::after,
+.tip-right-light:hover::after,
+.tip-left-light:hover::after,
+.tip-top-left-light::after,
+.tip-top-right-light::after,
+.tip-bottom-right-light::after,
+.tip-bottom-left-light::after {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tip-top-dark::after,
+.tip-bottom-dark::after,
+.tip-right-dark::after,
+.tip-left-dark::after,
+.tip-top-left-dark::after,
+.tip-top-right-dark::after,
+.tip-bottom-right-dark::after,
+.tip-bottom-left-dark::after,
+.tip-top-light::after,
+.tip-bottom-light::after,
+.tip-right-light::after,
+.tip-left-light::after,
+.tip-top-left-light::after,
+.tip-top-right-light::after,
+.tip-bottom-right-light::after,
+.tip-bottom-left-light::after {
+  @apply text-lg font-K2D rounded shadow absolute px-3 py-1 overflow-visible;
+  content: attr(data-tip);
+  white-space: nowrap;
+  z-index: 50000000000000;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.tip-top-dark::after,
+.tip-bottom-dark::after,
+.tip-right-dark::after,
+.tip-left-dark::after,
+.tip-top-left-dark::after,
+.tip-top-right-dark::after,
+.tip-bottom-right-dark::after,
+.tip-bottom-left-dark::after {
+  @apply text-fg-white bg-fg-tone-black-1;
+}
+
+.tip-top-light::after,
+.tip-bottom-light::after,
+.tip-right-light::after,
+.tip-left-light::after,
+.tip-top-left-light::after,
+.tip-top-right-light::after,
+.tip-bottom-right-light::after,
+.tip-bottom-left-light::after {
+  @apply text-fg-tone-black-1 bg-fg-white;
+}
+
+.tip-top-dark::after,
+.tip-top-light::after {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tip-bottom-dark::after,
+.tip-bottom-light::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tip-right-dark::after,
+.tip-right-light::after {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+}
+
+.tip-left-dark::after,
+.tip-left-light::after {
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+}
+
+.tip-top-left-dark::after,
+.tip-top-left-light::after {
+  bottom: 100%;
+  right: 100%;
+}
+
+.tip-top-right-dark::after,
+.tip-top-right-light::after {
+  bottom: 100%;
+  left: 100%;
+}
+
+.tip-bottom-left-dark::after,
+.tip-bottom-left-light::after {
+  top: 100%;
+  right: 100%;
+}
+
+.tip-bottom-right-dark::after,
+.tip-bottom-right-light::after {
+  top: 100%;
+  left: 100%;
+}

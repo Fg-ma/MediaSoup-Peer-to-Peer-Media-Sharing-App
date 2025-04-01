@@ -23,13 +23,13 @@ export default function ToolPanels() {
       <div className='flex items-center justify-between w-full h-12 pr-2'>
         <div
           id='objects_panel_button'
-          className='!font-Josefin hover:bg-fg-tone-black-7 text-fg-white text-lg px-2 rounded active'
+          className='!font-Josefin hover:bg-fg-tone-black-7 text-fg-white text-lg rounded-l w-1/2 active text-center'
         >
           Objects
         </div>
         <div
           id='editing_panel_button'
-          className='!font-Josefin hover:bg-fg-tone-black-7 text-fg-white text-lg px-2 rounded'
+          className='!font-Josefin hover:bg-fg-tone-black-7 text-fg-white text-lg rounded-r w-1/2 text-center'
         >
           Editing
         </div>

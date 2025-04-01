@@ -6,7 +6,7 @@ export default function LineTool() {
       className='tool_button'
       id='tool_line'
       data-mode='line'
-      title='Line tool (l)'
+      data-tip='Line tool (l)'
     >
       <svg
         viewBox='0 0 27 27'

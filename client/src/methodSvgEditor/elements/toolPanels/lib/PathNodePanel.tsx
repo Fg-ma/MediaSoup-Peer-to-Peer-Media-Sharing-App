@@ -38,22 +38,13 @@ export default function PathNodePanel() {
             <option id='curve_segments' value='6'>
               Curve
             </option>
-            <option id='curve_segments' value='7'>
-              Smooth
-            </option>
-            <option id='curve_segments' value='8'>
-              Symmetric
-            </option>
-            <option id='curve_segments' value='9'>
-              Auto-smooth
-            </option>
           </select>
           <div className='caret'></div>
           <label id='seg_type_label'>Straight</label>
         </div>
       </div>
 
-      <div className='button-container clearfix'>
+      <div className='button-container clearfix' style={{ maxWidth: "200px" }}>
         <div className='button full' id='tool_node_clone' title='Adds a node'>
           Add Node
         </div>

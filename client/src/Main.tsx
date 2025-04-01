@@ -25,9 +25,10 @@ import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
 import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
+import "./css/scrollbar.css";
+import "./css/fontStyles.css";
+import "./css/tips.css";
 import CreditPage from "./creditPage/CreditPage";
-import "./scrollbar.css";
-import "./fontStyles.css";
 import MethodSvgEditor from "./methodSvgEditor/MethodSvgEditor";
 
 export default function Main() {

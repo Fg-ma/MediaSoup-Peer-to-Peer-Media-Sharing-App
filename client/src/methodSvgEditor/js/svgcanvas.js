@@ -47,7 +47,6 @@ $.SvgCanvas = function (container, config) {
     dimensions: [800, 600],
     initFill: { color: "f2f2f2", opacity: 1 },
     initStroke: { width: 2, color: "090909", opacity: 1 },
-    initText: { color: "090909", opacity: 1 },
     imgPath: "./src/methodSvgEditor/images/",
     baseUnit: "px",
     defaultFont: "K2D",
@@ -3578,6 +3577,7 @@ $.SvgCanvas = function (container, config) {
       if (!evt_target) return;
       var parent = evt_target.parentNode;
       var mouse_target = getMouseTarget(evt);
+      console.log(mouse_target, evt);
       var tagName = mouse_target.tagName;
 
       if (parent === current_group) return;
@@ -3634,6 +3634,7 @@ $.SvgCanvas = function (container, config) {
         // Escape from in-group edit
         return;
       }
+      console.log("mouse", mouse_target);
       setContext(mouse_target);
     };
 
@@ -5588,14 +5589,12 @@ $.SvgCanvas = function (container, config) {
     // keep calling it until there are none to remove
     while (removeUnusedDefElems() > 0) {}
 
-    const last_current_group = current_group;
-
-    // pathActions.clear(true);
+    pathActions.clear(true);
 
     // Move out of in-group editing mode
-    if (last_current_group) {
+    if (current_group) {
       leaveContext();
-      selectOnly([last_current_group]);
+      selectOnly([current_group]);
     }
 
     //hide grid, otherwise shows a black canvas
@@ -5609,9 +5608,8 @@ $.SvgCanvas = function (container, config) {
       .find("text tspan")
       .each(function () {
         var $tspan = $(this);
-        var textContent = $tspan.text(); // Get the text inside <tspan>
-        var parentText = $tspan.parent(); // Get parent <text> element
-        $tspan.replaceWith(textContent); // Replace <tspan> with its text
+        var textContent = $tspan.text();
+        $tspan.replaceWith(textContent);
       });
 
     // Unwrap gsvg if it has no special attributes (only id and style)
@@ -6511,6 +6509,7 @@ $.SvgCanvas = function (container, config) {
       if (attrs.width <= 0) attrs.width = 200;
       if (attrs.height <= 0) attrs.height = 200;
 
+      content.attr(attrs);
       this.contentW = attrs["width"];
       this.contentH = attrs["height"];
 
@@ -7075,6 +7074,7 @@ $.SvgCanvas = function (container, config) {
   // Function: setContext
   // Set the current context (for in-group editing)
   var setContext = (this.setContext = function (elem) {
+    console.log(elem);
     leaveContext();
     if (typeof elem === "string") {
       elem = getElem(elem);
@@ -7098,7 +7098,8 @@ $.SvgCanvas = function (container, config) {
       });
 
     clearSelection();
-    call("contextset", current_group);
+    console.log(elem);
+    call("contextset", elem);
   });
 
   // Group: Document functions
@@ -7949,7 +7950,6 @@ $.SvgCanvas = function (container, config) {
     return val;
   };
 
-
   (function () {
     var cur_command = null;
     var filter = null;
@@ -8555,7 +8555,7 @@ $.SvgCanvas = function (container, config) {
 
   // Group: Element manipulation
 
-  // Function: setPointType
+  // Function: setSegType
   // Sets the new segment type to the selected segment(s).
   //
   // Parameters:

@@ -7,6 +7,27 @@ MD.Editor = function () {
   const workarea = document.getElementById("workarea");
   _self.selected = [];
 
+  function togglePanelActive() {
+    var objectsPanelButton = $("#objects_panel_button");
+    var editingPanelButton = $("#editing_panel_button");
+    var objectsPanels = $("#objects_panels");
+    var editingPanels = $(".editing_panels");
+
+    if (objectsPanelButton.hasClass("active")) {
+      objectsPanelButton.removeClass("active");
+      objectsPanels.removeClass("active");
+      editingPanelButton.addClass("active");
+      editingPanels.addClass("active");
+    } else {
+      editingPanelButton.removeClass("active");
+      editingPanels.removeClass("active");
+      objectsPanelButton.addClass("active");
+      objectsPanels.addClass("active");
+    }
+
+    editor.panel.updateContextPanel();
+  }
+
   function clear() {
     var dims = state.get("canvasSize");
     $.confirm(
@@ -179,6 +200,7 @@ MD.Editor = function () {
   }
 
   function contextChanged(win, context) {
+    console.log(context);
     var link_str = "";
     if (context) {
       var str = "";
@@ -5626,6 +5648,7 @@ MD.Editor = function () {
   this.save = save;
   this.undo = undo;
   this.redo = redo;
+  this.togglePanelActive = togglePanelActive;
   this.clear = clear;
   this.duplicateSelected = duplicateSelected;
   this.deleteSelected = deleteSelected;

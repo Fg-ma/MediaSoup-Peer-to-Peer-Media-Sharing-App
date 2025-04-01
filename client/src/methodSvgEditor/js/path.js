@@ -642,7 +642,6 @@ var svgedit = svgedit || {};
       }
     }
 
-    console.log(this.segs);
     return this;
   };
 

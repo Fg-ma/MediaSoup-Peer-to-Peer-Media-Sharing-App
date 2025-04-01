@@ -46,7 +46,7 @@ MD.PaintBox = function (container, type) {
       case "canvas":
         title = "Pick a canvas color and opacity";
         var toolCanvas = $("#tool_canvas");
-        console.log(toolCanvas, toolCanvas.offset());
+
         var offset = toolCanvas.offset() || {
           left: 0,
           top: 0,

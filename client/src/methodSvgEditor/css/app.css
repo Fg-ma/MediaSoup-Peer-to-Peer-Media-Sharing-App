@@ -19,7 +19,7 @@
   top: var(--x10);
   left: var(--x14);
   bottom: var(--x10);
-  right: calc(var(--panel-width) + var(--x4));
+  right: calc(var(--panel-width) + 1.875rem);
   background-color: var(--z2);
   overflow: auto;
   align-items: center;
@@ -119,4 +119,27 @@ body.dragging * {
 
 #selectorRubberBand {
   shape-rendering: crispEdges;
+}
+
+#split-bar {
+  @apply bg-fg-white;
+  top: calc(0.5rem + var(--x10));
+  bottom: calc(0.5rem + var(--x10));
+  right: calc(var(--panel-width) + 0.875rem);
+  width: 0.375rem;
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+#split-bar:hover,
+#split-bar.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#split-bar:hover:not(.active) {
+  cursor: pointer;
 }

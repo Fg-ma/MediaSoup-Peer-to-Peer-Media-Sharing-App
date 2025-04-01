@@ -19,7 +19,7 @@ export default function Zoom() {
         <option value='800'>800%</option>
         <option value='1600'>1600%</option>
       </select>
-      <div id='zoom_panel' className='toolset' title='Change zoom level'>
+      <div id='zoom_panel' className='toolset'>
         <div className='select-input' id='zoom_label'>
           <span id='zoomLabel' className='zoom_tool icon_label'>
             <svg

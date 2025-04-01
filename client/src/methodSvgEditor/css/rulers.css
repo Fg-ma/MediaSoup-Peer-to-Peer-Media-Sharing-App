@@ -23,7 +23,7 @@
   height: var(--x4);
   top: var(--x8);
   left: var(--x12);
-  right: calc(var(--panel-width) + var(--x4));;
+  right: calc(var(--panel-width) + 1.875rem);
   overflow: hidden;
   border-radius: var(--x2);
 }
@@ -37,7 +37,7 @@
   border-radius: var(--x2);
 }
 
-#ruler_x > div, 
+#ruler_x > div,
 #ruler_y > div {
   overflow: hidden;
 }

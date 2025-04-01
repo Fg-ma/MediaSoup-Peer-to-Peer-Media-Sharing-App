@@ -10,7 +10,7 @@
   height: var(--x8);
   display: block;
   width: calc(100% - var(--x2));
-  padding: 0 var(--x4);
+  padding-left: 0.5rem;
   border: none;
   border-radius: var(--x1);
 }

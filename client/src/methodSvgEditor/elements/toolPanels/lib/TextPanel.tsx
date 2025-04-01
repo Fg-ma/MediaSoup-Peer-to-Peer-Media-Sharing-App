@@ -24,7 +24,11 @@ export default function TextPanel() {
           />
           <span className='!font-Josefin'>Y</span>
         </label>
-        <div className='toolset draginput twocol' id='tool_font_family'>
+        <div
+          className='toolset draginput twocol'
+          id='tool_font_family'
+          style={{ maxWidth: "340px" }}
+        >
           <span className='!font-Josefin'>Font</span>
           <div id='preview_font' style={{ fontFamily: "sans-serif" }}>
             sans-serif
