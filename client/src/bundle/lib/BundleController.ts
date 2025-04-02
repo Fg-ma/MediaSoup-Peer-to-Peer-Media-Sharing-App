@@ -4,8 +4,8 @@ import {
 } from "../../context/mediaContext/typeConstant";
 import {
   RemoteEffectStylesType,
-  RemoteStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  RemoteEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
@@ -50,7 +50,7 @@ class BundleController extends BundleSocket {
       React.SetStateAction<MediaStream | undefined>
     >,
     remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     userMedia: React.MutableRefObject<UserMediaType>,
     private bundleRef: React.RefObject<HTMLDivElement>,
@@ -85,7 +85,7 @@ class BundleController extends BundleSocket {
       setScreenAudioStreams,
       setAudioStream,
       remoteMedia,
-      remoteStreamEffects,
+      remoteEffects,
       remoteEffectsStyles,
       userMedia,
       audioRef,

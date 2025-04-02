@@ -2,8 +2,8 @@ import {
   ImageEffectStylesType,
   ImageEffectTypes,
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
@@ -15,7 +15,7 @@ class ImageController {
     private imageId: string,
     private imageMedia: ImageMedia,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
@@ -30,7 +30,7 @@ class ImageController {
     const { effects, effectStyles } = event.data;
 
     if (contentType === "image" && contentId === this.imageId) {
-      this.userStreamEffects.current.image[this.imageId] = effects as {
+      this.userEffects.current.image[this.imageId] = effects as {
         [effectType in ImageEffectTypes]: boolean;
       };
 

@@ -4,8 +4,8 @@ import {
   UserEffectsStylesType,
   CameraEffectTypes,
   defaultCameraStreamEffects,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
@@ -47,14 +47,14 @@ class CameraMedia {
     private cameraId: string,
     private initCameraStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userMedia: React.MutableRefObject<UserMediaType>
   ) {
     this.effects = {};
 
-    this.userStreamEffects.current.camera[this.cameraId] = structuredClone(
+    this.userEffects.current.camera[this.cameraId] = structuredClone(
       defaultCameraStreamEffects
     );
 
@@ -297,9 +297,8 @@ class CameraMedia {
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
-        this.userStreamEffects.current.camera[this.cameraId][
-          effect as EffectType
-        ] = false;
+        this.userEffects.current.camera[this.cameraId][effect as EffectType] =
+          false;
 
         if (effect === "tint") {
           this.babylonScene?.toggleTintPlane(false);

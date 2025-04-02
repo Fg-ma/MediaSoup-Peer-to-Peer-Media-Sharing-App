@@ -1,7 +1,8 @@
 import { StaticContentTypes } from "../../universal/typeConstant";
-import { ApplicationEffectStylesType } from "./lib/applications/typeConstant";
-import { ImageEffectStylesType } from "./lib/images/typeConstant";
-import { VideoEffectStylesType } from "./lib/videos/typeConstant";
+import { ApplicationEffectStylesType } from "./lib/tableApplications/typeConstant";
+import { ImageEffectStylesType } from "./lib/tableImages/typeConstant";
+import { VideoEffectStylesType } from "./lib/tableVideos/typeConstant";
+import { SvgEffectStylesType } from "./lib/tableSvgs/typeConstant";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -94,7 +95,8 @@ export type onUpdateContentEffectsType = {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | ApplicationEffectStylesType;
+      | ApplicationEffectStylesType
+      | SvgEffectStylesType;
   };
 };
 

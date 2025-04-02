@@ -6,8 +6,8 @@ import {
 } from "../../context/mediaContext/typeConstant";
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
 import BundlesController from "../../lib/BundlesController";
 import onRouterCapabilities from "../../lib/onRouterCapabilities";
@@ -43,7 +43,7 @@ class JoinTableSectionController {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private setBundles: React.Dispatch<
@@ -118,7 +118,7 @@ class JoinTableSectionController {
           this.username.current,
           this.instance.current,
           this.userMedia,
-          this.userStreamEffects,
+          this.userEffects,
           this.userEffectsStyles,
           this.userDevice,
           this.deadbanding

@@ -5,7 +5,7 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../context/effectsContext/typeConstant";
+} from "../../../universal/effectsTypeConstant";
 
 export interface MeshJSON {
   vertex_faces: number[];

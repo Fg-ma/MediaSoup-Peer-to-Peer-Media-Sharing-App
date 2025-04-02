@@ -18,10 +18,10 @@ import {
   ImageEffectStylesType,
   ImageEffectTypes,
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   VideoEffectStylesType,
   VideoEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
 import TextMedia from "../../media/fgText/TextMedia";
@@ -34,7 +34,7 @@ class SharedBundleController extends SharedBundleSocket {
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
@@ -72,14 +72,15 @@ class SharedBundleController extends SharedBundleSocket {
 
     if (videos) {
       for (const video of videos) {
-        if (!this.userStreamEffects.current.video[video.videoId]) {
-          this.userStreamEffects.current.video[video.videoId] = {
+        if (!this.userEffects.current.video[video.videoId]) {
+          this.userEffects.current.video[video.videoId] = {
             video: structuredClone(defaultVideoStreamEffects),
             audio: structuredClone(defaultAudioStreamEffects),
           };
         }
-        this.userStreamEffects.current.video[video.videoId].video =
-          video.effects as { [effectType in VideoEffectTypes]: boolean };
+        this.userEffects.current.video[video.videoId].video = video.effects as {
+          [effectType in VideoEffectTypes]: boolean;
+        };
         if (!this.userEffectsStyles.current.video[video.videoId]) {
           this.userEffectsStyles.current.video[video.videoId] = {
             video: structuredClone(defaultVideoEffectsStyles),
@@ -96,7 +97,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.userDevice,
           this.deadbanding,
           this.userEffectsStyles,
-          this.userStreamEffects,
+          this.userEffects,
           this.userMedia,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
@@ -108,7 +109,7 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (images) {
       for (const image of images) {
-        this.userStreamEffects.current.image[image.imageId] = image.effects as {
+        this.userEffects.current.image[image.imageId] = image.effects as {
           [effectType in ImageEffectTypes]: boolean;
         };
         this.userEffectsStyles.current.image[image.imageId] =
@@ -119,7 +120,7 @@ class SharedBundleController extends SharedBundleSocket {
           image.filename,
           image.mimeType as TableTopStaticMimeType,
           this.userEffectsStyles,
-          this.userStreamEffects,
+          this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener,
@@ -138,7 +139,7 @@ class SharedBundleController extends SharedBundleSocket {
           svg.mimeType as TableTopStaticMimeType,
           svg.visible,
           this.userEffectsStyles,
-          this.userStreamEffects,
+          this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener,
@@ -161,7 +162,7 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (applications) {
       for (const application of applications) {
-        this.userStreamEffects.current.application[application.applicationId] =
+        this.userEffects.current.application[application.applicationId] =
           application.effects as {
             [effectType in ApplicationEffectTypes]: boolean;
           };
@@ -174,7 +175,7 @@ class SharedBundleController extends SharedBundleSocket {
             application.filename,
             application.mimeType as TableTopStaticMimeType,
             this.userEffectsStyles,
-            this.userStreamEffects,
+            this.userEffects,
             this.tableStaticContentSocket.current.getFile,
             this.tableStaticContentSocket.current.addMessageListener,
             this.tableStaticContentSocket.current.removeMessageListener,
@@ -209,7 +210,7 @@ class SharedBundleController extends SharedBundleSocket {
               this.userDevice,
               this.deadbanding,
               this.userEffectsStyles,
-              this.userStreamEffects,
+              this.userEffects,
               this.userMedia,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
@@ -254,7 +255,7 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               this.userEffectsStyles,
-              this.userStreamEffects,
+              this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener,
@@ -289,7 +290,7 @@ class SharedBundleController extends SharedBundleSocket {
               mimeType,
               visible,
               this.userEffectsStyles,
-              this.userStreamEffects,
+              this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener,

@@ -4,7 +4,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {

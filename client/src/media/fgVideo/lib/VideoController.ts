@@ -7,10 +7,10 @@ import {
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   VideoEffectStylesType,
   VideoEffectTypes,
-} from "../../../context/effectsContext/typeConstant";
+} from "../../../../../universal/effectsTypeConstant";
 import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 
 class VideoController {
@@ -20,7 +20,7 @@ class VideoController {
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private videoOptions: VideoOptions,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
     private paused: React.MutableRefObject<boolean>,
@@ -75,7 +75,7 @@ class VideoController {
     const { effects, effectStyles } = event.data;
 
     if (contentType === "video" && contentId === this.videoId) {
-      this.userStreamEffects.current.video[this.videoId].video = effects as {
+      this.userEffects.current.video[this.videoId].video = effects as {
         [effectType in VideoEffectTypes]: boolean;
       };
 
@@ -92,7 +92,7 @@ class VideoController {
 
       this.videoMedia.updateAllEffects(oldEffectStyle);
 
-      if (this.userStreamEffects.current.video[this.videoId].video.pause) {
+      if (this.userEffects.current.video[this.videoId].video.pause) {
         this.paused.current = true;
         if (!this.videoMedia.video.paused) {
           this.videoMedia.video.pause();

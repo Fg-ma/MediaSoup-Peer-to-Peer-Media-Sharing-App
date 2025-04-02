@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   CameraEffectTypes,
   CaptureEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import CaptureMedia from "../../../../media/capture/CaptureMedia";
 import TableFunctionsController from "../../TableFunctionsController";
 import {

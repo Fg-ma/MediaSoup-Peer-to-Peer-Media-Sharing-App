@@ -1,5 +1,5 @@
 import React, { Suspense, useRef } from "react";
-import { AudioEffectTypes } from "../../../context/effectsContext/typeConstant";
+import { AudioEffectTypes } from "../../../../../universal/effectsTypeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";

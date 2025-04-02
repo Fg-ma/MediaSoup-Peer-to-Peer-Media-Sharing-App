@@ -3,13 +3,13 @@ import { types } from "mediasoup-client";
 import { UserMedia } from "tone";
 import { v4 as uuidv4 } from "uuid";
 import {
-  UserStreamEffectsType,
-  RemoteStreamEffectsType,
+  UserEffectsType,
+  RemoteEffectsType,
   defaultAudioStreamEffects,
   defaultAudioEffectsStyles,
   RemoteEffectStylesType,
   UserEffectsStylesType,
-} from "../context/effectsContext/typeConstant";
+} from "../../../universal/effectsTypeConstant";
 import {
   DataStreamTypes,
   RemoteDataStreamsType,
@@ -51,8 +51,8 @@ class ProducersController {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
-    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
@@ -92,7 +92,7 @@ class ProducersController {
       cameraId,
       cameraBrowserMedia,
       this.userEffectsStyles,
-      this.userStreamEffects,
+      this.userEffects,
       this.userDevice,
       this.deadbanding,
       this.userMedia
@@ -131,7 +131,7 @@ class ProducersController {
       originalScreenBrowserMedia,
       screenBrowserMedia,
       this.userEffectsStyles,
-      this.userStreamEffects,
+      this.userEffects,
       this.userDevice,
       this.userMedia
     );
@@ -156,10 +156,7 @@ class ProducersController {
   };
 
   private createAudioProducer = async (audioBrowserMedia: UserMedia) => {
-    const newAudioMedia = new AudioMedia(
-      audioBrowserMedia,
-      this.userStreamEffects
-    );
+    const newAudioMedia = new AudioMedia(audioBrowserMedia, this.userEffects);
 
     this.userMedia.current.audio = newAudioMedia;
 
@@ -182,7 +179,7 @@ class ProducersController {
     const newScreenAudioMedia = new ScreenAudioMedia(
       screenAudioId,
       screenAudioBrowserMedia,
-      this.userStreamEffects
+      this.userEffects
     );
 
     this.userMedia.current.screenAudio[screenAudioId] = newScreenAudioMedia;
@@ -584,11 +581,11 @@ class ProducersController {
         producerType === "audio"
       ) {
         // Delete old stream effects
-        const streamEffects = this.userStreamEffects.current?.[producerType];
+        const streamEffects = this.userEffects.current?.[producerType];
 
         if (streamEffects) {
           if (producerType === "audio") {
-            this.userStreamEffects.current.audio = structuredClone(
+            this.userEffects.current.audio = structuredClone(
               defaultAudioStreamEffects
             );
           } else if (
@@ -597,7 +594,7 @@ class ProducersController {
             producerType === "screenAudio"
           ) {
             if (producerId && producerId in streamEffects) {
-              delete this.userStreamEffects.current[producerType][
+              delete this.userEffects.current[producerType][
                 producerId as keyof typeof streamEffects
               ];
             }
@@ -815,25 +812,25 @@ class ProducersController {
           (producerType === "camera" ||
             producerType === "screen" ||
             producerType === "screenAudio")
-            ? this.remoteStreamEffects.current?.[producerUsername]?.[
+            ? this.remoteEffects.current?.[producerUsername]?.[
                 producerInstance
               ]?.[producerType]?.[producerId]
-            : this.remoteStreamEffects.current?.[producerUsername]?.[
+            : this.remoteEffects.current?.[producerUsername]?.[
                 producerInstance
               ]?.[producerType];
 
         if (streamEffects) {
           if (producerType === "audio") {
-            this.remoteStreamEffects.current[producerUsername][
-              producerInstance
-            ][producerType] = structuredClone(defaultAudioStreamEffects);
+            this.remoteEffects.current[producerUsername][producerInstance][
+              producerType
+            ] = structuredClone(defaultAudioStreamEffects);
           } else if (
             producerType === "camera" ||
             producerType === "screen" ||
             producerType === "screenAudio"
           ) {
             if (producerId && producerId in streamEffects) {
-              delete this.remoteStreamEffects.current[producerUsername][
+              delete this.remoteEffects.current[producerUsername][
                 producerInstance
               ][producerType][producerId];
             }

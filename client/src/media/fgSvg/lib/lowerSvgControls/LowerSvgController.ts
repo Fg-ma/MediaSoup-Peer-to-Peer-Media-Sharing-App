@@ -1,9 +1,9 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
-  UserStreamEffectsType,
+  UserEffectsType,
   SvgEffectTypes,
   UserEffectsStylesType,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import SvgMedia from "../../SvgMedia";
 import { Settings } from "../typeConstant";
@@ -16,7 +16,7 @@ class LowerSvgController {
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private setSvgEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -97,30 +97,23 @@ class LowerSvgController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userStreamEffects.current.svg[this.svgId][effect] =
-          !this.userStreamEffects.current.svg[this.svgId][effect];
+        this.userEffects.current.svg[this.svgId][effect] =
+          !this.userEffects.current.svg[this.svgId][effect];
       }
 
-      // this.svgMedia.changeEffects(
-      //   effect,
-      //   this.tintColor.current,
-      //   blockStateChange
-      // );
-
-      // this.tableStaticContentSocket.current?.updateContentEffects(
-      //   "svg",
-      //   this.svgId,
-      //   this.userStreamEffects.current.svg[this.svgId],
-      //   this.userEffectsStyles.current.svg[this.svgId]
-      // );
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "svg",
+        this.svgId,
+        this.userEffects.current.svg[this.svgId],
+        this.userEffectsStyles.current.svg[this.svgId]
+      );
     } else {
-      // this.svgMedia.clearAllEffects();
-      // this.tableStaticContentSocket.current?.updateContentEffects(
-      //   "svg",
-      //   this.svgId,
-      //   this.userStreamEffects.current.svg[this.svgId],
-      //   this.userEffectsStyles.current.svg[this.svgId]
-      // );
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "svg",
+        this.svgId,
+        this.userEffects.current.svg[this.svgId],
+        this.userEffectsStyles.current.svg[this.svgId]
+      );
     }
   };
 
@@ -150,6 +143,7 @@ class LowerSvgController {
 
   handleEdit = () => {
     this.setEditing((prev) => !prev);
+    this.setSettingsActive(false);
   };
 
   handleDownload = () => {

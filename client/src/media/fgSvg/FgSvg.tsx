@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import SvgController from "./lib/SvgController";
 import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
 import {
@@ -28,8 +29,9 @@ export default function FgSvg({
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
+  const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
+  const { table_id } = useUserInfoContext();
 
   const [editing, setEditing] = useState(false);
 
@@ -67,7 +69,7 @@ export default function FgSvg({
     shiftPressed,
     controlPressed,
     setSvgEffectsActive,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     userMedia,
     setSettingsActive,
@@ -82,7 +84,7 @@ export default function FgSvg({
     svgId,
     svgMedia,
     setSettingsActive,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     setRerender
   );
@@ -223,6 +225,38 @@ export default function FgSvg({
                 svgMedia.svg.style.height = "100%";
                 subContainerRef.current?.appendChild(svgMedia.svg);
               }
+
+              const handleFileUpload = async () => {
+                if (!svgMedia.svg) {
+                  return;
+                }
+
+                // Convert the SVG element to a Blob
+                const svgElement = svgMedia.svg;
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svgElement);
+                const blob = new Blob([svgString], { type: "image/svg+xml" });
+
+                const file = new File([blob], svgMedia.filename.slice(0, -4), {
+                  type: "image/svg+xml",
+                });
+
+                // Prepare FormData
+                const formData = new FormData();
+                formData.append("file", file);
+
+                const url = `https://localhost:8045/upload/${table_id.current}/${svgId}/true`;
+
+                try {
+                  const xhr = new XMLHttpRequest();
+                  xhr.open("POST", url, true);
+                  xhr.send(formData);
+                } catch (error) {
+                  console.error("Error uploading file:", error);
+                }
+              };
+
+              if (svgMedia.svg) handleFileUpload();
             }}
             cancelCallback={() => {
               setEditing(false);

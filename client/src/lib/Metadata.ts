@@ -1,7 +1,7 @@
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../universal/effectsTypeConstant";
 import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
 import {
   onBundleMetadataRequestedType,
@@ -19,7 +19,7 @@ class Metadata {
     private instance: React.MutableRefObject<string>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
   ) {}
 
@@ -95,7 +95,7 @@ class Metadata {
       },
       data: {
         clientMute: this.mutedAudioRef.current,
-        streamEffects: this.userStreamEffects.current,
+        streamEffects: this.userEffects.current,
         userEffectsStyles: this.userEffectsStyles.current,
       },
     });

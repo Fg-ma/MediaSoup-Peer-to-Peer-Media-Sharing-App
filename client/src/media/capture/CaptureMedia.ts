@@ -4,7 +4,7 @@ import {
   CaptureEffectTypes,
   CaptureStreamEffectsType,
   defaultCaptureStreamEffects,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
   EffectType,

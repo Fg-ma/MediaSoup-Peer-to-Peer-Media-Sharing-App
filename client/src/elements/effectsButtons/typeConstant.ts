@@ -7,7 +7,7 @@ import {
   MustachesEffectTypes,
   PetsEffectTypes,
   PostProcessEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

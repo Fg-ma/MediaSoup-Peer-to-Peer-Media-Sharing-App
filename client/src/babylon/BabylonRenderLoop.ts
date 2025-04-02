@@ -16,7 +16,7 @@ import {
   VideoEffectStylesType,
   ImageEffectStylesType,
   ApplicationEffectStylesType,
-} from "../context/effectsContext/typeConstant";
+} from "../../../universal/effectsTypeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";

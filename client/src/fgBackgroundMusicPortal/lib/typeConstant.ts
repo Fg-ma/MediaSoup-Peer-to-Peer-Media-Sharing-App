@@ -1,4 +1,4 @@
-import { BackgroundMusicTypes } from "../../context/effectsContext/typeConstant";
+import { BackgroundMusicTypes } from "../../../../universal/effectsTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { HideBackgroundEffectTypes } from "../../context/effectsContext/typeConstant";
+import { HideBackgroundEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgImageElement from "../fgImageElement/FgImageElement";

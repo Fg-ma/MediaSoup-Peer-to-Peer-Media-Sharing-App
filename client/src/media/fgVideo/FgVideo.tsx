@@ -44,7 +44,7 @@ export default function FgVideo({
   };
 
   const { userMedia } = useMediaContext();
-  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
+  const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const videoMedia = userMedia.current.video[videoId];
@@ -114,7 +114,7 @@ export default function FgVideo({
     setVideoEffectsActive,
     setAudioEffectsActive,
     tintColor,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     userMedia,
     setSettingsActive,
@@ -134,7 +134,7 @@ export default function FgVideo({
     subContainerRef,
     videoContainerRef,
     videoOptions,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     tintColor,
     paused,

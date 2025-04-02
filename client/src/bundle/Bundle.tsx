@@ -59,7 +59,7 @@ export default function Bundle({
   };
 
   const { userMedia, remoteMedia } = useMediaContext();
-  const { remoteEffectsStyles, remoteStreamEffects } = useEffectsContext();
+  const { remoteEffectsStyles, remoteEffects } = useEffectsContext();
   const { signal } = useSignalContext();
   const { mediasoupSocket } = useSocketContext();
 
@@ -111,7 +111,7 @@ export default function Bundle({
     setScreenAudioStreams,
     setAudioStream,
     remoteMedia,
-    remoteStreamEffects,
+    remoteEffects,
     remoteEffectsStyles,
     userMedia,
     bundleRef,

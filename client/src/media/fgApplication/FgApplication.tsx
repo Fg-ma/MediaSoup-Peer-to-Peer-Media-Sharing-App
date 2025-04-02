@@ -37,7 +37,7 @@ export default function FgApplication({
   };
 
   const { userMedia } = useMediaContext();
-  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
+  const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const applicationMedia = userMedia.current.application[applicationId];
@@ -83,7 +83,7 @@ export default function FgApplication({
     controlPressed,
     setApplicationEffectsActive,
     tintColor,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     userMedia,
     setSettingsActive,

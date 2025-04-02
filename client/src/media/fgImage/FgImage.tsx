@@ -28,7 +28,7 @@ export default function FgImage({
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
+  const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const imageMedia = userMedia.current.image[imageId];
@@ -71,7 +71,7 @@ export default function FgImage({
     controlPressed,
     setImageEffectsActive,
     tintColor,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     userMedia,
     setSettingsActive,
@@ -87,7 +87,7 @@ export default function FgImage({
     imageId,
     imageMedia,
     setSettingsActive,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     tintColor,
     setRerender

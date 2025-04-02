@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
-import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
+import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgPanel from "../../elements/fgPanel/FgPanel";
 import FgButton from "../../elements/fgButton/FgButton";

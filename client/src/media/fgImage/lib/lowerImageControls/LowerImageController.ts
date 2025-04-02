@@ -1,9 +1,9 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
-  UserStreamEffectsType,
+  UserEffectsType,
   ImageEffectTypes,
   UserEffectsStylesType,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import ImageMedia from "../../ImageMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
@@ -19,7 +19,7 @@ class LowerImageController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -98,8 +98,8 @@ class LowerImageController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userStreamEffects.current.image[this.imageId][effect] =
-          !this.userStreamEffects.current.image[this.imageId][effect];
+        this.userEffects.current.image[this.imageId][effect] =
+          !this.userEffects.current.image[this.imageId][effect];
       }
 
       this.userMedia.current.image[this.imageId].changeEffects(
@@ -111,7 +111,7 @@ class LowerImageController {
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
         this.imageId,
-        this.userStreamEffects.current.image[this.imageId],
+        this.userEffects.current.image[this.imageId],
         this.userEffectsStyles.current.image[this.imageId]
       );
     } else {
@@ -120,7 +120,7 @@ class LowerImageController {
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
         this.imageId,
-        this.userStreamEffects.current.image[this.imageId],
+        this.userEffects.current.image[this.imageId],
         this.userEffectsStyles.current.image[this.imageId]
       );
     }

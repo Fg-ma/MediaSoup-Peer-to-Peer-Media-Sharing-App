@@ -2,8 +2,8 @@ import { BaseContext, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import AudioEffects from "../../audioEffects/AudioEffects";
 import {
   AudioMixEffectsType,
@@ -34,12 +34,13 @@ class SoundClipMedia {
   constructor(
     private soundClipId: string,
     private audioStream: MediaStream,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
+    private userEffects: React.MutableRefObject<UserEffectsType>
   ) {
     this.effects = {};
 
-    this.userStreamEffects.current.soundClip[this.soundClipId] =
-      structuredClone(defaultAudioStreamEffects);
+    this.userEffects.current.soundClip[this.soundClipId] = structuredClone(
+      defaultAudioStreamEffects
+    );
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = getContext();
@@ -124,32 +125,32 @@ class SoundClipMedia {
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
-      for (const oldEffect in this.userStreamEffects.current.soundClip[
+      for (const oldEffect in this.userEffects.current.soundClip[
         this.soundClipId
       ]) {
         if (
-          this.userStreamEffects.current.soundClip[this.soundClipId][
+          this.userEffects.current.soundClip[this.soundClipId][
             oldEffect as AudioEffectTypes
           ]
         ) {
           this.removeEffect(oldEffect as AudioEffectTypes);
         }
         if (oldEffect !== effect) {
-          this.userStreamEffects.current.soundClip[this.soundClipId][
+          this.userEffects.current.soundClip[this.soundClipId][
             oldEffect as AudioEffectTypes
           ] = false;
         }
       }
 
-      this.userStreamEffects.current.soundClip[this.soundClipId][
+      this.userEffects.current.soundClip[this.soundClipId][
         effect as AudioEffectTypes
       ] =
-        !this.userStreamEffects.current.soundClip[this.soundClipId][
+        !this.userEffects.current.soundClip[this.soundClipId][
           effect as AudioEffectTypes
         ];
 
       this.effects[effect] =
-        this.userStreamEffects.current.soundClip[this.soundClipId][
+        this.userEffects.current.soundClip[this.soundClipId][
           effect as AudioEffectTypes
         ];
     }

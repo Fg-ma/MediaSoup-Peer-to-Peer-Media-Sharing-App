@@ -29,7 +29,7 @@ import {
   ImageEffectStylesType,
   ScreenEffectStylesType,
   VideoEffectStylesType,
-} from "../context/effectsContext/typeConstant";
+} from "../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";

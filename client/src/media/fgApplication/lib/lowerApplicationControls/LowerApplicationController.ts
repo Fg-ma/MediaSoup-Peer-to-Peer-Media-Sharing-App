@@ -1,9 +1,9 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
-  UserStreamEffectsType,
+  UserEffectsType,
   ApplicationEffectTypes,
   UserEffectsStylesType,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import ApplicationMedia from "../../ApplicationMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
@@ -19,7 +19,7 @@ class LowerApplicationController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -97,8 +97,8 @@ class LowerApplicationController {
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
-      this.userStreamEffects.current.application[this.applicationId][effect] =
-        !this.userStreamEffects.current.application[this.applicationId][effect];
+      this.userEffects.current.application[this.applicationId][effect] =
+        !this.userEffects.current.application[this.applicationId][effect];
     }
 
     this.userMedia.current.application[this.applicationId].changeEffects(
@@ -110,7 +110,7 @@ class LowerApplicationController {
     this.tableStaticContentSocket.current?.updateContentEffects(
       "application",
       this.applicationId,
-      this.userStreamEffects.current.application[this.applicationId],
+      this.userEffects.current.application[this.applicationId],
       this.userEffectsStyles.current.application[this.applicationId]
     );
   };

@@ -1,12 +1,12 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   defaultImageStreamEffects,
   defaultImageEffectsStyles,
   ImageEffectTypes,
   ImageEffectStylesType,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
@@ -75,7 +75,7 @@ class ImageMedia {
     filename: string,
     mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private getImage: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -106,8 +106,8 @@ class ImageMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    if (!this.userStreamEffects.current.image[this.imageId]) {
-      this.userStreamEffects.current.image[this.imageId] = structuredClone(
+    if (!this.userEffects.current.image[this.imageId]) {
+      this.userEffects.current.image[this.imageId] = structuredClone(
         defaultImageStreamEffects
       );
     }
@@ -417,9 +417,8 @@ class ImageMedia {
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
-        this.userStreamEffects.current.image[this.imageId][
-          effect as EffectType
-        ] = false;
+        this.userEffects.current.image[this.imageId][effect as EffectType] =
+          false;
 
         if (effect === "tint") {
           this.babylonScene?.toggleTintPlane(false);
@@ -447,7 +446,7 @@ class ImageMedia {
   updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
     if (!this.babylonScene) return;
 
-    Object.entries(this.userStreamEffects.current.image[this.imageId]).map(
+    Object.entries(this.userEffects.current.image[this.imageId]).map(
       ([effect, value]) => {
         if (this.effects[effect as EffectType] && !value) {
           this.effects[effect as ImageEffectTypes] = false;

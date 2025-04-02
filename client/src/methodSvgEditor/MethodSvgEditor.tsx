@@ -181,7 +181,7 @@ export default function MethodSvgEditor({
         },
       });
     }
-  }, [editorLoaded, cancelCallback]);
+  }, [editorLoaded]);
 
   return (
     <div

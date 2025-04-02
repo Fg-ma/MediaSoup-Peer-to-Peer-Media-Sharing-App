@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { GlassesEffectTypes } from "../../context/effectsContext/typeConstant";
+import { GlassesEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgImageElement from "../fgImageElement/FgImageElement";

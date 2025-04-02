@@ -1,10 +1,11 @@
 import {
   ApplicationEffectStylesType,
   ImageEffectStylesType,
+  SvgEffectStylesType,
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   VideoEffectStylesType,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
@@ -29,7 +30,7 @@ class TableStaticContentSocketController {
     private username: string,
     private instance: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding
@@ -195,6 +196,7 @@ class TableStaticContentSocketController {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType
+      | SvgEffectStylesType
   ) => {
     this.sendMessage({
       type: "updateContentEffects",

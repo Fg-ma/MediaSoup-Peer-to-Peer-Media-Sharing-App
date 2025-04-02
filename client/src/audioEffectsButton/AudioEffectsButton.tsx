@@ -1,5 +1,5 @@
 import React, { Suspense, useRef } from "react";
-import { AudioEffectTypes } from "../context/effectsContext/typeConstant";
+import { AudioEffectTypes } from "../../../universal/effectsTypeConstant";
 import { Permissions } from "../context/permissionsContext/typeConstant";
 import FgButton from "../elements/fgButton/FgButton";
 import FgSVGElement from "../elements/fgSVGElement/FgSVGElement";

@@ -68,7 +68,7 @@ export default function VideoEffectsSection({
   videoMedia: VideoMedia;
   videoContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userEffectsStyles, userEffects } = useEffectsContext();
   const { userMedia } = useMediaContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -184,9 +184,7 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={
-            userStreamEffects.current.video[videoId].video.postProcess
-          }
+          streamEffects={userEffects.current.video[videoId].video.postProcess}
           effectsStyles={
             userEffectsStyles.current.video[videoId].video.postProcess
           }
@@ -211,7 +209,7 @@ export default function VideoEffectsSection({
 
             await lowerVideoController.handleVideoEffect(
               "postProcess",
-              userStreamEffects.current.video[videoId].video.postProcess
+              userEffects.current.video[videoId].video.postProcess
             );
           }}
         />
@@ -222,7 +220,7 @@ export default function VideoEffectsSection({
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
-                userStreamEffects.current.video[videoId].video.hideBackground
+                userEffects.current.video[videoId].video.hideBackground
               }
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.hideBackground
@@ -246,7 +244,7 @@ export default function VideoEffectsSection({
                 const effectsStyles =
                   userEffectsStyles.current.video[videoId].video.hideBackground;
                 const streamEffects =
-                  userStreamEffects.current.video[videoId].video.hideBackground;
+                  userEffects.current.video[videoId].video.hideBackground;
 
                 effectsStyles.style = effectType;
                 userMedia.current.video[
@@ -264,7 +262,7 @@ export default function VideoEffectsSection({
                 const effectsStyles =
                   userEffectsStyles.current.video[videoId].video.hideBackground;
                 const streamEffects =
-                  userStreamEffects.current.video[videoId].video.hideBackground;
+                  userEffects.current.video[videoId].video.hideBackground;
 
                 userMedia.current.video[
                   videoId
@@ -287,7 +285,7 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userStreamEffects.current.video[videoId].video.blur}
+          streamEffects={userEffects.current.video[videoId].video.blur}
           clickFunctionCallback={async () => {
             await lowerVideoController.handleVideoEffect("blur", false);
           }}
@@ -297,7 +295,7 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userStreamEffects.current.video[videoId].video.tint}
+          streamEffects={userEffects.current.video[videoId].video.tint}
           clickFunctionCallback={async () => {
             userEffectsStyles.current.video[videoId].video.tint.color =
               tintColor.current;
@@ -310,7 +308,7 @@ export default function VideoEffectsSection({
 
             await lowerVideoController.handleVideoEffect(
               "tint",
-              userStreamEffects.current.video[videoId].video.tint
+              userEffects.current.video[videoId].video.tint
             );
           }}
         />
@@ -320,9 +318,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.glasses
-              }
+              streamEffects={userEffects.current.video[videoId].video.glasses}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.glasses
               }
@@ -335,7 +331,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "glasses",
-                  userStreamEffects.current.video[videoId].video.glasses
+                  userEffects.current.video[videoId].video.glasses
                 );
               }}
             />
@@ -347,9 +343,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.beards
-              }
+              streamEffects={userEffects.current.video[videoId].video.beards}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.beards
               }
@@ -362,7 +356,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "beards",
-                  userStreamEffects.current.video[videoId].video.beards
+                  userEffects.current.video[videoId].video.beards
                 );
               }}
             />
@@ -374,9 +368,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.mustaches
-              }
+              streamEffects={userEffects.current.video[videoId].video.mustaches}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.mustaches
               }
@@ -392,7 +384,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "mustaches",
-                  userStreamEffects.current.video[videoId].video.mustaches
+                  userEffects.current.video[videoId].video.mustaches
                 );
               }}
             />
@@ -404,9 +396,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.masks
-              }
+              streamEffects={userEffects.current.video[videoId].video.masks}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.masks
               }
@@ -419,7 +409,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "masks",
-                  userStreamEffects.current.video[videoId].video.masks
+                  userEffects.current.video[videoId].video.masks
                 );
               }}
             />
@@ -431,9 +421,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.hats
-              }
+              streamEffects={userEffects.current.video[videoId].video.hats}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.hats
               }
@@ -446,7 +434,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "hats",
-                  userStreamEffects.current.video[videoId].video.hats
+                  userEffects.current.video[videoId].video.hats
                 );
               }}
             />
@@ -458,9 +446,7 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={
-                userStreamEffects.current.video[videoId].video.pets
-              }
+              streamEffects={userEffects.current.video[videoId].video.pets}
               effectsStyles={
                 userEffectsStyles.current.video[videoId].video.pets
               }
@@ -473,7 +459,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "pets",
-                  userStreamEffects.current.video[videoId].video.pets
+                  userEffects.current.video[videoId].video.pets
                 );
               }}
             />

@@ -6,8 +6,8 @@ import {
   RemoteEffectStylesType,
   AudioEffectTypes,
   defaultAudioStreamEffects,
-  RemoteStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  RemoteEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
@@ -60,7 +60,7 @@ class BundleSocket {
       React.SetStateAction<MediaStream | undefined>
     >,
     protected remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    protected remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    protected remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     protected remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     protected userMedia: React.MutableRefObject<UserMediaType>,
     protected audioRef: React.RefObject<HTMLAudioElement>,
@@ -355,7 +355,7 @@ class BundleSocket {
       this.clientMute.current = clientMute;
     }
 
-    this.remoteStreamEffects.current[inquiredUsername][inquiredInstance] =
+    this.remoteEffects.current[inquiredUsername][inquiredInstance] =
       streamEffects;
 
     this.remoteEffectsStyles.current[inquiredUsername][inquiredInstance] =
@@ -393,8 +393,8 @@ class BundleSocket {
     ) {
       if (!blockStateChange) {
         // @ts-expect-error: effect and producerType have no strict correlation enforcement
-        this.remoteStreamEffects.current[username][instance].audio[effect] = // @ts-expect-error: effect and producerType have no strict correlation enforcement
-          !this.remoteStreamEffects.current[username][instance].audio[effect];
+        this.remoteEffects.current[username][instance].audio[effect] = // @ts-expect-error: effect and producerType have no strict correlation enforcement
+          !this.remoteEffects.current[username][instance].audio[effect];
       }
     } else if (
       !this.isUser &&
@@ -404,16 +404,15 @@ class BundleSocket {
       producerId
     ) {
       if (!blockStateChange) {
-        this.remoteStreamEffects.current[username][instance].screenAudio[
-          producerId
-        ] = {
-          ...structuredClone(defaultAudioStreamEffects),
-          [effect]:
-            // @ts-expect-error: effect and producerType have no strict correlation enforcement
-            !this.remoteStreamEffects.current[username][instance].screenAudio[
-              producerId
-            ][effect],
-        };
+        this.remoteEffects.current[username][instance].screenAudio[producerId] =
+          {
+            ...structuredClone(defaultAudioStreamEffects),
+            [effect]:
+              // @ts-expect-error: effect and producerType have no strict correlation enforcement
+              !this.remoteEffects.current[username][instance].screenAudio[
+                producerId
+              ][effect],
+          };
       }
     }
   };

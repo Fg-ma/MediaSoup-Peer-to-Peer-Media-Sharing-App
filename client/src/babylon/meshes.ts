@@ -1,5 +1,5 @@
 import { MeshesData, MeshJSON } from "./typeContant";
-import { HideBackgroundEffectTypes } from "../context/effectsContext/typeConstant";
+import { HideBackgroundEffectTypes } from "../../../universal/effectsTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

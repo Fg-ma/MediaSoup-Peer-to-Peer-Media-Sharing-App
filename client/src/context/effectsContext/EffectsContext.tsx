@@ -3,22 +3,22 @@ import {
   UserEffectsStylesType,
   defaultAudioEffectsStyles,
   RemoteEffectStylesType,
-  UserStreamEffectsType,
-  RemoteStreamEffectsType,
+  UserEffectsType,
+  RemoteEffectsType,
   defaultAudioStreamEffects,
   CaptureStreamEffectsType,
   CaptureEffectStylesType,
   defaultCaptureStreamEffects,
   defaultCaptureEffectsStyles,
-} from "./typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 
 export interface EffectsContextProviderProps {
   children: React.ReactNode;
 }
 
 export interface EffectsContextType {
-  userStreamEffects: React.MutableRefObject<UserStreamEffectsType>;
-  remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>;
+  userEffects: React.MutableRefObject<UserEffectsType>;
+  remoteEffects: React.MutableRefObject<RemoteEffectsType>;
   userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>;
   remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>;
   captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>;
@@ -40,7 +40,7 @@ export const useEffectsContext = () => {
 export function EffectsContextProvider({
   children,
 }: EffectsContextProviderProps) {
-  const userStreamEffects = useRef<UserStreamEffectsType>({
+  const userEffects = useRef<UserEffectsType>({
     camera: {},
     screen: {},
     screenAudio: {},
@@ -51,7 +51,7 @@ export function EffectsContextProvider({
     application: {},
     soundClip: {},
   });
-  const remoteStreamEffects = useRef<RemoteStreamEffectsType>({});
+  const remoteEffects = useRef<RemoteEffectsType>({});
   const userEffectsStyles = useRef<UserEffectsStylesType>({
     camera: {},
     screen: {},
@@ -74,8 +74,8 @@ export function EffectsContextProvider({
   return (
     <EffectsContext.Provider
       value={{
-        userStreamEffects,
-        remoteStreamEffects,
+        userEffects,
+        remoteEffects,
         userEffectsStyles,
         remoteEffectsStyles,
         captureStreamEffects,

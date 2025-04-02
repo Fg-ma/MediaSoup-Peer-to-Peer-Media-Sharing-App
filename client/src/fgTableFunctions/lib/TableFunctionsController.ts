@@ -6,7 +6,7 @@ import Deadbanding from "../../babylon/Deadbanding";
 import {
   CaptureEffectStylesType,
   CaptureStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 
 class TableFunctionsController {
   constructor(

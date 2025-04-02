@@ -1,8 +1,8 @@
 import { BaseContext, UserMedia, getContext, start } from "tone";
 import {
   AudioEffectTypes,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import AudioEffects from "../../audioEffects/AudioEffects";
 import { FgSamplers } from "../../audioEffects/fgSamplers";
 import {
@@ -30,7 +30,7 @@ class AudioMedia {
 
   constructor(
     private audioStream: UserMedia,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
+    private userEffects: React.MutableRefObject<UserEffectsType>
   ) {
     this.effects = {};
 
@@ -124,23 +124,20 @@ class AudioMedia {
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
-      for (const oldEffect in this.userStreamEffects.current.audio) {
-        if (
-          this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes]
-        ) {
+      for (const oldEffect in this.userEffects.current.audio) {
+        if (this.userEffects.current.audio[oldEffect as AudioEffectTypes]) {
           this.removeEffect(oldEffect as AudioEffectTypes);
         }
         if (oldEffect !== effect) {
-          this.userStreamEffects.current.audio[oldEffect as AudioEffectTypes] =
-            false;
+          this.userEffects.current.audio[oldEffect as AudioEffectTypes] = false;
         }
       }
 
-      this.userStreamEffects.current.audio[effect as AudioEffectTypes] =
-        !this.userStreamEffects.current.audio[effect as AudioEffectTypes];
+      this.userEffects.current.audio[effect as AudioEffectTypes] =
+        !this.userEffects.current.audio[effect as AudioEffectTypes];
 
       this.effects[effect] =
-        this.userStreamEffects.current.audio[effect as AudioEffectTypes];
+        this.userEffects.current.audio[effect as AudioEffectTypes];
     }
 
     if (this.effects[effect]) {

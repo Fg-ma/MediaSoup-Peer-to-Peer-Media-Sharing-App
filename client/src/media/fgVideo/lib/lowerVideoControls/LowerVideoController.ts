@@ -1,9 +1,9 @@
 import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   VideoEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import {
   characterEdgeStyleMap,
   colorMap,
@@ -35,7 +35,7 @@ class LowerVideoController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -286,8 +286,8 @@ class LowerVideoController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userStreamEffects.current.video[this.videoId].video[effect] =
-          !this.userStreamEffects.current.video[this.videoId].video[effect];
+        this.userEffects.current.video[this.videoId].video[effect] =
+          !this.userEffects.current.video[this.videoId].video[effect];
       }
 
       this.userMedia.current.video[this.videoId].changeEffects(
@@ -299,7 +299,7 @@ class LowerVideoController {
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
         this.videoId,
-        this.userStreamEffects.current.video[this.videoId].video,
+        this.userEffects.current.video[this.videoId].video,
         this.userEffectsStyles.current.video[this.videoId].video
       );
     } else {
@@ -308,7 +308,7 @@ class LowerVideoController {
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
         this.videoId,
-        this.userStreamEffects.current.video[this.videoId].video,
+        this.userEffects.current.video[this.videoId].video,
         this.userEffectsStyles.current.video[this.videoId].video
       );
     }

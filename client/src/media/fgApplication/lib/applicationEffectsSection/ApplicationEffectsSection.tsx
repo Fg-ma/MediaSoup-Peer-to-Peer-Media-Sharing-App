@@ -39,7 +39,7 @@ export default function ApplicationEffectsSection({
   applicationMedia: ApplicationMedia;
   applicationContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userEffectsStyles, userEffects } = useEffectsContext();
   const { userMedia } = useMediaContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
@@ -121,7 +121,7 @@ export default function ApplicationEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
-            userStreamEffects.current.application[applicationId].postProcess
+            userEffects.current.application[applicationId].postProcess
           }
           effectsStyles={
             userEffectsStyles.current.application[applicationId].postProcess
@@ -152,7 +152,7 @@ export default function ApplicationEffectsSection({
 
             await lowerApplicationController.handleApplicationEffect(
               "postProcess",
-              userStreamEffects.current.application[applicationId].postProcess
+              userEffects.current.application[applicationId].postProcess
             );
           }}
         />
@@ -160,9 +160,7 @@ export default function ApplicationEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={
-            userStreamEffects.current.application[applicationId].blur
-          }
+          streamEffects={userEffects.current.application[applicationId].blur}
           clickFunctionCallback={async () => {
             await lowerApplicationController.handleApplicationEffect(
               "blur",
@@ -175,9 +173,7 @@ export default function ApplicationEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={
-            userStreamEffects.current.application[applicationId].tint
-          }
+          streamEffects={userEffects.current.application[applicationId].tint}
           clickFunctionCallback={async () => {
             userEffectsStyles.current.application[applicationId].tint.color =
               tintColor.current;
@@ -193,7 +189,7 @@ export default function ApplicationEffectsSection({
 
             await lowerApplicationController.handleApplicationEffect(
               "tint",
-              userStreamEffects.current.application[applicationId].tint
+              userEffects.current.application[applicationId].tint
             );
           }}
         />

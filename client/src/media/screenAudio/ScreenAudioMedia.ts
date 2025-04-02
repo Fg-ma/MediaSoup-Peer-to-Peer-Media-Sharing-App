@@ -2,8 +2,8 @@ import { BaseContext, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   defaultAudioStreamEffects,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import AudioEffects from "../../audioEffects/AudioEffects";
 import {
   AudioMixEffectsType,
@@ -34,10 +34,11 @@ class ScreenAudioMedia {
   constructor(
     private screenAudioId: string,
     private audioStream: MediaStream,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>
+    private userEffects: React.MutableRefObject<UserEffectsType>
   ) {
-    this.userStreamEffects.current.screenAudio[this.screenAudioId] =
-      structuredClone(defaultAudioStreamEffects);
+    this.userEffects.current.screenAudio[this.screenAudioId] = structuredClone(
+      defaultAudioStreamEffects
+    );
 
     // Create an AudioContext and MediaStreamDestination
     this.audioContext = getContext();
@@ -122,32 +123,32 @@ class ScreenAudioMedia {
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
-      for (const oldEffect in this.userStreamEffects.current.screenAudio[
+      for (const oldEffect in this.userEffects.current.screenAudio[
         this.screenAudioId
       ]) {
         if (
-          this.userStreamEffects.current.screenAudio[this.screenAudioId][
+          this.userEffects.current.screenAudio[this.screenAudioId][
             oldEffect as AudioEffectTypes
           ]
         ) {
           this.removeEffect(oldEffect as AudioEffectTypes);
         }
         if (oldEffect !== effect) {
-          this.userStreamEffects.current.screenAudio[this.screenAudioId][
+          this.userEffects.current.screenAudio[this.screenAudioId][
             oldEffect as AudioEffectTypes
           ] = false;
         }
       }
 
-      this.userStreamEffects.current.screenAudio[this.screenAudioId][
+      this.userEffects.current.screenAudio[this.screenAudioId][
         effect as AudioEffectTypes
       ] =
-        !this.userStreamEffects.current.screenAudio[this.screenAudioId][
+        !this.userEffects.current.screenAudio[this.screenAudioId][
           effect as AudioEffectTypes
         ];
 
       this.effects[effect] =
-        this.userStreamEffects.current.screenAudio[this.screenAudioId][
+        this.userEffects.current.screenAudio[this.screenAudioId][
           effect as AudioEffectTypes
         ];
     }

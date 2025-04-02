@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { BeardsEffectTypes } from "../../context/effectsContext/typeConstant";
+import { BeardsEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgButton from "../fgButton/FgButton";
 import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import FgImageElement from "../fgImageElement/FgImageElement";

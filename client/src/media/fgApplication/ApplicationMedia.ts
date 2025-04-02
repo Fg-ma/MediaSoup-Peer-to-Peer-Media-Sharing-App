@@ -1,10 +1,10 @@
 import {
   UserEffectsStylesType,
-  UserStreamEffectsType,
+  UserEffectsType,
   defaultApplicationStreamEffects,
   defaultApplicationEffectsStyles,
   ApplicationEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
@@ -48,7 +48,7 @@ class ApplicationMedia {
     filename: string,
     mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private getApplication: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -78,8 +78,8 @@ class ApplicationMedia {
     this.mimeType = mimeType;
     this.initPositioning = initPositioning;
 
-    if (!this.userStreamEffects.current.application[this.applicationId]) {
-      this.userStreamEffects.current.application[this.applicationId] =
+    if (!this.userEffects.current.application[this.applicationId]) {
+      this.userEffects.current.application[this.applicationId] =
         structuredClone(defaultApplicationStreamEffects);
     }
 
@@ -173,11 +173,11 @@ class ApplicationMedia {
 
       this.removeMessageListener(this.getApplicationListener);
 
-      for (const effect in this.userStreamEffects.current.application[
+      for (const effect in this.userEffects.current.application[
         this.applicationId
       ]) {
         if (
-          this.userStreamEffects.current.application[this.applicationId][
+          this.userEffects.current.application[this.applicationId][
             effect as ApplicationEffectTypes
           ]
         ) {

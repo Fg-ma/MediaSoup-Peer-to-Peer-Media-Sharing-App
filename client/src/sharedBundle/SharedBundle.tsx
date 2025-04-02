@@ -35,7 +35,7 @@ export default function SharedBundle({
 
   const { userMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userEffectsStyles, userEffects } = useEffectsContext();
   const { username } = useUserInfoContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ export default function SharedBundle({
     userDevice,
     deadbanding,
     userEffectsStyles,
-    userStreamEffects,
+    userEffects,
     userMedia,
     tableStaticContentSocket
   );

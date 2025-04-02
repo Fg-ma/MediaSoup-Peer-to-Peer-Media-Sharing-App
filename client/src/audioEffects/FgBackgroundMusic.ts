@@ -1,5 +1,5 @@
 import { Player, Volume, Gain } from "tone";
-import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
+import { BackgroundMusicTypes } from "../../../universal/effectsTypeConstant";
 
 class FgBackgroundMusic {
   private volumeNode: Volume;

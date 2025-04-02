@@ -71,7 +71,7 @@ export default function ImageEffectsSection({
   imageMedia: ImageMedia;
   imageContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userEffectsStyles, userStreamEffects } = useEffectsContext();
+  const { userEffectsStyles, userEffects } = useEffectsContext();
   const { userMedia } = useMediaContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(true);
@@ -226,7 +226,7 @@ export default function ImageEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
-            streamEffects={userStreamEffects.current.image[imageId].postProcess}
+            streamEffects={userEffects.current.image[imageId].postProcess}
             effectsStyles={userEffectsStyles.current.image[imageId].postProcess}
             clickFunctionCallback={async () => {
               userMedia.current.image[
@@ -252,7 +252,7 @@ export default function ImageEffectsSection({
 
               await lowerImageController.handleImageEffect(
                 "postProcess",
-                userStreamEffects.current.image[imageId].postProcess
+                userEffects.current.image[imageId].postProcess
               );
             }}
           />
@@ -263,7 +263,7 @@ export default function ImageEffectsSection({
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
                 streamEffects={
-                  userStreamEffects.current.image[imageId].hideBackground
+                  userEffects.current.image[imageId].hideBackground
                 }
                 effectsStyles={
                   userEffectsStyles.current.image[imageId].hideBackground
@@ -287,7 +287,7 @@ export default function ImageEffectsSection({
                   const effectsStyles =
                     userEffectsStyles.current.image[imageId].hideBackground;
                   const streamEffects =
-                    userStreamEffects.current.image[imageId].hideBackground;
+                    userEffects.current.image[imageId].hideBackground;
 
                   userEffectsStyles.current.image[
                     imageId
@@ -312,7 +312,7 @@ export default function ImageEffectsSection({
                   const effectsStyles =
                     userEffectsStyles.current.image[imageId].hideBackground;
                   const streamEffects =
-                    userStreamEffects.current.image[imageId].hideBackground;
+                    userEffects.current.image[imageId].hideBackground;
 
                   imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                     color
@@ -333,7 +333,7 @@ export default function ImageEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
-            streamEffects={userStreamEffects.current.image[imageId].blur}
+            streamEffects={userEffects.current.image[imageId].blur}
             clickFunctionCallback={async () => {
               await lowerImageController.handleImageEffect("blur", false);
             }}
@@ -343,7 +343,7 @@ export default function ImageEffectsSection({
             effectsDisabled={effectsDisabled}
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
-            streamEffects={userStreamEffects.current.image[imageId].tint}
+            streamEffects={userEffects.current.image[imageId].tint}
             clickFunctionCallback={async () => {
               userEffectsStyles.current.image[imageId].tint.color =
                 tintColor.current;
@@ -356,7 +356,7 @@ export default function ImageEffectsSection({
 
               await lowerImageController.handleImageEffect(
                 "tint",
-                userStreamEffects.current.image[imageId].tint
+                userEffects.current.image[imageId].tint
               );
             }}
           />
@@ -366,7 +366,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={userStreamEffects.current.image[imageId].glasses}
+                streamEffects={userEffects.current.image[imageId].glasses}
                 effectsStyles={userEffectsStyles.current.image[imageId].glasses}
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect(
@@ -380,7 +380,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "glasses",
-                    userStreamEffects.current.image[imageId].glasses
+                    userEffects.current.image[imageId].glasses
                   );
                 }}
               />
@@ -392,7 +392,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={userStreamEffects.current.image[imageId].beards}
+                streamEffects={userEffects.current.image[imageId].beards}
                 effectsStyles={userEffectsStyles.current.image[imageId].beards}
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect("beards", false);
@@ -403,7 +403,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "beards",
-                    userStreamEffects.current.image[imageId].beards
+                    userEffects.current.image[imageId].beards
                   );
                 }}
               />
@@ -415,9 +415,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={
-                  userStreamEffects.current.image[imageId].mustaches
-                }
+                streamEffects={userEffects.current.image[imageId].mustaches}
                 effectsStyles={
                   userEffectsStyles.current.image[imageId].mustaches
                 }
@@ -433,7 +431,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "mustaches",
-                    userStreamEffects.current.image[imageId].mustaches
+                    userEffects.current.image[imageId].mustaches
                   );
                 }}
               />
@@ -445,7 +443,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={userStreamEffects.current.image[imageId].masks}
+                streamEffects={userEffects.current.image[imageId].masks}
                 effectsStyles={userEffectsStyles.current.image[imageId].masks}
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect("masks", false);
@@ -456,7 +454,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "masks",
-                    userStreamEffects.current.image[imageId].masks
+                    userEffects.current.image[imageId].masks
                   );
                 }}
               />
@@ -468,7 +466,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={userStreamEffects.current.image[imageId].hats}
+                streamEffects={userEffects.current.image[imageId].hats}
                 effectsStyles={userEffectsStyles.current.image[imageId].hats}
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect("hats", false);
@@ -479,7 +477,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "hats",
-                    userStreamEffects.current.image[imageId].hats
+                    userEffects.current.image[imageId].hats
                   );
                 }}
               />
@@ -491,7 +489,7 @@ export default function ImageEffectsSection({
                 effectsDisabled={effectsDisabled}
                 setEffectsDisabled={setEffectsDisabled}
                 scrollingContainerRef={effectsContainerRef}
-                streamEffects={userStreamEffects.current.image[imageId].pets}
+                streamEffects={userEffects.current.image[imageId].pets}
                 effectsStyles={userEffectsStyles.current.image[imageId].pets}
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect("pets", false);
@@ -502,7 +500,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "pets",
-                    userStreamEffects.current.image[imageId].pets
+                    userEffects.current.image[imageId].pets
                   );
                 }}
               />

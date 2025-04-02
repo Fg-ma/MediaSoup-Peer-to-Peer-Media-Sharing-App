@@ -9,7 +9,7 @@ import {
   defaultAudioEffectsStyles,
   defaultCameraEffectsStyles,
   defaultScreenEffectsStyles,
-} from "./context/effectsContext/typeConstant";
+} from "../../universal/effectsTypeConstant";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import { useSocketContext } from "./context/socketContext/SocketContext";
 import ProducersController from "./lib/ProducersController";
@@ -36,8 +36,8 @@ export default function Main() {
   const {
     userEffectsStyles,
     remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
+    userEffects,
+    remoteEffects,
     captureEffectsStyles,
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
@@ -127,11 +127,11 @@ export default function Main() {
     screenIds: (string | undefined)[],
     screenAudioIds: (string | undefined)[]
   ) => {
-    if (!remoteStreamEffects.current[username]) {
-      remoteStreamEffects.current[username] = {};
+    if (!remoteEffects.current[username]) {
+      remoteEffects.current[username] = {};
     }
-    if (!remoteStreamEffects.current[username][instance]) {
-      remoteStreamEffects.current[username][instance] = {
+    if (!remoteEffects.current[username][instance]) {
+      remoteEffects.current[username][instance] = {
         camera: {},
         screen: {},
         screenAudio: {},
@@ -161,7 +161,7 @@ export default function Main() {
         return;
       }
 
-      remoteStreamEffects.current[username][instance].camera[cameraId] =
+      remoteEffects.current[username][instance].camera[cameraId] =
         structuredClone(defaultCameraStreamEffects);
 
       if (!remoteEffectsStyles.current[username][instance].camera[cameraId]) {
@@ -175,7 +175,7 @@ export default function Main() {
         return;
       }
 
-      remoteStreamEffects.current[username][instance].screen[screenId] =
+      remoteEffects.current[username][instance].screen[screenId] =
         structuredClone(defaultScreenStreamEffects);
 
       if (!remoteEffectsStyles.current[username][instance].screen[screenId]) {
@@ -189,9 +189,8 @@ export default function Main() {
         return;
       }
 
-      remoteStreamEffects.current[username][instance].screenAudio[
-        screenAudioId
-      ] = structuredClone(defaultAudioStreamEffects);
+      remoteEffects.current[username][instance].screenAudio[screenAudioId] =
+        structuredClone(defaultAudioStreamEffects);
 
       if (
         !remoteEffectsStyles.current[username][instance].screenAudio[
@@ -208,7 +207,7 @@ export default function Main() {
   const cleanupController = new CleanupController(
     remoteMedia,
     remoteDataStreams,
-    remoteStreamEffects,
+    remoteEffects,
     remoteEffectsStyles,
     setBundles
   );
@@ -258,8 +257,8 @@ export default function Main() {
     userMedia,
     userEffectsStyles,
     remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
+    userEffects,
+    remoteEffects,
     remoteMedia,
     userDataStreams,
     remoteDataStreams,
@@ -300,7 +299,7 @@ export default function Main() {
     instance,
     userMedia,
     mutedAudioRef,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles
   );
 

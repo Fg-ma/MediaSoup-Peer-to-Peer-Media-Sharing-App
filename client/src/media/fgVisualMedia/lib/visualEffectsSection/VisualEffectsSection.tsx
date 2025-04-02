@@ -11,7 +11,7 @@ import {
   ScreenEffectTypes,
   HideBackgroundEffectTypes,
   PostProcessEffectTypes,
-} from "../../../../context/effectsContext/typeConstant";
+} from "../../../../../../universal/effectsTypeConstant";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
@@ -93,12 +93,8 @@ export default function VisualEffectsSection({
 }) {
   const { mediasoupSocket } = useSocketContext();
   const { userMedia } = useMediaContext();
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
+  const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
+    useEffectsContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -218,10 +214,9 @@ export default function VisualEffectsSection({
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
             isUser
-              ? userStreamEffects.current[type][visualMediaId].postProcess
-              : remoteStreamEffects.current[username][instance][type][
-                  visualMediaId
-                ].postProcess
+              ? userEffects.current[type][visualMediaId].postProcess
+              : remoteEffects.current[username][instance][type][visualMediaId]
+                  .postProcess
           }
           effectsStyles={
             isUser
@@ -255,10 +250,9 @@ export default function VisualEffectsSection({
           }}
           holdFunctionCallback={async (effectType) => {
             const streamEffects = isUser
-              ? userStreamEffects.current[type][visualMediaId].postProcess
-              : remoteStreamEffects.current[username][instance][type][
-                  visualMediaId
-                ].postProcess;
+              ? userEffects.current[type][visualMediaId].postProcess
+              : remoteEffects.current[username][instance][type][visualMediaId]
+                  .postProcess;
             const effectsStyles = isUser
               ? userEffectsStyles.current[type][visualMediaId].postProcess
               : remoteEffectsStyles.current[username][instance][type][
@@ -292,9 +286,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId]
-                      .hideBackground
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].hideBackground
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].hideBackground
               }
@@ -336,9 +329,8 @@ export default function VisualEffectsSection({
                       visualMediaId
                     ].hideBackground;
                 const streamEffects = isUser
-                  ? userStreamEffects.current[type][visualMediaId]
-                      .hideBackground
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].hideBackground
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].hideBackground;
 
@@ -366,9 +358,8 @@ export default function VisualEffectsSection({
                       visualMediaId
                     ].hideBackground;
                 const streamEffects = isUser
-                  ? userStreamEffects.current[type][visualMediaId]
-                      .hideBackground
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].hideBackground
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].hideBackground;
 
@@ -401,10 +392,9 @@ export default function VisualEffectsSection({
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
             isUser
-              ? userStreamEffects.current[type][visualMediaId].blur
-              : remoteStreamEffects.current[username][instance][type][
-                  visualMediaId
-                ].blur
+              ? userEffects.current[type][visualMediaId].blur
+              : remoteEffects.current[username][instance][type][visualMediaId]
+                  .blur
           }
           clickFunctionCallback={async () => {
             await handleVisualEffectChange("blur");
@@ -417,10 +407,9 @@ export default function VisualEffectsSection({
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
             isUser
-              ? userStreamEffects.current[type][visualMediaId].tint
-              : remoteStreamEffects.current[username][instance][type][
-                  visualMediaId
-                ].tint
+              ? userEffects.current[type][visualMediaId].tint
+              : remoteEffects.current[username][instance][type][visualMediaId]
+                  .tint
           }
           clickFunctionCallback={async () => {
             await handleVisualEffectChange("tint");
@@ -429,10 +418,9 @@ export default function VisualEffectsSection({
             await handleVisualEffectChange(
               "tint",
               isUser
-                ? userStreamEffects.current[type][visualMediaId].tint
-                : remoteStreamEffects.current[username][instance][type][
-                    visualMediaId
-                  ].tint
+                ? userEffects.current[type][visualMediaId].tint
+                : remoteEffects.current[username][instance][type][visualMediaId]
+                    .tint
             );
           }}
         />
@@ -444,8 +432,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].glasses
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].glasses
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].glasses
               }
@@ -481,8 +469,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "glasses",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].glasses
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].glasses
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].glasses
                 );
@@ -498,8 +486,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].beards
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].beards
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].beards
               }
@@ -535,8 +523,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "beards",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].beards
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].beards
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].beards
                 );
@@ -552,8 +540,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].mustaches
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].mustaches
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].mustaches
               }
@@ -591,8 +579,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "mustaches",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].mustaches
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].mustaches
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].mustaches
                 );
@@ -608,8 +596,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].masks
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].masks
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].masks
               }
@@ -644,8 +632,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "masks",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].masks
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].masks
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].masks
                 );
@@ -661,8 +649,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].hats
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].hats
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].hats
               }
@@ -697,8 +685,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "hats",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].hats
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].hats
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].hats
                 );
@@ -714,8 +702,8 @@ export default function VisualEffectsSection({
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
                 isUser
-                  ? userStreamEffects.current[type][visualMediaId].pets
-                  : remoteStreamEffects.current[username][instance][type][
+                  ? userEffects.current[type][visualMediaId].pets
+                  : remoteEffects.current[username][instance][type][
                       visualMediaId
                     ].pets
               }
@@ -750,8 +738,8 @@ export default function VisualEffectsSection({
                 await handleVisualEffectChange(
                   "pets",
                   isUser
-                    ? userStreamEffects.current[type][visualMediaId].pets
-                    : remoteStreamEffects.current[username][instance][type][
+                    ? userEffects.current[type][visualMediaId].pets
+                    : remoteEffects.current[username][instance][type][
                         visualMediaId
                       ].pets
                 );

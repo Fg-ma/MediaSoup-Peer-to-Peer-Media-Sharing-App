@@ -3,10 +3,10 @@ import {
   RemoteEffectStylesType,
   CameraEffectTypes,
   ScreenEffectTypes,
-  RemoteStreamEffectsType,
+  RemoteEffectsType,
   defaultCameraStreamEffects,
   defaultScreenStreamEffects,
-} from "../../../context/effectsContext/typeConstant";
+} from "../../../../../universal/effectsTypeConstant";
 import { Permissions } from "../../../context/permissionsContext/typeConstant";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
@@ -56,7 +56,7 @@ class FgVisualMediaController {
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    private remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
@@ -194,11 +194,11 @@ class FgVisualMediaController {
     ) {
       if (!blockStateChange) {
         // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-        this.remoteStreamEffects.current[username][instance][producerType][
+        this.remoteEffects.current[username][instance][producerType][
           this.visualMediaId
         ][effect] =
           // @ts-expect-error: ts can't verify username, instance, visualMediaId, and effect correlate
-          !this.remoteStreamEffects.current[username][instance][producerType][
+          !this.remoteEffects.current[username][instance][producerType][
             producerId
           ][effect];
       }
@@ -300,7 +300,7 @@ class FgVisualMediaController {
       producerType === this.type &&
       producerId === this.visualMediaId
     ) {
-      this.remoteStreamEffects.current[this.username][this.instance][this.type][
+      this.remoteEffects.current[this.username][this.instance][this.type][
         this.visualMediaId
       ] = structuredClone(
         this.type === "camera"

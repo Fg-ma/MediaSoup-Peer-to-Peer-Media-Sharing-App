@@ -20,8 +20,8 @@ import {
   PostProcessEffectTypes,
   ScreenEffectTypes,
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../../universal/effectsTypeConstant";
 import { Permissions } from "../../../context/permissionsContext/typeConstant";
 
 export type OutGoingMediasoupMessages =
@@ -358,7 +358,7 @@ type onBundleMetadataResponseType = {
   };
   data: {
     clientMute: boolean;
-    streamEffects: UserStreamEffectsType;
+    streamEffects: UserEffectsType;
     userEffectsStyles: UserEffectsStylesType;
   };
 };
@@ -970,7 +970,7 @@ export type onBundleMetadataResponsedType = {
   };
   data: {
     clientMute: boolean;
-    streamEffects: UserStreamEffectsType;
+    streamEffects: UserEffectsType;
     userEffectsStyles: UserEffectsStylesType;
   };
 };

@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import FgPanel from "../elements/fgPanel/FgPanel";
 import FgButton from "../elements/fgButton/FgButton";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
-import { BackgroundMusicTypes } from "../context/effectsContext/typeConstant";
+import { BackgroundMusicTypes } from "../../../universal/effectsTypeConstant";
 import FgImageElement from "../elements/fgImageElement/FgImageElement";
 import FgSVGElement from "../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../elements/fgHoverContentStandard/FgHoverContentStandard";

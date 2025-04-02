@@ -5,7 +5,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../context/effectsContext/typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
@@ -98,12 +98,8 @@ export default function UserVisualMedia({
   };
 
   const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
-  const {
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userStreamEffects,
-    remoteStreamEffects,
-  } = useEffectsContext();
+  const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
+    useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
@@ -266,7 +262,7 @@ export default function UserVisualMedia({
     handleVisualEffectChange,
     tracksColorSetterCallback,
     tintColor,
-    userStreamEffects,
+    userEffects,
     userMedia,
     initTimeOffset,
     fgContentAdjustmentController,
@@ -292,7 +288,7 @@ export default function UserVisualMedia({
     setPausedState,
     paused,
     userMedia,
-    remoteStreamEffects,
+    remoteEffects,
     userEffectsStyles,
     remoteEffectsStyles,
     remoteDataStreams,

@@ -107,7 +107,7 @@ export type CaptureEffectTypes =
   | "hats"
   | "pets";
 
-export type UserStreamEffectsType = {
+export type UserEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
   };
@@ -146,7 +146,7 @@ export type UserStreamEffectsType = {
   };
 };
 
-export type RemoteStreamEffectsType = {
+export type RemoteEffectsType = {
   [username: string]: {
     [instance: string]: {
       camera: {

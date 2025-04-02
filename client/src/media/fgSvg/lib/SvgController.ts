@@ -2,8 +2,8 @@ import {
   SvgEffectStylesType,
   SvgEffectTypes,
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
@@ -15,7 +15,7 @@ class SvgController {
     private svgId: string,
     private svgMedia: SvgMedia,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
@@ -29,7 +29,7 @@ class SvgController {
     const { effects, effectStyles } = event.data;
 
     if (contentType === "svg" && contentId === this.svgId) {
-      this.userStreamEffects.current.svg[this.svgId] = effects as {
+      this.userEffects.current.svg[this.svgId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
       };
 

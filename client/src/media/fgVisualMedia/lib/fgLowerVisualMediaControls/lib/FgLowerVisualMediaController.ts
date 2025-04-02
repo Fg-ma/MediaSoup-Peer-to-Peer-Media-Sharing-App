@@ -3,7 +3,7 @@ import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
-} from "../../../../../context/effectsContext/typeConstant";
+} from "../../../../../../../universal/effectsTypeConstant";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
 import MediasoupSocketController from "../../../../../serverControllers/mediasoupServer/MediasoupSocketController";
@@ -103,7 +103,7 @@ class FgLowerVisualMediaController {
       producerId: string | undefined
     ) => void,
     private tintColor: React.MutableRefObject<string>,
-    private userStreamEffects: React.MutableRefObject<{
+    private userEffects: React.MutableRefObject<{
       camera: {
         [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
       };
@@ -648,17 +648,17 @@ class FgLowerVisualMediaController {
     // Fill stream effects if state change isn't blocked
     if (!blockStateChange) {
       if (this.type === "camera") {
-        this.userStreamEffects.current[this.type][this.visualMediaId][
+        this.userEffects.current[this.type][this.visualMediaId][
           effect as CameraEffectTypes
         ] =
-          !this.userStreamEffects.current[this.type][this.visualMediaId][
+          !this.userEffects.current[this.type][this.visualMediaId][
             effect as CameraEffectTypes
           ];
       } else if (this.type === "screen") {
-        this.userStreamEffects.current[this.type][this.visualMediaId][
+        this.userEffects.current[this.type][this.visualMediaId][
           effect as ScreenEffectTypes
         ] =
-          !this.userStreamEffects.current[this.type][this.visualMediaId][
+          !this.userEffects.current[this.type][this.visualMediaId][
             effect as ScreenEffectTypes
           ];
       }

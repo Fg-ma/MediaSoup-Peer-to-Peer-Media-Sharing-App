@@ -72,7 +72,7 @@ export default function JoinTableSection({
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
-  const { userStreamEffects, userEffectsStyles } = useEffectsContext();
+  const { userEffects, userEffectsStyles } = useEffectsContext();
   const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
     useSocketContext();
   const { table_id, username, instance, device } = useUserInfoContext();
@@ -93,7 +93,7 @@ export default function JoinTableSection({
     userMedia,
     userDataStreams,
     remoteMedia,
-    userStreamEffects,
+    userEffects,
     userEffectsStyles,
     handleDisableEnableBtns,
     setBundles,

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
-import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
+import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
@@ -27,28 +27,28 @@ export default function AudioEffectButton({
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   handleAudioEffectChange: (effect: AudioEffectTypes) => void;
 }) {
-  const { userStreamEffects, remoteStreamEffects } = useEffectsContext();
+  const { userEffects, remoteEffects } = useEffectsContext();
 
   const attributes = useRef<{ key: string; value: string; id?: string }[]>([]);
 
   const streamEffects = isUser
     ? producerType === "audio"
-      ? userStreamEffects.current[producerType][audioEffect]
+      ? userEffects.current[producerType][audioEffect]
       : producerType === "video"
       ? producerId
-        ? userStreamEffects.current[producerType][producerId].audio[audioEffect]
+        ? userEffects.current[producerType][producerId].audio[audioEffect]
         : undefined
       : producerId
-      ? userStreamEffects.current[producerType][producerId][audioEffect]
+      ? userEffects.current[producerType][producerId][audioEffect]
       : undefined
     : producerType === "audio"
-    ? remoteStreamEffects.current[username][instance][producerType][audioEffect]
+    ? remoteEffects.current[username][instance][producerType][audioEffect]
     : producerType === "video"
     ? producerId
-      ? remoteStreamEffects.current[producerType][producerId].audio[audioEffect]
+      ? remoteEffects.current[producerType][producerId].audio[audioEffect]
       : undefined
     : producerId
-    ? remoteStreamEffects.current[username][instance][producerType][producerId][
+    ? remoteEffects.current[username][instance][producerType][producerId][
         audioEffect
       ]
     : undefined;

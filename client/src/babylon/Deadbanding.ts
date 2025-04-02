@@ -8,7 +8,7 @@ import {
   PetsEffectTypes,
   CameraEffectTypes,
   CaptureEffectStylesType,
-} from "../context/effectsContext/typeConstant";
+} from "../../../universal/effectsTypeConstant";
 import { LandmarkTypes } from "./FaceLandmarks";
 
 type DeadbandingTypes =

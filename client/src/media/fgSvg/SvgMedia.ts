@@ -8,8 +8,8 @@ import {
   defaultSvgEffectsStyles,
   defaultSvgStreamEffects,
   UserEffectsStylesType,
-  UserStreamEffectsType,
-} from "../../context/effectsContext/typeConstant";
+  UserEffectsType,
+} from "../../../../universal/effectsTypeConstant";
 import {
   DownloadCompressionTypes,
   DownloadMimeTypes,
@@ -48,7 +48,7 @@ class SvgMedia {
     mimeType: TableTopStaticMimeType,
     visible: boolean,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userStreamEffects: React.MutableRefObject<UserStreamEffectsType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     private getSVG: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -77,8 +77,8 @@ class SvgMedia {
     this.visible = visible;
     this.initPositioning = initPositioning;
 
-    if (!this.userStreamEffects.current.svg[this.svgId]) {
-      this.userStreamEffects.current.svg[this.svgId] = structuredClone(
+    if (!this.userEffects.current.svg[this.svgId]) {
+      this.userEffects.current.svg[this.svgId] = structuredClone(
         defaultSvgStreamEffects
       );
     }

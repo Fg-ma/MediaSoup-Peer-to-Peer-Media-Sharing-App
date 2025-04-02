@@ -1,7 +1,7 @@
 import {
   RemoteEffectStylesType,
-  RemoteStreamEffectsType,
-} from "../context/effectsContext/typeConstant";
+  RemoteEffectsType,
+} from "../../../universal/effectsTypeConstant";
 import {
   RemoteDataStreamsType,
   RemoteMediaType,
@@ -11,7 +11,7 @@ class CleanupController {
   constructor(
     private remoteMedia: React.MutableRefObject<RemoteMediaType>,
     private remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>,
-    private remoteStreamEffects: React.MutableRefObject<RemoteStreamEffectsType>,
+    private remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
     private setBundles: React.Dispatch<
       React.SetStateAction<{
@@ -73,19 +73,19 @@ class CleanupController {
     }
 
     if (
-      this.remoteStreamEffects.current?.[disconnectedUsername]?.[
+      this.remoteEffects.current?.[disconnectedUsername]?.[
         disconnectedInstance
       ] !== undefined
     ) {
-      delete this.remoteStreamEffects.current?.[disconnectedUsername]?.[
+      delete this.remoteEffects.current?.[disconnectedUsername]?.[
         disconnectedInstance
       ];
 
       if (
-        Object.keys(this.remoteStreamEffects.current?.[disconnectedUsername])
+        Object.keys(this.remoteEffects.current?.[disconnectedUsername])
           .length === 0
       ) {
-        delete this.remoteStreamEffects.current?.[disconnectedUsername];
+        delete this.remoteEffects.current?.[disconnectedUsername];
       }
     }
 

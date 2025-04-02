@@ -8,7 +8,7 @@ import {
   SvgEffectStylesType,
   VideoEffectStylesType,
   VideoEffectTypes,
-} from "../../../context/effectsContext/typeConstant";
+} from "../../../../../universal/effectsTypeConstant";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -119,7 +119,8 @@ type onUpdateContentEffectsType = {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | ApplicationEffectStylesType;
+      | ApplicationEffectStylesType
+      | SvgEffectStylesType;
   };
 };
 

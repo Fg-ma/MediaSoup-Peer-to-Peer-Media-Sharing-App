@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../fgButton/FgButton";
-import { PostProcessEffectTypes } from "../../context/effectsContext/typeConstant";
+import { PostProcessEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgImageElement from "../fgImageElement/FgImageElement";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import { postProcessEffectsChoices } from "./typeConstant";

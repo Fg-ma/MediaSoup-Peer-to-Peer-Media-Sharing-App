@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import { AudioEffectTypes } from "../../context/effectsContext/typeConstant";
+import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
