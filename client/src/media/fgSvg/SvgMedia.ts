@@ -826,6 +826,16 @@ class SvgMedia {
 
     return undefined;
   };
+
+  setSvgfromString = (svgString: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, "image/svg+xml");
+    const svgElement = doc.querySelector("svg");
+
+    if (svgElement) {
+      this.svg = svgElement;
+    }
+  };
 }
 
 export default SvgMedia;

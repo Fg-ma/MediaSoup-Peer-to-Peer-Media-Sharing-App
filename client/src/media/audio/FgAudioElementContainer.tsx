@@ -571,7 +571,7 @@ export default function FgAudioElementContainer({
                   setIsBezierCurveEditor={setIsBezierCurveEditor}
                 />,
                 <ReactButton
-                  className='border-fg-off-white min-w-12 w-full hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                  className='min-w-12 w-full hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                   reactionsPanelActive={reactionsPanelActive}
                   setReactionsPanelActive={setReactionsPanelActive}
                   clickFunction={() => setReactionsPanelActive((prev) => !prev)}

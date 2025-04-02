@@ -66,7 +66,8 @@
   text-decoration: underline;
 }
 
-.configureModal {
+.configureModal,
+.cancelModal {
   position: absolute;
   width: max-content;
   max-width: 90%;
@@ -82,7 +83,8 @@
   transform: translate(-50%, -50%);
 }
 
-.configureModal h1 {
+.configureModal h1,
+.cancelModal h1 {
   font-size: 2.5rem;
   line-height: 2.75rem;
   font-family: Josefin, sans;
@@ -90,7 +92,8 @@
   text-align: center;
 }
 
-#configuration {
+#configuration,
+#cancellation {
   display: flex;
   align-items: center;
   justify-content: center;

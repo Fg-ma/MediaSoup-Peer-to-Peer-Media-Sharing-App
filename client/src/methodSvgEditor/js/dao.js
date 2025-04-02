@@ -1,4 +1,4 @@
-const dao = [
+var dao = dao || [
   // public, appears in builder
 
   {

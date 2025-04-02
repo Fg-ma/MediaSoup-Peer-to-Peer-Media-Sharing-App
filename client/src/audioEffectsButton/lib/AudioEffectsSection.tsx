@@ -283,7 +283,7 @@ export default function AudioEffectsSection({
               ...(items ? items : []),
               <FgButton
                 scrollingContainerRef={audioSectionRef}
-                className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                 clickFunction={() => {
                   handleMute(producerType, producerId);
                   setRerender((prev) => !prev);
@@ -363,7 +363,7 @@ export default function AudioEffectsSection({
               <FgButton
                 scrollingContainerRef={audioSectionRef}
                 externalRef={audioMixEffectsButtonRef}
-                className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                 clickFunction={() => {
                   setAudioMixEffectsActive((prev) => !prev);
                 }}
@@ -403,7 +403,7 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={pianoRef}
-                  className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                   clickFunction={() => {
                     if (visualMediaContainerRef?.current) {
                       if (
@@ -451,7 +451,7 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={soundBoardButtonRef}
-                  className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                   clickFunction={() => {
                     setSoundBoardActive((prev) => !prev);
                   }}
@@ -488,7 +488,7 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={backgroundMusicButtonRef}
-                  className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
                   clickFunction={() => {
                     setBackgroundMusicActive((prev) => !prev);
                   }}

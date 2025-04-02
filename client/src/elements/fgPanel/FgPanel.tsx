@@ -310,7 +310,7 @@ export default function FgPanel({
           : focus
           ? "z-[499999999999]"
           : "z-[499999999998]"
-      } shadow-lg rounded absolute p-3 overflow-hidden`}
+      } shadow-lg rounded-md absolute p-3 overflow-hidden`}
       style={{
         opacity:
           position.x === undefined || position.y === undefined ? "0%" : "100%",
@@ -410,7 +410,7 @@ export default function FgPanel({
           <FgButton
             externalRef={closeButtonRef}
             clickFunction={closeCallback}
-            className={`w-3 aspect-square absolute flex items-center justify-center ${
+            className={`w-3 aspect-square absolute flex items-center justify-center hover:bg-fg-red-light rounded-full ${
               closePosition === "topRight"
                 ? "right-0 top-0"
                 : closePosition === "topLeft"

@@ -143,7 +143,7 @@ export default function ReactButton({
                   <FgButton
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
-                    className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-1'
+                    className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-1'
                     clickFunction={
                       reactionFunction
                         ? () => reactionFunction(reaction as TableReactions)

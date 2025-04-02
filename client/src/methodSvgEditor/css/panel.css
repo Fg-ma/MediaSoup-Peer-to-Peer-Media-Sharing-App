@@ -85,6 +85,7 @@
 
 .folder-name-text {
   @apply pt-1;
+  max-width: calc(100% - 2rem);
 }
 
 .folder-name svg {
@@ -123,6 +124,7 @@
 
 .folder-item-text {
   @apply pb-0.5;
+  max-width: calc(100% - 2rem);
 }
 
 .folder-item svg {

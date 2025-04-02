@@ -41,6 +41,8 @@ MD.Keyboard = function () {
     cmd_k: { name: "Place image", cb: () => editor.import.place() },
     backspace: { name: "Delete", cb: () => editor.deleteSelected() },
     delete: { name: "Delete", cb: () => editor.deleteSelected() },
+    cmd_delete: { name: "Clear all", cb: () => editor.configure() },
+    cmd_backspace: { name: "Clear all", cb: () => editor.configure() },
     ctrl_arrowleft: {
       name: "Rotate -1deg",
       cb: () => editor.rotateSelected(0, 1),

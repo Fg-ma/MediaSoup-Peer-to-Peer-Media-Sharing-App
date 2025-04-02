@@ -1,6 +1,8 @@
 // globals
-const svgCanvas = new $.SvgCanvas(document.getElementById("svgcanvas"));
+var svgCanvas =
+  svgCanvas || new $.SvgCanvas(document.getElementById("svgcanvas"));
 const editor = new MD.Editor();
+window.methodEditor = editor;
 const state = new State();
 
 editor.modal = {
@@ -78,10 +80,9 @@ editor.modal = {
   configure: new MD.Modal({
     html: `
       <div class="configureModal">
-        <h1>Configuration</h1>
+        <h1>Clear all data?</h1>
         <div id="configuration">
-          <button class="warning">Erase all data</button>
-          </div>
+          <button class="warning">Erase</button>
         </div>
       </div>
     `,

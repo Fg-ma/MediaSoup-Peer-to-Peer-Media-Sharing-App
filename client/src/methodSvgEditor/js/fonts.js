@@ -31,7 +31,7 @@ function populateFonts(fonts) {
   $("head").append(fontLinks);
 }
 
-const fonts = {
+var fonts = fonts || {
   Alegreya: {
     axes: {
       ital: {

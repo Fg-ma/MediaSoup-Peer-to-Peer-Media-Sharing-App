@@ -239,7 +239,7 @@ MD.Panel = function () {
     callback: editor.changeAttribute,
     cursor: true,
     smallStep: 0.1,
-    start: 1.5,
+    start: 2,
   });
   $("#angle").dragInput({
     min: -180,
@@ -1532,7 +1532,7 @@ MD.Panel = function () {
       );
     }
 
-    populateObjectsPanel(svgCanvas.getSvgString());
+    populateObjectsPanel(svgCanvas.getSvgString(true));
     folderPadding();
   }
 
@@ -1583,7 +1583,7 @@ MD.Panel = function () {
 
   function openObjectsPanels() {
     panelActive = "object";
-    populateObjectsPanel(svgCanvas.getSvgString());
+    populateObjectsPanel(svgCanvas.getSvgString(true));
     $(this).addClass("active");
     $("#objects_panels").addClass("active");
     $("#editing_panel_button").removeClass("active");
@@ -1610,9 +1610,6 @@ MD.Panel = function () {
 
       // Set padding left to be 1.5 * the number of parent divs
       $(this).css("padding-left", 1.5 * parentDivCount + "rem");
-      $(this)
-        .find(".folder-item-text")
-        .css("max-width", `calc(100% - ${(parentDivCount + 1) * 1.5}rem)`);
     });
 
     $(".folder-name").each(function () {
@@ -1807,9 +1804,8 @@ MD.Panel = function () {
         let self = this;
 
         clickTimer = setTimeout(function () {
-          console.log("Single Click detected", e);
           handleFolderItemClick(e, $(self));
-        }, 250);
+        }, 150);
       });
 
     $(".folder-item")
@@ -1825,6 +1821,51 @@ MD.Panel = function () {
         $(`#folder-name-${elem.id}`)?.addClass("active");
       }
     });
+  }
+
+  function handleFolderNameDoubleClick($folderName) {
+    let $textDiv = $folderName.find(".folder-name-text");
+    // Prevent multiple inputs from being created
+    if ($textDiv.find("input").length) return;
+
+    let currentName = $textDiv.text().trim();
+    let inputField = $("<input>")
+      .val(currentName)
+      .addClass("folder-name-edit-input")
+      .css({
+        width: "100%",
+        border: "none",
+        outline: "none",
+        font: "inherit",
+        background: "transparent",
+        padding: "0",
+      });
+
+    $textDiv.empty().append(inputField);
+    inputField.focus();
+
+    inputField.on("blur", function () {
+      saveAndExitFolderNameEditMode(currentName, $folderName, inputField);
+    });
+
+    // Handle pressing Enter to save changes
+    inputField.on("keypress", function (e) {
+      if (e.key === "Enter") {
+        saveAndExitFolderNameEditMode(currentName, $folderName, inputField);
+      }
+    });
+  }
+
+  function saveAndExitFolderNameEditMode(oldName, $folderName, $inputField) {
+    let newName = $inputField.val().trim();
+    let $textDiv = $folderName.find(".folder-name-text");
+
+    $textDiv.text(newName);
+
+    let oldElement = document.getElementById(oldName);
+    if (oldElement) {
+      oldElement.id = newName;
+    }
   }
 
   function handleFolderItemDoubleClick($folderItem) {
@@ -1849,23 +1890,21 @@ MD.Panel = function () {
     $textDiv.empty().append(inputField);
     inputField.focus();
 
-    // Handle pressing Enter to save changes
-    inputField.on("keypress", function (e) {
-      if (e.which === 13) {
-        saveAndExitEditMode(currentName, $folderItem, inputField);
-      }
+    inputField.on("blur", function () {
+      saveAndExitFolderItemEditMode(currentName, $folderItem, inputField);
     });
 
-    // Prevent clicking inside input from triggering the document click handler
-    inputField.on("click", function (e) {
-      e.stopPropagation();
+    // Handle pressing Enter to save changes
+    inputField.on("keypress", function (e) {
+      if (e.key === "Enter") {
+        saveAndExitFolderItemEditMode(currentName, $folderItem, inputField);
+      }
     });
   }
 
-  function saveAndExitEditMode(oldName, $folderItem, $inputField) {
+  function saveAndExitFolderItemEditMode(oldName, $folderItem, $inputField) {
     let newName = $inputField.val().trim();
     let $textDiv = $folderItem.find(".folder-item-text");
-    console.log(oldName, newName);
 
     $textDiv.text(newName);
 
@@ -1993,8 +2032,7 @@ MD.Panel = function () {
     }
   }
 
-  function handleFolderClick(e) {
-    var folderNameDiv = $(this);
+  function handleFolderClick(e, folderNameDiv) {
     var parentDiv = folderNameDiv.closest(".object-folder");
     var isShiftPressed = e.shiftKey;
     var isCtrlPressed = e.ctrlKey;
@@ -2023,7 +2061,7 @@ MD.Panel = function () {
 
         if (folderOpen && !folderActive) {
           folderNameDiv.addClass("active");
-          let elementId = $(this).attr("data-element-id");
+          let elementId = folderNameDiv.attr("data-element-id");
           if (elementId) {
             let targetElement = document.getElementById(elementId);
             if (targetElement) {
@@ -2047,7 +2085,7 @@ MD.Panel = function () {
         } else {
           parentDiv.addClass("folder-open");
           folderNameDiv.addClass("active");
-          let elementId = $(this).attr("data-element-id");
+          let elementId = folderNameDiv.attr("data-element-id");
           if (elementId) {
             let targetElement = document.getElementById(elementId);
             if (targetElement) {
@@ -2119,9 +2157,30 @@ MD.Panel = function () {
     }
   }
 
+  let clickTimer;
+
+  // Use event delegation instead of direct binding
   $("#objects_panels")
     .off("click", ".folder-name")
-    .on("click", ".folder-name", handleFolderClick);
+    .on("click", ".folder-name", function (e) {
+      clearTimeout(clickTimer);
+      let self = this;
+
+      clickTimer = setTimeout(function () {
+        handleFolderClick(e, $(self));
+      }, 150);
+    });
+
+  $("#objects_panels")
+    .off("dblclick", ".folder-name")
+    .on("dblclick", ".folder-name", function () {
+      clearTimeout(clickTimer);
+
+      const folderName = $(this);
+      if (folderName.id === "folder-name-page") return;
+
+      handleFolderNameDoubleClick(folderName);
+    });
 
   $("#objects_panel_button").on("click", openObjectsPanels);
 

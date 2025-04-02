@@ -9,7 +9,7 @@ import {
   StaticMimeTypes,
 } from "../typeConstant";
 
-const utils = new Utils();
+const tableStaticContentUtils = new Utils();
 
 class Posts {
   constructor(app: uWS.TemplatedApp) {
@@ -37,8 +37,10 @@ class Posts {
       bb.on("file", (name, file, info) => {
         const { mimeType, filename } = info;
 
-        const sanitizedFilename = utils.sanitizeString(filename);
-        const sanitizedMimeType = utils.sanitizeMimeType(mimeType);
+        const sanitizedFilename =
+          tableStaticContentUtils.sanitizeString(filename);
+        const sanitizedMimeType =
+          tableStaticContentUtils.sanitizeMimeType(mimeType);
 
         const completeFilename = `${sanitizedFilename}${
           mimeToExtension[sanitizedMimeType as StaticMimeTypes]

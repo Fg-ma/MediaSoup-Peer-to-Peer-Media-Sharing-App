@@ -19,6 +19,7 @@ const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
 const navigateBack = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function BackgroundSelectorPanel({
+  externalPanelRef,
   setBackgroundSelectorPanelActive,
   backgroundSelectorBtnRef,
   activeBackground,
@@ -26,6 +27,7 @@ export default function BackgroundSelectorPanel({
   imports,
   setImports,
 }: {
+  externalPanelRef?: React.RefObject<HTMLDivElement>;
   setBackgroundSelectorPanelActive: React.Dispatch<
     React.SetStateAction<boolean>
   >;
@@ -99,6 +101,7 @@ export default function BackgroundSelectorPanel({
 
   return (
     <FgPanel
+      externalRef={externalPanelRef}
       content={
         activeCategory === "" ? (
           <div className='flex w-full h-full flex-col items-center justify-center space-y-2'>

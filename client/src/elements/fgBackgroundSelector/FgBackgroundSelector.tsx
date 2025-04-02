@@ -13,11 +13,13 @@ const chooseBackgroundOffIcon =
   nginxAssetServerBaseUrl + "svgs/chooseBackgroundOffIcon.svg";
 
 export default function FgBackgroundSelector({
+  externalPanelRef,
   backgroundRef,
   defaultActiveBackground,
   backgroundChangeFunction,
   hoverType = "below",
 }: {
+  externalPanelRef?: React.RefObject<HTMLDivElement>;
   backgroundRef: React.RefObject<HTMLDivElement>;
   defaultActiveBackground?: FgBackground;
   backgroundChangeFunction?: (background: FgBackground) => void;
@@ -123,6 +125,7 @@ export default function FgBackgroundSelector({
       />
       {backgroundSelectorPanelActive && (
         <BackgroundSelectorPanel
+          externalPanelRef={externalPanelRef}
           setBackgroundSelectorPanelActive={setBackgroundSelectorPanelActive}
           backgroundSelectorBtnRef={backgroundSelectorBtnRef}
           activeBackground={activeBackground}

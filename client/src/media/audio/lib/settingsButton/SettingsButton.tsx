@@ -98,7 +98,7 @@ export default function SettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className='flex border-fg-off-white min-w-12 w-full items-center justify-center pointer-events-auto aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4'
+        className='flex min-w-12 w-full items-center justify-center pointer-events-auto aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
         clickFunction={toggleSettings}
         contentFunction={() => (
           <svg

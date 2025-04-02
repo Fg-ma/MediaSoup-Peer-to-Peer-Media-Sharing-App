@@ -316,8 +316,8 @@ export default function ColorPicker({
       content={
         <div ref={colorPickerRef} className='flex flex-col space-y-2'>
           <div
-            className={`mb-2 flex items-center justify-center ${
-              isAlpha ? "h-[220px]" : "h-[200px]"
+            className={`mb-2 flex items-center ${
+              isAlpha ? "h-[220px] justify-between" : "h-[200px] justify-center"
             }`}
           >
             <HexColorPicker
@@ -330,7 +330,7 @@ export default function ColorPicker({
             />
             {isAlpha && (
               <FgSlider
-                className='w-10'
+                className='grow pl-2'
                 externalValue={alpha}
                 externalStyleValue={alpha}
                 onValueChange={(value) => handleAlphaSliderChanges(value.value)}

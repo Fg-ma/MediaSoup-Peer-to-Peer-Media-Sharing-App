@@ -35,6 +35,7 @@ export default function MoreTableFunctionsSection({
   captureMediaActive,
   setCaptureMediaActive,
   gamesSectionRef,
+  tableBackgroundSectionRef,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -62,6 +63,7 @@ export default function MoreTableFunctionsSection({
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
   gamesSectionRef: React.RefObject<HTMLDivElement>;
+  tableBackgroundSectionRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
@@ -105,6 +107,7 @@ export default function MoreTableFunctionsSection({
           <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>
             <GamesSection gamesSectionRef={gamesSectionRef} />
             <FgBackgroundSelector
+              externalPanelRef={tableBackgroundSectionRef}
               backgroundRef={tableTopRef}
               defaultActiveBackground={tableBackground}
               backgroundChangeFunction={(background: FgBackground) => {

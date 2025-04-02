@@ -14,6 +14,8 @@ import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import SvgEffectsButton from "./lib/lowerSvgControls/svgEffectsButton/SvgEffectsButton";
 import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
 import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
+import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
+import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
 
 export default function FgSvg({
@@ -177,15 +179,58 @@ export default function FgSvg({
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
         options={{ gradient: false, adjustmentAnimation: false }}
       />
-      {/* {editing && svgMedia.svg && (
-        <SvgEditor
-          initSvg={svgMedia.svg}
-          closeFunction={() => setEditing(false)}
-          confirmFunction={(url, svg, d, blob, name, filters) => {
-            console.log(url, svg, d, blob, name, filters);
-          }}
-        />
-      )} */}
+      <FgPortal
+        type='staticTopDomain'
+        top={0}
+        left={0}
+        zValue={10000}
+        className={`${
+          editing && svgMedia.svg ? "visible" : "hidden pointer-events-none"
+        } flex w-full h-full bg-fg-tone-black-1 bg-opacity-45 items-center justify-center`}
+        content={
+          <MethodSvgEditor
+            initialSVGString={() => {
+              if (svgMedia.svg) {
+                svgMedia.svg.setAttribute("width", "100");
+                svgMedia.svg.setAttribute("height", "100");
+                return new XMLSerializer().serializeToString(svgMedia.svg);
+              }
+            }}
+            finishCallback={(svg) => {
+              setEditing(false);
+
+              const allSvgs = subContainerRef.current?.querySelectorAll("svg");
+
+              if (allSvgs) {
+                allSvgs.forEach((svgElement) => {
+                  svgElement.remove();
+                });
+              }
+
+              svgMedia.setSvgfromString(svg);
+
+              if (svgMedia.svg) {
+                if (!svgMedia.svg.getAttribute("viewBox")) {
+                  const width = svgMedia.svg.width.baseVal.value;
+                  const height = svgMedia.svg.height.baseVal.value;
+
+                  svgMedia.svg.setAttribute(
+                    "viewBox",
+                    `0 0 ${width} ${height}`
+                  );
+                }
+                svgMedia.svg.style.width = "100%";
+                svgMedia.svg.style.height = "100%";
+                subContainerRef.current?.appendChild(svgMedia.svg);
+              }
+            }}
+            cancelCallback={() => {
+              setEditing(false);
+            }}
+          />
+        }
+        options={{ animate: false }}
+      />
     </>
   );
 }

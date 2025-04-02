@@ -29,7 +29,6 @@ import "./css/scrollbar.css";
 import "./css/fontStyles.css";
 import "./css/tips.css";
 import CreditPage from "./creditPage/CreditPage";
-import MethodSvgEditor from "./methodSvgEditor/MethodSvgEditor";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -376,7 +375,6 @@ export default function Main() {
         cleanupController={cleanupController}
         setRerender={setRerender}
       />
-      <MethodSvgEditor />
     </div>
   );
 }

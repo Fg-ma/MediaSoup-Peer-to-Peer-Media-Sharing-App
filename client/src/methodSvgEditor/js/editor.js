@@ -1,4 +1,4 @@
-const MD = {};
+var MD = MD || {};
 
 MD.Editor = function () {
   const el = document.getElementById("method-draw");
@@ -200,7 +200,6 @@ MD.Editor = function () {
   }
 
   function contextChanged(win, context) {
-    console.log(context);
     var link_str = "";
     if (context) {
       var str = "";
@@ -5605,6 +5604,11 @@ MD.Editor = function () {
     editor.modal.configure.open();
   }
 
+  function cancel() {
+    //const props = dao.filter
+    editor.modal.cancel.open();
+  }
+
   function shortcuts() {
     editor.modal.shortcuts.open();
   }
@@ -5637,6 +5641,7 @@ MD.Editor = function () {
     });
   }
 
+  this.svgCanvas = svgCanvas;
   this.el = el;
   this.selectedChanged = selectedChanged;
   this.elementChanged = elementChanged;
@@ -5720,6 +5725,7 @@ MD.Editor = function () {
   this.ungroupSelected = ungroupSelected;
   this.about = about;
   this.configure = configure;
+  this.cancel = cancel;
   this.shortcuts = shortcuts;
   this.source = source;
   this.saveCanvas = saveCanvas;

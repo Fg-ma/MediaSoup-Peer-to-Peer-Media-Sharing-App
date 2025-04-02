@@ -194,3 +194,7 @@
 #logo svg path:last-child {
   fill: var(--z15);
 }
+
+#edit_menu {
+  width: 170px;
+}

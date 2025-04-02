@@ -1,4 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Rulers from "./elements/rulers/Rulers";
+import WorkArea from "./elements/workArea/WorkArea";
+import MenuBar from "./elements/menuBar/MenuBar";
+import ToolPanels from "./elements/toolPanels/ToolPanels";
+import LeftTools from "./elements/leftTools/LeftTools";
+import BottomTools from "./elements/bottomTools/BottomTools";
+import DialogBox from "./elements/dialogBox/DialogBox";
+import ContextMenu from "./elements/contentMenu/ContextMenu";
+import ShapeButtons from "./elements/ShapeButtons";
+import SplitBar from "./elements/splitBar/SplitBar";
 import "./css/base.css";
 import "./css/method-draw.css";
 import "./css/jpicker.css";
@@ -25,29 +35,46 @@ import "./css/align_buttons.css";
 import "./css/text.css";
 import "./css/zoom-dropdown.css";
 import "./css/loading.css";
-import Rulers from "./elements/rulers/Rulers";
-import WorkArea from "./elements/workArea/WorkArea";
-import MenuBar from "./elements/menuBar/MenuBar";
-import ToolPanels from "./elements/toolPanels/ToolPanels";
-import LeftTools from "./elements/leftTools/LeftTools";
-import BottomTools from "./elements/bottomTools/BottomTools";
-import DialogBox from "./elements/dialogBox/DialogBox";
-import ContextMenu from "./elements/contentMenu/ContextMenu";
-import ShapeButtons from "./elements/ShapeButtons";
-import SplitBar from "./elements/splitBar/SplitBar";
 
 const loadScript = (src: string) => {
-  const script = document.createElement("script");
-  script.src = src;
-  script.async = true;
-  document.body.appendChild(script);
   return new Promise((resolve, reject) => {
-    script.onload = resolve;
-    script.onerror = reject;
+    // Check if script already exists
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve(true);
+      return;
+    }
+
+    // Create and load script
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      reject(false);
+    };
   });
 };
 
-export default function MethodSvgEditor() {
+declare global {
+  interface Window {
+    methodEditor: any;
+  }
+}
+
+export default function MethodSvgEditor({
+  initialSVGString,
+  finishCallback,
+  cancelCallback,
+}: {
+  initialSVGString?: () => string | undefined;
+  finishCallback?: (svg: string) => void;
+  cancelCallback?: () => void;
+}) {
+  const [editorLoaded, setEditorLoaded] = useState(false);
   const methodDrawRootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -116,26 +143,51 @@ export default function MethodSvgEditor() {
         for (let script of scripts) {
           await loadScript(script);
         }
-      } catch (error) {
-        console.error("Error loading script:", error);
-      }
+        setEditorLoaded(true);
+      } catch (error) {}
     };
 
     loadScripts();
-
-    return () => {
-      // Cleanup: remove all scripts if needed
-      const scriptTags = document.querySelectorAll('script[src^="./js"]');
-      scriptTags.forEach((script) => script.remove());
-    };
   }, []);
+
+  useEffect(() => {
+    if (editorLoaded && initialSVGString) {
+      const initialString = initialSVGString();
+
+      if (initialString) {
+        window.methodEditor?.import?.loadSvgString(initialString);
+      }
+    }
+  }, [editorLoaded, initialSVGString]);
+
+  useEffect(() => {
+    if (editorLoaded) {
+      // Initialize the editor modals, passing cancelCallback
+      window.methodEditor.modal.cancel = new MD.Modal({
+        html: `
+          <div class="cancelModal">
+            <h1>Close without saving?</h1>
+            <div id="cancellation">
+              <button class="warning">Close</button>
+            </div>
+          </div>
+        `,
+        js: function (el: HTMLElement) {
+          const input = el.querySelector("#cancellation button.warning");
+          input?.addEventListener("click", function () {
+            if (cancelCallback) cancelCallback();
+            window.methodEditor.modal.cancel.close();
+          });
+        },
+      });
+    }
+  }, [editorLoaded, cancelCallback]);
 
   return (
     <div
       id='methodDrawRoot'
       ref={methodDrawRootRef}
-      className='w-full h-full absolute top-0 left-0 bg-fg-tone-black-1 z-[10000] pointer-events-auto font-K2D'
-      style={{ marginTop: "0px" }}
+      className='w-full h-full bg-fg-tone-black-1 pointer-events-auto font-K2D'
     >
       <div id='method-draw' className='app'>
         <Rulers />
@@ -146,7 +198,11 @@ export default function MethodSvgEditor() {
 
         <MenuBar />
 
-        <ToolPanels />
+        <ToolPanels
+          finishCallback={finishCallback}
+          cancelCallback={cancelCallback}
+        />
+
         <div id='cur_context_panel'></div>
 
         <LeftTools />

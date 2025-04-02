@@ -72,7 +72,7 @@ export default function AudioEffectButton({
 
   return (
     <FgButton
-      className='flex border-fg-off-white items-center justify-center min-w-12 w-full aspect-square hover:border-fg-red-light rounded border-2 hover:border-3 bg-fg-tone-black-4 overflow-clip relative'
+      className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4 overflow-clip relative'
       scrollingContainerRef={scrollingContainerRef}
       clickFunction={() => {
         handleAudioEffectChange(audioEffect);

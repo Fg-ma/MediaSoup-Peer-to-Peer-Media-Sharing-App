@@ -53,12 +53,14 @@ export default function MoreTableFunctionsButton({
   const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
   const gamesSectionRef = useRef<HTMLDivElement>(null);
+  const tableBackgroundSectionRef = useRef<HTMLDivElement>(null);
 
   const handlePointerDown = (event: PointerEvent) => {
     if (
       !moreTableFunctionsPanelRef.current?.contains(event.target as Node) &&
       !moreTableFunctionsButtonRef.current?.contains(event.target as Node) &&
-      !gamesSectionRef.current?.contains(event.target as Node)
+      !gamesSectionRef.current?.contains(event.target as Node) &&
+      !tableBackgroundSectionRef.current?.contains(event.target as Node)
     ) {
       setMoreTableFunctionsActive(false);
     }
@@ -129,6 +131,7 @@ export default function MoreTableFunctionsButton({
           captureMediaActive={captureMediaActive}
           setCaptureMediaActive={setCaptureMediaActive}
           gamesSectionRef={gamesSectionRef}
+          tableBackgroundSectionRef={tableBackgroundSectionRef}
         />
       )}
     </>

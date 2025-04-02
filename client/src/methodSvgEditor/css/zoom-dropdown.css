@@ -1,14 +1,14 @@
 #zoom_panel,
 #zoom_select {
   padding: var(--x2) 0;
-  right: calc(var(--panel-width) + var(--x2));
+  right: 0;
   position: absolute;
-  cursor:  pointer;
-  width:  100px;
+  cursor: pointer;
+  width: 100px;
 }
 
 #zoom_label:after {
-  content: '';
+  content: "";
 }
 
 #zoom_select {
@@ -17,7 +17,7 @@
 }
 
 #zoom_select:hover + div {
-  opacity:  1;
+  opacity: 1;
 }
 
 #zoom_label {
@@ -31,7 +31,8 @@
   margin-top: -5px;
 }
 
-#zoom_label img, #zoom_label svg {
+#zoom_label img,
+#zoom_label svg {
   width: var(--x4);
   height: var(--x4);
 }
@@ -57,20 +58,20 @@
   padding: 0;
   cursor: default;
   position: absolute;
-  background:  transparent;
-  border:  none;
-  top:  2px;
-  left:  var(--x6);
+  background: transparent;
+  border: none;
+  top: 2px;
+  left: var(--x6);
   pointer-events: none;
 }
 
 #zoom_label select {
   -webkit-appearance: none;
   position: absolute;
-  top:  0;
-  left:  0;
-  bottom:  0;
-  right:  0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 #zoom_label span {

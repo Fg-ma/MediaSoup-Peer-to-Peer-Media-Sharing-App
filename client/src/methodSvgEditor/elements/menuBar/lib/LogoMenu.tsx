@@ -19,13 +19,6 @@ export default function LogoMenu() {
           About this app...
         </div>
         <div className='separator'></div>
-        <div
-          id='modal_preferences'
-          className='menu_item'
-          data-action='configure'
-        >
-          Configure...
-        </div>
         <div id='modal_shortcuts' className='menu_item' data-action='shortcuts'>
           Keyboard Shortcuts...
         </div>

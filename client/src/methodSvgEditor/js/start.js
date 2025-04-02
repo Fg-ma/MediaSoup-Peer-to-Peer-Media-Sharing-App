@@ -31,11 +31,11 @@ svgCanvas.bind("zoomed", editor.zoom.changed);
 svgCanvas.bind("contextset", editor.contextChanged);
 svgCanvas.bind("extension_added", editor.extensionAdded);
 svgCanvas.textActions.setInputElem($("#text")[0]);
-const shapeLib = svgCanvas.addExtension.apply(this, ["shapes", MD.Shapelib]);
-const eyedropper = svgCanvas.addExtension.apply(this, [
-  "eyedropper",
-  MD.Eyedropper,
-]);
+var shapeLib =
+  shapeLib || svgCanvas.addExtension.apply(this, ["shapes", MD.Shapelib]);
+var eyedropper =
+  eyedropper ||
+  svgCanvas.addExtension.apply(this, ["eyedropper", MD.Eyedropper]);
 state.set("canvasId", t("Untitled"));
 state.set("canvasMode", state.get("canvasMode"));
 

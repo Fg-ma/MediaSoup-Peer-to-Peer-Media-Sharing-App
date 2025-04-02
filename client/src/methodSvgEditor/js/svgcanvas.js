@@ -186,9 +186,10 @@ $.SvgCanvas = function (container, config) {
     if (!shape) {
       shape = svgdoc.createElementNS(svgns, data.element);
       if (current_layer) {
-        (current_group || current_layer).appendChild(shape);
+        (current_group ?? current_layer).appendChild(shape);
       }
     }
+
     if (data.curStyles) {
       svgedit.utilities.assignAttributes(
         shape,
@@ -564,7 +565,7 @@ $.SvgCanvas = function (container, config) {
       return null;
     }
 
-    var parent = current_group || getCurrentDrawing().getCurrentLayer();
+    var parent = current_group ?? getCurrentDrawing().getCurrentLayer();
 
     if (!curBBoxes.length) {
       // Cache all bboxes
@@ -2271,7 +2272,7 @@ $.SvgCanvas = function (container, config) {
     var current_layer = getCurrentDrawing().getCurrentLayer();
     if (current_layer) {
       current_mode = "select";
-      selectOnly($(current_group || current_layer).children());
+      selectOnly($(current_group ?? current_layer).children());
     }
   };
 
@@ -2325,7 +2326,7 @@ $.SvgCanvas = function (container, config) {
 
     while (
       mouse_target.parentNode &&
-      mouse_target.parentNode !== (current_group || current_layer)
+      mouse_target.parentNode !== (current_group ?? current_layer)
     ) {
       mouse_target = mouse_target.parentNode;
     }
@@ -3577,7 +3578,7 @@ $.SvgCanvas = function (container, config) {
       if (!evt_target) return;
       var parent = evt_target.parentNode;
       var mouse_target = getMouseTarget(evt);
-      console.log(mouse_target, evt);
+
       var tagName = mouse_target.tagName;
 
       if (parent === current_group) return;
@@ -3634,7 +3635,7 @@ $.SvgCanvas = function (container, config) {
         // Escape from in-group edit
         return;
       }
-      console.log("mouse", mouse_target);
+
       setContext(mouse_target);
     };
 
@@ -5585,16 +5586,15 @@ $.SvgCanvas = function (container, config) {
   //
   // Returns:
   // String containing the SVG image for output
-  this.svgCanvasToString = function () {
+  this.svgCanvasToString = function (preventLeave) {
     // keep calling it until there are none to remove
     while (removeUnusedDefElems() > 0) {}
 
     pathActions.clear(true);
 
     // Move out of in-group editing mode
-    if (current_group) {
+    if (!preventLeave && current_group) {
       leaveContext();
-      selectOnly([current_group]);
     }
 
     //hide grid, otherwise shows a black canvas
@@ -5947,9 +5947,9 @@ $.SvgCanvas = function (container, config) {
   //
   // Returns:
   // The current drawing as raw SVG XML text.
-  this.getSvgString = function () {
+  this.getSvgString = function (preventLeave) {
     save_options.apply = false;
-    return this.svgCanvasToString();
+    return this.svgCanvasToString(preventLeave);
   };
 
   // Function: randomizeIds
@@ -6543,7 +6543,7 @@ $.SvgCanvas = function (container, config) {
       addCommandToHistory(batchCmd);
       call("changed", [svgcontent]);
     } catch (e) {
-      console.log(e);
+      console.log("why", e);
       return false;
     }
 
@@ -6672,7 +6672,7 @@ $.SvgCanvas = function (container, config) {
 
       // Hack to make recalculateDimensions understand how to scale
 
-      const layer = current_group || getCurrentDrawing().getCurrentLayer();
+      const layer = current_group ?? getCurrentDrawing().getCurrentLayer();
       const g = svgdoc.createElementNS(svgns, "g");
       while (svg.firstChild) {
         g.appendChild(svg.firstChild);
@@ -7065,16 +7065,13 @@ $.SvgCanvas = function (container, config) {
     current_group = null;
   });
 
-  // Function: getContext
-  // Get the current context (in-group editing)
-  var getContext = (this.getContext = function () {
+  this.getContext = function () {
     return current_group;
-  });
+  };
 
   // Function: setContext
   // Set the current context (for in-group editing)
   var setContext = (this.setContext = function (elem) {
-    console.log(elem);
     leaveContext();
     if (typeof elem === "string") {
       elem = getElem(elem);
@@ -7098,7 +7095,6 @@ $.SvgCanvas = function (container, config) {
       });
 
     clearSelection();
-    console.log(elem);
     call("contextset", elem);
   });
 
@@ -9024,7 +9020,7 @@ $.SvgCanvas = function (container, config) {
       // See if elem with elem ID is in the DOM already
       if (!getElem(elem.id)) copy.id = elem.id;
       pasted.push(copy);
-      (current_group || getCurrentDrawing().getCurrentLayer()).appendChild(
+      (current_group ?? getCurrentDrawing().getCurrentLayer()).appendChild(
         copy
       );
       batchCmd.addSubCommand(new InsertElementCommand(copy));
@@ -9605,7 +9601,7 @@ $.SvgCanvas = function (container, config) {
       // clone each element and replace it within copiedElements
       var elem = copiedElements[i];
       var clone = copyElem(copiedElements[i]);
-      var parent = current_group || getCurrentDrawing().getCurrentLayer();
+      var parent = current_group ?? getCurrentDrawing().getCurrentLayer();
       if (drag) {
         //removed the dragged transform until that moment
         tlist = getTransformList(clone);
@@ -9838,7 +9834,7 @@ $.SvgCanvas = function (container, config) {
     var cur_elem = selectedElements[0];
     var elem = false;
     var all_elems = getVisibleElements(
-      current_group || getCurrentDrawing().getCurrentLayer()
+      current_group ?? getCurrentDrawing().getCurrentLayer()
     );
     if (!all_elems.length) return;
     if (cur_elem == null) {

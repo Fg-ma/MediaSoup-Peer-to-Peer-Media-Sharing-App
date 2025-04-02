@@ -17,9 +17,40 @@ import CanvasPanel from "./lib/CanvasPanel";
 import ObjectsPanel from "./lib/ObjectsPanel";
 import EffectsPanel from "./lib/EffectsPanel";
 
-export default function ToolPanels() {
+export default function ToolPanels({
+  finishCallback,
+  cancelCallback,
+}: {
+  finishCallback?: (svg: string) => void;
+  cancelCallback?: () => void;
+}) {
   return (
     <div id='panels' className='tools_panel'>
+      <div
+        className='flex items-center justify-between w-full h-12 px-2 fixed bottom-0 right-2 bg-fg-tone-black-6 z-[100] rounded-t'
+        style={{
+          width: "calc(var(--panel-width) + 0.25rem)",
+        }}
+      >
+        <div
+          id='finish_button'
+          onClick={() => {
+            if (finishCallback)
+              finishCallback(window.methodEditor.svgCanvas.getSvgString());
+          }}
+          className='!font-Josefin hover:bg-fg-red text-fg-white text-xl pt-1 rounded-l w-1/2 active text-center'
+        >
+          Finish
+        </div>
+        <div
+          id='cancel_button'
+          onClick={window.methodEditor?.cancel}
+          className='!font-Josefin hover:bg-fg-tone-black-7 text-fg-white text-xl pt-1 rounded-r w-1/2 text-center'
+        >
+          Cancel
+        </div>
+      </div>
+
       <div className='flex items-center justify-between w-full h-12 pr-2'>
         <div
           id='objects_panel_button'

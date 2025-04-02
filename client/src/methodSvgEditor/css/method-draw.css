@@ -261,7 +261,7 @@ button.warning:hover {
 #tools_bottom {
   position: absolute;
   left: var(--x12);
-  right: 0;
+  right: calc(var(--panel-width) + 1.875rem);
   bottom: 0;
   height: var(--x10);
   overflow: visible;
