@@ -1,9 +1,12 @@
 import uWS from "uWebSockets.js";
-import { ImageEffectStylesType } from "../../mongoServer/src/lib/tableImages/typeConstant";
-import { ApplicationEffectStylesType } from "../../mongoServer/src/lib/tableApplications/typeConstant";
-import { VideoEffectStylesType } from "../../mongoServer/src/lib/tableVideos/typeConstant";
 import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import { StaticContentTypes } from "../../universal/typeConstant";
+import {
+  ApplicationEffectStylesType,
+  ImageEffectStylesType,
+  SvgEffectStylesType,
+  VideoEffectStylesType,
+} from "../../universal/effectsTypeConstant";
 
 export interface Tables {
   [table_id: string]: {
@@ -228,7 +231,8 @@ export type onUpdateContentEffectsType = {
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
-      | ApplicationEffectStylesType;
+      | ApplicationEffectStylesType
+      | SvgEffectStylesType;
   };
 };
 

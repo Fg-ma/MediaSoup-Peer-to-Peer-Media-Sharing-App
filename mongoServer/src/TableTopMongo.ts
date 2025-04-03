@@ -9,8 +9,6 @@ import {
   onUpdateContentPositioningType,
   onUpdateVideoPositionType,
 } from "./typeConstant";
-import { ImageEffectStylesType } from "./lib/tableImages/typeConstant";
-import { VideoEffectStylesType } from "./lib/tableVideos/typeConstant";
 import TablesMeta from "./lib/tableMeta/TablesMeta";
 import { StaticContentTypes } from "../../universal/typeConstant";
 import UserImages from "./lib/userImages/UserImages";
@@ -20,6 +18,12 @@ import UserApplications from "./lib/userApplications/UserApplications";
 import UserText from "./lib/userText/UserText";
 import TableSvgs from "./lib/tableSvgs/TableSvgs";
 import UserSvgs from "./lib/userSvgs/UserSvgs";
+import {
+  ApplicationEffectStylesType,
+  ImageEffectStylesType,
+  SvgEffectStylesType,
+  VideoEffectStylesType,
+} from "../../universal/effectsTypeConstant";
 
 const uri = "mongodb://localhost:27017";
 const dbName = "tableTopMongo";
@@ -137,6 +141,8 @@ class TableTopMongo {
         user_id,
         contentId
       );
+    } else if (contentType === "svg") {
+      await this.userSvgs?.deletes.deleteMetaDataBy_UID_SID(user_id, contentId);
     }
   };
 
@@ -236,7 +242,16 @@ class TableTopMongo {
           { table_id, applicationId: contentId },
           {
             effects,
-            effectStyles,
+            effectStyles: effectStyles as ApplicationEffectStylesType,
+          }
+        );
+        break;
+      case "svg":
+        this.tableSvgs?.uploads.editMetaData(
+          { table_id, svgId: contentId },
+          {
+            effects,
+            effectStyles: effectStyles as SvgEffectStylesType,
           }
         );
         break;

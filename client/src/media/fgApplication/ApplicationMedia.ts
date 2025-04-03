@@ -1,7 +1,7 @@
 import {
   UserEffectsStylesType,
   UserEffectsType,
-  defaultApplicationStreamEffects,
+  defaultApplicationEffects,
   defaultApplicationEffectsStyles,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
@@ -80,7 +80,7 @@ class ApplicationMedia {
 
     if (!this.userEffects.current.application[this.applicationId]) {
       this.userEffects.current.application[this.applicationId] =
-        structuredClone(defaultApplicationStreamEffects);
+        structuredClone(defaultApplicationEffects);
     }
 
     if (!this.userEffectsStyles.current.application[this.applicationId]) {

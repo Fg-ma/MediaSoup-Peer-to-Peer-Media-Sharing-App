@@ -1,9 +1,9 @@
-import { postProcessEffectDecodingMap } from "../typeConstant";
 import {
-  applicationEffectEncodingMap,
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
-} from "./typeConstant";
+} from "../../../../universal/effectsTypeConstant";
+import { postProcessEffectDecodingMap } from "../typeConstant";
+import { applicationEffectEncodingMap } from "./typeConstant";
 
 class Decoder {
   constructor() {}

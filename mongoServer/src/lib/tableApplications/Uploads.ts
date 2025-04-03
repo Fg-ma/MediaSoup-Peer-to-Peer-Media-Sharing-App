@@ -1,11 +1,11 @@
 import { Collection } from "mongodb";
 import { postProcessEffectEncodingMap } from "../typeConstant";
 import Encoder from "./Encoder";
+import { applicationEffectEncodingMap } from "./typeConstant";
 import {
-  applicationEffectEncodingMap,
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
-} from "./typeConstant";
+} from "../../../../universal/effectsTypeConstant";
 
 class Uploads {
   constructor(

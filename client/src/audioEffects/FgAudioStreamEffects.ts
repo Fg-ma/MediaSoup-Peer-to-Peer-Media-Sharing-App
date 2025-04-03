@@ -26,8 +26,8 @@ import {
   ToneEffectsType,
 } from "./typeConstant";
 
-class FgAudioStreamEffects {
-  private audioStreamEffects: ToneEffectsType[] = [];
+class FgAudioEffects {
+  private audioEffects: ToneEffectsType[] = [];
 
   private autoFilter: AutoFilter | undefined;
   private autoPanner: AutoPanner | undefined;
@@ -467,54 +467,52 @@ class FgAudioStreamEffects {
   private removeEffect = (effect: ToneEffectsType | undefined) => {
     if (!effect) return;
 
-    const effectIndex = this.audioStreamEffects.indexOf(effect);
+    const effectIndex = this.audioEffects.indexOf(effect);
 
     if (effectIndex !== -1) {
       effect.disconnect();
 
       if (effectIndex > 0) {
-        this.audioStreamEffects[effectIndex - 1].disconnect();
-        if (effectIndex < this.audioStreamEffects.length - 1) {
-          this.audioStreamEffects[effectIndex - 1].connect(
-            this.audioStreamEffects[effectIndex + 1]
+        this.audioEffects[effectIndex - 1].disconnect();
+        if (effectIndex < this.audioEffects.length - 1) {
+          this.audioEffects[effectIndex - 1].connect(
+            this.audioEffects[effectIndex + 1]
           );
         } else {
-          this.audioStreamEffects[effectIndex - 1].connect(
+          this.audioEffects[effectIndex - 1].connect(
             this.audioStreamMediaStreamDestination
           );
         }
       } else {
         this.audioStreamChain.disconnect();
-        if (this.audioStreamEffects.length > 1) {
-          this.audioStreamChain.connect(this.audioStreamEffects[1]);
+        if (this.audioEffects.length > 1) {
+          this.audioStreamChain.connect(this.audioEffects[1]);
         } else {
           this.audioStreamChain.connect(this.audioStreamMediaStreamDestination);
         }
       }
 
       // Ensure the master chain is properly updated
-      if (this.audioStreamEffects.length === 1) {
-        this.audioStreamEffects[0].connect(this.masterChain);
+      if (this.audioEffects.length === 1) {
+        this.audioEffects[0].connect(this.masterChain);
       }
 
-      this.audioStreamEffects.splice(effectIndex, 1);
+      this.audioEffects.splice(effectIndex, 1);
       effect.dispose();
     }
   };
 
   private addEffect = (effect: ToneEffectsType) => {
-    if (this.audioStreamEffects.length > 0) {
-      this.audioStreamEffects[this.audioStreamEffects.length - 1].disconnect();
-      this.audioStreamEffects[this.audioStreamEffects.length - 1].connect(
-        effect
-      );
+    if (this.audioEffects.length > 0) {
+      this.audioEffects[this.audioEffects.length - 1].disconnect();
+      this.audioEffects[this.audioEffects.length - 1].connect(effect);
     } else {
       this.audioStreamChain.disconnect();
       this.audioStreamChain.connect(effect);
     }
 
     connect(this.audioStream, effect);
-    this.audioStreamEffects.push(effect);
+    this.audioEffects.push(effect);
 
     effect.connect(this.audioStreamMediaStreamDestination);
     effect.connect(this.masterChain);
@@ -682,4 +680,4 @@ class FgAudioStreamEffects {
   };
 }
 
-export default FgAudioStreamEffects;
+export default FgAudioEffects;

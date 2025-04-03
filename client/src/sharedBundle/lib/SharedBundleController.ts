@@ -12,9 +12,9 @@ import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
   defaultAudioEffectsStyles,
-  defaultAudioStreamEffects,
+  defaultAudioEffects,
   defaultVideoEffectsStyles,
-  defaultVideoStreamEffects,
+  defaultVideoEffects,
   ImageEffectStylesType,
   ImageEffectTypes,
   UserEffectsStylesType,
@@ -74,8 +74,8 @@ class SharedBundleController extends SharedBundleSocket {
       for (const video of videos) {
         if (!this.userEffects.current.video[video.videoId]) {
           this.userEffects.current.video[video.videoId] = {
-            video: structuredClone(defaultVideoStreamEffects),
-            audio: structuredClone(defaultAudioStreamEffects),
+            video: structuredClone(defaultVideoEffects),
+            audio: structuredClone(defaultAudioEffects),
           };
         }
         this.userEffects.current.video[video.videoId].video = video.effects as {
@@ -283,28 +283,36 @@ class SharedBundleController extends SharedBundleSocket {
           const { contentId } = message.header;
           const { filename, mimeType, visible } = message.data;
 
-          if (this.tableStaticContentSocket.current) {
-            this.userMedia.current.svg[contentId] = new SvgMedia(
-              contentId,
+          if (!this.userMedia.current.svg[contentId]) {
+            if (this.tableStaticContentSocket.current) {
+              this.userMedia.current.svg[contentId] = new SvgMedia(
+                contentId,
+                filename,
+                mimeType,
+                visible,
+                this.userEffectsStyles,
+                this.userEffects,
+                this.tableStaticContentSocket.current.getFile,
+                this.tableStaticContentSocket.current.addMessageListener,
+                this.tableStaticContentSocket.current.removeMessageListener,
+                {
+                  position: {
+                    left: 50,
+                    top: 50,
+                  },
+                  scale: {
+                    x: 25,
+                    y: 25,
+                  },
+                  rotation: 0,
+                }
+              );
+            }
+          } else {
+            this.userMedia.current.svg[contentId].reloadContent(
               filename,
               mimeType,
-              visible,
-              this.userEffectsStyles,
-              this.userEffects,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
-              {
-                position: {
-                  left: 50,
-                  top: 50,
-                },
-                scale: {
-                  x: 25,
-                  y: 25,
-                },
-                rotation: 0,
-              }
+              visible
             );
           }
           this.setRerender((prev) => !prev);

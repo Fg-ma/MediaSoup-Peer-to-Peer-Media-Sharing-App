@@ -1,7 +1,5 @@
-import {
-  soundClipEffectEncodingMap,
-  SoundClipEffectTypes,
-} from "./typeConstant";
+import { SoundClipEffectTypes } from "../../../../universal/effectsTypeConstant";
+import { soundClipEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}

@@ -1,5 +1,10 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
+import {
+  SvgEffectStylesType,
+  SvgEffectTypes,
+} from "../../../../universal/effectsTypeConstant";
+import { svgEffectEncodingMap } from "./typeConstant";
 
 class Uploads {
   constructor(
@@ -24,6 +29,10 @@ class Uploads {
       rotation: number;
     };
     visible: boolean;
+    effects: {
+      [effectType in SvgEffectTypes]: boolean;
+    };
+    effectStyles: SvgEffectStylesType;
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -45,6 +54,8 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       visible?: boolean;
+      effects?: { [effectType in SvgEffectTypes]?: boolean };
+      effectStyles?: SvgEffectStylesType;
     }>
   ) => {
     if (!this.tableSvgsCollection) {
@@ -86,6 +97,53 @@ class Uploads {
 
     if (updateData.visible) {
       updateFields["v"] = updateData.visible;
+    }
+
+    if (updateData.effects) {
+      updateFields["e"] = Object.keys(updateData.effects)
+        .filter(
+          (effect) =>
+            updateData.effects?.[effect as keyof typeof updateData.effects]
+        )
+        .map(
+          (effect) =>
+            svgEffectEncodingMap[effect as keyof typeof updateData.effects]
+        );
+    }
+
+    if (updateData.effectStyles) {
+      updateFields["es"] = {
+        "0": {
+          c: updateData.effectStyles.shadow.shadowColor,
+          s: updateData.effectStyles.shadow.strength,
+          x: updateData.effectStyles.shadow.offsetX,
+          y: updateData.effectStyles.shadow.offsetY,
+        },
+        "1": {
+          s: updateData.effectStyles.blur.strength,
+        },
+        "2": {
+          s: updateData.effectStyles.grayscale.scale,
+        },
+        "3": {
+          s: updateData.effectStyles.saturate.saturation,
+        },
+        "4": {
+          c: updateData.effectStyles.colorOverlay.overlayColor,
+        },
+        "5": {
+          f: updateData.effectStyles.waveDistortion.frequency,
+          s: updateData.effectStyles.waveDistortion.strength,
+        },
+        "6": {
+          n: updateData.effectStyles.crackedGlass.density,
+          d: updateData.effectStyles.crackedGlass.detail,
+          s: updateData.effectStyles.crackedGlass.strength,
+        },
+        "7": {
+          c: updateData.effectStyles.neonGlow.neonColor,
+        },
+      };
     }
 
     try {

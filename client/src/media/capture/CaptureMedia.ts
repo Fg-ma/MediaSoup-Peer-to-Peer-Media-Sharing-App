@@ -2,8 +2,8 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   CaptureEffectStylesType,
   CaptureEffectTypes,
-  CaptureStreamEffectsType,
-  defaultCaptureStreamEffects,
+  CaptureEffectsType,
+  defaultCaptureEffects,
 } from "../../../../universal/effectsTypeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
@@ -44,7 +44,7 @@ class CaptureMedia {
   constructor(
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>,
+    private captureEffects: React.MutableRefObject<CaptureEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
   ) {
     this.canvas = document.createElement("canvas");
@@ -299,7 +299,7 @@ class CaptureMedia {
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
-        this.captureStreamEffects.current[effect as CaptureEffectTypes] = false;
+        this.captureEffects.current[effect as CaptureEffectTypes] = false;
 
         if (effect === "tint") {
           this.babylonScene?.toggleTintPlane(false);
@@ -319,7 +319,7 @@ class CaptureMedia {
       }
     });
 
-    this.effects = structuredClone(defaultCaptureStreamEffects);
+    this.effects = structuredClone(defaultCaptureEffects);
 
     this.deadbanding.update("capture", this.captureId, this.effects);
   };

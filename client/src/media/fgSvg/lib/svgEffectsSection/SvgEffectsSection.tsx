@@ -147,7 +147,9 @@ export default function SvgEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={async () => {
-            await lowerSvgController.handleSvgEffect("clearAll", false);
+            svgMedia.clearAllEffects();
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <ColorPickerButton
@@ -195,8 +197,10 @@ export default function SvgEffectsSection({
                 `${style.offsetY}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgShadowFilter");
+              svgMedia.removeEffect("#fgSvgShadowFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -235,6 +239,8 @@ export default function SvgEffectsSection({
               `${style.offsetX}`,
               `${style.offsetY}`
             );
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
           handleAcceptColor={(_key, hexa) => {
             userEffectsStyles.current.svg[svgId].shadow.shadowColor = hexa;
@@ -250,6 +256,8 @@ export default function SvgEffectsSection({
               `${style.offsetX}`,
               `${style.offsetY}`
             );
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -265,8 +273,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].blur) {
               svgMedia.applyBlurEffect(`${style.strength}`);
             } else {
-              svgMedia.removeEffect("#fgSvgBlurFilter");
+              svgMedia.removeEffect("#fgSvgBlurFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -295,6 +305,8 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgId].blur;
 
             svgMedia.applyBlurEffect(`${style.strength}`);
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -310,8 +322,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].colorOverlay) {
               svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
             } else {
-              svgMedia.removeEffect("#fgSvgColorOverlayFilter");
+              svgMedia.removeEffect("#fgSvgColorOverlayFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -341,6 +355,8 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgId].colorOverlay;
 
             svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -356,8 +372,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].saturate) {
               svgMedia.applySaturateEffect(`${style.saturation}`);
             } else {
-              svgMedia.removeEffect("#fgSvgSaturateFilter");
+              svgMedia.removeEffect("#fgSvgSaturateFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -386,6 +404,8 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgId].saturate;
 
             svgMedia.applySaturateEffect(`${style.saturation}`);
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -401,8 +421,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].grayscale) {
               svgMedia.applyGrayscaleEffect(`${style.scale}`);
             } else {
-              svgMedia.removeEffect("#fgSvgGrayscaleFilter");
+              svgMedia.removeEffect("#fgSvgGrayscaleFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -435,6 +457,8 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgId].grayscale;
 
             svgMedia.applyGrayscaleEffect(`${style.scale}`);
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -449,8 +473,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].edgeDetection) {
               svgMedia.applyEdgeDetectionEffect();
             } else {
-              svgMedia.removeEffect("#fgSvgEdgeDetectionFilter");
+              svgMedia.removeEffect("#fgSvgEdgeDetectionFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -481,8 +507,10 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgId].neonGlow) {
               svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
             } else {
-              svgMedia.removeEffect("#fgSvgNeonGlowFilter");
+              svgMedia.removeEffect("#fgSvgNeonGlowFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -511,6 +539,8 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgId].neonGlow;
 
             svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -529,8 +559,10 @@ export default function SvgEffectsSection({
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgWaveDistortionFilter");
+              svgMedia.removeEffect("#fgSvgWaveDistortionFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -562,6 +594,8 @@ export default function SvgEffectsSection({
               `${style.frequency}`,
               `${style.strength}`
             );
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -581,8 +615,10 @@ export default function SvgEffectsSection({
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgCrackedGlassFilter");
+              svgMedia.removeEffect("#fgSvgCrackedGlassFilter_" + svgId);
             }
+
+            lowerSvgController.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -615,6 +651,8 @@ export default function SvgEffectsSection({
               `${style.detail}`,
               `${style.strength}`
             );
+
+            lowerSvgController.handleAlertSvgEffect();
           }}
         />
       </div>

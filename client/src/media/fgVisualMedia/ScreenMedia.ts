@@ -1,7 +1,7 @@
 import {
   defaultScreenEffectsStyles,
   UserEffectsStylesType,
-  defaultScreenStreamEffects,
+  defaultScreenEffects,
   ScreenEffectTypes,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
@@ -44,9 +44,8 @@ class ScreenMedia {
   ) {
     this.effects = {};
 
-    this.userEffects.current.screen[this.screenId] = structuredClone(
-      defaultScreenStreamEffects
-    );
+    this.userEffects.current.screen[this.screenId] =
+      structuredClone(defaultScreenEffects);
 
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
@@ -178,7 +177,7 @@ class ScreenMedia {
       }
     });
 
-    this.effects = structuredClone(defaultScreenStreamEffects);
+    this.effects = structuredClone(defaultScreenEffects);
   };
 
   changeEffects(

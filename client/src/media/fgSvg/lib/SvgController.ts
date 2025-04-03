@@ -29,20 +29,18 @@ class SvgController {
     const { effects, effectStyles } = event.data;
 
     if (contentType === "svg" && contentId === this.svgId) {
+      this.svgMedia.clearAllEffects();
+
       this.userEffects.current.svg[this.svgId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
       };
-
-      const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.svg[this.svgId]
-      );
 
       if (effectStyles !== undefined) {
         this.userEffectsStyles.current.svg[this.svgId] =
           effectStyles as SvgEffectStylesType;
       }
 
-      // this.svgMedia.updateAllEffects(oldEffectStyle);
+      this.svgMedia.updateAllEffects();
 
       this.setRerender((prev) => !prev);
     }

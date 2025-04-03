@@ -87,7 +87,9 @@ class VideoController {
         this.userEffectsStyles.current.video[this.videoId].video =
           effectStyles as VideoEffectStylesType;
 
-        this.tintColor.current = effectStyles.tint.color;
+        this.tintColor.current = (
+          effectStyles as VideoEffectStylesType
+        ).tint.color;
       }
 
       this.videoMedia.updateAllEffects(oldEffectStyle);

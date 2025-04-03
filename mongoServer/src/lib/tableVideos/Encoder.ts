@@ -1,4 +1,8 @@
 import {
+  VideoEffectStylesType,
+  VideoEffectTypes,
+} from "../../../../universal/effectsTypeConstant";
+import {
   beardsEffectEncodingMap,
   glassesEffectEncodingMap,
   hatsEffectEncodingMap,
@@ -8,11 +12,7 @@ import {
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
 } from "../typeConstant";
-import {
-  videoEffectEncodingMap,
-  VideoEffectStylesType,
-  VideoEffectTypes,
-} from "./typeConstant";
+import { videoEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}

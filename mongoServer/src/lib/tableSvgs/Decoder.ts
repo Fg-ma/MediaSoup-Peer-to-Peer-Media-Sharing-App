@@ -1,3 +1,9 @@
+import {
+  SvgEffectStylesType,
+  SvgEffectTypes,
+} from "../../../../universal/effectsTypeConstant";
+import { svgEffectEncodingMap } from "./typeConstant";
+
 class Decoder {
   constructor() {}
 
@@ -18,6 +24,39 @@ class Decoder {
       r: number;
     };
     v: boolean;
+    e: number[];
+    es: {
+      "0": {
+        c: string;
+        s: number;
+        x: number;
+        y: number;
+      };
+      "1": {
+        s: number;
+      };
+      "2": {
+        s: number;
+      };
+      "3": {
+        s: number;
+      };
+      "4": {
+        c: string;
+      };
+      "5": {
+        f: number;
+        s: number;
+      };
+      "6": {
+        n: number;
+        d: number;
+        s: number;
+      };
+      "7": {
+        c: string;
+      };
+    };
   }): {
     table_id: string;
     svgId: string;
@@ -35,8 +74,18 @@ class Decoder {
       rotation: number;
     };
     visible: boolean;
+    effects: {
+      [effectType in SvgEffectTypes]: boolean;
+    };
+    effectStyles: SvgEffectStylesType;
   } => {
-    const { tid, sid, n, m, p, v } = data;
+    const { tid, sid, n, m, p, v, e, es } = data;
+
+    const effects = Object.keys(svgEffectEncodingMap).reduce((acc, key) => {
+      const value = svgEffectEncodingMap[key as SvgEffectTypes];
+      acc[key as SvgEffectTypes] = e.includes(value);
+      return acc;
+    }, {} as Record<SvgEffectTypes, boolean>);
 
     return {
       table_id: tid,
@@ -55,6 +104,39 @@ class Decoder {
         rotation: p.r,
       },
       visible: v,
+      effects,
+      effectStyles: {
+        shadow: {
+          shadowColor: es[0].c,
+          strength: es[0].s,
+          offsetX: es[0].x,
+          offsetY: es[0].y,
+        },
+        blur: {
+          strength: es[1].s,
+        },
+        grayscale: {
+          scale: es[2].s,
+        },
+        saturate: {
+          saturation: es[3].s,
+        },
+        colorOverlay: {
+          overlayColor: es[4].c,
+        },
+        waveDistortion: {
+          frequency: es[5].f,
+          strength: es[5].s,
+        },
+        crackedGlass: {
+          density: es[6].n,
+          detail: es[6].d,
+          strength: es[6].s,
+        },
+        neonGlow: {
+          neonColor: es[7].c,
+        },
+      },
     };
   };
 }

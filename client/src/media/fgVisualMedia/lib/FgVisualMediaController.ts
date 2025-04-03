@@ -4,8 +4,8 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
   RemoteEffectsType,
-  defaultCameraStreamEffects,
-  defaultScreenStreamEffects,
+  defaultCameraEffects,
+  defaultScreenEffects,
 } from "../../../../../universal/effectsTypeConstant";
 import { Permissions } from "../../../context/permissionsContext/typeConstant";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
@@ -303,9 +303,7 @@ class FgVisualMediaController {
       this.remoteEffects.current[this.username][this.instance][this.type][
         this.visualMediaId
       ] = structuredClone(
-        this.type === "camera"
-          ? defaultCameraStreamEffects
-          : defaultScreenStreamEffects
+        this.type === "camera" ? defaultCameraEffects : defaultScreenEffects
       );
 
       this.setRerender((prev) => !prev);

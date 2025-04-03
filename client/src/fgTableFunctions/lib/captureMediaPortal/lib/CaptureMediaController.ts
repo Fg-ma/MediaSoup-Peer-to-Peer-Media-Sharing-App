@@ -16,7 +16,7 @@ import {
 class CaptureMediaController {
   constructor(
     private table_id: React.RefObject<string>,
-    private captureStreamEffects: React.MutableRefObject<{
+    private captureEffects: React.MutableRefObject<{
       [effectType in CameraEffectTypes]: boolean;
     }>,
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
@@ -86,8 +86,8 @@ class CaptureMediaController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.captureStreamEffects.current[effect] =
-          !this.captureStreamEffects.current[effect];
+        this.captureEffects.current[effect] =
+          !this.captureEffects.current[effect];
       }
 
       this.captureMedia.current?.changeEffects(

@@ -3,9 +3,9 @@ import { types } from "mediasoup-client";
 import { useMediaContext } from "./context/mediaContext/MediaContext";
 import { useEffectsContext } from "./context/effectsContext/EffectsContext";
 import {
-  defaultAudioStreamEffects,
-  defaultCameraStreamEffects,
-  defaultScreenStreamEffects,
+  defaultAudioEffects,
+  defaultCameraEffects,
+  defaultScreenEffects,
   defaultAudioEffectsStyles,
   defaultCameraEffectsStyles,
   defaultScreenEffectsStyles,
@@ -135,7 +135,7 @@ export default function Main() {
         camera: {},
         screen: {},
         screenAudio: {},
-        audio: structuredClone(defaultAudioStreamEffects),
+        audio: structuredClone(defaultAudioEffects),
       };
     }
 
@@ -162,7 +162,7 @@ export default function Main() {
       }
 
       remoteEffects.current[username][instance].camera[cameraId] =
-        structuredClone(defaultCameraStreamEffects);
+        structuredClone(defaultCameraEffects);
 
       if (!remoteEffectsStyles.current[username][instance].camera[cameraId]) {
         remoteEffectsStyles.current[username][instance].camera[cameraId] =
@@ -176,7 +176,7 @@ export default function Main() {
       }
 
       remoteEffects.current[username][instance].screen[screenId] =
-        structuredClone(defaultScreenStreamEffects);
+        structuredClone(defaultScreenEffects);
 
       if (!remoteEffectsStyles.current[username][instance].screen[screenId]) {
         remoteEffectsStyles.current[username][instance].screen[screenId] =
@@ -190,7 +190,7 @@ export default function Main() {
       }
 
       remoteEffects.current[username][instance].screenAudio[screenAudioId] =
-        structuredClone(defaultAudioStreamEffects);
+        structuredClone(defaultAudioEffects);
 
       if (
         !remoteEffectsStyles.current[username][instance].screenAudio[

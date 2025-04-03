@@ -3,8 +3,8 @@ import shaka from "shaka-player";
 import {
   UserEffectsStylesType,
   UserEffectsType,
-  defaultVideoStreamEffects,
-  defaultAudioStreamEffects,
+  defaultVideoEffects,
+  defaultAudioEffects,
   defaultVideoEffectsStyles,
   defaultAudioEffectsStyles,
   VideoEffectTypes,
@@ -123,14 +123,13 @@ class VideoMedia {
 
     if (!this.userEffects.current.video[this.videoId]) {
       this.userEffects.current.video[this.videoId] = {
-        video: structuredClone(defaultVideoStreamEffects),
-        audio: structuredClone(defaultAudioStreamEffects),
+        video: structuredClone(defaultVideoEffects),
+        audio: structuredClone(defaultAudioEffects),
       };
     }
     if (!this.userEffects.current.video[this.videoId].audio) {
-      this.userEffects.current.video[this.videoId].audio = structuredClone(
-        defaultAudioStreamEffects
-      );
+      this.userEffects.current.video[this.videoId].audio =
+        structuredClone(defaultAudioEffects);
     }
 
     this.canvas = document.createElement("canvas");
@@ -599,7 +598,7 @@ class VideoMedia {
       }
     });
 
-    this.effects = structuredClone(defaultVideoStreamEffects);
+    this.effects = structuredClone(defaultVideoEffects);
 
     this.deadbanding.update("capture", this.videoId, this.effects);
   };

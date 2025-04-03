@@ -42,7 +42,9 @@ class ImageController {
         this.userEffectsStyles.current.image[this.imageId] =
           effectStyles as ImageEffectStylesType;
 
-        this.tintColor.current = effectStyles.tint.color;
+        this.tintColor.current = (
+          effectStyles as ImageEffectStylesType
+        ).tint.color;
       }
 
       this.imageMedia.updateAllEffects(oldEffectStyle);

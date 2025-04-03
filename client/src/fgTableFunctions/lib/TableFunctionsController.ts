@@ -5,7 +5,7 @@ import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import {
   CaptureEffectStylesType,
-  CaptureStreamEffectsType,
+  CaptureEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 
 class TableFunctionsController {
@@ -20,7 +20,7 @@ class TableFunctionsController {
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private captureStreamEffects: React.MutableRefObject<CaptureStreamEffectsType>,
+    private captureEffects: React.MutableRefObject<CaptureEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>
   ) {}
@@ -42,7 +42,7 @@ class TableFunctionsController {
       this.captureMedia.current = new CaptureMedia(
         this.userDevice,
         this.deadbanding,
-        this.captureStreamEffects,
+        this.captureEffects,
         this.captureEffectsStyles
       );
 

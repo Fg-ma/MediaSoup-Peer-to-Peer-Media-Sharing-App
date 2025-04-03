@@ -107,6 +107,49 @@ export type CaptureEffectTypes =
   | "hats"
   | "pets";
 
+export type SoundClipEffectTypes =
+  | "robot"
+  | "echo"
+  | "alien"
+  | "underwater"
+  | "telephone"
+  | "space"
+  | "distortion"
+  | "vintage"
+  | "psychedelic"
+  | "deepBass"
+  | "highEnergy"
+  | "ambient"
+  | "glitch"
+  | "muffled"
+  | "crystal"
+  | "heavyMetal"
+  | "dreamy"
+  | "horror"
+  | "sciFi"
+  | "dystopian"
+  | "retroGame"
+  | "ghostly"
+  | "metallic"
+  | "hypnotic"
+  | "cyberpunk"
+  | "windy"
+  | "radio"
+  | "explosion"
+  | "whisper"
+  | "submarine"
+  | "windTunnel"
+  | "crushedBass"
+  | "ethereal"
+  | "electroSting"
+  | "heartbeat"
+  | "underworld"
+  | "sizzling"
+  | "staticNoise"
+  | "bubbly"
+  | "thunder"
+  | "echosOfThePast";
+
 export type UserEffectsType = {
   camera: {
     [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
@@ -165,7 +208,7 @@ export type RemoteEffectsType = {
   };
 };
 
-export type CaptureStreamEffectsType = {
+export type CaptureEffectsType = {
   [effectType in CaptureEffectTypes]: boolean;
 };
 
@@ -436,7 +479,6 @@ export type SvgEffectStylesType = {
   saturate: {
     saturation: number;
   };
-  edgeDetection: {};
   colorOverlay: {
     overlayColor: string;
   };
@@ -564,7 +606,7 @@ export type RemoteEffectStylesType = {
   };
 };
 
-export const defaultAudioStreamEffects: {
+export const defaultAudioEffects: {
   [effect in AudioEffectTypes]: boolean;
 } = Object.freeze({
   robot: false,
@@ -610,7 +652,7 @@ export const defaultAudioStreamEffects: {
   echosOfThePast: false,
 });
 
-export const defaultCameraStreamEffects: {
+export const defaultCameraEffects: {
   [effect in CameraEffectTypes]: boolean;
 } = Object.freeze({
   pause: false,
@@ -626,7 +668,7 @@ export const defaultCameraStreamEffects: {
   pets: false,
 });
 
-export const defaultScreenStreamEffects: {
+export const defaultScreenEffects: {
   [effect in ScreenEffectTypes]: boolean;
 } = Object.freeze({
   postProcess: false,
@@ -635,7 +677,7 @@ export const defaultScreenStreamEffects: {
   tint: false,
 });
 
-export const defaultVideoStreamEffects: {
+export const defaultVideoEffects: {
   [effect in VideoEffectTypes]: boolean;
 } = Object.freeze({
   pause: false,
@@ -651,7 +693,7 @@ export const defaultVideoStreamEffects: {
   pets: false,
 });
 
-export const defaultImageStreamEffects: {
+export const defaultImageEffects: {
   [effect in ImageEffectTypes]: boolean;
 } = Object.freeze({
   postProcess: false,
@@ -666,7 +708,7 @@ export const defaultImageStreamEffects: {
   pets: false,
 });
 
-export const defaultSvgStreamEffects: {
+export const defaultSvgEffects: {
   [effect in SvgEffectTypes]: boolean;
 } = Object.freeze({
   shadow: false,
@@ -680,7 +722,7 @@ export const defaultSvgStreamEffects: {
   neonGlow: false,
 });
 
-export const defaultApplicationStreamEffects: {
+export const defaultApplicationEffects: {
   [effect in ApplicationEffectTypes]: boolean;
 } = Object.freeze({
   postProcess: false,
@@ -688,7 +730,7 @@ export const defaultApplicationStreamEffects: {
   tint: false,
 });
 
-export const defaultCaptureStreamEffects: {
+export const defaultCaptureEffects: {
   [effect in CaptureEffectTypes]: boolean;
 } = Object.freeze({
   pause: false,

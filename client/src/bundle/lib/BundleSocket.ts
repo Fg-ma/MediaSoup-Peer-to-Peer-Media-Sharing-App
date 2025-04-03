@@ -5,7 +5,7 @@ import {
 import {
   RemoteEffectStylesType,
   AudioEffectTypes,
-  defaultAudioStreamEffects,
+  defaultAudioEffects,
   RemoteEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import { BundleOptions } from "./typeConstant";
@@ -406,7 +406,7 @@ class BundleSocket {
       if (!blockStateChange) {
         this.remoteEffects.current[username][instance].screenAudio[producerId] =
           {
-            ...structuredClone(defaultAudioStreamEffects),
+            ...structuredClone(defaultAudioEffects),
             [effect]:
               // @ts-expect-error: effect and producerType have no strict correlation enforcement
               !this.remoteEffects.current[username][instance].screenAudio[

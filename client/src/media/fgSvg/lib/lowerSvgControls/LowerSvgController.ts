@@ -91,30 +91,13 @@ class LowerSvgController {
     }
   };
 
-  handleSvgEffect = async (
-    effect: SvgEffectTypes | "clearAll",
-    blockStateChange: boolean
-  ) => {
-    if (effect !== "clearAll") {
-      if (!blockStateChange) {
-        this.userEffects.current.svg[this.svgId][effect] =
-          !this.userEffects.current.svg[this.svgId][effect];
-      }
-
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "svg",
-        this.svgId,
-        this.userEffects.current.svg[this.svgId],
-        this.userEffectsStyles.current.svg[this.svgId]
-      );
-    } else {
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "svg",
-        this.svgId,
-        this.userEffects.current.svg[this.svgId],
-        this.userEffectsStyles.current.svg[this.svgId]
-      );
-    }
+  handleAlertSvgEffect = () => {
+    this.tableStaticContentSocket.current?.updateContentEffects(
+      "svg",
+      this.svgId,
+      this.userEffects.current.svg[this.svgId],
+      this.userEffectsStyles.current.svg[this.svgId]
+    );
   };
 
   handleSettings = () => {

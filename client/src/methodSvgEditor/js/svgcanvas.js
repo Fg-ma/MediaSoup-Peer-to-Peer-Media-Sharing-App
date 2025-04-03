@@ -6543,7 +6543,7 @@ $.SvgCanvas = function (container, config) {
       addCommandToHistory(batchCmd);
       call("changed", [svgcontent]);
     } catch (e) {
-      console.log("why", e);
+      console.log(e);
       return false;
     }
 

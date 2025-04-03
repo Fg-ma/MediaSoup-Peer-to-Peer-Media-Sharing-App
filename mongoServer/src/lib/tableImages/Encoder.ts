@@ -1,4 +1,8 @@
 import {
+  ImageEffectStylesType,
+  ImageEffectTypes,
+} from "../../../../universal/effectsTypeConstant";
+import {
   beardsEffectEncodingMap,
   glassesEffectEncodingMap,
   hatsEffectEncodingMap,
@@ -8,11 +12,7 @@ import {
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
 } from "../typeConstant";
-import {
-  imageEffectEncodingMap,
-  ImageEffectStylesType,
-  ImageEffectTypes,
-} from "./typeConstant";
+import { imageEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}

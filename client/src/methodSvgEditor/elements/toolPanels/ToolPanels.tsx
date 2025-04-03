@@ -19,10 +19,8 @@ import EffectsPanel from "./lib/EffectsPanel";
 
 export default function ToolPanels({
   finishCallback,
-  cancelCallback,
 }: {
   finishCallback?: (svg: string) => void;
-  cancelCallback?: () => void;
 }) {
   return (
     <div id='panels' className='tools_panel'>

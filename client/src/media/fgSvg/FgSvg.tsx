@@ -90,13 +90,20 @@ export default function FgSvg({
   );
 
   useEffect(() => {
-    if (svgMedia.svg) {
-      subContainerRef.current?.appendChild(svgMedia.svg);
-    } else {
-      svgMedia.addDownloadCompleteListener(() => {
-        if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
-      });
-    }
+    if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
+    svgMedia.addDownloadCompleteListener(() => {
+      if (svgMedia.svg) {
+        const allSvgs = subContainerRef.current?.querySelectorAll("svg");
+
+        if (allSvgs) {
+          allSvgs.forEach((svgElement) => {
+            svgElement.remove();
+          });
+        }
+
+        subContainerRef.current?.appendChild(svgMedia.svg);
+      }
+    });
 
     document.addEventListener("keydown", lowerSvgController.handleKeyDown);
 
@@ -191,72 +198,50 @@ export default function FgSvg({
         } flex w-full h-full bg-fg-tone-black-1 bg-opacity-45 items-center justify-center`}
         content={
           <MethodSvgEditor
+            editing={editing}
             initialSVGString={() => {
               if (svgMedia.svg) {
-                svgMedia.svg.setAttribute("width", "100");
-                svgMedia.svg.setAttribute("height", "100");
-                return new XMLSerializer().serializeToString(svgMedia.svg);
+                // Create a deep clone of the original svg element
+                const clonedSVG = svgMedia.svg.cloneNode(true) as HTMLElement;
+
+                // Modify the clone
+                clonedSVG.setAttribute("width", "100");
+                clonedSVG.setAttribute("height", "");
+
+                // Serialize the cloned SVG to a string
+                return new XMLSerializer().serializeToString(clonedSVG);
               }
             }}
             finishCallback={(svg) => {
               setEditing(false);
 
-              const allSvgs = subContainerRef.current?.querySelectorAll("svg");
-
-              if (allSvgs) {
-                allSvgs.forEach((svgElement) => {
-                  svgElement.remove();
-                });
+              const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
+              if (!svgMatch) {
+                console.error("Malformed SVG received:", svg);
+                return;
               }
 
-              svgMedia.setSvgfromString(svg);
+              const cleanSvgText = svgMatch[0];
 
-              if (svgMedia.svg) {
-                if (!svgMedia.svg.getAttribute("viewBox")) {
-                  const width = svgMedia.svg.width.baseVal.value;
-                  const height = svgMedia.svg.height.baseVal.value;
+              const blob = new Blob([cleanSvgText], { type: "image/svg+xml" });
 
-                  svgMedia.svg.setAttribute(
-                    "viewBox",
-                    `0 0 ${width} ${height}`
-                  );
-                }
-                svgMedia.svg.style.width = "100%";
-                svgMedia.svg.style.height = "100%";
-                subContainerRef.current?.appendChild(svgMedia.svg);
+              const file = new File([blob], svgMedia.filename.slice(0, -4), {
+                type: "image/svg+xml",
+              });
+
+              // Prepare FormData
+              const formData = new FormData();
+              formData.append("file", file);
+
+              const url = `https://localhost:8045/upload/${table_id.current}/${svgId}/true`;
+
+              try {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", url, true);
+                xhr.send(formData);
+              } catch (error) {
+                console.error("Error uploading file:", error);
               }
-
-              const handleFileUpload = async () => {
-                if (!svgMedia.svg) {
-                  return;
-                }
-
-                // Convert the SVG element to a Blob
-                const svgElement = svgMedia.svg;
-                const serializer = new XMLSerializer();
-                const svgString = serializer.serializeToString(svgElement);
-                const blob = new Blob([svgString], { type: "image/svg+xml" });
-
-                const file = new File([blob], svgMedia.filename.slice(0, -4), {
-                  type: "image/svg+xml",
-                });
-
-                // Prepare FormData
-                const formData = new FormData();
-                formData.append("file", file);
-
-                const url = `https://localhost:8045/upload/${table_id.current}/${svgId}/true`;
-
-                try {
-                  const xhr = new XMLHttpRequest();
-                  xhr.open("POST", url, true);
-                  xhr.send(formData);
-                } catch (error) {
-                  console.error("Error uploading file:", error);
-                }
-              };
-
-              if (svgMedia.svg) handleFileUpload();
             }}
             cancelCallback={() => {
               setEditing(false);

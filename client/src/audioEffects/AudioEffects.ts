@@ -5,7 +5,7 @@ import FgSoundEffects from "./FgSoundEffects";
 import FgBackgroundMusic from "./FgBackgroundMusic";
 import FgAssetSoundEffects from "./FgAssetSoundEffects";
 import { AudioMixEffectsType } from "./typeConstant";
-import FgAudioStreamEffects from "./FgAudioStreamEffects";
+import FgAudioEffects from "./FgAudioStreamEffects";
 
 class AudioEffects {
   private masterChain: Gain;
@@ -39,7 +39,7 @@ class AudioEffects {
 
   fgMic: FgMic | undefined;
 
-  fgAudioStreamEffects: FgAudioStreamEffects | undefined;
+  fgAudioEffects: FgAudioEffects | undefined;
 
   fgSampler: FgSampler;
 
@@ -126,7 +126,7 @@ class AudioEffects {
       this.audioStreamMediaStreamDestination !== undefined &&
       this.audioStreamChain !== undefined
     ) {
-      this.fgAudioStreamEffects = new FgAudioStreamEffects(
+      this.fgAudioEffects = new FgAudioEffects(
         this.audioStream,
         this.audioStreamMediaStreamDestination,
         this.masterChain,

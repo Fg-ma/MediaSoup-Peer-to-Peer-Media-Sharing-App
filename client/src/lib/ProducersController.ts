@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   UserEffectsType,
   RemoteEffectsType,
-  defaultAudioStreamEffects,
+  defaultAudioEffects,
   defaultAudioEffectsStyles,
   RemoteEffectStylesType,
   UserEffectsStylesType,
@@ -585,9 +585,8 @@ class ProducersController {
 
         if (streamEffects) {
           if (producerType === "audio") {
-            this.userEffects.current.audio = structuredClone(
-              defaultAudioStreamEffects
-            );
+            this.userEffects.current.audio =
+              structuredClone(defaultAudioEffects);
           } else if (
             producerType === "camera" ||
             producerType === "screen" ||
@@ -823,7 +822,7 @@ class ProducersController {
           if (producerType === "audio") {
             this.remoteEffects.current[producerUsername][producerInstance][
               producerType
-            ] = structuredClone(defaultAudioStreamEffects);
+            ] = structuredClone(defaultAudioEffects);
           } else if (
             producerType === "camera" ||
             producerType === "screen" ||

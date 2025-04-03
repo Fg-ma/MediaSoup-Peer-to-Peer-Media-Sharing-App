@@ -8,6 +8,17 @@ import {
   mimeTypeContentTypeMap,
   StaticMimeTypes,
 } from "../typeConstant";
+import {
+  defaultApplicationEffectsStyles,
+  defaultApplicationEffects,
+  defaultAudioEffects,
+  defaultImageEffectsStyles,
+  defaultImageEffects,
+  defaultSvgEffectsStyles,
+  defaultSvgEffects,
+  defaultVideoEffectsStyles,
+  defaultVideoEffects,
+} from "../../../universal/effectsTypeConstant";
 
 const tableStaticContentUtils = new Utils();
 
@@ -37,8 +48,9 @@ class Posts {
       bb.on("file", (name, file, info) => {
         const { mimeType, filename } = info;
 
-        const sanitizedFilename =
-          tableStaticContentUtils.sanitizeString(filename);
+        const sanitizedFilename = tableStaticContentUtils.sanitizeString(
+          filename.slice(0, -4)
+        );
         const sanitizedMimeType =
           tableStaticContentUtils.sanitizeMimeType(mimeType);
 
@@ -156,48 +168,8 @@ class Posts {
         },
         rotation: 0,
       },
-      effects: {
-        postProcess: false,
-        hideBackground: false,
-        blur: false,
-        tint: false,
-        glasses: false,
-        beards: false,
-        mustaches: false,
-        masks: false,
-        hats: false,
-        pets: false,
-      },
-      effectStyles: {
-        postProcess: {
-          style: "prismaColors",
-        },
-        hideBackground: {
-          style: "beach",
-          color: "#d40213",
-        },
-        tint: {
-          color: "#d40213",
-        },
-        glasses: {
-          style: "defaultGlasses",
-        },
-        beards: {
-          style: "classicalCurlyBeard",
-        },
-        mustaches: {
-          style: "mustache1",
-        },
-        masks: {
-          style: "baseMask",
-        },
-        hats: {
-          style: "stylishHat",
-        },
-        pets: {
-          style: "beardedDragon",
-        },
-      },
+      effects: structuredClone(defaultVideoEffects),
+      effectStyles: structuredClone(defaultVideoEffectsStyles),
       videoPosition: 0,
     });
 
@@ -264,48 +236,8 @@ class Posts {
         },
         rotation: 0,
       },
-      effects: {
-        postProcess: false,
-        hideBackground: false,
-        blur: false,
-        tint: false,
-        glasses: false,
-        beards: false,
-        mustaches: false,
-        masks: false,
-        hats: false,
-        pets: false,
-      },
-      effectStyles: {
-        postProcess: {
-          style: "prismaColors",
-        },
-        hideBackground: {
-          style: "beach",
-          color: "#d40213",
-        },
-        tint: {
-          color: "#d40213",
-        },
-        glasses: {
-          style: "defaultGlasses",
-        },
-        beards: {
-          style: "classicalCurlyBeard",
-        },
-        mustaches: {
-          style: "mustache1",
-        },
-        masks: {
-          style: "baseMask",
-        },
-        hats: {
-          style: "stylishHat",
-        },
-        pets: {
-          style: "beardedDragon",
-        },
-      },
+      effects: structuredClone(defaultImageEffects),
+      effectStyles: structuredClone(defaultImageEffectsStyles),
     });
 
     broadcaster.broadcastToTable(table_id, {
@@ -339,6 +271,8 @@ class Posts {
         rotation: 0,
       },
       visible,
+      effects: structuredClone(defaultSvgEffects),
+      effectStyles: structuredClone(defaultSvgEffectsStyles),
     });
 
     broadcaster.broadcastToTable(table_id, {
@@ -370,49 +304,7 @@ class Posts {
         },
         rotation: 0,
       },
-      effects: {
-        robot: false,
-        echo: false,
-        alien: false,
-        underwater: false,
-        telephone: false,
-        space: false,
-        distortion: false,
-        vintage: false,
-        psychedelic: false,
-        deepBass: false,
-        highEnergy: false,
-        ambient: false,
-        glitch: false,
-        muffled: false,
-        crystal: false,
-        heavyMetal: false,
-        dreamy: false,
-        horror: false,
-        sciFi: false,
-        dystopian: false,
-        retroGame: false,
-        ghostly: false,
-        metallic: false,
-        hypnotic: false,
-        cyberpunk: false,
-        windy: false,
-        radio: false,
-        explosion: false,
-        whisper: false,
-        submarine: false,
-        windTunnel: false,
-        crushedBass: false,
-        ethereal: false,
-        electroSting: false,
-        heartbeat: false,
-        underworld: false,
-        sizzling: false,
-        staticNoise: false,
-        bubbly: false,
-        thunder: false,
-        echosOfThePast: false,
-      },
+      effects: structuredClone(defaultAudioEffects),
     });
 
     broadcaster.broadcastToTable(table_id, {
@@ -444,19 +336,8 @@ class Posts {
         },
         rotation: 0,
       },
-      effects: {
-        postProcess: false,
-        blur: false,
-        tint: false,
-      },
-      effectStyles: {
-        postProcess: {
-          style: "prismaColors",
-        },
-        tint: {
-          color: "#d40213",
-        },
-      },
+      effects: structuredClone(defaultApplicationEffects),
+      effectStyles: structuredClone(defaultApplicationEffectsStyles),
     });
 
     broadcaster.broadcastToTable(table_id, {

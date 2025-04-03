@@ -6,9 +6,11 @@ import {
 import { StaticContentTypes } from "../../../../universal/typeConstant";
 import {
   defaultSvgEffectsStyles,
-  defaultSvgStreamEffects,
+  defaultSvgEffects,
   UserEffectsStylesType,
   UserEffectsType,
+  SvgEffectTypes,
+  SvgEffectStylesType,
 } from "../../../../universal/effectsTypeConstant";
 import {
   DownloadCompressionTypes,
@@ -78,9 +80,8 @@ class SvgMedia {
     this.initPositioning = initPositioning;
 
     if (!this.userEffects.current.svg[this.svgId]) {
-      this.userEffects.current.svg[this.svgId] = structuredClone(
-        defaultSvgStreamEffects
-      );
+      this.userEffects.current.svg[this.svgId] =
+        structuredClone(defaultSvgEffects);
     }
 
     if (!this.userEffectsStyles.current.svg[this.svgId]) {
@@ -93,13 +94,30 @@ class SvgMedia {
     this.addMessageListener(this.getSvgListener);
   }
 
-  deconstructor() {
+  deconstructor = () => {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.removeMessageListener(this.getSvgListener);
 
     this.downloadCompleteListeners.clear();
-  }
+  };
+
+  reloadContent = (
+    filename: string,
+    mimeType: TableTopStaticMimeType,
+    visible: boolean
+  ) => {
+    this.fileChunks = [];
+    this.totalSize = 0;
+    this.blobURL = undefined;
+
+    this.filename = filename;
+    this.mimeType = mimeType;
+    this.visible = visible;
+
+    this.getSVG("svg", this.svgId, this.filename);
+    this.addMessageListener(this.getSvgListener);
+  };
 
   private getSvgListener = async (
     message: IncomingTableStaticContentMessages
@@ -145,6 +163,7 @@ class SvgMedia {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
       this.svg = svgDoc.documentElement as unknown as SVGSVGElement;
+
       this.svg.setAttribute("width", "100%");
       this.svg.setAttribute("height", "100%");
 
@@ -153,7 +172,6 @@ class SvgMedia {
       this.downloadCompleteListeners.forEach((listener) => {
         listener();
       });
-      this.downloadCompleteListeners.clear();
 
       this.removeMessageListener(this.getSvgListener);
     }
@@ -167,6 +185,106 @@ class SvgMedia {
     this.downloadCompleteListeners.delete(listener);
   };
 
+  clearAllEffects = () => {
+    Object.entries(this.userEffects.current.svg[this.svgId]).map(
+      ([effect, value]) => {
+        if (value) {
+          let effectId = "";
+          switch (effect) {
+            case "blur":
+              effectId = "#fgSvgBlurFilter_" + this.svgId;
+              break;
+            case "shadow":
+              effectId = "#fgSvgShadowFilter_" + this.svgId;
+              break;
+            case "grayscale":
+              effectId = "#fgSvgGrayscaleFilter_" + this.svgId;
+              break;
+            case "saturate":
+              effectId = "#fgSvgSaturateFilter_" + this.svgId;
+              break;
+            case "edgeDetection":
+              effectId = "#fgSvgEdgeDetectionFilter_" + this.svgId;
+              break;
+            case "colorOverlay":
+              effectId = "#fgSvgColorOverlayFilter_" + this.svgId;
+              break;
+            case "waveDistortion":
+              effectId = "#fgSvgWaveDistortionFilter_" + this.svgId;
+              break;
+            case "crackedGlass":
+              effectId = "#fgSvgCrackedGlassFilter_" + this.svgId;
+              break;
+            case "neonGlow":
+              effectId = "#fgSvgNeonGlowFilter_" + this.svgId;
+              break;
+            default:
+              break;
+          }
+
+          this.removeEffect(effectId);
+
+          this.userEffects.current.svg[this.svgId][effect as SvgEffectTypes] =
+            false;
+        }
+      }
+    );
+  };
+
+  updateAllEffects = () => {
+    Object.entries(this.userEffects.current.svg[this.svgId]).map(
+      ([effect, value]) => {
+        if (value) {
+          const styles = this.userEffectsStyles.current.svg[this.svgId];
+
+          switch (effect) {
+            case "blur":
+              this.applyBlurEffect(`${styles.blur.strength}`);
+              break;
+            case "shadow":
+              this.applyShadowEffect(
+                styles.shadow.shadowColor,
+                `${styles.shadow.strength}`,
+                `${styles.shadow.offsetX}`,
+                `${styles.shadow.offsetY}`
+              );
+              break;
+            case "grayscale":
+              this.applyGrayscaleEffect(`${styles.grayscale.scale}`);
+              break;
+            case "saturate":
+              this.applySaturateEffect(`${styles.saturate.saturation}`);
+              break;
+            case "edgeDetection":
+              this.applyEdgeDetectionEffect();
+              break;
+            case "colorOverlay":
+              this.applyColorOverlayEffect(styles.colorOverlay.overlayColor);
+              break;
+            case "waveDistortion":
+              this.applyWaveDistortionEffect(
+                `${styles.waveDistortion.frequency}`,
+                `${styles.waveDistortion.strength}`
+              );
+              break;
+            case "crackedGlass":
+              this.applyCrackedGlassEffect(
+                `${styles.crackedGlass.density}`,
+                `${styles.crackedGlass.detail}`,
+                `${styles.crackedGlass.strength}`
+              );
+              break;
+            case "neonGlow":
+              this.applyNeonGlowEffect(styles.neonGlow.neonColor);
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    );
+  };
+
   applyShadowEffect(
     shadowColor: string,
     strength: string,
@@ -175,11 +293,11 @@ class SvgMedia {
   ) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgShadowFilter");
+    let filter = this.svg.querySelector("#fgSvgShadowFilter_" + this.svgId);
 
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgShadowFilter");
+      filter.setAttribute("id", "fgSvgShadowFilter_" + this.svgId);
 
       const feGaussianBlur = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -253,7 +371,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgShadowFilter")';
+    const filterString = `url(#fgSvgShadowFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -264,11 +382,11 @@ class SvgMedia {
   applyBlurEffect(strength: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgBlurFilter");
+    let filter = this.svg.querySelector("#fgSvgBlurFilter_" + this.svgId);
 
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgBlurFilter");
+      filter.setAttribute("id", "fgSvgBlurFilter_" + this.svgId);
 
       const feGaussianBlur = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -285,7 +403,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgBlurFilter")';
+    const filterString = `url(#fgSvgBlurFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -296,11 +414,11 @@ class SvgMedia {
   applyGrayscaleEffect(scale: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgGrayscaleFilter");
+    let filter = this.svg.querySelector("#fgSvgGrayscaleFilter_" + this.svgId);
 
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgGrayscaleFilter");
+      filter.setAttribute("id", "fgSvgGrayscaleFilter_" + this.svgId);
 
       const feColorMatrix = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -317,7 +435,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgGrayscaleFilter")';
+    const filterString = `url(#fgSvgGrayscaleFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -328,11 +446,11 @@ class SvgMedia {
   applySaturateEffect(saturation: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgSaturateFilter");
+    let filter = this.svg.querySelector("#fgSvgSaturateFilter_" + this.svgId);
 
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgSaturateFilter");
+      filter.setAttribute("id", "fgSvgSaturateFilter_" + this.svgId);
 
       const feColorMatrix = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -349,7 +467,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgSaturateFilter")';
+    const filterString = `url(#fgSvgSaturateFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -360,10 +478,12 @@ class SvgMedia {
   applyEdgeDetectionEffect() {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgEdgeDetectionFilter");
+    let filter = this.svg.querySelector(
+      "#fgSvgEdgeDetectionFilter_" + this.svgId
+    );
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgEdgeDetectionFilter");
+      filter.setAttribute("id", "fgSvgEdgeDetectionFilter_" + this.svgId);
 
       const feConvolveMatrix = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -381,7 +501,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgEdgeDetectionFilter")';
+    const filterString = `url(#fgSvgEdgeDetectionFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -392,10 +512,12 @@ class SvgMedia {
   applyColorOverlayEffect(overlayColor: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgColorOverlayFilter");
+    let filter = this.svg.querySelector(
+      "#fgSvgColorOverlayFilter_" + this.svgId
+    );
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgColorOverlayFilter");
+      filter.setAttribute("id", "fgSvgColorOverlayFilter_" + this.svgId);
 
       const feFlood = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -403,7 +525,7 @@ class SvgMedia {
       );
       feFlood.setAttribute("flood-color", overlayColor);
       feFlood.setAttribute("result", "flood");
-      feFlood.setAttribute("id", "fgSvgFeFlood");
+      feFlood.setAttribute("id", "fgSvgFeFlood_" + this.svgId);
 
       const feComposite1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -427,14 +549,14 @@ class SvgMedia {
       this.svg.appendChild(filter);
     } else {
       // Update existing filter
-      const feFlood = filter.querySelector("#fgSvgFeFlood");
+      const feFlood = filter.querySelector("#fgSvgFeFlood_" + this.svgId);
       if (feFlood) {
         feFlood.setAttribute("flood-color", overlayColor);
       }
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgColorOverlayFilter")';
+    const filterString = `url(#fgSvgColorOverlayFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -445,10 +567,10 @@ class SvgMedia {
   applyNeonGlowEffect(neonColor: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgNeonGlowFilter");
+    let filter = this.svg.querySelector("#fgSvgNeonGlowFilter_" + this.svgId);
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgNeonGlowFilter");
+      filter.setAttribute("id", "fgSvgNeonGlowFilter_" + this.svgId);
 
       const feGaussianBlur = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -464,7 +586,7 @@ class SvgMedia {
       );
       feFlood.setAttribute("flood-color", neonColor);
       feFlood.setAttribute("result", "glowColor");
-      feFlood.setAttribute("id", "fgSvgFeNeonFlood");
+      feFlood.setAttribute("id", "fgSvgFeNeonFlood_" + this.svgId);
 
       const feComposite1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -491,14 +613,14 @@ class SvgMedia {
       this.svg.appendChild(filter);
     } else {
       // Update existing filter
-      const feFlood = filter.querySelector("#fgSvgFeNeonFlood");
+      const feFlood = filter.querySelector("#fgSvgFeNeonFlood_" + this.svgId);
       if (feFlood) {
         feFlood.setAttribute("flood-color", neonColor);
       }
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgNeonGlowFilter")';
+    const filterString = `url(#fgSvgNeonGlowFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -509,10 +631,12 @@ class SvgMedia {
   applyCrackedGlassEffect(density: string, detail: string, strength: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgCrackedGlassFilter");
+    let filter = this.svg.querySelector(
+      "#fgSvgCrackedGlassFilter_" + this.svgId
+    );
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgCrackedGlassFilter");
+      filter.setAttribute("id", "fgSvgCrackedGlassFilter_" + this.svgId);
 
       const feTurbulence = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -522,7 +646,7 @@ class SvgMedia {
       feTurbulence.setAttribute("baseFrequency", density);
       feTurbulence.setAttribute("numOctaves", `${parseInt(detail)}`);
       feTurbulence.setAttribute("result", "turbulence");
-      feTurbulence.setAttribute("id", "fgSvgFeCrackedTurbulence");
+      feTurbulence.setAttribute("id", "fgSvgFeCrackedTurbulence_" + this.svgId);
 
       const feDisplacementMap = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -531,7 +655,10 @@ class SvgMedia {
       feDisplacementMap.setAttribute("in", "SourceGraphic");
       feDisplacementMap.setAttribute("in2", "turbulence");
       feDisplacementMap.setAttribute("scale", strength);
-      feDisplacementMap.setAttribute("id", "fgSvgFeCrackedDisplacement");
+      feDisplacementMap.setAttribute(
+        "id",
+        "fgSvgFeCrackedDisplacement_" + this.svgId
+      );
 
       filter.appendChild(feTurbulence);
       filter.appendChild(feDisplacementMap);
@@ -539,13 +666,15 @@ class SvgMedia {
       this.svg.appendChild(filter);
     } else {
       // Update existing filter
-      const feTurbulence = filter.querySelector("#fgSvgFeCrackedTurbulence");
+      const feTurbulence = filter.querySelector(
+        "#fgSvgFeCrackedTurbulence_" + this.svgId
+      );
       if (feTurbulence) {
         feTurbulence.setAttribute("baseFrequency", density);
         feTurbulence.setAttribute("numOctaves", `${parseInt(detail)}`);
       }
       const feDisplacementMap = filter.querySelector(
-        "#fgSvgFeCrackedDisplacement"
+        "#fgSvgFeCrackedDisplacement_" + this.svgId
       );
       if (feDisplacementMap) {
         feDisplacementMap.setAttribute("scale", strength);
@@ -553,7 +682,7 @@ class SvgMedia {
     }
 
     const filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgCrackedGlassFilter")';
+    const filterString = `url(#fgSvgCrackedGlassFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -564,11 +693,13 @@ class SvgMedia {
   applyWaveDistortionEffect(frequency: string, strength: string) {
     if (!this.svg) return;
 
-    let filter = this.svg.querySelector("#fgSvgWaveDistortionFilter");
+    let filter = this.svg.querySelector(
+      "#fgSvgWaveDistortionFilter_" + this.svgId
+    );
 
     if (!filter) {
       filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-      filter.setAttribute("id", "fgSvgWaveDistortionFilter");
+      filter.setAttribute("id", "fgSvgWaveDistortionFilter_" + this.svgId);
 
       const feTurbulence = document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -599,7 +730,7 @@ class SvgMedia {
     }
 
     let filterList = this.svg.style.filter.split(/\s+/);
-    const filterString = 'url("#fgSvgWaveDistortionFilter")';
+    const filterString = `url(#fgSvgWaveDistortionFilter_${this.svgId})`;
     if (filterList && !filterList.includes(filterString)) {
       this.svg.style.filter += ` ${filterString}`;
     } else if (!filterList) {
@@ -616,11 +747,12 @@ class SvgMedia {
     }
 
     let currentFilter = this.svg.style.filter;
-    if (currentFilter && currentFilter.includes(`url(${id})`)) {
+    if (currentFilter && currentFilter.includes(`url("${id}")`)) {
       this.svg.style.filter = currentFilter
-        .split(" ")
-        .filter((filter) => filter !== `url(${id})`)
-        .join(" ");
+        .split(/\s+/)
+        .filter((filter) => filter !== `url("${id}")`)
+        .join(" ")
+        .trim();
     }
   }
 
@@ -792,7 +924,6 @@ class SvgMedia {
 
     try {
       await navigator.clipboard.writeText(svgString);
-      console.log("SVG copied to clipboard!");
     } catch (error) {
       console.error("Failed to copy SVG to clipboard:", error);
     }

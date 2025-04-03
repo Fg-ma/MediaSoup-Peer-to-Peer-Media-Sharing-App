@@ -2,7 +2,7 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   UserEffectsStylesType,
   UserEffectsType,
-  defaultImageStreamEffects,
+  defaultImageEffects,
   defaultImageEffectsStyles,
   ImageEffectTypes,
   ImageEffectStylesType,
@@ -107,9 +107,8 @@ class ImageMedia {
     this.initPositioning = initPositioning;
 
     if (!this.userEffects.current.image[this.imageId]) {
-      this.userEffects.current.image[this.imageId] = structuredClone(
-        defaultImageStreamEffects
-      );
+      this.userEffects.current.image[this.imageId] =
+        structuredClone(defaultImageEffects);
     }
 
     if (!this.userEffectsStyles.current.image[this.imageId]) {
@@ -438,7 +437,7 @@ class ImageMedia {
       }
     });
 
-    this.effects = structuredClone(defaultImageStreamEffects);
+    this.effects = structuredClone(defaultImageEffects);
 
     this.deadbanding.update("capture", this.imageId, this.effects);
   };

@@ -1,5 +1,4 @@
 import { Collection } from "mongodb";
-import { postProcessEffectEncodingMap } from "../typeConstant";
 import Encoder from "./Encoder";
 
 class Uploads {

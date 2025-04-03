@@ -1,26 +1,3 @@
-import {
-  BeardsEffectTypes,
-  GlassesEffectTypes,
-  HatsEffectTypes,
-  HideBackgroundEffectTypes,
-  MasksEffectTypes,
-  MustachesEffectTypes,
-  PetsEffectTypes,
-  PostProcessEffectTypes,
-} from "../typeConstant";
-
-export type VideoEffectTypes =
-  | "postProcess"
-  | "hideBackground"
-  | "blur"
-  | "tint"
-  | "glasses"
-  | "beards"
-  | "mustaches"
-  | "masks"
-  | "hats"
-  | "pets";
-
 export const videoEffectEncodingMap = {
   postProcess: 0,
   hideBackground: 1,
@@ -32,37 +9,7 @@ export const videoEffectEncodingMap = {
   masks: 7,
   hats: 8,
   pets: 9,
-};
-
-export type VideoEffectStylesType = {
-  postProcess: {
-    style: PostProcessEffectTypes;
-  };
-  hideBackground: {
-    style: HideBackgroundEffectTypes;
-    color: string;
-  };
-  tint: {
-    color: string;
-  };
-  glasses: {
-    style: GlassesEffectTypes;
-  };
-  beards: {
-    style: BeardsEffectTypes;
-  };
-  mustaches: {
-    style: MustachesEffectTypes;
-  };
-  masks: {
-    style: MasksEffectTypes;
-  };
-  hats: {
-    style: HatsEffectTypes;
-  };
-  pets: {
-    style: PetsEffectTypes;
-  };
+  pause: 10,
 };
 
 export const videoEffectStylesEncodingMap = {

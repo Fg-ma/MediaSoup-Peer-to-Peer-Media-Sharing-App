@@ -66,10 +66,12 @@ declare global {
 }
 
 export default function MethodSvgEditor({
+  editing = true,
   initialSVGString,
   finishCallback,
   cancelCallback,
 }: {
+  editing?: boolean;
   initialSVGString?: () => string | undefined;
   finishCallback?: (svg: string) => void;
   cancelCallback?: () => void;
@@ -78,6 +80,8 @@ export default function MethodSvgEditor({
   const methodDrawRootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!editing) return;
+
     const scripts = [
       "./src/methodSvgEditor/js/loading.js",
       "./src/methodSvgEditor/js/lib/jquery-3.5.1.min.js",
@@ -148,17 +152,17 @@ export default function MethodSvgEditor({
     };
 
     loadScripts();
-  }, []);
+  }, [editing]);
 
   useEffect(() => {
-    if (editorLoaded && initialSVGString) {
+    if (editing && editorLoaded && initialSVGString) {
       const initialString = initialSVGString();
 
       if (initialString) {
         window.methodEditor?.import?.loadSvgString(initialString);
       }
     }
-  }, [editorLoaded, initialSVGString]);
+  }, [editing, editorLoaded, initialSVGString]);
 
   useEffect(() => {
     if (editorLoaded) {
@@ -198,10 +202,7 @@ export default function MethodSvgEditor({
 
         <MenuBar />
 
-        <ToolPanels
-          finishCallback={finishCallback}
-          cancelCallback={cancelCallback}
-        />
+        <ToolPanels finishCallback={finishCallback} />
 
         <div id='cur_context_panel'></div>
 

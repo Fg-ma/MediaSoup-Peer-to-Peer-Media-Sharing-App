@@ -3,7 +3,7 @@ import {
   defaultCameraEffectsStyles,
   UserEffectsStylesType,
   CameraEffectTypes,
-  defaultCameraStreamEffects,
+  defaultCameraEffects,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
@@ -54,9 +54,8 @@ class CameraMedia {
   ) {
     this.effects = {};
 
-    this.userEffects.current.camera[this.cameraId] = structuredClone(
-      defaultCameraStreamEffects
-    );
+    this.userEffects.current.camera[this.cameraId] =
+      structuredClone(defaultCameraEffects);
 
     this.canvas = document.createElement("canvas");
     this.canvas.classList.add("babylonJS-canvas");
@@ -318,7 +317,7 @@ class CameraMedia {
       }
     });
 
-    this.effects = structuredClone(defaultCameraStreamEffects);
+    this.effects = structuredClone(defaultCameraEffects);
 
     this.deadbanding.update("capture", this.cameraId, this.effects);
   };
