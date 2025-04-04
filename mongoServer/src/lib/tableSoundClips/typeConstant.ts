@@ -1,3 +1,26 @@
+export interface TableSoundClipsType {
+  tid: string;
+  sid: string;
+  m: string;
+  n: string;
+  t: boolean;
+  i: {
+    siid: string;
+    p: {
+      p: {
+        l: number;
+        t: number;
+      };
+      s: {
+        x: number;
+        y: number;
+      };
+      r: number;
+    };
+    e: number[];
+  }[];
+}
+
 export const soundClipEffectEncodingMap = {
   robot: 0,
   echo: 1,

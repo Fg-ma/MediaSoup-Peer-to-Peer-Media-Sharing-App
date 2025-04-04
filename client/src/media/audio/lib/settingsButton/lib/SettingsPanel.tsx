@@ -284,7 +284,7 @@ export default function SettingsPanel({
                       ? muteStylesMeta[
                           settings.muteStyle.value as MuteStyleTypes
                         ].title
-                      : Object.entries(userMedia.current.svg).find(
+                      : Object.entries(userMedia.current.svg.all).find(
                           ([svgId]) => svgId === settings.muteStyle.value
                         )?.[1].filename ?? ""}
                   </div>

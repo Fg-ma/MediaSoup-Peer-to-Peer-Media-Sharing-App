@@ -5,8 +5,8 @@ import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 import SvgEffectButton from "./lib/SvgEffectButton";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import SvgMedia from "../../SvgMedia";
 import ColorPickerButton from "../../../../elements/colorPickerButton/ColorPickerButton";
+import SvgMediaInstance from "../../SvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -52,13 +52,13 @@ const EffectSectionTransition: Transition = {
 };
 
 export default function SvgEffectsSection({
-  svgId,
+  svgInstanceId,
   svgMedia,
   lowerSvgController,
   svgContainerRef,
 }: {
-  svgId: string;
-  svgMedia: SvgMedia;
+  svgInstanceId: string;
+  svgMedia: SvgMediaInstance;
   lowerSvgController: LowerSvgController;
   svgContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -180,16 +180,16 @@ export default function SvgEffectsSection({
           isAlpha={true}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='shadow'
-          active={userEffects.current.svg[svgId].shadow}
+          active={userEffects.current.svg[svgInstanceId].shadow}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].shadow =
-              !userEffects.current.svg[svgId].shadow;
-            const style = userEffectsStyles.current.svg[svgId].shadow;
+            userEffects.current.svg[svgInstanceId].shadow =
+              !userEffects.current.svg[svgInstanceId].shadow;
+            const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
-            if (userEffects.current.svg[svgId].shadow) {
+            if (userEffects.current.svg[svgInstanceId].shadow) {
               svgMedia.applyShadowEffect(
                 `${style.shadowColor}`,
                 `${style.strength}`,
@@ -197,7 +197,7 @@ export default function SvgEffectsSection({
                 `${style.offsetY}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgShadowFilter_" + svgId);
+              svgMedia.removeEffect("#fgSvgShadowFilter_" + svgInstanceId);
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -207,7 +207,7 @@ export default function SvgEffectsSection({
           content={
             <FgSVGElement
               src={
-                userEffects.current.svg[svgId].shadow
+                userEffects.current.svg[svgInstanceId].shadow
                   ? shadowOffIcon
                   : shadowIcon
               }
@@ -224,14 +224,14 @@ export default function SvgEffectsSection({
           colorPickerRefs={{ shadowColor: shadowColorPickerRef }}
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].shadow[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].shadow[key] = value;
 
-            if (!userEffects.current.svg[svgId].shadow) {
-              userEffects.current.svg[svgId].shadow = true;
+            if (!userEffects.current.svg[svgInstanceId].shadow) {
+              userEffects.current.svg[svgInstanceId].shadow = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].shadow;
+            const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
             svgMedia.applyShadowEffect(
               `${style.shadowColor}`,
@@ -243,12 +243,13 @@ export default function SvgEffectsSection({
             lowerSvgController.handleAlertSvgEffect();
           }}
           handleAcceptColor={(_key, hexa) => {
-            userEffectsStyles.current.svg[svgId].shadow.shadowColor = hexa;
+            userEffectsStyles.current.svg[svgInstanceId].shadow.shadowColor =
+              hexa;
 
-            if (!userEffects.current.svg[svgId].shadow)
-              userEffects.current.svg[svgId].shadow = true;
+            if (!userEffects.current.svg[svgInstanceId].shadow)
+              userEffects.current.svg[svgInstanceId].shadow = true;
 
-            const style = userEffectsStyles.current.svg[svgId].shadow;
+            const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
             svgMedia.applyShadowEffect(
               `${style.shadowColor}`,
@@ -261,19 +262,19 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='blur'
-          active={userEffects.current.svg[svgId].blur}
+          active={userEffects.current.svg[svgInstanceId].blur}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].blur =
-              !userEffects.current.svg[svgId].blur;
-            const style = userEffectsStyles.current.svg[svgId].blur;
+            userEffects.current.svg[svgInstanceId].blur =
+              !userEffects.current.svg[svgInstanceId].blur;
+            const style = userEffectsStyles.current.svg[svgInstanceId].blur;
 
-            if (userEffects.current.svg[svgId].blur) {
+            if (userEffects.current.svg[svgInstanceId].blur) {
               svgMedia.applyBlurEffect(`${style.strength}`);
             } else {
-              svgMedia.removeEffect("#fgSvgBlurFilter_" + svgId);
+              svgMedia.removeEffect("#fgSvgBlurFilter_" + svgInstanceId);
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -282,7 +283,11 @@ export default function SvgEffectsSection({
           }}
           content={
             <FgSVGElement
-              src={userEffects.current.svg[svgId].blur ? blurOffIcon : blurIcon}
+              src={
+                userEffects.current.svg[svgInstanceId].blur
+                  ? blurOffIcon
+                  : blurIcon
+              }
               className='flex h-full w-full items-center justify-center'
               attributes={[
                 { key: "width", value: "80%" },
@@ -295,14 +300,14 @@ export default function SvgEffectsSection({
           hoverLabel='Blur'
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].blur[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].blur[key] = value;
 
-            if (!userEffects.current.svg[svgId].blur) {
-              userEffects.current.svg[svgId].blur = true;
+            if (!userEffects.current.svg[svgInstanceId].blur) {
+              userEffects.current.svg[svgInstanceId].blur = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].blur;
+            const style = userEffectsStyles.current.svg[svgInstanceId].blur;
 
             svgMedia.applyBlurEffect(`${style.strength}`);
 
@@ -310,19 +315,22 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='colorOverlay'
-          active={userEffects.current.svg[svgId].colorOverlay}
+          active={userEffects.current.svg[svgInstanceId].colorOverlay}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].colorOverlay =
-              !userEffects.current.svg[svgId].colorOverlay;
-            const style = userEffectsStyles.current.svg[svgId].colorOverlay;
+            userEffects.current.svg[svgInstanceId].colorOverlay =
+              !userEffects.current.svg[svgInstanceId].colorOverlay;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].colorOverlay;
 
-            if (userEffects.current.svg[svgId].colorOverlay) {
+            if (userEffects.current.svg[svgInstanceId].colorOverlay) {
               svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
             } else {
-              svgMedia.removeEffect("#fgSvgColorOverlayFilter_" + svgId);
+              svgMedia.removeEffect(
+                "#fgSvgColorOverlayFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -344,15 +352,17 @@ export default function SvgEffectsSection({
           hoverLabel='Color overlay'
           colorPickerRefs={{ overlayColor: overlayColorPickerRef }}
           handleAcceptColor={(_key, hexa) => {
-            userEffectsStyles.current.svg[svgId].colorOverlay.overlayColor =
-              hexa;
+            userEffectsStyles.current.svg[
+              svgInstanceId
+            ].colorOverlay.overlayColor = hexa;
 
-            if (!userEffects.current.svg[svgId].colorOverlay) {
-              userEffects.current.svg[svgId].colorOverlay = true;
+            if (!userEffects.current.svg[svgInstanceId].colorOverlay) {
+              userEffects.current.svg[svgInstanceId].colorOverlay = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].colorOverlay;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].colorOverlay;
 
             svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
 
@@ -360,19 +370,19 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='saturate'
-          active={userEffects.current.svg[svgId].saturate}
+          active={userEffects.current.svg[svgInstanceId].saturate}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].saturate =
-              !userEffects.current.svg[svgId].saturate;
-            const style = userEffectsStyles.current.svg[svgId].saturate;
+            userEffects.current.svg[svgInstanceId].saturate =
+              !userEffects.current.svg[svgInstanceId].saturate;
+            const style = userEffectsStyles.current.svg[svgInstanceId].saturate;
 
-            if (userEffects.current.svg[svgId].saturate) {
+            if (userEffects.current.svg[svgInstanceId].saturate) {
               svgMedia.applySaturateEffect(`${style.saturation}`);
             } else {
-              svgMedia.removeEffect("#fgSvgSaturateFilter_" + svgId);
+              svgMedia.removeEffect("#fgSvgSaturateFilter_" + svgInstanceId);
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -394,14 +404,14 @@ export default function SvgEffectsSection({
           hoverLabel='Saturate'
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].saturate[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].saturate[key] = value;
 
-            if (!userEffects.current.svg[svgId].saturate) {
-              userEffects.current.svg[svgId].saturate = true;
+            if (!userEffects.current.svg[svgInstanceId].saturate) {
+              userEffects.current.svg[svgInstanceId].saturate = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].saturate;
+            const style = userEffectsStyles.current.svg[svgInstanceId].saturate;
 
             svgMedia.applySaturateEffect(`${style.saturation}`);
 
@@ -409,19 +419,20 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='grayscale'
-          active={userEffects.current.svg[svgId].grayscale}
+          active={userEffects.current.svg[svgInstanceId].grayscale}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].grayscale =
-              !userEffects.current.svg[svgId].grayscale;
-            const style = userEffectsStyles.current.svg[svgId].grayscale;
+            userEffects.current.svg[svgInstanceId].grayscale =
+              !userEffects.current.svg[svgInstanceId].grayscale;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].grayscale;
 
-            if (userEffects.current.svg[svgId].grayscale) {
+            if (userEffects.current.svg[svgInstanceId].grayscale) {
               svgMedia.applyGrayscaleEffect(`${style.scale}`);
             } else {
-              svgMedia.removeEffect("#fgSvgGrayscaleFilter_" + svgId);
+              svgMedia.removeEffect("#fgSvgGrayscaleFilter_" + svgInstanceId);
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -431,7 +442,7 @@ export default function SvgEffectsSection({
           content={
             <FgSVGElement
               src={
-                userEffects.current.svg[svgId].grayscale
+                userEffects.current.svg[svgInstanceId].grayscale
                   ? grayscaleOffIcon
                   : grayscaleIcon
               }
@@ -447,14 +458,15 @@ export default function SvgEffectsSection({
           hoverLabel='Grayscale'
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].grayscale[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].grayscale[key] = value;
 
-            if (!userEffects.current.svg[svgId].grayscale) {
-              userEffects.current.svg[svgId].grayscale = true;
+            if (!userEffects.current.svg[svgInstanceId].grayscale) {
+              userEffects.current.svg[svgInstanceId].grayscale = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].grayscale;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].grayscale;
 
             svgMedia.applyGrayscaleEffect(`${style.scale}`);
 
@@ -462,18 +474,20 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='edgeDetection'
-          active={userEffects.current.svg[svgId].edgeDetection}
+          active={userEffects.current.svg[svgInstanceId].edgeDetection}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].edgeDetection =
-              !userEffects.current.svg[svgId].edgeDetection;
+            userEffects.current.svg[svgInstanceId].edgeDetection =
+              !userEffects.current.svg[svgInstanceId].edgeDetection;
 
-            if (userEffects.current.svg[svgId].edgeDetection) {
+            if (userEffects.current.svg[svgInstanceId].edgeDetection) {
               svgMedia.applyEdgeDetectionEffect();
             } else {
-              svgMedia.removeEffect("#fgSvgEdgeDetectionFilter_" + svgId);
+              svgMedia.removeEffect(
+                "#fgSvgEdgeDetectionFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -495,19 +509,19 @@ export default function SvgEffectsSection({
           hoverLabel='Edge dectection'
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='neonGlow'
-          active={userEffects.current.svg[svgId].neonGlow}
+          active={userEffects.current.svg[svgInstanceId].neonGlow}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].neonGlow =
-              !userEffects.current.svg[svgId].neonGlow;
-            const style = userEffectsStyles.current.svg[svgId].neonGlow;
+            userEffects.current.svg[svgInstanceId].neonGlow =
+              !userEffects.current.svg[svgInstanceId].neonGlow;
+            const style = userEffectsStyles.current.svg[svgInstanceId].neonGlow;
 
-            if (userEffects.current.svg[svgId].neonGlow) {
+            if (userEffects.current.svg[svgInstanceId].neonGlow) {
               svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
             } else {
-              svgMedia.removeEffect("#fgSvgNeonGlowFilter_" + svgId);
+              svgMedia.removeEffect("#fgSvgNeonGlowFilter_" + svgInstanceId);
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -529,14 +543,15 @@ export default function SvgEffectsSection({
           hoverLabel='Neon glow'
           colorPickerRefs={{ neonColor: neonColorPickerRef }}
           handleAcceptColor={(_key, hexa) => {
-            userEffectsStyles.current.svg[svgId].neonGlow.neonColor = hexa;
+            userEffectsStyles.current.svg[svgInstanceId].neonGlow.neonColor =
+              hexa;
 
-            if (!userEffects.current.svg[svgId].neonGlow) {
-              userEffects.current.svg[svgId].neonGlow = true;
+            if (!userEffects.current.svg[svgInstanceId].neonGlow) {
+              userEffects.current.svg[svgInstanceId].neonGlow = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].neonGlow;
+            const style = userEffectsStyles.current.svg[svgInstanceId].neonGlow;
 
             svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
 
@@ -544,22 +559,25 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='waveDistortion'
-          active={userEffects.current.svg[svgId].waveDistortion}
+          active={userEffects.current.svg[svgInstanceId].waveDistortion}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].waveDistortion =
-              !userEffects.current.svg[svgId].waveDistortion;
-            const style = userEffectsStyles.current.svg[svgId].waveDistortion;
+            userEffects.current.svg[svgInstanceId].waveDistortion =
+              !userEffects.current.svg[svgInstanceId].waveDistortion;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].waveDistortion;
 
-            if (userEffects.current.svg[svgId].waveDistortion) {
+            if (userEffects.current.svg[svgInstanceId].waveDistortion) {
               svgMedia.applyWaveDistortionEffect(
                 `${style.frequency}`,
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgWaveDistortionFilter_" + svgId);
+              svgMedia.removeEffect(
+                "#fgSvgWaveDistortionFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -581,14 +599,16 @@ export default function SvgEffectsSection({
           hoverLabel='Wave distortion'
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].waveDistortion[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].waveDistortion[key] =
+              value;
 
-            if (!userEffects.current.svg[svgId].waveDistortion) {
-              userEffects.current.svg[svgId].waveDistortion = true;
+            if (!userEffects.current.svg[svgInstanceId].waveDistortion) {
+              userEffects.current.svg[svgInstanceId].waveDistortion = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].waveDistortion;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].waveDistortion;
 
             svgMedia.applyWaveDistortionEffect(
               `${style.frequency}`,
@@ -599,23 +619,26 @@ export default function SvgEffectsSection({
           }}
         />
         <SvgEffectButton
-          svgId={svgId}
+          svgInstanceId={svgInstanceId}
           filter='crackedGlass'
-          active={userEffects.current.svg[svgId].crackedGlass}
+          active={userEffects.current.svg[svgInstanceId].crackedGlass}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
-            userEffects.current.svg[svgId].crackedGlass =
-              !userEffects.current.svg[svgId].crackedGlass;
-            const style = userEffectsStyles.current.svg[svgId].crackedGlass;
+            userEffects.current.svg[svgInstanceId].crackedGlass =
+              !userEffects.current.svg[svgInstanceId].crackedGlass;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].crackedGlass;
 
-            if (userEffects.current.svg[svgId].crackedGlass) {
+            if (userEffects.current.svg[svgInstanceId].crackedGlass) {
               svgMedia.applyCrackedGlassEffect(
                 `${style.density}`,
                 `${style.detail}`,
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgCrackedGlassFilter_" + svgId);
+              svgMedia.removeEffect(
+                "#fgSvgCrackedGlassFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -637,14 +660,16 @@ export default function SvgEffectsSection({
           hoverLabel='Cracked glass'
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
-            userEffectsStyles.current.svg[svgId].crackedGlass[key] = value;
+            userEffectsStyles.current.svg[svgInstanceId].crackedGlass[key] =
+              value;
 
-            if (!userEffects.current.svg[svgId].crackedGlass) {
-              userEffects.current.svg[svgId].crackedGlass = true;
+            if (!userEffects.current.svg[svgInstanceId].crackedGlass) {
+              userEffects.current.svg[svgInstanceId].crackedGlass = true;
               setRerender((prev) => !prev);
             }
 
-            const style = userEffectsStyles.current.svg[svgId].crackedGlass;
+            const style =
+              userEffectsStyles.current.svg[svgInstanceId].crackedGlass;
 
             svgMedia.applyCrackedGlassEffect(
               `${style.density}`,

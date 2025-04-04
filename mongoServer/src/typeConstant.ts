@@ -67,6 +67,7 @@ export type onUpdateContentPositioningType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     positioning: {
@@ -89,6 +90,7 @@ export type onUpdateContentEffectsType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     effects: {
@@ -109,6 +111,7 @@ export type onUpdateVideoPositionType = {
     table_id: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: { videoPosition: number };
 };

@@ -1,9 +1,10 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
+import { TableTextType } from "./typeConstant";
 
 class Uploads {
   constructor(
-    private tableTextCollection: Collection,
+    private tableTextCollection: Collection<TableTextType>,
     private encoder: Encoder
   ) {}
 
@@ -12,17 +13,21 @@ class Uploads {
     textId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      textInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
+    }[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -36,11 +41,17 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; textId: string },
     updateData: Partial<{
-      positioning?: {
-        position?: { left?: number; top?: number };
-        scale?: { x?: number; y?: number };
-        rotation?: number;
-      };
+      tabled?: boolean;
+      filename?: string;
+      mimeType?: string;
+      instances?: {
+        xiid: string;
+        positioning?: {
+          position?: { left?: number; top?: number };
+          scale?: { x?: number; y?: number };
+          rotation?: number;
+        };
+      }[];
     }>
   ) => {
     if (!this.tableTextCollection) {
@@ -50,26 +61,50 @@ class Uploads {
 
     const updateFields: any = {};
 
-    if (updateData.positioning) {
-      if (updateData.positioning.position) {
-        if (updateData.positioning.position.left !== undefined) {
-          updateFields["p.p.l"] = updateData.positioning.position.left;
+    if (updateData.filename) {
+      updateFields["n"] = updateData.filename;
+    }
+
+    if (updateData.mimeType) {
+      updateFields["m"] = updateData.mimeType;
+    }
+
+    if (updateData.tabled) {
+      updateFields["t"] = updateData.tabled;
+    }
+
+    if (updateData.instances && updateData.instances.length > 0) {
+      updateData.instances.forEach(({ xiid, positioning }) => {
+        const instanceUpdate: any = {};
+
+        if (xiid) {
+          if (positioning) {
+            if (positioning.position) {
+              if (positioning.position.left !== undefined) {
+                instanceUpdate["i.$.p.p.l"] = positioning.position.left;
+              }
+              if (positioning.position.top !== undefined) {
+                instanceUpdate["i.$.p.p.t"] = positioning.position.top;
+              }
+            }
+            if (positioning.scale) {
+              if (positioning.scale.x !== undefined) {
+                instanceUpdate["i.$.p.s.x"] = positioning.scale.x;
+              }
+              if (positioning.scale.y !== undefined) {
+                instanceUpdate["i.$.p.s.y"] = positioning.scale.y;
+              }
+            }
+            if (positioning.rotation !== undefined) {
+              instanceUpdate["i.$.p.r"] = positioning.rotation;
+            }
+          }
+
+          if (Object.keys(instanceUpdate).length > 0) {
+            updateFields["$set"] = instanceUpdate;
+          }
         }
-        if (updateData.positioning.position.top !== undefined) {
-          updateFields["p.p.t"] = updateData.positioning.position.top;
-        }
-      }
-      if (updateData.positioning.scale) {
-        if (updateData.positioning.scale.x !== undefined) {
-          updateFields["p.s.x"] = updateData.positioning.scale.x;
-        }
-        if (updateData.positioning.scale.y !== undefined) {
-          updateFields["p.s.y"] = updateData.positioning.scale.y;
-        }
-      }
-      if (updateData.positioning.rotation !== undefined) {
-        updateFields["p.r"] = updateData.positioning.rotation;
-      }
+      });
     }
 
     try {

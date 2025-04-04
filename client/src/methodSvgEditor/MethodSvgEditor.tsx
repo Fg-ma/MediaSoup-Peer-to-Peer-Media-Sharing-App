@@ -142,13 +142,26 @@ export default function MethodSvgEditor({
       "./src/methodSvgEditor/js/lib/tinycolor-min.js",
     ];
 
+    const loadedScripts: HTMLScriptElement[] = [];
+
     const loadScripts = async () => {
       try {
         for (let script of scripts) {
-          await loadScript(script);
+          const scriptElement = document.createElement("script");
+          scriptElement.src = script;
+          scriptElement.async = true;
+          document.body.appendChild(scriptElement);
+          loadedScripts.push(scriptElement);
+
+          await new Promise((resolve, reject) => {
+            scriptElement.onload = resolve;
+            scriptElement.onerror = reject;
+          });
         }
         setEditorLoaded(true);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Failed to load scripts:", error);
+      }
     };
 
     loadScripts();
@@ -172,7 +185,7 @@ export default function MethodSvgEditor({
           <div class="cancelModal">
             <h1>Close without saving?</h1>
             <div id="cancellation">
-              <button class="warning">Close</button>
+              <button class="warning method-button">Close</button>
             </div>
           </div>
         `,

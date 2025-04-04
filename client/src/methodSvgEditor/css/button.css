@@ -1,9 +1,9 @@
-.button-container {
+.method-button-container {
   clear: both;
   margin-top: var(--x4);
 }
 
-.button {
+.method-button {
   height: var(--x12);
   cursor: pointer;
   line-height: var(--x12);
@@ -19,33 +19,33 @@
   background-color: var(--z1);
 }
 
-.button:hover {
+.method-button:hover {
   background-color: var(--z2);
 }
 
-.button.full {
+.method-button.full {
   display: block;
   text-align: center;
 }
 
-.button svg {
+.method-button svg {
   vertical-align: center;
   fill: var(--z5);
 }
 
-.button:hover svg {
+.method-button:hover svg {
   fill: var(--z10);
 }
 
-.button.current {
+.method-button.current {
   background-color: var(--z0);
 }
 
-.button.current svg {
+.method-button.current svg {
   fill: var(--accent15);
 }
 
-.button.disabled svg {
+.method-button.disabled svg {
   background-color: #aaa;
   cursor: not-allowed;
   fill: var(--z3);

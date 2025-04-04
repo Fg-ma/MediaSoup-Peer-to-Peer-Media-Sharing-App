@@ -19,7 +19,7 @@
     btn_holder.empty();
 
     if (type != "alert") {
-      $('<input type="button" class="cancel" value="Cancel">')
+      $('<input type="button" class="cancel method-button" value="Cancel">')
         .appendTo(btn_holder)
         .on("click touchstart", function () {
           box.hide();
@@ -27,7 +27,9 @@
         });
     }
 
-    var ok = $('<input type="button" value="OK">').appendTo(btn_holder);
+    var ok = $(
+      '<input type="button" class="ok method-button" value="OK">'
+    ).appendTo(btn_holder);
 
     if (type === "prompt") {
       var input = $('<input type="text">').prependTo(btn_holder);

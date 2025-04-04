@@ -13,84 +13,93 @@ class Decoder {
     aid: string;
     n: string;
     m: string;
-    p: {
+    t: boolean;
+    i: {
+      aiid: string;
       p: {
-        l: number;
-        t: number;
+        p: {
+          l: number;
+          t: number;
+        };
+        s: {
+          x: number;
+          y: number;
+        };
+        r: number;
       };
-      s: {
-        x: number;
-        y: number;
+      e: number[];
+      es: {
+        "0": {
+          s: number;
+        };
+        "1": {
+          c: string;
+        };
       };
-      r: number;
-    };
-    e: number[];
-    es: {
-      "0": {
-        s: number;
-      };
-      "1": {
-        c: string;
-      };
-    };
+    }[];
   }): {
     table_id: string;
     applicationId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      applicationInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
+      effects: {
+        [effectType in ApplicationEffectTypes]: boolean;
       };
-      rotation: number;
-    };
-    effects: {
-      [effectType in ApplicationEffectTypes]: boolean;
-    };
-    effectStyles: ApplicationEffectStylesType;
+      effectStyles: ApplicationEffectStylesType;
+    }[];
   } => {
-    const { tid, aid, n, m, p, e, es } = data;
-
-    const effects = Object.keys(applicationEffectEncodingMap).reduce(
-      (acc, key) => {
-        const value =
-          applicationEffectEncodingMap[key as ApplicationEffectTypes];
-        acc[key as ApplicationEffectTypes] = e.includes(value);
-        return acc;
-      },
-      {} as Record<ApplicationEffectTypes, boolean>
-    );
+    const { tid, aid, n, m, t, i } = data;
 
     return {
       table_id: tid,
       applicationId: aid,
       filename: n,
       mimeType: m,
-      positioning: {
-        position: {
-          left: p.p.l,
-          top: p.p.t,
+      tabled: t,
+      instances: i.map(({ aiid, p, e, es }) => ({
+        applicationInstanceId: aiid,
+        positioning: {
+          position: {
+            left: p.p.l,
+            top: p.p.t,
+          },
+          scale: {
+            x: p.s.x,
+            y: p.s.y,
+          },
+          rotation: p.r,
         },
-        scale: {
-          x: p.s.x,
-          y: p.s.y,
+        effects: Object.fromEntries(
+          Object.keys(applicationEffectEncodingMap).map((key) => [
+            key,
+            e.includes(
+              applicationEffectEncodingMap[key as ApplicationEffectTypes]
+            ),
+          ])
+        ) as Record<ApplicationEffectTypes, boolean>,
+        effectStyles: {
+          postProcess: {
+            style: postProcessEffectDecodingMap[es["0"].s],
+          },
+          tint: {
+            color: es["1"].c,
+          },
         },
-        rotation: p.r,
-      },
-      effects,
-      effectStyles: {
-        postProcess: {
-          style: postProcessEffectDecodingMap[es["0"].s],
-        },
-        tint: {
-          color: es["1"].c,
-        },
-      },
+      })),
     };
   };
 }

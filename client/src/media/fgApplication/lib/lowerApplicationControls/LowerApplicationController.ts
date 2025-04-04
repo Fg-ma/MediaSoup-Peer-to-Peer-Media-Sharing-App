@@ -10,7 +10,7 @@ import TableStaticContentSocketController from "../../../../serverControllers/ta
 
 class LowerApplicationController {
   constructor(
-    private applicationId: string,
+    private applicationInstanceId: string,
     private applicationMedia: ApplicationMedia,
     private applicationContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -97,11 +97,13 @@ class LowerApplicationController {
     blockStateChange: boolean
   ) => {
     if (!blockStateChange) {
-      this.userEffects.current.application[this.applicationId][effect] =
-        !this.userEffects.current.application[this.applicationId][effect];
+      this.userEffects.current.application[this.applicationInstanceId][effect] =
+        !this.userEffects.current.application[this.applicationInstanceId][
+          effect
+        ];
     }
 
-    this.userMedia.current.application[this.applicationId].changeEffects(
+    this.applicationMedia.changeEffects(
       effect,
       this.tintColor.current,
       blockStateChange
@@ -109,9 +111,10 @@ class LowerApplicationController {
 
     this.tableStaticContentSocket.current?.updateContentEffects(
       "application",
-      this.applicationId,
-      this.userEffects.current.application[this.applicationId],
-      this.userEffectsStyles.current.application[this.applicationId]
+      this.applicationMedia.applicationId,
+      this.applicationInstanceId,
+      this.userEffects.current.application[this.applicationInstanceId],
+      this.userEffectsStyles.current.application[this.applicationInstanceId]
     );
   };
 

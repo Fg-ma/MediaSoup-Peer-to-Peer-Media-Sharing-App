@@ -16,17 +16,17 @@ import EditableText from "./lib/EditableText";
 import ExpandLineNumbers from "./lib/ExpandLineNumbers";
 
 export default function FgText({
-  textId,
+  textInstanceId,
   bundleRef,
   tableRef,
 }: {
-  textId: string;
+  textInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
 
-  const textMedia = userMedia.current.text[textId];
+  const textMedia = userMedia.current.text.instances[textInstanceId];
 
   const positioning = useRef<{
     position: { left: number; top: number };
@@ -99,7 +99,8 @@ export default function FgText({
 
   return (
     <FgMediaContainer
-      mediaId={textId}
+      mediaId={textMedia.textId}
+      mediaInstanceId={textInstanceId}
       filename={textMedia.filename}
       kind='text'
       media={

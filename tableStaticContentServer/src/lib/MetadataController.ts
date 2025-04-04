@@ -18,7 +18,7 @@ class MetadataController {
     const svgs = await tableTopMongo.tableSvgs?.gets.getAllBy_TID(table_id);
     const videos = await tableTopMongo.tableVideos?.gets.getAllBy_TID(table_id);
     const text = await tableTopMongo.tableText?.gets.getAllBy_TID(table_id);
-    const audio = await tableTopMongo.tableSoundClips?.gets.getAllBy_TID(
+    const soundClips = await tableTopMongo.tableSoundClips?.gets.getAllBy_TID(
       table_id
     );
     const applications =
@@ -26,7 +26,7 @@ class MetadataController {
 
     this.broadcaster.broadcastToInstance(table_id, username, instance, {
       type: "responsedCatchUpTableData",
-      data: { images, svgs, videos, text, audio, applications },
+      data: { images, svgs, videos, text, soundClips, applications },
     });
   };
 
@@ -60,7 +60,7 @@ class MetadataController {
   onRequestCatchUpVideoPosition = (
     event: onRequestCatchUpVideoPositionType
   ) => {
-    const { table_id, username, instance, contentType, contentId } =
+    const { table_id, username, instance, contentType, contentId, instanceId } =
       event.header;
 
     this.broadcaster.broadcastToFirstFoundInstance(table_id, {
@@ -70,6 +70,7 @@ class MetadataController {
         instance,
         contentType,
         contentId,
+        instanceId,
       },
     });
   };
@@ -77,7 +78,7 @@ class MetadataController {
   onResponseCatchUpVideoPosition = (
     event: onResponseCatchUpVideoPositionType
   ) => {
-    const { table_id, username, instance, contentType, contentId } =
+    const { table_id, username, instance, contentType, contentId, instanceId } =
       event.header;
     const { currentVideoPosition } = event.data;
 
@@ -86,6 +87,7 @@ class MetadataController {
       header: {
         contentType,
         contentId,
+        instanceId,
       },
       data: {
         currentVideoPosition,

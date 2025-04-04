@@ -1,9 +1,8 @@
 // globals
-var svgCanvas =
-  svgCanvas || new $.SvgCanvas(document.getElementById("svgcanvas"));
-const editor = new MD.Editor();
+var svgCanvas = new $.SvgCanvas(document.getElementById("svgcanvas"));
+var editor = new MD.Editor();
 window.methodEditor = editor;
-const state = new State();
+var state = new State();
 
 editor.modal = {
   about: new MD.Modal({
@@ -29,8 +28,8 @@ editor.modal = {
               <textarea id="svg_source_textarea" spellcheck="false"></textarea>
             </form>
             <div id="tool_source_back" class="toolbar_button">
-              <button id="tool_source_cancel" class="cancel">Cancel</button>
-              <button id="tool_source_save" class="ok">Ok</button>
+              <button id="tool_source_cancel" class="cancel method-button">Cancel</button>
+              <button id="tool_source_save" class="ok method-button">Ok</button>
             </div>
           </div>
         </div>
@@ -82,7 +81,7 @@ editor.modal = {
       <div class="configureModal">
         <h1>Clear all data?</h1>
         <div id="configuration">
-          <button class="warning">Erase</button>
+          <button class="warning method-button">Erase</button>
         </div>
       </div>
     `,

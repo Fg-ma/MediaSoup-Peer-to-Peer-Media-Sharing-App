@@ -287,7 +287,7 @@ export default function FgAudioElementContainer({
   }, [positioning.current]);
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
-    const url = `https://localhost:8045/upload/${table_id}/${uuidv4()}/false`;
+    const url = `https://localhost:8045/upload/${table_id}/${uuidv4()}/undefined/toTabled/false`;
     const formData = new FormData();
 
     formData.append("file", blob, `${name ? name : "image"}`);

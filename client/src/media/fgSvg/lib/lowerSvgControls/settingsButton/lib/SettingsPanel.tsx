@@ -8,9 +8,9 @@ import MimeTypePage from "./MimeTypePage";
 import SizePage from "./SizePage";
 import CompressionPage from "./CompressionPage";
 import DownloadOptionsPage from "./DownloadOptionsPage";
-import SvgMedia from "../../../../../fgSvg/SvgMedia";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import SvgMediaInstance from "../../../../../../media/fgSvg/SvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -68,7 +68,7 @@ export default function SettingsPanel({
   setSettings,
   lowerSvgController,
 }: {
-  svgMedia: SvgMedia;
+  svgMedia: SvgMediaInstance;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;

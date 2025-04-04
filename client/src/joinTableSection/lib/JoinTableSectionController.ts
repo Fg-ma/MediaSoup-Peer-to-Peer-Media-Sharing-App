@@ -178,6 +178,68 @@ class JoinTableSectionController {
       delete this.userMedia.current.screenAudio[screenAudioId];
     }
 
+    for (const applicationId in this.userMedia.current.application.all) {
+      this.userMedia.current.application.all[applicationId].deconstructor();
+      delete this.userMedia.current.application.all[applicationId];
+    }
+
+    for (const applicationId in this.userMedia.current.application.instances) {
+      this.userMedia.current.application.instances[
+        applicationId
+      ].deconstructor();
+      delete this.userMedia.current.application.instances[applicationId];
+    }
+
+    for (const imageId in this.userMedia.current.image.all) {
+      this.userMedia.current.image.all[imageId].deconstructor();
+      delete this.userMedia.current.image.all[imageId];
+    }
+
+    for (const imageId in this.userMedia.current.image.instances) {
+      this.userMedia.current.image.instances[imageId].deconstructor();
+      delete this.userMedia.current.image.instances[imageId];
+    }
+
+    for (const soundClipId in this.userMedia.current.soundClip.all) {
+      this.userMedia.current.soundClip.all[soundClipId].deconstructor();
+      delete this.userMedia.current.soundClip.all[soundClipId];
+    }
+
+    for (const soundClipId in this.userMedia.current.soundClip.instances) {
+      this.userMedia.current.soundClip.instances[soundClipId].deconstructor();
+      delete this.userMedia.current.soundClip.instances[soundClipId];
+    }
+
+    for (const svgId in this.userMedia.current.svg.all) {
+      this.userMedia.current.svg.all[svgId].deconstructor();
+      delete this.userMedia.current.svg.all[svgId];
+    }
+
+    for (const svgId in this.userMedia.current.svg.instances) {
+      this.userMedia.current.svg.instances[svgId].deconstructor();
+      delete this.userMedia.current.svg.instances[svgId];
+    }
+
+    for (const textId in this.userMedia.current.text.instances) {
+      this.userMedia.current.text.instances[textId].deconstructor();
+      delete this.userMedia.current.text.instances[textId];
+    }
+
+    for (const textId in this.userMedia.current.text.all) {
+      this.userMedia.current.text.all[textId].deconstructor();
+      delete this.userMedia.current.text.all[textId];
+    }
+
+    for (const videoId in this.userMedia.current.video.all) {
+      this.userMedia.current.video.all[videoId].deconstructor();
+      delete this.userMedia.current.video.all[videoId];
+    }
+
+    for (const videoId in this.userMedia.current.video.instances) {
+      this.userMedia.current.video.instances[videoId].deconstructor();
+      delete this.userMedia.current.video.instances[videoId];
+    }
+
     if (this.userMedia.current.audio) {
       this.userMedia.current.audio.deconstructor();
       this.userMedia.current.audio = undefined;
@@ -186,6 +248,16 @@ class JoinTableSectionController {
     if (this.userMedia.current.gamesSignaling) {
       this.userMedia.current.gamesSignaling.deconstructor();
       this.userMedia.current.gamesSignaling = undefined;
+    }
+
+    for (const gameType in this.userMedia.current.games) {
+      // @ts-expect-error gameType stupid
+      for (const game in this.userMedia.current.games[gameType]) {
+        // @ts-expect-error gameType stupid
+        this.userMedia.current.games[gameType][game].deconstructor();
+        // @ts-expect-error gameType stupid
+        delete this.userMedia.current.games[gameType][game];
+      }
     }
 
     this.remoteMedia.current = {};

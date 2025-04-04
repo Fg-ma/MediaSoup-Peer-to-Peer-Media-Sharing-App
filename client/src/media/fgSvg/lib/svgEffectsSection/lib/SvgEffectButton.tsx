@@ -10,7 +10,7 @@ import { useEffectsContext } from "../../../../../context/effectsContext/Effects
 import ColorPickerButton from "../../../../../elements/colorPickerButton/ColorPickerButton";
 
 export default function SvgEffectButton({
-  svgId,
+  svgInstanceId,
   filter,
   scrollingContainerRef,
   content,
@@ -21,7 +21,7 @@ export default function SvgEffectButton({
   handleValueChange,
   handleAcceptColor,
 }: {
-  svgId: string;
+  svgInstanceId: string;
   filter: FiltersTypes;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   content: ReactElement;
@@ -57,11 +57,15 @@ export default function SvgEffectButton({
                     className='h-16'
                     externalValue={
                       // @ts-ignore-error no coherence between filter and option.key
-                      userEffectsStyles.current.svg[svgId][filter][option.key]
+                      userEffectsStyles.current.svg[svgInstanceId][filter][
+                        option.key
+                      ]
                     }
                     externalStyleValue={
                       // @ts-ignore-error no coherence between filter and option.key
-                      userEffectsStyles.current.svg[svgId][filter][option.key]
+                      userEffectsStyles.current.svg[svgInstanceId][filter][
+                        option.key
+                      ]
                     }
                     onValueChange={(value) => {
                       if (handleValueChange) {
@@ -72,7 +76,7 @@ export default function SvgEffectButton({
                     options={{
                       initValue:
                         // @ts-ignore-error no coherence between filter and option.key
-                        userEffectsStyles.current.svg[svgId][filter][
+                        userEffectsStyles.current.svg[svgInstanceId][filter][
                           option.key
                         ],
                       ticks: option.ticks,
@@ -96,7 +100,9 @@ export default function SvgEffectButton({
                     className='h-8 aspect-square'
                     defaultColor={
                       // @ts-ignore filter and option.key are strings not types
-                      userEffectsStyles.current.svg[svgId][filter][option.key]
+                      userEffectsStyles.current.svg[svgInstanceId][filter][
+                        option.key
+                      ]
                     }
                     handleAcceptColorCallback={(_hex, hexa) => {
                       if (handleAcceptColor) {

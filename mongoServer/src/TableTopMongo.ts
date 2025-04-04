@@ -107,9 +107,54 @@ class TableTopMongo {
         contentId
       );
     } else if (contentType === "soundClip") {
-      await this.tableSoundClips?.deletes.deleteMetaDataBy_TID_AID(
+      await this.tableSoundClips?.deletes.deleteMetaDataBy_TID_SID(
         table_id,
         contentId
+      );
+    }
+  };
+
+  deleteTableDocumentInstance = async (
+    table_id: string,
+    contentType: StaticContentTypes,
+    contentId: string,
+    instanceId: string
+  ) => {
+    if (contentType === "image") {
+      return await this.tableImages?.deletes.deleteInstanceBy_TID_IID_IIID(
+        table_id,
+        contentId,
+        instanceId
+      );
+    } else if (contentType === "svg") {
+      return await this.tableSvgs?.deletes.deleteInstanceBy_TID_SID_SIID(
+        table_id,
+        contentId,
+        instanceId
+      );
+    } else if (contentType === "video") {
+      return await this.tableVideos?.deletes.deleteInstanceBy_TID_VID_VIID(
+        table_id,
+        contentId,
+        instanceId
+      );
+    } else if (contentType === "application") {
+      return await this.tableApplications?.deletes.deleteInstanceBy_TID_AID_AIID(
+        table_id,
+        contentId,
+        instanceId
+      );
+    } else if (contentType === "text") {
+      return await this.tableText?.deletes.deleteInstanceBy_TID_XID_XIID(
+        table_id,
+        contentId,
+        instanceId
+      );
+    } else if (contentType === "soundClip") {
+      return await this.tableSoundClips?.deletes.deleteInstanceBy_TID_SID_SIID(
+        table_id,
+        contentId,
+        instanceId
       );
     }
   };
@@ -147,7 +192,7 @@ class TableTopMongo {
   };
 
   updateContentPositioning = async (event: onUpdateContentPositioningType) => {
-    const { table_id, contentType, contentId } = event.header;
+    const { table_id, contentType, contentId, instanceId } = event.header;
     const { positioning } = event.data;
 
     switch (contentType) {
@@ -155,7 +200,12 @@ class TableTopMongo {
         this.tableImages?.uploads.editMetaData(
           { table_id, imageId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                iiid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -163,7 +213,12 @@ class TableTopMongo {
         this.tableSvgs?.uploads.editMetaData(
           { table_id, svgId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                siid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -171,7 +226,12 @@ class TableTopMongo {
         this.tableVideos?.uploads.editMetaData(
           { table_id, videoId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                viid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -179,7 +239,12 @@ class TableTopMongo {
         this.tableText?.uploads.editMetaData(
           { table_id, textId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                xiid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -187,7 +252,12 @@ class TableTopMongo {
         this.tableSoundClips?.uploads.editMetaData(
           { table_id, soundClipId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                siid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -195,7 +265,12 @@ class TableTopMongo {
         this.tableApplications?.uploads.editMetaData(
           { table_id, applicationId: contentId },
           {
-            positioning,
+            instances: [
+              {
+                aiid: instanceId,
+                positioning,
+              },
+            ],
           }
         );
         break;
@@ -205,7 +280,7 @@ class TableTopMongo {
   };
 
   updateContentEffects = async (event: onUpdateContentEffectsType) => {
-    const { table_id, contentType, contentId } = event.header;
+    const { table_id, contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
     switch (contentType) {
@@ -213,8 +288,13 @@ class TableTopMongo {
         this.tableImages?.uploads.editMetaData(
           { table_id, imageId: contentId },
           {
-            effects,
-            effectStyles: effectStyles as ImageEffectStylesType,
+            instances: [
+              {
+                iiid: instanceId,
+                effects,
+                effectStyles: effectStyles as ImageEffectStylesType,
+              },
+            ],
           }
         );
         break;
@@ -222,8 +302,13 @@ class TableTopMongo {
         this.tableVideos?.uploads.editMetaData(
           { table_id, videoId: contentId },
           {
-            effects,
-            effectStyles: effectStyles as VideoEffectStylesType,
+            instances: [
+              {
+                viid: instanceId,
+                effects,
+                effectStyles: effectStyles as VideoEffectStylesType,
+              },
+            ],
           }
         );
         break;
@@ -233,7 +318,12 @@ class TableTopMongo {
         this.tableSoundClips?.uploads.editMetaData(
           { table_id, soundClipId: contentId },
           {
-            effects,
+            instances: [
+              {
+                siid: instanceId,
+                effects,
+              },
+            ],
           }
         );
         break;
@@ -241,8 +331,13 @@ class TableTopMongo {
         this.tableApplications?.uploads.editMetaData(
           { table_id, applicationId: contentId },
           {
-            effects,
-            effectStyles: effectStyles as ApplicationEffectStylesType,
+            instances: [
+              {
+                aiid: instanceId,
+                effects,
+                effectStyles: effectStyles as ApplicationEffectStylesType,
+              },
+            ],
           }
         );
         break;
@@ -250,8 +345,13 @@ class TableTopMongo {
         this.tableSvgs?.uploads.editMetaData(
           { table_id, svgId: contentId },
           {
-            effects,
-            effectStyles: effectStyles as SvgEffectStylesType,
+            instances: [
+              {
+                siid: instanceId,
+                effects,
+                effectStyles: effectStyles as SvgEffectStylesType,
+              },
+            ],
           }
         );
         break;
@@ -261,12 +361,17 @@ class TableTopMongo {
   };
 
   updateVideoPosition = async (event: onUpdateVideoPositionType) => {
-    const { table_id, contentId } = event.header;
+    const { table_id, contentId, instanceId } = event.header;
 
     this.tableVideos?.uploads.editMetaData(
       { table_id, videoId: contentId },
       {
-        videoPosition: event.data.videoPosition,
+        instances: [
+          {
+            viid: instanceId,
+            videoPosition: event.data.videoPosition,
+          },
+        ],
       }
     );
   };

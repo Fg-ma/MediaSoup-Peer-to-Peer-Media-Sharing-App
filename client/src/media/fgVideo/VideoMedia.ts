@@ -33,8 +33,6 @@ class VideoMedia {
   hiddenVideo: HTMLVideoElement | undefined;
   hiddenShakaPlayer: shaka.Player | undefined;
 
-  filename: string;
-  mimeType: TableTopStaticMimeType;
   dashUrl: string | undefined;
 
   private fileChunks: Uint8Array[] = [];
@@ -63,18 +61,6 @@ class VideoMedia {
 
   babylonScene: BabylonScene | undefined;
 
-  initPositioning: {
-    position: {
-      left: number;
-      top: number;
-    };
-    scale: {
-      x: number;
-      y: number;
-    };
-    rotation: number;
-  };
-
   private audioStream?: MediaStream;
   private videoAudioMedia?: VideoAudioMedia;
 
@@ -82,9 +68,9 @@ class VideoMedia {
     new Set();
 
   constructor(
-    private videoId: string,
-    filename: string,
-    mimeType: TableTopStaticMimeType,
+    public videoId: string,
+    public filename: string,
+    public mimeType: TableTopStaticMimeType,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -101,7 +87,7 @@ class VideoMedia {
     private removeMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
-    initPositioning: {
+    public initPositioning: {
       position: {
         left: number;
         top: number;
@@ -117,10 +103,6 @@ class VideoMedia {
       contentId: string
     ) => void
   ) {
-    this.filename = filename;
-    this.mimeType = mimeType;
-    this.initPositioning = initPositioning;
-
     if (!this.userEffects.current.video[this.videoId]) {
       this.userEffects.current.video[this.videoId] = {
         video: structuredClone(defaultVideoEffects),

@@ -3,97 +3,102 @@ import {
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import { postProcessEffectEncodingMap } from "../typeConstant";
+import { applicationEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}
 
-  encodeMetaData = (data: {
+  encodeMetaData(data: {
     table_id: string;
     applicationId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      applicationInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
+      effects: {
+        [effectType in ApplicationEffectTypes]: boolean;
       };
-      rotation: number;
-    };
-    effects: {
-      [effectType in ApplicationEffectTypes]: boolean;
-    };
-    effectStyles: ApplicationEffectStylesType;
+      effectStyles: ApplicationEffectStylesType;
+    }[];
   }): {
     tid: string;
     aid: string;
     n: string;
     m: string;
-    p: {
+    t: boolean;
+    i: {
+      aiid: string;
       p: {
-        l: number;
-        t: number;
+        p: {
+          l: number;
+          t: number;
+        };
+        s: {
+          x: number;
+          y: number;
+        };
+        r: number;
       };
-      s: {
-        x: number;
-        y: number;
+      e: number[];
+      es: {
+        "0": {
+          s: number;
+        };
+        "1": {
+          c: string;
+        };
       };
-      r: number;
-    };
-    e: number[];
-    es: {
-      "0": {
-        s: number;
-      };
-      "1": {
-        c: string;
-      };
-    };
-  } => {
-    const {
-      table_id,
-      applicationId,
-      filename,
-      mimeType,
-      positioning,
-      effects,
-      effectStyles,
-    } = data;
-
-    const e: number[] = Object.keys(effects)
-      .filter((effect) => effects[effect as keyof typeof effects])
-      .map((effect) => parseInt(effect));
+    }[];
+  } {
+    const { table_id, applicationId, filename, mimeType, tabled, instances } =
+      data;
 
     return {
       tid: table_id,
       aid: applicationId,
       n: filename,
       m: mimeType,
-      p: {
-        p: {
-          l: positioning.position.left,
-          t: positioning.position.top,
-        },
-        s: {
-          x: positioning.scale.x,
-          y: positioning.scale.y,
-        },
-        r: positioning.rotation,
-      },
-      e,
-      es: {
-        "0": {
-          s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
-        },
-        "1": {
-          c: effectStyles.tint.color,
-        },
-      },
+      t: tabled,
+      i: instances.map(
+        ({ applicationInstanceId, positioning, effects, effectStyles }) => ({
+          aiid: applicationInstanceId,
+          p: {
+            p: { l: positioning.position.left, t: positioning.position.top },
+            s: { x: positioning.scale.x, y: positioning.scale.y },
+            r: positioning.rotation,
+          },
+          e: Object.entries(effects)
+            .filter(([, isEnabled]) => isEnabled)
+            .map(
+              ([effect]) =>
+                applicationEffectEncodingMap[
+                  effect as keyof typeof applicationEffectEncodingMap
+                ]
+            ),
+          es: {
+            "0": {
+              s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
+            },
+            "1": {
+              c: effectStyles.tint.color,
+            },
+          },
+        })
+      ),
     };
-  };
+  }
 }
 
 export default Encoder;

@@ -1,7 +1,10 @@
 import { Collection } from "mongodb";
+import { TableApplicationsType } from "./typeConstant";
 
 class Deletes {
-  constructor(private tableApplicationsCollection: Collection) {}
+  constructor(
+    private tableApplicationsCollection: Collection<TableApplicationsType>
+  ) {}
 
   deleteMetaDataBy_TID_AID = async (
     table_id: string,
@@ -14,6 +17,42 @@ class Deletes {
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  deleteInstanceBy_TID_AID_AIID = async (
+    table_id: string,
+    applicationId: string,
+    applicationInstanceId: string
+  ): Promise<null | TableApplicationsType> => {
+    try {
+      const result = await this.tableApplicationsCollection.findOneAndUpdate(
+        {
+          tid: table_id,
+          aid: applicationId,
+        },
+        {
+          $pull: {
+            i: {
+              aiid: applicationInstanceId,
+            },
+          },
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+
+      // @ts-expect-error weird
+      if (!result || !result.value) {
+        return null;
+      }
+
+      // @ts-expect-error weird
+      return result.value as TableApplicationsType;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   };
 }

@@ -1,7 +1,8 @@
 import { Collection } from "mongodb";
+import { TableSvgsType } from "./typeConstant";
 
 class Deletes {
-  constructor(private tableSvgsCollection: Collection) {}
+  constructor(private tableSvgsCollection: Collection<TableSvgsType>) {}
 
   deleteMetaDataBy_TID_SID = async (table_id: string, svgId: string) => {
     try {
@@ -11,6 +12,42 @@ class Deletes {
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  deleteInstanceBy_TID_SID_SIID = async (
+    table_id: string,
+    svgId: string,
+    svgInstanceId: string
+  ): Promise<null | TableSvgsType> => {
+    try {
+      const result = await this.tableSvgsCollection.findOneAndUpdate(
+        {
+          tid: table_id,
+          sid: svgId,
+        },
+        {
+          $pull: {
+            i: {
+              siid: svgInstanceId,
+            },
+          },
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+
+      // @ts-expect-error weird
+      if (!result || !result.value) {
+        return null;
+      }
+
+      // @ts-expect-error weird
+      return result.value as TableSvgsType;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   };
 }

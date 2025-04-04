@@ -2,12 +2,13 @@ import { Collection } from "mongodb";
 import Encoder from "./Encoder";
 import {
   soundClipEffectEncodingMap,
-  SoundClipEffectTypes,
+  TableSoundClipsType,
 } from "./typeConstant";
+import { SoundClipEffectTypes } from "../../../../universal/effectsTypeConstant";
 
 class Uploads {
   constructor(
-    private tableSoundClipsCollection: Collection,
+    private tableSoundClipsCollection: Collection<TableSoundClipsType>,
     private encoder: Encoder
   ) {}
 
@@ -16,20 +17,24 @@ class Uploads {
     soundClipId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      soundClipInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
+      effects: {
+        [effectType in SoundClipEffectTypes]: boolean;
       };
-      rotation: number;
-    };
-    effects: {
-      [effectType in SoundClipEffectTypes]: boolean;
-    };
+    }[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -43,12 +48,18 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; soundClipId: string },
     updateData: Partial<{
-      positioning?: {
-        position?: { left?: number; top?: number };
-        scale?: { x?: number; y?: number };
-        rotation?: number;
-      };
-      effects?: { [effectType in SoundClipEffectTypes]?: boolean };
+      tabled?: boolean;
+      filename?: string;
+      mimeType?: string;
+      instances?: {
+        siid: string;
+        positioning?: {
+          position?: { left?: number; top?: number };
+          scale?: { x?: number; y?: number };
+          rotation?: number;
+        };
+        effects?: { [effectType in SoundClipEffectTypes]?: boolean };
+      }[];
     }>
   ) => {
     if (!this.tableSoundClipsCollection) {
@@ -58,40 +69,61 @@ class Uploads {
 
     const updateFields: any = {};
 
-    if (updateData.positioning) {
-      if (updateData.positioning.position) {
-        if (updateData.positioning.position.left !== undefined) {
-          updateFields["p.p.l"] = updateData.positioning.position.left;
-        }
-        if (updateData.positioning.position.top !== undefined) {
-          updateFields["p.p.t"] = updateData.positioning.position.top;
-        }
-      }
-      if (updateData.positioning.scale) {
-        if (updateData.positioning.scale.x !== undefined) {
-          updateFields["p.s.x"] = updateData.positioning.scale.x;
-        }
-        if (updateData.positioning.scale.y !== undefined) {
-          updateFields["p.s.y"] = updateData.positioning.scale.y;
-        }
-      }
-      if (updateData.positioning.rotation !== undefined) {
-        updateFields["p.r"] = updateData.positioning.rotation;
-      }
+    if (updateData.filename) {
+      updateFields["n"] = updateData.filename;
     }
 
-    if (updateData.effects) {
-      updateFields["e"] = Object.keys(updateData.effects)
-        .filter(
-          (effect) =>
-            updateData.effects?.[effect as keyof typeof updateData.effects]
-        )
-        .map(
-          (effect) =>
-            soundClipEffectEncodingMap[
-              effect as keyof typeof updateData.effects
-            ]
-        );
+    if (updateData.mimeType) {
+      updateFields["m"] = updateData.mimeType;
+    }
+
+    if (updateData.tabled) {
+      updateFields["t"] = updateData.tabled;
+    }
+
+    if (updateData.instances && updateData.instances.length > 0) {
+      updateData.instances.forEach(({ siid, positioning, effects }) => {
+        const instanceUpdate: any = {};
+
+        if (siid) {
+          if (positioning) {
+            if (positioning.position) {
+              if (positioning.position.left !== undefined) {
+                instanceUpdate["i.$.p.p.l"] = positioning.position.left;
+              }
+              if (positioning.position.top !== undefined) {
+                instanceUpdate["i.$.p.p.t"] = positioning.position.top;
+              }
+            }
+            if (positioning.scale) {
+              if (positioning.scale.x !== undefined) {
+                instanceUpdate["i.$.p.s.x"] = positioning.scale.x;
+              }
+              if (positioning.scale.y !== undefined) {
+                instanceUpdate["i.$.p.s.y"] = positioning.scale.y;
+              }
+            }
+            if (positioning.rotation !== undefined) {
+              instanceUpdate["i.$.p.r"] = positioning.rotation;
+            }
+          }
+
+          if (effects) {
+            const effectValues = Object.keys(effects)
+              .filter((effect) => effects?.[effect as keyof typeof effects])
+              .map(
+                (effect) =>
+                  soundClipEffectEncodingMap[effect as keyof typeof effects]
+              );
+
+            instanceUpdate["i.$.e"] = effectValues;
+          }
+        }
+
+        if (Object.keys(instanceUpdate).length > 0) {
+          updateFields["$set"] = instanceUpdate;
+        }
+      });
     }
 
     try {

@@ -377,10 +377,10 @@ $.jGraduate.Paint({hex: "#rrggbb", linearGradient: o}) -> throws an exception?
           '<div class="jGraduate_OkCancel">' +
           '<input type="button" id="' +
           id +
-          '_jGraduate_Ok" class="jGraduate_Ok" value="OK"/>' +
+          '_jGraduate_Ok" class="jGraduate_Ok method-button" value="OK"/>' +
           '<input type="button" id="' +
           id +
-          '_jGraduate_Cancel" class="jGraduate_Cancel" value="Cancel"/>' +
+          '_jGraduate_Cancel" class="jGraduate_Cancel method-button" value="Cancel"/>' +
           "</div>"
       );
 

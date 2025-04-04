@@ -1,9 +1,10 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { TableApplicationsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private tableApplicationsCollection: Collection,
+    private tableApplicationsCollection: Collection<TableApplicationsType>,
     private decoder: Decoder
   ) {}
 
@@ -21,7 +22,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(applicationData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
@@ -40,10 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return applicationData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return applicationData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

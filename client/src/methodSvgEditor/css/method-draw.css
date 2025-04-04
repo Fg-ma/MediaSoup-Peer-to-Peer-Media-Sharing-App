@@ -1,21 +1,5 @@
 /* Comment to prevent wrong concat */
 
-body {
-  background: var(--z1);
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  margin: 0;
-  padding: 0;
-}
-
-body.inverted {
-  background: var(--z2);
-}
-
 ::selection {
   background: #e62833;
   color: #f2f2f2; /* Safari */
@@ -25,40 +9,37 @@ text::selection {
   color: #f2f2f2;
 }
 ::-moz-selection {
-  background: #000;
-  color: #fff; /* Firefox */
+  background: #e62833;
+  color: #f2f2f2; /* Firefox */
 }
 
-html,
-body {
-  overscroll-behavior-x: none;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-}
-
-::-webkit-scrollbar {
+#workarea::-webkit-scrollbar,
+.method-scrollbar::-webkit-scrollbar {
   width: var(--x1);
   height: var(--x1);
   background: transparent;
   position: absolute;
 }
 
-::-webkit-scrollbar-track {
+#workarea::-webkit-scrollbar-track,
+.method-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+#workarea::-webkit-scrollbar-thumb,
+.method-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background: var(--z3);
 }
 
-::-webkit-scrollbar-corner {
+#workarea::-webkit-scrollbar-corner,
+.method-scrollbar::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-.inverted ::-webkit-scrollbar-thumb {
+.inverted #workarea::-webkit-scrollbar-thumb,
+.inverted .method-scrollbar::-webkit-scrollbar-thumb {
   background: var(--z3);
 }
 
@@ -107,9 +88,9 @@ input[type="number"].tuco {
   width: 150px;
 }
 
-input[type="submit"],
-input[type="button"],
-button {
+input[type="submit"].method-button,
+input[type="button"].method-button,
+button.method-button {
   background: var(--accent7);
   color: var(--z15);
   border-radius: var(--x1);
@@ -121,21 +102,21 @@ button {
   cursor: pointer;
 }
 
-input[type="submit"]:hover,
-input[type="button"]:hover,
-button:hover {
+input[type="submit"].method-button:hover,
+input[type="button"].method-button:hover,
+button.method-button:hover {
   background: var(--accent9);
 }
 
-input[type="submit"]:active,
-input[type="button"]:active,
-button:active {
+input[type="submit"].method-button:active,
+input[type="button"].method-button:active,
+button.method-button:active {
   outline: none;
 }
 
-input[type="submit"]:focus,
-input[type="button"]:focus,
-button:focus {
+input[type="submit"].method-button:focus,
+input[type="button"].method-button:focus,
+button.method-button:focus {
   outline: none;
 }
 
@@ -267,7 +248,7 @@ button.warning:hover {
   overflow: visible;
 }
 
-ul li.current {
+ul.method-ul li.current {
   background-color: #f4e284;
 }
 
@@ -290,7 +271,7 @@ ul li.current {
   clear: both;
 }
 
-input[readonly="readonly"]:focus {
+input[readonly="readonly"].method-button:focus {
   box-shadow: none;
 }
 

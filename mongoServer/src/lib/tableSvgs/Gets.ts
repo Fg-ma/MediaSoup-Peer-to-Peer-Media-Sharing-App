@@ -1,9 +1,10 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { TableSvgsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private tableSvgsCollection: Collection,
+    private tableSvgsCollection: Collection<TableSvgsType>,
     private decoder: Decoder
   ) {}
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(svgData);
     } catch (err) {
       console.error("Error retrieving svg data:", err);
@@ -37,10 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return svgData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return svgData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

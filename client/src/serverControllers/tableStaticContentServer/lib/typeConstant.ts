@@ -6,6 +6,7 @@ import {
   ImageEffectStylesType,
   ImageEffectTypes,
   SvgEffectStylesType,
+  SvgEffectTypes,
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
@@ -65,6 +66,7 @@ type onDeleteContentType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     filename: string;
@@ -89,6 +91,7 @@ type onUpdateContentPositioningType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     positioning: {
@@ -111,6 +114,7 @@ type onUpdateContentEffectsType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     effects: {
@@ -130,6 +134,7 @@ type onUpdateVideoPositionType = {
     table_id: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: {
     videoPosition: number;
@@ -144,6 +149,7 @@ type onRequestCatchUpVideoPositionType = {
     instance: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
 };
 
@@ -155,6 +161,7 @@ type onResponseCatchUpVideoPositionType = {
     instance: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: {
     currentVideoPosition: number;
@@ -163,11 +170,19 @@ type onResponseCatchUpVideoPositionType = {
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
-  | onOriginalVideoReadyType
+  | onVideoUploadedToTableType
+  | onVideoUploadedToTabledType
+  | onVideoReuploadedType
   | onDashVideoReadyType
-  | onImageReadyType
-  | onSvgReadyType
-  | onTextReadyType
+  | onImageUploadedToTableType
+  | onImageUploadedToTabledType
+  | onImageReuploadedType
+  | onSvgUploadedToTableType
+  | onSvgUploadedToTabledType
+  | onSvgReuploadedType
+  | onTextUploadedToTableType
+  | onTextUploadedToTabledType
+  | onTextReuploadedType
   | onChunkType
   | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
@@ -177,14 +192,33 @@ export type IncomingTableStaticContentMessages =
   | onRequestedCatchUpVideoPositionType
   | onRespondedCatchUpVideoPositionType;
 
-export type onOriginalVideoReadyType = {
-  type: "originalVideoReady";
+export type onVideoUploadedToTableType = {
+  type: "videoUploadedToTable";
   header: {
-    videoId: string;
+    contentId: string;
+    instanceId: string;
   };
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onVideoUploadedToTabledType = {
+  type: "videoUploadedToTabled";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onVideoReuploadedType = {
+  type: "videoReuploaded";
+  header: {
+    contentId: string;
   };
 };
 
@@ -198,8 +232,20 @@ export type onDashVideoReadyType = {
   };
 };
 
-export type onImageReadyType = {
-  type: "imageReady";
+export type onImageUploadedToTableType = {
+  type: "imageUploadedToTable";
+  header: {
+    contentId: string;
+    instanceId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onImageUploadedToTabledType = {
+  type: "imageUploadedToTabled";
   header: {
     contentId: string;
   };
@@ -209,26 +255,130 @@ export type onImageReadyType = {
   };
 };
 
-export type onSvgReadyType = {
-  type: "svgReady";
+export type onImageReuploadedType = {
+  type: "imageReuploaded";
   header: {
     contentId: string;
-  };
-  data: {
-    filename: string;
-    mimeType: TableTopStaticMimeType;
-    visible: boolean;
   };
 };
 
-export type onTextReadyType = {
-  type: "textReady";
+export type onSvgUploadedToTableType = {
+  type: "svgUploadedToTable";
+  header: {
+    contentId: string;
+    instanceId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onSvgUploadedToTabledType = {
+  type: "svgUploadedToTabled";
   header: {
     contentId: string;
   };
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onSvgReuploadedType = {
+  type: "svgReuploaded";
+  header: {
+    contentId: string;
+  };
+};
+
+export type onTextUploadedToTableType = {
+  type: "textUploadedToTable";
+  header: {
+    contentId: string;
+    instanceId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onTextUploadedToTabledType = {
+  type: "textUploadedToTabled";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onTextReuploadedType = {
+  type: "textReuploaded";
+  header: {
+    contentId: string;
+  };
+};
+
+export type onApplicationUploadedToTableType = {
+  type: "applicationUploadedToTable";
+  header: {
+    contentId: string;
+    instanceId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onApplicationUploadedToTabledType = {
+  type: "applicationUploadedToTabled";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onApplicationReuploadedType = {
+  type: "applicationReuploaded";
+  header: {
+    contentId: string;
+  };
+};
+
+export type onSoundClipUploadedToTableType = {
+  type: "soundClipUploadedToTable";
+  header: {
+    contentId: string;
+    instanceId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onSoundClipUploadedToTabledType = {
+  type: "soundClipUploadedToTabled";
+  header: {
+    contentId: string;
+  };
+  data: {
+    filename: string;
+    mimeType: TableTopStaticMimeType;
+  };
+};
+
+export type onSoundClipReuploadedType = {
+  type: "soundClipReuploaded";
+  header: {
+    contentId: string;
   };
 };
 
@@ -262,19 +412,23 @@ export type onResponsedCatchUpTableDataType = {
           imageId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            imageInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-          effects: { [effectType in ImageEffectTypes]: boolean };
-          effectStyles: ImageEffectStylesType;
+            effects: { [effectType in ImageEffectTypes]: boolean };
+            effectStyles: ImageEffectStylesType;
+          }[];
         }[]
       | undefined;
     svgs:
@@ -283,18 +437,23 @@ export type onResponsedCatchUpTableDataType = {
           svgId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            svgInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-          visible: boolean;
+            effects: { [effectType in SvgEffectTypes]: boolean };
+            effectStyles: SvgEffectStylesType;
+          }[];
         }[]
       | undefined;
     videos:
@@ -303,20 +462,24 @@ export type onResponsedCatchUpTableDataType = {
           videoId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            videoInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-          effects: { [effectType in VideoEffectTypes]: boolean };
-          effectStyles: VideoEffectStylesType;
-          videoPosition: number;
+            effects: { [effectType in VideoEffectTypes]: boolean };
+            effectStyles: VideoEffectStylesType;
+            videoPosition: number;
+          }[];
         }[]
       | undefined;
     text:
@@ -325,37 +488,45 @@ export type onResponsedCatchUpTableDataType = {
           textId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            textInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
+          }[];
         }[]
       | undefined;
-    audio:
+    soundClips:
       | {
           table_id: string;
-          audioId: string;
+          soundClipId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            soundClipInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-          effects: { [effectType in AudioEffectTypes]: boolean };
+            effects: { [effectType in AudioEffectTypes]: boolean };
+          }[];
         }[]
       | undefined;
     applications:
@@ -364,19 +535,23 @@ export type onResponsedCatchUpTableDataType = {
           applicationId: string;
           filename: string;
           mimeType: string;
-          positioning: {
-            position: {
-              left: number;
-              top: number;
+          tabled: boolean;
+          instances: {
+            applicationInstanceId: string;
+            positioning: {
+              position: {
+                left: number;
+                top: number;
+              };
+              scale: {
+                x: number;
+                y: number;
+              };
+              rotation: number;
             };
-            scale: {
-              x: number;
-              y: number;
-            };
-            rotation: number;
-          };
-          effects: { [effectType in ApplicationEffectTypes]: boolean };
-          effectStyles: ApplicationEffectStylesType;
+            effects: { [effectType in ApplicationEffectTypes]: boolean };
+            effectStyles: ApplicationEffectStylesType;
+          }[];
         }[]
       | undefined;
   };
@@ -387,6 +562,7 @@ export type onContentDeletedType = {
   header: {
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
 };
 
@@ -423,6 +599,7 @@ export type onRequestedCatchUpVideoPositionType = {
     instance: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
 };
 
@@ -431,6 +608,7 @@ export type onRespondedCatchUpVideoPositionType = {
   header: {
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: {
     currentVideoPosition: number;

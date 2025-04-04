@@ -19,11 +19,11 @@ import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/Dow
 import "./lib/fgImageStyles.css";
 
 export default function FgImage({
-  imageId,
+  imageInstanceId,
   bundleRef,
   tableRef,
 }: {
-  imageId: string;
+  imageInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -31,7 +31,7 @@ export default function FgImage({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const imageMedia = userMedia.current.image[imageId];
+  const imageMedia = userMedia.current.image.instances[imageInstanceId];
 
   const [imageEffectsActive, setImageEffectsActive] = useState(false);
 
@@ -45,7 +45,9 @@ export default function FgImage({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
 
-  const tintColor = useRef(userEffectsStyles.current.image[imageId].tint.color);
+  const tintColor = useRef(
+    userEffectsStyles.current.image[imageInstanceId].tint.color
+  );
 
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
@@ -64,7 +66,7 @@ export default function FgImage({
   const downloadRecordingReady = useRef(false);
 
   const lowerImageController = new LowerImageController(
-    imageId,
+    imageInstanceId,
     imageMedia,
     imageContainerRef,
     shiftPressed,
@@ -84,7 +86,7 @@ export default function FgImage({
   );
 
   const imageController = new ImageController(
-    imageId,
+    imageInstanceId,
     imageMedia,
     setSettingsActive,
     userEffects,
@@ -143,7 +145,8 @@ export default function FgImage({
 
   return (
     <FgMediaContainer
-      mediaId={imageId}
+      mediaId={imageMedia.imageId}
+      mediaInstanceId={imageInstanceId}
       filename={imageMedia.filename}
       kind='image'
       rootMedia={imageMedia.image}
@@ -153,7 +156,7 @@ export default function FgImage({
       popupElements={[
         imageEffectsActive ? (
           <ImageEffectsSection
-            imageId={imageId}
+            imageInstanceId={imageInstanceId}
             lowerImageController={lowerImageController}
             tintColor={tintColor}
             imageMedia={imageMedia}

@@ -1,27 +1,23 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserEffectsType,
-  SvgEffectTypes,
   UserEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import SvgMedia from "../../SvgMedia";
 import { Settings } from "../typeConstant";
+import SvgMediaInstance from "../../SvgMediaInstance";
 
 class LowerSvgController {
   constructor(
-    private svgId: string,
-    private svgMedia: SvgMedia,
+    private svgInstanceId: string,
+    private svgMedia: SvgMediaInstance,
     private svgContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
     private setSvgEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
@@ -94,9 +90,10 @@ class LowerSvgController {
   handleAlertSvgEffect = () => {
     this.tableStaticContentSocket.current?.updateContentEffects(
       "svg",
-      this.svgId,
-      this.userEffects.current.svg[this.svgId],
-      this.userEffectsStyles.current.svg[this.svgId]
+      this.svgMedia.svgId,
+      this.svgInstanceId,
+      this.userEffects.current.svg[this.svgInstanceId],
+      this.userEffectsStyles.current.svg[this.svgInstanceId]
     );
   };
 

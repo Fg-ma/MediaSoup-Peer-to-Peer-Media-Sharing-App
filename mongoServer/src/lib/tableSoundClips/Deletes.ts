@@ -1,16 +1,55 @@
 import { Collection } from "mongodb";
+import { TableSoundClipsType } from "./typeConstant";
 
 class Deletes {
-  constructor(private tableSoundClipsCollection: Collection) {}
+  constructor(
+    private tableSoundClipsCollection: Collection<TableSoundClipsType>
+  ) {}
 
-  deleteMetaDataBy_TID_AID = async (table_id: string, soundClipId: string) => {
+  deleteMetaDataBy_TID_SID = async (table_id: string, soundClipId: string) => {
     try {
       await this.tableSoundClipsCollection.deleteOne({
         tid: table_id,
-        aid: soundClipId,
+        sid: soundClipId,
       });
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  deleteInstanceBy_TID_SID_SIID = async (
+    table_id: string,
+    soundClipId: string,
+    soundClipInstanceId: string
+  ): Promise<null | TableSoundClipsType> => {
+    try {
+      const result = await this.tableSoundClipsCollection.findOneAndUpdate(
+        {
+          tid: table_id,
+          sid: soundClipId,
+        },
+        {
+          $pull: {
+            i: {
+              siid: soundClipInstanceId,
+            },
+          },
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+
+      // @ts-expect-error weird
+      if (!result || !result.value) {
+        return null;
+      }
+
+      // @ts-expect-error weird
+      return result.value as TableSoundClipsType;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   };
 }

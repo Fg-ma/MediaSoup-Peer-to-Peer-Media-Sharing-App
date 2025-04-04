@@ -12,6 +12,7 @@ import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import TextMedia from "../../media/fgText/TextMedia";
 import SoundClipMedia from "../../media/soundClip/SoundClipMedia";
 import SvgMedia from "../../media/fgSvg/SvgMedia";
+import SvgMediaInstance from "src/media/fgSvg/SvgMediaInstance";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -25,22 +26,52 @@ export type UserMediaType = {
   screenAudio: { [screenAudioId: string]: ScreenAudioMedia };
   audio: AudioMedia | undefined;
   video: {
-    [videoId: string]: VideoMedia;
+    all: {
+      [videoId: string]: VideoMedia;
+    };
+    instances: {
+      [videoId: string]: VideoMedia;
+    };
   };
   image: {
-    [imageId: string]: ImageMedia;
+    all: {
+      [imageId: string]: ImageMedia;
+    };
+    instances: {
+      [imageId: string]: ImageMedia;
+    };
   };
   svg: {
-    [svgId: string]: SvgMedia;
+    all: {
+      [svgId: string]: SvgMedia;
+    };
+    instances: {
+      [svgId: string]: SvgMediaInstance;
+    };
   };
   application: {
-    [applicationId: string]: ApplicationMedia;
+    all: {
+      [applicationId: string]: ApplicationMedia;
+    };
+    instances: {
+      [applicationId: string]: ApplicationMedia;
+    };
   };
   text: {
-    [textId: string]: TextMedia;
+    all: {
+      [textId: string]: TextMedia;
+    };
+    instances: {
+      [textId: string]: TextMedia;
+    };
   };
   soundClip: {
-    [soundClipId: string]: SoundClipMedia;
+    all: {
+      [soundClipId: string]: SoundClipMedia;
+    };
+    instances: {
+      [soundClipId: string]: SoundClipMedia;
+    };
   };
   gamesSignaling: GamesSignalingMedia | undefined;
   games: {

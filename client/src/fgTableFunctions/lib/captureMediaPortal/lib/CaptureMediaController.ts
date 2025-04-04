@@ -359,7 +359,7 @@ class CaptureMediaController {
     if (this.videoRef.current && this.videoRef.current.src) {
       const url = `https://localhost:8045/upload/${
         this.table_id.current
-      }/${uuidv4()}/true`;
+      }/${uuidv4()}/${uuidv4()}/toTable/true`;
 
       const formData = new FormData();
 
@@ -385,7 +385,7 @@ class CaptureMediaController {
     } else if (this.imageRef.current && this.imageRef.current.src) {
       const url = `https://localhost:8045/upload/${
         this.table_id.current
-      }/${uuidv4()}/true`;
+      }/${uuidv4()}/${uuidv4()}/toTable/true`;
 
       const formData = new FormData();
 

@@ -4,7 +4,7 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import SettingsPanel from "./lib/SettingsPanel";
 import { Settings, ActivePages } from "../../typeConstant";
 import LowerSvgController from "../LowerSvgController";
-import SvgMedia from "../../../../../media/fgSvg/SvgMedia";
+import SvgMediaInstance from "../../../../../media/fgSvg/SvgMediaInstance";
 
 type RecursiveObject = {
   active?: boolean;
@@ -24,7 +24,7 @@ export default function SettingsButton({
   scrollingContainerRef,
   lowerSvgController,
 }: {
-  svgMedia: SvgMedia;
+  svgMedia: SvgMediaInstance;
   effectsActive: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;

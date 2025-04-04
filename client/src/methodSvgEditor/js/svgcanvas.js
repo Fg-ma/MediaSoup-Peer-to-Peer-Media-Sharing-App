@@ -5601,7 +5601,6 @@ $.SvgCanvas = function (container, config) {
     $("#canvasGrid").attr("display", "none");
 
     var naked_svgs = [];
-
     $(svgcontent).find(".no-render").remove();
 
     $(svgcontent)
@@ -5657,7 +5656,6 @@ $.SvgCanvas = function (container, config) {
       toXml = svgedit.utilities.toXml;
     var unit = curConfig.baseUnit;
     var unit_re = new RegExp("^-?[\\d\\.]+" + unit + "$");
-
     if (elem) {
       cleanupElement(elem);
       var attrs = elem.attributes,
@@ -5672,7 +5670,7 @@ $.SvgCanvas = function (container, config) {
         // Process root element separately
         var res = getResolution();
 
-        var vb = "";
+        var vb = elem.getAttribute("viewBox");
 
         if (unit !== "px") {
           res.w = svgedit.units.convertUnit(res.w, unit) + unit;
@@ -5685,7 +5683,7 @@ $.SvgCanvas = function (container, config) {
             '" height="' +
             res.h +
             '"' +
-            vb +
+            (vb ? ' viewBox="' + vb + '"' : "") +
             ' xmlns="' +
             svgns +
             '"'
@@ -6343,7 +6341,6 @@ $.SvgCanvas = function (container, config) {
       // convert string into XML document
       var newDoc = svgedit.utilities.text2xml(xmlString);
       var batchCmd = new BatchCommand("Change Source");
-
       this.prepareSvg(newDoc);
       newDoc = this.styleToAttr(newDoc);
 
@@ -6468,6 +6465,7 @@ $.SvgCanvas = function (container, config) {
         var vb = content.attr("viewBox").split(" ");
         attrs.width = vb[2];
         attrs.height = vb[3];
+        attrs.viewBox = content.attr("viewBox");
       }
       // handle content that doesn't have a viewBox
       else {
@@ -6484,6 +6482,7 @@ $.SvgCanvas = function (container, config) {
             attrs[dim] = convertToNum(dim, val);
           }
         });
+        attrs.viewBox = "0 0 100 100";
       }
 
       // identify layers
@@ -6528,7 +6527,7 @@ $.SvgCanvas = function (container, config) {
 
       batchCmd.addSubCommand(new InsertElementCommand(svgcontent));
       // update root to the correct size
-      var changes = content.attr(["width", "height"]);
+      var changes = content.attr(["width", "height", "viewBox"]);
       batchCmd.addSubCommand(new ChangeElementCommand(svgroot, changes));
 
       // reset zoom

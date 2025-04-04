@@ -8,12 +8,12 @@ import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import SvgMedia from "../SvgMedia";
+import SvgMediaInstance from "../SvgMediaInstance";
 
 class SvgController {
   constructor(
-    private svgId: string,
-    private svgMedia: SvgMedia,
+    private svgInstanceId: string,
+    private svgMedia: SvgMediaInstance,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -28,15 +28,15 @@ class SvgController {
     const { contentType, contentId } = event.header;
     const { effects, effectStyles } = event.data;
 
-    if (contentType === "svg" && contentId === this.svgId) {
+    if (contentType === "svg" && contentId === this.svgInstanceId) {
       this.svgMedia.clearAllEffects();
 
-      this.userEffects.current.svg[this.svgId] = effects as {
+      this.userEffects.current.svg[this.svgInstanceId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
       };
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.svg[this.svgId] =
+        this.userEffectsStyles.current.svg[this.svgInstanceId] =
           effectStyles as SvgEffectStylesType;
       }
 

@@ -34,8 +34,10 @@ export default function UploadMediaButton() {
 
     const url = `https://localhost:8045/upload/${
       table_id.current
-    }/${uuidv4()}/true`;
+    }/${uuidv4()}/${uuidv4()}/toTable/true`;
+
     const formData = new FormData();
+
     formData.append("file", file.current);
 
     try {

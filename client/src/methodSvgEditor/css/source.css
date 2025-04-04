@@ -25,7 +25,7 @@
 #svg_source_editor form {
   position: absolute;
   top: 0.5rem;
-  bottom: 55px;
+  bottom: 72px;
   left: 0.5rem;
   right: 0.5rem;
   font-size: 14px;
@@ -60,17 +60,18 @@
 }
 
 #tool_source_cancel {
-  margin-bottom: 0.25rem;
   margin-right: 0.5rem;
-  height: 2rem;
+  height: 2.5rem;
   width: 7rem;
   color: #0d0d0d;
+  text-align: center;
 }
 
 #tool_source_save {
-  margin-bottom: 0.25rem;
   margin-left: 0.5rem;
-  height: 2rem;
+  height: 2.5rem;
   width: 7rem;
   background: #d40213;
+  text-align: center;
+  color: #090909;
 }

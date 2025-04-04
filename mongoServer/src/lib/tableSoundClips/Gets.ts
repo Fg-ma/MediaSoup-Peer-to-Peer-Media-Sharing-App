@@ -1,9 +1,10 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { TableSoundClipsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private tableSoundClipsCollection: Collection,
+    private tableSoundClipsCollection: Collection<TableSoundClipsType>,
     private decoder: Decoder
   ) {}
 
@@ -21,7 +22,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(soundClipData);
     } catch (err) {
       console.error("Error retrieving sound clip data:", err);
@@ -40,10 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return soundClipsData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return soundClipsData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

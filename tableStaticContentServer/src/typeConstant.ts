@@ -175,6 +175,7 @@ export type onDeleteContentType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     filename: string;
@@ -223,6 +224,7 @@ export type onUpdateContentEffectsType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     effects: {
@@ -244,6 +246,7 @@ export type onRequestCatchUpVideoPositionType = {
     instance: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
 };
 
@@ -255,6 +258,7 @@ export type onResponseCatchUpVideoPositionType = {
     instance: string;
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: {
     currentVideoPosition: number;

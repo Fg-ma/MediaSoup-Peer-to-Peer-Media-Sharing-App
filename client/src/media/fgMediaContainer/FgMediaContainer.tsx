@@ -38,6 +38,7 @@ const MediaContainerTransition: Transition = {
 
 export default function FgMediaContainer({
   mediaId,
+  mediaInstanceId,
   filename,
   kind,
   bundleRef,
@@ -60,6 +61,7 @@ export default function FgMediaContainer({
   options,
 }: {
   mediaId: string;
+  mediaInstanceId: string;
   filename: string;
   kind: StaticContentTypes;
   bundleRef: React.RefObject<HTMLDivElement>;
@@ -156,6 +158,7 @@ export default function FgMediaContainer({
   const lowerController = new LowerController(
     tableStaticContentSocket,
     mediaId,
+    mediaInstanceId,
     filename,
     kind,
     bundleRef,

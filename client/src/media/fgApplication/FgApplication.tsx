@@ -21,12 +21,12 @@ import DownloadRecordingButton from "./lib/lowerApplicationControls/downloadButt
 import "./lib/fgApplicationStyles.css";
 
 export default function FgApplication({
-  applicationId,
+  applicationInstanceId,
   bundleRef,
   tableRef,
   options,
 }: {
-  applicationId: string;
+  applicationInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
   options?: ApplicationOptions;
@@ -40,7 +40,8 @@ export default function FgApplication({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const applicationMedia = userMedia.current.application[applicationId];
+  const applicationMedia =
+    userMedia.current.application.instances[applicationInstanceId];
 
   const [applicationEffectsActive, setApplicationEffectsActive] =
     useState(false);
@@ -56,7 +57,7 @@ export default function FgApplication({
   const rightLowerApplicationControlsRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(
-    userEffectsStyles.current.application[applicationId].tint.color
+    userEffectsStyles.current.application[applicationInstanceId].tint.color
   );
 
   const shiftPressed = useRef(false);
@@ -76,7 +77,7 @@ export default function FgApplication({
   const downloadRecordingReady = useRef(false);
 
   const lowerApplicationController = new LowerApplicationController(
-    applicationId,
+    applicationInstanceId,
     applicationMedia,
     applicationContainerRef,
     shiftPressed,
@@ -149,7 +150,8 @@ export default function FgApplication({
 
   return (
     <FgMediaContainer
-      mediaId={applicationId}
+      mediaId={applicationMedia.applicationId}
+      mediaInstanceId={applicationInstanceId}
       filename={applicationMedia.filename}
       kind='application'
       rootMedia={applicationMedia.application}
@@ -159,7 +161,7 @@ export default function FgApplication({
       popupElements={[
         applicationEffectsActive ? (
           <ApplicationEffectsSection
-            applicationId={applicationId}
+            applicationInstanceId={applicationInstanceId}
             lowerApplicationController={lowerApplicationController}
             tintColor={tintColor}
             applicationMedia={applicationMedia}

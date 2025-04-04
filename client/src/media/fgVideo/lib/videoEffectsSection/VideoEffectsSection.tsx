@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
 import VideoMedia from "../../VideoMedia";
 import lowerVideoController from "../lowerVideoControls/LowerVideoController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
@@ -56,20 +55,19 @@ const EffectSectionTransition: Transition = {
 };
 
 export default function VideoEffectsSection({
-  videoId,
+  videoInstanceId,
   lowerVideoController,
   tintColor,
   videoMedia,
   videoContainerRef,
 }: {
-  videoId: string;
+  videoInstanceId: string;
   lowerVideoController: lowerVideoController;
   tintColor: React.MutableRefObject<string>;
   videoMedia: VideoMedia;
   videoContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffectsStyles, userEffects } = useEffectsContext();
-  const { userMedia } = useMediaContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -184,32 +182,33 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.video[videoId].video.postProcess}
+          streamEffects={
+            userEffects.current.video[videoInstanceId].video.postProcess
+          }
           effectsStyles={
-            userEffectsStyles.current.video[videoId].video.postProcess
+            userEffectsStyles.current.video[videoInstanceId].video.postProcess
           }
           clickFunctionCallback={async () => {
-            userMedia.current.video[
-              videoId
-            ].babylonScene?.babylonShaderController.swapPostProcessEffects(
-              userEffectsStyles.current.video[videoId].video.postProcess.style
+            videoMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              userEffectsStyles.current.video[videoInstanceId].video.postProcess
+                .style
             );
 
             await lowerVideoController.handleVideoEffect("postProcess", false);
           }}
           holdFunctionCallback={async (effectType) => {
-            userEffectsStyles.current.video[videoId].video.postProcess.style =
-              effectType;
+            userEffectsStyles.current.video[
+              videoInstanceId
+            ].video.postProcess.style = effectType;
 
-            userMedia.current.video[
-              videoId
-            ].babylonScene?.babylonShaderController.swapPostProcessEffects(
-              userEffectsStyles.current.video[videoId].video.postProcess.style
+            videoMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              userEffectsStyles.current.video[videoInstanceId].video.postProcess
+                .style
             );
 
             await lowerVideoController.handleVideoEffect(
               "postProcess",
-              userEffects.current.video[videoId].video.postProcess
+              userEffects.current.video[videoInstanceId].video.postProcess
             );
           }}
         />
@@ -220,18 +219,18 @@ export default function VideoEffectsSection({
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
-                userEffects.current.video[videoId].video.hideBackground
+                userEffects.current.video[videoInstanceId].video.hideBackground
               }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.hideBackground
+                userEffectsStyles.current.video[videoInstanceId].video
+                  .hideBackground
               }
               clickFunctionCallback={async () => {
                 const effectsStyles =
-                  userEffectsStyles.current.video[videoId].video.hideBackground;
+                  userEffectsStyles.current.video[videoInstanceId].video
+                    .hideBackground;
 
-                userMedia.current.video[
-                  videoId
-                ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectsStyles.style
                 );
 
@@ -242,14 +241,14 @@ export default function VideoEffectsSection({
               }}
               holdFunctionCallback={async (effectType) => {
                 const effectsStyles =
-                  userEffectsStyles.current.video[videoId].video.hideBackground;
+                  userEffectsStyles.current.video[videoInstanceId].video
+                    .hideBackground;
                 const streamEffects =
-                  userEffects.current.video[videoId].video.hideBackground;
+                  userEffects.current.video[videoInstanceId].video
+                    .hideBackground;
 
                 effectsStyles.style = effectType;
-                userMedia.current.video[
-                  videoId
-                ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectType
                 );
 
@@ -260,13 +259,13 @@ export default function VideoEffectsSection({
               }}
               acceptColorCallback={async (color) => {
                 const effectsStyles =
-                  userEffectsStyles.current.video[videoId].video.hideBackground;
+                  userEffectsStyles.current.video[videoInstanceId].video
+                    .hideBackground;
                 const streamEffects =
-                  userEffects.current.video[videoId].video.hideBackground;
+                  userEffects.current.video[videoInstanceId].video
+                    .hideBackground;
 
-                userMedia.current.video[
-                  videoId
-                ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color
                 );
 
@@ -285,7 +284,7 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.video[videoId].video.blur}
+          streamEffects={userEffects.current.video[videoInstanceId].video.blur}
           clickFunctionCallback={async () => {
             await lowerVideoController.handleVideoEffect("blur", false);
           }}
@@ -295,20 +294,20 @@ export default function VideoEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.video[videoId].video.tint}
+          streamEffects={userEffects.current.video[videoInstanceId].video.tint}
           clickFunctionCallback={async () => {
-            userEffectsStyles.current.video[videoId].video.tint.color =
+            userEffectsStyles.current.video[videoInstanceId].video.tint.color =
               tintColor.current;
 
             await lowerVideoController.handleVideoEffect("tint", false);
           }}
           acceptColorCallback={async () => {
-            userEffectsStyles.current.video[videoId].video.tint.color =
+            userEffectsStyles.current.video[videoInstanceId].video.tint.color =
               tintColor.current;
 
             await lowerVideoController.handleVideoEffect(
               "tint",
-              userEffects.current.video[videoId].video.tint
+              userEffects.current.video[videoInstanceId].video.tint
             );
           }}
         />
@@ -318,20 +317,23 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.glasses}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.glasses
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.glasses
+                userEffectsStyles.current.video[videoInstanceId].video.glasses
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect("glasses", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.glasses.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.glasses.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "glasses",
-                  userEffects.current.video[videoId].video.glasses
+                  userEffects.current.video[videoInstanceId].video.glasses
                 );
               }}
             />
@@ -343,20 +345,23 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.beards}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.beards
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.beards
+                userEffectsStyles.current.video[videoInstanceId].video.beards
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect("beards", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.beards.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.beards.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "beards",
-                  userEffects.current.video[videoId].video.beards
+                  userEffects.current.video[videoInstanceId].video.beards
                 );
               }}
             />
@@ -368,9 +373,11 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.mustaches}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.mustaches
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.mustaches
+                userEffectsStyles.current.video[videoInstanceId].video.mustaches
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect(
@@ -379,12 +386,13 @@ export default function VideoEffectsSection({
                 );
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.mustaches.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.mustaches.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "mustaches",
-                  userEffects.current.video[videoId].video.mustaches
+                  userEffects.current.video[videoInstanceId].video.mustaches
                 );
               }}
             />
@@ -396,20 +404,23 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.masks}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.masks
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.masks
+                userEffectsStyles.current.video[videoInstanceId].video.masks
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect("masks", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.masks.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.masks.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "masks",
-                  userEffects.current.video[videoId].video.masks
+                  userEffects.current.video[videoInstanceId].video.masks
                 );
               }}
             />
@@ -421,20 +432,23 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.hats}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.hats
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.hats
+                userEffectsStyles.current.video[videoInstanceId].video.hats
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect("hats", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.hats.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.hats.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "hats",
-                  userEffects.current.video[videoId].video.hats
+                  userEffects.current.video[videoInstanceId].video.hats
                 );
               }}
             />
@@ -446,20 +460,23 @@ export default function VideoEffectsSection({
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.video[videoId].video.pets}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.pets
+              }
               effectsStyles={
-                userEffectsStyles.current.video[videoId].video.pets
+                userEffectsStyles.current.video[videoInstanceId].video.pets
               }
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect("pets", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.video[videoId].video.pets.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.pets.style = effectType;
 
                 await lowerVideoController.handleVideoEffect(
                   "pets",
-                  userEffects.current.video[videoId].video.pets
+                  userEffects.current.video[videoInstanceId].video.pets
                 );
               }}
             />

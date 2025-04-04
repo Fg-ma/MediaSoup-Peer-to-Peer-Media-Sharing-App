@@ -143,14 +143,16 @@ class TableStaticContentSocketController {
   deleteContent = (
     contentType: StaticContentTypes,
     contentId: string,
+    instanceId: string,
     filename: string
   ) => {
     this.sendMessage({
       type: "deleteContent",
       header: {
         table_id: this.table_id,
-        contentType: contentType,
-        contentId: contentId,
+        contentType,
+        contentId,
+        instanceId,
       },
       data: {
         filename,
@@ -161,6 +163,7 @@ class TableStaticContentSocketController {
   updateContentPositioning = (
     contentType: StaticContentTypes,
     contentId: string,
+    instanceId: string,
     positioning: {
       position?: {
         left: number;
@@ -179,6 +182,7 @@ class TableStaticContentSocketController {
         table_id: this.table_id,
         contentType,
         contentId,
+        instanceId,
       },
       data: {
         positioning,
@@ -189,6 +193,7 @@ class TableStaticContentSocketController {
   updateContentEffects = (
     contentType: StaticContentTypes,
     contentId: string,
+    instanceId: string,
     effects: {
       [effectType: string]: boolean;
     },
@@ -204,6 +209,7 @@ class TableStaticContentSocketController {
         table_id: this.table_id,
         contentType,
         contentId,
+        instanceId,
       },
       data: {
         effects,
@@ -215,6 +221,7 @@ class TableStaticContentSocketController {
   updateVideoPosition = (
     contentType: "video",
     contentId: string,
+    instanceId: string,
     videoPosition: number
   ) => {
     this.sendMessage({
@@ -223,6 +230,7 @@ class TableStaticContentSocketController {
         table_id: this.table_id,
         contentType,
         contentId,
+        instanceId,
       },
       data: {
         videoPosition,
@@ -230,7 +238,11 @@ class TableStaticContentSocketController {
     });
   };
 
-  requestCatchUpVideoPosition = (contentType: "video", contentId: string) => {
+  requestCatchUpVideoPosition = (
+    contentType: "video",
+    contentId: string,
+    instanceId: string
+  ) => {
     this.sendMessage({
       type: "requestCatchUpVideoPosition",
       header: {
@@ -239,6 +251,7 @@ class TableStaticContentSocketController {
         instance: this.instance,
         contentType,
         contentId,
+        instanceId,
       },
     });
   };
@@ -262,24 +275,36 @@ class TableStaticContentSocketController {
   };
 
   private onContentDeleted = (event: onContentDeletedType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
 
     if (
       this.userMedia.current[contentType] &&
-      this.userMedia.current[contentType][contentId]
+      this.userMedia.current[contentType].instances[instanceId]
     ) {
-      this.userMedia.current[contentType][contentId].deconstructor();
-      delete this.userMedia.current[contentType][contentId];
+      this.userMedia.current[contentType].instances[instanceId].deconstructor();
+      delete this.userMedia.current[contentType].instances[instanceId];
+    }
+
+    if (
+      this.userMedia.current[contentType] &&
+      Object.keys(this.userMedia.current[contentType].instances).length === 0 &&
+      this.userMedia.current[contentType].all[contentId] &&
+      !this.userMedia.current[contentType].all[contentId].tabled
+    ) {
+      this.userMedia.current[contentType].all[contentId].deconstructor();
+      delete this.userMedia.current[contentType].all[contentId];
     }
   };
 
   private onRequestedCatchUpVideoPosition = (
     event: onRequestedCatchUpVideoPositionType
   ) => {
-    const { username, instance, contentType, contentId } = event.header;
+    const { username, instance, contentType, contentId, instanceId } =
+      event.header;
 
     const currentVideoPosition =
-      this.userMedia.current[contentType][contentId]?.video.currentTime;
+      this.userMedia.current[contentType].instances[instanceId]?.video
+        .currentTime;
 
     if (currentVideoPosition) {
       this.sendMessage({
@@ -290,6 +315,7 @@ class TableStaticContentSocketController {
           instance,
           contentType,
           contentId,
+          instanceId,
         },
         data: {
           currentVideoPosition,
@@ -301,12 +327,13 @@ class TableStaticContentSocketController {
   private onRespondedCatchUpVideoPosition = (
     event: onRespondedCatchUpVideoPositionType
   ) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
     const { currentVideoPosition } = event.data;
 
-    if (this.userMedia.current[contentType][contentId])
-      this.userMedia.current[contentType][contentId].video.currentTime =
-        currentVideoPosition;
+    if (this.userMedia.current[contentType].instances[instanceId])
+      this.userMedia.current[contentType].instances[
+        instanceId
+      ].video.currentTime = currentVideoPosition;
   };
 }
 

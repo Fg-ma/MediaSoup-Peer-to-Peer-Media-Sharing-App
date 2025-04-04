@@ -17,6 +17,7 @@ class LowerController {
       TableStaticContentSocketController | undefined
     >,
     private mediaId: string,
+    private mediaInstanceId: string,
     private filename: string,
     private kind: StaticContentTypes,
     private bundleRef: React.RefObject<HTMLDivElement>,
@@ -288,6 +289,7 @@ class LowerController {
     this.tableStaticContentSocket.current?.deleteContent(
       this.kind,
       this.mediaId,
+      this.mediaInstanceId,
       this.filename
     );
   };

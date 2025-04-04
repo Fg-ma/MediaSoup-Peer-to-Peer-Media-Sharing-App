@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { TableImagesType } from "./typeConstant";
 
 class TableImages {
-  private tableImagesCollection: Collection;
+  private tableImagesCollection: Collection<TableImagesType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

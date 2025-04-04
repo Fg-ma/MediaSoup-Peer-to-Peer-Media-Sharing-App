@@ -4,11 +4,12 @@ import {
   SvgEffectStylesType,
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { svgEffectEncodingMap } from "./typeConstant";
+import { svgEffectEncodingMap, TableSvgsType } from "./typeConstant";
+import { error } from "console";
 
 class Uploads {
   constructor(
-    private tableSvgsCollection: Collection,
+    private tableSvgsCollection: Collection<TableSvgsType>,
     private encoder: Encoder
   ) {}
 
@@ -17,22 +18,25 @@ class Uploads {
     svgId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      svgInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
+      effects: {
+        [effectType in SvgEffectTypes]: boolean;
       };
-      rotation: number;
-    };
-    visible: boolean;
-    effects: {
-      [effectType in SvgEffectTypes]: boolean;
-    };
-    effectStyles: SvgEffectStylesType;
+      effectStyles: SvgEffectStylesType;
+    }[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -46,16 +50,19 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; svgId: string },
     updateData: Partial<{
-      positioning?: {
-        position?: { left?: number; top?: number };
-        scale?: { x?: number; y?: number };
-        rotation?: number;
-      };
+      tabled?: boolean;
       filename?: string;
       mimeType?: string;
-      visible?: boolean;
-      effects?: { [effectType in SvgEffectTypes]?: boolean };
-      effectStyles?: SvgEffectStylesType;
+      instances?: {
+        siid: string;
+        positioning?: {
+          position?: { left?: number; top?: number };
+          scale?: { x?: number; y?: number };
+          rotation?: number;
+        };
+        effects?: { [effectType in SvgEffectTypes]?: boolean };
+        effectStyles?: SvgEffectStylesType;
+      }[];
     }>
   ) => {
     if (!this.tableSvgsCollection) {
@@ -65,28 +72,6 @@ class Uploads {
 
     const updateFields: any = {};
 
-    if (updateData.positioning) {
-      if (updateData.positioning.position) {
-        if (updateData.positioning.position.left !== undefined) {
-          updateFields["p.p.l"] = updateData.positioning.position.left;
-        }
-        if (updateData.positioning.position.top !== undefined) {
-          updateFields["p.p.t"] = updateData.positioning.position.top;
-        }
-      }
-      if (updateData.positioning.scale) {
-        if (updateData.positioning.scale.x !== undefined) {
-          updateFields["p.s.x"] = updateData.positioning.scale.x;
-        }
-        if (updateData.positioning.scale.y !== undefined) {
-          updateFields["p.s.y"] = updateData.positioning.scale.y;
-        }
-      }
-      if (updateData.positioning.rotation !== undefined) {
-        updateFields["p.r"] = updateData.positioning.rotation;
-      }
-    }
-
     if (updateData.filename) {
       updateFields["n"] = updateData.filename;
     }
@@ -95,55 +80,90 @@ class Uploads {
       updateFields["m"] = updateData.mimeType;
     }
 
-    if (updateData.visible) {
-      updateFields["v"] = updateData.visible;
+    if (updateData.tabled) {
+      updateFields["t"] = updateData.tabled;
     }
 
-    if (updateData.effects) {
-      updateFields["e"] = Object.keys(updateData.effects)
-        .filter(
-          (effect) =>
-            updateData.effects?.[effect as keyof typeof updateData.effects]
-        )
-        .map(
-          (effect) =>
-            svgEffectEncodingMap[effect as keyof typeof updateData.effects]
-        );
-    }
+    if (updateData.instances && updateData.instances.length > 0) {
+      updateData.instances.forEach(
+        ({ siid, positioning, effects, effectStyles }) => {
+          const instanceUpdate: any = {};
 
-    if (updateData.effectStyles) {
-      updateFields["es"] = {
-        "0": {
-          c: updateData.effectStyles.shadow.shadowColor,
-          s: updateData.effectStyles.shadow.strength,
-          x: updateData.effectStyles.shadow.offsetX,
-          y: updateData.effectStyles.shadow.offsetY,
-        },
-        "1": {
-          s: updateData.effectStyles.blur.strength,
-        },
-        "2": {
-          s: updateData.effectStyles.grayscale.scale,
-        },
-        "3": {
-          s: updateData.effectStyles.saturate.saturation,
-        },
-        "4": {
-          c: updateData.effectStyles.colorOverlay.overlayColor,
-        },
-        "5": {
-          f: updateData.effectStyles.waveDistortion.frequency,
-          s: updateData.effectStyles.waveDistortion.strength,
-        },
-        "6": {
-          n: updateData.effectStyles.crackedGlass.density,
-          d: updateData.effectStyles.crackedGlass.detail,
-          s: updateData.effectStyles.crackedGlass.strength,
-        },
-        "7": {
-          c: updateData.effectStyles.neonGlow.neonColor,
-        },
-      };
+          if (siid) {
+            if (positioning) {
+              if (positioning.position) {
+                if (positioning.position.left !== undefined) {
+                  instanceUpdate["i.$.p.p.l"] = positioning.position.left;
+                }
+                if (positioning.position.top !== undefined) {
+                  instanceUpdate["i.$.p.p.t"] = positioning.position.top;
+                }
+              }
+              if (positioning.scale) {
+                if (positioning.scale.x !== undefined) {
+                  instanceUpdate["i.$.p.s.x"] = positioning.scale.x;
+                }
+                if (positioning.scale.y !== undefined) {
+                  instanceUpdate["i.$.p.s.y"] = positioning.scale.y;
+                }
+              }
+              if (positioning.rotation !== undefined) {
+                instanceUpdate["i.$.p.r"] = positioning.rotation;
+              }
+            }
+
+            if (effects) {
+              const effectValues = Object.keys(effects)
+                .filter((effect) => effects?.[effect as keyof typeof effects])
+                .map(
+                  (effect) =>
+                    svgEffectEncodingMap[effect as keyof typeof effects]
+                );
+
+              instanceUpdate["i.$.e"] = effectValues;
+            }
+
+            if (effectStyles) {
+              instanceUpdate["i.$.es"] = {
+                "0": {
+                  c: effectStyles.shadow.shadowColor,
+                  s: effectStyles.shadow.strength,
+                  x: effectStyles.shadow.offsetX,
+                  y: effectStyles.shadow.offsetY,
+                },
+                "1": {
+                  s: effectStyles.blur.strength,
+                },
+                "2": {
+                  s: effectStyles.grayscale.scale,
+                },
+                "3": {
+                  s: effectStyles.saturate.saturation,
+                },
+                "4": {
+                  c: effectStyles.colorOverlay.overlayColor,
+                },
+                "5": {
+                  f: effectStyles.waveDistortion.frequency,
+                  s: effectStyles.waveDistortion.strength,
+                },
+                "6": {
+                  n: effectStyles.crackedGlass.density,
+                  d: effectStyles.crackedGlass.detail,
+                  s: effectStyles.crackedGlass.strength,
+                },
+                "7": {
+                  c: effectStyles.neonGlow.neonColor,
+                },
+              };
+            }
+          }
+
+          if (Object.keys(instanceUpdate).length > 0) {
+            updateFields["$set"] = instanceUpdate;
+          }
+        }
+      );
     }
 
     try {

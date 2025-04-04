@@ -12,30 +12,15 @@ export type onTextFinishedLoadingType = {
 class TextMedia {
   text: string | undefined;
 
-  filename: string;
-  mimeType: TableTopStaticMimeType;
-
   private listeners: Set<(message: TextMediaEvents) => void> = new Set();
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
 
-  initPositioning: {
-    position: {
-      left: number;
-      top: number;
-    };
-    scale: {
-      x: number;
-      y: number;
-    };
-    rotation: number;
-  };
-
   constructor(
-    private textId: string,
-    filename: string,
-    mimeType: TableTopStaticMimeType,
+    public textId: string,
+    public filename: string,
+    public mimeType: TableTopStaticMimeType,
     private getText: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -47,7 +32,7 @@ class TextMedia {
     private removeMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void,
-    initPositioning: {
+    public initPositioning: {
       position: {
         left: number;
         top: number;
@@ -59,10 +44,6 @@ class TextMedia {
       rotation: number;
     }
   ) {
-    this.filename = filename;
-    this.mimeType = mimeType;
-    this.initPositioning = initPositioning;
-
     this.getText("text", this.textId, this.filename);
     this.addMessageListener(this.getTextListener);
   }

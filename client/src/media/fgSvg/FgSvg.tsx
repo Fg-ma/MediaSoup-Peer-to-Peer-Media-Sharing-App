@@ -20,11 +20,11 @@ import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
 
 export default function FgSvg({
-  svgId,
+  svgInstanceId,
   bundleRef,
   tableRef,
 }: {
-  svgId: string;
+  svgInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -35,7 +35,7 @@ export default function FgSvg({
 
   const [editing, setEditing] = useState(false);
 
-  const svgMedia = userMedia.current.svg[svgId];
+  const svgMedia = userMedia.current.svg.instances[svgInstanceId];
 
   const [svgEffectsActive, setSvgEffectsActive] = useState(false);
 
@@ -63,7 +63,7 @@ export default function FgSvg({
   );
 
   const lowerSvgController = new LowerSvgController(
-    svgId,
+    svgInstanceId,
     svgMedia,
     svgContainerRef,
     shiftPressed,
@@ -71,17 +71,15 @@ export default function FgSvg({
     setSvgEffectsActive,
     userEffects,
     userEffectsStyles,
-    userMedia,
     setSettingsActive,
     settings,
-    setRerender,
     tableStaticContentSocket,
     setSettings,
     setEditing
   );
 
   const svgController = new SvgController(
-    svgId,
+    svgInstanceId,
     svgMedia,
     setSettingsActive,
     userEffects,
@@ -90,9 +88,17 @@ export default function FgSvg({
   );
 
   useEffect(() => {
-    if (svgMedia.svg) subContainerRef.current?.appendChild(svgMedia.svg);
+    if (svgMedia.instanceSvg) {
+      subContainerRef.current?.appendChild(svgMedia.instanceSvg);
+      positioning.current.scale = {
+        x: svgMedia.aspect
+          ? positioning.current.scale.y * svgMedia.aspect
+          : positioning.current.scale.x,
+        y: positioning.current.scale.y,
+      };
+    }
     svgMedia.addDownloadCompleteListener(() => {
-      if (svgMedia.svg) {
+      if (svgMedia.instanceSvg) {
         const allSvgs = subContainerRef.current?.querySelectorAll("svg");
 
         if (allSvgs) {
@@ -101,7 +107,13 @@ export default function FgSvg({
           });
         }
 
-        subContainerRef.current?.appendChild(svgMedia.svg);
+        subContainerRef.current?.appendChild(svgMedia.instanceSvg);
+        positioning.current.scale = {
+          x: svgMedia.aspect
+            ? positioning.current.scale.y * svgMedia.aspect
+            : positioning.current.scale.x,
+          y: positioning.current.scale.y,
+        };
       }
     });
 
@@ -142,7 +154,8 @@ export default function FgSvg({
   return (
     <>
       <FgMediaContainer
-        mediaId={svgId}
+        mediaId={svgMedia.svgId}
+        mediaInstanceId={svgInstanceId}
         filename={svgMedia.filename}
         kind='svg'
         rootMedia={svgMedia.svg}
@@ -152,7 +165,7 @@ export default function FgSvg({
         popupElements={[
           svgEffectsActive ? (
             <SvgEffectsSection
-              svgId={svgId}
+              svgInstanceId={svgInstanceId}
               svgMedia={svgMedia}
               lowerSvgController={lowerSvgController}
               svgContainerRef={svgContainerRef}
@@ -188,68 +201,70 @@ export default function FgSvg({
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
         options={{ gradient: false, adjustmentAnimation: false }}
       />
-      <FgPortal
-        type='staticTopDomain'
-        top={0}
-        left={0}
-        zValue={10000}
-        className={`${
-          editing && svgMedia.svg ? "visible" : "hidden pointer-events-none"
-        } flex w-full h-full bg-fg-tone-black-1 bg-opacity-45 items-center justify-center`}
-        content={
-          <MethodSvgEditor
-            editing={editing}
-            initialSVGString={() => {
-              if (svgMedia.svg) {
-                // Create a deep clone of the original svg element
-                const clonedSVG = svgMedia.svg.cloneNode(true) as HTMLElement;
+      {editing && svgMedia.svg && (
+        <FgPortal
+          type='staticTopDomain'
+          top={0}
+          left={0}
+          zValue={10000}
+          className='flex w-full h-full bg-fg-tone-black-1 bg-opacity-45 items-center justify-center'
+          content={
+            <MethodSvgEditor
+              editing={editing}
+              initialSVGString={() => {
+                if (svgMedia.svg) {
+                  // Create a deep clone of the original svg element
+                  const clonedSVG = svgMedia.svg.cloneNode(true) as HTMLElement;
 
-                // Modify the clone
-                clonedSVG.setAttribute("width", "100");
-                clonedSVG.setAttribute("height", "");
+                  // Modify the clone
+                  clonedSVG.setAttribute("width", "100");
+                  clonedSVG.setAttribute("height", "");
 
-                // Serialize the cloned SVG to a string
-                return new XMLSerializer().serializeToString(clonedSVG);
-              }
-            }}
-            finishCallback={(svg) => {
-              setEditing(false);
+                  // Serialize the cloned SVG to a string
+                  return new XMLSerializer().serializeToString(clonedSVG);
+                }
+              }}
+              finishCallback={(svg) => {
+                setEditing(false);
 
-              const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
-              if (!svgMatch) {
-                console.error("Malformed SVG received:", svg);
-                return;
-              }
+                const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
+                if (!svgMatch) {
+                  console.error("Malformed SVG received:", svg);
+                  return;
+                }
 
-              const cleanSvgText = svgMatch[0];
+                const cleanSvgText = svgMatch[0];
 
-              const blob = new Blob([cleanSvgText], { type: "image/svg+xml" });
+                const blob = new Blob([cleanSvgText], {
+                  type: "image/svg+xml",
+                });
 
-              const file = new File([blob], svgMedia.filename.slice(0, -4), {
-                type: "image/svg+xml",
-              });
+                const file = new File([blob], svgMedia.filename, {
+                  type: "image/svg+xml",
+                });
 
-              // Prepare FormData
-              const formData = new FormData();
-              formData.append("file", file);
+                // Prepare FormData
+                const formData = new FormData();
+                formData.append("file", file);
 
-              const url = `https://localhost:8045/upload/${table_id.current}/${svgId}/true`;
+                const url = `https://localhost:8045/upload/${table_id.current}/${svgMedia.svgId}/undefined/reupload/true`;
 
-              try {
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", url, true);
-                xhr.send(formData);
-              } catch (error) {
-                console.error("Error uploading file:", error);
-              }
-            }}
-            cancelCallback={() => {
-              setEditing(false);
-            }}
-          />
-        }
-        options={{ animate: false }}
-      />
+                try {
+                  const xhr = new XMLHttpRequest();
+                  xhr.open("POST", url, true);
+                  xhr.send(formData);
+                } catch (error) {
+                  console.error("Error uploading file:", error);
+                }
+              }}
+              cancelCallback={() => {
+                setEditing(false);
+              }}
+            />
+          }
+          options={{ animate: false }}
+        />
+      )}
     </>
   );
 }

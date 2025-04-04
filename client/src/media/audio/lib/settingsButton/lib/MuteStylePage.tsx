@@ -88,36 +88,38 @@ export default function MuteStylePage({
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
-          {Object.entries(userMedia.current.svg).map(([svgId, svgMedia]) => (
-            <FgButton
-              key={svgId}
-              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                svgId === settings.muteStyle.value
-                  ? "bg-fg-white text-fg-tone-black-1"
-                  : ""
-              }`}
-              contentFunction={() => (
-                <div
-                  className={`${
-                    svgMedia.filename ? "justify-between" : "justify-start"
-                  } flex w-full bg-opacity-75 px-2 items-center text-lg`}
-                >
-                  <>{svgMedia.filename}</>
-                  <FgSVGElement
-                    src={svgMedia.blobURL ?? ""}
-                    className='h-6 aspect-square'
-                    attributes={[
-                      { key: "height", value: "100%" },
-                      { key: "width", value: "100%" },
-                    ]}
-                  />
-                </div>
-              )}
-              clickFunction={() => {
-                setMuteStyle(svgId);
-              }}
-            />
-          ))}
+          {Object.entries(userMedia.current.svg.all).map(
+            ([svgId, svgMedia]) => (
+              <FgButton
+                key={svgId}
+                className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                  svgId === settings.muteStyle.value
+                    ? "bg-fg-white text-fg-tone-black-1"
+                    : ""
+                }`}
+                contentFunction={() => (
+                  <div
+                    className={`${
+                      svgMedia.filename ? "justify-between" : "justify-start"
+                    } flex w-full bg-opacity-75 px-2 items-center text-lg`}
+                  >
+                    <>{svgMedia.filename}</>
+                    <FgSVGElement
+                      src={svgMedia.blobURL ?? ""}
+                      className='h-6 aspect-square'
+                      attributes={[
+                        { key: "height", value: "100%" },
+                        { key: "width", value: "100%" },
+                      ]}
+                    />
+                  </div>
+                )}
+                clickFunction={() => {
+                  setMuteStyle(svgId);
+                }}
+              />
+            )
+          )}
           {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}

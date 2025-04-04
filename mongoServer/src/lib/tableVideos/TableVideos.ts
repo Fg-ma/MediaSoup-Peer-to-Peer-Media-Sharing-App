@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { TableVideosType } from "./typeConstant";
 
 class TableVideos {
-  private tableVideosCollection: Collection;
+  private tableVideosCollection: Collection<TableVideosType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

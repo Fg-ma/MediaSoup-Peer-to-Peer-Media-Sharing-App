@@ -24,13 +24,13 @@ import DownloadButton from "./lib/lowerVideoControls/downloadButton/DownloadButt
 import DownloadRecordingButton from "./lib/lowerVideoControls/downloadButton/DownloadRecordingButton";
 
 export default function FgVideo({
-  videoId,
+  videoInstanceId,
   name,
   bundleRef,
   videoContentMute,
   options,
 }: {
-  videoId: string;
+  videoInstanceId: string;
   name?: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   videoContentMute: React.MutableRefObject<{
@@ -47,7 +47,7 @@ export default function FgVideo({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const videoMedia = userMedia.current.video[videoId];
+  const videoMedia = userMedia.current.video.instances[videoInstanceId];
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +65,7 @@ export default function FgVideo({
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
   const tintColor = useRef(
-    userEffectsStyles.current.video[videoId].video.tint.color
+    userEffectsStyles.current.video[videoInstanceId].video.tint.color
   );
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
@@ -101,7 +101,7 @@ export default function FgVideo({
   const wasPaused = useRef(false);
 
   const lowerVideoController = new LowerVideoController(
-    videoId,
+    videoInstanceId,
     videoMedia,
     videoContainerRef,
     setPausedState,
@@ -129,7 +129,7 @@ export default function FgVideo({
   );
 
   const videoController = new VideoController(
-    videoId,
+    videoInstanceId,
     videoMedia,
     subContainerRef,
     videoContainerRef,
@@ -198,17 +198,17 @@ export default function FgVideo({
   }, [settings]);
 
   useEffect(() => {
-    if (subContainerRef.current && userMedia.current.video[videoId]?.canvas) {
-      userMedia.current.video[videoId].canvas.style.position = "absolute";
-      userMedia.current.video[videoId].canvas.style.top = "0%";
-      userMedia.current.video[videoId].canvas.style.left = "0%";
-      userMedia.current.video[videoId].canvas.style.width = "100%";
-      userMedia.current.video[videoId].canvas.style.height = "100%";
+    if (subContainerRef.current && videoMedia?.canvas) {
+      videoMedia.canvas.style.position = "absolute";
+      videoMedia.canvas.style.top = "0%";
+      videoMedia.canvas.style.left = "0%";
+      videoMedia.canvas.style.width = "100%";
+      videoMedia.canvas.style.height = "100%";
       // subContainerRef.current.appendChild(
-      //   userMedia.current.video[videoId].canvas
+      //   userMedia.current.video[videoInstanceId].canvas
       // );
     }
-  }, [videoId, userMedia]);
+  }, [videoInstanceId, userMedia]);
 
   useEffect(() => {
     videoController.scaleCallback();
@@ -227,7 +227,8 @@ export default function FgVideo({
 
   return (
     <FgMediaContainer
-      mediaId={videoId}
+      mediaId={videoMedia.videoId}
+      mediaInstanceId={videoInstanceId}
       filename={videoMedia.filename}
       kind='video'
       rootMedia={videoMedia.video}
@@ -237,7 +238,7 @@ export default function FgVideo({
       popupElements={[
         videoEffectsActive ? (
           <VideoEffectsSection
-            videoId={videoId}
+            videoInstanceId={videoInstanceId}
             lowerVideoController={lowerVideoController}
             tintColor={tintColor}
             videoMedia={videoMedia}
@@ -323,7 +324,7 @@ export default function FgVideo({
         //   isUser={false}
         //   permissions={undefined}
         //   producerType={"video"}
-        //   producerId={videoId}
+        //   producerId={videoInstanceId}
         //   audioEffectsActive={audioEffectsActive}
         //   setAudioEffectsActive={setAudioEffectsActive}
         //   visualMediaContainerRef={videoContainerRef}

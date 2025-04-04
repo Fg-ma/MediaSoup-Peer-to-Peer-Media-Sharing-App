@@ -161,11 +161,11 @@ table.jPicker td {
   border-top-width: 0;
   cursor: pointer;
 }
-.jPicker .Button {
+.jPicker .method-button-color {
   text-align: center;
   width: 115px;
 }
-.jPicker .Button input {
+.jPicker .method-button-color input {
   width: 100px;
   cursor: pointer;
 }

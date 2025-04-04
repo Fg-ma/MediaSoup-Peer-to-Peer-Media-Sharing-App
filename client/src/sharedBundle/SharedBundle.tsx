@@ -94,59 +94,60 @@ export default function SharedBundle({
             />
           </Suspense>
         ))}
-      {userMedia.current.video &&
-        Object.keys(userMedia.current.video).length !== 0 &&
-        Object.keys(userMedia.current.video).map((videoId) => (
-          <Suspense key={videoId} fallback={<div>Loading...</div>}>
-            <FgVideo
-              videoId={videoId}
-              bundleRef={sharedBundleRef}
-              videoContentMute={videoContentMute}
-            />
-          </Suspense>
-        ))}
-      {userMedia.current.image &&
-        Object.keys(userMedia.current.image).length !== 0 &&
-        Object.keys(userMedia.current.image).map((imageId) => (
-          <Suspense key={imageId} fallback={<div>Loading...</div>}>
-            <FgImage
-              imageId={imageId}
-              bundleRef={sharedBundleRef}
-              tableRef={tableRef}
-            />
-          </Suspense>
-        ))}
-      {userMedia.current.svg &&
-        Object.keys(userMedia.current.svg).length !== 0 &&
-        Object.entries(userMedia.current.svg).map(
-          ([svgId, svgMedia]) =>
-            svgMedia.visible && (
-              <Suspense key={svgId} fallback={<div>Loading...</div>}>
-                <FgSvg
-                  svgId={svgId}
-                  bundleRef={sharedBundleRef}
-                  tableRef={tableRef}
-                />
-              </Suspense>
-            )
+      {Object.keys(userMedia.current.video.instances).length !== 0 &&
+        Object.keys(userMedia.current.video.instances).map(
+          (videoInstanceId) => (
+            <Suspense key={videoInstanceId} fallback={<div>Loading...</div>}>
+              <FgVideo
+                videoInstanceId={videoInstanceId}
+                bundleRef={sharedBundleRef}
+                videoContentMute={videoContentMute}
+              />
+            </Suspense>
+          )
         )}
-      {userMedia.current.application &&
-        Object.keys(userMedia.current.application).length !== 0 &&
-        Object.keys(userMedia.current.application).map((applicationId) => (
-          <Suspense key={applicationId} fallback={<div>Loading...</div>}>
-            <FgApplication
-              applicationId={applicationId}
+      {Object.keys(userMedia.current.image.instances).length !== 0 &&
+        Object.keys(userMedia.current.image.instances).map(
+          (imageInstanceId) => (
+            <Suspense key={imageInstanceId} fallback={<div>Loading...</div>}>
+              <FgImage
+                imageInstanceId={imageInstanceId}
+                bundleRef={sharedBundleRef}
+                tableRef={tableRef}
+              />
+            </Suspense>
+          )
+        )}
+      {Object.keys(userMedia.current.svg.instances).length !== 0 &&
+        Object.keys(userMedia.current.svg.instances).map((svgInstanceId) => (
+          <Suspense key={svgInstanceId} fallback={<div>Loading...</div>}>
+            <FgSvg
+              svgInstanceId={svgInstanceId}
               bundleRef={sharedBundleRef}
               tableRef={tableRef}
             />
           </Suspense>
         ))}
-      {userMedia.current.text &&
-        Object.keys(userMedia.current.text).length !== 0 &&
-        Object.keys(userMedia.current.text).map((textId) => (
-          <Suspense key={textId} fallback={<div>Loading...</div>}>
+      {Object.keys(userMedia.current.application.instances).length !== 0 &&
+        Object.keys(userMedia.current.application.instances).map(
+          (applicationInstanceId) => (
+            <Suspense
+              key={applicationInstanceId}
+              fallback={<div>Loading...</div>}
+            >
+              <FgApplication
+                applicationInstanceId={applicationInstanceId}
+                bundleRef={sharedBundleRef}
+                tableRef={tableRef}
+              />
+            </Suspense>
+          )
+        )}
+      {Object.keys(userMedia.current.text.instances).length !== 0 &&
+        Object.keys(userMedia.current.text.instances).map((textInstanceId) => (
+          <Suspense key={textInstanceId} fallback={<div>Loading...</div>}>
             <FgText
-              textId={textId}
+              textInstanceId={textInstanceId}
               bundleRef={sharedBundleRef}
               tableRef={tableRef}
             />

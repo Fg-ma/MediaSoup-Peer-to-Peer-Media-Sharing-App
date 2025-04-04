@@ -46,7 +46,7 @@
 
 #dialog_buttons input:last-child {
   color: #090909;
-  margin-left: 0.5rem;
+  padding-inline: 30px;
 }
 
 #dialog_buttons input:last-child:hover {

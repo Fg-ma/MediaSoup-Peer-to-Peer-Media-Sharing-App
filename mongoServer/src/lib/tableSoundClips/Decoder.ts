@@ -9,66 +9,74 @@ class Decoder {
     sid: string;
     n: string;
     m: string;
-    p: {
+    t: boolean;
+    i: {
+      siid: string;
       p: {
-        l: number;
-        t: number;
+        p: {
+          l: number;
+          t: number;
+        };
+        s: {
+          x: number;
+          y: number;
+        };
+        r: number;
       };
-      s: {
-        x: number;
-        y: number;
-      };
-      r: number;
-    };
-    e: number[];
+      e: number[];
+    }[];
   }): {
     table_id: string;
-    soundClipId: string;
+    svgId: string;
     filename: string;
     mimeType: string;
-    positioning: {
-      position: {
-        left: number;
-        top: number;
+    tabled: boolean;
+    instances: {
+      soundClipInstanceId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
       };
-      scale: {
-        x: number;
-        y: number;
+      effects: {
+        [effectType in SoundClipEffectTypes]: boolean;
       };
-      rotation: number;
-    };
-    effects: {
-      [effectType in SoundClipEffectTypes]: boolean;
-    };
+    }[];
   } => {
-    const { tid, sid, n, m, p, e } = data;
-
-    const effects = Object.keys(soundClipEffectEncodingMap).reduce(
-      (acc, key) => {
-        const value = soundClipEffectEncodingMap[key as SoundClipEffectTypes];
-        acc[key as SoundClipEffectTypes] = e.includes(value);
-        return acc;
-      },
-      {} as Record<SoundClipEffectTypes, boolean>
-    );
+    const { tid, sid, n, m, t, i } = data;
 
     return {
       table_id: tid,
-      soundClipId: sid,
+      svgId: sid,
       filename: n,
       mimeType: m,
-      positioning: {
-        position: {
-          left: p.p.l,
-          top: p.p.t,
+      tabled: t,
+      instances: i.map(({ siid, p, e }) => ({
+        soundClipInstanceId: siid,
+        positioning: {
+          position: {
+            left: p.p.l,
+            top: p.p.t,
+          },
+          scale: {
+            x: p.s.x,
+            y: p.s.y,
+          },
+          rotation: p.r,
         },
-        scale: {
-          x: p.s.x,
-          y: p.s.y,
-        },
-        rotation: p.r,
-      },
-      effects,
+        effects: Object.fromEntries(
+          Object.keys(soundClipEffectEncodingMap).map((key) => [
+            key,
+            e.includes(soundClipEffectEncodingMap[key as SoundClipEffectTypes]),
+          ])
+        ) as Record<SoundClipEffectTypes, boolean>,
+      })),
     };
   };
 }

@@ -307,7 +307,7 @@
   background-color: #515151;
   position: absolute;
   bottom: var(--x1);
-  left: 14px;
+  left: calc(50% - var(--x6));
 }
 
 input#angle {

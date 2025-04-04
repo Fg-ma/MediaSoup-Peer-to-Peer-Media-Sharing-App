@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { TableTextType } from "./typeConstant";
 
 class TableText {
-  private tableTextCollection: Collection;
+  private tableTextCollection: Collection<TableTextType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

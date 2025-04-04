@@ -18,9 +18,6 @@ class ApplicationMedia {
   canvas: HTMLCanvasElement;
   application: HTMLImageElement;
 
-  filename: string;
-  mimeType: TableTopStaticMimeType;
-
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   private blobURL: string | undefined;
@@ -31,22 +28,10 @@ class ApplicationMedia {
     [applicationEffect in ApplicationEffectTypes]?: boolean;
   } = {};
 
-  initPositioning: {
-    position: {
-      left: number;
-      top: number;
-    };
-    scale: {
-      x: number;
-      y: number;
-    };
-    rotation: number;
-  };
-
   constructor(
-    private applicationId: string,
-    filename: string,
-    mimeType: TableTopStaticMimeType,
+    public applicationId: string,
+    public filename: string,
+    public mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private getApplication: (
@@ -62,7 +47,7 @@ class ApplicationMedia {
     ) => void,
     private userDevice: UserDevice,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    initPositioning: {
+    public initPositioning: {
       position: {
         left: number;
         top: number;
@@ -74,10 +59,6 @@ class ApplicationMedia {
       rotation: number;
     }
   ) {
-    this.filename = filename;
-    this.mimeType = mimeType;
-    this.initPositioning = initPositioning;
-
     if (!this.userEffects.current.application[this.applicationId]) {
       this.userEffects.current.application[this.applicationId] =
         structuredClone(defaultApplicationEffects);
@@ -256,7 +237,7 @@ class ApplicationMedia {
       );
     }
 
-    this.babylonScene.imageAlreadyProcessed = 1;
+    this.babylonScene.imageAlreadyProcessed = [1];
   };
 
   setTintColor = (newTintColor: string) => {

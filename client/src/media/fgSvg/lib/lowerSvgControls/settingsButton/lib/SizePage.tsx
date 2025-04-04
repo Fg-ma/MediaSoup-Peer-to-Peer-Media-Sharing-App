@@ -7,7 +7,7 @@ import {
   downloadOptionsArrays,
 } from "../../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
-import SvgMedia from "../../../../../fgSvg/SvgMedia";
+import SvgMediaInstance from "../../../../../../media/fgSvg/SvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -19,7 +19,7 @@ export default function SizePage({
   settings,
   setSettings,
 }: {
-  svgMedia: SvgMedia;
+  svgMedia: SvgMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;

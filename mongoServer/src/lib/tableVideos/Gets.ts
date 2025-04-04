@@ -1,9 +1,10 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { TableVideosType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private tableVideosCollection: Collection,
+    private tableVideosCollection: Collection<TableVideosType>,
     private decoder: Decoder
   ) {}
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(videoData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
@@ -37,10 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return videoData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return videoData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

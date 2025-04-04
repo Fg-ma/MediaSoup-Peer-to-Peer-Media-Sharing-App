@@ -19,6 +19,7 @@ import {
   defaultVideoEffectsStyles,
   defaultVideoEffects,
 } from "../../../universal/effectsTypeConstant";
+import { StaticContentTypes } from "../../../universal/typeConstant";
 
 const tableStaticContentUtils = new Utils();
 
@@ -29,7 +30,9 @@ class Posts {
       const split = url.split("/");
       const table_id = split[2];
       const contentId = split[3];
-      const visible = split[4];
+      const instanceId = split[4];
+      const direction = split[5];
+      const tabled = split[6] !== "false";
 
       res.cork(() => {
         res.writeHeader(
@@ -67,51 +70,33 @@ class Posts {
             file
           )
           .then(async () => {
-            if (staticContentType === "video") {
-              await this.handleVideoUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename
-              );
-            } else if (staticContentType === "image") {
-              await this.handleImageUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename
-              );
-            } else if (staticContentType === "svg") {
-              await this.handleSvgUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename,
-                visible === "false" ? false : true
-              );
-            } else if (staticContentType === "soundClip") {
-              await this.handleAudioUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename
-              );
-            } else if (staticContentType === "application") {
-              await this.handleApplicationUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename
-              );
-            } else if (staticContentType === "text") {
-              await this.handleTextUploads(
-                table_id,
-                contentId,
-                mimeType as StaticMimeTypes,
-                completeFilename
-              );
-            } else {
-              console.warn(`Unsupported file type uploaded: ${mimeType}`);
+            switch (direction) {
+              case "toTable":
+                await this.handleToTable(
+                  staticContentType,
+                  table_id,
+                  contentId,
+                  instanceId,
+                  mimeType as StaticMimeTypes,
+                  completeFilename,
+                  tabled
+                );
+                break;
+              case "reupload":
+                this.handleReupload(staticContentType, table_id, contentId);
+                break;
+              case "toTabled":
+                await this.handleToTabled(
+                  staticContentType,
+                  table_id,
+                  contentId,
+                  mimeType as StaticMimeTypes,
+                  completeFilename,
+                  tabled
+                );
+                break;
+              default:
+                break;
             }
           });
 
@@ -146,235 +131,562 @@ class Posts {
     });
   }
 
-  private handleVideoUploads = async (
+  private handleToTable = async (
+    staticContentType: StaticContentTypes,
+    table_id: string,
+    contentId: string,
+    instanceId: string,
+    mimeType: StaticMimeTypes,
+    completeFilename: string,
+    tabled: boolean
+  ) => {
+    switch (staticContentType) {
+      case "video":
+        await this.handleMongoVideoUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "videoUploadedToTable",
+          header: {
+            contentId,
+            instanceId,
+          },
+          data: {
+            filename: completeFilename,
+            mimeType,
+          },
+        });
+
+        // Process video into DASH format in the background
+        // try {
+        //   // await processVideoWithABR(saveTo, processedDir, filename);
+
+        //   // Notify clients to switch to the DASH stream
+        //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
+        //     0,
+        //     -4
+        //   )}.mpd`;
+
+        //   tableContentController.setContent(table_id, "video", contentId, [
+        //     { property: "dashURL", value: dashVideoUrl },
+        //   ]);
+
+        //   const dashVideoMessage = {
+        //     type: "dashVideoReady",
+        //     header: {
+        //       videoId: contentId,
+        //     },
+        //     data: {
+        //       filename,
+        //       url: dashVideoUrl,
+        //     },
+        //   };
+        //   broadcaster.broadcastToTable(table_id, dashVideoMessage);
+        // } catch (error) {
+        //   console.error("Error during video processing:", error);
+        // }
+        break;
+      case "image":
+        await this.handleMongoImageUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "imageUploadedToTable",
+          header: { contentId, instanceId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "svg":
+        await this.handleMongoSvgUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "svgUploadedToTable",
+          header: { contentId, instanceId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "soundClip":
+        await this.handleMongoSoundClipUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "soundClipUploadedToTable",
+          header: { contentId, instanceId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "application":
+        await this.handleMongoApplicationUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "applicationUploadedToTable",
+          header: { contentId, instanceId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "text":
+        await this.handleMongoTextUploads(
+          table_id,
+          contentId,
+          instanceId,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "textUploadedToTable",
+          header: { contentId, instanceId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      default:
+        console.warn(`Unsupported file type uploaded: ${mimeType}`);
+        break;
+    }
+  };
+
+  private handleReupload = (
+    staticContentType: StaticContentTypes,
+    table_id: string,
+    contentId: string
+  ) => {
+    switch (staticContentType) {
+      case "video":
+        broadcaster.broadcastToTable(table_id, {
+          type: "videoReupload",
+          header: { contentId },
+        });
+        break;
+      case "image":
+        broadcaster.broadcastToTable(table_id, {
+          type: "imageReupload",
+          header: { contentId },
+        });
+        break;
+      case "svg":
+        broadcaster.broadcastToTable(table_id, {
+          type: "svgReuploaded",
+          header: { contentId },
+        });
+        break;
+      case "soundClip":
+        broadcaster.broadcastToTable(table_id, {
+          type: "soundClipReupload",
+          header: { contentId },
+        });
+        break;
+      case "application":
+        broadcaster.broadcastToTable(table_id, {
+          type: "applicationReupload",
+          header: { contentId },
+        });
+        break;
+      case "text":
+        broadcaster.broadcastToTable(table_id, {
+          type: "textReupload",
+          header: { contentId },
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
+  private handleToTabled = async (
+    staticContentType: StaticContentTypes,
     table_id: string,
     contentId: string,
     mimeType: StaticMimeTypes,
-    filename: string
+    completeFilename: string,
+    tabled: boolean
+  ) => {
+    switch (staticContentType) {
+      case "video":
+        await this.handleMongoVideoUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "videoUploadedToTabled",
+          header: {
+            contentId,
+          },
+          data: {
+            filename: completeFilename,
+            mimeType,
+          },
+        });
+
+        // Process video into DASH format in the background
+        // try {
+        //   // await processVideoWithABR(saveTo, processedDir, filename);
+
+        //   // Notify clients to switch to the DASH stream
+        //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
+        //     0,
+        //     -4
+        //   )}.mpd`;
+
+        //   tableContentController.setContent(table_id, "video", contentId, [
+        //     { property: "dashURL", value: dashVideoUrl },
+        //   ]);
+
+        //   const dashVideoMessage = {
+        //     type: "dashVideoReady",
+        //     header: {
+        //       videoId: contentId,
+        //     },
+        //     data: {
+        //       filename,
+        //       url: dashVideoUrl,
+        //     },
+        //   };
+        //   broadcaster.broadcastToTable(table_id, dashVideoMessage);
+        // } catch (error) {
+        //   console.error("Error during video processing:", error);
+        // }
+        break;
+      case "image":
+        await this.handleMongoImageUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "imageUploadedToTabled",
+          header: { contentId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "svg":
+        await this.handleMongoSvgUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "svgUploadedToTabled",
+          header: { contentId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "soundClip":
+        await this.handleMongoSoundClipUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "soundClipUploadedToTabled",
+          header: { contentId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "application":
+        await this.handleMongoApplicationUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "applicationUploadedToTabled",
+          header: { contentId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      case "text":
+        await this.handleMongoTextUploads(
+          table_id,
+          contentId,
+          undefined,
+          mimeType,
+          completeFilename,
+          tabled
+        );
+
+        broadcaster.broadcastToTable(table_id, {
+          type: "textUploadedToTabled",
+          header: { contentId },
+          data: { filename: completeFilename, mimeType },
+        });
+        break;
+      default:
+        console.warn(`Unsupported file type uploaded: ${mimeType}`);
+        break;
+    }
+  };
+
+  private handleMongoVideoUploads = async (
+    table_id: string,
+    contentId: string,
+    instanceId: string | undefined,
+    mimeType: StaticMimeTypes,
+    filename: string,
+    tabled: boolean
   ) => {
     await tableTopMongo.tableVideos?.uploads.uploadMetaData({
       table_id,
       videoId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-      effects: structuredClone(defaultVideoEffects),
-      effectStyles: structuredClone(defaultVideoEffectsStyles),
-      videoPosition: 0,
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              videoInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+              effects: structuredClone(defaultVideoEffects),
+              effectStyles: structuredClone(defaultVideoEffectsStyles),
+              videoPosition: 0,
+            },
+          ]
+        : [],
     });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "originalVideoReady",
-      header: {
-        videoId: contentId,
-      },
-      data: {
-        filename,
-        mimeType,
-      },
-    });
-
-    // Process video into DASH format in the background
-    // try {
-    //   // await processVideoWithABR(saveTo, processedDir, filename);
-
-    //   // Notify clients to switch to the DASH stream
-    //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
-    //     0,
-    //     -4
-    //   )}.mpd`;
-
-    //   tableContentController.setContent(table_id, "video", contentId, [
-    //     { property: "dashURL", value: dashVideoUrl },
-    //   ]);
-
-    //   const dashVideoMessage = {
-    //     type: "dashVideoReady",
-    //     header: {
-    //       videoId: contentId,
-    //     },
-    //     data: {
-    //       filename,
-    //       url: dashVideoUrl,
-    //     },
-    //   };
-    //   broadcaster.broadcastToTable(table_id, dashVideoMessage);
-    // } catch (error) {
-    //   console.error("Error during video processing:", error);
-    // }
   };
 
-  private handleImageUploads = async (
+  private handleMongoImageUploads = async (
     table_id: string,
     contentId: string,
+    instanceId: string | undefined,
     mimeType: StaticMimeTypes,
-    filename: string
+    filename: string,
+    tabled: boolean
   ) => {
     await tableTopMongo.tableImages?.uploads.uploadMetaData({
       table_id,
       imageId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-      effects: structuredClone(defaultImageEffects),
-      effectStyles: structuredClone(defaultImageEffectsStyles),
-    });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "imageReady",
-      header: { contentId },
-      data: { filename: filename, mimeType },
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              imageInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+              effects: structuredClone(defaultImageEffects),
+              effectStyles: structuredClone(defaultImageEffectsStyles),
+            },
+          ]
+        : [],
     });
   };
 
-  private handleSvgUploads = async (
+  private handleMongoSvgUploads = async (
     table_id: string,
     contentId: string,
+    instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    visible: boolean
+    tabled: boolean
   ) => {
     await tableTopMongo.tableSvgs?.uploads.uploadMetaData({
       table_id,
       svgId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-      visible,
-      effects: structuredClone(defaultSvgEffects),
-      effectStyles: structuredClone(defaultSvgEffectsStyles),
-    });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "svgReady",
-      header: { contentId },
-      data: { filename: filename, mimeType, visible },
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              svgInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+              effects: structuredClone(defaultSvgEffects),
+              effectStyles: structuredClone(defaultSvgEffectsStyles),
+            },
+          ]
+        : [],
     });
   };
 
-  private handleAudioUploads = async (
+  private handleMongoSoundClipUploads = async (
     table_id: string,
     contentId: string,
+    instanceId: string | undefined,
     mimeType: StaticMimeTypes,
-    filename: string
+    filename: string,
+    tabled: boolean
   ) => {
     await tableTopMongo.tableSoundClips?.uploads.uploadMetaData({
       table_id,
       soundClipId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-      effects: structuredClone(defaultAudioEffects),
-    });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "audioReady",
-      header: { contentId },
-      data: { filename: filename, mimeType },
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              soundClipInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+              effects: structuredClone(defaultAudioEffects),
+            },
+          ]
+        : [],
     });
   };
 
-  private handleApplicationUploads = async (
+  private handleMongoApplicationUploads = async (
     table_id: string,
     contentId: string,
+    instanceId: string | undefined,
     mimeType: StaticMimeTypes,
-    filename: string
+    filename: string,
+    tabled: boolean
   ) => {
     await tableTopMongo.tableApplications?.uploads.uploadMetaData({
       table_id,
       applicationId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-      effects: structuredClone(defaultApplicationEffects),
-      effectStyles: structuredClone(defaultApplicationEffectsStyles),
-    });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "applicationReady",
-      header: { contentId },
-      data: { filename: filename, mimeType },
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              applicationInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+              effects: structuredClone(defaultApplicationEffects),
+              effectStyles: structuredClone(defaultApplicationEffectsStyles),
+            },
+          ]
+        : [],
     });
   };
 
-  private handleTextUploads = async (
+  private handleMongoTextUploads = async (
     table_id: string,
     contentId: string,
+    instanceId: string | undefined,
     mimeType: StaticMimeTypes,
-    filename: string
+    filename: string,
+    tabled: boolean
   ) => {
     await tableTopMongo.tableText?.uploads.uploadMetaData({
       table_id,
       textId: contentId,
       filename,
       mimeType,
-      positioning: {
-        position: {
-          left: 32.5,
-          top: 32.5,
-        },
-        scale: {
-          x: 25,
-          y: 25,
-        },
-        rotation: 0,
-      },
-    });
-
-    broadcaster.broadcastToTable(table_id, {
-      type: "textReady",
-      header: { contentId },
-      data: { filename, mimeType },
+      tabled,
+      instances: instanceId
+        ? [
+            {
+              textInstanceId: instanceId,
+              positioning: {
+                position: {
+                  left: 32.5,
+                  top: 32.5,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              },
+            },
+          ]
+        : [],
     });
   };
 }

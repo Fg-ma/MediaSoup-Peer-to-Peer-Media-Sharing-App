@@ -18,7 +18,7 @@ import TableStaticContentSocketController from "../../../../serverControllers/ta
 
 class LowerVideoController {
   constructor(
-    private videoId: string,
+    private videoInstanceId: string,
     private videoMedia: VideoMedia,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
@@ -197,7 +197,8 @@ class LowerVideoController {
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
-      this.videoId,
+      this.videoMedia.videoId,
+      this.videoInstanceId,
       this.videoMedia.video.currentTime
     );
   };
@@ -216,7 +217,8 @@ class LowerVideoController {
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
-      this.videoId,
+      this.videoMedia.videoId,
+      this.videoInstanceId,
       this.videoMedia.video.currentTime
     );
   };
@@ -286,11 +288,11 @@ class LowerVideoController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userEffects.current.video[this.videoId].video[effect] =
-          !this.userEffects.current.video[this.videoId].video[effect];
+        this.userEffects.current.video[this.videoInstanceId].video[effect] =
+          !this.userEffects.current.video[this.videoInstanceId].video[effect];
       }
 
-      this.userMedia.current.video[this.videoId].changeEffects(
+      this.videoMedia.changeEffects(
         effect,
         this.tintColor.current,
         blockStateChange
@@ -298,18 +300,20 @@ class LowerVideoController {
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
-        this.videoId,
-        this.userEffects.current.video[this.videoId].video,
-        this.userEffectsStyles.current.video[this.videoId].video
+        this.videoMedia.videoId,
+        this.videoInstanceId,
+        this.userEffects.current.video[this.videoInstanceId].video,
+        this.userEffectsStyles.current.video[this.videoInstanceId].video
       );
     } else {
-      this.userMedia.current.video[this.videoId].clearAllEffects();
+      this.videoMedia.clearAllEffects();
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
-        this.videoId,
-        this.userEffects.current.video[this.videoId].video,
-        this.userEffectsStyles.current.video[this.videoId].video
+        this.videoMedia.videoId,
+        this.videoInstanceId,
+        this.userEffects.current.video[this.videoInstanceId].video,
+        this.userEffectsStyles.current.video[this.videoInstanceId].video
       );
     }
   };
@@ -397,7 +401,8 @@ class LowerVideoController {
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
-      this.videoId,
+      this.videoMedia.videoId,
+      this.videoInstanceId,
       this.videoMedia.video.currentTime
     );
 

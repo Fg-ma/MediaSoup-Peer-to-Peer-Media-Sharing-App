@@ -26,9 +26,6 @@ class ImageMedia {
   canvas: HTMLCanvasElement;
   image: HTMLImageElement;
 
-  filename: string;
-  mimeType: TableTopStaticMimeType;
-
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   private blobURL: string | undefined;
@@ -53,27 +50,15 @@ class ImageMedia {
   private selfieSegmentationResults: ImageData[] = [];
   private selfieSegmentationProcessing = [false];
 
-  initPositioning: {
-    position: {
-      left: number;
-      top: number;
-    };
-    scale: {
-      x: number;
-      y: number;
-    };
-    rotation: number;
-  };
-
   private faceCountChangeListeners: Set<(facesDetected: number) => void> =
     new Set();
 
   forcingFaces = false;
 
   constructor(
-    private imageId: string,
-    filename: string,
-    mimeType: TableTopStaticMimeType,
+    public imageId: string,
+    public filename: string,
+    public mimeType: TableTopStaticMimeType,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private getImage: (
@@ -90,7 +75,7 @@ class ImageMedia {
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    initPositioning: {
+    public initPositioning: {
       position: {
         left: number;
         top: number;
@@ -102,10 +87,6 @@ class ImageMedia {
       rotation: number;
     }
   ) {
-    this.filename = filename;
-    this.mimeType = mimeType;
-    this.initPositioning = initPositioning;
-
     if (!this.userEffects.current.image[this.imageId]) {
       this.userEffects.current.image[this.imageId] =
         structuredClone(defaultImageEffects);

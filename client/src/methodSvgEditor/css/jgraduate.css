@@ -358,19 +358,25 @@ div.jGraduate_Slider img {
   cursor: ew-resize;
 }
 
-.jPicker .Button .Ok,
+.jPicker .method-button-color .Ok,
 .jGraduate_Picker .jGraduate_OkCancel .jGraduate_Ok {
   -webkit-appearance: none;
   margin: 0;
   position: absolute;
   bottom: var(--x2);
   right: var(--x2);
+  text-align: center;
+  padding: 0 var(--x4);
+  height: 40px;
 }
 
-.jPicker .Button .Cancel,
+.jPicker .method-button-color .Cancel,
 .jGraduate_Picker .jGraduate_OkCancel .jGraduate_Cancel {
   margin: 0;
   position: absolute;
   bottom: var(--x2);
   left: var(--x2);
+  text-align: center;
+  padding: 0 var(--x4);
+  height: 40px;
 }

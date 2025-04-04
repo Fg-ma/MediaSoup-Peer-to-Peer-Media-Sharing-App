@@ -10,7 +10,7 @@ import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 
 class LowerImageController {
   constructor(
-    private imageId: string,
+    private imageInstanceId: string,
     private imageMedia: ImageMedia,
     private imageContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -98,11 +98,11 @@ class LowerImageController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userEffects.current.image[this.imageId][effect] =
-          !this.userEffects.current.image[this.imageId][effect];
+        this.userEffects.current.image[this.imageInstanceId][effect] =
+          !this.userEffects.current.image[this.imageInstanceId][effect];
       }
 
-      this.userMedia.current.image[this.imageId].changeEffects(
+      this.imageMedia.changeEffects(
         effect,
         this.tintColor.current,
         blockStateChange
@@ -110,18 +110,20 @@ class LowerImageController {
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
-        this.imageId,
-        this.userEffects.current.image[this.imageId],
-        this.userEffectsStyles.current.image[this.imageId]
+        this.imageMedia.imageId,
+        this.imageInstanceId,
+        this.userEffects.current.image[this.imageInstanceId],
+        this.userEffectsStyles.current.image[this.imageInstanceId]
       );
     } else {
-      this.userMedia.current.image[this.imageId].clearAllEffects();
+      this.imageMedia.clearAllEffects();
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
-        this.imageId,
-        this.userEffects.current.image[this.imageId],
-        this.userEffectsStyles.current.image[this.imageId]
+        this.imageMedia.imageId,
+        this.imageInstanceId,
+        this.userEffects.current.image[this.imageInstanceId],
+        this.userEffectsStyles.current.image[this.imageInstanceId]
       );
     }
   };
