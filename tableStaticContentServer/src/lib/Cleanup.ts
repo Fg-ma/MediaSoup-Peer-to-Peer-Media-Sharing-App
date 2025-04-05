@@ -16,19 +16,14 @@ class Cleanup {
       instanceId
     );
 
-    if (document) {
-      if (document.i.length === 0 && !document.t) {
-        await tableTopCeph.deleteFile(
-          contentTypeBucketMap[contentType],
-          filename
-        );
+    if (document && document.i.length === 0 && !document.t) {
+      console.log("wokr", filename, contentTypeBucketMap[contentType]);
+      await tableTopCeph.deleteFile(
+        contentTypeBucketMap[contentType],
+        filename
+      );
 
-        await tableTopMongo.deleteTableDocument(
-          table_id,
-          contentType,
-          contentId
-        );
-      }
+      await tableTopMongo.deleteTableDocument(table_id, contentType, contentId);
     }
 
     this.broadcaster.broadcastToTable(table_id, {

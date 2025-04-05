@@ -13,6 +13,10 @@ import TextMedia from "../../media/fgText/TextMedia";
 import SoundClipMedia from "../../media/soundClip/SoundClipMedia";
 import SvgMedia from "../../media/fgSvg/SvgMedia";
 import SvgMediaInstance from "src/media/fgSvg/SvgMediaInstance";
+import TextMediaInstance from "src/media/fgText/TextMediaInstance";
+import ApplicationMediaInstance from "src/media/fgApplication/ApplicationMediaInstance";
+import ImageMediaInstance from "src/media/fgImage/ImageMediaInstance";
+import VideoMediaInstance from "src/media/fgVideo/VideoMediaInstance";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -30,7 +34,7 @@ export type UserMediaType = {
       [videoId: string]: VideoMedia;
     };
     instances: {
-      [videoId: string]: VideoMedia;
+      [videoId: string]: VideoMediaInstance;
     };
   };
   image: {
@@ -38,7 +42,7 @@ export type UserMediaType = {
       [imageId: string]: ImageMedia;
     };
     instances: {
-      [imageId: string]: ImageMedia;
+      [imageId: string]: ImageMediaInstance;
     };
   };
   svg: {
@@ -54,7 +58,7 @@ export type UserMediaType = {
       [applicationId: string]: ApplicationMedia;
     };
     instances: {
-      [applicationId: string]: ApplicationMedia;
+      [applicationId: string]: ApplicationMediaInstance;
     };
   };
   text: {
@@ -62,7 +66,7 @@ export type UserMediaType = {
       [textId: string]: TextMedia;
     };
     instances: {
-      [textId: string]: TextMedia;
+      [textId: string]: TextMediaInstance;
     };
   };
   soundClip: {

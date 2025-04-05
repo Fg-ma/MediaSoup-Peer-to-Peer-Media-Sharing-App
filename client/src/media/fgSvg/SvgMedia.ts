@@ -3,14 +3,9 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { StaticContentTypes } from "../../../../universal/typeConstant";
-import {
-  UserEffectsStylesType,
-  UserEffectsType,
-} from "../../../../universal/effectsTypeConstant";
 
 class SvgMedia {
-  static svgCache: Map<string, SVGSVGElement> = new Map();
-  svg?: SVGSVGElement;
+  svg: SVGSVGElement | undefined;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
@@ -25,8 +20,6 @@ class SvgMedia {
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public tabled: boolean,
-    protected userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    protected userEffects: React.MutableRefObject<UserEffectsType>,
     private getSVG: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -39,12 +32,8 @@ class SvgMedia {
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void
   ) {
-    if (SvgMedia.svgCache.has(this.svgId)) {
-      this.svg = SvgMedia.svgCache.get(this.svgId);
-    } else {
-      this.getSVG("svg", this.svgId, this.filename);
-      this.addMessageListener(this.getSvgListener);
-    }
+    this.getSVG("svg", this.svgId, this.filename);
+    this.addMessageListener(this.getSvgListener);
   }
 
   deconstructor = () => {
@@ -62,9 +51,8 @@ class SvgMedia {
     this.blobURL = undefined;
 
     this.svg = undefined;
-    this.aspect = undefined;
 
-    SvgMedia.svgCache.delete(this.svgId);
+    this.aspect = undefined;
 
     this.getSVG("svg", this.svgId, this.filename);
     this.addMessageListener(this.getSvgListener);
@@ -73,7 +61,6 @@ class SvgMedia {
   private getSvgListener = async (
     message: IncomingTableStaticContentMessages
   ) => {
-    console.log(message);
     if (message.type === "chunk") {
       const { contentType, contentId, key } = message.header;
 
@@ -122,8 +109,6 @@ class SvgMedia {
 
       this.aspect = this.getSvgAspectRatio();
 
-      SvgMedia.svgCache.set(this.svgId, this.svg);
-
       this.downloadCompleteListeners.forEach((listener) => {
         listener();
       });
@@ -149,7 +134,7 @@ class SvgMedia {
     if (viewBox) {
       const [, , width, height] = viewBox.split(" ").map(Number);
       if (width > 0 && height > 0) {
-        return width / height; // Aspect ratio (width / height)
+        return width / height;
       }
     }
 

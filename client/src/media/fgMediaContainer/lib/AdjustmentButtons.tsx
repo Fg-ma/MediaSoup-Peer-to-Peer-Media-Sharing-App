@@ -10,6 +10,7 @@ import { StaticContentTypes } from "../../../../../universal/typeConstant";
 export default function AdjustmentButtons({
   kind,
   mediaId,
+  mediaInstanceId,
   bundleRef,
   panBtnRef,
   positioning,
@@ -20,6 +21,7 @@ export default function AdjustmentButtons({
 }: {
   kind: StaticContentTypes;
   mediaId: string;
+  mediaInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
   positioning: React.MutableRefObject<{
@@ -72,6 +74,7 @@ export default function AdjustmentButtons({
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
+            mediaInstanceId,
             { rotation: positioning.current.rotation }
           );
         }}
@@ -133,6 +136,7 @@ export default function AdjustmentButtons({
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
+            mediaInstanceId,
             { position: positioning.current.position }
           );
         }}
@@ -171,6 +175,7 @@ export default function AdjustmentButtons({
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
+            mediaInstanceId,
             { scale: positioning.current.scale }
           );
         }}

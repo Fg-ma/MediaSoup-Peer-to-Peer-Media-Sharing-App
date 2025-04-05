@@ -25,6 +25,7 @@ export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
 // tableTopCeph.emptyBucket("table-svgs");
+// tableTopCeph.emptyBucket("table-images");
 // tableTopCeph.listBucketContents("table-svgs");
 
 const sslOptions = {

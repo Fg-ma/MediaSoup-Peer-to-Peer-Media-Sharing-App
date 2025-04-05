@@ -12,7 +12,7 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
-  svgMedia,
+  svgMediaInstance,
   effectsActive,
   containerRef,
   settingsActive,
@@ -24,7 +24,7 @@ export default function SettingsButton({
   scrollingContainerRef,
   lowerSvgController,
 }: {
-  svgMedia: SvgMediaInstance;
+  svgMediaInstance: SvgMediaInstance;
   effectsActive: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -131,7 +131,7 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
-          svgMedia={svgMedia}
+          svgMediaInstance={svgMediaInstance}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

@@ -4,7 +4,6 @@ import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,
 } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
-import { IncomingTableStaticContentMessages } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import ReactController from "../../../elements/reactButton/lib/ReactController";
 import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
 import {
@@ -69,6 +68,7 @@ class FgAudioElementContainerController {
   ) {
     this.reactController = new ReactController(
       `audio_${this.table_id}_${this.username}_${this.instance}`,
+      undefined,
       "audio",
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,

@@ -11,34 +11,19 @@ import {
   UserEffectsStylesType,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
 import {
   DownloadCompressionTypes,
   DownloadMimeTypes,
 } from "./lib/typeConstant";
 
-class SvgMediaInstance extends SvgMedia {
+class SvgMediaInstance {
   instanceSvg: SVGSVGElement | undefined = undefined;
 
   constructor(
-    svgId: string,
+    public svgMedia: SvgMedia,
     private svgInstanceId: string,
-    filename: string,
-    mimeType: TableTopStaticMimeType,
-    tabled: boolean,
-    userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    userEffects: React.MutableRefObject<UserEffectsType>,
-    getSVG: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string
-    ) => void,
-    addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void,
-    removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void,
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private userEffects: React.MutableRefObject<UserEffectsType>,
     public initPositioning: {
       position: {
         left: number;
@@ -51,20 +36,6 @@ class SvgMediaInstance extends SvgMedia {
       rotation: number;
     }
   ) {
-    super(
-      svgId,
-      filename,
-      mimeType,
-      tabled,
-      userEffectsStyles,
-      userEffects,
-      getSVG,
-      addMessageListener,
-      removeMessageListener
-    );
-
-    this.initPositioning = initPositioning;
-
     if (!this.userEffects.current.svg[this.svgInstanceId]) {
       this.userEffects.current.svg[this.svgInstanceId] =
         structuredClone(defaultSvgEffects);
@@ -76,23 +47,15 @@ class SvgMediaInstance extends SvgMedia {
       );
     }
 
-    if (SvgMedia.svgCache.has(this.svgId)) {
-      this.instanceSvg = SvgMedia.svgCache
-        .get(this.svgId)
-        ?.cloneNode(true) as SVGSVGElement;
-      console.log("3");
+    if (this.svgMedia.svg) {
+      this.instanceSvg = this.svgMedia.svg?.cloneNode(true) as SVGSVGElement;
     }
-    this.addDownloadCompleteListener(() => {
-      this.instanceSvg = SvgMedia.svgCache
-        .get(this.svgId)
-        ?.cloneNode(true) as SVGSVGElement;
-      console.log("wokr2", this.instanceSvg);
+    this.svgMedia.addDownloadCompleteListener(() => {
+      this.instanceSvg = this.svgMedia.svg?.cloneNode(true) as SVGSVGElement;
     });
   }
 
-  deconstructor = () => {
-    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
-  };
+  deconstructor = () => {};
 
   clearAllEffects = () => {
     Object.entries(this.userEffects.current.svg[this.svgInstanceId]).map(

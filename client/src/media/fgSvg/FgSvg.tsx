@@ -35,7 +35,7 @@ export default function FgSvg({
 
   const [editing, setEditing] = useState(false);
 
-  const svgMedia = userMedia.current.svg.instances[svgInstanceId];
+  const svgMediaInstance = userMedia.current.svg.instances[svgInstanceId];
 
   const [svgEffectsActive, setSvgEffectsActive] = useState(false);
 
@@ -43,7 +43,7 @@ export default function FgSvg({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(svgMedia.initPositioning);
+  }>(svgMediaInstance.initPositioning);
 
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ export default function FgSvg({
 
   const lowerSvgController = new LowerSvgController(
     svgInstanceId,
-    svgMedia,
+    svgMediaInstance,
     svgContainerRef,
     shiftPressed,
     controlPressed,
@@ -80,7 +80,7 @@ export default function FgSvg({
 
   const svgController = new SvgController(
     svgInstanceId,
-    svgMedia,
+    svgMediaInstance,
     setSettingsActive,
     userEffects,
     userEffectsStyles,
@@ -88,17 +88,19 @@ export default function FgSvg({
   );
 
   useEffect(() => {
-    if (svgMedia.instanceSvg) {
-      subContainerRef.current?.appendChild(svgMedia.instanceSvg);
+    if (svgMediaInstance.instanceSvg) {
+      subContainerRef.current?.appendChild(svgMediaInstance.instanceSvg);
       positioning.current.scale = {
-        x: svgMedia.aspect
-          ? positioning.current.scale.y * svgMedia.aspect
+        x: svgMediaInstance.svgMedia.aspect
+          ? positioning.current.scale.y * svgMediaInstance.svgMedia.aspect
           : positioning.current.scale.x,
         y: positioning.current.scale.y,
       };
+
+      setRerender((prev) => !prev);
     }
-    svgMedia.addDownloadCompleteListener(() => {
-      if (svgMedia.instanceSvg) {
+    svgMediaInstance.svgMedia.addDownloadCompleteListener(() => {
+      if (svgMediaInstance.instanceSvg) {
         const allSvgs = subContainerRef.current?.querySelectorAll("svg");
 
         if (allSvgs) {
@@ -107,13 +109,16 @@ export default function FgSvg({
           });
         }
 
-        subContainerRef.current?.appendChild(svgMedia.instanceSvg);
+        subContainerRef.current?.appendChild(svgMediaInstance.instanceSvg);
+
         positioning.current.scale = {
-          x: svgMedia.aspect
-            ? positioning.current.scale.y * svgMedia.aspect
+          x: svgMediaInstance.svgMedia.aspect
+            ? positioning.current.scale.y * svgMediaInstance.svgMedia.aspect
             : positioning.current.scale.x,
           y: positioning.current.scale.y,
         };
+
+        setRerender((prev) => !prev);
       }
     });
 
@@ -154,11 +159,11 @@ export default function FgSvg({
   return (
     <>
       <FgMediaContainer
-        mediaId={svgMedia.svgId}
+        mediaId={svgMediaInstance.svgMedia.svgId}
         mediaInstanceId={svgInstanceId}
-        filename={svgMedia.filename}
+        filename={svgMediaInstance.svgMedia.filename}
         kind='svg'
-        rootMedia={svgMedia.svg}
+        rootMedia={svgMediaInstance.instanceSvg}
         bundleRef={bundleRef}
         backgroundMedia={settings.background.value}
         className='svg-container'
@@ -166,7 +171,7 @@ export default function FgSvg({
           svgEffectsActive ? (
             <SvgEffectsSection
               svgInstanceId={svgInstanceId}
-              svgMedia={svgMedia}
+              svgMediaInstance={svgMediaInstance}
               lowerSvgController={lowerSvgController}
               svgContainerRef={svgContainerRef}
             />
@@ -174,7 +179,7 @@ export default function FgSvg({
         ]}
         rightLowerControls={[
           <SettingsButton
-            svgMedia={svgMedia}
+            svgMediaInstance={svgMediaInstance}
             effectsActive={svgEffectsActive}
             containerRef={svgContainerRef}
             settingsActive={settingsActive}
@@ -201,7 +206,7 @@ export default function FgSvg({
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
         options={{ gradient: false, adjustmentAnimation: false }}
       />
-      {editing && svgMedia.svg && (
+      {editing && svgMediaInstance.svgMedia.svg && (
         <FgPortal
           type='staticTopDomain'
           top={0}
@@ -212,9 +217,11 @@ export default function FgSvg({
             <MethodSvgEditor
               editing={editing}
               initialSVGString={() => {
-                if (svgMedia.svg) {
+                if (svgMediaInstance.svgMedia.svg) {
                   // Create a deep clone of the original svg element
-                  const clonedSVG = svgMedia.svg.cloneNode(true) as HTMLElement;
+                  const clonedSVG = svgMediaInstance.svgMedia.svg.cloneNode(
+                    true
+                  ) as HTMLElement;
 
                   // Modify the clone
                   clonedSVG.setAttribute("width", "100");
@@ -239,15 +246,19 @@ export default function FgSvg({
                   type: "image/svg+xml",
                 });
 
-                const file = new File([blob], svgMedia.filename, {
-                  type: "image/svg+xml",
-                });
+                const file = new File(
+                  [blob],
+                  svgMediaInstance.svgMedia.filename,
+                  {
+                    type: "image/svg+xml",
+                  }
+                );
 
                 // Prepare FormData
                 const formData = new FormData();
                 formData.append("file", file);
 
-                const url = `https://localhost:8045/upload/${table_id.current}/${svgMedia.svgId}/undefined/reupload/true`;
+                const url = `https://localhost:8045/upload/${table_id.current}/${svgMediaInstance.svgMedia.svgId}/undefined/reupload/false`;
 
                 try {
                   const xhr = new XMLHttpRequest();

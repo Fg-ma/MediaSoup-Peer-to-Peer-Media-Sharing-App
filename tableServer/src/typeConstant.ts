@@ -140,6 +140,7 @@ export type onReactionType = {
     table_id: string;
     contentType: ContentTypes;
     contentId: string | undefined;
+    instanceId: string | undefined;
   };
   data: { reaction: TableReactions; reactionStyle: TableReactionStyles };
 };

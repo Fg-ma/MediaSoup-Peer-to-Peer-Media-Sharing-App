@@ -1,17 +1,16 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserEffectsType,
   ImageEffectTypes,
   UserEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import ImageMedia from "../../ImageMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
+import ImageMediaInstance from "../../ImageMediaInstance";
 
 class LowerImageController {
   constructor(
     private imageInstanceId: string,
-    private imageMedia: ImageMedia,
+    private imageMediaInstance: ImageMediaInstance,
     private imageContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -21,7 +20,6 @@ class LowerImageController {
     private tintColor: React.MutableRefObject<string>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
@@ -102,7 +100,7 @@ class LowerImageController {
           !this.userEffects.current.image[this.imageInstanceId][effect];
       }
 
-      this.imageMedia.changeEffects(
+      this.imageMediaInstance.changeEffects(
         effect,
         this.tintColor.current,
         blockStateChange
@@ -110,17 +108,17 @@ class LowerImageController {
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
-        this.imageMedia.imageId,
+        this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
         this.userEffects.current.image[this.imageInstanceId],
         this.userEffectsStyles.current.image[this.imageInstanceId]
       );
     } else {
-      this.imageMedia.clearAllEffects();
+      this.imageMediaInstance.clearAllEffects();
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "image",
-        this.imageMedia.imageId,
+        this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
         this.userEffects.current.image[this.imageInstanceId],
         this.userEffectsStyles.current.image[this.imageInstanceId]
@@ -130,12 +128,12 @@ class LowerImageController {
 
   handleDownload = () => {
     if (this.settings.downloadType.value === "snapShot") {
-      this.imageMedia.babylonScene?.downloadSnapShot();
+      this.imageMediaInstance.babylonScene?.downloadSnapShot();
     } else if (this.settings.downloadType.value === "original") {
-      this.imageMedia.downloadImage();
+      this.imageMediaInstance.imageMedia.downloadImage();
     } else if (this.settings.downloadType.value === "record") {
       if (!this.recording.current) {
-        this.imageMedia.babylonScene?.startRecording(
+        this.imageMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
             this.settings.downloadType.downloadTypeOptions.mimeType.value
           ],
@@ -148,7 +146,7 @@ class LowerImageController {
         );
         this.downloadRecordingReady.current = false;
       } else {
-        this.imageMedia.babylonScene?.stopRecording();
+        this.imageMediaInstance.babylonScene?.stopRecording();
         this.downloadRecordingReady.current = true;
       }
 
@@ -158,7 +156,7 @@ class LowerImageController {
   };
 
   handleDownloadRecording = () => {
-    this.imageMedia.babylonScene?.downloadRecording();
+    this.imageMediaInstance.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {

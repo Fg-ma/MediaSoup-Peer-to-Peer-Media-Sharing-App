@@ -9,6 +9,7 @@ import { reactionsMeta } from "./typeConstant";
 class ReactController {
   constructor(
     private contentId: string | undefined,
+    private instanceId: string | undefined,
     private contentType: ContentTypes,
     private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
@@ -40,9 +41,10 @@ class ReactController {
       if (broadcast) {
         this.tableSocket.current?.reaction(
           this.contentType,
-          this.contentId,
           reaction,
-          reactionStyle
+          reactionStyle,
+          this.contentId,
+          this.instanceId
         );
       }
     } else {
@@ -55,9 +57,10 @@ class ReactController {
       if (broadcast) {
         this.tableSocket.current?.reaction(
           this.contentType,
-          this.contentId,
           reaction,
-          randomAction[0] as TableReactionStyles
+          randomAction[0] as TableReactionStyles,
+          this.contentId,
+          this.instanceId
         );
       }
     }

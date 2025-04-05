@@ -15,7 +15,7 @@ import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 
 class VideoController {
   constructor(
-    private videoId: string,
+    private videoInstanceId: string,
     private videoMedia: VideoMedia,
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
@@ -71,20 +71,24 @@ class VideoController {
   };
 
   onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
-    if (contentType === "video" && contentId === this.videoId) {
-      this.userEffects.current.video[this.videoId].video = effects as {
+    if (
+      contentType === "video" &&
+      contentId === this.videoMedia.videoId &&
+      instanceId === this.videoInstanceId
+    ) {
+      this.userEffects.current.video[this.videoInstanceId].video = effects as {
         [effectType in VideoEffectTypes]: boolean;
       };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.video[this.videoId].video
+        this.userEffectsStyles.current.video[this.videoInstanceId].video
       );
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.video[this.videoId].video =
+        this.userEffectsStyles.current.video[this.videoInstanceId].video =
           effectStyles as VideoEffectStylesType;
 
         this.tintColor.current = (
@@ -94,7 +98,7 @@ class VideoController {
 
       this.videoMedia.updateAllEffects(oldEffectStyle);
 
-      if (this.userEffects.current.video[this.videoId].video.pause) {
+      if (this.userEffects.current.video[this.videoInstanceId].video.pause) {
         this.paused.current = true;
         if (!this.videoMedia.video.paused) {
           this.videoMedia.video.pause();
@@ -113,9 +117,13 @@ class VideoController {
   };
 
   onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
 
-    if (contentType === "video" && contentId === this.videoId) {
+    if (
+      contentType === "video" &&
+      contentId === this.videoMedia.videoId &&
+      instanceId === this.videoInstanceId
+    ) {
       this.videoMedia.updateVideoPosition(event.data.videoPosition);
 
       this.lowerVideoController.timeUpdate();

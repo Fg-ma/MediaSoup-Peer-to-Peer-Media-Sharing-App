@@ -53,12 +53,12 @@ const EffectSectionTransition: Transition = {
 
 export default function SvgEffectsSection({
   svgInstanceId,
-  svgMedia,
+  svgMediaInstance,
   lowerSvgController,
   svgContainerRef,
 }: {
   svgInstanceId: string;
-  svgMedia: SvgMediaInstance;
+  svgMediaInstance: SvgMediaInstance;
   lowerSvgController: LowerSvgController;
   svgContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -147,7 +147,7 @@ export default function SvgEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={async () => {
-            svgMedia.clearAllEffects();
+            svgMediaInstance.clearAllEffects();
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -155,27 +155,27 @@ export default function SvgEffectsSection({
         <ColorPickerButton
           className='h-full aspect-square'
           defaultColor={
-            svgMedia.getBackgroundColor() === "transparent" ||
-            svgMedia.getBackgroundColor() === "none" ||
-            svgMedia.getBackgroundColor() === undefined ||
-            svgMedia.getBackgroundColor() === ""
+            svgMediaInstance.getBackgroundColor() === "transparent" ||
+            svgMediaInstance.getBackgroundColor() === "none" ||
+            svgMediaInstance.getBackgroundColor() === undefined ||
+            svgMediaInstance.getBackgroundColor() === ""
               ? "#ffffff00"
-              : svgMedia.getBackgroundColor()
+              : svgMediaInstance.getBackgroundColor()
           }
           handleAcceptColorCallback={(_hex, hexa) => {
-            svgMedia.setBackgroundColor(hexa);
+            svgMediaInstance.setBackgroundColor(hexa);
           }}
           isAlpha={true}
         />
         <ColorPickerButton
           className='h-full aspect-square'
           defaultColor={
-            svgMedia.getPathColor() === undefined
+            svgMediaInstance.getPathColor() === undefined
               ? "#000000ff"
-              : svgMedia.getPathColor()
+              : svgMediaInstance.getPathColor()
           }
           handleAcceptColorCallback={(_hex, hexa) => {
-            svgMedia.setPathColor(hexa);
+            svgMediaInstance.setPathColor(hexa);
           }}
           isAlpha={true}
         />
@@ -190,14 +190,16 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
             if (userEffects.current.svg[svgInstanceId].shadow) {
-              svgMedia.applyShadowEffect(
+              svgMediaInstance.applyShadowEffect(
                 `${style.shadowColor}`,
                 `${style.strength}`,
                 `${style.offsetX}`,
                 `${style.offsetY}`
               );
             } else {
-              svgMedia.removeEffect("#fgSvgShadowFilter_" + svgInstanceId);
+              svgMediaInstance.removeEffect(
+                "#fgSvgShadowFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -233,7 +235,7 @@ export default function SvgEffectsSection({
 
             const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
-            svgMedia.applyShadowEffect(
+            svgMediaInstance.applyShadowEffect(
               `${style.shadowColor}`,
               `${style.strength}`,
               `${style.offsetX}`,
@@ -251,7 +253,7 @@ export default function SvgEffectsSection({
 
             const style = userEffectsStyles.current.svg[svgInstanceId].shadow;
 
-            svgMedia.applyShadowEffect(
+            svgMediaInstance.applyShadowEffect(
               `${style.shadowColor}`,
               `${style.strength}`,
               `${style.offsetX}`,
@@ -272,9 +274,11 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgInstanceId].blur;
 
             if (userEffects.current.svg[svgInstanceId].blur) {
-              svgMedia.applyBlurEffect(`${style.strength}`);
+              svgMediaInstance.applyBlurEffect(`${style.strength}`);
             } else {
-              svgMedia.removeEffect("#fgSvgBlurFilter_" + svgInstanceId);
+              svgMediaInstance.removeEffect(
+                "#fgSvgBlurFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -309,7 +313,7 @@ export default function SvgEffectsSection({
 
             const style = userEffectsStyles.current.svg[svgInstanceId].blur;
 
-            svgMedia.applyBlurEffect(`${style.strength}`);
+            svgMediaInstance.applyBlurEffect(`${style.strength}`);
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -326,9 +330,9 @@ export default function SvgEffectsSection({
               userEffectsStyles.current.svg[svgInstanceId].colorOverlay;
 
             if (userEffects.current.svg[svgInstanceId].colorOverlay) {
-              svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
+              svgMediaInstance.applyColorOverlayEffect(`${style.overlayColor}`);
             } else {
-              svgMedia.removeEffect(
+              svgMediaInstance.removeEffect(
                 "#fgSvgColorOverlayFilter_" + svgInstanceId
               );
             }
@@ -364,7 +368,7 @@ export default function SvgEffectsSection({
             const style =
               userEffectsStyles.current.svg[svgInstanceId].colorOverlay;
 
-            svgMedia.applyColorOverlayEffect(`${style.overlayColor}`);
+            svgMediaInstance.applyColorOverlayEffect(`${style.overlayColor}`);
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -380,9 +384,11 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgInstanceId].saturate;
 
             if (userEffects.current.svg[svgInstanceId].saturate) {
-              svgMedia.applySaturateEffect(`${style.saturation}`);
+              svgMediaInstance.applySaturateEffect(`${style.saturation}`);
             } else {
-              svgMedia.removeEffect("#fgSvgSaturateFilter_" + svgInstanceId);
+              svgMediaInstance.removeEffect(
+                "#fgSvgSaturateFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -413,7 +419,7 @@ export default function SvgEffectsSection({
 
             const style = userEffectsStyles.current.svg[svgInstanceId].saturate;
 
-            svgMedia.applySaturateEffect(`${style.saturation}`);
+            svgMediaInstance.applySaturateEffect(`${style.saturation}`);
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -430,9 +436,11 @@ export default function SvgEffectsSection({
               userEffectsStyles.current.svg[svgInstanceId].grayscale;
 
             if (userEffects.current.svg[svgInstanceId].grayscale) {
-              svgMedia.applyGrayscaleEffect(`${style.scale}`);
+              svgMediaInstance.applyGrayscaleEffect(`${style.scale}`);
             } else {
-              svgMedia.removeEffect("#fgSvgGrayscaleFilter_" + svgInstanceId);
+              svgMediaInstance.removeEffect(
+                "#fgSvgGrayscaleFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -468,7 +476,7 @@ export default function SvgEffectsSection({
             const style =
               userEffectsStyles.current.svg[svgInstanceId].grayscale;
 
-            svgMedia.applyGrayscaleEffect(`${style.scale}`);
+            svgMediaInstance.applyGrayscaleEffect(`${style.scale}`);
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -483,9 +491,9 @@ export default function SvgEffectsSection({
               !userEffects.current.svg[svgInstanceId].edgeDetection;
 
             if (userEffects.current.svg[svgInstanceId].edgeDetection) {
-              svgMedia.applyEdgeDetectionEffect();
+              svgMediaInstance.applyEdgeDetectionEffect();
             } else {
-              svgMedia.removeEffect(
+              svgMediaInstance.removeEffect(
                 "#fgSvgEdgeDetectionFilter_" + svgInstanceId
               );
             }
@@ -519,9 +527,11 @@ export default function SvgEffectsSection({
             const style = userEffectsStyles.current.svg[svgInstanceId].neonGlow;
 
             if (userEffects.current.svg[svgInstanceId].neonGlow) {
-              svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
+              svgMediaInstance.applyNeonGlowEffect(`${style.neonColor}`);
             } else {
-              svgMedia.removeEffect("#fgSvgNeonGlowFilter_" + svgInstanceId);
+              svgMediaInstance.removeEffect(
+                "#fgSvgNeonGlowFilter_" + svgInstanceId
+              );
             }
 
             lowerSvgController.handleAlertSvgEffect();
@@ -553,7 +563,7 @@ export default function SvgEffectsSection({
 
             const style = userEffectsStyles.current.svg[svgInstanceId].neonGlow;
 
-            svgMedia.applyNeonGlowEffect(`${style.neonColor}`);
+            svgMediaInstance.applyNeonGlowEffect(`${style.neonColor}`);
 
             lowerSvgController.handleAlertSvgEffect();
           }}
@@ -570,12 +580,12 @@ export default function SvgEffectsSection({
               userEffectsStyles.current.svg[svgInstanceId].waveDistortion;
 
             if (userEffects.current.svg[svgInstanceId].waveDistortion) {
-              svgMedia.applyWaveDistortionEffect(
+              svgMediaInstance.applyWaveDistortionEffect(
                 `${style.frequency}`,
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect(
+              svgMediaInstance.removeEffect(
                 "#fgSvgWaveDistortionFilter_" + svgInstanceId
               );
             }
@@ -610,7 +620,7 @@ export default function SvgEffectsSection({
             const style =
               userEffectsStyles.current.svg[svgInstanceId].waveDistortion;
 
-            svgMedia.applyWaveDistortionEffect(
+            svgMediaInstance.applyWaveDistortionEffect(
               `${style.frequency}`,
               `${style.strength}`
             );
@@ -630,13 +640,13 @@ export default function SvgEffectsSection({
               userEffectsStyles.current.svg[svgInstanceId].crackedGlass;
 
             if (userEffects.current.svg[svgInstanceId].crackedGlass) {
-              svgMedia.applyCrackedGlassEffect(
+              svgMediaInstance.applyCrackedGlassEffect(
                 `${style.density}`,
                 `${style.detail}`,
                 `${style.strength}`
               );
             } else {
-              svgMedia.removeEffect(
+              svgMediaInstance.removeEffect(
                 "#fgSvgCrackedGlassFilter_" + svgInstanceId
               );
             }
@@ -671,7 +681,7 @@ export default function SvgEffectsSection({
             const style =
               userEffectsStyles.current.svg[svgInstanceId].crackedGlass;
 
-            svgMedia.applyCrackedGlassEffect(
+            svgMediaInstance.applyCrackedGlassEffect(
               `${style.density}`,
               `${style.detail}`,
               `${style.strength}`

@@ -59,7 +59,7 @@ const panelVariants: Variants = {
 };
 
 export default function SettingsPanel({
-  svgMedia,
+  svgMediaInstance,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -68,7 +68,7 @@ export default function SettingsPanel({
   setSettings,
   lowerSvgController,
 }: {
-  svgMedia: SvgMediaInstance;
+  svgMediaInstance: SvgMediaInstance;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -394,7 +394,7 @@ export default function SettingsPanel({
             exit='exit'
           >
             <SizePage
-              svgMedia={svgMedia}
+              svgMediaInstance={svgMediaInstance}
               setActivePages={setActivePages}
               settings={settings}
               setSettings={setSettings}

@@ -30,6 +30,10 @@ import TextMedia from "../../media/fgText/TextMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import SvgMediaInstance from "../../media/fgSvg/SvgMediaInstance";
 import SvgMedia from "../../media/fgSvg/SvgMedia";
+import ImageMediaInstance from "../../media/fgImage/ImageMediaInstance";
+import TextMediaInstance from "../../media/fgText/TextMediaInstance";
+import ApplicationMediaInstance from "../../media/fgApplication/ApplicationMediaInstance";
+import VideoMediaInstance from "src/media/fgVideo/VideoMediaInstance";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -75,6 +79,19 @@ class SharedBundleController extends SharedBundleSocket {
 
     if (videos) {
       for (const video of videos) {
+        const newVideoMedia = new VideoMedia(
+          video.videoId,
+          video.filename,
+          video.mimeType as TableTopStaticMimeType,
+          video.tabled,
+          this.userEffects,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener
+        );
+
+        this.userMedia.current.video.all[video.videoId] = newVideoMedia;
+
         for (const instance of video.instances) {
           if (!this.userEffects.current.video[instance.videoInstanceId]) {
             this.userEffects.current.video[instance.videoInstanceId] = {
@@ -97,18 +114,13 @@ class SharedBundleController extends SharedBundleSocket {
 
           this.userMedia.current.video.instances[instance.videoInstanceId] =
             new VideoMediaInstance(
-              video.videoId,
+              newVideoMedia,
               instance.videoInstanceId,
-              video.filename,
-              video.mimeType as TableTopStaticMimeType,
               this.userDevice,
               this.deadbanding,
               this.userEffectsStyles,
               this.userEffects,
               this.userMedia,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
               instance.positioning,
               this.tableStaticContentSocket.current.requestCatchUpVideoPosition
             );
@@ -117,6 +129,18 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (images) {
       for (const image of images) {
+        const newImageMedia = new ImageMedia(
+          image.imageId,
+          image.filename,
+          image.mimeType as TableTopStaticMimeType,
+          image.tabled,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener
+        );
+
+        this.userMedia.current.image.all[image.imageId] = newImageMedia;
+
         for (const instance of image.instances) {
           this.userEffects.current.image[instance.imageInstanceId] =
             instance.effects as {
@@ -127,15 +151,10 @@ class SharedBundleController extends SharedBundleSocket {
 
           this.userMedia.current.image.instances[instance.imageInstanceId] =
             new ImageMediaInstance(
-              image.imageId,
+              newImageMedia,
               instance.imageInstanceId,
-              image.filename,
-              image.mimeType as TableTopStaticMimeType,
               this.userEffectsStyles,
               this.userEffects,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
               this.userDevice,
               this.deadbanding,
               this.userMedia,
@@ -146,17 +165,17 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (svgs) {
       for (const svg of svgs) {
-        this.userMedia.current.svg.all[svg.svgId] = new SvgMedia(
+        const newSvgMedia = new SvgMedia(
           svg.svgId,
           svg.filename,
           svg.mimeType as TableTopStaticMimeType,
           svg.tabled,
-          this.userEffectsStyles,
-          this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener
         );
+
+        this.userMedia.current.svg.all[svg.svgId] = newSvgMedia;
 
         for (const instance of svg.instances) {
           this.userEffects.current.svg[instance.svgInstanceId] =
@@ -166,18 +185,12 @@ class SharedBundleController extends SharedBundleSocket {
           this.userEffectsStyles.current.svg[instance.svgInstanceId] =
             instance.effectStyles as SvgEffectStylesType;
 
-          this.userMedia.current.svg.instances[svg.svgId] =
+          this.userMedia.current.svg.instances[instance.svgInstanceId] =
             new SvgMediaInstance(
-              svg.svgId,
+              newSvgMedia,
               instance.svgInstanceId,
-              svg.filename,
-              svg.mimeType as TableTopStaticMimeType,
-              svg.tabled,
               this.userEffectsStyles,
               this.userEffects,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
               instance.positioning
             );
         }
@@ -185,6 +198,16 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (text) {
       for (const textItem of text) {
+        this.userMedia.current.text.all[textItem.textId] = new TextMedia(
+          textItem.textId,
+          textItem.filename,
+          textItem.mimeType as TableTopStaticMimeType,
+          textItem.tabled,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener
+        );
+
         for (const instance of textItem.instances) {
           this.userMedia.current.text.instances[instance.textInstanceId] =
             new TextMediaInstance(
@@ -192,6 +215,7 @@ class SharedBundleController extends SharedBundleSocket {
               instance.textInstanceId,
               textItem.filename,
               textItem.mimeType as TableTopStaticMimeType,
+              textItem.tabled,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener,
@@ -202,6 +226,19 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (applications) {
       for (const application of applications) {
+        const newApplication = new ApplicationMedia(
+          application.applicationId,
+          application.filename,
+          application.mimeType as TableTopStaticMimeType,
+          application.tabled,
+          this.tableStaticContentSocket.current.getFile,
+          this.tableStaticContentSocket.current.addMessageListener,
+          this.tableStaticContentSocket.current.removeMessageListener
+        );
+
+        this.userMedia.current.application.all[application.applicationId] =
+          newApplication;
+
         for (const instance of application.instances) {
           this.userEffects.current.application[instance.applicationInstanceId] =
             instance.effects as {
@@ -214,15 +251,10 @@ class SharedBundleController extends SharedBundleSocket {
           this.userMedia.current.application.instances[
             instance.applicationInstanceId
           ] = new ApplicationMediaInstance(
-            application.applicationId,
+            newApplication,
             instance.applicationInstanceId,
-            application.filename,
-            application.mimeType as TableTopStaticMimeType,
             this.userEffectsStyles,
             this.userEffects,
-            this.tableStaticContentSocket.current.getFile,
-            this.tableStaticContentSocket.current.addMessageListener,
-            this.tableStaticContentSocket.current.removeMessageListener,
             this.userDevice,
             this.userMedia,
             instance.positioning
@@ -248,20 +280,28 @@ class SharedBundleController extends SharedBundleSocket {
           const { contentId, instanceId } = message.header;
           const { filename, mimeType } = message.data;
           if (this.tableStaticContentSocket.current) {
+            const newVideoMedia = new VideoMedia(
+              contentId,
+              filename,
+              mimeType,
+              false,
+              this.userEffects,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener
+            );
+
+            this.userMedia.current.video.all[contentId] = newVideoMedia;
+
             this.userMedia.current.video.instances[instanceId] =
               new VideoMediaInstance(
-                contentId,
+                newVideoMedia,
                 instanceId,
-                filename,
-                mimeType,
                 this.userDevice,
                 this.deadbanding,
                 this.userEffectsStyles,
                 this.userEffects,
                 this.userMedia,
-                this.tableStaticContentSocket.current.getFile,
-                this.tableStaticContentSocket.current.addMessageListener,
-                this.tableStaticContentSocket.current.removeMessageListener,
                 {
                   position: {
                     left: 50,
@@ -276,6 +316,7 @@ class SharedBundleController extends SharedBundleSocket {
                 this.tableStaticContentSocket.current.requestCatchUpVideoPosition
               );
           }
+
           this.setRerender((prev) => !prev);
         }
         break;
@@ -292,17 +333,24 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType } = message.data;
 
           if (this.tableStaticContentSocket.current) {
+            const newImageMedia = new ImageMedia(
+              contentId,
+              filename,
+              mimeType,
+              false,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener
+            );
+
+            this.userMedia.current.image.all[contentId] = newImageMedia;
+
             this.userMedia.current.image.instances[instanceId] =
               new ImageMediaInstance(
-                contentId,
+                newImageMedia,
                 instanceId,
-                filename,
-                mimeType,
                 this.userEffectsStyles,
                 this.userEffects,
-                this.tableStaticContentSocket.current.getFile,
-                this.tableStaticContentSocket.current.addMessageListener,
-                this.tableStaticContentSocket.current.removeMessageListener,
                 this.userDevice,
                 this.deadbanding,
                 this.userMedia,
@@ -322,36 +370,50 @@ class SharedBundleController extends SharedBundleSocket {
           this.setRerender((prev) => !prev);
         }
         break;
+      case "imageUploadedToTabled":
+        {
+          const { contentId } = message.header;
+          const { filename, mimeType } = message.data;
+
+          if (this.tableStaticContentSocket.current) {
+            this.userMedia.current.image.all[contentId] = new ImageMedia(
+              contentId,
+              filename,
+              mimeType,
+              true,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener
+            );
+          }
+
+          this.setRerender((prev) => !prev);
+        }
+        break;
       case "svgUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
           const { filename, mimeType } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            this.userMedia.current.svg.all[contentId] = new SvgMedia(
+            const newSvgMedia = new SvgMedia(
               contentId,
               filename,
               mimeType,
               false,
-              this.userEffectsStyles,
-              this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
             );
 
+            this.userMedia.current.svg.all[contentId] = newSvgMedia;
+
             this.userMedia.current.svg.instances[instanceId] =
               new SvgMediaInstance(
-                contentId,
+                newSvgMedia,
                 instanceId,
-                filename,
-                mimeType,
-                false,
                 this.userEffectsStyles,
                 this.userEffects,
-                this.tableStaticContentSocket.current.getFile,
-                this.tableStaticContentSocket.current.addMessageListener,
-                this.tableStaticContentSocket.current.removeMessageListener,
                 {
                   position: {
                     left: 50,
@@ -379,14 +441,13 @@ class SharedBundleController extends SharedBundleSocket {
               contentId,
               filename,
               mimeType,
-              false,
-              this.userEffectsStyles,
-              this.userEffects,
+              true,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
             );
           }
+
           this.setRerender((prev) => !prev);
         }
         break;
@@ -411,6 +472,7 @@ class SharedBundleController extends SharedBundleSocket {
                 instanceId,
                 filename,
                 mimeType,
+                false,
                 this.tableStaticContentSocket.current.getFile,
                 this.tableStaticContentSocket.current.addMessageListener,
                 this.tableStaticContentSocket.current.removeMessageListener,

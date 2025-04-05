@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import ImageMedia from "../../ImageMedia";
 import LowerImageController from "../lowerImageControls/LowerImageController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
 import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
+import ImageMediaInstance from "../../ImageMediaInstance";
 
 const HideBackgroundButton = React.lazy(
   () => import("../../../../elements/effectsButtons/HideBackgroundButton")
@@ -61,13 +61,13 @@ export default function ImageEffectsSection({
   imageInstanceId,
   lowerImageController,
   tintColor,
-  imageMedia,
+  imageMediaInstance,
   imageContainerRef,
 }: {
   imageInstanceId: string;
   lowerImageController: LowerImageController;
   tintColor: React.MutableRefObject<string>;
-  imageMedia: ImageMedia;
+  imageMediaInstance: ImageMediaInstance;
   imageContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffectsStyles, userEffects } = useEffectsContext();
@@ -81,9 +81,9 @@ export default function ImageEffectsSection({
 
   const [_, setRerender] = useState(false);
 
-  const faceDetectedCount = useRef(imageMedia.detectedFaces);
-  const [forceDetectingFaces, setForceDetectingFaces] = useState(false);
+  const faceDetectedCount = useRef(imageMediaInstance.detectedFaces);
   const [noFacesDetectedWarning, setNoFacesDetectedWarning] = useState(false);
+  const forceDetectingFaces = useRef(false);
   const noFacesDetectedTimeout = useRef<NodeJS.Timeout>(undefined);
 
   const handleWheel = (event: WheelEvent) => {
@@ -102,9 +102,9 @@ export default function ImageEffectsSection({
   };
 
   const handleForceFaceDetectEnd = () => {
-    setForceDetectingFaces(false);
+    if (forceDetectingFaces.current && faceDetectedCount.current === 0) {
+      forceDetectingFaces.current = false;
 
-    if (faceDetectedCount.current === 0) {
       setNoFacesDetectedWarning(true);
 
       clearTimeout(noFacesDetectedTimeout.current);
@@ -120,15 +120,19 @@ export default function ImageEffectsSection({
   };
 
   useEffect(() => {
-    imageMedia.addFaceCountChangeListener(handleFaceDetectedCountChange);
-    imageMedia.babylonScene?.addForceFaceDetectEndListener(
+    imageMediaInstance.addFaceCountChangeListener(
+      handleFaceDetectedCountChange
+    );
+    imageMediaInstance.babylonScene?.addForceFaceDetectEndListener(
       handleForceFaceDetectEnd
     );
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
-      imageMedia.removeFaceCountChangeListener(handleFaceDetectedCountChange);
-      imageMedia.babylonScene?.removeForceFaceDetectEndListener(
+      imageMediaInstance.removeFaceCountChangeListener(
+        handleFaceDetectedCountChange
+      );
+      imageMediaInstance.babylonScene?.removeForceFaceDetectEndListener(
         handleForceFaceDetectEnd
       );
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
@@ -168,7 +172,7 @@ export default function ImageEffectsSection({
         subEffectsContainerRef.current.clientWidth;
       setRerender((prev) => !prev);
     }
-  }, [imageMedia.detectedFaces]);
+  }, [imageMediaInstance.detectedFaces]);
 
   return (
     <>
@@ -182,9 +186,11 @@ export default function ImageEffectsSection({
               height: "min(max(0.75rem, 4%), 1rem)",
             }}
             clickFunctionCallback={() => {
-              setForceDetectingFaces(true);
+              forceDetectingFaces.current = true;
 
-              imageMedia.forceRedetectFaces();
+              setRerender((prev) => !prev);
+
+              imageMediaInstance.forceRedetectFaces();
             }}
             forceDetectingFaces={forceDetectingFaces}
             noFacesDetectedWarning={noFacesDetectedWarning}
@@ -231,7 +237,7 @@ export default function ImageEffectsSection({
               userEffectsStyles.current.image[imageInstanceId].postProcess
             }
             clickFunctionCallback={async () => {
-              imageMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
                 userEffectsStyles.current.image[imageInstanceId].postProcess
                   .style
               );
@@ -246,7 +252,7 @@ export default function ImageEffectsSection({
                 imageInstanceId
               ].postProcess.style = effectType;
 
-              imageMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
                 effectType
               );
 
@@ -274,7 +280,7 @@ export default function ImageEffectsSection({
                     userEffectsStyles.current.image[imageInstanceId]
                       .hideBackground;
 
-                  imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                     effectsStyles.style
                   );
 
@@ -295,11 +301,11 @@ export default function ImageEffectsSection({
                   ].hideBackground.style = effectType;
 
                   if (effectType !== "color") {
-                    imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                    imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                       effectType
                     );
                   } else {
-                    imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                    imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                       effectsStyles.color
                     );
                   }
@@ -316,7 +322,7 @@ export default function ImageEffectsSection({
                   const streamEffects =
                     userEffects.current.image[imageInstanceId].hideBackground;
 
-                  imageMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                  imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                     color
                   );
 

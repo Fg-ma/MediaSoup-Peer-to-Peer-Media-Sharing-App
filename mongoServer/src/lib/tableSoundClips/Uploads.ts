@@ -67,73 +67,91 @@ class Uploads {
       return;
     }
 
-    const updateFields: any = {};
+    const bulkOps: any[] = [];
+
+    // 1. General metadata update
+    const generalSetFields: Record<string, any> = {};
 
     if (updateData.filename) {
-      updateFields["n"] = updateData.filename;
+      generalSetFields["n"] = updateData.filename;
     }
 
     if (updateData.mimeType) {
-      updateFields["m"] = updateData.mimeType;
+      generalSetFields["m"] = updateData.mimeType;
     }
 
-    if (updateData.tabled) {
-      updateFields["t"] = updateData.tabled;
+    if (updateData.tabled !== undefined) {
+      generalSetFields["t"] = updateData.tabled;
     }
 
-    if (updateData.instances && updateData.instances.length > 0) {
-      updateData.instances.forEach(({ siid, positioning, effects }) => {
-        const instanceUpdate: any = {};
-
-        if (siid) {
-          if (positioning) {
-            if (positioning.position) {
-              if (positioning.position.left !== undefined) {
-                instanceUpdate["i.$.p.p.l"] = positioning.position.left;
-              }
-              if (positioning.position.top !== undefined) {
-                instanceUpdate["i.$.p.p.t"] = positioning.position.top;
-              }
-            }
-            if (positioning.scale) {
-              if (positioning.scale.x !== undefined) {
-                instanceUpdate["i.$.p.s.x"] = positioning.scale.x;
-              }
-              if (positioning.scale.y !== undefined) {
-                instanceUpdate["i.$.p.s.y"] = positioning.scale.y;
-              }
-            }
-            if (positioning.rotation !== undefined) {
-              instanceUpdate["i.$.p.r"] = positioning.rotation;
-            }
-          }
-
-          if (effects) {
-            const effectValues = Object.keys(effects)
-              .filter((effect) => effects?.[effect as keyof typeof effects])
-              .map(
-                (effect) =>
-                  soundClipEffectEncodingMap[effect as keyof typeof effects]
-              );
-
-            instanceUpdate["i.$.e"] = effectValues;
-          }
-        }
-
-        if (Object.keys(instanceUpdate).length > 0) {
-          updateFields["$set"] = instanceUpdate;
-        }
+    if (Object.keys(generalSetFields).length > 0) {
+      bulkOps.push({
+        updateOne: {
+          filter: { tid: filter.table_id, sid: filter.soundClipId },
+          update: { $set: generalSetFields },
+        },
       });
     }
 
-    try {
-      const result = await this.tableSoundClipsCollection.updateOne(
-        { tid: filter.table_id, sid: filter.soundClipId },
-        { $set: updateFields }
-      );
-      return result;
-    } catch (err) {
-      console.error("Error updating data:", err);
+    // 2. Instance updates
+    if (updateData.instances && updateData.instances.length > 0) {
+      for (const { siid, positioning, effects } of updateData.instances) {
+        if (!siid) continue;
+
+        const instanceSetFields: Record<string, any> = {};
+
+        if (positioning) {
+          if (positioning.position?.left !== undefined) {
+            instanceSetFields["i.$.p.p.l"] = positioning.position.left;
+          }
+          if (positioning.position?.top !== undefined) {
+            instanceSetFields["i.$.p.p.t"] = positioning.position.top;
+          }
+          if (positioning.scale?.x !== undefined) {
+            instanceSetFields["i.$.p.s.x"] = positioning.scale.x;
+          }
+          if (positioning.scale?.y !== undefined) {
+            instanceSetFields["i.$.p.s.y"] = positioning.scale.y;
+          }
+          if (positioning.rotation !== undefined) {
+            instanceSetFields["i.$.p.r"] = positioning.rotation;
+          }
+        }
+
+        if (effects) {
+          const effectValues = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) =>
+                soundClipEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          instanceSetFields["i.$.e"] = effectValues;
+        }
+
+        if (Object.keys(instanceSetFields).length > 0) {
+          bulkOps.push({
+            updateOne: {
+              filter: {
+                tid: filter.table_id,
+                sid: filter.soundClipId,
+                "i.siid": siid,
+              },
+              update: { $set: instanceSetFields },
+            },
+          });
+        }
+      }
+    }
+
+    // Execute bulkWrite
+    if (bulkOps.length > 0) {
+      try {
+        const result = await this.tableSoundClipsCollection.bulkWrite(bulkOps);
+        return result;
+      } catch (err) {
+        console.error("Bulk write error:", err);
+      }
     }
   };
 }

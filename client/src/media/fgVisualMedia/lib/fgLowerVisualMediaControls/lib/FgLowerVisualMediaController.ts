@@ -141,6 +141,7 @@ class FgLowerVisualMediaController {
 
     this.reactController = new ReactController(
       this.visualMediaId,
+      undefined,
       this.type,
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,

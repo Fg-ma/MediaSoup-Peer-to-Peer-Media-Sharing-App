@@ -13,7 +13,7 @@ import SvgMediaInstance from "../SvgMediaInstance";
 class SvgController {
   constructor(
     private svgInstanceId: string,
-    private svgMedia: SvgMediaInstance,
+    private svgMediaInstance: SvgMediaInstance,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -25,11 +25,15 @@ class SvgController {
   };
 
   onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
-    if (contentType === "svg" && contentId === this.svgInstanceId) {
-      this.svgMedia.clearAllEffects();
+    if (
+      contentType === "svg" &&
+      contentId === this.svgMediaInstance.svgMedia.svgId &&
+      instanceId === this.svgInstanceId
+    ) {
+      this.svgMediaInstance.clearAllEffects();
 
       this.userEffects.current.svg[this.svgInstanceId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
@@ -40,7 +44,7 @@ class SvgController {
           effectStyles as SvgEffectStylesType;
       }
 
-      this.svgMedia.updateAllEffects();
+      this.svgMediaInstance.updateAllEffects();
 
       this.setRerender((prev) => !prev);
     }

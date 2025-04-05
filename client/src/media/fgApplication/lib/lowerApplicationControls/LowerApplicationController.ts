@@ -4,14 +4,14 @@ import {
   ApplicationEffectTypes,
   UserEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
-import ApplicationMedia from "../../ApplicationMedia";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import ApplicationMediaInstance from "../../ApplicationMediaInstance";
 
 class LowerApplicationController {
   constructor(
     private applicationInstanceId: string,
-    private applicationMedia: ApplicationMedia,
+    private applicationMedia: ApplicationMediaInstance,
     private applicationContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -21,7 +21,6 @@ class LowerApplicationController {
     private tintColor: React.MutableRefObject<string>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,

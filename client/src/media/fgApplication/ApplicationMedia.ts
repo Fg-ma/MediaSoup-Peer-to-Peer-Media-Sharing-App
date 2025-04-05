@@ -1,39 +1,24 @@
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
-  defaultApplicationEffects,
-  defaultApplicationEffectsStyles,
-  ApplicationEffectTypes,
-} from "../../../../universal/effectsTypeConstant";
-import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import BabylonScene from "../../babylon/BabylonScene";
-import UserDevice from "../../lib/UserDevice";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import { StaticContentTypes } from "../../../../universal/typeConstant";
 
 class ApplicationMedia {
-  canvas: HTMLCanvasElement;
-  application: HTMLImageElement;
+  application: HTMLImageElement | undefined;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   private blobURL: string | undefined;
+  aspect: number | undefined;
 
-  babylonScene: BabylonScene | undefined;
-
-  private effects: {
-    [applicationEffect in ApplicationEffectTypes]?: boolean;
-  } = {};
+  private downloadCompleteListeners: Set<() => void> = new Set();
 
   constructor(
     public applicationId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    public tabled: boolean,
     private getApplication: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -44,49 +29,19 @@ class ApplicationMedia {
     ) => void,
     private removeMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void,
-    private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<UserMediaType>,
-    public initPositioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    }
+    ) => void
   ) {
-    if (!this.userEffects.current.application[this.applicationId]) {
-      this.userEffects.current.application[this.applicationId] =
-        structuredClone(defaultApplicationEffects);
-    }
-
-    if (!this.userEffectsStyles.current.application[this.applicationId]) {
-      this.userEffectsStyles.current.application[this.applicationId] =
-        structuredClone(defaultApplicationEffectsStyles);
-    }
-
-    this.application = document.createElement("img");
-    this.application.onloadedmetadata = () => {
-      this.canvas.width = this.application.width;
-      this.canvas.height = this.application.height;
-    };
-
     this.getApplication("application", this.applicationId, this.filename);
     this.addMessageListener(this.getApplicationListener);
-
-    this.canvas = document.createElement("canvas");
-    this.canvas.classList.add("babylonJS-canvas");
-    this.canvas.style.width = "100%";
-    this.canvas.style.height = "100%";
-    this.canvas.style.objectFit = "contain";
   }
 
   deconstructor() {
-    this.application.src = "";
+    if (this.application) {
+      this.application.src = "";
+      this.application = undefined;
+    }
+
+    this.aspect = undefined;
 
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
   }
@@ -129,62 +84,19 @@ class ApplicationMedia {
 
       const blob = new Blob([mergedBuffer], { type: this.mimeType });
       this.blobURL = URL.createObjectURL(blob);
+      this.application = document.createElement("img");
       this.application.src = this.blobURL;
 
-      this.babylonScene = new BabylonScene(
-        this.applicationId,
-        "application",
-        this.canvas,
-        this.application,
-        undefined,
-        this.effects,
-        this.userEffectsStyles.current.application[this.applicationId],
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        this.userDevice,
-        [0],
-        this.userMedia
-      );
+      this.application.onload = () => {
+        this.aspect =
+          (this.application?.width ?? 1) / (this.application?.height ?? 1);
+      };
+
+      this.downloadCompleteListeners.forEach((listener) => {
+        listener();
+      });
 
       this.removeMessageListener(this.getApplicationListener);
-
-      for (const effect in this.userEffects.current.application[
-        this.applicationId
-      ]) {
-        if (
-          this.userEffects.current.application[this.applicationId][
-            effect as ApplicationEffectTypes
-          ]
-        ) {
-          if (effect === "postProcess") {
-            this.babylonScene.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.application[this.applicationId]
-                .postProcess.style
-            );
-
-            this.changeEffects(effect as ApplicationEffectTypes);
-          } else if (effect === "tint") {
-            this.setTintColor(
-              this.userEffectsStyles.current.application[this.applicationId]
-                .tint.color
-            );
-
-            this.changeEffects(
-              effect as ApplicationEffectTypes,
-              this.userEffectsStyles.current.application[this.applicationId]
-                .tint.color
-            );
-          } else {
-            this.changeEffects(effect as ApplicationEffectTypes);
-          }
-        }
-      }
     }
   };
 
@@ -202,59 +114,12 @@ class ApplicationMedia {
     document.body.removeChild(link);
   };
 
-  changeEffects = (
-    effect: ApplicationEffectTypes,
-    tintColor?: string,
-    blockStateChange: boolean = false
-  ) => {
-    if (!this.babylonScene) return;
-
-    if (this.effects[effect] !== undefined) {
-      if (!blockStateChange) {
-        this.effects[effect] = !this.effects[effect];
-      }
-    } else {
-      this.effects[effect] = true;
-    }
-
-    if (tintColor) {
-      this.setTintColor(tintColor);
-    }
-    if (effect === "tint" && tintColor) {
-      this.babylonScene?.toggleTintPlane(
-        this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
-      );
-    }
-
-    if (effect === "blur") {
-      this.babylonScene?.toggleBlurEffect(this.effects[effect]);
-    }
-
-    if (effect === "postProcess") {
-      this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
-      );
-    }
-
-    this.babylonScene.imageAlreadyProcessed = [1];
+  addDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.add(listener);
   };
 
-  setTintColor = (newTintColor: string) => {
-    this.babylonScene?.setTintColor(this.hexToNormalizedRgb(newTintColor));
-  };
-
-  private hexToNormalizedRgb = (hex: string): [number, number, number] => {
-    // Remove the leading '#' if present
-    hex = hex.replace(/^#/, "");
-
-    // Parse the r, g, b values from the hex string
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    return [r / 255, g / 255, b / 255];
+  removeDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.delete(listener);
   };
 }
 

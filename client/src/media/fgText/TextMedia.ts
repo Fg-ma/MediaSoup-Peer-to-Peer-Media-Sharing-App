@@ -9,7 +9,9 @@ export type TextMediaEvents = onTextFinishedLoadingType;
 export type onTextFinishedLoadingType = {
   type: "textFinishedLoading";
 };
+
 class TextMedia {
+  static textCache: Map<string, string> = new Map();
   text: string | undefined;
 
   private listeners: Set<(message: TextMediaEvents) => void> = new Set();
@@ -21,6 +23,7 @@ class TextMedia {
     public textId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
+    public tabled: boolean,
     private getText: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -31,21 +34,14 @@ class TextMedia {
     ) => void,
     private removeMessageListener: (
       listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void,
-    public initPositioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    }
+    ) => void
   ) {
-    this.getText("text", this.textId, this.filename);
-    this.addMessageListener(this.getTextListener);
+    if (TextMedia.textCache.has(this.textId)) {
+      this.text = TextMedia.textCache.get(this.textId);
+    } else {
+      this.getText("text", this.textId, this.filename);
+      this.addMessageListener(this.getTextListener);
+    }
   }
 
   deconstructor = () => {};

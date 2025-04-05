@@ -31,7 +31,7 @@ export default function FgImage({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const imageMedia = userMedia.current.image.instances[imageInstanceId];
+  const imageMediaInstance = userMedia.current.image.instances[imageInstanceId];
 
   const [imageEffectsActive, setImageEffectsActive] = useState(false);
 
@@ -39,7 +39,7 @@ export default function FgImage({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(imageMedia.initPositioning);
+  }>(imageMediaInstance.initPositioning);
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ export default function FgImage({
 
   const lowerImageController = new LowerImageController(
     imageInstanceId,
-    imageMedia,
+    imageMediaInstance,
     imageContainerRef,
     shiftPressed,
     controlPressed,
@@ -75,7 +75,6 @@ export default function FgImage({
     tintColor,
     userEffects,
     userEffectsStyles,
-    userMedia,
     setSettingsActive,
     settings,
     recording,
@@ -87,7 +86,7 @@ export default function FgImage({
 
   const imageController = new ImageController(
     imageInstanceId,
-    imageMedia,
+    imageMediaInstance,
     setSettingsActive,
     userEffects,
     userEffectsStyles,
@@ -96,7 +95,50 @@ export default function FgImage({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(imageMedia.canvas);
+    if (imageMediaInstance.instanceCanvas) {
+      const aspect =
+        imageMediaInstance.instanceCanvas.width /
+        imageMediaInstance.instanceCanvas.height;
+
+      subContainerRef.current?.appendChild(imageMediaInstance.instanceCanvas);
+
+      positioning.current.scale = {
+        x: aspect
+          ? positioning.current.scale.y * aspect
+          : positioning.current.scale.x,
+        y: positioning.current.scale.y,
+      };
+
+      setRerender((prev) => !prev);
+    }
+    imageMediaInstance.imageMedia.addDownloadCompleteListener(() => {
+      if (!imageMediaInstance.instanceCanvas) {
+        return;
+      }
+
+      const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
+
+      if (allCanvas) {
+        allCanvas.forEach((canvasElement) => {
+          canvasElement.remove();
+        });
+      }
+
+      subContainerRef.current?.appendChild(imageMediaInstance.instanceCanvas);
+
+      const aspect =
+        imageMediaInstance.instanceCanvas.width /
+        imageMediaInstance.instanceCanvas.height;
+
+      positioning.current.scale = {
+        x: aspect
+          ? positioning.current.scale.y * aspect
+          : positioning.current.scale.x,
+        y: positioning.current.scale.y,
+      };
+
+      setRerender((prev) => !prev);
+    });
 
     document.addEventListener("keydown", lowerImageController.handleKeyDown);
 
@@ -126,7 +168,7 @@ export default function FgImage({
 
   useEffect(() => {
     if (settings.downloadType.value !== "record" && recording.current) {
-      imageMedia.babylonScene?.stopRecording();
+      imageMediaInstance.babylonScene?.stopRecording();
       downloadRecordingReady.current = true;
       recording.current = false;
     }
@@ -145,11 +187,11 @@ export default function FgImage({
 
   return (
     <FgMediaContainer
-      mediaId={imageMedia.imageId}
+      mediaId={imageMediaInstance.imageMedia.imageId}
       mediaInstanceId={imageInstanceId}
-      filename={imageMedia.filename}
+      filename={imageMediaInstance.imageMedia.filename}
       kind='image'
-      rootMedia={imageMedia.image}
+      rootMedia={imageMediaInstance.instanceImage}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className='image-container'
@@ -159,7 +201,7 @@ export default function FgImage({
             imageInstanceId={imageInstanceId}
             lowerImageController={lowerImageController}
             tintColor={tintColor}
-            imageMedia={imageMedia}
+            imageMediaInstance={imageMediaInstance}
             imageContainerRef={imageContainerRef}
           />
         ) : null,

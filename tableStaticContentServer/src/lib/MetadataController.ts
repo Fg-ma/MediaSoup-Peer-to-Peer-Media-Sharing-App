@@ -33,11 +33,11 @@ class MetadataController {
   onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
     tableTopMongo.updateContentEffects(event);
 
-    const { table_id, contentType, contentId } = event.header;
+    const { table_id, contentType, contentId, instanceId } = event.header;
 
     const msg = {
       type: "updatedContentEffects",
-      header: { contentType, contentId },
+      header: { contentType, contentId, instanceId },
       data: event.data,
     };
     this.broadcaster.broadcastToTable(table_id, msg);
@@ -46,12 +46,12 @@ class MetadataController {
   onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
     await tableTopMongo.updateVideoPosition(event);
 
-    const { table_id, contentType, contentId } = event.header;
+    const { table_id, contentType, contentId, instanceId } = event.header;
     const { videoPosition } = event.data;
 
     const msg = {
       type: "updatedVideoPosition",
-      header: { contentType, contentId },
+      header: { contentType, contentId, instanceId },
       data: { videoPosition },
     };
     this.broadcaster.broadcastToTable(table_id, msg);

@@ -12,7 +12,7 @@ export default function FaceCountButton({
 }: {
   style: React.CSSProperties;
   clickFunctionCallback?: () => void;
-  forceDetectingFaces: boolean;
+  forceDetectingFaces: React.MutableRefObject<boolean>;
   noFacesDetectedWarning: boolean;
 }) {
   const faceCountButtonRef = useRef<HTMLButtonElement>(null);
@@ -22,21 +22,21 @@ export default function FaceCountButton({
       <FgButton
         externalRef={faceCountButtonRef}
         className={`${
-          forceDetectingFaces ? "force-detect-face-blink" : ""
+          forceDetectingFaces.current ? "force-detect-face-blink" : ""
         } !aspect-square bg-fg-red-light rounded-full absolute left-1/2 -translate-x-1/2`}
         style={style}
         clickFunction={async () => {
           if (clickFunctionCallback) clickFunctionCallback();
         }}
         hoverContent={
-          !forceDetectingFaces && !noFacesDetectedWarning ? (
+          !forceDetectingFaces.current && !noFacesDetectedWarning ? (
             <FgHoverContentStandard content='No faces detected! Retry face detection?' />
           ) : undefined
         }
         options={{
           hoverZValue: 500000000001,
           hoverTimeoutDuration: 1500,
-          disabled: forceDetectingFaces,
+          disabled: forceDetectingFaces.current,
         }}
       />
       {noFacesDetectedWarning && (

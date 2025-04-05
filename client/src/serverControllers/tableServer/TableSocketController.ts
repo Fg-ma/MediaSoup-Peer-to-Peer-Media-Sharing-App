@@ -144,9 +144,10 @@ class TableSocketController {
 
   reaction = (
     contentType: ContentTypes,
-    contentId: string | undefined,
     reaction: TableReactions,
-    reactionStyle: TableReactionStyles
+    reactionStyle: TableReactionStyles,
+    contentId?: string,
+    instanceId?: string
   ) => {
     this.sendMessage({
       type: "reaction",
@@ -154,6 +155,7 @@ class TableSocketController {
         table_id: this.table_id,
         contentType,
         contentId,
+        instanceId,
       },
       data: { reaction, reactionStyle },
     });

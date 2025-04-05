@@ -5,7 +5,6 @@ import {
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import { svgEffectEncodingMap, TableSvgsType } from "./typeConstant";
-import { error } from "console";
 
 class Uploads {
   constructor(
@@ -70,110 +69,120 @@ class Uploads {
       return;
     }
 
-    const updateFields: any = {};
+    const bulkOps: any[] = [];
+
+    // 1. General metadata update
+    const generalSetFields: Record<string, any> = {};
 
     if (updateData.filename) {
-      updateFields["n"] = updateData.filename;
+      generalSetFields["n"] = updateData.filename;
     }
 
     if (updateData.mimeType) {
-      updateFields["m"] = updateData.mimeType;
+      generalSetFields["m"] = updateData.mimeType;
     }
 
-    if (updateData.tabled) {
-      updateFields["t"] = updateData.tabled;
+    if (updateData.tabled !== undefined) {
+      generalSetFields["t"] = updateData.tabled;
     }
 
+    if (Object.keys(generalSetFields).length > 0) {
+      bulkOps.push({
+        updateOne: {
+          filter: { tid: filter.table_id, sid: filter.svgId },
+          update: { $set: generalSetFields },
+        },
+      });
+    }
+
+    // 2. Instance updates
     if (updateData.instances && updateData.instances.length > 0) {
-      updateData.instances.forEach(
-        ({ siid, positioning, effects, effectStyles }) => {
-          const instanceUpdate: any = {};
+      for (const {
+        siid,
+        positioning,
+        effects,
+        effectStyles,
+      } of updateData.instances) {
+        if (!siid) continue;
 
-          if (siid) {
-            if (positioning) {
-              if (positioning.position) {
-                if (positioning.position.left !== undefined) {
-                  instanceUpdate["i.$.p.p.l"] = positioning.position.left;
-                }
-                if (positioning.position.top !== undefined) {
-                  instanceUpdate["i.$.p.p.t"] = positioning.position.top;
-                }
-              }
-              if (positioning.scale) {
-                if (positioning.scale.x !== undefined) {
-                  instanceUpdate["i.$.p.s.x"] = positioning.scale.x;
-                }
-                if (positioning.scale.y !== undefined) {
-                  instanceUpdate["i.$.p.s.y"] = positioning.scale.y;
-                }
-              }
-              if (positioning.rotation !== undefined) {
-                instanceUpdate["i.$.p.r"] = positioning.rotation;
-              }
-            }
+        const instanceSetFields: Record<string, any> = {};
 
-            if (effects) {
-              const effectValues = Object.keys(effects)
-                .filter((effect) => effects?.[effect as keyof typeof effects])
-                .map(
-                  (effect) =>
-                    svgEffectEncodingMap[effect as keyof typeof effects]
-                );
-
-              instanceUpdate["i.$.e"] = effectValues;
-            }
-
-            if (effectStyles) {
-              instanceUpdate["i.$.es"] = {
-                "0": {
-                  c: effectStyles.shadow.shadowColor,
-                  s: effectStyles.shadow.strength,
-                  x: effectStyles.shadow.offsetX,
-                  y: effectStyles.shadow.offsetY,
-                },
-                "1": {
-                  s: effectStyles.blur.strength,
-                },
-                "2": {
-                  s: effectStyles.grayscale.scale,
-                },
-                "3": {
-                  s: effectStyles.saturate.saturation,
-                },
-                "4": {
-                  c: effectStyles.colorOverlay.overlayColor,
-                },
-                "5": {
-                  f: effectStyles.waveDistortion.frequency,
-                  s: effectStyles.waveDistortion.strength,
-                },
-                "6": {
-                  n: effectStyles.crackedGlass.density,
-                  d: effectStyles.crackedGlass.detail,
-                  s: effectStyles.crackedGlass.strength,
-                },
-                "7": {
-                  c: effectStyles.neonGlow.neonColor,
-                },
-              };
-            }
+        if (positioning) {
+          if (positioning.position?.left !== undefined) {
+            instanceSetFields["i.$.p.p.l"] = positioning.position.left;
           }
-
-          if (Object.keys(instanceUpdate).length > 0) {
-            updateFields["$set"] = instanceUpdate;
+          if (positioning.position?.top !== undefined) {
+            instanceSetFields["i.$.p.p.t"] = positioning.position.top;
+          }
+          if (positioning.scale?.x !== undefined) {
+            instanceSetFields["i.$.p.s.x"] = positioning.scale.x;
+          }
+          if (positioning.scale?.y !== undefined) {
+            instanceSetFields["i.$.p.s.y"] = positioning.scale.y;
+          }
+          if (positioning.rotation !== undefined) {
+            instanceSetFields["i.$.p.r"] = positioning.rotation;
           }
         }
-      );
+
+        if (effects) {
+          const effectValues = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) => svgEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          instanceSetFields["i.$.e"] = effectValues;
+        }
+
+        if (effectStyles) {
+          instanceSetFields["i.$.es"] = {
+            "0": {
+              c: effectStyles.shadow.shadowColor,
+              s: effectStyles.shadow.strength,
+              x: effectStyles.shadow.offsetX,
+              y: effectStyles.shadow.offsetY,
+            },
+            "1": { s: effectStyles.blur.strength },
+            "2": { s: effectStyles.grayscale.scale },
+            "3": { s: effectStyles.saturate.saturation },
+            "4": { c: effectStyles.colorOverlay.overlayColor },
+            "5": {
+              f: effectStyles.waveDistortion.frequency,
+              s: effectStyles.waveDistortion.strength,
+            },
+            "6": {
+              n: effectStyles.crackedGlass.density,
+              d: effectStyles.crackedGlass.detail,
+              s: effectStyles.crackedGlass.strength,
+            },
+            "7": { c: effectStyles.neonGlow.neonColor },
+          };
+        }
+
+        if (Object.keys(instanceSetFields).length > 0) {
+          bulkOps.push({
+            updateOne: {
+              filter: {
+                tid: filter.table_id,
+                sid: filter.svgId,
+                "i.siid": siid,
+              },
+              update: { $set: instanceSetFields },
+            },
+          });
+        }
+      }
     }
 
-    try {
-      const result = await this.tableSvgsCollection.updateOne(
-        { tid: filter.table_id, sid: filter.svgId },
-        { $set: updateFields }
-      );
-      return result;
-    } catch (err) {
-      console.error("Error updating data:", err);
+    // Execute bulkWrite
+    if (bulkOps.length > 0) {
+      try {
+        const result = await this.tableSvgsCollection.bulkWrite(bulkOps);
+        return result;
+      } catch (err) {
+        console.error("Bulk write error:", err);
+      }
     }
   };
 }

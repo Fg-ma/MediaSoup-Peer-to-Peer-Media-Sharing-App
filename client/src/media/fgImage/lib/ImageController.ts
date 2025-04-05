@@ -8,12 +8,12 @@ import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import ImageMedia from "../ImageMedia";
+import ImageMediaInstance from "../ImageMediaInstance";
 
 class ImageController {
   constructor(
-    private imageId: string,
-    private imageMedia: ImageMedia,
+    private imageInstanceId: string,
+    private imageMediaInstance: ImageMediaInstance,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
@@ -26,20 +26,24 @@ class ImageController {
   };
 
   onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
-    if (contentType === "image" && contentId === this.imageId) {
-      this.userEffects.current.image[this.imageId] = effects as {
+    if (
+      contentType === "image" &&
+      contentId === this.imageMediaInstance.imageMedia.imageId &&
+      instanceId === this.imageInstanceId
+    ) {
+      this.userEffects.current.image[this.imageInstanceId] = effects as {
         [effectType in ImageEffectTypes]: boolean;
       };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.image[this.imageId]
+        this.userEffectsStyles.current.image[this.imageInstanceId]
       );
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.image[this.imageId] =
+        this.userEffectsStyles.current.image[this.imageInstanceId] =
           effectStyles as ImageEffectStylesType;
 
         this.tintColor.current = (
@@ -47,7 +51,7 @@ class ImageController {
         ).tint.color;
       }
 
-      this.imageMedia.updateAllEffects(oldEffectStyle);
+      this.imageMediaInstance.updateAllEffects(oldEffectStyle);
 
       this.setRerender((prev) => !prev);
     }

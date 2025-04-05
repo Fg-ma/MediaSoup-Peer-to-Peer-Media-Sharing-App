@@ -13,6 +13,7 @@ class MediaContainerController {
   constructor(
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
+    private mediaInstanceId: string,
     private kind: StaticContentTypes,
     private rootMedia:
       | HTMLVideoElement
@@ -122,6 +123,7 @@ class MediaContainerController {
       this.tableStaticContentSocket.current?.updateContentPositioning(
         this.kind,
         this.mediaId,
+        this.mediaInstanceId,
         { position: this.positioning.current.position }
       );
     }
@@ -158,7 +160,8 @@ class MediaContainerController {
             if (
               data.table_id === this.table_id.current &&
               data.kind === this.kind &&
-              data.mediaId === this.mediaId
+              data.mediaId === this.mediaId &&
+              data.mediaInstanceId === this.mediaInstanceId
             ) {
               this.positioning.current = data.positioning;
               this.setRerender((prev) => !prev);
@@ -179,10 +182,14 @@ class MediaContainerController {
   };
 
   reactionOccurred = (event: onReactionOccurredType) => {
-    const { contentType, contentId } = event.header;
+    const { contentType, contentId, instanceId } = event.header;
     const { reaction, reactionStyle } = event.data;
 
-    if (contentType === this.kind && contentId === this.mediaId) {
+    if (
+      contentType === this.kind &&
+      contentId === this.mediaId &&
+      instanceId === this.mediaInstanceId
+    ) {
       this.lowerController.reactController.handleReaction(
         reaction,
         false,

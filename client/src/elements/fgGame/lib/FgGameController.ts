@@ -66,6 +66,7 @@ class FgGameController {
   ) {
     this.reactController = new ReactController(
       this.gameId,
+      undefined,
       "game",
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,

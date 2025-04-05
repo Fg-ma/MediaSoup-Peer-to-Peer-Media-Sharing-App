@@ -86,7 +86,6 @@ export default function FgApplication({
     tintColor,
     userEffects,
     userEffectsStyles,
-    userMedia,
     setSettingsActive,
     settings,
     recording,
@@ -103,7 +102,22 @@ export default function FgApplication({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(applicationMedia.canvas);
+    if (applicationMedia.instanceCanvas) {
+      subContainerRef.current?.appendChild(applicationMedia.instanceCanvas);
+    }
+    applicationMedia.addDownloadCompleteListener(() => {
+      if (applicationMedia.instanceCanvas) {
+        const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
+
+        if (allCanvas) {
+          allCanvas.forEach((canvasElement) => {
+            canvasElement.remove();
+          });
+        }
+
+        subContainerRef.current?.appendChild(applicationMedia.instanceCanvas);
+      }
+    });
 
     // Set up initial conditions
     applicationController.init();
@@ -154,7 +168,7 @@ export default function FgApplication({
       mediaInstanceId={applicationInstanceId}
       filename={applicationMedia.filename}
       kind='application'
-      rootMedia={applicationMedia.application}
+      rootMedia={applicationMedia.instanceApplication}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className='application-container'

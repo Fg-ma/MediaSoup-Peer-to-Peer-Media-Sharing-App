@@ -14,12 +14,12 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function SizePage({
-  svgMedia,
+  svgMediaInstance,
   setActivePages,
   settings,
   setSettings,
 }: {
-  svgMedia: SvgMediaInstance;
+  svgMediaInstance: SvgMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
@@ -55,7 +55,8 @@ export default function SizePage({
         newSettings.downloadOptions.size.value = "aspect";
         setSize(
           "height",
-          newSettings.downloadOptions.size.width.value / (svgMedia.aspect ?? 1)
+          newSettings.downloadOptions.size.width.value /
+            (svgMediaInstance.svgMedia.aspect ?? 1)
         );
       } else {
         newSettings.downloadOptions.size.value = "free";
@@ -123,7 +124,10 @@ export default function SizePage({
             onValueChange={(value) => {
               setSize("width", value.value);
               if (settings.downloadOptions.size.value === "aspect") {
-                setSize("height", value.value / (svgMedia.aspect ?? 1));
+                setSize(
+                  "height",
+                  value.value / (svgMediaInstance.svgMedia.aspect ?? 1)
+                );
               }
             }}
             options={{
@@ -146,7 +150,10 @@ export default function SizePage({
             onValueChange={(value) => {
               setSize("height", value.value);
               if (settings.downloadOptions.size.value === "aspect") {
-                setSize("width", value.value * (svgMedia.aspect ?? 1));
+                setSize(
+                  "width",
+                  value.value * (svgMediaInstance.svgMedia.aspect ?? 1)
+                );
               }
             }}
             options={{
@@ -176,12 +183,16 @@ export default function SizePage({
                 className='flex items-center justify-center grow'
                 contentFunction={() => (
                   <div className='flex w-full px-2 items-start'>
-                    {size}x{parseInt(size) / (svgMedia.aspect ?? 1)}
+                    {size}x
+                    {parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1)}
                   </div>
                 )}
                 clickFunction={() => {
                   setSize("width", parseInt(size));
-                  setSize("height", parseInt(size) / (svgMedia.aspect ?? 1));
+                  setSize(
+                    "height",
+                    parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1)
+                  );
                 }}
               />
             </div>

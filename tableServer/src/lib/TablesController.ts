@@ -177,13 +177,14 @@ class TablesController {
   };
 
   onReaction = (event: onReactionType) => {
-    const { table_id, contentType, contentId } = event.header;
+    const { table_id, contentType, contentId, instanceId } = event.header;
 
     this.broadcaster.broadcastToTable(table_id, {
       type: "reactionOccurred",
       header: {
         contentType,
         contentId,
+        instanceId,
       },
       data: event.data,
     });

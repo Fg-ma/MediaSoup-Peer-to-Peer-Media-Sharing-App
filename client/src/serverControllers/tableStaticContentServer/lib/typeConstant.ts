@@ -568,7 +568,11 @@ export type onContentDeletedType = {
 
 export type onUpdatedContentEffectsType = {
   type: "updatedContentEffects";
-  header: { contentType: StaticContentTypes; contentId: string };
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+    instanceId: string;
+  };
   data: {
     effects: {
       [effectType: string]: boolean;
@@ -586,6 +590,7 @@ export type onUpdatedVideoPositionType = {
   header: {
     contentType: "video";
     contentId: string;
+    instanceId: string;
   };
   data: {
     videoPosition: number;

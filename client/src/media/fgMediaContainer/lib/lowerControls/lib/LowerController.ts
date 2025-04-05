@@ -51,6 +51,7 @@ class LowerController {
   ) {
     this.reactController = new ReactController(
       this.mediaId,
+      this.mediaInstanceId,
       this.kind,
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
@@ -145,6 +146,7 @@ class LowerController {
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
       this.mediaId,
+      this.mediaInstanceId,
       { scale: this.positioning.current.scale }
     );
   };
@@ -157,6 +159,7 @@ class LowerController {
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
       this.mediaId,
+      this.mediaInstanceId,
       { rotation: this.positioning.current.rotation }
     );
   };
@@ -169,6 +172,7 @@ class LowerController {
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
       this.mediaId,
+      this.mediaInstanceId,
       { position: this.positioning.current.position }
     );
   };

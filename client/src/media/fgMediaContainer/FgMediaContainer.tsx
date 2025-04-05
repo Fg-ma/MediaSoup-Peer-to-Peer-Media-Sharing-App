@@ -180,6 +180,7 @@ export default function FgMediaContainer({
   const mediaContainerController = new MediaContainerController(
     table_id,
     mediaId,
+    mediaInstanceId,
     kind,
     rootMedia,
     positioningListeners,
@@ -268,6 +269,7 @@ export default function FgMediaContainer({
           table_id: table_id.current,
           kind,
           mediaId,
+          mediaInstanceId,
           positioning: positioning.current,
         })
       );
@@ -277,7 +279,7 @@ export default function FgMediaContainer({
   return (
     <motion.div
       ref={mediaContainerRef}
-      id={`${mediaId}_media_container`}
+      id={`${mediaInstanceId}_media_container`}
       className={`media-container ${
         inMedia || reactionsPanelActive || inMediaVariables?.some(Boolean)
           ? "in-media"
@@ -325,6 +327,7 @@ export default function FgMediaContainer({
       <AdjustmentButtons
         kind={kind}
         mediaId={mediaId}
+        mediaInstanceId={mediaInstanceId}
         bundleRef={bundleRef}
         panBtnRef={panBtnRef}
         positioning={positioning}

@@ -9,7 +9,7 @@ import SvgMediaInstance from "../../SvgMediaInstance";
 class LowerSvgController {
   constructor(
     private svgInstanceId: string,
-    private svgMedia: SvgMediaInstance,
+    private svgMediaInstance: SvgMediaInstance,
     private svgContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -90,7 +90,7 @@ class LowerSvgController {
   handleAlertSvgEffect = () => {
     this.tableStaticContentSocket.current?.updateContentEffects(
       "svg",
-      this.svgMedia.svgId,
+      this.svgMediaInstance.svgMedia.svgId,
       this.svgInstanceId,
       this.userEffects.current.svg[this.svgInstanceId],
       this.userEffectsStyles.current.svg[this.svgInstanceId]
@@ -127,7 +127,7 @@ class LowerSvgController {
   };
 
   handleDownload = () => {
-    this.svgMedia.downloadSvg(
+    this.svgMediaInstance.downloadSvg(
       this.settings.downloadOptions.mimeType.value,
       this.settings.downloadOptions.size.width.value,
       this.settings.downloadOptions.size.height.value,
@@ -136,7 +136,7 @@ class LowerSvgController {
   };
 
   handleCopyToClipBoard = () => {
-    this.svgMedia.copyToClipboard(
+    this.svgMediaInstance.copyToClipboard(
       this.settings.downloadOptions.compression.value
     );
   };

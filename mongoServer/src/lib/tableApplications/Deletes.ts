@@ -43,13 +43,11 @@ class Deletes {
         }
       );
 
-      // @ts-expect-error weird
-      if (!result || !result.value) {
+      if (!result) {
         return null;
       }
 
-      // @ts-expect-error weird
-      return result.value as TableApplicationsType;
+      return result as TableApplicationsType;
     } catch (err) {
       console.log(err);
       return null;

@@ -34,7 +34,7 @@ export default function UploadMediaButton() {
 
     const url = `https://localhost:8045/upload/${
       table_id.current
-    }/${uuidv4()}/${uuidv4()}/toTable/true`;
+    }/${uuidv4()}/${uuidv4()}/toTable/false`;
 
     const formData = new FormData();
 
