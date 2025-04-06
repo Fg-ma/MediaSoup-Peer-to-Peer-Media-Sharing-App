@@ -12,7 +12,7 @@ import {
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 import ApplicationMedia from "./ApplicationMedia";
 
 class ApplicationMediaInstance {

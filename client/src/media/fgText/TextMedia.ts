@@ -1,4 +1,7 @@
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
@@ -11,10 +14,9 @@ export type onTextFinishedLoadingType = {
 };
 
 class TextMedia {
-  static textCache: Map<string, string> = new Map();
   text: string | undefined;
 
-  private listeners: Set<(message: TextMediaEvents) => void> = new Set();
+  private downloadCompleteListeners: Set<() => void> = new Set();
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
@@ -23,7 +25,7 @@ class TextMedia {
     public textId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public tabled: boolean,
+    public state: ContentStateTypes[],
     private getText: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -36,15 +38,15 @@ class TextMedia {
       listener: (message: IncomingTableStaticContentMessages) => void
     ) => void
   ) {
-    if (TextMedia.textCache.has(this.textId)) {
-      this.text = TextMedia.textCache.get(this.textId);
-    } else {
-      this.getText("text", this.textId, this.filename);
-      this.addMessageListener(this.getTextListener);
-    }
+    this.getText("text", this.textId, this.filename);
+    this.addMessageListener(this.getTextListener);
   }
 
-  deconstructor = () => {};
+  deconstructor = () => {
+    this.removeMessageListener(this.getTextListener);
+
+    this.downloadCompleteListeners.clear();
+  };
 
   private getTextListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
@@ -82,7 +84,9 @@ class TextMedia {
 
       this.text = new TextDecoder("utf-8").decode(mergedBuffer);
 
-      this.emitEvent({ type: "textFinishedLoading" });
+      this.downloadCompleteListeners.forEach((listener) => {
+        listener();
+      });
 
       this.removeMessageListener(this.getTextListener);
     }
@@ -111,18 +115,12 @@ class TextMedia {
     URL.revokeObjectURL(blobURL);
   };
 
-  private emitEvent = (event: TextMediaEvents) => {
-    this.listeners.forEach((listener) => {
-      listener(event);
-    });
+  addDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.add(listener);
   };
 
-  addListener = (listener: (message: TextMediaEvents) => void): void => {
-    this.listeners.add(listener);
-  };
-
-  removeListener = (listener: (message: TextMediaEvents) => void): void => {
-    this.listeners.delete(listener);
+  removeDownloadCompleteListener = (listener: () => void): void => {
+    this.downloadCompleteListeners.delete(listener);
   };
 }
 

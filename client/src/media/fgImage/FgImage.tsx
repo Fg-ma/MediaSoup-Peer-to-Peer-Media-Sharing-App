@@ -96,15 +96,11 @@ export default function FgImage({
 
   useEffect(() => {
     if (imageMediaInstance.instanceCanvas) {
-      const aspect =
-        imageMediaInstance.instanceCanvas.width /
-        imageMediaInstance.instanceCanvas.height;
-
       subContainerRef.current?.appendChild(imageMediaInstance.instanceCanvas);
 
       positioning.current.scale = {
-        x: aspect
-          ? positioning.current.scale.y * aspect
+        x: imageMediaInstance.imageMedia.aspect
+          ? positioning.current.scale.y * imageMediaInstance.imageMedia.aspect
           : positioning.current.scale.x,
         y: positioning.current.scale.y,
       };
@@ -126,13 +122,9 @@ export default function FgImage({
 
       subContainerRef.current?.appendChild(imageMediaInstance.instanceCanvas);
 
-      const aspect =
-        imageMediaInstance.instanceCanvas.width /
-        imageMediaInstance.instanceCanvas.height;
-
       positioning.current.scale = {
-        x: aspect
-          ? positioning.current.scale.y * aspect
+        x: imageMediaInstance.imageMedia.aspect
+          ? positioning.current.scale.y * imageMediaInstance.imageMedia.aspect
           : positioning.current.scale.x,
         y: positioning.current.scale.y,
       };

@@ -2,7 +2,10 @@ import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 
 class ApplicationMedia {
   application: HTMLImageElement | undefined;
@@ -18,7 +21,7 @@ class ApplicationMedia {
     public applicationId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public tabled: boolean,
+    public state: ContentStateTypes[],
     private getApplication: (
       contentType: StaticContentTypes,
       contentId: string,

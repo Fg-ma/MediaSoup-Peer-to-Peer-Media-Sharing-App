@@ -2,7 +2,10 @@ import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 
 class SvgMedia {
   svg: SVGSVGElement | undefined;
@@ -19,7 +22,7 @@ class SvgMedia {
     public svgId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public tabled: boolean,
+    public state: ContentStateTypes[],
     private getSVG: (
       contentType: StaticContentTypes,
       contentId: string,

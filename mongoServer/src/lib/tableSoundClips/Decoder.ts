@@ -1,4 +1,6 @@
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
 import { SoundClipEffectTypes } from "../../../../universal/effectsTypeConstant";
+import { stateDecodingMap } from "../typeConstant";
 import { soundClipEffectEncodingMap } from "./typeConstant";
 
 class Decoder {
@@ -9,7 +11,7 @@ class Decoder {
     sid: string;
     n: string;
     m: string;
-    t: boolean;
+    s: number[];
     i: {
       siid: string;
       p: {
@@ -30,7 +32,7 @@ class Decoder {
     svgId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       soundClipInstanceId: string;
       positioning: {
@@ -49,14 +51,14 @@ class Decoder {
       };
     }[];
   } => {
-    const { tid, sid, n, m, t, i } = data;
+    const { tid, sid, n, m, s, i } = data;
 
     return {
       table_id: tid,
       svgId: sid,
       filename: n,
       mimeType: m,
-      tabled: t,
+      state: s.map((ate) => stateDecodingMap[ate]),
       instances: i.map(({ siid, p, e }) => ({
         soundClipInstanceId: siid,
         positioning: {

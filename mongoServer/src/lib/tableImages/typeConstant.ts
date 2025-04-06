@@ -1,9 +1,11 @@
+import { ImageEffectTypes } from "../../../../universal/effectsTypeConstant";
+
 export interface TableImagesType {
   tid: string;
   iid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     iiid: string;
     p: {
@@ -51,7 +53,7 @@ export interface TableImagesType {
   }[];
 }
 
-export const imageEffectEncodingMap = {
+export const imageEffectEncodingMap: Record<ImageEffectTypes, number> = {
   postProcess: 0,
   hideBackground: 1,
   blur: 2,
@@ -64,7 +66,9 @@ export const imageEffectEncodingMap = {
   pets: 9,
 };
 
-export const imageEffectStylesEncodingMap = {
+export const imageEffectStylesEncodingMap: Partial<
+  Record<ImageEffectTypes, number>
+> = {
   postProcess: 0,
   hideBackground: 1,
   tint: 2,

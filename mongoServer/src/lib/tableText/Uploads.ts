@@ -1,6 +1,8 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
 import { TableTextType } from "./typeConstant";
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { stateEncodingMap } from "../typeConstant";
 
 class Uploads {
   constructor(
@@ -13,7 +15,7 @@ class Uploads {
     textId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       textInstanceId: string;
       positioning: {
@@ -41,7 +43,7 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; textId: string },
     updateData: Partial<{
-      tabled?: boolean;
+      state?: ContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -64,16 +66,18 @@ class Uploads {
     // 1. General metadata update
     const generalSetFields: Record<string, any> = {};
 
-    if (updateData.filename) {
+    if (updateData.filename !== undefined) {
       generalSetFields["n"] = updateData.filename;
     }
 
-    if (updateData.mimeType) {
+    if (updateData.mimeType !== undefined) {
       generalSetFields["m"] = updateData.mimeType;
     }
 
-    if (updateData.tabled !== undefined) {
-      generalSetFields["t"] = updateData.tabled;
+    if (updateData.state !== undefined) {
+      generalSetFields["s"] = updateData.state.map(
+        (ate) => stateEncodingMap[ate]
+      );
     }
 
     if (Object.keys(generalSetFields).length > 0) {
@@ -86,13 +90,13 @@ class Uploads {
     }
 
     // 2. Instance updates
-    if (updateData.instances && updateData.instances.length > 0) {
+    if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const { xiid, positioning } of updateData.instances) {
         if (!xiid) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
-        if (positioning) {
+        if (positioning !== undefined) {
           if (positioning.position?.left !== undefined) {
             instanceSetFields["i.$.p.p.l"] = positioning.position.left;
           }

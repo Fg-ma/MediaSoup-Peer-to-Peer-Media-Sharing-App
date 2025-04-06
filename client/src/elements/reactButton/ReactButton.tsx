@@ -10,7 +10,7 @@ import {
   ReactButtonOptions,
   reactionsMeta,
 } from "./lib/typeConstant";
-import { TableReactions } from "../../../../universal/typeConstant";
+import { TableReactions } from "../../../../universal/reactionsTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

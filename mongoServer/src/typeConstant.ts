@@ -4,7 +4,7 @@ import {
   SvgEffectStylesType,
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
-import { StaticContentTypes } from "../../universal/typeConstant";
+import { StaticContentTypes } from "../../universal/contentTypeConstant";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"

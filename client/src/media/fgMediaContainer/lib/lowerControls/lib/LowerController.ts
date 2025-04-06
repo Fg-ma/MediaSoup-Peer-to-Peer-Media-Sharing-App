@@ -1,7 +1,7 @@
 import TableStaticContentSocketController from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
-import { StaticContentTypes } from "../../../../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
 

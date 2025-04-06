@@ -1,7 +1,9 @@
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   SvgEffectStylesType,
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
+import { stateEncodingMap } from "../typeConstant";
 import { svgEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
@@ -12,7 +14,7 @@ class Encoder {
     svgId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       svgInstanceId: string;
       positioning: {
@@ -28,7 +30,7 @@ class Encoder {
     sid: string;
     n: string;
     m: string;
-    t: boolean;
+    s: number[];
     i: {
       siid: string;
       p: {
@@ -77,14 +79,14 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, svgId, filename, mimeType, tabled, instances } = data;
+    const { table_id, svgId, filename, mimeType, state, instances } = data;
 
     return {
       tid: table_id,
       sid: svgId,
       n: filename,
       m: mimeType,
-      t: tabled,
+      s: state.map((ate) => stateEncodingMap[ate]),
       i: instances.map(
         ({ svgInstanceId, positioning, effects, effectStyles }) => ({
           siid: svgInstanceId,
@@ -95,12 +97,7 @@ class Encoder {
           },
           e: Object.entries(effects)
             .filter(([, isEnabled]) => isEnabled)
-            .map(
-              ([effect]) =>
-                svgEffectEncodingMap[
-                  effect as keyof typeof svgEffectEncodingMap
-                ]
-            ),
+            .map(([effect]) => svgEffectEncodingMap[effect as SvgEffectTypes]),
           es: {
             "0": {
               c: effectStyles.shadow.shadowColor,

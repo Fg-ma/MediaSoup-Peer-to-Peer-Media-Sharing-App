@@ -47,7 +47,7 @@ export default function FgVideo({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const videoMedia = userMedia.current.video.instances[videoInstanceId];
+  const videoMediaInstance = userMedia.current.video.instances[videoInstanceId];
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -94,7 +94,7 @@ export default function FgVideo({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(videoMedia.initPositioning);
+  }>(videoMediaInstance.initPositioning);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const isScrubbing = useRef(false);
@@ -102,7 +102,7 @@ export default function FgVideo({
 
   const lowerVideoController = new LowerVideoController(
     videoInstanceId,
-    videoMedia,
+    videoMediaInstance,
     videoContainerRef,
     setPausedState,
     shiftPressed,
@@ -116,7 +116,6 @@ export default function FgVideo({
     tintColor,
     userEffects,
     userEffectsStyles,
-    userMedia,
     setSettingsActive,
     recording,
     downloadRecordingReady,
@@ -130,8 +129,7 @@ export default function FgVideo({
 
   const videoController = new VideoController(
     videoInstanceId,
-    videoMedia,
-    subContainerRef,
+    videoMediaInstance,
     videoContainerRef,
     videoOptions,
     userEffects,
@@ -143,34 +141,81 @@ export default function FgVideo({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(videoMedia.canvas);
-    // if (videoMedia.hiddenVideo) {
-    //   subContainerRef.current?.appendChild(videoMedia.hiddenVideo);
-    // }
+    subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
+    if (videoMediaInstance.instanceCanvas) {
+      subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
+      positioning.current.scale = {
+        x: videoMediaInstance.videoMedia.aspect
+          ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect
+          : positioning.current.scale.x,
+        y: positioning.current.scale.y,
+      };
 
-    videoController.scaleCallback();
+      // Keep video time
+      lowerVideoController.timeUpdate();
+      videoMediaInstance.instanceVideo?.addEventListener(
+        "timeupdate",
+        lowerVideoController.timeUpdate
+      );
+
+      videoMediaInstance.instanceVideo?.addEventListener(
+        "enterpictureinpicture",
+        () => lowerVideoController.handlePictureInPicture("enter")
+      );
+
+      videoMediaInstance.instanceVideo?.addEventListener(
+        "leavepictureinpicture",
+        () => lowerVideoController.handlePictureInPicture("leave")
+      );
+
+      setRerender((prev) => !prev);
+    }
+    videoMediaInstance.videoMedia.addDownloadCompleteListener(() => {
+      if (videoMediaInstance.instanceCanvas) {
+        const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
+
+        if (allCanvas) {
+          allCanvas.forEach((canvasElement) => {
+            canvasElement.remove();
+          });
+        }
+
+        subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
+
+        positioning.current.scale = {
+          x: videoMediaInstance.videoMedia.aspect
+            ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect
+            : positioning.current.scale.x,
+          y: positioning.current.scale.y,
+        };
+
+        // Keep video time
+        lowerVideoController.timeUpdate();
+        videoMediaInstance.instanceVideo?.addEventListener(
+          "timeupdate",
+          lowerVideoController.timeUpdate
+        );
+
+        videoMediaInstance.instanceVideo?.addEventListener(
+          "enterpictureinpicture",
+          () => lowerVideoController.handlePictureInPicture("enter")
+        );
+
+        videoMediaInstance.instanceVideo?.addEventListener(
+          "leavepictureinpicture",
+          () => lowerVideoController.handlePictureInPicture("leave")
+        );
+
+        setRerender((prev) => !prev);
+      }
+    });
 
     // Set up initial conditions
     videoController.init();
 
-    // Keep video time
-    lowerVideoController.timeUpdate();
-    videoMedia.video.addEventListener(
-      "timeupdate",
-      lowerVideoController.timeUpdate
-    );
-
     document.addEventListener("keydown", lowerVideoController.handleKeyDown);
 
     document.addEventListener("keyup", lowerVideoController.handleKeyUp);
-
-    videoMedia.video.addEventListener("enterpictureinpicture", () =>
-      lowerVideoController.handlePictureInPicture("enter")
-    );
-
-    videoMedia.video.addEventListener("leavepictureinpicture", () =>
-      lowerVideoController.handlePictureInPicture("leave")
-    );
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
@@ -184,11 +229,13 @@ export default function FgVideo({
         lowerVideoController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerVideoController.handleKeyUp);
-      videoMedia.video.removeEventListener("enterpictureinpicture", () =>
-        lowerVideoController.handlePictureInPicture("enter")
+      videoMediaInstance.instanceVideo?.removeEventListener(
+        "enterpictureinpicture",
+        () => lowerVideoController.handlePictureInPicture("enter")
       );
-      videoMedia.video.removeEventListener("leavepictureinpicture", () =>
-        lowerVideoController.handlePictureInPicture("leave")
+      videoMediaInstance.instanceVideo?.removeEventListener(
+        "leavepictureinpicture",
+        () => lowerVideoController.handlePictureInPicture("leave")
       );
     };
   }, []);
@@ -196,23 +243,6 @@ export default function FgVideo({
   useEffect(() => {
     lowerVideoController.updateCaptionsStyles();
   }, [settings]);
-
-  useEffect(() => {
-    if (subContainerRef.current && videoMedia?.canvas) {
-      videoMedia.canvas.style.position = "absolute";
-      videoMedia.canvas.style.top = "0%";
-      videoMedia.canvas.style.left = "0%";
-      videoMedia.canvas.style.width = "100%";
-      videoMedia.canvas.style.height = "100%";
-      // subContainerRef.current.appendChild(
-      //   userMedia.current.video[videoInstanceId].canvas
-      // );
-    }
-  }, [videoInstanceId, userMedia]);
-
-  useEffect(() => {
-    videoController.scaleCallback();
-  }, [positioning.current.scale]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
@@ -227,11 +257,11 @@ export default function FgVideo({
 
   return (
     <FgMediaContainer
-      mediaId={videoMedia.videoId}
+      mediaId={videoMediaInstance.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
-      filename={videoMedia.filename}
+      filename={videoMediaInstance.videoMedia.filename}
       kind='video'
-      rootMedia={videoMedia.video}
+      rootMedia={videoMediaInstance.instanceVideo}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className='video-container'
@@ -241,7 +271,7 @@ export default function FgVideo({
             videoInstanceId={videoInstanceId}
             lowerVideoController={lowerVideoController}
             tintColor={tintColor}
-            videoMedia={videoMedia}
+            videoMediaInstance={videoMediaInstance}
             videoContainerRef={videoContainerRef}
           />
         ) : null,
@@ -306,7 +336,7 @@ export default function FgVideo({
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
           settings={settings}
-          audioStream={videoMedia.getAudioTrack()}
+          audioStream={videoMediaInstance.getAudioTrack()!}
           videoContainerRef={videoContainerRef}
           scrollingContainerRef={rightLowerVideoControlsRef}
           containerRef={subContainerRef}

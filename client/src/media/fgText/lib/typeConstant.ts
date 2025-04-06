@@ -8,7 +8,8 @@ export interface ActivePages {
 }
 
 export interface Settings {
-  background: { value: "true" | "false" };
+  background: { value: boolean };
+  synced: { value: boolean };
   colors: {
     value: "";
     backgroundColor: {
@@ -30,7 +31,8 @@ export interface Settings {
 }
 
 export const defaultSettings: Settings = Object.freeze({
-  background: Object.freeze({ value: "false" }),
+  background: Object.freeze({ value: false }),
+  synced: Object.freeze({ value: false }),
   colors: Object.freeze({
     value: "",
     backgroundColor: {

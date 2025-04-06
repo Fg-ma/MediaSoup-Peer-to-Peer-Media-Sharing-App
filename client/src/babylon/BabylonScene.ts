@@ -270,6 +270,8 @@ class BabylonScene {
       });
     }
 
+    this.babylonShaderController.renderLoop();
+
     this.scene.render();
   };
 

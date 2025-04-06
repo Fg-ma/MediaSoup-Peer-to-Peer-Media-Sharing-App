@@ -2,7 +2,10 @@ import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 
 class ImageMedia {
   image: HTMLImageElement | undefined;
@@ -18,7 +21,7 @@ class ImageMedia {
     public imageId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public tabled: boolean,
+    public state: ContentStateTypes[],
     private getImage: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -87,11 +90,11 @@ class ImageMedia {
 
       this.image.onload = () => {
         this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
-      };
 
-      this.downloadCompleteListeners.forEach((listener) => {
-        listener();
-      });
+        this.downloadCompleteListeners.forEach((listener) => {
+          listener();
+        });
+      };
 
       this.removeMessageListener(this.getImageListener);
     }

@@ -1,9 +1,11 @@
+import { VideoEffectTypes } from "../../../../universal/effectsTypeConstant";
+
 export interface TableVideosType {
   tid: string;
   vid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     viid: string;
     p: {
@@ -52,7 +54,7 @@ export interface TableVideosType {
   }[];
 }
 
-export const videoEffectEncodingMap = {
+export const videoEffectEncodingMap: Record<VideoEffectTypes, number> = {
   postProcess: 0,
   hideBackground: 1,
   blur: 2,
@@ -66,7 +68,9 @@ export const videoEffectEncodingMap = {
   pause: 10,
 };
 
-export const videoEffectStylesEncodingMap = {
+export const videoEffectStylesEncodingMap: Partial<
+  Record<VideoEffectTypes, number>
+> = {
   postProcess: 0,
   hideBackground: 1,
   tint: 2,

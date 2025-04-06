@@ -1,9 +1,9 @@
 import uWS from "uWebSockets.js";
+import { ContentTypes } from "../../universal/contentTypeConstant";
 import {
-  ContentTypes,
   TableReactions,
   TableReactionStyles,
-} from "../../universal/typeConstant";
+} from "../../universal/reactionsTypeConstant";
 
 export type TableColors =
   | "cyan"

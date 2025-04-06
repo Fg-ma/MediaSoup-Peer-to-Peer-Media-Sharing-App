@@ -16,8 +16,12 @@ class Cleanup {
       instanceId
     );
 
-    if (document && document.i.length === 0 && !document.t) {
-      console.log("wokr", filename, contentTypeBucketMap[contentType]);
+    if (
+      document &&
+      document.i.length === 0 &&
+      !document.s.includes(0) &&
+      !document.s.includes(1)
+    ) {
       await tableTopCeph.deleteFile(
         contentTypeBucketMap[contentType],
         filename

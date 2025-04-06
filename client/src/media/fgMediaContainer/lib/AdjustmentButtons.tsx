@@ -5,7 +5,7 @@ import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { MediaContainerOptions } from "./typeConstant";
-import { StaticContentTypes } from "../../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 
 export default function AdjustmentButtons({
   kind,

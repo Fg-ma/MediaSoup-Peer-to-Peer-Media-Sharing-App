@@ -1,4 +1,7 @@
-import { StaticContentTypes } from "../../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
@@ -201,6 +204,7 @@ export type onVideoUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -212,6 +216,7 @@ export type onVideoUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -241,6 +246,7 @@ export type onImageUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -252,6 +258,7 @@ export type onImageUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -271,6 +278,7 @@ export type onSvgUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -282,6 +290,7 @@ export type onSvgUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -301,6 +310,7 @@ export type onTextUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -312,6 +322,7 @@ export type onTextUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -331,6 +342,7 @@ export type onApplicationUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -342,6 +354,7 @@ export type onApplicationUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -361,6 +374,7 @@ export type onSoundClipUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -372,6 +386,7 @@ export type onSoundClipUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
+    state: ContentStateTypes[];
   };
 };
 
@@ -412,7 +427,7 @@ export type onResponsedCatchUpTableDataType = {
           imageId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             imageInstanceId: string;
             positioning: {
@@ -437,7 +452,7 @@ export type onResponsedCatchUpTableDataType = {
           svgId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             svgInstanceId: string;
             positioning: {
@@ -462,7 +477,7 @@ export type onResponsedCatchUpTableDataType = {
           videoId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             videoInstanceId: string;
             positioning: {
@@ -488,7 +503,7 @@ export type onResponsedCatchUpTableDataType = {
           textId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             textInstanceId: string;
             positioning: {
@@ -511,7 +526,7 @@ export type onResponsedCatchUpTableDataType = {
           soundClipId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             soundClipInstanceId: string;
             positioning: {
@@ -535,7 +550,7 @@ export type onResponsedCatchUpTableDataType = {
           applicationId: string;
           filename: string;
           mimeType: string;
-          tabled: boolean;
+          state: ContentStateTypes[];
           instances: {
             applicationInstanceId: string;
             positioning: {

@@ -1,4 +1,5 @@
 import uWS from "uWebSockets.js";
+import { v4 as uuidv4 } from "uuid";
 import busboy from "busboy";
 import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
@@ -19,20 +20,45 @@ import {
   defaultVideoEffectsStyles,
   defaultVideoEffects,
 } from "../../../universal/effectsTypeConstant";
-import { StaticContentTypes } from "../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../universal/contentTypeConstant";
 
 const tableStaticContentUtils = new Utils();
 
+const uploadSessions = new Map<
+  string,
+  | {
+      direction: "toTable";
+      table_id: string;
+      contentId: string;
+      instanceId: string;
+      state: ContentStateTypes[];
+    }
+  | {
+      direction: "reupload";
+      table_id: string;
+      contentId: string;
+    }
+  | {
+      direction: "toTabled";
+      table_id: string;
+      contentId: string;
+      state: ContentStateTypes[];
+    }
+  | {
+      direction: "toMuteStyle";
+      table_id: string;
+      contentId: string;
+      state: ContentStateTypes[];
+    }
+>();
+
 class Posts {
   constructor(app: uWS.TemplatedApp) {
-    app.post("/upload/*", (res, req) => {
-      const url = req.getUrl();
-      const split = url.split("/");
-      const table_id = split[2];
-      const contentId = split[3];
-      const instanceId = split[4];
-      const direction = split[5];
-      const tabled = split[6] !== "false";
+    app.post("/upload-meta", (res, req) => {
+      let buffer = "";
 
       res.cork(() => {
         res.writeHeader(
@@ -41,6 +67,81 @@ class Posts {
         );
       });
 
+      // Required to prevent crash if the client disconnects early
+      let aborted = false;
+      res.onAborted(() => {
+        aborted = true;
+        console.warn("Request aborted by client");
+      });
+
+      res.onData((chunk, isLast) => {
+        buffer += Buffer.from(chunk).toString();
+
+        if (isLast) {
+          if (aborted) return;
+
+          try {
+            const metadata = JSON.parse(buffer);
+            const { table_id, contentId, instanceId, direction, state } =
+              metadata;
+
+            const uploadId = uuidv4();
+
+            uploadSessions.set(uploadId, {
+              table_id,
+              contentId,
+              instanceId,
+              direction,
+              state,
+            });
+
+            res.cork(() => {
+              res
+                .writeStatus("200 OK")
+                .writeHeader("Content-Type", "application/json")
+                .end(JSON.stringify({ uploadId }));
+            });
+          } catch (err) {
+            console.error("Error in /upload-meta:", err);
+            res.cork(() => {
+              res
+                .writeStatus("400 Bad Request")
+                .writeHeader("Content-Type", "application/json")
+                .end(
+                  JSON.stringify({ error: "Invalid JSON or missing fields" })
+                );
+            });
+          }
+        }
+      });
+    });
+
+    app.post("/upload-file/:uploadId", (res, req) => {
+      res.cork(() => {
+        res.writeHeader(
+          "Access-Control-Allow-Origin",
+          "https://localhost:8080"
+        );
+      });
+
+      const uploadId = req.getParameter(0);
+
+      if (!uploadId) {
+        res.cork(() => {
+          res.writeStatus("404 Not Found").end("Upload session not found");
+        });
+        return;
+      }
+
+      const session = uploadSessions.get(uploadId);
+
+      if (!session) {
+        res.cork(() => {
+          res.writeStatus("404 Not Found").end("Upload session not found");
+        });
+        return;
+      }
+
       const headers: { [header: string]: string } = {};
       req.forEach((key, value) => {
         headers[key] = value;
@@ -48,7 +149,7 @@ class Posts {
 
       const bb = busboy({ headers });
 
-      bb.on("file", (name, file, info) => {
+      bb.on("file", (_, file, info) => {
         const { mimeType, filename } = info;
 
         const sanitizedFilename = tableStaticContentUtils.sanitizeString(
@@ -56,13 +157,13 @@ class Posts {
         );
         const sanitizedMimeType =
           tableStaticContentUtils.sanitizeMimeType(mimeType);
-
         const completeFilename = `${sanitizedFilename}${
           mimeToExtension[sanitizedMimeType as StaticMimeTypes]
         }`;
         const staticContentType =
           mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
 
+        // Save file
         tableTopCeph
           .uploadFile(
             contentTypeBucketMap[staticContentType],
@@ -70,65 +171,168 @@ class Posts {
             file
           )
           .then(async () => {
-            switch (direction) {
+            switch (session.direction) {
               case "toTable":
                 await this.handleToTable(
                   staticContentType,
-                  table_id,
-                  contentId,
-                  instanceId,
+                  session.table_id,
+                  session.contentId,
+                  session.instanceId,
                   mimeType as StaticMimeTypes,
                   completeFilename,
-                  tabled
+                  session.state
                 );
                 break;
               case "reupload":
-                this.handleReupload(staticContentType, table_id, contentId);
+                this.handleReupload(
+                  staticContentType,
+                  session.table_id,
+                  session.contentId
+                );
                 break;
               case "toTabled":
                 await this.handleToTabled(
                   staticContentType,
-                  table_id,
-                  contentId,
+                  session.table_id,
+                  session.contentId,
                   mimeType as StaticMimeTypes,
                   completeFilename,
-                  tabled
+                  session.state
                 );
                 break;
-              default:
-                break;
             }
+
+            // Cleanup session
+            uploadSessions.delete(uploadId);
+
+            res.cork(() => {
+              res.writeStatus("200 OK").end("Upload complete");
+            });
           });
 
         file.on("error", (err) => {
-          console.error(`Error writing file ${completeFilename}:`, err);
-        });
-      });
-
-      bb.on("close", () => {
-        res.cork(() => {
-          console.log("Upload complete");
-          res.writeStatus("200 OK").end("That's all folks!");
+          console.error(`Error writing file:`, err);
         });
       });
 
       let bodyBuffer = Buffer.alloc(0);
-
       res.onData((chunk, isLast) => {
         bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
-
         if (isLast) {
           bb.end(bodyBuffer);
-        } else {
-          bb.write(bodyBuffer);
-          bodyBuffer = Buffer.alloc(0);
         }
       });
 
       res.onAborted(() => {
         bb.destroy();
+        uploadSessions.delete(uploadId);
       });
     });
+
+    // app.post("/upload/*", (res, req) => {
+    //   const url = req.getUrl();
+    //   const split = url.split("/");
+    //   const table_id = split[2];
+    //   const contentId = split[3];
+    //   const instanceId = split[4];
+    //   const direction = split[5];
+    //   const tabled = split[6] !== "false";
+
+    //   res.cork(() => {
+    //     res.writeHeader(
+    //       "Access-Control-Allow-Origin",
+    //       "https://localhost:8080"
+    //     );
+    //   });
+
+    //   const headers: { [header: string]: string } = {};
+    //   req.forEach((key, value) => {
+    //     headers[key] = value;
+    //   });
+
+    //   const bb = busboy({ headers });
+
+    //   bb.on("file", (name, file, info) => {
+    //     const { mimeType, filename } = info;
+
+    //     const sanitizedFilename = tableStaticContentUtils.sanitizeString(
+    //       filename.slice(0, -4)
+    //     );
+    //     const sanitizedMimeType =
+    //       tableStaticContentUtils.sanitizeMimeType(mimeType);
+
+    //     const completeFilename = `${sanitizedFilename}${
+    //       mimeToExtension[sanitizedMimeType as StaticMimeTypes]
+    //     }`;
+    //     const staticContentType =
+    //       mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
+
+    //     tableTopCeph
+    //       .uploadFile(
+    //         contentTypeBucketMap[staticContentType],
+    //         completeFilename,
+    //         file
+    //       )
+    //       .then(async () => {
+    //         switch (direction) {
+    //           case "toTable":
+    //             await this.handleToTable(
+    //               staticContentType,
+    //               table_id,
+    //               contentId,
+    //               instanceId,
+    //               mimeType as StaticMimeTypes,
+    //               completeFilename,
+    //               tabled
+    //             );
+    //             break;
+    //           case "reupload":
+    //             this.handleReupload(staticContentType, table_id, contentId);
+    //             break;
+    //           case "toTabled":
+    //             await this.handleToTabled(
+    //               staticContentType,
+    //               table_id,
+    //               contentId,
+    //               mimeType as StaticMimeTypes,
+    //               completeFilename,
+    //               tabled
+    //             );
+    //             break;
+    //           default:
+    //             break;
+    //         }
+    //       });
+
+    //     file.on("error", (err) => {
+    //       console.error(`Error writing file ${completeFilename}:`, err);
+    //     });
+    //   });
+
+    //   bb.on("close", () => {
+    //     res.cork(() => {
+    //       console.log("Upload complete");
+    //       res.writeStatus("200 OK").end("That's all folks!");
+    //     });
+    //   });
+
+    //   let bodyBuffer = Buffer.alloc(0);
+
+    //   res.onData((chunk, isLast) => {
+    //     bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
+
+    //     if (isLast) {
+    //       bb.end(bodyBuffer);
+    //     } else {
+    //       bb.write(bodyBuffer);
+    //       bodyBuffer = Buffer.alloc(0);
+    //     }
+    //   });
+
+    //   res.onAborted(() => {
+    //     bb.destroy();
+    //   });
+    // });
   }
 
   private handleToTable = async (
@@ -138,7 +342,7 @@ class Posts {
     instanceId: string,
     mimeType: StaticMimeTypes,
     completeFilename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     switch (staticContentType) {
       case "video":
@@ -148,7 +352,7 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
@@ -160,6 +364,7 @@ class Posts {
           data: {
             filename: completeFilename,
             mimeType,
+            state,
           },
         });
 
@@ -199,13 +404,13 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "imageUploadedToTable",
           header: { contentId, instanceId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "svg":
@@ -215,13 +420,13 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "svgUploadedToTable",
           header: { contentId, instanceId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "soundClip":
@@ -231,13 +436,13 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "soundClipUploadedToTable",
           header: { contentId, instanceId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "application":
@@ -247,13 +452,13 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "applicationUploadedToTable",
           header: { contentId, instanceId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "text":
@@ -263,13 +468,13 @@ class Posts {
           instanceId,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "textUploadedToTable",
           header: { contentId, instanceId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       default:
@@ -331,7 +536,7 @@ class Posts {
     contentId: string,
     mimeType: StaticMimeTypes,
     completeFilename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     switch (staticContentType) {
       case "video":
@@ -341,7 +546,7 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
@@ -352,6 +557,7 @@ class Posts {
           data: {
             filename: completeFilename,
             mimeType,
+            state,
           },
         });
 
@@ -391,13 +597,13 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "imageUploadedToTabled",
           header: { contentId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "svg":
@@ -407,13 +613,13 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "svgUploadedToTabled",
           header: { contentId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "soundClip":
@@ -423,13 +629,13 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "soundClipUploadedToTabled",
           header: { contentId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       case "application":
@@ -439,7 +645,7 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
@@ -455,13 +661,13 @@ class Posts {
           undefined,
           mimeType,
           completeFilename,
-          tabled
+          state
         );
 
         broadcaster.broadcastToTable(table_id, {
           type: "textUploadedToTabled",
           header: { contentId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename: completeFilename, mimeType, state },
         });
         break;
       default:
@@ -476,14 +682,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableVideos?.uploads.uploadMetaData({
       table_id,
       videoId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {
@@ -514,14 +720,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableImages?.uploads.uploadMetaData({
       table_id,
       imageId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {
@@ -551,14 +757,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableSvgs?.uploads.uploadMetaData({
       table_id,
       svgId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {
@@ -588,14 +794,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableSoundClips?.uploads.uploadMetaData({
       table_id,
       soundClipId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {
@@ -624,14 +830,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableApplications?.uploads.uploadMetaData({
       table_id,
       applicationId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {
@@ -661,14 +867,14 @@ class Posts {
     instanceId: string | undefined,
     mimeType: StaticMimeTypes,
     filename: string,
-    tabled: boolean
+    state: ContentStateTypes[]
   ) => {
     await tableTopMongo.tableText?.uploads.uploadMetaData({
       table_id,
       textId: contentId,
       filename,
       mimeType,
-      tabled,
+      state,
       instances: instanceId
         ? [
             {

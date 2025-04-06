@@ -13,7 +13,7 @@ import {
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
@@ -145,8 +145,6 @@ export default function FgMediaContainer({
     });
 
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
-
-  const [tabled, setTabled] = useState(false);
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
@@ -347,7 +345,6 @@ export default function FgMediaContainer({
         !backgroundMedia && (
           <>
             <UpperControls
-              tabled={tabled}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}
@@ -383,10 +380,10 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className='flex sub-media-container absolute items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
+        className='flex sub-media-container absolute items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden pointer-events-none'
       >
         {media && media}
-        <div className='media-lower-controls pointer-events-none w-full h-full absolute top-0 left-0'>
+        <div className='media-lower-controls !pointer-events-none w-full h-full absolute top-0 left-0'>
           {popupElements &&
             popupElements.length > 0 &&
             popupElements.map((element, index) => (
@@ -398,7 +395,6 @@ export default function FgMediaContainer({
           backgroundMedia) && (
           <>
             <UpperControls
-              tabled={tabled}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}

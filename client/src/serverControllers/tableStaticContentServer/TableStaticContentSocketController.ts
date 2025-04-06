@@ -16,7 +16,7 @@ import {
   onRespondedCatchUpVideoPositionType,
   OutGoingTableStaticContentMessages,
 } from "./lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -303,8 +303,8 @@ class TableStaticContentSocketController {
       event.header;
 
     const currentVideoPosition =
-      this.userMedia.current[contentType].instances[instanceId]?.video
-        .currentTime;
+      this.userMedia.current[contentType].instances[instanceId]?.instanceVideo
+        ?.currentTime;
 
     if (currentVideoPosition) {
       this.sendMessage({
@@ -327,13 +327,16 @@ class TableStaticContentSocketController {
   private onRespondedCatchUpVideoPosition = (
     event: onRespondedCatchUpVideoPositionType
   ) => {
-    const { contentType, contentId, instanceId } = event.header;
+    const { contentType, instanceId } = event.header;
     const { currentVideoPosition } = event.data;
 
-    if (this.userMedia.current[contentType].instances[instanceId])
+    if (
+      this.userMedia.current[contentType].instances[instanceId] &&
+      this.userMedia.current[contentType].instances[instanceId].instanceVideo
+    )
       this.userMedia.current[contentType].instances[
         instanceId
-      ].video.currentTime = currentVideoPosition;
+      ].instanceVideo.currentTime = currentVideoPosition;
   };
 }
 

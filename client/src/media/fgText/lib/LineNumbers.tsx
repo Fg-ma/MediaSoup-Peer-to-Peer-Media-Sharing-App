@@ -86,7 +86,9 @@ export default function LineNumbers({
           className='flex h-max flex-col text-right pr-2 cursor-pointer font-B612Mono'
           style={{
             fontSize: settings.fontSize.value,
-            lineHeight: `calc(${settings.fontSize.value} + 8px)`,
+            lineHeight: `calc(${settings.fontSize.value} + ${
+              parseInt(settings.fontSize.value.slice(0, -2)) * 0.25
+            }px)`,
           }}
           onPointerDown={handleClick}
           initial={{ x: -50, opacity: 0 }}

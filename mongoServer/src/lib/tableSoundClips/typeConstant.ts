@@ -1,9 +1,11 @@
+import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
+
 export interface TableSoundClipsType {
   tid: string;
   sid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     siid: string;
     p: {
@@ -21,7 +23,7 @@ export interface TableSoundClipsType {
   }[];
 }
 
-export const soundClipEffectEncodingMap = {
+export const soundClipEffectEncodingMap: Record<AudioEffectTypes, number> = {
   robot: 0,
   echo: 1,
   alien: 2,

@@ -33,7 +33,7 @@ import SvgMedia from "../../media/fgSvg/SvgMedia";
 import ImageMediaInstance from "../../media/fgImage/ImageMediaInstance";
 import TextMediaInstance from "../../media/fgText/TextMediaInstance";
 import ApplicationMediaInstance from "../../media/fgApplication/ApplicationMediaInstance";
-import VideoMediaInstance from "src/media/fgVideo/VideoMediaInstance";
+import VideoMediaInstance from "../../media/fgVideo/VideoMediaInstance";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -83,7 +83,7 @@ class SharedBundleController extends SharedBundleSocket {
           video.videoId,
           video.filename,
           video.mimeType as TableTopStaticMimeType,
-          video.tabled,
+          video.state,
           this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
@@ -133,7 +133,7 @@ class SharedBundleController extends SharedBundleSocket {
           image.imageId,
           image.filename,
           image.mimeType as TableTopStaticMimeType,
-          image.tabled,
+          image.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener
@@ -169,7 +169,7 @@ class SharedBundleController extends SharedBundleSocket {
           svg.svgId,
           svg.filename,
           svg.mimeType as TableTopStaticMimeType,
-          svg.tabled,
+          svg.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener
@@ -198,27 +198,23 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (text) {
       for (const textItem of text) {
-        this.userMedia.current.text.all[textItem.textId] = new TextMedia(
+        const newTextMedia = new TextMedia(
           textItem.textId,
           textItem.filename,
           textItem.mimeType as TableTopStaticMimeType,
-          textItem.tabled,
+          textItem.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener
         );
 
+        this.userMedia.current.text.all[textItem.textId] = newTextMedia;
+
         for (const instance of textItem.instances) {
           this.userMedia.current.text.instances[instance.textInstanceId] =
             new TextMediaInstance(
-              textItem.textId,
+              newTextMedia,
               instance.textInstanceId,
-              textItem.filename,
-              textItem.mimeType as TableTopStaticMimeType,
-              textItem.tabled,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
               instance.positioning
             );
         }
@@ -230,7 +226,7 @@ class SharedBundleController extends SharedBundleSocket {
           application.applicationId,
           application.filename,
           application.mimeType as TableTopStaticMimeType,
-          application.tabled,
+          application.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener
@@ -278,13 +274,14 @@ class SharedBundleController extends SharedBundleSocket {
       case "videoUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
+
           if (this.tableStaticContentSocket.current) {
             const newVideoMedia = new VideoMedia(
               contentId,
               filename,
               mimeType,
-              false,
+              state,
               this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
@@ -330,14 +327,14 @@ class SharedBundleController extends SharedBundleSocket {
       case "imageUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newImageMedia = new ImageMedia(
               contentId,
               filename,
               mimeType,
-              false,
+              state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
@@ -373,14 +370,14 @@ class SharedBundleController extends SharedBundleSocket {
       case "imageUploadedToTabled":
         {
           const { contentId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             this.userMedia.current.image.all[contentId] = new ImageMedia(
               contentId,
               filename,
               mimeType,
-              true,
+              state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
@@ -393,14 +390,14 @@ class SharedBundleController extends SharedBundleSocket {
       case "svgUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newSvgMedia = new SvgMedia(
               contentId,
               filename,
               mimeType,
-              false,
+              state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
@@ -434,14 +431,14 @@ class SharedBundleController extends SharedBundleSocket {
       case "svgUploadedToTabled":
         {
           const { contentId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             this.userMedia.current.svg.all[contentId] = new SvgMedia(
               contentId,
               filename,
               mimeType,
-              true,
+              state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener
@@ -463,31 +460,33 @@ class SharedBundleController extends SharedBundleSocket {
       case "textUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType } = message.data;
+          const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
+            const newTextMedia = new TextMedia(
+              contentId,
+              filename,
+              mimeType,
+              state,
+              this.tableStaticContentSocket.current.getFile,
+              this.tableStaticContentSocket.current.addMessageListener,
+              this.tableStaticContentSocket.current.removeMessageListener
+            );
+
+            this.userMedia.current.text.all[contentId] = newTextMedia;
+
             this.userMedia.current.text.instances[instanceId] =
-              new TextMediaInstance(
-                contentId,
-                instanceId,
-                filename,
-                mimeType,
-                false,
-                this.tableStaticContentSocket.current.getFile,
-                this.tableStaticContentSocket.current.addMessageListener,
-                this.tableStaticContentSocket.current.removeMessageListener,
-                {
-                  position: {
-                    left: 50,
-                    top: 50,
-                  },
-                  scale: {
-                    x: 25,
-                    y: 25,
-                  },
-                  rotation: 0,
-                }
-              );
+              new TextMediaInstance(newTextMedia, instanceId, {
+                position: {
+                  left: 50,
+                  top: 50,
+                },
+                scale: {
+                  x: 25,
+                  y: 25,
+                },
+                rotation: 0,
+              });
           }
           this.setRerender((prev) => !prev);
         }

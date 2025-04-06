@@ -13,6 +13,8 @@ import {
   Settings,
 } from "./typeConstant";
 
+const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+
 class CaptureMediaController {
   constructor(
     private table_id: React.RefObject<string>,
@@ -357,13 +359,29 @@ class CaptureMediaController {
 
   confirmCapture = async () => {
     if (this.videoRef.current && this.videoRef.current.src) {
-      const url = `https://localhost:8045/upload/${
-        this.table_id.current
-      }/${uuidv4()}/${uuidv4()}/toTable/false`;
-
-      const formData = new FormData();
+      const metadata = {
+        table_id: this.table_id.current,
+        contentId: uuidv4(),
+        instanceId: uuidv4(),
+        direction: "toTable",
+        state: [],
+      };
 
       try {
+        const metaRes = await fetch(
+          staticContentServerBaseUrl + "upload-meta",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(metadata),
+          }
+        );
+
+        const { uploadId } = await metaRes.json();
+
+        const formData = new FormData();
         const response = await fetch(this.videoRef.current.src);
         const blob = await response.blob();
         formData.append(
@@ -377,19 +395,40 @@ class CaptureMediaController {
         );
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
+        xhr.open(
+          "POST",
+          staticContentServerBaseUrl + `upload-file/${uploadId}`,
+          true
+        );
+
         xhr.send(formData);
       } catch (error) {
-        console.error("Error uploading video source:", error);
+        console.error("Error sending metadata:", error);
       }
     } else if (this.imageRef.current && this.imageRef.current.src) {
-      const url = `https://localhost:8045/upload/${
-        this.table_id.current
-      }/${uuidv4()}/${uuidv4()}/toTable/false`;
-
-      const formData = new FormData();
+      const metadata = {
+        table_id: this.table_id.current,
+        contentId: uuidv4(),
+        instanceId: uuidv4(),
+        direction: "toTable",
+        state: [],
+      };
 
       try {
+        const metaRes = await fetch(
+          staticContentServerBaseUrl + "upload-meta",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(metadata),
+          }
+        );
+
+        const { uploadId } = await metaRes.json();
+
+        const formData = new FormData();
         const response = await fetch(this.imageRef.current.src);
         const blob = await response.blob();
         formData.append(
@@ -399,10 +438,15 @@ class CaptureMediaController {
         );
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
+        xhr.open(
+          "POST",
+          staticContentServerBaseUrl + `upload-file/${uploadId}`,
+          true
+        );
+
         xhr.send(formData);
       } catch (error) {
-        console.error("Error uploading video source:", error);
+        console.error("Error sending metadata:", error);
       }
     }
 

@@ -1,5 +1,4 @@
 import { VideoOptions } from "./typeConstant";
-import VideoMedia from "../VideoMedia";
 import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
@@ -12,12 +11,12 @@ import {
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
 import LowerVideoController from "./lowerVideoControls/LowerVideoController";
+import VideoMediaInstance from "../VideoMediaInstance";
 
 class VideoController {
   constructor(
     private videoInstanceId: string,
-    private videoMedia: VideoMedia,
-    private subContainerRef: React.RefObject<HTMLDivElement>,
+    private videoMediaInstance: VideoMediaInstance,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private videoOptions: VideoOptions,
     private userEffects: React.MutableRefObject<UserEffectsType>,
@@ -35,48 +34,13 @@ class VideoController {
     );
   };
 
-  scaleCallback = () => {
-    if (!this.subContainerRef.current) return;
-
-    // Calculate the aspect ratio of the video
-    const videoAspectRatio =
-      this.videoMedia.video.videoWidth / this.videoMedia.video.videoHeight;
-
-    // Get the size of the container
-    const containerBox = this.subContainerRef.current.getBoundingClientRect();
-    const containerWidth = containerBox.width;
-    const containerHeight = containerBox.height;
-
-    // Calculate the container's aspect ratio
-    const containerAspectRatio = containerWidth / containerHeight;
-
-    // Apply scaling based on the smaller dimension to prevent overflow
-    if (containerAspectRatio > videoAspectRatio) {
-      // Container is wider than the video aspect ratio
-      this.videoMedia.video.style.width = "auto";
-      this.videoMedia.video.style.height = "100%";
-      if (this.videoMedia.hiddenVideo) {
-        this.videoMedia.hiddenVideo.style.width = "auto";
-        this.videoMedia.hiddenVideo.style.height = "100%";
-      }
-    } else {
-      // Container is taller than the video aspect ratio
-      this.videoMedia.video.style.width = "100%";
-      this.videoMedia.video.style.height = "auto";
-      if (this.videoMedia.hiddenVideo) {
-        this.videoMedia.hiddenVideo.style.width = "100%";
-        this.videoMedia.hiddenVideo.style.height = "auto";
-      }
-    }
-  };
-
   onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
     const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
     if (
       contentType === "video" &&
-      contentId === this.videoMedia.videoId &&
+      contentId === this.videoMediaInstance.videoMedia.videoId &&
       instanceId === this.videoInstanceId
     ) {
       this.userEffects.current.video[this.videoInstanceId].video = effects as {
@@ -96,19 +60,25 @@ class VideoController {
         ).tint.color;
       }
 
-      this.videoMedia.updateAllEffects(oldEffectStyle);
+      this.videoMediaInstance.updateAllEffects(oldEffectStyle);
 
       if (this.userEffects.current.video[this.videoInstanceId].video.pause) {
         this.paused.current = true;
-        if (!this.videoMedia.video.paused) {
-          this.videoMedia.video.pause();
+        if (
+          this.videoMediaInstance.instanceVideo &&
+          !this.videoMediaInstance.instanceVideo.paused
+        ) {
+          this.videoMediaInstance.instanceVideo.pause();
         }
 
         this.setPausedState(true);
       } else {
         this.paused.current = false;
-        if (this.videoMedia.video.paused) {
-          this.videoMedia.video.play();
+        if (
+          this.videoMediaInstance.instanceVideo &&
+          this.videoMediaInstance.instanceVideo.paused
+        ) {
+          this.videoMediaInstance.instanceVideo.play();
         }
 
         this.setPausedState(false);
@@ -121,10 +91,10 @@ class VideoController {
 
     if (
       contentType === "video" &&
-      contentId === this.videoMedia.videoId &&
+      contentId === this.videoMediaInstance.videoMedia.videoId &&
       instanceId === this.videoInstanceId
     ) {
-      this.videoMedia.updateVideoPosition(event.data.videoPosition);
+      this.videoMediaInstance.updateVideoPosition(event.data.videoPosition);
 
       this.lowerVideoController.timeUpdate();
     }

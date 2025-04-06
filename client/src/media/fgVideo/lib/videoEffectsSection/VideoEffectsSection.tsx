@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import VideoMedia from "../../VideoMedia";
 import lowerVideoController from "../lowerVideoControls/LowerVideoController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
 import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
+import VideoMediaInstance from "../../VideoMediaInstance";
 
 const HideBackgroundButton = React.lazy(
   () => import("../../../../elements/effectsButtons/HideBackgroundButton")
@@ -58,13 +58,13 @@ export default function VideoEffectsSection({
   videoInstanceId,
   lowerVideoController,
   tintColor,
-  videoMedia,
+  videoMediaInstance,
   videoContainerRef,
 }: {
   videoInstanceId: string;
   lowerVideoController: lowerVideoController;
   tintColor: React.MutableRefObject<string>;
-  videoMedia: VideoMedia;
+  videoMediaInstance: VideoMediaInstance;
   videoContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffectsStyles, userEffects } = useEffectsContext();
@@ -76,7 +76,7 @@ export default function VideoEffectsSection({
 
   const overflow = useRef(false);
 
-  const faceDetectedCount = useRef(videoMedia.maxFacesDetected);
+  const faceDetectedCount = useRef(videoMediaInstance.maxFacesDetected);
 
   const [_, setRerender] = useState(false);
 
@@ -99,13 +99,17 @@ export default function VideoEffectsSection({
 
   useEffect(() => {
     if (faceDetectedCount.current === 0) {
-      videoMedia.addFaceCountChangeListener(handleFaceDetectedCountChange);
+      videoMediaInstance.addFaceCountChangeListener(
+        handleFaceDetectedCountChange
+      );
     }
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
       if (faceDetectedCount.current === 0) {
-        videoMedia.removeFaceCountChangeListener(handleFaceDetectedCountChange);
+        videoMediaInstance.removeFaceCountChangeListener(
+          handleFaceDetectedCountChange
+        );
       }
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
@@ -189,7 +193,7 @@ export default function VideoEffectsSection({
             userEffectsStyles.current.video[videoInstanceId].video.postProcess
           }
           clickFunctionCallback={async () => {
-            videoMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
               userEffectsStyles.current.video[videoInstanceId].video.postProcess
                 .style
             );
@@ -201,7 +205,7 @@ export default function VideoEffectsSection({
               videoInstanceId
             ].video.postProcess.style = effectType;
 
-            videoMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
               userEffectsStyles.current.video[videoInstanceId].video.postProcess
                 .style
             );
@@ -230,7 +234,7 @@ export default function VideoEffectsSection({
                   userEffectsStyles.current.video[videoInstanceId].video
                     .hideBackground;
 
-                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectsStyles.style
                 );
 
@@ -248,7 +252,7 @@ export default function VideoEffectsSection({
                     .hideBackground;
 
                 effectsStyles.style = effectType;
-                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectType
                 );
 
@@ -265,7 +269,7 @@ export default function VideoEffectsSection({
                   userEffects.current.video[videoInstanceId].video
                     .hideBackground;
 
-                videoMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color
                 );
 

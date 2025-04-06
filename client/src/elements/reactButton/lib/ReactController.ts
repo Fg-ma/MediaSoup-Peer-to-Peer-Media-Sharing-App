@@ -1,9 +1,9 @@
 import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
+import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import {
-  ContentTypes,
   TableReactions,
   TableReactionStyles,
-} from "../../../../../universal/typeConstant";
+} from "../../../../../universal/reactionsTypeConstant";
 import { reactionsMeta } from "./typeConstant";
 
 class ReactController {

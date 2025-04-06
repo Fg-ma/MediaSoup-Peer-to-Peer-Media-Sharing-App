@@ -5,6 +5,8 @@ import {
   TableSoundClipsType,
 } from "./typeConstant";
 import { SoundClipEffectTypes } from "../../../../universal/effectsTypeConstant";
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { stateEncodingMap } from "../typeConstant";
 
 class Uploads {
   constructor(
@@ -17,7 +19,7 @@ class Uploads {
     soundClipId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       soundClipInstanceId: string;
       positioning: {
@@ -48,7 +50,7 @@ class Uploads {
   editMetaData = async (
     filter: { table_id: string; soundClipId: string },
     updateData: Partial<{
-      tabled?: boolean;
+      state?: ContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -72,16 +74,18 @@ class Uploads {
     // 1. General metadata update
     const generalSetFields: Record<string, any> = {};
 
-    if (updateData.filename) {
+    if (updateData.filename !== undefined) {
       generalSetFields["n"] = updateData.filename;
     }
 
-    if (updateData.mimeType) {
+    if (updateData.mimeType !== undefined) {
       generalSetFields["m"] = updateData.mimeType;
     }
 
-    if (updateData.tabled !== undefined) {
-      generalSetFields["t"] = updateData.tabled;
+    if (updateData.state !== undefined) {
+      generalSetFields["s"] = updateData.state.map(
+        (ate) => stateEncodingMap[ate]
+      );
     }
 
     if (Object.keys(generalSetFields).length > 0) {
@@ -94,13 +98,13 @@ class Uploads {
     }
 
     // 2. Instance updates
-    if (updateData.instances && updateData.instances.length > 0) {
+    if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const { siid, positioning, effects } of updateData.instances) {
         if (!siid) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
-        if (positioning) {
+        if (positioning !== undefined) {
           if (positioning.position?.left !== undefined) {
             instanceSetFields["i.$.p.p.l"] = positioning.position.left;
           }
@@ -118,7 +122,7 @@ class Uploads {
           }
         }
 
-        if (effects) {
+        if (effects !== undefined) {
           const effectValues = Object.keys(effects)
             .filter((effect) => effects[effect as keyof typeof effects])
             .map(

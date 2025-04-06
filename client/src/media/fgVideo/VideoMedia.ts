@@ -5,7 +5,10 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import VideoAudioMedia from "./VideoAudioMedia";
-import { StaticContentTypes } from "../../../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 
 class VideoMedia {
   video: HTMLVideoElement | undefined;
@@ -29,7 +32,7 @@ class VideoMedia {
     public videoId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public tabled: boolean,
+    public state: ContentStateTypes[],
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private getVideo: (
       contentType: StaticContentTypes,
@@ -138,7 +141,7 @@ class VideoMedia {
       this.video = document.createElement("video");
       this.video.src = this.blobURL;
 
-      this.video.onloadeddata = () => {
+      this.video.addEventListener("loadeddata", () => {
         this.aspect =
           (this.video?.videoWidth ?? 1) / (this.video?.videoHeight ?? 1);
 
@@ -151,10 +154,10 @@ class VideoMedia {
             this.userEffects
           );
         }
-      };
 
-      this.downloadCompleteListeners.forEach((listener) => {
-        listener();
+        this.downloadCompleteListeners.forEach((listener) => {
+          listener();
+        });
       });
 
       this.removeMessageListener(this.getVideoListener);

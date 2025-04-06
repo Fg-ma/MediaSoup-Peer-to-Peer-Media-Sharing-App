@@ -13,13 +13,13 @@ import {
   opacityMap,
   Settings,
 } from "../typeConstant";
-import VideoMedia from "../../VideoMedia";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import VideoMediaInstance from "../../VideoMediaInstance";
 
 class LowerVideoController {
   constructor(
     private videoInstanceId: string,
-    private videoMedia: VideoMedia,
+    private videoMediaInstance: VideoMediaInstance,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private shiftPressed: React.MutableRefObject<boolean>,
@@ -37,7 +37,6 @@ class LowerVideoController {
     private tintColor: React.MutableRefObject<string>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
@@ -180,26 +179,30 @@ class LowerVideoController {
         console.error("Failed to exit picture in picture:", error);
       });
     } else {
-      this.videoMedia.video.requestPictureInPicture().catch((error) => {
-        console.error("Failed to request picture in picture:", error);
-      });
+      this.videoMediaInstance.instanceVideo
+        ?.requestPictureInPicture()
+        .catch((error) => {
+          console.error("Failed to request picture in picture:", error);
+        });
     }
   };
 
   skipInVideo = (amount: number) => {
-    this.videoMedia.video.currentTime = Math.max(
+    if (!this.videoMediaInstance.instanceVideo) return;
+
+    this.videoMediaInstance.instanceVideo.currentTime = Math.max(
       0,
       Math.min(
-        this.videoMedia.video.currentTime + amount,
-        this.videoMedia.video.duration
+        this.videoMediaInstance.instanceVideo.currentTime + amount,
+        this.videoMediaInstance.instanceVideo.duration
       )
     );
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
-      this.videoMedia.videoId,
+      this.videoMediaInstance.videoMedia.videoId,
       this.videoInstanceId,
-      this.videoMedia.video.currentTime
+      this.videoMediaInstance.instanceVideo.currentTime
     );
   };
 
@@ -207,19 +210,22 @@ class LowerVideoController {
     this.handleVideoEffect("pause", false);
 
     this.paused.current = !this.paused.current;
+
+    if (!this.videoMediaInstance.instanceVideo) return;
+
     if (this.paused.current) {
-      this.videoMedia.video.pause();
+      this.videoMediaInstance.instanceVideo.pause();
     } else {
-      this.videoMedia.video.play();
+      this.videoMediaInstance.instanceVideo.play();
     }
 
     this.setPausedState((prev) => !prev);
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
-      this.videoMedia.videoId,
+      this.videoMediaInstance.videoMedia.videoId,
       this.videoInstanceId,
-      this.videoMedia.video.currentTime
+      this.videoMediaInstance.instanceVideo.currentTime
     );
   };
 
@@ -232,9 +238,10 @@ class LowerVideoController {
   };
 
   timeUpdate = () => {
-    if (this.currentTimeRef.current) {
-      const currentTime = this.videoMedia.video.currentTime;
-      const percent = currentTime / this.videoMedia.video.duration;
+    if (this.currentTimeRef.current && this.videoMediaInstance.instanceVideo) {
+      const currentTime = this.videoMediaInstance.instanceVideo.currentTime;
+      const percent =
+        currentTime / this.videoMediaInstance.instanceVideo.duration;
 
       this.currentTimeRef.current.textContent =
         this.formatDuration(currentTime);
@@ -292,7 +299,7 @@ class LowerVideoController {
           !this.userEffects.current.video[this.videoInstanceId].video[effect];
       }
 
-      this.videoMedia.changeEffects(
+      this.videoMediaInstance.changeEffects(
         effect,
         this.tintColor.current,
         blockStateChange
@@ -300,17 +307,17 @@ class LowerVideoController {
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
-        this.videoMedia.videoId,
+        this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
         this.userEffects.current.video[this.videoInstanceId].video,
         this.userEffectsStyles.current.video[this.videoInstanceId].video
       );
     } else {
-      this.videoMedia.clearAllEffects();
+      this.videoMediaInstance.clearAllEffects();
 
       this.tableStaticContentSocket.current?.updateContentEffects(
         "video",
-        this.videoMedia.videoId,
+        this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
         this.userEffects.current.video[this.videoInstanceId].video,
         this.userEffectsStyles.current.video[this.videoInstanceId].video
@@ -320,12 +327,12 @@ class LowerVideoController {
 
   handleDownload = () => {
     if (this.settings.downloadType.value === "snapShot") {
-      this.videoMedia.babylonScene?.downloadSnapShot();
+      this.videoMediaInstance.babylonScene?.downloadSnapShot();
     } else if (this.settings.downloadType.value === "original") {
-      this.videoMedia.downloadVideo();
+      this.videoMediaInstance.videoMedia.downloadVideo();
     } else if (this.settings.downloadType.value === "record") {
       if (!this.recording.current) {
-        this.videoMedia.babylonScene?.startRecording(
+        this.videoMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
             this.settings.downloadType.downloadTypeOptions.mimeType.value
           ],
@@ -338,7 +345,7 @@ class LowerVideoController {
         );
         this.downloadRecordingReady.current = false;
       } else {
-        this.videoMedia.babylonScene?.stopRecording();
+        this.videoMediaInstance.babylonScene?.stopRecording();
         this.downloadRecordingReady.current = true;
       }
 
@@ -348,7 +355,7 @@ class LowerVideoController {
   };
 
   handleDownloadRecording = () => {
-    this.videoMedia.babylonScene?.downloadRecording();
+    this.videoMediaInstance.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {
@@ -372,8 +379,10 @@ class LowerVideoController {
     this.isScrubbing.current = true;
     if (this.isScrubbing.current) {
       this.videoContainerRef.current?.classList.add("scrubbing");
-      this.wasPaused.current = this.videoMedia.video.paused;
-      this.videoMedia.video.pause();
+      if (this.videoMediaInstance.instanceVideo) {
+        this.wasPaused.current = this.videoMediaInstance.instanceVideo.paused;
+        this.videoMediaInstance.instanceVideo.pause();
+      }
     }
 
     this.handleScrubbingTimelineUpdate(event as unknown as PointerEvent);
@@ -396,18 +405,22 @@ class LowerVideoController {
     this.isScrubbing.current = false;
 
     this.videoContainerRef.current?.classList.remove("scrubbing");
-    this.videoMedia.video.currentTime =
-      percent * this.videoMedia.video.duration;
+    if (this.videoMediaInstance.instanceVideo) {
+      this.videoMediaInstance.instanceVideo.currentTime =
+        percent * this.videoMediaInstance.instanceVideo.duration;
+    }
 
-    this.tableStaticContentSocket.current?.updateVideoPosition(
-      "video",
-      this.videoMedia.videoId,
-      this.videoInstanceId,
-      this.videoMedia.video.currentTime
-    );
+    if (this.videoMediaInstance.instanceVideo) {
+      this.tableStaticContentSocket.current?.updateVideoPosition(
+        "video",
+        this.videoMediaInstance.videoMedia.videoId,
+        this.videoInstanceId,
+        this.videoMediaInstance.instanceVideo.currentTime
+      );
 
-    if (!this.wasPaused.current) {
-      this.videoMedia.video.play();
+      if (!this.wasPaused.current) {
+        this.videoMediaInstance.instanceVideo.play();
+      }
     }
 
     this.handleScrubbingTimelineUpdate(event);
@@ -424,15 +437,16 @@ class LowerVideoController {
       `${percent}`
     );
 
-    if (this.isScrubbing.current && this.currentTimeRef.current) {
+    if (this.isScrubbing.current) {
       this.timelineContainerRef.current.style.setProperty(
         "--progress-position",
         `${percent}`
       );
 
-      this.currentTimeRef.current.textContent = this.formatDuration(
-        percent * this.videoMedia.video.duration
-      );
+      if (this.videoMediaInstance.instanceVideo && this.currentTimeRef.current)
+        this.currentTimeRef.current.textContent = this.formatDuration(
+          percent * this.videoMediaInstance.instanceVideo.duration
+        );
     }
   };
 
@@ -449,7 +463,8 @@ class LowerVideoController {
   };
 
   handlePlaybackSpeed = (playbackRate: number) => {
-    this.videoMedia.video.playbackRate = playbackRate;
+    if (this.videoMediaInstance.instanceVideo)
+      this.videoMediaInstance.instanceVideo.playbackRate = playbackRate;
   };
 
   handleSetAsBackground = () => {

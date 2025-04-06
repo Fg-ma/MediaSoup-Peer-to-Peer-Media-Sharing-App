@@ -6,7 +6,7 @@ import {
   IncomingTableMessages,
   onReactionOccurredType,
 } from "../../../serverControllers/tableServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../../universal/typeConstant";
+import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 import LowerController from "./lowerControls/lib/LowerController";
 
 class MediaContainerController {

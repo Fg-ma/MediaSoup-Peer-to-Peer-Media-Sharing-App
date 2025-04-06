@@ -1,8 +1,12 @@
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { postProcessEffectDecodingMap } from "../typeConstant";
+import {
+  postProcessEffectDecodingMap,
+  stateDecodingMap,
+} from "../typeConstant";
 import { applicationEffectEncodingMap } from "./typeConstant";
 
 class Decoder {
@@ -13,7 +17,7 @@ class Decoder {
     aid: string;
     n: string;
     m: string;
-    t: boolean;
+    s: number[];
     i: {
       aiid: string;
       p: {
@@ -42,7 +46,7 @@ class Decoder {
     applicationId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       applicationInstanceId: string;
       positioning: {
@@ -62,14 +66,14 @@ class Decoder {
       effectStyles: ApplicationEffectStylesType;
     }[];
   } => {
-    const { tid, aid, n, m, t, i } = data;
+    const { tid, aid, n, m, s, i } = data;
 
     return {
       table_id: tid,
       applicationId: aid,
       filename: n,
       mimeType: m,
-      tabled: t,
+      state: s.map((ate) => stateDecodingMap[ate]),
       instances: i.map(({ aiid, p, e, es }) => ({
         applicationInstanceId: aiid,
         positioning: {

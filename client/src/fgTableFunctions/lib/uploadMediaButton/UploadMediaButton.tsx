@@ -6,6 +6,7 @@ import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 
 const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
@@ -32,22 +33,38 @@ export default function UploadMediaButton() {
       return;
     }
 
-    const url = `https://localhost:8045/upload/${
-      table_id.current
-    }/${uuidv4()}/${uuidv4()}/toTable/false`;
-
-    const formData = new FormData();
-
-    formData.append("file", file.current);
+    const metadata = {
+      table_id: table_id.current,
+      contentId: uuidv4(),
+      instanceId: uuidv4(),
+      direction: "toTable",
+      state: [],
+    };
 
     try {
-      const xhr = new XMLHttpRequest();
+      const metaRes = await fetch(staticContentServerBaseUrl + "upload-meta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(metadata),
+      });
 
-      xhr.open("POST", url, true);
+      const { uploadId } = await metaRes.json();
+
+      const formData = new FormData();
+      formData.append("file", file.current);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open(
+        "POST",
+        staticContentServerBaseUrl + `upload-file/${uploadId}`,
+        true
+      );
 
       xhr.send(formData);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error sending metadata:", error);
     }
   };
 

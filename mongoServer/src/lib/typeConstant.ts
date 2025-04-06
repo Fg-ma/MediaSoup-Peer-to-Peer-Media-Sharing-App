@@ -1,3 +1,4 @@
+import { ContentStateTypes } from "../../../universal/contentTypeConstant";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -9,7 +10,20 @@ import {
   PostProcessEffectTypes,
 } from "../../../universal/effectsTypeConstant";
 
-export const postProcessEffectEncodingMap = {
+export const stateEncodingMap: Record<ContentStateTypes, number> = {
+  tabled: 0,
+  muteStyle: 1,
+};
+export const stateDecodingMap: Record<number, ContentStateTypes> =
+  Object.entries(stateEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as ContentStateTypes;
+    return acc;
+  }, {} as Record<number, ContentStateTypes>);
+
+export const postProcessEffectEncodingMap: Record<
+  PostProcessEffectTypes,
+  number
+> = {
   prismaColors: 0,
   blackAndWhite: 1,
   bubbleChromatic: 2,
@@ -27,13 +41,17 @@ export const postProcessEffectEncodingMap = {
   tiltShift: 14,
   cartoon: 15,
 };
-export const postProcessEffectDecodingMap = Object.entries(
-  postProcessEffectEncodingMap
-).reduce((acc, [key, value]) => {
+export const postProcessEffectDecodingMap: Record<
+  number,
+  PostProcessEffectTypes
+> = Object.entries(postProcessEffectEncodingMap).reduce((acc, [key, value]) => {
   acc[value] = key as PostProcessEffectTypes;
   return acc;
 }, {} as Record<number, PostProcessEffectTypes>);
-export const hideBackgroundEffectEncodingMap = {
+export const hideBackgroundEffectEncodingMap: Record<
+  HideBackgroundEffectTypes,
+  number
+> = {
   color: 0,
   beach: 1,
   brickWall: 2,
@@ -60,24 +78,27 @@ export const hideBackgroundEffectEncodingMap = {
   trees: 23,
   windingRoad: 24,
 };
-export const hideBackgroundEffectDecodingMap = Object.entries(
-  hideBackgroundEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as HideBackgroundEffectTypes;
-  return acc;
-}, {} as Record<number, HideBackgroundEffectTypes>);
-export const beardsEffectEncodingMap = {
+export const hideBackgroundEffectDecodingMap: Record<
+  number,
+  HideBackgroundEffectTypes
+> = Object.entries(hideBackgroundEffectEncodingMap).reduce(
+  (acc, [key, value]) => {
+    acc[value] = key as HideBackgroundEffectTypes;
+    return acc;
+  },
+  {} as Record<number, HideBackgroundEffectTypes>
+);
+export const beardsEffectEncodingMap: Record<BeardsEffectTypes, number> = {
   classicalCurlyBeard: 0,
   chinBeard: 1,
   fullBeard: 2,
 };
-export const beardsEffectDecodingMap = Object.entries(
-  beardsEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as BeardsEffectTypes;
-  return acc;
-}, {} as Record<number, BeardsEffectTypes>);
-export const glassesEffectEncodingMap = {
+export const beardsEffectDecodingMap: Record<number, BeardsEffectTypes> =
+  Object.entries(beardsEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as BeardsEffectTypes;
+    return acc;
+  }, {} as Record<number, BeardsEffectTypes>);
+export const glassesEffectEncodingMap: Record<GlassesEffectTypes, number> = {
   defaultGlasses: 0,
   aviatorGoggles: 1,
   bloodyGlasses: 2,
@@ -96,32 +117,31 @@ export const glassesEffectEncodingMap = {
   toyGlasses: 15,
   VRGlasses: 16,
 };
-export const glassesEffectDecodingMap = Object.entries(
-  glassesEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as GlassesEffectTypes;
-  return acc;
-}, {} as Record<number, GlassesEffectTypes>);
-export const mustachesEffectEncodingMap = {
-  disguiseMustache: 0,
-  fullMustache: 1,
-  mustache1: 2,
-  mustache2: 3,
-  mustache3: 4,
-  mustache4: 5,
-  nicodemusMustache: 6,
-  pencilMustache: 7,
-  spongebobMustache: 8,
-  tinyMustache: 9,
-  wingedMustache: 10,
-};
-export const mustachesEffectDecodingMap = Object.entries(
-  mustachesEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as MustachesEffectTypes;
-  return acc;
-}, {} as Record<number, MustachesEffectTypes>);
-export const masksEffectEncodingMap = {
+export const glassesEffectDecodingMap: Record<number, GlassesEffectTypes> =
+  Object.entries(glassesEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as GlassesEffectTypes;
+    return acc;
+  }, {} as Record<number, GlassesEffectTypes>);
+export const mustachesEffectEncodingMap: Record<MustachesEffectTypes, number> =
+  {
+    disguiseMustache: 0,
+    fullMustache: 1,
+    mustache1: 2,
+    mustache2: 3,
+    mustache3: 4,
+    mustache4: 5,
+    nicodemusMustache: 6,
+    pencilMustache: 7,
+    spongebobMustache: 8,
+    tinyMustache: 9,
+    wingedMustache: 10,
+  };
+export const mustachesEffectDecodingMap: Record<number, MustachesEffectTypes> =
+  Object.entries(mustachesEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as MustachesEffectTypes;
+    return acc;
+  }, {} as Record<number, MustachesEffectTypes>);
+export const masksEffectEncodingMap: Record<MasksEffectTypes, number> = {
   baseMask: 0,
   alienMask: 1,
   clownMask: 2,
@@ -145,13 +165,12 @@ export const masksEffectEncodingMap = {
   woodPaintedMask: 20,
   zombieMask: 21,
 };
-export const masksEffectDecodingMap = Object.entries(
-  masksEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as MasksEffectTypes;
-  return acc;
-}, {} as Record<number, MasksEffectTypes>);
-export const hatsEffectEncodingMap = {
+export const masksEffectDecodingMap: Record<number, MasksEffectTypes> =
+  Object.entries(masksEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as MasksEffectTypes;
+    return acc;
+  }, {} as Record<number, MasksEffectTypes>);
+export const hatsEffectEncodingMap: Record<HatsEffectTypes, number> = {
   AsianConicalHat: 0,
   aviatorHelmet: 1,
   bicornHat: 2,
@@ -172,13 +191,12 @@ export const hatsEffectEncodingMap = {
   ushankaHat: 17,
   vikingHelmet: 18,
 };
-export const hatsEffectDecodingMap = Object.entries(
-  hatsEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as HatsEffectTypes;
-  return acc;
-}, {} as Record<number, HatsEffectTypes>);
-export const petsEffectEncodingMap = {
+export const hatsEffectDecodingMap: Record<number, HatsEffectTypes> =
+  Object.entries(hatsEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as HatsEffectTypes;
+    return acc;
+  }, {} as Record<number, HatsEffectTypes>);
+export const petsEffectEncodingMap: Record<PetsEffectTypes, number> = {
   angryHamster: 0,
   axolotl: 1,
   babyDragon: 2,
@@ -205,12 +223,11 @@ export const petsEffectEncodingMap = {
   spinosaurus: 23,
   TRex: 24,
 };
-export const petsEffectDecodingMap = Object.entries(
-  petsEffectEncodingMap
-).reduce((acc, [key, value]) => {
-  acc[value] = key as PetsEffectTypes;
-  return acc;
-}, {} as Record<number, PetsEffectTypes>);
+export const petsEffectDecodingMap: Record<number, PetsEffectTypes> =
+  Object.entries(petsEffectEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as PetsEffectTypes;
+    return acc;
+  }, {} as Record<number, PetsEffectTypes>);
 
 export type TableColors =
   | "cyan"

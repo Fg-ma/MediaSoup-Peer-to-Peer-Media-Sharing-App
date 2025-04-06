@@ -10,7 +10,7 @@ import {
   onUpdateVideoPositionType,
 } from "./typeConstant";
 import TablesMeta from "./lib/tableMeta/TablesMeta";
-import { StaticContentTypes } from "../../universal/typeConstant";
+import { StaticContentTypes } from "../../universal/contentTypeConstant";
 import UserImages from "./lib/userImages/UserImages";
 import UserVideos from "./lib/userVideos/UserVideos";
 import UserSoundClips from "./lib/userSoundClips/UserSoundClips";

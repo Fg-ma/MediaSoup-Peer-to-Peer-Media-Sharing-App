@@ -1,3 +1,4 @@
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ImageEffectStylesType,
   ImageEffectTypes,
@@ -11,6 +12,7 @@ import {
   mustachesEffectEncodingMap,
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
+  stateEncodingMap,
 } from "../typeConstant";
 import { imageEffectEncodingMap } from "./typeConstant";
 
@@ -22,7 +24,7 @@ class Encoder {
     imageId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       imageInstanceId: string;
       positioning: {
@@ -46,7 +48,7 @@ class Encoder {
     iid: string;
     n: string;
     m: string;
-    t: boolean;
+    s: number[];
     i: {
       iiid: string;
       p: {
@@ -93,14 +95,14 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, imageId, filename, mimeType, tabled, instances } = data;
+    const { table_id, imageId, filename, mimeType, state, instances } = data;
 
     return {
       tid: table_id,
       iid: imageId,
       n: filename,
       m: mimeType,
-      t: tabled,
+      s: state.map((ate) => stateEncodingMap[ate]),
       i: instances.map(
         ({ imageInstanceId, positioning, effects, effectStyles }) => ({
           iiid: imageInstanceId,

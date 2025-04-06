@@ -6,7 +6,6 @@ import ReactButton from "../../../../elements/reactButton/ReactButton";
 import TabledButton from "./lib/tabledButton/TabledButton";
 
 export default function UpperControls({
-  tabled,
   reactionsPanelActive,
   setReactionsPanelActive,
   lowerController,
@@ -16,7 +15,6 @@ export default function UpperControls({
   fullscreen,
   backgroundMedia,
 }: {
-  tabled: boolean;
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   lowerController: LowerController;
@@ -34,10 +32,10 @@ export default function UpperControls({
         backgroundMedia
           ? "top-0"
           : "bottom-full"
-      } absolute w-full h-[12%] max-h-12 min-h-6 items-center justify-between z-20`}
+      } absolute w-full h-[12%] max-h-12 min-h-6 items-center justify-between z-20 pointer-events-none`}
     >
       <div className='flex h-full w-max items-center justify-center'>
-        <TabledButton tabled={tabled} lowerController={lowerController} />
+        <TabledButton tabled={false} lowerController={lowerController} />
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}
       </div>
       <div className='flex grow h-full items-center justify-end space-x-2'>

@@ -1,9 +1,11 @@
+import { SvgEffectTypes } from "../../../../universal/effectsTypeConstant";
+
 export interface TableSvgsType {
   tid: string;
   sid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     siid: string;
     p: {
@@ -31,7 +33,7 @@ export interface TableSvgsType {
   }[];
 }
 
-export const svgEffectEncodingMap = {
+export const svgEffectEncodingMap: Record<SvgEffectTypes, number> = {
   shadow: 0,
   blur: 1,
   grayscale: 2,
@@ -43,7 +45,9 @@ export const svgEffectEncodingMap = {
   edgeDetection: 8,
 };
 
-export const svgEffectStylesEncodingMap = {
+export const svgEffectStylesEncodingMap: Partial<
+  Record<SvgEffectTypes, number>
+> = {
   shadow: 0,
   blur: 1,
   grayscale: 2,

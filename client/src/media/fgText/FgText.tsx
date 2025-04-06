@@ -26,13 +26,13 @@ export default function FgText({
 }) {
   const { userMedia } = useMediaContext();
 
-  const textMedia = userMedia.current.text.instances[textInstanceId];
+  const textMediaInstance = userMedia.current.text.instances[textInstanceId];
 
   const positioning = useRef<{
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(textMedia.initPositioning);
+  }>(textMediaInstance.initPositioning);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -51,32 +51,44 @@ export default function FgText({
     defaultActiveSettingsPages
   );
 
+  const [isEditing, setIsEditing] = useState(false);
+  const textAreaContainerRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLPreElement>(null);
+
   const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
 
   const [_, setRerender] = useState(false);
 
   const lowerTextController = new LowerTextController(
-    textMedia,
+    textMediaInstance,
     textContainerRef,
     shiftPressed,
     controlPressed,
-    setSettings
+    setSettings,
+    setSettingsActive,
+    textAreaRef,
+    setIsEditing,
+    textAreaContainerRef
   );
 
-  const textController = new TextController(
-    setSettingsActive,
-    setRerender,
-    text,
-    textMedia
-  );
+  const textController = new TextController(setSettingsActive);
 
   useEffect(() => {
+    if (textMediaInstance.instanceText) {
+      text.current = textMediaInstance.instanceText;
+      setRerender((prev) => !prev);
+    }
+    textMediaInstance.textMedia.addDownloadCompleteListener(() => {
+      if (textMediaInstance.instanceText) {
+        text.current = textMediaInstance.instanceText;
+        setRerender((prev) => !prev);
+      }
+    });
+
     document.addEventListener("keydown", lowerTextController.handleKeyDown);
 
     document.addEventListener("keyup", lowerTextController.handleKeyUp);
-
-    textMedia.addListener(textController.handleTextMediaEvents);
 
     tableRef.current?.addEventListener(
       "scroll",
@@ -89,7 +101,6 @@ export default function FgText({
         lowerTextController.handleKeyDown
       );
       document.removeEventListener("keyup", lowerTextController.handleKeyUp);
-      textMedia.removeListener(textController.handleTextMediaEvents);
       tableRef.current?.removeEventListener(
         "scroll",
         textController.handleTableScroll
@@ -99,16 +110,21 @@ export default function FgText({
 
   return (
     <FgMediaContainer
-      mediaId={textMedia.textId}
+      mediaId={textMediaInstance.textMedia.textId}
       mediaInstanceId={textInstanceId}
-      filename={textMedia.filename}
+      filename={textMediaInstance.textMedia.filename}
       kind='text'
       media={
         <EditableText
+          lowerTextController={lowerTextController}
           text={text}
           settings={settings}
           expandLineNumbersButtonRef={expandLineNumbersButtonRef}
           lineNumbersRef={lineNumbersRef}
+          textAreaRef={textAreaRef}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          textAreaContainerRef={textAreaContainerRef}
         />
       }
       floatingTagContent={[
@@ -118,7 +134,7 @@ export default function FgText({
         />,
       ]}
       bundleRef={bundleRef}
-      backgroundMedia={settings.background.value === "true"}
+      backgroundMedia={settings.background.value}
       className='text-container'
       rightLowerControls={[
         <SettingsButton

@@ -1,9 +1,11 @@
+import { ApplicationEffectTypes } from "../../../../universal/effectsTypeConstant";
+
 export interface TableApplicationsType {
   tid: string;
   aid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     aiid: string;
     p: {
@@ -29,13 +31,18 @@ export interface TableApplicationsType {
   }[];
 }
 
-export const applicationEffectEncodingMap = {
+export const applicationEffectEncodingMap: Record<
+  ApplicationEffectTypes,
+  number
+> = {
   postProcess: 0,
   blur: 1,
   tint: 2,
 };
 
-export const applicationEffectStylesEncodingMap = {
+export const applicationEffectStylesEncodingMap: Partial<
+  Record<ApplicationEffectTypes, number>
+> = {
   postProcess: 0,
   tint: 1,
 };

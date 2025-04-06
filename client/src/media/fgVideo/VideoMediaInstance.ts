@@ -18,10 +18,6 @@ import BabylonScene, {
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import VideoMedia from "./VideoMedia";
 
 class VideoMediaInstance {
@@ -100,7 +96,6 @@ class VideoMediaInstance {
     this.instanceCanvas.classList.add("babylonJS-canvas");
     this.instanceCanvas.style.height = "100%";
     this.instanceCanvas.style.width = "auto";
-    this.instanceCanvas.style.objectFit = "contain";
 
     this.faceLandmarks = new FaceLandmarks(
       true,
@@ -236,9 +231,6 @@ class VideoMediaInstance {
     ) as HTMLVideoElement;
 
     this.instanceVideo.autoplay = true;
-    this.instanceVideo.style.width = "100%";
-    this.instanceVideo.style.height = "100%";
-    this.instanceVideo.style.objectFit = "contain";
     this.instanceVideo.style.backgroundColor = "#000";
 
     this.instanceVideo.onloadedmetadata = () => {
@@ -738,7 +730,9 @@ class VideoMediaInstance {
   };
 
   getAudioTrack = () => {
-    return (this.instanceVideo as any).captureStream() as MediaStream;
+    return this.instanceVideo
+      ? ((this.instanceVideo as any).captureStream() as MediaStream)
+      : undefined;
   };
 
   getTrack = () => {

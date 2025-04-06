@@ -3,7 +3,7 @@ export interface TableTextType {
   xid: string;
   m: string;
   n: string;
-  t: boolean;
+  s: number[];
   i: {
     xiid: string;
     p: {

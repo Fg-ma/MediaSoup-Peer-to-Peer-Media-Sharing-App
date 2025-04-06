@@ -35,6 +35,8 @@ const AudioEffectsSection = React.lazy(
   () => import("../../audioEffectsButton/lib/AudioEffectsSection")
 );
 
+const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+
 export default function FgAudioElementContainer({
   table_id,
   username,
@@ -287,17 +289,37 @@ export default function FgAudioElementContainer({
   }, [positioning.current]);
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
-    const url = `https://localhost:8045/upload/${table_id}/${uuidv4()}/undefined/toTabled/false`;
-    const formData = new FormData();
-
-    formData.append("file", blob, `${name ? name : "image"}`);
+    const metadata = {
+      table_id: table_id,
+      contentId: uuidv4(),
+      direction: "toMuteStyle",
+      state: ["muteStyle"],
+    };
 
     try {
+      const metaRes = await fetch(staticContentServerBaseUrl + "upload-meta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(metadata),
+      });
+
+      const { uploadId } = await metaRes.json();
+
+      const formData = new FormData();
+      formData.append("file", blob, `${name ? name : "image"}`);
+
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", url, true);
+      xhr.open(
+        "POST",
+        staticContentServerBaseUrl + `upload-file/${uploadId}`,
+        true
+      );
+
       xhr.send(formData);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error sending metadata:", error);
     }
   };
 

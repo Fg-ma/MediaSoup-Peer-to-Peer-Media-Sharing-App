@@ -1,8 +1,8 @@
+import { ContentTypes } from "../../../../universal/contentTypeConstant";
 import {
-  ContentTypes,
   TableReactions,
   TableReactionStyles,
-} from "../../../../universal/typeConstant";
+} from "../../../../universal/reactionsTypeConstant";
 import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConstant";
 import {
   IncomingTableMessages,

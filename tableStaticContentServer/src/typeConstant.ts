@@ -1,6 +1,9 @@
 import uWS from "uWebSockets.js";
 import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
-import { StaticContentTypes } from "../../universal/typeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
   ImageEffectStylesType,
@@ -23,7 +26,7 @@ export const contentTypeBucketMap: {
   image: "table-images",
   svg: "table-svgs",
   application: "table-applications",
-  text: "table-texts",
+  text: "table-text",
   soundClip: "table-sound-clips",
 };
 
@@ -140,7 +143,8 @@ export type MessageTypes =
   | onUpdateContentEffectsType
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType;
+  | onResponseCatchUpVideoPositionType
+  | onChangeContentStateType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -262,6 +266,18 @@ export type onResponseCatchUpVideoPositionType = {
   };
   data: {
     currentVideoPosition: number;
+  };
+};
+
+export type onChangeContentStateType = {
+  type: "changeContentState";
+  header: {
+    table_id: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    state: ContentStateTypes[];
   };
 };
 

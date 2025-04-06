@@ -19,6 +19,8 @@ import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
 import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
 
+const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+
 export default function FgSvg({
   svgInstanceId,
   bundleRef,
@@ -231,7 +233,7 @@ export default function FgSvg({
                   return new XMLSerializer().serializeToString(clonedSVG);
                 }
               }}
-              finishCallback={(svg) => {
+              finishCallback={async (svg) => {
                 setEditing(false);
 
                 const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
@@ -254,18 +256,39 @@ export default function FgSvg({
                   }
                 );
 
-                // Prepare FormData
-                const formData = new FormData();
-                formData.append("file", file);
-
-                const url = `https://localhost:8045/upload/${table_id.current}/${svgMediaInstance.svgMedia.svgId}/undefined/reupload/false`;
+                const metadata = {
+                  table_id: table_id.current,
+                  contentId: svgMediaInstance.svgMedia.svgId,
+                  direction: "reupload",
+                };
 
                 try {
+                  const metaRes = await fetch(
+                    staticContentServerBaseUrl + "upload-meta",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(metadata),
+                    }
+                  );
+
+                  const { uploadId } = await metaRes.json();
+
+                  const formData = new FormData();
+                  formData.append("file", file);
+
                   const xhr = new XMLHttpRequest();
-                  xhr.open("POST", url, true);
+                  xhr.open(
+                    "POST",
+                    staticContentServerBaseUrl + `upload-file/${uploadId}`,
+                    true
+                  );
+
                   xhr.send(formData);
                 } catch (error) {
-                  console.error("Error uploading file:", error);
+                  console.error("Error sending metadata:", error);
                 }
               }}
               cancelCallback={() => {

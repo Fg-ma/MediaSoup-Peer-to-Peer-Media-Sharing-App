@@ -1,8 +1,12 @@
+import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { postProcessEffectEncodingMap } from "../typeConstant";
+import {
+  postProcessEffectEncodingMap,
+  stateEncodingMap,
+} from "../typeConstant";
 import { applicationEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
@@ -13,7 +17,7 @@ class Encoder {
     applicationId: string;
     filename: string;
     mimeType: string;
-    tabled: boolean;
+    state: ContentStateTypes[];
     instances: {
       applicationInstanceId: string;
       positioning: {
@@ -37,7 +41,7 @@ class Encoder {
     aid: string;
     n: string;
     m: string;
-    t: boolean;
+    s: number[];
     i: {
       aiid: string;
       p: {
@@ -62,7 +66,7 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, applicationId, filename, mimeType, tabled, instances } =
+    const { table_id, applicationId, filename, mimeType, state, instances } =
       data;
 
     return {
@@ -70,7 +74,7 @@ class Encoder {
       aid: applicationId,
       n: filename,
       m: mimeType,
-      t: tabled,
+      s: state.map((ate) => stateEncodingMap[ate]),
       i: instances.map(
         ({ applicationInstanceId, positioning, effects, effectStyles }) => ({
           aiid: applicationInstanceId,
