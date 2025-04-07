@@ -58,10 +58,10 @@ export default function FgSvg({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    structuredClone(defaultActivePages)
+    structuredClone(defaultActivePages),
   );
 
   const lowerSvgController = new LowerSvgController(
@@ -77,7 +77,7 @@ export default function FgSvg({
     settings,
     tableStaticContentSocket,
     setSettings,
-    setEditing
+    setEditing,
   );
 
   const svgController = new SvgController(
@@ -86,7 +86,7 @@ export default function FgSvg({
     setSettingsActive,
     userEffects,
     userEffectsStyles,
-    setRerender
+    setRerender,
   );
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function FgSvg({
 
     tableRef.current?.addEventListener(
       "scroll",
-      svgController.handleTableScroll
+      svgController.handleTableScroll,
     );
 
     return () => {
@@ -138,7 +138,7 @@ export default function FgSvg({
       document.removeEventListener("keyup", lowerSvgController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
-        svgController.handleTableScroll
+        svgController.handleTableScroll,
       );
     };
   }, []);
@@ -149,12 +149,12 @@ export default function FgSvg({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      svgController.handleTableStaticContentMessage
+      svgController.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        svgController.handleTableStaticContentMessage
+        svgController.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -164,11 +164,12 @@ export default function FgSvg({
         mediaId={svgMediaInstance.svgMedia.svgId}
         mediaInstanceId={svgInstanceId}
         filename={svgMediaInstance.svgMedia.filename}
-        kind='svg'
+        kind="svg"
+        initState={svgMediaInstance.svgMedia.state}
         rootMedia={svgMediaInstance.instanceSvg}
         bundleRef={bundleRef}
         backgroundMedia={settings.background.value}
-        className='svg-container'
+        className="svg-container"
         popupElements={[
           svgEffectsActive ? (
             <SvgEffectsSection
@@ -210,11 +211,11 @@ export default function FgSvg({
       />
       {editing && svgMediaInstance.svgMedia.svg && (
         <FgPortal
-          type='staticTopDomain'
+          type="staticTopDomain"
           top={0}
           left={0}
           zValue={10000}
-          className='flex w-full h-full bg-fg-tone-black-1 bg-opacity-45 items-center justify-center'
+          className="flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-45"
           content={
             <MethodSvgEditor
               editing={editing}
@@ -222,7 +223,7 @@ export default function FgSvg({
                 if (svgMediaInstance.svgMedia.svg) {
                   // Create a deep clone of the original svg element
                   const clonedSVG = svgMediaInstance.svgMedia.svg.cloneNode(
-                    true
+                    true,
                   ) as HTMLElement;
 
                   // Modify the clone
@@ -253,7 +254,7 @@ export default function FgSvg({
                   svgMediaInstance.svgMedia.filename,
                   {
                     type: "image/svg+xml",
-                  }
+                  },
                 );
 
                 const metadata = {
@@ -271,7 +272,7 @@ export default function FgSvg({
                         "Content-Type": "application/json",
                       },
                       body: JSON.stringify(metadata),
-                    }
+                    },
                   );
 
                   const { uploadId } = await metaRes.json();
@@ -283,7 +284,7 @@ export default function FgSvg({
                   xhr.open(
                     "POST",
                     staticContentServerBaseUrl + `upload-file/${uploadId}`,
-                    true
+                    true,
                   );
 
                   xhr.send(formData);

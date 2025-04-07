@@ -13,7 +13,10 @@ import {
 } from "./lib/typeConstant";
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
@@ -41,6 +44,7 @@ export default function FgMediaContainer({
   mediaInstanceId,
   filename,
   kind,
+  initState,
   bundleRef,
   backgroundMedia,
   media,
@@ -64,6 +68,7 @@ export default function FgMediaContainer({
   mediaInstanceId: string;
   filename: string;
   kind: StaticContentTypes;
+  initState: ContentStateTypes[];
   bundleRef: React.RefObject<HTMLDivElement>;
   backgroundMedia: boolean;
   media?: React.ReactNode;
@@ -122,6 +127,8 @@ export default function FgMediaContainer({
   const shiftPressed = useRef(false);
   const controlPressed = useRef(false);
 
+  const [state, setState] = useState<ContentStateTypes[]>(initState);
+
   const [_, setRerender] = useState(false);
 
   const positioningListeners = useRef<{
@@ -150,7 +157,7 @@ export default function FgMediaContainer({
     bundleRef,
     positioning,
     setAdjustingDimensions,
-    setRerender
+    setRerender,
   );
 
   const lowerController = new LowerController(
@@ -172,7 +179,9 @@ export default function FgMediaContainer({
     setReactionsPanelActive,
     behindEffectsContainerRef,
     frontEffectsContainerRef,
-    tableSocket
+    tableSocket,
+    state,
+    setState,
   );
 
   const mediaContainerController = new MediaContainerController(
@@ -192,7 +201,7 @@ export default function FgMediaContainer({
     movementTimeout,
     setRerender,
     tableStaticContentSocket,
-    lowerController
+    lowerController,
   );
 
   useEffect(() => {
@@ -202,10 +211,10 @@ export default function FgMediaContainer({
   useEffect(() => {
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      mediaContainerController.handleMediasoupMessage
+      mediaContainerController.handleMediasoupMessage,
     );
     tableSocket.current?.addMessageListener(
-      mediaContainerController.handleTableMessage
+      mediaContainerController.handleTableMessage,
     );
 
     document.addEventListener("keydown", lowerController.handleKeyDown);
@@ -214,45 +223,45 @@ export default function FgMediaContainer({
 
     rootMedia?.addEventListener(
       "load",
-      mediaContainerController.handleMetadataLoaded
+      mediaContainerController.handleMetadataLoaded,
     );
 
     rootMedia?.addEventListener(
       "loadedmetadata",
-      mediaContainerController.handleMetadataLoaded
+      mediaContainerController.handleMetadataLoaded,
     );
 
     document.addEventListener(
       "fullscreenchange",
-      lowerController.handleFullScreenChange
+      lowerController.handleFullScreenChange,
     );
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
+          removeListener(),
+        ),
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        mediaContainerController.handleMediasoupMessage
+        mediaContainerController.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        mediaContainerController.handleTableMessage
+        mediaContainerController.handleTableMessage,
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
       document.removeEventListener("keyup", lowerController.handleKeyUp);
       rootMedia?.removeEventListener(
         "load",
-        mediaContainerController.handleMetadataLoaded
+        mediaContainerController.handleMetadataLoaded,
       );
       rootMedia?.removeEventListener(
         "loadedmetadata",
-        mediaContainerController.handleMetadataLoaded
+        mediaContainerController.handleMetadataLoaded,
       );
       document.removeEventListener(
         "fullscreenchange",
-        lowerController.handleFullScreenChange
+        lowerController.handleFullScreenChange,
       );
     };
   }, []);
@@ -269,7 +278,7 @@ export default function FgMediaContainer({
           mediaId,
           mediaInstanceId,
           positioning: positioning.current,
-        })
+        }),
       );
     }
   }, [positioning.current]);
@@ -288,7 +297,7 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} flex items-center justify-center absolute`}
+      } ${className} absolute flex items-center justify-center`}
       style={
         backgroundMedia
           ? {
@@ -313,9 +322,9 @@ export default function FgMediaContainer({
       onPointerLeave={mediaContainerController.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
       variants={MediaContainerVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={MediaContainerTransition}
     >
       {floatingTagContent &&
@@ -336,8 +345,8 @@ export default function FgMediaContainer({
       />
       {mediaContainerOptions.adjustmentAnimation && adjustingDimensions && (
         <>
-          <div className='animated-border-box-glow'></div>
-          <div className='animated-border-box'></div>
+          <div className="animated-border-box-glow"></div>
+          <div className="animated-border-box"></div>
         </>
       )}
       {mediaContainerOptions.controlsPlacement === "outside" &&
@@ -353,6 +362,7 @@ export default function FgMediaContainer({
               mediaContainerOptions={mediaContainerOptions}
               fullscreen={fullscreen}
               backgroundMedia={backgroundMedia}
+              state={state}
             />
             <LowerControls
               lowerController={lowerController}
@@ -366,24 +376,24 @@ export default function FgMediaContainer({
             />
           </>
         )}
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={frontEffectsContainerRef}
-          className='w-full h-full relative z-[100] pointer-events-none'
+          className="pointer-events-none relative z-[100] h-full w-full"
         />
       </div>
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={behindEffectsContainerRef}
-          className='w-full h-full relative -z-[100] pointer-events-none'
+          className="pointer-events-none relative -z-[100] h-full w-full"
         />
       </div>
       <div
         ref={subContainerRef}
-        className='flex sub-media-container absolute items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden pointer-events-none'
+        className="sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         {media && media}
-        <div className='media-lower-controls !pointer-events-none w-full h-full absolute top-0 left-0'>
+        <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">
           {popupElements &&
             popupElements.length > 0 &&
             popupElements.map((element, index) => (
@@ -403,6 +413,7 @@ export default function FgMediaContainer({
               mediaContainerOptions={mediaContainerOptions}
               fullscreen={fullscreen}
               backgroundMedia={backgroundMedia}
+              state={state}
             />
             <LowerControls
               lowerController={lowerController}

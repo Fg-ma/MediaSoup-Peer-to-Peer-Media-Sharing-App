@@ -10,7 +10,7 @@ import {
   MixEffectsOptionsType,
 } from "../../audioEffects/typeConstant";
 
-class SoundClipMedia {
+class SoundClipMediaInstance {
   private audioSource: MediaStreamAudioSourceNode;
   private audioContext: BaseContext;
   private mediaStream: MediaStream;
@@ -34,7 +34,7 @@ class SoundClipMedia {
   constructor(
     private soundClipId: string,
     private audioStream: MediaStream,
-    private userEffects: React.MutableRefObject<UserEffectsType>
+    private userEffects: React.MutableRefObject<UserEffectsType>,
   ) {
     this.effects = {};
 
@@ -58,7 +58,7 @@ class SoundClipMedia {
 
     // Create a source node from the provided MediaStream
     this.audioSource = this.audioContext.createMediaStreamSource(
-      this.audioStream
+      this.audioStream,
     );
 
     // Connect the source to the master MediaStreamDestination
@@ -72,7 +72,7 @@ class SoundClipMedia {
       this.samplerMediaStreamDestination,
       this.soundEffectsMediaStreamDestination,
       this.backgroundMusicMediaStreamDestination,
-      this.assetSoundEffectsMediaStreamDestination
+      this.assetSoundEffectsMediaStreamDestination,
     );
 
     // Combine both MediaStreamDestinations into a single MediaStream
@@ -80,27 +80,27 @@ class SoundClipMedia {
 
     // Add the master track (from masterMediaStreamDestination) to combined stream
     this.mediaStream.addTrack(
-      this.masterMediaStreamDestination.stream.getAudioTracks()[0]
+      this.masterMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     // Add the sampler track (from samplerMediaStreamDestination) to combined stream
     this.mediaStream.addTrack(
-      this.samplerMediaStreamDestination.stream.getAudioTracks()[0]
+      this.samplerMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     // Add the sound effect track (from soundEffectsStreamDestination) to combined stream
     this.mediaStream.addTrack(
-      this.soundEffectsMediaStreamDestination.stream.getAudioTracks()[0]
+      this.soundEffectsMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     // Add the background music track (from backgroundMusicStreamDestination) to combined stream
     this.mediaStream.addTrack(
-      this.backgroundMusicMediaStreamDestination.stream.getAudioTracks()[0]
+      this.backgroundMusicMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     // Add the asset sound effect track (from assetSoundEffectsStreamDestination) to combined stream
     this.mediaStream.addTrack(
-      this.assetSoundEffectsMediaStreamDestination.stream.getAudioTracks()[0]
+      this.assetSoundEffectsMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     // Make master media stream
@@ -108,7 +108,7 @@ class SoundClipMedia {
 
     // Add the master track (from masterMediaStreamDestination) to combined stream
     this.masterMediaStream.addTrack(
-      this.masterMediaStreamDestination.stream.getAudioTracks()[0]
+      this.masterMediaStreamDestination.stream.getAudioTracks()[0],
     );
 
     start();
@@ -120,7 +120,7 @@ class SoundClipMedia {
 
   changeEffects = (
     effect: AudioEffectTypes,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
@@ -1496,7 +1496,7 @@ class SoundClipMedia {
     effects: {
       type: AudioMixEffectsType;
       updates: { option: MixEffectsOptionsType; value: number }[];
-    }[]
+    }[],
   ) => {
     this.audioEffects.fgAudioEffects?.updateEffects(effects);
   };
@@ -1536,4 +1536,4 @@ class SoundClipMedia {
   };
 }
 
-export default SoundClipMedia;
+export default SoundClipMediaInstance;

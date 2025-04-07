@@ -46,7 +46,7 @@ export default function FgImage({
   const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(
-    userEffectsStyles.current.image[imageInstanceId].tint.color
+    userEffectsStyles.current.image[imageInstanceId].tint.color,
   );
 
   const shiftPressed = useRef(false);
@@ -56,10 +56,10 @@ export default function FgImage({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    defaultActiveSettingsPages
+    defaultActiveSettingsPages,
   );
 
   const recording = useRef(false);
@@ -81,7 +81,7 @@ export default function FgImage({
     downloadRecordingReady,
     setRerender,
     tableStaticContentSocket,
-    setSettings
+    setSettings,
   );
 
   const imageController = new ImageController(
@@ -91,7 +91,7 @@ export default function FgImage({
     userEffects,
     userEffectsStyles,
     tintColor,
-    setRerender
+    setRerender,
   );
 
   useEffect(() => {
@@ -138,18 +138,18 @@ export default function FgImage({
 
     tableRef.current?.addEventListener(
       "scroll",
-      imageController.handleTableScroll
+      imageController.handleTableScroll,
     );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        lowerImageController.handleKeyDown
+        lowerImageController.handleKeyDown,
       );
       document.removeEventListener("keyup", lowerImageController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
-        imageController.handleTableScroll
+        imageController.handleTableScroll,
       );
     };
   }, []);
@@ -168,12 +168,12 @@ export default function FgImage({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      imageController.handleTableStaticContentMessage
+      imageController.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        imageController.handleTableStaticContentMessage
+        imageController.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -182,11 +182,12 @@ export default function FgImage({
       mediaId={imageMediaInstance.imageMedia.imageId}
       mediaInstanceId={imageInstanceId}
       filename={imageMediaInstance.imageMedia.filename}
-      kind='image'
+      kind="image"
+      initState={imageMediaInstance.imageMedia.state}
       rootMedia={imageMediaInstance.instanceImage}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
-      className='image-container'
+      className="image-container"
       popupElements={[
         imageEffectsActive ? (
           <ImageEffectsSection

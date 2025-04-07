@@ -28,7 +28,10 @@ const handleMessage = (
       gets.getFile(event);
       break;
     case "updateContentPositioning":
-      tableTopMongo.updateContentPositioning(event);
+      tableTopMongo.onUpdateContentPositioning(event);
+      break;
+    case "changeContentState":
+      metadataController.onChangeContentState(event);
       break;
     case "updateContentEffects":
       metadataController.onUpdateContentEffects(event);

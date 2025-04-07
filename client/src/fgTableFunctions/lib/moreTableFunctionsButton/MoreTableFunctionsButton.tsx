@@ -52,6 +52,7 @@ export default function MoreTableFunctionsButton({
     useState(false);
   const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
+  const tabledSectionRef = useRef<HTMLDivElement>(null);
   const gamesSectionRef = useRef<HTMLDivElement>(null);
   const tableBackgroundSectionRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +60,7 @@ export default function MoreTableFunctionsButton({
     if (
       !moreTableFunctionsPanelRef.current?.contains(event.target as Node) &&
       !moreTableFunctionsButtonRef.current?.contains(event.target as Node) &&
+      !tabledSectionRef.current?.contains(event.target as Node) &&
       !gamesSectionRef.current?.contains(event.target as Node) &&
       !tableBackgroundSectionRef.current?.contains(event.target as Node)
     ) {
@@ -80,13 +82,13 @@ export default function MoreTableFunctionsButton({
     <>
       <FgButton
         externalRef={moreTableFunctionsButtonRef}
-        className='h-full aspect-square bg-transparent'
+        className="aspect-square h-full bg-transparent"
         clickFunction={() => setMoreTableFunctionsActive((prev) => !prev)}
         contentFunction={() => {
           return (
             <FgSVGElement
               src={additionIcon}
-              className='flex h-full aspect-square items-center justify-center'
+              className="flex aspect-square h-full items-center justify-center"
               attributes={[
                 { key: "width", value: "75%" },
                 { key: "height", value: "75%" },
@@ -105,7 +107,7 @@ export default function MoreTableFunctionsButton({
         setExternalClickToggleState={setMoreTableFunctionsActive}
         hoverContent={
           !moreTableFunctionsActive ? (
-            <FgHoverContentStandard content='More table functions' />
+            <FgHoverContentStandard content="More table functions" />
           ) : undefined
         }
         options={{ hoverTimeoutDuration: 100 }}
@@ -130,6 +132,7 @@ export default function MoreTableFunctionsButton({
           handleExternalMute={handleExternalMute}
           captureMediaActive={captureMediaActive}
           setCaptureMediaActive={setCaptureMediaActive}
+          tabledSectionRef={tabledSectionRef}
           gamesSectionRef={gamesSectionRef}
           tableBackgroundSectionRef={tableBackgroundSectionRef}
         />

@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from "react";
+import React, { Suspense, useRef, useState } from "react";
 import { AudioEffectTypes } from "../../../../../universal/effectsTypeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
@@ -11,9 +11,10 @@ import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeCon
 import TableGridSizeButton from "../tableGrisSizeButton/TableGridSizeButton";
 import FgPanel from "../../../elements/fgPanel/FgPanel";
 import CaptureMediaButton from "../captureMediaButton/CaptureMediaButton";
+import TabledSection from "../tabledSection/TabledSection";
 
 const AudioEffectsButton = React.lazy(
-  () => import("../../../audioEffectsButton/AudioEffectsButton")
+  () => import("../../../audioEffectsButton/AudioEffectsButton"),
 );
 
 export default function MoreTableFunctionsSection({
@@ -34,6 +35,7 @@ export default function MoreTableFunctionsSection({
   handleExternalMute,
   captureMediaActive,
   setCaptureMediaActive,
+  tabledSectionRef,
   gamesSectionRef,
   tableBackgroundSectionRef,
 }: {
@@ -62,6 +64,7 @@ export default function MoreTableFunctionsSection({
   handleExternalMute: () => void;
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
+  tabledSectionRef: React.RefObject<HTMLDivElement>;
   gamesSectionRef: React.RefObject<HTMLDivElement>;
   tableBackgroundSectionRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -70,10 +73,12 @@ export default function MoreTableFunctionsSection({
   const { mediasoupSocket, tableSocket } = useSocketContext();
   const { table_id, username, instance } = useUserInfoContext();
 
+  const [dragging, setDragging] = useState(false);
+
   const handleExternalAudioEffectChange = (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => {
     if (producerType === "audio") {
       userMedia.current.audio?.changeEffects(effect, false);
@@ -101,11 +106,16 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
+      className={`${dragging ? "!opacity-0 transition-opacity" : ""}`}
       externalRef={moreTableFunctionsPanelRef}
       content={
-        <div className='w-full h-full overflow-y-auto small-vertical-scroll-bar'>
-          <div className='grid grid-cols-3 w-full my-2 h-max gap-3'>
-            <GamesSection gamesSectionRef={gamesSectionRef} />
+        <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">
+          <div className="my-2 grid h-max w-full grid-cols-3 gap-3">
+            <TabledSection
+              tabledSectionRef={tabledSectionRef}
+              dragging={dragging}
+              setDragging={setDragging}
+            />
             <FgBackgroundSelector
               externalPanelRef={tableBackgroundSectionRef}
               backgroundRef={tableTopRef}
@@ -117,8 +127,16 @@ export default function MoreTableFunctionsSection({
                   tableSocket.current?.changeTableBackground(background);
                 }
               }}
-              hoverType='above'
+              hoverType="above"
             />
+            {table_id.current && username.current && (
+              <CaptureMediaButton
+                captureMediaActive={captureMediaActive}
+                setCaptureMediaActive={setCaptureMediaActive}
+                setMoreTableFunctionsActive={setMoreTableFunctionsActive}
+              />
+            )}
+            <GamesSection gamesSectionRef={gamesSectionRef} />
             <TableGridButton
               gridActive={gridActive}
               setGridActive={setGridActive}
@@ -150,13 +168,6 @@ export default function MoreTableFunctionsSection({
                 />
               </Suspense>
             )}
-            {table_id.current && username.current && (
-              <CaptureMediaButton
-                captureMediaActive={captureMediaActive}
-                setCaptureMediaActive={setCaptureMediaActive}
-                setMoreTableFunctionsActive={setMoreTableFunctionsActive}
-              />
-            )}
             {
               // Clock
               // Weather
@@ -175,7 +186,7 @@ export default function MoreTableFunctionsSection({
       minWidth={200}
       minHeight={80}
       closeCallback={() => setMoreTableFunctionsActive(false)}
-      closePosition='topRight'
+      closePosition="topRight"
       shadow={{ top: true, bottom: true }}
     />
   );

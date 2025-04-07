@@ -12,11 +12,15 @@ import UserDevice from "../../lib/UserDevice";
 import {
   IncomingTableStaticContentMessages,
   onContentDeletedType,
+  onContentStateChangedType,
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
   OutGoingTableStaticContentMessages,
 } from "./lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../universal/contentTypeConstant";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -33,7 +37,7 @@ class TableStaticContentSocketController {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userDevice: UserDevice,
-    private deadbanding: Deadbanding
+    private deadbanding: Deadbanding,
   ) {
     this.connect(this.url);
   }
@@ -83,13 +87,13 @@ class TableStaticContentSocketController {
   };
 
   addMessageListener = (
-    listener: (message: IncomingTableStaticContentMessages) => void
+    listener: (message: IncomingTableStaticContentMessages) => void,
   ): void => {
     this.messageListeners.add(listener);
   };
 
   removeMessageListener = (
-    listener: (message: IncomingTableStaticContentMessages) => void
+    listener: (message: IncomingTableStaticContentMessages) => void,
   ): void => {
     this.messageListeners.delete(listener);
   };
@@ -125,7 +129,7 @@ class TableStaticContentSocketController {
   getFile = (
     contentType: StaticContentTypes,
     contentId: string,
-    key: string
+    key: string,
   ) => {
     this.sendMessage({
       type: "getFile",
@@ -144,7 +148,7 @@ class TableStaticContentSocketController {
     contentType: StaticContentTypes,
     contentId: string,
     instanceId: string,
-    filename: string
+    filename: string,
   ) => {
     this.sendMessage({
       type: "deleteContent",
@@ -174,7 +178,7 @@ class TableStaticContentSocketController {
         y: number;
       };
       rotation?: number;
-    }
+    },
   ) => {
     this.sendMessage({
       type: "updateContentPositioning",
@@ -201,7 +205,7 @@ class TableStaticContentSocketController {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType
-      | SvgEffectStylesType
+      | SvgEffectStylesType,
   ) => {
     this.sendMessage({
       type: "updateContentEffects",
@@ -218,11 +222,29 @@ class TableStaticContentSocketController {
     });
   };
 
+  changeContentState = (
+    contentType: StaticContentTypes,
+    contentId: string,
+    state: ContentStateTypes[],
+  ) => {
+    this.sendMessage({
+      type: "changeContentState",
+      header: {
+        table_id: this.table_id,
+        contentType,
+        contentId,
+      },
+      data: {
+        state,
+      },
+    });
+  };
+
   updateVideoPosition = (
     contentType: "video",
     contentId: string,
     instanceId: string,
-    videoPosition: number
+    videoPosition: number,
   ) => {
     this.sendMessage({
       type: "updateVideoPosition",
@@ -241,7 +263,7 @@ class TableStaticContentSocketController {
   requestCatchUpVideoPosition = (
     contentType: "video",
     contentId: string,
-    instanceId: string
+    instanceId: string,
   ) => {
     this.sendMessage({
       type: "requestCatchUpVideoPosition",
@@ -257,11 +279,14 @@ class TableStaticContentSocketController {
   };
 
   private handleMessage = (
-    message: { type: undefined } | IncomingTableStaticContentMessages
+    message: { type: undefined } | IncomingTableStaticContentMessages,
   ) => {
     switch (message.type) {
       case "contentDeleted":
         this.onContentDeleted(message);
+        break;
+      case "contentStateChanged":
+        this.onContentStateChanged(message);
         break;
       case "requestedCatchUpVideoPosition":
         this.onRequestedCatchUpVideoPosition(message);
@@ -289,15 +314,27 @@ class TableStaticContentSocketController {
       this.userMedia.current[contentType] &&
       Object.keys(this.userMedia.current[contentType].instances).length === 0 &&
       this.userMedia.current[contentType].all[contentId] &&
-      !this.userMedia.current[contentType].all[contentId].tabled
+      !this.userMedia.current[contentType].all[contentId].state.includes(
+        "tabled",
+      ) &&
+      !this.userMedia.current[contentType].all[contentId].state.includes(
+        "muteStyle",
+      )
     ) {
       this.userMedia.current[contentType].all[contentId].deconstructor();
       delete this.userMedia.current[contentType].all[contentId];
     }
   };
 
+  private onContentStateChanged = (event: onContentStateChangedType) => {
+    const { contentType, contentId } = event.header;
+    const { state } = event.data;
+
+    this.userMedia.current[contentType].all[contentId].state = state;
+  };
+
   private onRequestedCatchUpVideoPosition = (
-    event: onRequestedCatchUpVideoPositionType
+    event: onRequestedCatchUpVideoPositionType,
   ) => {
     const { username, instance, contentType, contentId, instanceId } =
       event.header;
@@ -325,7 +362,7 @@ class TableStaticContentSocketController {
   };
 
   private onRespondedCatchUpVideoPosition = (
-    event: onRespondedCatchUpVideoPositionType
+    event: onRespondedCatchUpVideoPositionType,
   ) => {
     const { contentType, instanceId } = event.header;
     const { currentVideoPosition } = event.data;

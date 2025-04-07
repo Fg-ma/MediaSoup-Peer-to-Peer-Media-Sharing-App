@@ -10,13 +10,14 @@ import VideoMedia from "../../media/fgVideo/VideoMedia";
 import ImageMedia from "../../media/fgImage/ImageMedia";
 import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
 import TextMedia from "../../media/fgText/TextMedia";
-import SoundClipMedia from "../../media/soundClip/SoundClipMedia";
+import SoundClipMedia from "../../media/fgSoundClip/SoundClipMedia";
 import SvgMedia from "../../media/fgSvg/SvgMedia";
 import SvgMediaInstance from "src/media/fgSvg/SvgMediaInstance";
 import TextMediaInstance from "src/media/fgText/TextMediaInstance";
 import ApplicationMediaInstance from "src/media/fgApplication/ApplicationMediaInstance";
 import ImageMediaInstance from "src/media/fgImage/ImageMediaInstance";
 import VideoMediaInstance from "src/media/fgVideo/VideoMediaInstance";
+import SoundClipMediaInstance from "src/media/fgSoundClip/SoundClipMediaInstance";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -74,7 +75,7 @@ export type UserMediaType = {
       [soundClipId: string]: SoundClipMedia;
     };
     instances: {
-      [soundClipId: string]: SoundClipMedia;
+      [soundClipId: string]: SoundClipMediaInstance;
     };
   };
   gamesSignaling: GamesSignalingMedia | undefined;

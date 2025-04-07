@@ -1,7 +1,10 @@
 import TableStaticContentSocketController from "../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
-import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../../../../../../universal/contentTypeConstant";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
 
@@ -47,7 +50,9 @@ class LowerController {
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
-    >
+    >,
+    private state: ContentStateTypes[],
+    private setState: React.Dispatch<React.SetStateAction<ContentStateTypes[]>>,
   ) {
     this.reactController = new ReactController(
       this.mediaId,
@@ -55,7 +60,7 @@ class LowerController {
       this.kind,
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
-      this.tableSocket
+      this.tableSocket,
     );
   }
 
@@ -96,7 +101,7 @@ class LowerController {
           this.scaleFunctionEnd();
         } else {
           this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-            "scale"
+            "scale",
           );
           document.addEventListener("pointermove", this.scaleFuntion);
           document.addEventListener("pointerdown", this.scaleFunctionEnd);
@@ -109,7 +114,7 @@ class LowerController {
         } else {
           this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "position",
-            { rotationPointPlacement: "topLeft" }
+            { rotationPointPlacement: "topLeft" },
           );
           document.addEventListener("pointermove", this.moveFunction);
           document.addEventListener("pointerdown", this.moveFunctionEnd);
@@ -121,7 +126,7 @@ class LowerController {
           this.rotateFunctionEnd();
         } else {
           this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-            "rotation"
+            "rotation",
           );
           document.addEventListener("pointermove", this.rotateFunction);
           document.addEventListener("pointerdown", this.rotateFunctionEnd);
@@ -147,7 +152,7 @@ class LowerController {
       this.kind,
       this.mediaId,
       this.mediaInstanceId,
-      { scale: this.positioning.current.scale }
+      { scale: this.positioning.current.scale },
     );
   };
 
@@ -160,7 +165,7 @@ class LowerController {
       this.kind,
       this.mediaId,
       this.mediaInstanceId,
-      { rotation: this.positioning.current.rotation }
+      { rotation: this.positioning.current.rotation },
     );
   };
 
@@ -173,7 +178,7 @@ class LowerController {
       this.kind,
       this.mediaId,
       this.mediaInstanceId,
-      { position: this.positioning.current.position }
+      { position: this.positioning.current.position },
     );
   };
 
@@ -220,7 +225,7 @@ class LowerController {
         y:
           (this.positioning.current.position.top / 100) *
           this.bundleRef.current.clientHeight,
-      }
+      },
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
@@ -249,7 +254,7 @@ class LowerController {
       },
       referencePoint,
       referencePoint,
-      this.aspectRatio.current
+      this.aspectRatio.current,
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
@@ -294,11 +299,28 @@ class LowerController {
       this.kind,
       this.mediaId,
       this.mediaInstanceId,
-      this.filename
+      this.filename,
     );
   };
 
-  handleTable = () => {};
+  handleTable = () => {
+    const newState = [...this.state];
+
+    const index = newState.indexOf("tabled");
+    if (index !== -1) {
+      newState.splice(index, 1);
+    } else {
+      newState.push("tabled");
+    }
+
+    this.setState(newState);
+
+    this.tableStaticContentSocket.current?.changeContentState(
+      this.kind,
+      this.mediaId,
+      newState,
+    );
+  };
 
   handleFullScreen = () => {
     if (document.fullscreenElement) {

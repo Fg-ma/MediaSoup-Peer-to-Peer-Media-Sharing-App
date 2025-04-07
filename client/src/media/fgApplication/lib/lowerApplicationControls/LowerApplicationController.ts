@@ -1,4 +1,3 @@
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
 import {
   UserEffectsType,
   ApplicationEffectTypes,
@@ -11,7 +10,7 @@ import ApplicationMediaInstance from "../../ApplicationMediaInstance";
 class LowerApplicationController {
   constructor(
     private applicationInstanceId: string,
-    private applicationMedia: ApplicationMediaInstance,
+    private applicationMediaInstance: ApplicationMediaInstance,
     private applicationContainerRef: React.RefObject<HTMLDivElement>,
     private shiftPressed: React.MutableRefObject<boolean>,
     private controlPressed: React.MutableRefObject<boolean>,
@@ -29,7 +28,7 @@ class LowerApplicationController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
   ) {}
 
   handleApplicationEffects = () => {
@@ -93,7 +92,7 @@ class LowerApplicationController {
 
   handleApplicationEffect = async (
     effect: ApplicationEffectTypes,
-    blockStateChange: boolean
+    blockStateChange: boolean,
   ) => {
     if (!blockStateChange) {
       this.userEffects.current.application[this.applicationInstanceId][effect] =
@@ -102,42 +101,42 @@ class LowerApplicationController {
         ];
     }
 
-    this.applicationMedia.changeEffects(
+    this.applicationMediaInstance.changeEffects(
       effect,
       this.tintColor.current,
-      blockStateChange
+      blockStateChange,
     );
 
     this.tableStaticContentSocket.current?.updateContentEffects(
       "application",
-      this.applicationMedia.applicationId,
+      this.applicationMediaInstance.applicationMedia.applicationId,
       this.applicationInstanceId,
       this.userEffects.current.application[this.applicationInstanceId],
-      this.userEffectsStyles.current.application[this.applicationInstanceId]
+      this.userEffectsStyles.current.application[this.applicationInstanceId],
     );
   };
 
   handleDownload = () => {
     if (this.settings.downloadType.value === "snapShot") {
-      this.applicationMedia.babylonScene?.downloadSnapShot();
+      this.applicationMediaInstance.babylonScene?.downloadSnapShot();
     } else if (this.settings.downloadType.value === "original") {
-      this.applicationMedia.downloadApplication();
+      this.applicationMediaInstance.applicationMedia.downloadApplication();
     } else if (this.settings.downloadType.value === "record") {
       if (!this.recording.current) {
-        this.applicationMedia.babylonScene?.startRecording(
+        this.applicationMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
             this.settings.downloadType.downloadTypeOptions.mimeType.value
           ],
           parseInt(
             this.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
-              -4
-            )
-          )
+              -4,
+            ),
+          ),
         );
         this.downloadRecordingReady.current = false;
       } else {
-        this.applicationMedia.babylonScene?.stopRecording();
+        this.applicationMediaInstance.babylonScene?.stopRecording();
         this.downloadRecordingReady.current = true;
       }
 
@@ -147,7 +146,7 @@ class LowerApplicationController {
   };
 
   handleDownloadRecording = () => {
-    this.applicationMedia.babylonScene?.downloadRecording();
+    this.applicationMediaInstance.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {

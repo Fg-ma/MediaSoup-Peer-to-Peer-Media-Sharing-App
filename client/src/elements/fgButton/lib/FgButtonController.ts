@@ -18,7 +18,7 @@ class FgButtonController {
             x: number;
             y: number;
           },
-          event: PointerEvent
+          event: PointerEvent,
         ) => void)
       | undefined,
     private toggleHold: (event: PointerEvent) => void,
@@ -47,8 +47,7 @@ class FgButtonController {
     >,
     private buttonRef: React.RefObject<HTMLButtonElement>,
     private externalRef: React.RefObject<HTMLButtonElement> | undefined,
-    private scrollingContainerRef: React.RefObject<HTMLDivElement> | undefined,
-    private referenceDragElement: React.RefObject<HTMLElement> | undefined
+    private referenceDragElement: React.RefObject<HTMLElement> | undefined,
   ) {}
 
   handlePointerDown = (event: React.PointerEvent) => {
@@ -71,10 +70,10 @@ class FgButtonController {
       }, this.fgButtonOptions.holdTimeoutDuration);
     }
 
-    if (this.dragFunction) {
-      this.startDragPosition.current = { x: event.clientX, y: event.clientY };
-      window.addEventListener("pointermove", this.handleDragPointerMove);
-    }
+    // if (this.dragFunction) {
+    //   this.startDragPosition.current = { x: event.clientX, y: event.clientY };
+    //   window.addEventListener("pointermove", this.handleDragPointerMove);
+    // }
   };
 
   private handlePointerUp = (event: PointerEvent) => {
@@ -127,9 +126,9 @@ class FgButtonController {
       this.isClicked.current = false;
     }
 
-    if (this.dragFunction) {
-      window.removeEventListener("pointermove", this.handleDragPointerMove);
-    }
+    // if (this.dragFunction) {
+    //   window.removeEventListener("pointermove", this.handleDragPointerMove);
+    // }
   };
 
   handleDoubleClick = (event: React.MouseEvent) => {
@@ -168,10 +167,10 @@ class FgButtonController {
   };
 
   handleDragPointerMove = (event: PointerEvent) => {
-    event.stopPropagation();
     if (
       this.dragFunction === undefined ||
-      this.startDragPosition.current === undefined
+      this.startDragPosition.current === undefined ||
+      (event.clientX === 0 && event.clientY === 0)
     ) {
       return;
     }
@@ -183,7 +182,7 @@ class FgButtonController {
           x: event.clientX - rect.left,
           y: event.clientY - rect.top,
         },
-        event
+        event,
       );
     } else {
       this.dragFunction(
@@ -191,7 +190,7 @@ class FgButtonController {
           x: event.clientX - this.startDragPosition.current.x,
           y: event.clientY - this.startDragPosition.current.y,
         },
-        event
+        event,
       );
 
       this.startDragPosition.current = { x: event.clientX, y: event.clientY };

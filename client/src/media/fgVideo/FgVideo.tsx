@@ -65,7 +65,7 @@ export default function FgVideo({
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
   const tintColor = useRef(
-    userEffectsStyles.current.video[videoInstanceId].video.tint.color
+    userEffectsStyles.current.video[videoInstanceId].video.tint.color,
   );
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
@@ -74,7 +74,7 @@ export default function FgVideo({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] =
     useState<ActivePages>(defaultActivePages);
@@ -124,7 +124,7 @@ export default function FgVideo({
     isScrubbing,
     wasPaused,
     tableStaticContentSocket,
-    setSettings
+    setSettings,
   );
 
   const videoController = new VideoController(
@@ -137,7 +137,7 @@ export default function FgVideo({
     tintColor,
     paused,
     setPausedState,
-    lowerVideoController
+    lowerVideoController,
   );
 
   useEffect(() => {
@@ -155,17 +155,17 @@ export default function FgVideo({
       lowerVideoController.timeUpdate();
       videoMediaInstance.instanceVideo?.addEventListener(
         "timeupdate",
-        lowerVideoController.timeUpdate
+        lowerVideoController.timeUpdate,
       );
 
       videoMediaInstance.instanceVideo?.addEventListener(
         "enterpictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("enter")
+        () => lowerVideoController.handlePictureInPicture("enter"),
       );
 
       videoMediaInstance.instanceVideo?.addEventListener(
         "leavepictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("leave")
+        () => lowerVideoController.handlePictureInPicture("leave"),
       );
 
       setRerender((prev) => !prev);
@@ -193,17 +193,17 @@ export default function FgVideo({
         lowerVideoController.timeUpdate();
         videoMediaInstance.instanceVideo?.addEventListener(
           "timeupdate",
-          lowerVideoController.timeUpdate
+          lowerVideoController.timeUpdate,
         );
 
         videoMediaInstance.instanceVideo?.addEventListener(
           "enterpictureinpicture",
-          () => lowerVideoController.handlePictureInPicture("enter")
+          () => lowerVideoController.handlePictureInPicture("enter"),
         );
 
         videoMediaInstance.instanceVideo?.addEventListener(
           "leavepictureinpicture",
-          () => lowerVideoController.handlePictureInPicture("leave")
+          () => lowerVideoController.handlePictureInPicture("leave"),
         );
 
         setRerender((prev) => !prev);
@@ -220,22 +220,22 @@ export default function FgVideo({
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
+          removeListener(),
+        ),
       );
       positioningListeners.current = {};
       document.removeEventListener(
         "keydown",
-        lowerVideoController.handleKeyDown
+        lowerVideoController.handleKeyDown,
       );
       document.removeEventListener("keyup", lowerVideoController.handleKeyUp);
       videoMediaInstance.instanceVideo?.removeEventListener(
         "enterpictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("enter")
+        () => lowerVideoController.handlePictureInPicture("enter"),
       );
       videoMediaInstance.instanceVideo?.removeEventListener(
         "leavepictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("leave")
+        () => lowerVideoController.handlePictureInPicture("leave"),
       );
     };
   }, []);
@@ -246,12 +246,12 @@ export default function FgVideo({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      videoController.handleTableStaticContentMessage
+      videoController.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        videoController.handleTableStaticContentMessage
+        videoController.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -260,11 +260,12 @@ export default function FgVideo({
       mediaId={videoMediaInstance.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
       filename={videoMediaInstance.videoMedia.filename}
-      kind='video'
+      kind="video"
+      initState={videoMediaInstance.videoMedia.state}
       rootMedia={videoMediaInstance.instanceVideo}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
-      className='video-container'
+      className="video-container"
       popupElements={[
         videoEffectsActive ? (
           <VideoEffectsSection
@@ -277,12 +278,12 @@ export default function FgVideo({
         ) : null,
         <div
           ref={timelineContainerRef}
-          className='timeline-container'
+          className="timeline-container"
           onPointerDown={lowerVideoController.handleStartScrubbing}
           onPointerMove={lowerVideoController.handleHoverTimelineUpdate}
         >
-          <div className='timeline'>
-            <div className='thumb-indicator'></div>
+          <div className="timeline">
+            <div className="thumb-indicator"></div>
           </div>
         </div>,
       ]}
@@ -293,8 +294,8 @@ export default function FgVideo({
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
         />,
-        <div className='flex items-center gap-1 px-1 select-none'>
-          <div ref={currentTimeRef} className='font-K2D text-lg'></div>
+        <div className="flex select-none items-center gap-1 px-1">
+          <div ref={currentTimeRef} className="font-K2D text-lg"></div>
         </div>,
       ]}
       rightLowerControls={[

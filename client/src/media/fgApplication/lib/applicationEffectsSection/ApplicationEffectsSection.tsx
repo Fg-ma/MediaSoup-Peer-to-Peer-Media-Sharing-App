@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import ApplicationMedia from "../../ApplicationMedia";
 import LowerApplicationController from "../lowerApplicationControls/LowerApplicationController";
 import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../elements/effectsButtons/TintSection";
+import ApplicationMediaInstance from "../../ApplicationMediaInstance";
 
 const EffectSectionVar: Variants = {
   init: { opacity: 0, scale: 0.8, translate: "-50%" },
@@ -29,13 +29,13 @@ export default function ApplicationEffectsSection({
   applicationInstanceId,
   lowerApplicationController,
   tintColor,
-  applicationMedia,
+  applicationMediaInstance,
   applicationContainerRef,
 }: {
   applicationInstanceId: string;
   lowerApplicationController: LowerApplicationController;
   tintColor: React.MutableRefObject<string>;
-  applicationMedia: ApplicationMedia;
+  applicationMediaInstance: ApplicationMediaInstance;
   applicationContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffectsStyles, userEffects } = useEffectsContext();
@@ -95,7 +95,7 @@ export default function ApplicationEffectsSection({
   return (
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
       style={{
         bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
         height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
@@ -105,14 +105,14 @@ export default function ApplicationEffectsSection({
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
       variants={EffectSectionVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={EffectSectionTransition}
     >
       <div
         ref={subEffectsContainerRef}
-        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+        className="flex h-full w-max items-center justify-center space-x-2 px-4"
       >
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
@@ -126,14 +126,14 @@ export default function ApplicationEffectsSection({
               .postProcess
           }
           clickFunctionCallback={async () => {
-            applicationMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            applicationMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
               userEffectsStyles.current.application[applicationInstanceId]
-                .postProcess.style
+                .postProcess.style,
             );
 
             await lowerApplicationController.handleApplicationEffect(
               "postProcess",
-              false
+              false,
             );
           }}
           holdFunctionCallback={async (effectType) => {
@@ -141,13 +141,14 @@ export default function ApplicationEffectsSection({
               applicationInstanceId
             ].postProcess.style = effectType;
 
-            applicationMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              effectType
+            applicationMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              effectType,
             );
 
             await lowerApplicationController.handleApplicationEffect(
               "postProcess",
-              userEffects.current.application[applicationInstanceId].postProcess
+              userEffects.current.application[applicationInstanceId]
+                .postProcess,
             );
           }}
         />
@@ -161,7 +162,7 @@ export default function ApplicationEffectsSection({
           clickFunctionCallback={async () => {
             await lowerApplicationController.handleApplicationEffect(
               "blur",
-              false
+              false,
             );
           }}
         />
@@ -180,7 +181,7 @@ export default function ApplicationEffectsSection({
 
             await lowerApplicationController.handleApplicationEffect(
               "tint",
-              false
+              false,
             );
           }}
           acceptColorCallback={async () => {
@@ -190,7 +191,7 @@ export default function ApplicationEffectsSection({
 
             await lowerApplicationController.handleApplicationEffect(
               "tint",
-              userEffects.current.application[applicationInstanceId].tint
+              userEffects.current.application[applicationInstanceId].tint,
             );
           }}
         />

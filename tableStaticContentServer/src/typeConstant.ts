@@ -206,6 +206,7 @@ export type onUpdateContentPositioningType = {
     table_id: string;
     contentType: StaticContentTypes;
     contentId: string;
+    instanceId: string;
   };
   data: {
     positioning: {

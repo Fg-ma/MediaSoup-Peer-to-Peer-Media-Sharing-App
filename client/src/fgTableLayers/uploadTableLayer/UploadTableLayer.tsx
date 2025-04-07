@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
+import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 
 const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 
@@ -43,7 +43,7 @@ export default function UploadTableLayer() {
       xhr.open(
         "POST",
         staticContentServerBaseUrl + `upload-file/${uploadId}`,
-        true
+        true,
       );
 
       xhr.send(formData);
@@ -81,7 +81,7 @@ export default function UploadTableLayer() {
   return (
     <div
       ref={uploadRef}
-      className='w-full h-full abosulte top-0 left-0 bg-transparent pointer-events-none'
+      className="abosulte pointer-events-none left-0 top-0 h-full w-full bg-transparent"
       onDragEnter={() => setDraggingFiles(true)}
       onDragLeave={() => setDraggingFiles(false)}
       onDragOver={handleDragOver}
@@ -89,7 +89,7 @@ export default function UploadTableLayer() {
     >
       {draggingFiles && (
         <div
-          className='absolute w-1/6 aspect-video bg-fg-primary-desaturated-2 bg-opacity-75 border-4 border-fg-primary-desaturated border-dashed rounded-md'
+          className="absolute aspect-video w-1/6 rounded-md border-4 border-dashed border-fg-primary-desaturated bg-fg-primary-desaturated-2 bg-opacity-75"
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`,

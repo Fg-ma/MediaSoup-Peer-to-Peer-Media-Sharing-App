@@ -3,6 +3,7 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
+import { ContentStateTypes } from "../../../../../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -12,33 +13,37 @@ const tableTopReducedTippedIcon =
   nginxAssetServerBaseUrl + "svgs/tableTopReducedTippedIcon.svg";
 
 export default function TabledButton({
-  tabled,
+  state,
   lowerController,
 }: {
-  tabled: boolean;
+  state: ContentStateTypes[];
   lowerController: LowerController;
 }) {
   return (
     <FgButton
-      className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
+      className="pointer-events-auto flex !aspect-square h-full items-center justify-end"
       clickFunction={() => {
         lowerController.handleTable();
       }}
       contentFunction={() => {
         return (
           <FgSVGElement
-            src={tabled ? tableTopReducedTippedIcon : tableTopReducedIcon}
+            src={
+              state.includes("tabled")
+                ? tableTopReducedTippedIcon
+                : tableTopReducedIcon
+            }
             attributes={[
-              { key: "width", value: "90%" },
-              { key: "height", value: "90%" },
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
             ]}
           />
         );
       }}
       hoverContent={
         <FgHoverContentStandard
-          content={tabled ? "Untable (t)" : "Table (t)"}
-          style='light'
+          content={state.includes("tabled") ? "Untable (t)" : "Table (t)"}
+          style="light"
         />
       }
       options={{ hoverType: "below" }}

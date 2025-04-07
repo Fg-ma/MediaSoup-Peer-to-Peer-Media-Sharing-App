@@ -45,10 +45,10 @@ export default function FgText({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    defaultActiveSettingsPages
+    defaultActiveSettingsPages,
   );
 
   const [isEditing, setIsEditing] = useState(false);
@@ -69,7 +69,7 @@ export default function FgText({
     setSettingsActive,
     textAreaRef,
     setIsEditing,
-    textAreaContainerRef
+    textAreaContainerRef,
   );
 
   const textController = new TextController(setSettingsActive);
@@ -92,18 +92,18 @@ export default function FgText({
 
     tableRef.current?.addEventListener(
       "scroll",
-      textController.handleTableScroll
+      textController.handleTableScroll,
     );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        lowerTextController.handleKeyDown
+        lowerTextController.handleKeyDown,
       );
       document.removeEventListener("keyup", lowerTextController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
-        textController.handleTableScroll
+        textController.handleTableScroll,
       );
     };
   }, []);
@@ -113,7 +113,8 @@ export default function FgText({
       mediaId={textMediaInstance.textMedia.textId}
       mediaInstanceId={textInstanceId}
       filename={textMediaInstance.textMedia.filename}
-      kind='text'
+      kind="text"
+      initState={textMediaInstance.textMedia.state}
       media={
         <EditableText
           lowerTextController={lowerTextController}
@@ -135,7 +136,7 @@ export default function FgText({
       ]}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value}
-      className='text-container'
+      className="text-container"
       rightLowerControls={[
         <SettingsButton
           containerRef={textContainerRef}

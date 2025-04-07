@@ -87,7 +87,7 @@ export default function ReactButton({
     <>
       <FgButton
         externalRef={reactionsButtonRef}
-        className={`${className} flex items-center justify-end h-full !aspect-square pointer-events-auto`}
+        className={`${className} pointer-events-auto flex !aspect-square h-full items-center justify-end`}
         clickFunction={clickFunction}
         contentFunction={() => {
           const src = reactionsPanelActive ? reactionsOffIcon : reactionsIcon;
@@ -95,11 +95,10 @@ export default function ReactButton({
           return (
             <FgSVGElement
               src={src}
-              className='flex w-full h-full items-center justify-center'
+              className="h-full w-full fill-fg-white"
               attributes={[
-                { key: "width", value: "80%" },
-                { key: "height", value: "80%" },
-                { key: "fill", value: "#f2f2f2" },
+                { key: "width", value: "100%" },
+                { key: "height", value: "100%" },
               ]}
             />
           );
@@ -121,29 +120,29 @@ export default function ReactButton({
           content={
             <LazyScrollingContainer
               externalRef={reactionsPanelScrollingContainerRef}
-              className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
+              className={`small-vertical-scroll-bar grid h-full min-h-[9.5rem] w-full min-w-[9.5rem] gap-1 overflow-y-auto py-2 ${
                 cols === 3
                   ? "grid-cols-3"
                   : cols === 4
-                  ? "grid-cols-4"
-                  : cols === 5
-                  ? "grid-cols-5"
-                  : cols === 6
-                  ? "grid-cols-6"
-                  : cols === 7
-                  ? "grid-cols-7"
-                  : cols === 8
-                  ? "grid-cols-8"
-                  : cols === 9
-                  ? "grid-cols-9"
-                  : "grid-cols-10"
+                    ? "grid-cols-4"
+                    : cols === 5
+                      ? "grid-cols-5"
+                      : cols === 6
+                        ? "grid-cols-6"
+                        : cols === 7
+                          ? "grid-cols-7"
+                          : cols === 8
+                            ? "grid-cols-8"
+                            : cols === 9
+                              ? "grid-cols-9"
+                              : "grid-cols-10"
               }`}
               items={[
                 ...Object.entries(reactionsMeta).map(([reaction, meta]) => (
                   <FgButton
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
-                    className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-1'
+                    className="flex aspect-square w-full min-w-12 items-center justify-center rounded bg-fg-tone-black-1 hover:bg-fg-red-light"
                     clickFunction={
                       reactionFunction
                         ? () => reactionFunction(reaction as TableReactions)
@@ -153,7 +152,7 @@ export default function ReactButton({
                       meta.type === "svg" ? (
                         <FgSVGElement
                           src={meta.src}
-                          className='flex items-center justify-center'
+                          className="flex items-center justify-center"
                           attributes={[
                             { key: "width", value: "90%" },
                             { key: "height", value: "90%" },
@@ -190,9 +189,9 @@ export default function ReactButton({
           resizeCallback={gridColumnsChange}
           closeCallback={clickFunction}
           closeLabelElement={
-            <FgHoverContentStandard content='Close (x)' style='dark' />
+            <FgHoverContentStandard content="Close (x)" style="dark" />
           }
-          closePosition='topRight'
+          closePosition="topRight"
           shadow={{ top: true, bottom: true }}
           backgroundColor={"#161616"}
           secondaryBackgroundColor={"#212121"}

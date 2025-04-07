@@ -15,6 +15,7 @@ const PanelTransition: Transition = {
 export default function FgPanel({
   externalRef,
   content,
+  className,
   initPosition = { x: 0, y: 0 },
   initWidth = "100px",
   initHeight = "100px",
@@ -41,6 +42,7 @@ export default function FgPanel({
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
+  className?: string;
   initPosition?: {
     x?: number;
     y?: number;
@@ -104,7 +106,7 @@ export default function FgPanel({
   const startPosition = useRef({ x: 0, y: 0 });
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
-    undefined
+    undefined,
   );
 
   const fgPanelController = new FgPanelController(
@@ -126,7 +128,7 @@ export default function FgPanel({
     closeCallback,
     panelBoundariesRef,
     panelBoundariesScrollingContainerRef,
-    panelInsertionPointRef
+    panelInsertionPointRef,
   );
 
   useEffect(() => {
@@ -265,7 +267,7 @@ export default function FgPanel({
       if (closeCallback && isHover) {
         document.removeEventListener(
           "keydown",
-          fgPanelController.handleKeyDown
+          fgPanelController.handleKeyDown,
         );
       }
     };
@@ -274,13 +276,13 @@ export default function FgPanel({
   useEffect(() => {
     document.addEventListener(
       "pointerdown",
-      fgPanelController.handlePanelClick
+      fgPanelController.handlePanelClick,
     );
 
     return () => {
       document.removeEventListener(
         "pointerdown",
-        fgPanelController.handlePanelClick
+        fgPanelController.handlePanelClick,
       );
     };
   }, []);
@@ -304,13 +306,13 @@ export default function FgPanel({
       }}
       onHoverEnd={closeCallback && (() => setIsHover(false))}
       onHoverStart={closeCallback && (() => setIsHover(true))}
-      className={`fg-panel ${
+      className={`fg-panel ${className} ${
         focusClicked
           ? "z-[500000000000]"
           : focus
-          ? "z-[499999999999]"
-          : "z-[499999999998]"
-      } shadow-lg rounded-md absolute p-3 overflow-hidden`}
+            ? "z-[499999999999]"
+            : "z-[499999999998]"
+      } absolute overflow-hidden rounded-md p-3 shadow-lg`}
       style={{
         opacity:
           position.x === undefined || position.y === undefined ? "0%" : "100%",
@@ -322,9 +324,9 @@ export default function FgPanel({
       }}
       custom={focus}
       variants={PanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={PanelTransition}
     >
       <div
@@ -336,7 +338,7 @@ export default function FgPanel({
       {moveable && (
         <div
           onPointerDown={fgPanelController.handleDragPointerDown}
-          className='h-3 absolute top-0 cursor-pointer'
+          className="absolute top-0 h-3 cursor-pointer"
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
             left: `${resizeable ? "0.75rem" : "0rem"}`,
@@ -346,7 +348,7 @@ export default function FgPanel({
       {moveable && (
         <div
           onPointerDown={fgPanelController.handleDragPointerDown}
-          className='h-3 absolute bottom-0 cursor-pointer'
+          className="absolute bottom-0 h-3 cursor-pointer"
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
             left: `${resizeable ? "0.75rem" : "0rem"}`,
@@ -356,7 +358,7 @@ export default function FgPanel({
       {moveable && (
         <div
           onPointerDown={fgPanelController.handleDragPointerDown}
-          className='w-3 absolute left-0 cursor-pointer'
+          className="absolute left-0 w-3 cursor-pointer"
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
             top: `${resizeable ? "0.75rem" : "0rem"}`,
@@ -366,7 +368,7 @@ export default function FgPanel({
       {moveable && (
         <div
           onPointerDown={fgPanelController.handleDragPointerDown}
-          className='w-3 absolute right-0 cursor-pointer'
+          className="absolute right-0 w-3 cursor-pointer"
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
             top: `${resizeable ? "0.75rem" : "0rem"}`,
@@ -378,7 +380,7 @@ export default function FgPanel({
           onPointerDown={(event) =>
             fgPanelController.handleResizePointerDown(event, "se")
           }
-          className='w-3 aspect-square absolute right-0 bottom-0 cursor-se-resize'
+          className="absolute bottom-0 right-0 aspect-square w-3 cursor-se-resize"
         />
       )}
       {resizeable && (closePosition !== "bottomRight" || !closeCallback) && (
@@ -386,7 +388,7 @@ export default function FgPanel({
           onPointerDown={(event) =>
             fgPanelController.handleResizePointerDown(event, "sw")
           }
-          className='w-3 aspect-square absolute left-0 bottom-0 cursor-sw-resize'
+          className="absolute bottom-0 left-0 aspect-square w-3 cursor-sw-resize"
         />
       )}
       {resizeable && (closePosition !== "topLeft" || !closeCallback) && (
@@ -394,7 +396,7 @@ export default function FgPanel({
           onPointerDown={(event) =>
             fgPanelController.handleResizePointerDown(event, "nw")
           }
-          className='w-3 aspect-square absolute left-0 top-0 cursor-nw-resize'
+          className="absolute left-0 top-0 aspect-square w-3 cursor-nw-resize"
         />
       )}
       {resizeable && (closePosition !== "topRight" || !closeCallback) && (
@@ -402,7 +404,7 @@ export default function FgPanel({
           onPointerDown={(event) =>
             fgPanelController.handleResizePointerDown(event, "ne")
           }
-          className='w-3 aspect-square absolute right-0 top-0 cursor-ne-resize'
+          className="absolute right-0 top-0 aspect-square w-3 cursor-ne-resize"
         />
       )}
       {closeCallback && closePosition && (
@@ -410,29 +412,29 @@ export default function FgPanel({
           <FgButton
             externalRef={closeButtonRef}
             clickFunction={closeCallback}
-            className={`w-3 aspect-square absolute flex items-center justify-center hover:bg-fg-red-light rounded-full ${
+            className={`absolute flex aspect-square w-3 items-center justify-center rounded-full hover:bg-fg-red-light ${
               closePosition === "topRight"
                 ? "right-0 top-0"
                 : closePosition === "topLeft"
-                ? "left-0 top-0"
-                : closePosition === "bottomRight"
-                ? "left-0 bottom-0"
-                : closePosition === "bottomLeft"
-                ? "right-0 bottom-0"
-                : ""
+                  ? "left-0 top-0"
+                  : closePosition === "bottomRight"
+                    ? "bottom-0 left-0"
+                    : closePosition === "bottomLeft"
+                      ? "bottom-0 right-0"
+                      : ""
             }`}
             hoverContent={
               closeLabelElement ? (
                 closeLabelElement
               ) : (
-                <FgHoverContentStandard content='Close (x)' />
+                <FgHoverContentStandard content="Close (x)" />
               )
             }
           />
         </Suspense>
       )}
       <motion.div
-        className='z-10 absolute left-3 top-3 pointer-events-none'
+        className="pointer-events-none absolute left-3 top-3 z-10"
         style={{
           width: "calc(100% - 1.5rem)",
           height: "calc(100% - 1.5rem)",
@@ -448,6 +450,6 @@ export default function FgPanel({
     </motion.div>,
     panelInsertionPointRef && panelInsertionPointRef.current
       ? panelInsertionPointRef.current
-      : document.body
+      : document.body,
   );
 }

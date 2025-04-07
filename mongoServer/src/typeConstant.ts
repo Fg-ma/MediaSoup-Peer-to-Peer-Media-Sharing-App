@@ -4,7 +4,10 @@ import {
   SvgEffectStylesType,
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
-import { StaticContentTypes } from "../../universal/contentTypeConstant";
+import {
+  ContentStateTypes,
+  StaticContentTypes,
+} from "../../universal/contentTypeConstant";
 
 export type TableTopStaticMimeType =
   | "image/jpeg"
@@ -114,4 +117,16 @@ export type onUpdateVideoPositionType = {
     instanceId: string;
   };
   data: { videoPosition: number };
+};
+
+export type onChangeContentStateType = {
+  type: "changeContentState";
+  header: {
+    table_id: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    state: ContentStateTypes[];
+  };
 };

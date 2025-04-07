@@ -23,6 +23,7 @@ export type FgButtonOptions = {
   holdSpacing?: number;
   disabled?: boolean;
   toggleClickCloseWhenOutside?: boolean;
+  dragPreventDefault?: boolean;
 };
 
 const defaultFgButtonOptions: {
@@ -37,6 +38,7 @@ const defaultFgButtonOptions: {
   holdSpacing?: number;
   disabled: boolean;
   toggleClickCloseWhenOutside: boolean;
+  dragPreventDefault: boolean;
 } = {
   defaultDataValue: undefined,
   holdTimeoutDuration: 500,
@@ -49,6 +51,7 @@ const defaultFgButtonOptions: {
   holdSpacing: undefined,
   disabled: false,
   toggleClickCloseWhenOutside: true,
+  dragPreventDefault: false,
 };
 
 export default function FgButton({
@@ -62,6 +65,8 @@ export default function FgButton({
   contentFunction,
   doubleClickFunction,
   dragFunction,
+  startDragFunction,
+  stopDragFunction,
   referenceDragElement,
   focusFunction,
   blurFunction,
@@ -90,8 +95,10 @@ export default function FgButton({
   doubleClickFunction?: (event: React.MouseEvent) => void;
   dragFunction?: (
     displacement: { x: number; y: number },
-    event: PointerEvent
+    event: PointerEvent,
   ) => void;
+  startDragFunction?: (event: React.DragEvent<HTMLButtonElement>) => void;
+  stopDragFunction?: (event: React.DragEvent<HTMLButtonElement>) => void;
   referenceDragElement?: React.RefObject<HTMLElement>;
   focusFunction?: (event: React.FocusEvent) => void;
   blurFunction?: (event: React.FocusEvent) => void;
@@ -139,7 +146,7 @@ export default function FgButton({
   const clickTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const startDragPosition = useRef<{ x: number; y: number } | undefined>(
-    undefined
+    undefined,
   );
 
   // Use useCallback to memoize the toggleHold function
@@ -148,14 +155,14 @@ export default function FgButton({
       if (
         !holdContentRef.current?.contains(event.target as Node) &&
         !holdToggleExclusionRefs?.some((ref) =>
-          ref.current?.contains(event.target as Node)
+          ref.current?.contains(event.target as Node),
         )
       ) {
-        window.removeEventListener("pointerdown", toggleHold);
+        document.removeEventListener("pointerdown", toggleHold);
         setIsHeldToggle(false);
       }
     },
-    [holdContentRef, setIsHeldToggle]
+    [holdContentRef, setIsHeldToggle],
   );
 
   // Use useCallback to memoize the togglePopup function
@@ -167,16 +174,16 @@ export default function FgButton({
       ) {
         if (
           !(externalRef ? externalRef : buttonRef).current?.contains(
-            event.target as Node
+            event.target as Node,
           )
         ) {
           setIsClickToggle(false);
           if (setExternalClickToggleState) setExternalClickToggleState(false);
         }
-        window.removeEventListener("pointerup", togglePopup);
+        document.removeEventListener("pointerup", togglePopup);
       }
     },
-    [toggleClickContentRef, setIsClickToggle, setExternalClickToggleState]
+    [toggleClickContentRef, setIsClickToggle, setExternalClickToggleState],
   );
 
   const fgButtonController = new FgButtonController(
@@ -205,13 +212,12 @@ export default function FgButton({
     startDragPosition,
     buttonRef,
     externalRef,
-    scrollingContainerRef,
-    referenceDragElement
+    referenceDragElement,
   );
 
   useEffect(() => {
     if (closeHoldToggle) {
-      window.removeEventListener("pointerdown", toggleHold);
+      document.removeEventListener("pointerdown", toggleHold);
       setIsHeldToggle(false);
       if (setCloseHoldToggle) setCloseHoldToggle(false);
     }
@@ -222,13 +228,13 @@ export default function FgButton({
 
     document.addEventListener(
       "visibilitychange",
-      fgButtonController.handleVisibilityChange
+      fgButtonController.handleVisibilityChange,
     );
 
     return () => {
       document.removeEventListener(
         "visibilitychange",
-        fgButtonController.handleVisibilityChange
+        fgButtonController.handleVisibilityChange,
       );
     };
   }, [isHover]);
@@ -237,7 +243,7 @@ export default function FgButton({
     if (scrollingContainerRef && scrollingContainerRef.current) {
       scrollingContainerRef.current.addEventListener(
         "scroll",
-        fgButtonController.handleScrollingContainerScroll
+        fgButtonController.handleScrollingContainerScroll,
       );
     }
 
@@ -245,13 +251,15 @@ export default function FgButton({
       if (scrollingContainerRef && scrollingContainerRef.current) {
         scrollingContainerRef.current.removeEventListener(
           "scroll",
-          fgButtonController.handleScrollingContainerScroll
+          fgButtonController.handleScrollingContainerScroll,
         );
       }
     };
   }, [scrollingContainerRef?.current]);
 
-  const ButtonComponent = animationOptions ? motion.button : "button";
+  const ButtonComponent = (
+    animationOptions ? motion.button : "button"
+  ) as React.ElementType;
 
   return (
     <>
@@ -260,11 +268,36 @@ export default function FgButton({
         id={externalId}
         className={className}
         style={style}
-        onPointerDown={(event) => fgButtonController.handlePointerDown(event)}
+        onPointerDown={fgButtonController.handlePointerDown}
         onDoubleClick={fgButtonController.handleDoubleClick}
         onPointerEnter={fgButtonController.handlePointerEnter}
         onFocus={focusFunction}
         onBlur={blurFunction}
+        draggable={dragFunction !== undefined}
+        {...(dragFunction && {
+          onDragStart: (event: React.DragEvent<HTMLButtonElement>) => {
+            if (fgButtonOptions.dragPreventDefault) {
+              event.preventDefault();
+              document.onpointerup = () => {
+                if (stopDragFunction) stopDragFunction(event);
+                document.onpointerup = null;
+              };
+            }
+            const img = new Image();
+            img.src =
+              "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiLz4=";
+            event.dataTransfer.setDragImage(img, 0, 0);
+            startDragPosition.current = { x: event.clientX, y: event.clientY };
+            if (startDragFunction) startDragFunction(event);
+          },
+          onDrag: (event: PointerEvent) => {
+            fgButtonController.handleDragPointerMove(event);
+          },
+          onDragEnd: (event: React.DragEvent<HTMLButtonElement>) => {
+            startDragPosition.current = undefined;
+            if (stopDragFunction) stopDragFunction(event);
+          },
+        })}
         data-value={fgButtonOptions.defaultDataValue}
         disabled={fgButtonOptions.disabled}
         {...(animationOptions && {

@@ -4,7 +4,8 @@ import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import FgTableController from "./lib/FgTableController";
 import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
-import UploadTableLayer from "../uploadTableLayer/UploadTableLayer";
+import UploadTableLayer from "../fgTableLayers/uploadTableLayer/UploadTableLayer";
+import NewInstancesLayer from "../fgTableLayers/newInstancesLayer/NewInstancesLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
@@ -55,7 +56,7 @@ export default function FgTable({
     tableRef,
     setUserData,
     aspectDir,
-    setRerender
+    setRerender,
   );
 
   useEffect(() => {
@@ -89,23 +90,23 @@ export default function FgTable({
 
   useEffect(() => {
     tableSocket.current?.addMessageListener(
-      fgTableController.handleTableMessage
+      fgTableController.handleTableMessage,
     );
 
     return () => {
       tableSocket.current?.removeMessageListener(
-        fgTableController.handleTableMessage
+        fgTableController.handleTableMessage,
       );
     };
   }, [tableSocket.current]);
 
   return (
-    <div ref={tableContainerRef} className='flex grow h-1 w-full flex-col'>
+    <div ref={tableContainerRef} className="flex h-1 w-full grow flex-col">
       <TopTableSection
         userData={userData}
         tableContainerRef={tableContainerRef}
       />
-      <div className='flex w-full' style={{ height: "1px", flexGrow: "1" }}>
+      <div className="flex w-full" style={{ height: "1px", flexGrow: "1" }}>
         <LeftTableSection
           userData={userData}
           tableContainerRef={tableContainerRef}
@@ -116,7 +117,7 @@ export default function FgTable({
           content={
             <div
               ref={tableRef}
-              className={`fg-table relative rounded-md w-full h-full border-[2px] border-fg-off-white ${
+              className={`fg-table relative h-full w-full rounded-md border-[2px] border-fg-off-white ${
                 aspectDir.current === "width"
                   ? "overflow-y-auto"
                   : "overflow-x-auto"
@@ -124,7 +125,7 @@ export default function FgTable({
             >
               <div
                 ref={tableTopRef}
-                className='relative bg-fg-tone-black-6 aspect-square overflow-hidden'
+                className="relative aspect-square overflow-hidden bg-fg-tone-black-6"
                 style={{
                   ...(aspectDir.current === "width"
                     ? { width: "100%" }
@@ -132,11 +133,12 @@ export default function FgTable({
                 }}
               >
                 <UploadTableLayer />
+                <NewInstancesLayer tableRef={tableRef} />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}
                     tableTopRef={tableTopRef}
-                    gridColor='#fff'
+                    gridColor="#fff"
                   />
                 )}
                 <SharedBundle
@@ -151,13 +153,13 @@ export default function FgTable({
                       Object.keys(bundles[username]).length !== 0 &&
                       Object.entries(bundles[username]).map(([key, bundle]) => (
                         <div
-                          className='w-full h-full absolute top-0 left-0 pointer-events-none'
+                          className="pointer-events-none absolute left-0 top-0 h-full w-full"
                           key={key}
                           id={`${key}_bundle`}
                         >
                           {bundle}
                         </div>
-                      ))
+                      )),
                   )}
               </div>
             </div>

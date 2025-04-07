@@ -28,8 +28,8 @@ export default function PanButton({
       externalRef={externalRef}
       className={className}
       style={style}
-      pointerDownFunction={pointerDownFunction}
-      pointerUpFunction={pointerUpFunction}
+      startDragFunction={pointerDownFunction}
+      stopDragFunction={pointerUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

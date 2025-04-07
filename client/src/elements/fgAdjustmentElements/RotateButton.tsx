@@ -21,7 +21,7 @@ export default function RotateButton({
       x: number;
       y: number;
     },
-    event: PointerEvent
+    event: PointerEvent,
   ) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
@@ -31,8 +31,8 @@ export default function RotateButton({
     <FgButton
       className={className}
       style={style}
-      pointerDownFunction={pointerDownFunction}
-      pointerUpFunction={pointerUpFunction}
+      startDragFunction={pointerDownFunction}
+      stopDragFunction={pointerUpFunction}
       dragFunction={dragFunction}
       referenceDragElement={bundleRef}
       contentFunction={() => {

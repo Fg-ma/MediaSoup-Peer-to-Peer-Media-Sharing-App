@@ -40,7 +40,7 @@ export default function FgApplication({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const applicationMedia =
+  const applicationMediaInstance =
     userMedia.current.application.instances[applicationInstanceId];
 
   const [applicationEffectsActive, setApplicationEffectsActive] =
@@ -50,14 +50,14 @@ export default function FgApplication({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(applicationMedia.initPositioning);
+  }>(applicationMediaInstance.initPositioning);
 
   const applicationContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerApplicationControlsRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(
-    userEffectsStyles.current.application[applicationInstanceId].tint.color
+    userEffectsStyles.current.application[applicationInstanceId].tint.color,
   );
 
   const shiftPressed = useRef(false);
@@ -67,10 +67,10 @@ export default function FgApplication({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    defaultActiveSettingsPages
+    defaultActiveSettingsPages,
   );
 
   const recording = useRef(false);
@@ -78,7 +78,7 @@ export default function FgApplication({
 
   const lowerApplicationController = new LowerApplicationController(
     applicationInstanceId,
-    applicationMedia,
+    applicationMediaInstance,
     applicationContainerRef,
     shiftPressed,
     controlPressed,
@@ -92,60 +92,66 @@ export default function FgApplication({
     downloadRecordingReady,
     setRerender,
     tableStaticContentSocket,
-    setSettings
+    setSettings,
   );
 
   const applicationController = new ApplicationController(
     applicationContainerRef,
     applicationOptions,
-    setSettingsActive
+    setSettingsActive,
   );
 
   useEffect(() => {
-    if (applicationMedia.instanceCanvas) {
-      subContainerRef.current?.appendChild(applicationMedia.instanceCanvas);
+    if (applicationMediaInstance.instanceCanvas) {
+      subContainerRef.current?.appendChild(
+        applicationMediaInstance.instanceCanvas,
+      );
     }
-    applicationMedia.addDownloadCompleteListener(() => {
-      if (applicationMedia.instanceCanvas) {
-        const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
+    applicationMediaInstance.applicationMedia.addDownloadCompleteListener(
+      () => {
+        if (applicationMediaInstance.instanceCanvas) {
+          const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
 
-        if (allCanvas) {
-          allCanvas.forEach((canvasElement) => {
-            canvasElement.remove();
-          });
+          if (allCanvas) {
+            allCanvas.forEach((canvasElement) => {
+              canvasElement.remove();
+            });
+          }
+
+          subContainerRef.current?.appendChild(
+            applicationMediaInstance.instanceCanvas,
+          );
         }
-
-        subContainerRef.current?.appendChild(applicationMedia.instanceCanvas);
-      }
-    });
+      },
+    );
 
     // Set up initial conditions
     applicationController.init();
 
     document.addEventListener(
       "keydown",
-      lowerApplicationController.handleKeyDown
+      lowerApplicationController.handleKeyDown,
     );
 
     document.addEventListener("keyup", lowerApplicationController.handleKeyUp);
 
     tableRef.current?.addEventListener(
       "scroll",
-      applicationController.handleTableScroll
+      applicationController.handleTableScroll,
     );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        lowerApplicationController.handleKeyDown
+        lowerApplicationController.handleKeyDown,
       );
       document.removeEventListener(
         "keyup",
-        lowerApplicationController.handleKeyUp
+        lowerApplicationController.handleKeyUp,
       );
       tableRef.current?.removeEventListener(
         "scroll",
-        applicationController.handleTableScroll
+        applicationController.handleTableScroll,
       );
     };
   }, []);
@@ -156,7 +162,7 @@ export default function FgApplication({
 
   useEffect(() => {
     if (settings.downloadType.value !== "record" && recording.current) {
-      applicationMedia.babylonScene?.stopRecording();
+      applicationMediaInstance.babylonScene?.stopRecording();
       downloadRecordingReady.current = true;
       recording.current = false;
     }
@@ -164,21 +170,22 @@ export default function FgApplication({
 
   return (
     <FgMediaContainer
-      mediaId={applicationMedia.applicationId}
+      mediaId={applicationMediaInstance.applicationMedia.applicationId}
       mediaInstanceId={applicationInstanceId}
-      filename={applicationMedia.filename}
-      kind='application'
-      rootMedia={applicationMedia.instanceApplication}
+      filename={applicationMediaInstance.applicationMedia.filename}
+      kind="application"
+      initState={applicationMediaInstance.applicationMedia.state}
+      rootMedia={applicationMediaInstance.instanceApplication}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
-      className='application-container'
+      className="application-container"
       popupElements={[
         applicationEffectsActive ? (
           <ApplicationEffectsSection
             applicationInstanceId={applicationInstanceId}
             lowerApplicationController={lowerApplicationController}
             tintColor={tintColor}
-            applicationMedia={applicationMedia}
+            applicationMediaInstance={applicationMediaInstance}
             applicationContainerRef={applicationContainerRef}
           />
         ) : null,

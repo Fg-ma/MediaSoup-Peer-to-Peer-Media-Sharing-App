@@ -15,7 +15,7 @@ export default function CloseButton({
 }) {
   return (
     <FgButton
-      className='flex items-center justify-end h-full !aspect-square pointer-events-auto'
+      className="pointer-events-auto flex !aspect-square h-full items-center justify-center"
       clickFunction={() => {
         lowerController.handleClose();
       }}
@@ -23,16 +23,16 @@ export default function CloseButton({
         return (
           <FgSVGElement
             src={closeIcon}
+            className="h-[85%] w-[85%] fill-fg-white"
             attributes={[
-              { key: "width", value: "60%" },
-              { key: "height", value: "60%" },
-              { key: "fill", value: "#f2f2f2" },
+              { key: "width", value: "100%" },
+              { key: "height", value: "100%" },
             ]}
           />
         );
       }}
       hoverContent={
-        <FgHoverContentStandard content='Close (x)' style='light' />
+        <FgHoverContentStandard content="Close (x)" style="light" />
       }
       options={{ hoverType: "below" }}
     />

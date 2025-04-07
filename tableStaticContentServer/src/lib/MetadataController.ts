@@ -1,5 +1,6 @@
 import { tableTopMongo } from "src";
 import {
+  onChangeContentStateType,
   onRequestCatchUpTableDataType,
   onRequestCatchUpVideoPositionType,
   onResponseCatchUpVideoPositionType,
@@ -31,7 +32,7 @@ class MetadataController {
   };
 
   onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
-    tableTopMongo.updateContentEffects(event);
+    tableTopMongo.onUpdateContentEffects(event);
 
     const { table_id, contentType, contentId, instanceId } = event.header;
 
@@ -43,8 +44,21 @@ class MetadataController {
     this.broadcaster.broadcastToTable(table_id, msg);
   };
 
+  onChangeContentState = (event: onChangeContentStateType) => {
+    tableTopMongo.onChangeContentState(event);
+
+    const { table_id, contentType, contentId } = event.header;
+
+    const msg = {
+      type: "contentStateChanged",
+      header: { contentType, contentId },
+      data: event.data,
+    };
+    this.broadcaster.broadcastToTable(table_id, msg);
+  };
+
   onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
-    await tableTopMongo.updateVideoPosition(event);
+    await tableTopMongo.onUpdateVideoPosition(event);
 
     const { table_id, contentType, contentId, instanceId } = event.header;
     const { videoPosition } = event.data;

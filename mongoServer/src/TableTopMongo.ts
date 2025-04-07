@@ -5,6 +5,7 @@ import TableSoundClips from "./lib/tableSoundClips/TableSoundClips";
 import TableApplications from "./lib/tableApplications/TableApplications";
 import TableText from "./lib/tableText/TableText";
 import {
+  onChangeContentStateType,
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
   onUpdateVideoPositionType,
@@ -191,7 +192,9 @@ class TableTopMongo {
     }
   };
 
-  updateContentPositioning = async (event: onUpdateContentPositioningType) => {
+  onUpdateContentPositioning = async (
+    event: onUpdateContentPositioningType
+  ) => {
     const { table_id, contentType, contentId, instanceId } = event.header;
     const { positioning } = event.data;
 
@@ -279,7 +282,7 @@ class TableTopMongo {
     }
   };
 
-  updateContentEffects = async (event: onUpdateContentEffectsType) => {
+  onUpdateContentEffects = async (event: onUpdateContentEffectsType) => {
     const { table_id, contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
@@ -360,7 +363,7 @@ class TableTopMongo {
     }
   };
 
-  updateVideoPosition = async (event: onUpdateVideoPositionType) => {
+  onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
     const { table_id, contentId, instanceId } = event.header;
 
     this.tableVideos?.uploads.editMetaData(
@@ -374,6 +377,48 @@ class TableTopMongo {
         ],
       }
     );
+  };
+
+  onChangeContentState = async (event: onChangeContentStateType) => {
+    const { table_id, contentType, contentId } = event.header;
+    const { state } = event.data;
+
+    switch (contentType) {
+      case "image":
+        this.tableImages?.uploads.editMetaData(
+          { table_id, imageId: contentId },
+          { state }
+        );
+        break;
+      case "video":
+        this.tableVideos?.uploads.editMetaData(
+          { table_id, videoId: contentId },
+          { state }
+        );
+        break;
+      case "text":
+        break;
+      case "soundClip":
+        this.tableSoundClips?.uploads.editMetaData(
+          { table_id, soundClipId: contentId },
+          { state }
+        );
+        break;
+      case "application":
+        this.tableApplications?.uploads.editMetaData(
+          { table_id, applicationId: contentId },
+          { state }
+        );
+        break;
+      case "svg":
+        this.tableSvgs?.uploads.editMetaData(
+          { table_id, svgId: contentId },
+          { state }
+        );
+        break;
+      default:
+        break;
+    }
   };
 }
 

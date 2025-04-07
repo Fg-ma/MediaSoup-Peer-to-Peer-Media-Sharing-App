@@ -4,6 +4,7 @@ import CloseButton from "./lib/closeButton/CloseButton";
 import { MediaContainerOptions } from "../typeConstant";
 import ReactButton from "../../../../elements/reactButton/ReactButton";
 import TabledButton from "./lib/tabledButton/TabledButton";
+import { ContentStateTypes } from "../../../../../../universal/contentTypeConstant";
 
 export default function UpperControls({
   reactionsPanelActive,
@@ -14,6 +15,7 @@ export default function UpperControls({
   mediaContainerOptions,
   fullscreen,
   backgroundMedia,
+  state,
 }: {
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,22 +25,23 @@ export default function UpperControls({
   mediaContainerOptions: MediaContainerOptions;
   fullscreen: boolean;
   backgroundMedia: boolean;
+  state: ContentStateTypes[];
 }) {
   return (
     <div
-      className={`flex media-upper-controls ${
+      className={`media-upper-controls flex ${
         mediaContainerOptions.controlsPlacement === "inside" ||
         fullscreen ||
         backgroundMedia
           ? "top-0"
           : "bottom-full"
-      } absolute w-full h-[12%] max-h-12 min-h-6 items-center justify-between z-20 pointer-events-none`}
+      } pointer-events-none absolute z-20 h-[10%] max-h-10 min-h-6 w-full items-center justify-between`}
     >
-      <div className='flex h-full w-max items-center justify-center'>
-        <TabledButton tabled={false} lowerController={lowerController} />
+      <div className="flex h-full w-max items-center justify-center">
+        <TabledButton state={state} lowerController={lowerController} />
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}
       </div>
-      <div className='flex grow h-full items-center justify-end space-x-2'>
+      <div className="flex h-full grow items-center justify-end space-x-2">
         {rightUpperControls &&
           rightUpperControls.length > 0 &&
           rightUpperControls}

@@ -34,7 +34,8 @@ export type OutGoingTableStaticContentMessages =
   | onUpdateContentEffectsType
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType;
+  | onResponseCatchUpVideoPositionType
+  | onChangeContentStateType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -171,6 +172,18 @@ type onResponseCatchUpVideoPositionType = {
   };
 };
 
+type onChangeContentStateType = {
+  type: "changeContentState";
+  header: {
+    table_id: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    state: ContentStateTypes[];
+  };
+};
+
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
   | onVideoUploadedToTableType
@@ -190,6 +203,7 @@ export type IncomingTableStaticContentMessages =
   | onDownloadCompleteType
   | onResponsedCatchUpTableDataType
   | onContentDeletedType
+  | onContentStateChangedType
   | onUpdatedContentEffectsType
   | onUpdatedVideoPositionType
   | onRequestedCatchUpVideoPositionType
@@ -579,6 +593,12 @@ export type onContentDeletedType = {
     contentId: string;
     instanceId: string;
   };
+};
+
+export type onContentStateChangedType = {
+  type: "contentStateChanged";
+  header: { contentType: StaticContentTypes; contentId: string };
+  data: { state: ContentStateTypes[] };
 };
 
 export type onUpdatedContentEffectsType = {

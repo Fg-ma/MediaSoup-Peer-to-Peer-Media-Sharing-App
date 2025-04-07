@@ -42,24 +42,30 @@ export default function GamesSection({
   };
 
   return (
-    <div className='flex w-full aspect-square'>
+    <div className="flex aspect-square w-full">
       <FgButton
         externalRef={gamesButtonRef}
         clickFunction={() => setGamesActive((prev) => !prev)}
-        className='flex h-full aspect-square items-center justify-center'
+        className="flex aspect-square h-full items-center justify-center"
         contentFunction={() => {
           return (
             <FgSVGElement
               src={joystickIcon}
-              className='h-full aspect-square'
+              className="aspect-square h-full"
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
                 { key: "fill", value: "black", id: "joystickBottom" },
                 { key: "stroke", value: "black" },
                 ...(gamesActive
-                  ? [{ key: "fill", value: "#e80110", id: "joystickTop" }]
-                  : [{ key: "fill", value: "none", id: "joystickTop" }]),
+                  ? [{ key: "fill", value: "#e62833", id: "joystickTop" }]
+                  : [
+                      {
+                        key: "fill",
+                        value: "none",
+                        id: "joystickTop",
+                      },
+                    ]),
               ]}
             />
           );
@@ -77,23 +83,23 @@ export default function GamesSection({
           content={
             <LazyScrollingContainer
               externalRef={gamesSectionRef}
-              className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
+              className={`small-vertical-scroll-bar grid h-full min-h-[9.5rem] w-full min-w-[9.5rem] gap-1 overflow-y-auto py-2 ${
                 cols === 3
                   ? "grid-cols-3"
                   : cols === 4
-                  ? "grid-cols-4"
-                  : cols === 5
-                  ? "grid-cols-5"
-                  : "grid-cols-6"
+                    ? "grid-cols-4"
+                    : cols === 5
+                      ? "grid-cols-5"
+                      : "grid-cols-6"
               }`}
               items={[
                 <FgButton
                   scrollingContainerRef={gamesSectionRef}
-                  className='flex border-gray-300 items-center justify-center min-w-12 max-w-24 aspect-square hover:border-fg-secondary rounded border-2 hover:border-3'
+                  className="flex aspect-square min-w-12 max-w-24 items-center justify-center rounded border-2 border-gray-300 hover:border-3 hover:border-fg-secondary"
                   contentFunction={() => (
                     <FgSVGElement
                       src={snakeGameIcon}
-                      className='h-full aspect-square'
+                      className="aspect-square h-full"
                       attributes={[
                         { key: "width", value: "100%" },
                         { key: "height", value: "100%" },
@@ -111,11 +117,11 @@ export default function GamesSection({
 
                     userMedia.current.gamesSignaling?.initiateGame(
                       "snake",
-                      `snake_game_${uuidv4()}`
+                      `snake_game_${uuidv4()}`,
                     );
                   }}
                   hoverContent={
-                    <FgHoverContentStandard content='Start snake game' />
+                    <FgHoverContentStandard content="Start snake game" />
                   }
                   options={{ hoverTimeoutDuration: 750 }}
                   aria-label={"Snake game"}
@@ -134,7 +140,7 @@ export default function GamesSection({
           minHeight={190}
           resizeCallback={gridColumnsChange}
           closeCallback={() => setGamesActive(false)}
-          closePosition='topRight'
+          closePosition="topRight"
           shadow={{ top: true, bottom: true }}
         />
       )}
