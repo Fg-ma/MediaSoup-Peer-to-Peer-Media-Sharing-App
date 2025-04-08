@@ -7,6 +7,10 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
+export type SvgListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class SvgMedia {
   svg: SVGSVGElement | undefined;
 
@@ -14,7 +18,7 @@ class SvgMedia {
   private totalSize = 0;
   blobURL: string | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
+  private svgListeners: Set<(message: SvgListenerTypes) => void> = new Set();
 
   aspect: number | undefined;
 
@@ -26,14 +30,14 @@ class SvgMedia {
     private getSVG: (
       contentType: StaticContentTypes,
       contentId: string,
-      key: string
+      key: string,
     ) => void,
     private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
     ) => void,
     private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
+    ) => void,
   ) {
     this.getSVG("svg", this.svgId, this.filename);
     this.addMessageListener(this.getSvgListener);
@@ -44,7 +48,7 @@ class SvgMedia {
 
     this.removeMessageListener(this.getSvgListener);
 
-    this.downloadCompleteListeners.clear();
+    this.svgListeners.clear();
   };
 
   reloadContent = () => {
@@ -62,7 +66,7 @@ class SvgMedia {
   };
 
   private getSvgListener = async (
-    message: IncomingTableStaticContentMessages
+    message: IncomingTableStaticContentMessages,
   ) => {
     if (message.type === "chunk") {
       const { contentType, contentId, key } = message.header;
@@ -112,20 +116,20 @@ class SvgMedia {
 
       this.aspect = this.getSvgAspectRatio();
 
-      this.downloadCompleteListeners.forEach((listener) => {
-        listener();
+      this.svgListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
       });
 
       this.removeMessageListener(this.getSvgListener);
     }
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addSvgListener = (listener: (message: SvgListenerTypes) => void): void => {
+    this.svgListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeSvgListener = (listener: (message: SvgListenerTypes) => void): void => {
+    this.svgListeners.delete(listener);
   };
 
   private getSvgAspectRatio = () => {
@@ -155,6 +159,14 @@ class SvgMedia {
     } catch (e) {}
 
     return undefined;
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.svgListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 }
 

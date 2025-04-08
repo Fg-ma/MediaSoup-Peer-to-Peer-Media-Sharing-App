@@ -66,7 +66,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        viid: string;
+        videoInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -114,13 +114,13 @@ class Uploads {
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const {
-        viid,
+        videoInstanceId,
         positioning,
         effects,
         effectStyles,
         videoPosition,
       } of updateData.instances) {
-        if (!viid) continue;
+        if (!videoInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -197,7 +197,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 vid: filter.videoId,
-                "i.viid": viid,
+                "i.viid": videoInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -213,6 +213,119 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; videoId: string },
+    updateData: {
+      videoInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+      effects: { [effectType in VideoEffectTypes]: boolean };
+      effectStyles: VideoEffectStylesType;
+      videoPosition: number;
+    }[]
+  ) => {
+    if (!this.tableVideosCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({
+          videoInstanceId,
+          positioning,
+          effects,
+          effectStyles,
+          videoPosition,
+        }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          const e = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) => videoEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          const es = {
+            "0": {
+              s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
+            },
+            "1": {
+              s: hideBackgroundEffectEncodingMap[
+                effectStyles.hideBackground.style
+              ],
+              c: effectStyles.hideBackground.color,
+            },
+            "2": {
+              c: effectStyles.tint.color,
+            },
+            "3": {
+              s: glassesEffectEncodingMap[effectStyles.glasses.style],
+            },
+            "4": {
+              s: beardsEffectEncodingMap[effectStyles.beards.style],
+            },
+            "5": {
+              s: mustachesEffectEncodingMap[effectStyles.mustaches.style],
+            },
+            "6": {
+              s: masksEffectEncodingMap[effectStyles.masks.style],
+            },
+            "7": {
+              s: hatsEffectEncodingMap[effectStyles.hats.style],
+            },
+            "8": {
+              s: petsEffectEncodingMap[effectStyles.pets.style],
+            },
+          };
+
+          const vp = videoPosition;
+
+          return {
+            viid: videoInstanceId,
+            p,
+            e,
+            es,
+            vp,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableVideosCollection.updateOne(
+          {
+            tid: filter.table_id,
+            vid: filter.videoId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };

@@ -61,7 +61,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        aiid: string;
+        applicationInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -107,12 +107,12 @@ class Uploads {
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const {
-        aiid,
+        applicationInstanceId,
         positioning,
         effects,
         effectStyles,
       } of updateData.instances) {
-        if (!aiid) continue;
+        if (!applicationInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -162,7 +162,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 aid: filter.applicationId,
-                "i.aiid": aiid,
+                "i.aiid": applicationInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -180,6 +180,86 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; applicationId: string },
+    updateData: {
+      applicationInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+      effects: { [effectType in ApplicationEffectTypes]?: boolean };
+      effectStyles: ApplicationEffectStylesType;
+    }[]
+  ) => {
+    if (!this.tableApplicationsCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({ applicationInstanceId, positioning, effects, effectStyles }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          const e = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) =>
+                applicationEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          const es = {
+            "0": {
+              s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
+            },
+            "1": {
+              c: effectStyles.tint.color,
+            },
+          };
+
+          return {
+            aiid: applicationInstanceId,
+            p,
+            e,
+            es,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableApplicationsCollection.updateOne(
+          {
+            tid: filter.table_id,
+            aid: filter.applicationId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };

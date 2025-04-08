@@ -273,8 +273,12 @@ export default function FgButton({
         onPointerEnter={fgButtonController.handlePointerEnter}
         onFocus={focusFunction}
         onBlur={blurFunction}
-        draggable={dragFunction !== undefined}
-        {...(dragFunction && {
+        draggable={
+          dragFunction !== undefined ||
+          startDragFunction !== undefined ||
+          stopDragFunction !== undefined
+        }
+        {...(startDragFunction && {
           onDragStart: (event: React.DragEvent<HTMLButtonElement>) => {
             if (fgButtonOptions.dragPreventDefault) {
               event.preventDefault();
@@ -290,11 +294,14 @@ export default function FgButton({
             startDragPosition.current = { x: event.clientX, y: event.clientY };
             if (startDragFunction) startDragFunction(event);
           },
+        })}
+        {...(dragFunction && {
           onDrag: (event: PointerEvent) => {
             fgButtonController.handleDragPointerMove(event);
           },
+        })}
+        {...(stopDragFunction && {
           onDragEnd: (event: React.DragEvent<HTMLButtonElement>) => {
-            startDragPosition.current = undefined;
             if (stopDragFunction) stopDragFunction(event);
           },
         })}

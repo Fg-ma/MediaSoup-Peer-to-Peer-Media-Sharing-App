@@ -1,6 +1,7 @@
 import { tableTopMongo } from "src";
 import {
   onChangeContentStateType,
+  onCreateNewInstancesType,
   onRequestCatchUpTableDataType,
   onRequestCatchUpVideoPositionType,
   onResponseCatchUpVideoPositionType,
@@ -105,6 +106,20 @@ class MetadataController {
       },
       data: {
         currentVideoPosition,
+      },
+    });
+  };
+
+  onCreateNewInstances = (event: onCreateNewInstancesType) => {
+    tableTopMongo.onCreateNewInstances(event);
+
+    const { table_id } = event.header;
+    const { updates } = event.data;
+
+    this.broadcaster.broadcastToTable(table_id, {
+      type: "createdNewInstances",
+      data: {
+        newInstances: updates,
       },
     });
   };

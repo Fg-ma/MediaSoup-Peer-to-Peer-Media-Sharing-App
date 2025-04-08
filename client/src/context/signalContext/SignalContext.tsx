@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 
 export type Signals =
   | undefined
@@ -16,6 +17,7 @@ export type Signals =
       type: "startInstancesDrag";
       data: {
         instances: {
+          contentType: StaticContentTypes;
           contentId: string;
           width: number;
           height: number;
@@ -24,9 +26,6 @@ export type Signals =
     }
   | {
       type: "stopInstancesDrag";
-      data: {
-        contentIds: string[];
-      };
     };
 
 export interface SignalContextProviderProps {

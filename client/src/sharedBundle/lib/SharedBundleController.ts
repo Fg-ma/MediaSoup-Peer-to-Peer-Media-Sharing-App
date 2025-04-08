@@ -2,6 +2,7 @@ import VideoMedia from "../../media/fgVideo/VideoMedia";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import {
   IncomingTableStaticContentMessages,
+  onCreatedNewInstancesType,
   onResponsedCatchUpTableDataType,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
@@ -45,7 +46,7 @@ class SharedBundleController extends SharedBundleSocket {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
-    >
+    >,
   ) {
     super();
   }
@@ -71,7 +72,7 @@ class SharedBundleController extends SharedBundleSocket {
   };
 
   private onResponsedCatchUpTableData = (
-    event: onResponsedCatchUpTableDataType
+    event: onResponsedCatchUpTableDataType,
   ) => {
     if (!this.tableStaticContentSocket.current) return;
 
@@ -87,7 +88,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener
+          this.tableStaticContentSocket.current.removeMessageListener,
         );
 
         this.userMedia.current.video.all[video.videoId] = newVideoMedia;
@@ -122,7 +123,7 @@ class SharedBundleController extends SharedBundleSocket {
               this.userEffects,
               this.userMedia,
               instance.positioning,
-              this.tableStaticContentSocket.current.requestCatchUpVideoPosition
+              this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
             );
         }
       }
@@ -136,7 +137,7 @@ class SharedBundleController extends SharedBundleSocket {
           image.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener
+          this.tableStaticContentSocket.current.removeMessageListener,
         );
 
         this.userMedia.current.image.all[image.imageId] = newImageMedia;
@@ -158,7 +159,7 @@ class SharedBundleController extends SharedBundleSocket {
               this.userDevice,
               this.deadbanding,
               this.userMedia,
-              instance.positioning
+              instance.positioning,
             );
         }
       }
@@ -172,7 +173,7 @@ class SharedBundleController extends SharedBundleSocket {
           svg.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener
+          this.tableStaticContentSocket.current.removeMessageListener,
         );
 
         this.userMedia.current.svg.all[svg.svgId] = newSvgMedia;
@@ -191,7 +192,7 @@ class SharedBundleController extends SharedBundleSocket {
               instance.svgInstanceId,
               this.userEffectsStyles,
               this.userEffects,
-              instance.positioning
+              instance.positioning,
             );
         }
       }
@@ -205,7 +206,7 @@ class SharedBundleController extends SharedBundleSocket {
           textItem.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener
+          this.tableStaticContentSocket.current.removeMessageListener,
         );
 
         this.userMedia.current.text.all[textItem.textId] = newTextMedia;
@@ -215,7 +216,7 @@ class SharedBundleController extends SharedBundleSocket {
             new TextMediaInstance(
               newTextMedia,
               instance.textInstanceId,
-              instance.positioning
+              instance.positioning,
             );
         }
       }
@@ -229,7 +230,7 @@ class SharedBundleController extends SharedBundleSocket {
           application.state,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener
+          this.tableStaticContentSocket.current.removeMessageListener,
         );
 
         this.userMedia.current.application.all[application.applicationId] =
@@ -253,7 +254,7 @@ class SharedBundleController extends SharedBundleSocket {
             this.userEffects,
             this.userDevice,
             this.userMedia,
-            instance.positioning
+            instance.positioning,
           );
         }
       }
@@ -264,8 +265,99 @@ class SharedBundleController extends SharedBundleSocket {
     }, 100);
   };
 
+  private onCreatedNewInstances = (event: onCreatedNewInstancesType) => {
+    const { newInstances } = event.data;
+
+    newInstances.forEach((instance) => {
+      switch (instance.contentType) {
+        case "svg":
+          if (this.userMedia.current.svg.all[instance.contentId]) {
+            instance.instances.forEach((ins) => {
+              this.userMedia.current.svg.instances[ins.instanceId] =
+                new SvgMediaInstance(
+                  this.userMedia.current.svg.all[instance.contentId],
+                  ins.instanceId,
+                  this.userEffectsStyles,
+                  this.userEffects,
+                  ins.positioning,
+                );
+            });
+          }
+          break;
+        case "application":
+          if (this.userMedia.current.application.all[instance.contentId]) {
+            instance.instances.forEach((ins) => {
+              this.userMedia.current.application.instances[ins.instanceId] =
+                new ApplicationMediaInstance(
+                  this.userMedia.current.application.all[instance.contentId],
+                  ins.instanceId,
+                  this.userEffectsStyles,
+                  this.userEffects,
+                  this.userDevice,
+                  this.userMedia,
+                  ins.positioning,
+                );
+            });
+          }
+          break;
+        case "image":
+          if (this.userMedia.current.image.all[instance.contentId]) {
+            instance.instances.forEach((ins) => {
+              this.userMedia.current.image.instances[ins.instanceId] =
+                new ImageMediaInstance(
+                  this.userMedia.current.image.all[instance.contentId],
+                  ins.instanceId,
+                  this.userEffectsStyles,
+                  this.userEffects,
+                  this.userDevice,
+                  this.deadbanding,
+                  this.userMedia,
+                  ins.positioning,
+                );
+            });
+          }
+          break;
+        case "text":
+          if (this.userMedia.current.text.all[instance.contentId]) {
+            instance.instances.forEach((ins) => {
+              this.userMedia.current.text.instances[ins.instanceId] =
+                new TextMediaInstance(
+                  this.userMedia.current.text.all[instance.contentId],
+                  ins.instanceId,
+                  ins.positioning,
+                );
+            });
+          }
+          break;
+        case "video":
+          if (this.userMedia.current.video.all[instance.contentId]) {
+            instance.instances.forEach((ins) => {
+              if (this.tableStaticContentSocket.current)
+                this.userMedia.current.video.instances[ins.instanceId] =
+                  new VideoMediaInstance(
+                    this.userMedia.current.video.all[instance.contentId],
+                    ins.instanceId,
+                    this.userDevice,
+                    this.deadbanding,
+                    this.userEffectsStyles,
+                    this.userEffects,
+                    this.userMedia,
+                    ins.positioning,
+                    this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
+                  );
+            });
+          }
+          break;
+        case "soundClip":
+          break;
+      }
+    });
+
+    this.setRerender((prev) => !prev);
+  };
+
   handleTableStaticContentMessage = (
-    message: IncomingTableStaticContentMessages
+    message: IncomingTableStaticContentMessages,
   ) => {
     switch (message.type) {
       case "responsedCatchUpTableData":
@@ -285,7 +377,7 @@ class SharedBundleController extends SharedBundleSocket {
               this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
 
             this.userMedia.current.video.all[contentId] = newVideoMedia;
@@ -310,7 +402,7 @@ class SharedBundleController extends SharedBundleSocket {
                   },
                   rotation: 0,
                 },
-                this.tableStaticContentSocket.current.requestCatchUpVideoPosition
+                this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
               );
           }
 
@@ -337,7 +429,7 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
 
             this.userMedia.current.image.all[contentId] = newImageMedia;
@@ -361,7 +453,7 @@ class SharedBundleController extends SharedBundleSocket {
                     y: 25,
                   },
                   rotation: 0,
-                }
+                },
               );
           }
           this.setRerender((prev) => !prev);
@@ -380,7 +472,7 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
           }
 
@@ -400,7 +492,7 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
 
             this.userMedia.current.svg.all[contentId] = newSvgMedia;
@@ -421,7 +513,7 @@ class SharedBundleController extends SharedBundleSocket {
                     y: 25,
                   },
                   rotation: 0,
-                }
+                },
               );
           }
 
@@ -441,7 +533,7 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
           }
 
@@ -470,7 +562,7 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener
+              this.tableStaticContentSocket.current.removeMessageListener,
             );
 
             this.userMedia.current.text.all[contentId] = newTextMedia;
@@ -493,6 +585,9 @@ class SharedBundleController extends SharedBundleSocket {
         break;
       case "contentDeleted":
         this.setRerender((prev) => !prev);
+        break;
+      case "createdNewInstances":
+        this.onCreatedNewInstances(message);
         break;
       default:
         break;

@@ -5,17 +5,23 @@ export default function LazyScrollingContainer({
   externalRef,
   className,
   items,
+  clickFunction,
 }: {
   externalRef: React.RefObject<HTMLDivElement>;
   className: string;
   items: (React.ReactNode | null)[];
+  clickFunction?: (event: React.MouseEvent) => void;
 }) {
   const scrollingContainerRef = externalRef
     ? externalRef
     : useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={scrollingContainerRef} className={className}>
+    <div
+      ref={scrollingContainerRef}
+      className={className}
+      onClick={clickFunction}
+    >
       {items.map(
         (item, index) =>
           item !== null && (
@@ -24,7 +30,7 @@ export default function LazyScrollingContainer({
               scrollingContainerRef={scrollingContainerRef}
               item={item}
             />
-          )
+          ),
       )}
     </div>
   );

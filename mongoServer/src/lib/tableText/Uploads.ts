@@ -47,7 +47,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        xiid: string;
+        textInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -91,8 +91,8 @@ class Uploads {
 
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
-      for (const { xiid, positioning } of updateData.instances) {
-        if (!xiid) continue;
+      for (const { textInstanceId, positioning } of updateData.instances) {
+        if (!textInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -120,7 +120,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 xid: filter.textId,
-                "i.xiid": xiid,
+                "i.xiid": textInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -136,6 +136,66 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; textId: string },
+    updateData: {
+      textInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+    }[]
+  ) => {
+    if (!this.tableTextCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({ textInstanceId, positioning }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          return {
+            xiid: textInstanceId,
+            p,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableTextCollection.updateOne(
+          {
+            tid: filter.table_id,
+            xid: filter.textId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };

@@ -54,7 +54,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        siid: string;
+        soundClipInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -99,8 +99,12 @@ class Uploads {
 
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
-      for (const { siid, positioning, effects } of updateData.instances) {
-        if (!siid) continue;
+      for (const {
+        soundClipInstanceId,
+        positioning,
+        effects,
+      } of updateData.instances) {
+        if (!soundClipInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -139,7 +143,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 sid: filter.soundClipId,
-                "i.siid": siid,
+                "i.siid": soundClipInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -155,6 +159,75 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; soundClipId: string },
+    updateData: {
+      soundClipInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+      effects: { [effectType in SoundClipEffectTypes]: boolean };
+    }[]
+  ) => {
+    if (!this.tableSoundClipsCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({ soundClipInstanceId, positioning, effects }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          const e = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) =>
+                soundClipEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          return {
+            siid: soundClipInstanceId,
+            p,
+            e,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableSoundClipsCollection.updateOne(
+          {
+            tid: filter.table_id,
+            sid: filter.soundClipId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };

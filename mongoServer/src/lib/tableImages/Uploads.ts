@@ -65,7 +65,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        iiid: string;
+        imageInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -112,12 +112,12 @@ class Uploads {
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const {
-        iiid,
+        imageInstanceId,
         positioning,
         effects,
         effectStyles,
       } of updateData.instances) {
-        if (!iiid) continue;
+        if (!imageInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -190,7 +190,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 iid: filter.imageId,
-                "i.iiid": iiid,
+                "i.iiid": imageInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -206,6 +206,109 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; imageId: string },
+    updateData: {
+      imageInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+      effects: { [effectType in ImageEffectTypes]: boolean };
+      effectStyles: ImageEffectStylesType;
+    }[]
+  ) => {
+    if (!this.tableImagesCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({ imageInstanceId, positioning, effects, effectStyles }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          const e = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) => imageEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          const es = {
+            "0": {
+              s: postProcessEffectEncodingMap[effectStyles.postProcess.style],
+            },
+            "1": {
+              s: hideBackgroundEffectEncodingMap[
+                effectStyles.hideBackground.style
+              ],
+              c: effectStyles?.hideBackground?.color,
+            },
+            "2": {
+              c: effectStyles?.tint?.color,
+            },
+            "3": {
+              s: glassesEffectEncodingMap[effectStyles.glasses.style],
+            },
+            "4": {
+              s: beardsEffectEncodingMap[effectStyles.beards.style],
+            },
+            "5": {
+              s: mustachesEffectEncodingMap[effectStyles.mustaches.style],
+            },
+            "6": {
+              s: masksEffectEncodingMap[effectStyles.masks.style],
+            },
+            "7": {
+              s: hatsEffectEncodingMap[effectStyles.hats.style],
+            },
+            "8": {
+              s: petsEffectEncodingMap[effectStyles.pets.style],
+            },
+          };
+
+          return {
+            iiid: imageInstanceId,
+            p,
+            e,
+            es,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableImagesCollection.updateOne(
+          {
+            tid: filter.table_id,
+            iid: filter.imageId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };

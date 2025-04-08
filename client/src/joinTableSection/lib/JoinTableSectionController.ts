@@ -75,7 +75,7 @@ class JoinTableSectionController {
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private cleanupController: CleanupController,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   joinTable = () => {
@@ -108,7 +108,7 @@ class JoinTableSectionController {
         "wss://localhost:8043",
         this.table_id.current,
         this.username.current,
-        this.instance.current
+        this.instance.current,
       );
 
       this.tableStaticContentSocket.current =
@@ -118,10 +118,6 @@ class JoinTableSectionController {
           this.username.current,
           this.instance.current,
           this.userMedia,
-          this.userEffects,
-          this.userEffectsStyles,
-          this.userDevice,
-          this.deadbanding
         );
 
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
@@ -130,7 +126,7 @@ class JoinTableSectionController {
         this.instance.current,
         "wss://localhost:8042",
         this.userMedia,
-        this.bundlesController
+        this.bundlesController,
       );
 
       this.mediasoupSocket.current = new MediasoupSocketController(
@@ -142,7 +138,7 @@ class JoinTableSectionController {
         this.consumersController,
         this.permissionsController,
         this.metadata,
-        this.cleanupController
+        this.cleanupController,
       );
 
       this.setIsInTable(true);

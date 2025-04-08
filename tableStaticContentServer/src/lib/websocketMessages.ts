@@ -45,6 +45,9 @@ const handleMessage = (
     case "responseCatchUpVideoPosition":
       metadataController.onResponseCatchUpVideoPosition(event);
       break;
+    case "createNewInstances":
+      metadataController.onCreateNewInstances(event);
+      break;
     default:
       break;
   }

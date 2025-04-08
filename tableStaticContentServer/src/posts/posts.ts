@@ -204,14 +204,17 @@ class Posts {
 
             // Cleanup session
             uploadSessions.delete(uploadId);
-
-            res.cork(() => {
-              res.writeStatus("200 OK").end("Upload complete");
-            });
           });
 
         file.on("error", (err) => {
           console.error(`Error writing file:`, err);
+        });
+      });
+
+      bb.on("close", () => {
+        res.cork(() => {
+          console.log("Upload complete");
+          res.writeStatus("200 OK").end("That's all folks!");
         });
       });
 

@@ -35,7 +35,8 @@ export type OutGoingTableStaticContentMessages =
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
-  | onChangeContentStateType;
+  | onChangeContentStateType
+  | onCreateNewInstancesType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -184,6 +185,33 @@ type onChangeContentStateType = {
   };
 };
 
+type onCreateNewInstancesType = {
+  type: "createNewInstances";
+  header: {
+    table_id: string;
+  };
+  data: {
+    updates: {
+      contentType: StaticContentTypes;
+      contentId: string;
+      instances: {
+        instanceId: string;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }[];
+    }[];
+  };
+};
+
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
   | onVideoUploadedToTableType
@@ -207,7 +235,8 @@ export type IncomingTableStaticContentMessages =
   | onUpdatedContentEffectsType
   | onUpdatedVideoPositionType
   | onRequestedCatchUpVideoPositionType
-  | onRespondedCatchUpVideoPositionType;
+  | onRespondedCatchUpVideoPositionType
+  | onCreatedNewInstancesType;
 
 export type onVideoUploadedToTableType = {
   type: "videoUploadedToTable";
@@ -652,5 +681,29 @@ export type onRespondedCatchUpVideoPositionType = {
   };
   data: {
     currentVideoPosition: number;
+  };
+};
+
+export type onCreatedNewInstancesType = {
+  type: "createdNewInstances";
+  data: {
+    newInstances: {
+      contentType: StaticContentTypes;
+      contentId: string;
+      instances: {
+        instanceId: string;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }[];
+    }[];
   };
 };

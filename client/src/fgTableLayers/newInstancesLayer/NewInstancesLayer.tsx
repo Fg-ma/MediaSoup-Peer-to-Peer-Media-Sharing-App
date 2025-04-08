@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   Signals,
   useSignalContext,
 } from "../../context/signalContext/SignalContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 
 type InstanceType = {
+  contentType: StaticContentTypes;
   contentId: string;
   width: number;
   height: number;
@@ -17,12 +21,15 @@ export default function NewInstancesLayer({
 }: {
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
+  const { tableStaticContentSocket } = useSocketContext();
   const { addSignalListener, removeSignalListener } = useSignalContext();
 
-  const [newInstances, setNewInstances] = useState<InstanceType[]>([]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hideInstances, setHideInstances] = useState(false);
+  const newInstances = useRef<InstanceType[]>([]);
   const newInstanceLayerRef = useRef<HTMLDivElement>(null);
+
+  const [_, setRerender] = useState(false);
 
   const handleSignals = (event: Signals) => {
     if (!event) return;
@@ -32,25 +39,107 @@ export default function NewInstancesLayer({
         {
           const { instances } = event.data;
 
-          setNewInstances((prev) => [
-            ...prev,
+          newInstances.current = [
+            ...newInstances.current,
             ...instances.map((instance) => ({
+              contentType: instance.contentType,
               contentId: instance.contentId,
               width: instance.width,
               height: instance.height,
               x: 0,
               y: 0,
             })),
-          ]);
+          ];
+          setRerender((prev) => !prev);
         }
         break;
       case "stopInstancesDrag":
         {
-          const { contentIds } = event.data;
+          const instancesToUpload = newInstances.current.reduce(
+            (acc, instance) => {
+              const existing = acc.find(
+                (item) =>
+                  item.contentType === instance.contentType &&
+                  item.contentId === instance.contentId,
+              );
 
-          setNewInstances((prev) =>
-            prev.filter((instance) => !contentIds.includes(instance.contentId)),
+              if (existing) {
+                existing.instances.push({
+                  positioning: {
+                    position: {
+                      left:
+                        (instance.x /
+                          (newInstanceLayerRef.current?.clientWidth ?? 1)) *
+                        100,
+                      top:
+                        (instance.y /
+                          (newInstanceLayerRef.current?.clientHeight ?? 1)) *
+                        100,
+                    },
+                    scale: {
+                      x: instance.width,
+                      y: instance.height,
+                    },
+                    rotation: 0,
+                  },
+                });
+              } else {
+                acc.push({
+                  contentType: instance.contentType,
+                  contentId: instance.contentId,
+                  instances: [
+                    {
+                      positioning: {
+                        position: {
+                          left:
+                            (instance.x /
+                              (newInstanceLayerRef.current?.clientWidth ?? 1)) *
+                            100,
+                          top:
+                            (instance.y /
+                              (newInstanceLayerRef.current?.clientHeight ??
+                                1)) *
+                            100,
+                        },
+                        scale: {
+                          x: instance.width,
+                          y: instance.height,
+                        },
+                        rotation: 0,
+                      },
+                    },
+                  ],
+                });
+              }
+
+              return acc;
+            },
+            [] as {
+              contentType: StaticContentTypes;
+              contentId: string;
+              instances: {
+                positioning: {
+                  position: { left: number; top: number };
+                  scale: { x: number; y: number };
+                  rotation: number;
+                };
+              }[];
+            }[],
           );
+
+          tableStaticContentSocket.current?.createNewInstances(
+            instancesToUpload.map((instance) => ({
+              contentType: instance.contentType,
+              contentId: instance.contentId,
+              instances: instance.instances.map((inst) => ({
+                instanceId: uuidv4(),
+                positioning: inst.positioning,
+              })),
+            })),
+          );
+
+          newInstances.current = [];
+          setRerender((prev) => !prev);
         }
         break;
       default:
@@ -102,19 +191,19 @@ export default function NewInstancesLayer({
   };
 
   useEffect(() => {
-    if (newInstances.length === 0) return;
+    if (newInstances.current.length === 0) return;
 
     window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [newInstances.length]);
+  }, [newInstances.current.length]);
 
   const placeInstances = () => {
     if (!newInstanceLayerRef.current) return;
     const containerRect = newInstanceLayerRef.current.getBoundingClientRect();
-    const instances = [...newInstances];
+    const instances = [...newInstances.current];
     const GAP = 4;
 
     const gridLeft = mousePosition.x;
@@ -152,14 +241,15 @@ export default function NewInstancesLayer({
       currentRowTop = gridBottom - currentRowMaxHeight;
     });
 
-    setNewInstances(newPositions);
+    newInstances.current = newPositions;
+    setRerender((prev) => !prev);
   };
 
   useEffect(() => {
-    if (newInstances.length > 0) {
+    if (newInstances.current.length > 0) {
       placeInstances();
     }
-  }, [mousePosition, newInstances.length]);
+  }, [mousePosition, newInstances.current.length]);
 
   return (
     <div
@@ -167,7 +257,7 @@ export default function NewInstancesLayer({
       className="pointer-events-none absolute left-0 top-0 z-[10000] h-full w-full bg-transparent"
     >
       {!hideInstances &&
-        newInstances.map((instance) => (
+        newInstances.current.map((instance) => (
           <div
             key={instance.contentId}
             className="absolute rounded border-4 border-dashed border-fg-red border-opacity-80 bg-fg-red-light bg-opacity-45"

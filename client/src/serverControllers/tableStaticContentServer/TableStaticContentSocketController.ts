@@ -2,13 +2,9 @@ import {
   ApplicationEffectStylesType,
   ImageEffectStylesType,
   SvgEffectStylesType,
-  UserEffectsStylesType,
-  UserEffectsType,
   VideoEffectStylesType,
 } from "../../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import Deadbanding from "../../babylon/Deadbanding";
-import UserDevice from "../../lib/UserDevice";
 import {
   IncomingTableStaticContentMessages,
   onContentDeletedType,
@@ -34,10 +30,6 @@ class TableStaticContentSocketController {
     private username: string,
     private instance: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
   ) {
     this.connect(this.url);
   }
@@ -278,6 +270,37 @@ class TableStaticContentSocketController {
     });
   };
 
+  createNewInstances = (
+    updates: {
+      contentType: StaticContentTypes;
+      contentId: string;
+      instances: {
+        instanceId: string;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }[];
+    }[],
+  ) => {
+    this.sendMessage({
+      type: "createNewInstances",
+      header: {
+        table_id: this.table_id,
+      },
+      data: {
+        updates,
+      },
+    });
+  };
+
   private handleMessage = (
     message: { type: undefined } | IncomingTableStaticContentMessages,
   ) => {
@@ -330,7 +353,7 @@ class TableStaticContentSocketController {
     const { contentType, contentId } = event.header;
     const { state } = event.data;
 
-    this.userMedia.current[contentType].all[contentId].state = state;
+    this.userMedia.current[contentType].all[contentId].setState(state);
   };
 
   private onRequestedCatchUpVideoPosition = (

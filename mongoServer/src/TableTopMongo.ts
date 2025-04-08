@@ -6,6 +6,7 @@ import TableApplications from "./lib/tableApplications/TableApplications";
 import TableText from "./lib/tableText/TableText";
 import {
   onChangeContentStateType,
+  onCreateNewInstancesType,
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
   onUpdateVideoPositionType,
@@ -21,6 +22,15 @@ import TableSvgs from "./lib/tableSvgs/TableSvgs";
 import UserSvgs from "./lib/userSvgs/UserSvgs";
 import {
   ApplicationEffectStylesType,
+  defaultApplicationEffects,
+  defaultApplicationEffectsStyles,
+  defaultAudioEffects,
+  defaultImageEffects,
+  defaultImageEffectsStyles,
+  defaultSvgEffects,
+  defaultSvgEffectsStyles,
+  defaultVideoEffects,
+  defaultVideoEffectsStyles,
   ImageEffectStylesType,
   SvgEffectStylesType,
   VideoEffectStylesType,
@@ -205,7 +215,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                iiid: instanceId,
+                imageInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -218,7 +228,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                siid: instanceId,
+                svgInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -231,7 +241,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                viid: instanceId,
+                videoInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -244,7 +254,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                xiid: instanceId,
+                textInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -257,7 +267,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                siid: instanceId,
+                soundClipInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -270,7 +280,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                aiid: instanceId,
+                applicationInstanceId: instanceId,
                 positioning,
               },
             ],
@@ -293,7 +303,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                iiid: instanceId,
+                imageInstanceId: instanceId,
                 effects,
                 effectStyles: effectStyles as ImageEffectStylesType,
               },
@@ -307,7 +317,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                viid: instanceId,
+                videoInstanceId: instanceId,
                 effects,
                 effectStyles: effectStyles as VideoEffectStylesType,
               },
@@ -323,7 +333,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                siid: instanceId,
+                soundClipInstanceId: instanceId,
                 effects,
               },
             ],
@@ -336,7 +346,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                aiid: instanceId,
+                applicationInstanceId: instanceId,
                 effects,
                 effectStyles: effectStyles as ApplicationEffectStylesType,
               },
@@ -350,7 +360,7 @@ class TableTopMongo {
           {
             instances: [
               {
-                siid: instanceId,
+                svgInstanceId: instanceId,
                 effects,
                 effectStyles: effectStyles as SvgEffectStylesType,
               },
@@ -371,7 +381,7 @@ class TableTopMongo {
       {
         instances: [
           {
-            viid: instanceId,
+            videoInstanceId: instanceId,
             videoPosition: event.data.videoPosition,
           },
         ],
@@ -397,6 +407,10 @@ class TableTopMongo {
         );
         break;
       case "text":
+        this.tableVideos?.uploads.editMetaData(
+          { table_id, videoId: contentId },
+          { state }
+        );
         break;
       case "soundClip":
         this.tableSoundClips?.uploads.editMetaData(
@@ -419,6 +433,82 @@ class TableTopMongo {
       default:
         break;
     }
+  };
+
+  onCreateNewInstances = async (event: onCreateNewInstancesType) => {
+    const { table_id } = event.header;
+    const { updates } = event.data;
+
+    updates.forEach((update) => {
+      switch (update.contentType) {
+        case "image":
+          this.tableImages?.uploads.addNewInstances(
+            { table_id, imageId: update.contentId },
+            update.instances.map((instance) => ({
+              imageInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+              effects: defaultImageEffects,
+              effectStyles: defaultImageEffectsStyles,
+            }))
+          );
+          break;
+        case "video":
+          this.tableVideos?.uploads.addNewInstances(
+            { table_id, videoId: update.contentId },
+            update.instances.map((instance) => ({
+              videoInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+              effects: defaultVideoEffects,
+              effectStyles: defaultVideoEffectsStyles,
+              videoPosition: 0,
+            }))
+          );
+          break;
+        case "text":
+          this.tableText?.uploads.addNewInstances(
+            { table_id, textId: update.contentId },
+            update.instances.map((instance) => ({
+              textInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+            }))
+          );
+          break;
+        case "soundClip":
+          this.tableSoundClips?.uploads.addNewInstances(
+            { table_id, soundClipId: update.contentId },
+            update.instances.map((instance) => ({
+              soundClipInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+              effects: defaultAudioEffects,
+            }))
+          );
+          break;
+        case "application":
+          this.tableApplications?.uploads.addNewInstances(
+            { table_id, applicationId: update.contentId },
+            update.instances.map((instance) => ({
+              applicationInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+              effects: defaultApplicationEffects,
+              effectStyles: defaultApplicationEffectsStyles,
+            }))
+          );
+          break;
+        case "svg":
+          this.tableSvgs?.uploads.addNewInstances(
+            { table_id, svgId: update.contentId },
+            update.instances.map((instance) => ({
+              svgInstanceId: instance.instanceId,
+              positioning: instance.positioning,
+              effects: defaultSvgEffects,
+              effectStyles: defaultSvgEffectsStyles,
+            }))
+          );
+          break;
+        default:
+          break;
+      }
+    });
   };
 }
 

@@ -144,7 +144,8 @@ export type MessageTypes =
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
-  | onChangeContentStateType;
+  | onChangeContentStateType
+  | onCreateNewInstancesType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -279,6 +280,33 @@ export type onChangeContentStateType = {
   };
   data: {
     state: ContentStateTypes[];
+  };
+};
+
+export type onCreateNewInstancesType = {
+  type: "createNewInstances";
+  header: {
+    table_id: string;
+  };
+  data: {
+    updates: {
+      contentType: StaticContentTypes;
+      contentId: string;
+      instances: {
+        instanceId: string;
+        positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        };
+      }[];
+    }[];
   };
 };
 

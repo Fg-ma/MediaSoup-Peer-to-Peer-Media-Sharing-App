@@ -55,7 +55,7 @@ class Uploads {
       filename?: string;
       mimeType?: string;
       instances?: {
-        siid: string;
+        svgInstanceId: string;
         positioning?: {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
@@ -102,12 +102,12 @@ class Uploads {
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
       for (const {
-        siid,
+        svgInstanceId,
         positioning,
         effects,
         effectStyles,
       } of updateData.instances) {
-        if (!siid) continue;
+        if (!svgInstanceId) continue;
 
         const instanceSetFields: Record<string, any> = {};
 
@@ -170,7 +170,7 @@ class Uploads {
               filter: {
                 tid: filter.table_id,
                 sid: filter.svgId,
-                "i.siid": siid,
+                "i.siid": svgInstanceId,
               },
               update: { $set: instanceSetFields },
             },
@@ -186,6 +186,99 @@ class Uploads {
         return result;
       } catch (err) {
         console.error("Bulk write error:", err);
+      }
+    }
+  };
+
+  addNewInstances = async (
+    filter: { table_id: string; svgId: string },
+    updateData: {
+      svgInstanceId: string;
+      positioning: {
+        position: { left: number; top: number };
+        scale: { x: number; y: number };
+        rotation: number;
+      };
+      effects: { [effectType in SvgEffectTypes]: boolean };
+      effectStyles: SvgEffectStylesType;
+    }[]
+  ) => {
+    if (!this.tableSvgsCollection) {
+      console.error("Database not connected");
+      return;
+    }
+
+    if (updateData && updateData.length > 0) {
+      const pushInstances = updateData.map(
+        ({ svgInstanceId, positioning, effects, effectStyles }) => {
+          const p: any = {
+            p: {
+              l: positioning.position.left,
+              t: positioning.position.top,
+            },
+            s: {
+              x: positioning.scale.x,
+              y: positioning.scale.y,
+            },
+            r: positioning.rotation,
+          };
+
+          const e = Object.keys(effects)
+            .filter((effect) => effects[effect as keyof typeof effects])
+            .map(
+              (effect) => svgEffectEncodingMap[effect as keyof typeof effects]
+            );
+
+          const es = {
+            "0": {
+              c: effectStyles.shadow.shadowColor,
+              s: effectStyles.shadow.strength,
+              x: effectStyles.shadow.offsetX,
+              y: effectStyles.shadow.offsetY,
+            },
+            "1": { s: effectStyles.blur.strength },
+            "2": { s: effectStyles.grayscale.scale },
+            "3": { s: effectStyles.saturate.saturation },
+            "4": { c: effectStyles.colorOverlay.overlayColor },
+            "5": {
+              f: effectStyles.waveDistortion.frequency,
+              s: effectStyles.waveDistortion.strength,
+            },
+            "6": {
+              n: effectStyles.crackedGlass.density,
+              d: effectStyles.crackedGlass.detail,
+              s: effectStyles.crackedGlass.strength,
+            },
+            "7": { c: effectStyles.neonGlow.neonColor },
+          };
+
+          return {
+            siid: svgInstanceId,
+            p,
+            e,
+            es,
+          };
+        }
+      );
+
+      try {
+        const result = await this.tableSvgsCollection.updateOne(
+          {
+            tid: filter.table_id,
+            sid: filter.svgId,
+          },
+          {
+            $push: {
+              i: {
+                $each: pushInstances,
+              },
+            },
+          }
+        );
+
+        return result;
+      } catch (err) {
+        console.error("Update error:", err);
       }
     }
   };
