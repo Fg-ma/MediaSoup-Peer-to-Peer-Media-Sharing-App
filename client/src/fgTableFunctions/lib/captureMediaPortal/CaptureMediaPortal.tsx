@@ -94,7 +94,7 @@ export default function CaptureMediaPortal({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] =
     useState<ActivePages>(defaultActivePages);
@@ -145,7 +145,7 @@ export default function CaptureMediaPortal({
     setDelayCountDown,
     delayTimeout,
     delayCountDownInterval,
-    delaying
+    delaying,
   );
 
   const handleResize = () => {
@@ -169,8 +169,8 @@ export default function CaptureMediaPortal({
     setControlsHeight(
       Math.max(
         24,
-        Math.min(48, captureMainContainerRef.current.clientHeight * 0.12)
-      )
+        Math.min(48, captureMainContainerRef.current.clientHeight * 0.12),
+      ),
     );
   };
 
@@ -216,30 +216,30 @@ export default function CaptureMediaPortal({
     if (captureMedia.current)
       captureMedia.current.video.addEventListener(
         "loadedmetadata",
-        handleResize
+        handleResize,
       );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        captureMediaController.handleKeyDown
+        captureMediaController.handleKeyDown,
       );
       document.removeEventListener("keyup", captureMediaController.handleKeyUp);
       if (captureMedia.current)
         captureMedia.current.video.removeEventListener(
           "loadedmetadata",
-          handleResize
+          handleResize,
         );
     };
   }, []);
 
   return !finalizeCapture && !delaying.current ? (
     <FgPortal
-      type='staticTopDomain'
+      type="staticTopDomain"
       top={0}
       left={0}
       zValue={499999998}
-      className='w-full h-full'
+      className="h-full w-full"
       content={
         <div
           ref={captureMediaPortalRef}
@@ -250,29 +250,29 @@ export default function CaptureMediaPortal({
             settingsActive
               ? "in-capture-media"
               : ""
-          } capture-media-container w-full h-full bg-fg-tone-black-4 bg-opacity-45 pointer-events-none`}
+          } capture-media-container pointer-events-none h-full w-full bg-fg-tone-black-4 bg-opacity-45`}
         >
           <div
             ref={captureMainContainerRef}
-            className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
+            className="absolute left-1/2 top-1/2 flex h-[95%] w-4/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
           >
             <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
+              } pointer-events-auto relative overflow-hidden rounded-md bg-transparent`}
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
-              initial='init'
-              animate='animate'
-              exit='init'
+              initial="init"
+              animate="animate"
+              exit="init"
               transition={CaptureMediaTransition}
             >
-              <div className='capture-media-overlay-container w-full h-full z-10 absolute top-0 left-0 pointer-events-none'>
+              <div className="capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-10 h-full w-full">
                 {captureMediaTypeActive && (
                   <TypeSection
                     captureMedia={captureMedia}
@@ -290,7 +290,7 @@ export default function CaptureMediaPortal({
                     captureContainerRef={captureContainerRef}
                   />
                 )}
-                <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center'>
+                <div className="absolute left-0 top-[1%] flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center">
                   <CloseButton
                     delaying={delaying}
                     finalizeCapture={finalizeCapture}
@@ -298,9 +298,9 @@ export default function CaptureMediaPortal({
                     captureMediaController={captureMediaController}
                   />
                 </div>
-                <div className='flex bottom-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center space-x-3'>
+                <div className="absolute bottom-[1%] left-0 flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center space-x-3">
                   <div
-                    className='flex justify-end h-full items-center overflow-hidden'
+                    className="flex h-full items-center justify-end overflow-hidden"
                     style={{ width: `calc(50% - ${controlsHeight / 2}px` }}
                   >
                     <MediaTypeButton
@@ -317,7 +317,7 @@ export default function CaptureMediaPortal({
                     captureMediaController={captureMediaController}
                   />
                   <div
-                    className='flex justify-between h-full items-center pr-3 overflow-hidden'
+                    className="flex h-full items-center justify-between overflow-hidden pr-3"
                     style={{ width: `calc(50% - ${controlsHeight / 2}px` }}
                   >
                     <EffectsButton
@@ -349,8 +349,8 @@ export default function CaptureMediaPortal({
     />
   ) : delaying.current ? (
     <FgPortal
-      className='w-full h-full'
-      type='staticTopDomain'
+      className="h-full w-full"
+      type="staticTopDomain"
       top={0}
       left={0}
       zValue={499999998}
@@ -359,27 +359,27 @@ export default function CaptureMediaPortal({
           ref={captureMediaPortalRef}
           className={`${
             inCaptureMedia || settingsActive ? "in-capture-media" : ""
-          } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45`}
+          } capture-media-container aspect h-full w-full bg-fg-tone-black-4 bg-opacity-45`}
         >
-          <div className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
+          <div className="absolute left-1/2 top-1/2 flex h-[95%] w-4/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
             <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
+              } pointer-events-auto relative overflow-hidden rounded-md bg-transparent`}
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
-              initial='init'
-              animate='animate'
-              exit='init'
+              initial="init"
+              animate="animate"
+              exit="init"
               transition={CaptureMediaTransition}
             >
-              <div className='flex capture-media-overlay-container items-center z-20 justify-center w-full h-full absolute top-0 left-0 pointer-events-none'>
-                <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center z-[100]'>
+              <div className="flex capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 h-full w-full items-center justify-center">
+                <div className="absolute left-0 top-[1%] z-[100] flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center">
                   <CloseButton
                     delaying={delaying}
                     finalizeCapture={finalizeCapture}
@@ -387,7 +387,7 @@ export default function CaptureMediaPortal({
                     captureMediaController={captureMediaController}
                   />
                 </div>
-                <div className='flex bottom-[1%] w-full h-[16%] max-h-20 min-h-10 absolute left-0 items-center justify-center z-[100]'>
+                <div className="absolute bottom-[1%] left-0 z-[100] flex h-[16%] max-h-20 min-h-10 w-full items-center justify-center">
                   <DelayCountDownButton delayCountDown={delayCountDown} />
                 </div>
               </div>
@@ -399,8 +399,8 @@ export default function CaptureMediaPortal({
     />
   ) : (
     <FgPortal
-      className='w-full h-full'
-      type='staticTopDomain'
+      className="h-full w-full"
+      type="staticTopDomain"
       top={0}
       left={0}
       zValue={499999998}
@@ -409,23 +409,23 @@ export default function CaptureMediaPortal({
           ref={captureMediaPortalRef}
           className={`${
             inCaptureMedia || settingsActive ? "in-capture-media" : ""
-          } capture-media-container w-full aspect h-full bg-fg-tone-black-4 bg-opacity-45`}
+          } capture-media-container aspect h-full w-full bg-fg-tone-black-4 bg-opacity-45`}
         >
-          <div className='flex absolute w-4/5 h-[95%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'>
+          <div className="absolute left-1/2 top-1/2 flex h-[95%] w-4/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
             <motion.div
               ref={captureContainerRef}
               className={`${
                 largestDim === "width" ? "w-full" : "h-full"
-              } rounded-md overflow-hidden relative pointer-events-auto bg-transparent`}
+              } pointer-events-auto relative overflow-hidden rounded-md bg-transparent`}
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
               onPointerEnter={captureMediaController.handlePointerEnter}
               onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
-              initial='init'
-              animate='animate'
-              exit='init'
+              initial="init"
+              animate="animate"
+              exit="init"
               transition={CaptureMediaTransition}
             >
               {finalizedCaptureType.current === "image" && (
@@ -434,23 +434,23 @@ export default function CaptureMediaPortal({
               {finalizedCaptureType.current === "image" ? (
                 <img
                   ref={imageRef}
-                  className='w-full h-full absolute left-0 top-0 z-10'
+                  className="absolute left-0 top-0 z-10 h-full w-full"
                   src={captureMedia.current?.babylonScene?.downloadSnapShotLink()}
                 />
               ) : finalizedCaptureType.current === "video" ? (
                 <video
                   ref={videoRef}
-                  className='absolute left-0 top-0 w-full h-full pointer-events-auto z-10'
+                  className="pointer-events-auto absolute left-0 top-0 z-10 h-full w-full"
                   src={captureMedia.current?.babylonScene?.downloadRecordingLink()}
                   autoPlay
                   onClick={captureMediaController.handlePausePlay}
                 />
               ) : null}
-              <div className='flex capture-media-overlay-container items-center z-20 justify-center w-full h-full absolute top-0 left-0 pointer-events-none'>
+              <div className="flex capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 h-full w-full items-center justify-center">
                 {finalizedCaptureType.current === "video" && (
                   <div
                     ref={timelineContainerRef}
-                    className='timeline-container z-[100]'
+                    className="timeline-container z-[100]"
                     onPointerDown={(event) => {
                       event.stopPropagation();
                       captureMediaController.handleStartScrubbing(event);
@@ -460,12 +460,12 @@ export default function CaptureMediaPortal({
                       captureMediaController.handleHoverTimelineUpdate(event);
                     }}
                   >
-                    <div className='timeline'>
-                      <div className='thumb-indicator'></div>
+                    <div className="timeline">
+                      <div className="thumb-indicator"></div>
                     </div>
                   </div>
                 )}
-                <div className='flex top-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center z-[100]'>
+                <div className="absolute left-0 top-[1%] z-[100] flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center">
                   <CloseButton
                     delaying={delaying}
                     finalizeCapture={finalizeCapture}
@@ -473,9 +473,9 @@ export default function CaptureMediaPortal({
                     captureMediaController={captureMediaController}
                   />
                 </div>
-                <div className='flex bottom-[1%] w-full h-[12%] max-h-12 min-h-6 absolute left-0 items-center justify-center space-x-3 z-[100]'>
+                <div className="absolute bottom-[1%] left-0 z-[100] flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center space-x-3">
                   <div
-                    className='flex justify-start h-full items-center pl-3 overflow-hidden'
+                    className="flex h-full items-center justify-start overflow-hidden pl-3"
                     style={{ width: `calc(50% - ${controlsHeight / 2}px` }}
                   >
                     {finalizedCaptureType.current === "video" && (
@@ -493,7 +493,7 @@ export default function CaptureMediaPortal({
                       finalizedCaptureType.current === "video"
                         ? "justify-between"
                         : "justify-start"
-                    } flex h-full items-center pr-3 overflow-hidden`}
+                    } flex h-full items-center overflow-hidden pr-3`}
                     style={{ width: `calc(50% - ${controlsHeight / 2}px` }}
                   >
                     <DownloadButton

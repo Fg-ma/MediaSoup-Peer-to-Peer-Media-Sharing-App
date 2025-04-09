@@ -1,4 +1,4 @@
-import TextMedia from "./TextMedia";
+import TextMedia, { TextListenerTypes } from "./TextMedia";
 
 class TextMediaInstance {
   instanceText: undefined | string;
@@ -16,17 +16,31 @@ class TextMediaInstance {
         y: number;
       };
       rotation: number;
-    }
+    },
   ) {
     if (this.textMedia.text) {
       this.instanceText = this.textMedia.text;
     }
-    this.textMedia.addDownloadCompleteListener(() => {
-      this.instanceText = this.textMedia.text;
-    });
+    this.textMedia.addTextListener(this.handleTextMessages);
   }
 
-  deconstructor = () => {};
+  deconstructor = () => {
+    this.textMedia.removeTextListener(this.handleTextMessages);
+  };
+
+  private handleTextMessages = (event: TextListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    this.instanceText = this.textMedia.text;
+  };
 }
 
 export default TextMediaInstance;

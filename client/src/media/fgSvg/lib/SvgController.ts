@@ -8,6 +8,7 @@ import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { SvgListenerTypes } from "../SvgMedia";
 import SvgMediaInstance from "../SvgMediaInstance";
 
 class SvgController {
@@ -17,14 +18,26 @@ class SvgController {
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private subContainerRef: React.RefObject<HTMLDivElement>,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>,
   ) {}
 
   handleTableScroll = () => {
     this.setSettingsActive(false);
   };
 
-  onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
+  private onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
     const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
@@ -51,11 +64,50 @@ class SvgController {
   };
 
   handleTableStaticContentMessage = (
-    event: IncomingTableStaticContentMessages
+    event: IncomingTableStaticContentMessages,
   ) => {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    if (this.svgMediaInstance.instanceSvg) {
+      const allSvgs = this.subContainerRef.current?.querySelectorAll("svg");
+
+      if (allSvgs) {
+        allSvgs.forEach((svgElement) => {
+          svgElement.remove();
+        });
+      }
+
+      this.subContainerRef.current?.appendChild(
+        this.svgMediaInstance.instanceSvg,
+      );
+
+      this.positioning.current.scale = {
+        x: this.svgMediaInstance.svgMedia.aspect
+          ? this.positioning.current.scale.y *
+            this.svgMediaInstance.svgMedia.aspect
+          : this.positioning.current.scale.x,
+        y: this.positioning.current.scale.y,
+      };
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleSvgMessages = (event: SvgListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      case "stateChanged":
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

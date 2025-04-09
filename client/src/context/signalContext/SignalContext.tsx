@@ -19,8 +19,10 @@ export type Signals =
         instances: {
           contentType: StaticContentTypes;
           contentId: string;
-          width: number;
-          height: number;
+          instances: {
+            width: number;
+            height: number;
+          }[];
         }[];
       };
     }

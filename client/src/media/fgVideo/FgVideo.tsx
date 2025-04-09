@@ -138,6 +138,9 @@ export default function FgVideo({
     paused,
     setPausedState,
     lowerVideoController,
+    setRerender,
+    subContainerRef,
+    positioning,
   );
 
   useEffect(() => {
@@ -170,48 +173,13 @@ export default function FgVideo({
 
       setRerender((prev) => !prev);
     }
-    videoMediaInstance.videoMedia.addDownloadCompleteListener(() => {
-      if (videoMediaInstance.instanceCanvas) {
-        const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
-
-        if (allCanvas) {
-          allCanvas.forEach((canvasElement) => {
-            canvasElement.remove();
-          });
-        }
-
-        subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
-
-        positioning.current.scale = {
-          x: videoMediaInstance.videoMedia.aspect
-            ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect
-            : positioning.current.scale.x,
-          y: positioning.current.scale.y,
-        };
-
-        // Keep video time
-        lowerVideoController.timeUpdate();
-        videoMediaInstance.instanceVideo?.addEventListener(
-          "timeupdate",
-          lowerVideoController.timeUpdate,
-        );
-
-        videoMediaInstance.instanceVideo?.addEventListener(
-          "enterpictureinpicture",
-          () => lowerVideoController.handlePictureInPicture("enter"),
-        );
-
-        videoMediaInstance.instanceVideo?.addEventListener(
-          "leavepictureinpicture",
-          () => lowerVideoController.handlePictureInPicture("leave"),
-        );
-
-        setRerender((prev) => !prev);
-      }
-    });
 
     // Set up initial conditions
     videoController.init();
+
+    videoMediaInstance.videoMedia.addVideoListener(
+      videoController.handleVideoMessages,
+    );
 
     document.addEventListener("keydown", lowerVideoController.handleKeyDown);
 
@@ -224,6 +192,9 @@ export default function FgVideo({
         ),
       );
       positioningListeners.current = {};
+      videoMediaInstance.videoMedia.removeVideoListener(
+        videoController.handleVideoMessages,
+      );
       document.removeEventListener(
         "keydown",
         lowerVideoController.handleKeyDown,

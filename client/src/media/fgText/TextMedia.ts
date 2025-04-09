@@ -13,13 +13,17 @@ export type onTextFinishedLoadingType = {
   type: "textFinishedLoading";
 };
 
+export type TextListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class TextMedia {
   text: string | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
-
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
+
+  private textListeners: Set<(message: TextListenerTypes) => void> = new Set();
 
   constructor(
     public textId: string,
@@ -29,14 +33,14 @@ class TextMedia {
     private getText: (
       contentType: StaticContentTypes,
       contentId: string,
-      key: string
+      key: string,
     ) => void,
     private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
     ) => void,
     private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
+    ) => void,
   ) {
     this.getText("text", this.textId, this.filename);
     this.addMessageListener(this.getTextListener);
@@ -45,7 +49,7 @@ class TextMedia {
   deconstructor = () => {
     this.removeMessageListener(this.getTextListener);
 
-    this.downloadCompleteListeners.clear();
+    this.textListeners.clear();
   };
 
   private getTextListener = (message: IncomingTableStaticContentMessages) => {
@@ -84,8 +88,8 @@ class TextMedia {
 
       this.text = new TextDecoder("utf-8").decode(mergedBuffer);
 
-      this.downloadCompleteListeners.forEach((listener) => {
-        listener();
+      this.textListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
       });
 
       this.removeMessageListener(this.getTextListener);
@@ -115,12 +119,22 @@ class TextMedia {
     URL.revokeObjectURL(blobURL);
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addTextListener = (listener: (message: TextListenerTypes) => void): void => {
+    this.textListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeTextListener = (
+    listener: (message: TextListenerTypes) => void,
+  ): void => {
+    this.textListeners.delete(listener);
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.textListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 }
 

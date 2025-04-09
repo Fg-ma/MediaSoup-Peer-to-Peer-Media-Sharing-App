@@ -5,15 +5,10 @@ import {
   defaultApplicationEffectsStyles,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
-import ApplicationMedia from "./ApplicationMedia";
+import ApplicationMedia, { ApplicationListenerTypes } from "./ApplicationMedia";
 
 class ApplicationMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -42,7 +37,7 @@ class ApplicationMediaInstance {
         y: number;
       };
       rotation: number;
-    }
+    },
   ) {
     if (!this.userEffects.current.application[this.applicationInstanceId]) {
       this.userEffects.current.application[this.applicationInstanceId] =
@@ -70,7 +65,7 @@ class ApplicationMediaInstance {
 
     if (applicationMedia.application) {
       this.instanceApplication = applicationMedia.application?.cloneNode(
-        true
+        true,
       ) as HTMLImageElement;
 
       this.babylonScene = new BabylonScene(
@@ -91,83 +86,101 @@ class ApplicationMediaInstance {
         undefined,
         this.userDevice,
         [0],
-        this.userMedia
+        this.userMedia,
       );
     }
-    this.applicationMedia.addDownloadCompleteListener(() => {
-      this.instanceApplication = applicationMedia.application?.cloneNode(
-        true
-      ) as HTMLImageElement;
 
-      if (!this.babylonScene)
-        this.babylonScene = new BabylonScene(
-          this.applicationInstanceId,
-          "application",
-          this.instanceCanvas,
-          this.instanceApplication,
-          undefined,
-          this.effects,
-          this.userEffectsStyles.current.application[
-            this.applicationInstanceId
-          ],
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          this.userDevice,
-          [0],
-          this.userMedia
-        );
-
-      for (const effect in this.userEffects.current.application[
-        this.applicationInstanceId
-      ]) {
-        if (
-          this.userEffects.current.application[this.applicationInstanceId][
-            effect as ApplicationEffectTypes
-          ]
-        ) {
-          if (effect === "postProcess") {
-            this.babylonScene.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.application[
-                this.applicationInstanceId
-              ].postProcess.style
-            );
-
-            this.changeEffects(effect as ApplicationEffectTypes);
-          } else if (effect === "tint") {
-            this.setTintColor(
-              this.userEffectsStyles.current.application[
-                this.applicationInstanceId
-              ].tint.color
-            );
-
-            this.changeEffects(
-              effect as ApplicationEffectTypes,
-              this.userEffectsStyles.current.application[
-                this.applicationInstanceId
-              ].tint.color
-            );
-          } else {
-            this.changeEffects(effect as ApplicationEffectTypes);
-          }
-        }
-      }
-    });
+    this.applicationMedia.addApplicationListener(
+      this.handleApplicationMessages,
+    );
   }
 
   deconstructor() {
     this.instanceApplication.src = "";
+
+    this.applicationMedia.removeApplicationListener(
+      this.handleApplicationMessages,
+    );
   }
+
+  private handleApplicationMessages = (event: ApplicationListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    this.instanceApplication = this.applicationMedia.application?.cloneNode(
+      true,
+    ) as HTMLImageElement;
+
+    if (!this.babylonScene) {
+      this.babylonScene = new BabylonScene(
+        this.applicationInstanceId,
+        "application",
+        this.instanceCanvas,
+        this.instanceApplication,
+        undefined,
+        this.effects,
+        this.userEffectsStyles.current.application[this.applicationInstanceId],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        this.userDevice,
+        [0],
+        this.userMedia,
+      );
+    }
+
+    for (const effect in this.userEffects.current.application[
+      this.applicationInstanceId
+    ]) {
+      if (
+        this.userEffects.current.application[this.applicationInstanceId][
+          effect as ApplicationEffectTypes
+        ]
+      ) {
+        if (effect === "postProcess") {
+          this.babylonScene.babylonShaderController.swapPostProcessEffects(
+            this.userEffectsStyles.current.application[
+              this.applicationInstanceId
+            ].postProcess.style,
+          );
+
+          this.changeEffects(effect as ApplicationEffectTypes);
+        } else if (effect === "tint") {
+          this.setTintColor(
+            this.userEffectsStyles.current.application[
+              this.applicationInstanceId
+            ].tint.color,
+          );
+
+          this.changeEffects(
+            effect as ApplicationEffectTypes,
+            this.userEffectsStyles.current.application[
+              this.applicationInstanceId
+            ].tint.color,
+          );
+        } else {
+          this.changeEffects(effect as ApplicationEffectTypes);
+        }
+      }
+    }
+  };
 
   changeEffects = (
     effect: ApplicationEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (!this.babylonScene) return;
 
@@ -185,7 +198,7 @@ class ApplicationMediaInstance {
     if (effect === "tint" && tintColor) {
       this.babylonScene?.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -195,7 +208,7 @@ class ApplicationMediaInstance {
 
     if (effect === "postProcess") {
       this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
 

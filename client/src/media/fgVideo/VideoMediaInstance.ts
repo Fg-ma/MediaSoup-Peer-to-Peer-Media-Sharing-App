@@ -18,7 +18,7 @@ import BabylonScene, {
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
-import VideoMedia from "./VideoMedia";
+import VideoMedia, { VideoListenerTypes } from "./VideoMedia";
 
 class VideoMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -71,8 +71,8 @@ class VideoMediaInstance {
     private requestCatchUpVideoPosition: (
       contentType: "video",
       contentId: string,
-      instanceId: string
-    ) => void
+      instanceId: string,
+    ) => void,
   ) {
     if (!this.userEffects.current.video[this.videoInstanceId]) {
       this.userEffects.current.video[this.videoInstanceId] = {
@@ -101,14 +101,14 @@ class VideoMediaInstance {
       true,
       "video",
       this.videoInstanceId,
-      this.deadbanding
+      this.deadbanding,
     );
 
     this.faceMeshWorker = new Worker(
       new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceMeshWorker.onmessage = (event) => {
@@ -130,11 +130,11 @@ class VideoMediaInstance {
     this.faceDetectionWorker = new Worker(
       new URL(
         "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceDetectionWorker.onmessage = (event) => {
@@ -170,11 +170,11 @@ class VideoMediaInstance {
     this.selfieSegmentationWorker = new Worker(
       new URL(
         "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.selfieSegmentationWorker.onmessage = (event) => {
@@ -191,9 +191,7 @@ class VideoMediaInstance {
     };
 
     if (this.videoMedia.video) this.setVideo();
-    this.videoMedia.addDownloadCompleteListener(() => {
-      this.setVideo();
-    });
+    this.videoMedia.addVideoListener(this.handleVideoMessages);
   }
 
   deconstructor() {
@@ -223,11 +221,23 @@ class VideoMediaInstance {
     this.babylonScene?.deconstructor();
 
     this.faceCountChangeListeners.clear();
+
+    this.videoMedia.removeVideoListener(this.handleVideoMessages);
   }
 
-  setVideo = () => {
+  private handleVideoMessages = (event: VideoListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.setVideo();
+        break;
+      default:
+        break;
+    }
+  };
+
+  private setVideo = () => {
     this.instanceVideo = this.videoMedia.video?.cloneNode(
-      true
+      true,
     ) as HTMLVideoElement;
 
     this.instanceVideo.autoplay = true;
@@ -261,7 +271,7 @@ class VideoMediaInstance {
         this.selfieSegmentationProcessing,
         this.userDevice,
         this.maxFaces,
-        this.userMedia
+        this.userMedia,
       );
 
     this.updateAllEffects();
@@ -269,18 +279,18 @@ class VideoMediaInstance {
     this.requestCatchUpVideoPosition(
       "video",
       this.videoMedia.videoId,
-      this.videoInstanceId
+      this.videoInstanceId,
     );
   };
 
   addFaceCountChangeListener = (
-    listener: (facesDetected: number) => void
+    listener: (facesDetected: number) => void,
   ): void => {
     this.faceCountChangeListeners.add(listener);
   };
 
   removeFaceCountChangeListener = (
-    listener: (facesDetected: number) => void
+    listener: (facesDetected: number) => void,
   ): void => {
     this.faceCountChangeListeners.delete(listener);
   };
@@ -339,7 +349,7 @@ class VideoMediaInstance {
               meshData.soundEffectPath,
               [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
-              meshData.initRotation
+              meshData.initRotation,
             );
           }
         }
@@ -391,7 +401,7 @@ class VideoMediaInstance {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -408,7 +418,7 @@ class VideoMediaInstance {
     if (!this.babylonScene) return;
 
     Object.entries(
-      this.userEffects.current.video[this.videoInstanceId].video
+      this.userEffects.current.video[this.videoInstanceId].video,
     ).map(([effect, value]) => {
       if (this.effects[effect as EffectType] && !value) {
         this.effects[effect as EffectType] = false;
@@ -423,7 +433,7 @@ class VideoMediaInstance {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -453,15 +463,15 @@ class VideoMediaInstance {
           this.setTintColor(
             this.userEffectsStyles.current.video[this.videoInstanceId].video[
               effect
-            ].color
+            ].color,
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].color
-            )
+              ].color,
+            ),
           );
         }
 
@@ -482,18 +492,18 @@ class VideoMediaInstance {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].color
+              ].color,
             );
           } else {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].style
+              ].style,
             );
           }
 
           this.babylonScene?.toggleHideBackgroundPlane(
-            this.effects[effect] ?? false
+            this.effects[effect] ?? false,
           );
         }
 
@@ -501,11 +511,11 @@ class VideoMediaInstance {
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
             this.userEffectsStyles.current.video[this.videoInstanceId].video[
               effect
-            ].style
+            ].style,
           );
 
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            this.effects[effect] ?? false
+            this.effects[effect] ?? false,
           );
         }
       } else if (this.effects[effect as EffectType] && value) {
@@ -549,15 +559,15 @@ class VideoMediaInstance {
           this.setTintColor(
             this.userEffectsStyles.current.video[this.videoInstanceId].video[
               effect
-            ].color
+            ].color,
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].color
-            )
+              ].color,
+            ),
           );
         }
 
@@ -583,17 +593,17 @@ class VideoMediaInstance {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].color
+              ].color,
             );
           } else {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
               this.userEffectsStyles.current.video[this.videoInstanceId].video[
                 effect
-              ].style
+              ].style,
             );
           }
           this.babylonScene?.toggleHideBackgroundPlane(
-            this.effects[effect] ?? false
+            this.effects[effect] ?? false,
           );
         }
 
@@ -606,16 +616,16 @@ class VideoMediaInstance {
               ].style)
         ) {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
 
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
             this.userEffectsStyles.current.video[this.videoInstanceId].video[
               effect
-            ].style
+            ].style,
           );
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            this.effects[effect] ?? false
+            this.effects[effect] ?? false,
           );
         }
       }
@@ -627,7 +637,7 @@ class VideoMediaInstance {
   changeEffects = (
     effect: VideoEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (!this.babylonScene) return;
 
@@ -664,7 +674,7 @@ class VideoMediaInstance {
     if (effect === "tint" && tintColor) {
       this.babylonScene.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -682,7 +692,7 @@ class VideoMediaInstance {
 
     if (effect === "postProcess") {
       this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
   };
@@ -720,7 +730,7 @@ class VideoMediaInstance {
         meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
         meshData.initScale,
-        meshData.initRotation
+        meshData.initRotation,
       );
     }
   };

@@ -7,15 +7,20 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
+export type ImageListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class ImageMedia {
   image: HTMLImageElement | undefined;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
-  public blobURL: string | undefined;
+  blobURL: string | undefined;
   aspect: number | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
+  private imageListeners: Set<(message: ImageListenerTypes) => void> =
+    new Set();
 
   constructor(
     public imageId: string,
@@ -25,14 +30,14 @@ class ImageMedia {
     private getImage: (
       contentType: StaticContentTypes,
       contentId: string,
-      key: string
+      key: string,
     ) => void,
     private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
     ) => void,
     private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
+    ) => void,
   ) {
     this.getImage("image", this.imageId, this.filename);
     this.addMessageListener(this.getImageListener);
@@ -47,6 +52,8 @@ class ImageMedia {
     this.aspect = undefined;
 
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
+
+    this.imageListeners.clear();
   }
 
   private getImageListener = (message: IncomingTableStaticContentMessages) => {
@@ -91,8 +98,8 @@ class ImageMedia {
       this.image.onload = () => {
         this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
 
-        this.downloadCompleteListeners.forEach((listener) => {
-          listener();
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadComplete" });
         });
       };
 
@@ -100,12 +107,24 @@ class ImageMedia {
     }
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addImageListener = (
+    listener: (message: ImageListenerTypes) => void,
+  ): void => {
+    this.imageListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeImageListener = (
+    listener: (message: ImageListenerTypes) => void,
+  ): void => {
+    this.imageListeners.delete(listener);
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.imageListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 
   downloadImage = () => {

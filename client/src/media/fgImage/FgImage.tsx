@@ -92,6 +92,8 @@ export default function FgImage({
     userEffectsStyles,
     tintColor,
     setRerender,
+    subContainerRef,
+    positioning,
   );
 
   useEffect(() => {
@@ -107,30 +109,9 @@ export default function FgImage({
 
       setRerender((prev) => !prev);
     }
-    imageMediaInstance.imageMedia.addDownloadCompleteListener(() => {
-      if (!imageMediaInstance.instanceCanvas) {
-        return;
-      }
-
-      const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
-
-      if (allCanvas) {
-        allCanvas.forEach((canvasElement) => {
-          canvasElement.remove();
-        });
-      }
-
-      subContainerRef.current?.appendChild(imageMediaInstance.instanceCanvas);
-
-      positioning.current.scale = {
-        x: imageMediaInstance.imageMedia.aspect
-          ? positioning.current.scale.y * imageMediaInstance.imageMedia.aspect
-          : positioning.current.scale.x,
-        y: positioning.current.scale.y,
-      };
-
-      setRerender((prev) => !prev);
-    });
+    imageMediaInstance.imageMedia.addImageListener(
+      imageController.handleImageMessages,
+    );
 
     document.addEventListener("keydown", lowerImageController.handleKeyDown);
 
@@ -142,6 +123,9 @@ export default function FgImage({
     );
 
     return () => {
+      imageMediaInstance.imageMedia.removeImageListener(
+        imageController.handleImageMessages,
+      );
       document.removeEventListener(
         "keydown",
         lowerImageController.handleKeyDown,

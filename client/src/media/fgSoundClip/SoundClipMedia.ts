@@ -7,6 +7,10 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
+export type SoundClipListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class SoundClipMedia {
   soundClip: HTMLAudioElement | undefined;
 
@@ -14,7 +18,8 @@ class SoundClipMedia {
   private totalSize = 0;
   blobURL: string | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
+  private soundClipListeners: Set<(message: SoundClipListenerTypes) => void> =
+    new Set();
 
   constructor(
     public soundClipId: string,
@@ -42,7 +47,7 @@ class SoundClipMedia {
 
     this.removeMessageListener(this.getSoundClipListener);
 
-    this.downloadCompleteListeners.clear();
+    this.soundClipListeners.clear();
   };
 
   private getSoundClipListener = async (
@@ -87,8 +92,8 @@ class SoundClipMedia {
       this.soundClip = new Audio(this.blobURL);
 
       this.soundClip.onload = () => {
-        this.downloadCompleteListeners.forEach((listener) => {
-          listener();
+        this.soundClipListeners.forEach((listener) => {
+          listener({ type: "downloadComplete" });
         });
       };
 
@@ -96,12 +101,24 @@ class SoundClipMedia {
     }
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addSoundClipListener = (
+    listener: (message: SoundClipListenerTypes) => void,
+  ): void => {
+    this.soundClipListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeSoundClipListener = (
+    listener: (message: SoundClipListenerTypes) => void,
+  ): void => {
+    this.soundClipListeners.delete(listener);
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.soundClipListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 }
 

@@ -12,6 +12,7 @@ import {
 } from "../../../../../universal/effectsTypeConstant";
 import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 import VideoMediaInstance from "../VideoMediaInstance";
+import { VideoListenerTypes } from "../VideoMedia";
 
 class VideoController {
   constructor(
@@ -24,17 +25,30 @@ class VideoController {
     private tintColor: React.MutableRefObject<string>,
     private paused: React.MutableRefObject<boolean>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private lowerVideoController: LowerVideoController
+    private lowerVideoController: LowerVideoController,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private subContainerRef: React.RefObject<HTMLDivElement>,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>,
   ) {}
 
   init = () => {
     this.videoContainerRef.current?.style.setProperty(
       "--primary-video-color",
-      `${this.videoOptions.primaryVideoColor}`
+      `${this.videoOptions.primaryVideoColor}`,
     );
   };
 
-  onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
+  private onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
     const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
@@ -48,7 +62,7 @@ class VideoController {
       };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.video[this.videoInstanceId].video
+        this.userEffectsStyles.current.video[this.videoInstanceId].video,
       );
 
       if (effectStyles !== undefined) {
@@ -86,7 +100,7 @@ class VideoController {
     }
   };
 
-  onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
+  private onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
     const { contentType, contentId, instanceId } = event.header;
 
     if (
@@ -101,7 +115,7 @@ class VideoController {
   };
 
   handleTableStaticContentMessage = (
-    event: IncomingTableStaticContentMessages
+    event: IncomingTableStaticContentMessages,
   ) => {
     switch (event.type) {
       case "updatedContentEffects":
@@ -109,6 +123,63 @@ class VideoController {
         break;
       case "updatedVideoPosition":
         this.onUpdateVideoPosition(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    if (this.videoMediaInstance.instanceCanvas) {
+      const allCanvas =
+        this.subContainerRef.current?.querySelectorAll("canvas");
+
+      if (allCanvas) {
+        allCanvas.forEach((canvasElement) => {
+          canvasElement.remove();
+        });
+      }
+
+      this.subContainerRef.current?.appendChild(
+        this.videoMediaInstance.instanceCanvas,
+      );
+
+      this.positioning.current.scale = {
+        x: this.videoMediaInstance.videoMedia.aspect
+          ? this.positioning.current.scale.y *
+            this.videoMediaInstance.videoMedia.aspect
+          : this.positioning.current.scale.x,
+        y: this.positioning.current.scale.y,
+      };
+
+      // Keep video time
+      this.lowerVideoController.timeUpdate();
+      this.videoMediaInstance.instanceVideo?.addEventListener(
+        "timeupdate",
+        this.lowerVideoController.timeUpdate,
+      );
+
+      this.videoMediaInstance.instanceVideo?.addEventListener(
+        "enterpictureinpicture",
+        () => this.lowerVideoController.handlePictureInPicture("enter"),
+      );
+
+      this.videoMediaInstance.instanceVideo?.addEventListener(
+        "leavepictureinpicture",
+        () => this.lowerVideoController.handlePictureInPicture("leave"),
+      );
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleVideoMessages = (event: VideoListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      case "stateChanged":
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

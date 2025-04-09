@@ -99,6 +99,10 @@ export default function FgApplication({
     applicationContainerRef,
     applicationOptions,
     setSettingsActive,
+    applicationMediaInstance,
+    subContainerRef,
+    positioning,
+    setRerender,
   );
 
   useEffect(() => {
@@ -107,26 +111,13 @@ export default function FgApplication({
         applicationMediaInstance.instanceCanvas,
       );
     }
-    applicationMediaInstance.applicationMedia.addDownloadCompleteListener(
-      () => {
-        if (applicationMediaInstance.instanceCanvas) {
-          const allCanvas = subContainerRef.current?.querySelectorAll("canvas");
-
-          if (allCanvas) {
-            allCanvas.forEach((canvasElement) => {
-              canvasElement.remove();
-            });
-          }
-
-          subContainerRef.current?.appendChild(
-            applicationMediaInstance.instanceCanvas,
-          );
-        }
-      },
-    );
 
     // Set up initial conditions
     applicationController.init();
+
+    applicationMediaInstance.applicationMedia.addApplicationListener(
+      applicationController.handleApplicationMessages,
+    );
 
     document.addEventListener(
       "keydown",
@@ -141,6 +132,9 @@ export default function FgApplication({
     );
 
     return () => {
+      applicationMediaInstance.applicationMedia.removeApplicationListener(
+        applicationController.handleApplicationMessages,
+      );
       document.removeEventListener(
         "keydown",
         lowerApplicationController.handleKeyDown,

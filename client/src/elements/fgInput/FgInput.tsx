@@ -14,6 +14,7 @@ export default function FgInput({
   name,
   onSubmit,
   onChange,
+  onUnfocus,
   externalValue,
   options,
 }: {
@@ -22,6 +23,7 @@ export default function FgInput({
   name?: string;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onUnfocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
   externalValue?: string;
   options?: InputOptionsType;
 }) {
@@ -42,29 +44,30 @@ export default function FgInput({
 
   return (
     <form
-      className={`${className} bg-fg-white text-fg-tone-black-3 text-opacity-80 border-fg-white focus-within:border-fg-red hover:border-fg-red flex justify-between items-center overflow-hidden`}
+      className={`${className} flex items-center justify-between overflow-hidden border-fg-white bg-fg-white text-fg-tone-black-3 text-opacity-80 focus-within:border-fg-red hover:border-fg-red`}
       onSubmit={handleSubmit}
     >
-      <div className='grow h-max'>
+      <div className="h-max grow">
         <input
           ref={inputRef}
           placeholder={placeholder}
           name={name ? name : "defaultInput"}
-          type='text'
-          className='w-full h-full px-2 focus:outline-none bg-fg-white'
+          type="text"
+          className={`${fgInputOptions.centerText ? "text-center" : ""} px-[${fgInputOptions.padding}rem] h-full w-full bg-fg-white focus:outline-none`}
           onChange={onChange}
+          onBlur={onUnfocus}
           value={externalValue}
           autoComplete={fgInputOptions.autocomplete}
         />
       </div>
       {fgInputOptions.submitButton && (
         <FgButton
-          className='h-[90%] aspect-square rounded-full border-fg-red flex items-center justify-center pl-[1%] mr-1'
+          className="mr-1 flex aspect-square h-[90%] items-center justify-center rounded-full border-fg-red pl-[1%]"
           style={{ borderWidth: "1px" }}
           contentFunction={() => (
             <FgSVGElement
               src={navigateForward}
-              className='w-[95%] h-[95%] flex items-center justify-center'
+              className="flex h-[95%] w-[95%] items-center justify-center"
               attributes={[
                 { key: "width", value: "95%" },
                 { key: "height", value: "95%" },
@@ -74,7 +77,7 @@ export default function FgInput({
             />
           )}
           hoverContent={
-            <FgHoverContentStandard content='Submit' style='light' />
+            <FgHoverContentStandard content="Submit" style="light" />
           }
           options={{
             hoverSpacing: 4,
@@ -82,7 +85,7 @@ export default function FgInput({
             hoverTimeoutDuration: 3500,
             hoverZValue: 1000000000000000,
           }}
-          type='submit'
+          type="submit"
         />
       )}
     </form>

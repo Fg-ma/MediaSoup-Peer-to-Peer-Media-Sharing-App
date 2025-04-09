@@ -7,15 +7,21 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
+export type ApplicationListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class ApplicationMedia {
   application: HTMLImageElement | undefined;
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
-  private blobURL: string | undefined;
+  blobURL: string | undefined;
   aspect: number | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
+  private applicationListeners: Set<
+    (message: ApplicationListenerTypes) => void
+  > = new Set();
 
   constructor(
     public applicationId: string,
@@ -25,14 +31,14 @@ class ApplicationMedia {
     private getApplication: (
       contentType: StaticContentTypes,
       contentId: string,
-      key: string
+      key: string,
     ) => void,
     private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
     ) => void,
     private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
+    ) => void,
   ) {
     this.getApplication("application", this.applicationId, this.filename);
     this.addMessageListener(this.getApplicationListener);
@@ -47,10 +53,12 @@ class ApplicationMedia {
     this.aspect = undefined;
 
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
+
+    this.applicationListeners.clear();
   }
 
   private getApplicationListener = (
-    message: IncomingTableStaticContentMessages
+    message: IncomingTableStaticContentMessages,
   ) => {
     if (message.type === "chunk") {
       const { contentType, contentId, key } = message.header;
@@ -93,11 +101,11 @@ class ApplicationMedia {
       this.application.onload = () => {
         this.aspect =
           (this.application?.width ?? 1) / (this.application?.height ?? 1);
-      };
 
-      this.downloadCompleteListeners.forEach((listener) => {
-        listener();
-      });
+        this.applicationListeners.forEach((listener) => {
+          listener({ type: "downloadComplete" });
+        });
+      };
 
       this.removeMessageListener(this.getApplicationListener);
     }
@@ -117,12 +125,24 @@ class ApplicationMedia {
     document.body.removeChild(link);
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addApplicationListener = (
+    listener: (message: ApplicationListenerTypes) => void,
+  ): void => {
+    this.applicationListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeApplicationListener = (
+    listener: (message: ApplicationListenerTypes) => void,
+  ): void => {
+    this.applicationListeners.delete(listener);
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.applicationListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 }
 

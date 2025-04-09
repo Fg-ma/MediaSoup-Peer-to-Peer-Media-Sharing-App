@@ -5,12 +5,14 @@ export default function FgImageElement({
   src,
   srcLoading,
   alt,
+  className,
   style,
   ...props
 }: {
   src: string;
   srcLoading?: string;
   alt?: string;
+  className?: string;
   style?: React.CSSProperties;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,7 @@ export default function FgImageElement({
     if (containerRef.current && srcLoading) {
       containerRef.current.style.setProperty(
         "--background-image",
-        `url(${srcLoading})`
+        `url(${srcLoading})`,
       );
     }
   }, [srcLoading]);
@@ -35,7 +37,7 @@ export default function FgImageElement({
   return (
     <div
       ref={containerRef}
-      className='blurred-img'
+      className={`${className} blurred-img`}
       style={{
         backgroundImage: `${srcLoading ? `url(${srcLoading})` : ""}`,
         ...style,
@@ -43,11 +45,11 @@ export default function FgImageElement({
       {...props}
     >
       <img
-        className='w-full h-full'
+        className="h-full w-full"
         ref={imgRef}
         src={src}
         onLoad={loaded}
-        loading='lazy'
+        loading="lazy"
         alt={alt}
         {...props}
       />

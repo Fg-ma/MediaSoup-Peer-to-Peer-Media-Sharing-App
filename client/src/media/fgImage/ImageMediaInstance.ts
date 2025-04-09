@@ -7,10 +7,6 @@ import {
   ImageEffectTypes,
   ImageEffectStylesType,
 } from "../../../../universal/effectsTypeConstant";
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
@@ -20,7 +16,7 @@ import Deadbanding from "../../babylon/Deadbanding";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import assetMeshes from "../../babylon/meshes";
-import ImageMedia from "./ImageMedia";
+import ImageMedia, { ImageListenerTypes } from "./ImageMedia";
 
 class ImageMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -69,7 +65,7 @@ class ImageMediaInstance {
         y: number;
       };
       rotation: number;
-    }
+    },
   ) {
     if (!this.userEffects.current.image[this.imageInstanceId]) {
       this.userEffects.current.image[this.imageInstanceId] =
@@ -91,14 +87,14 @@ class ImageMediaInstance {
       true,
       "image",
       this.imageInstanceId,
-      this.deadbanding
+      this.deadbanding,
     );
 
     this.faceMeshWorker = new Worker(
       new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceMeshWorker.onmessage = (event) => {
@@ -120,11 +116,11 @@ class ImageMediaInstance {
     this.faceDetectionWorker = new Worker(
       new URL(
         "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceDetectionWorker.onmessage = (event) => {
@@ -157,11 +153,11 @@ class ImageMediaInstance {
     this.selfieSegmentationWorker = new Worker(
       new URL(
         "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.selfieSegmentationWorker.onmessage = (event) => {
@@ -179,7 +175,7 @@ class ImageMediaInstance {
 
     if (this.imageMedia.image) {
       this.instanceImage = this.imageMedia.image?.cloneNode(
-        true
+        true,
       ) as HTMLImageElement;
 
       this.instanceImage.onload = () => {
@@ -208,46 +204,10 @@ class ImageMediaInstance {
           this.selfieSegmentationProcessing,
           this.userDevice,
           this.maxFaces,
-          this.userMedia
+          this.userMedia,
         );
     }
-    this.imageMedia.addDownloadCompleteListener(() => {
-      this.instanceImage = this.imageMedia.image?.cloneNode(
-        true
-      ) as HTMLImageElement;
-
-      this.instanceImage.onload = () => {
-        if (this.instanceImage) {
-          this.instanceCanvas.width = this.instanceImage.width;
-          this.instanceCanvas.height = this.instanceImage.height;
-        }
-      };
-
-      if (!this.babylonScene && this.instanceImage) {
-        this.babylonScene = new BabylonScene(
-          this.imageInstanceId,
-          "image",
-          this.instanceCanvas,
-          this.instanceImage,
-          this.faceLandmarks,
-          this.effects,
-          this.userEffectsStyles.current.image[this.imageInstanceId],
-          this.faceMeshWorker,
-          this.faceMeshResults,
-          this.faceMeshProcessing,
-          this.faceDetectionWorker,
-          this.faceDetectionProcessing,
-          this.selfieSegmentationWorker,
-          this.selfieSegmentationResults,
-          this.selfieSegmentationProcessing,
-          this.userDevice,
-          this.maxFaces,
-          this.userMedia
-        );
-      }
-
-      this.updateAllEffects();
-    });
+    this.imageMedia.addImageListener(this.handleImageMessages);
   }
 
   deconstructor() {
@@ -255,6 +215,8 @@ class ImageMediaInstance {
       this.instanceImage.src = "";
       this.instanceImage = undefined;
     }
+
+    this.imageMedia.removeImageListener(this.handleImageMessages);
 
     // Remove canvas element
     this.instanceCanvas.remove();
@@ -276,14 +238,62 @@ class ImageMediaInstance {
     this.faceCountChangeListeners.clear();
   }
 
+  private handleImageMessages = (event: ImageListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    this.instanceImage = this.imageMedia.image?.cloneNode(
+      true,
+    ) as HTMLImageElement;
+
+    this.instanceImage.onload = () => {
+      if (this.instanceImage) {
+        this.instanceCanvas.width = this.instanceImage.width;
+        this.instanceCanvas.height = this.instanceImage.height;
+      }
+    };
+
+    if (!this.babylonScene && this.instanceImage) {
+      this.babylonScene = new BabylonScene(
+        this.imageInstanceId,
+        "image",
+        this.instanceCanvas,
+        this.instanceImage,
+        this.faceLandmarks,
+        this.effects,
+        this.userEffectsStyles.current.image[this.imageInstanceId],
+        this.faceMeshWorker,
+        this.faceMeshResults,
+        this.faceMeshProcessing,
+        this.faceDetectionWorker,
+        this.faceDetectionProcessing,
+        this.selfieSegmentationWorker,
+        this.selfieSegmentationResults,
+        this.selfieSegmentationProcessing,
+        this.userDevice,
+        this.maxFaces,
+        this.userMedia,
+      );
+    }
+
+    this.updateAllEffects();
+  };
+
   addFaceCountChangeListener = (
-    listener: (facesDetected: number) => void
+    listener: (facesDetected: number) => void,
   ): void => {
     this.faceCountChangeListeners.add(listener);
   };
 
   removeFaceCountChangeListener = (
-    listener: (facesDetected: number) => void
+    listener: (facesDetected: number) => void,
   ): void => {
     this.faceCountChangeListeners.delete(listener);
   };
@@ -340,7 +350,7 @@ class ImageMediaInstance {
               meshData.soundEffectPath,
               [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
-              meshData.initRotation
+              meshData.initRotation,
             );
           }
         }
@@ -379,7 +389,7 @@ class ImageMediaInstance {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -408,7 +418,7 @@ class ImageMediaInstance {
             this.babylonScene?.toggleHideBackgroundPlane(false);
           } else if (effect === "postProcess") {
             this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              false
+              false,
             );
           } else {
             this.babylonScene?.deleteEffectMeshes(effect);
@@ -437,15 +447,15 @@ class ImageMediaInstance {
           if (effect === "tint") {
             this.setTintColor(
               this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .color
+                .color,
             );
             this.babylonScene?.toggleTintPlane(
               this.effects[effect] ?? false,
               this.hexToNormalizedRgb(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].color
-              )
+                ].color,
+              ),
             );
           }
 
@@ -461,29 +471,29 @@ class ImageMediaInstance {
               this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].color
+                ].color,
               );
             } else {
               this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].style
+                ].style,
               );
             }
 
             this.babylonScene?.toggleHideBackgroundPlane(
-              this.effects[effect] ?? false
+              this.effects[effect] ?? false,
             );
           }
 
           if (effect === "postProcess") {
             this.babylonScene?.babylonShaderController.swapPostProcessEffects(
               this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style
+                .style,
             );
 
             this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              this.effects[effect] ?? false
+              this.effects[effect] ?? false,
             );
           }
         } else if (this.effects[effect as EffectType] && value) {
@@ -526,15 +536,15 @@ class ImageMediaInstance {
 
             this.setTintColor(
               this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .color
+                .color,
             );
             this.babylonScene?.toggleTintPlane(
               this.effects[effect] ?? false,
               this.hexToNormalizedRgb(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].color
-              )
+                ].color,
+              ),
             );
           }
 
@@ -559,17 +569,17 @@ class ImageMediaInstance {
               this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].color
+                ].color,
               );
             } else {
               this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                 this.userEffectsStyles.current.image[this.imageInstanceId][
                   effect
-                ].style
+                ].style,
               );
             }
             this.babylonScene?.toggleHideBackgroundPlane(
-              this.effects[effect] ?? false
+              this.effects[effect] ?? false,
             );
           }
 
@@ -582,19 +592,19 @@ class ImageMediaInstance {
                 ].style)
           ) {
             this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              false
+              false,
             );
 
             this.babylonScene?.babylonShaderController.swapPostProcessEffects(
               this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style
+                .style,
             );
             this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              this.effects[effect] ?? false
+              this.effects[effect] ?? false,
             );
           }
         }
-      }
+      },
     );
 
     this.deadbanding.update("image", this.imageInstanceId, this.effects);
@@ -605,7 +615,7 @@ class ImageMediaInstance {
   changeEffects = (
     effect: ImageEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (!this.babylonScene) return;
 
@@ -642,7 +652,7 @@ class ImageMediaInstance {
     if (effect === "tint" && tintColor) {
       this.babylonScene?.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -659,12 +669,12 @@ class ImageMediaInstance {
       ) {
         this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
           this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-            .color
+            .color,
         );
       } else {
         this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
           this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-            .style
+            .style,
         );
       }
 
@@ -675,7 +685,7 @@ class ImageMediaInstance {
 
     if (effect === "postProcess") {
       this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
 
@@ -711,7 +721,7 @@ class ImageMediaInstance {
         meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
         meshData.initScale,
-        meshData.initRotation
+        meshData.initRotation,
       );
     }
   };

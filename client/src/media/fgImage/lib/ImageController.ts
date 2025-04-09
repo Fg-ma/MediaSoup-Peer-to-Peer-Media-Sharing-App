@@ -8,6 +8,7 @@ import {
   IncomingTableStaticContentMessages,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { ImageListenerTypes } from "../ImageMedia";
 import ImageMediaInstance from "../ImageMediaInstance";
 
 class ImageController {
@@ -18,14 +19,26 @@ class ImageController {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private subContainerRef: React.RefObject<HTMLDivElement>,
+    private positioning: React.MutableRefObject<{
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    }>,
   ) {}
 
   handleTableScroll = () => {
     this.setSettingsActive(false);
   };
 
-  onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
+  private onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
     const { contentType, contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
@@ -39,7 +52,7 @@ class ImageController {
       };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.image[this.imageInstanceId]
+        this.userEffectsStyles.current.image[this.imageInstanceId],
       );
 
       if (effectStyles !== undefined) {
@@ -58,11 +71,52 @@ class ImageController {
   };
 
   handleTableStaticContentMessage = (
-    event: IncomingTableStaticContentMessages
+    event: IncomingTableStaticContentMessages,
   ) => {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onDownloadComplete = () => {
+    if (!this.imageMediaInstance.instanceCanvas) {
+      return;
+    }
+
+    const allCanvas = this.subContainerRef.current?.querySelectorAll("canvas");
+
+    if (allCanvas) {
+      allCanvas.forEach((canvasElement) => {
+        canvasElement.remove();
+      });
+    }
+
+    this.subContainerRef.current?.appendChild(
+      this.imageMediaInstance.instanceCanvas,
+    );
+
+    this.positioning.current.scale = {
+      x: this.imageMediaInstance.imageMedia.aspect
+        ? this.positioning.current.scale.y *
+          this.imageMediaInstance.imageMedia.aspect
+        : this.positioning.current.scale.x,
+      y: this.positioning.current.scale.y,
+    };
+
+    this.setRerender((prev) => !prev);
+  };
+
+  handleImageMessages = (event: ImageListenerTypes) => {
+    switch (event.type) {
+      case "downloadComplete":
+        this.onDownloadComplete();
+        break;
+      case "stateChanged":
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

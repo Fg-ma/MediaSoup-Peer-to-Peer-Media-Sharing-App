@@ -10,6 +10,10 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
+export type VideoListenerTypes =
+  | { type: "downloadComplete" }
+  | { type: "stateChanged" };
+
 class VideoMedia {
   video: HTMLVideoElement | undefined;
   shakaPlayer: shaka.Player;
@@ -20,10 +24,11 @@ class VideoMedia {
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
-  private blobURL: string | undefined;
+  blobURL: string | undefined;
   aspect: number | undefined;
 
-  private downloadCompleteListeners: Set<() => void> = new Set();
+  private videoListeners: Set<(message: VideoListenerTypes) => void> =
+    new Set();
 
   private audioStream?: MediaStream;
   private videoAudioMedia?: VideoAudioMedia;
@@ -37,14 +42,14 @@ class VideoMedia {
     private getVideo: (
       contentType: StaticContentTypes,
       contentId: string,
-      key: string
+      key: string,
     ) => void,
     private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
     ) => void,
     private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void
-    ) => void
+      listener: (message: IncomingTableStaticContentMessages) => void,
+    ) => void,
   ) {
     // this.shakaPlayer = new shaka.Player(this.video);
 
@@ -100,6 +105,8 @@ class VideoMedia {
         console.error("Error destroying hidden Shaka player:", error);
       });
     }
+
+    this.videoListeners.clear();
   }
 
   private getVideoListener = (message: IncomingTableStaticContentMessages) => {
@@ -151,12 +158,12 @@ class VideoMedia {
           this.videoAudioMedia = new VideoAudioMedia(
             this.videoId,
             this.audioStream,
-            this.userEffects
+            this.userEffects,
           );
         }
 
-        this.downloadCompleteListeners.forEach((listener) => {
-          listener();
+        this.videoListeners.forEach((listener) => {
+          listener({ type: "downloadComplete" });
         });
       });
 
@@ -206,7 +213,7 @@ class VideoMedia {
 
         await this.shakaPlayer?.load(
           this.dashUrl,
-          this.hiddenVideo.currentTime
+          this.hiddenVideo.currentTime,
         );
 
         this.video.width = videoBox.width;
@@ -248,12 +255,24 @@ class VideoMedia {
     document.body.removeChild(link);
   };
 
-  addDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.add(listener);
+  addVideoListener = (
+    listener: (message: VideoListenerTypes) => void,
+  ): void => {
+    this.videoListeners.add(listener);
   };
 
-  removeDownloadCompleteListener = (listener: () => void): void => {
-    this.downloadCompleteListeners.delete(listener);
+  removeVideoListener = (
+    listener: (message: VideoListenerTypes) => void,
+  ): void => {
+    this.videoListeners.delete(listener);
+  };
+
+  setState = (state: ContentStateTypes[]) => {
+    this.state = state;
+
+    this.videoListeners.forEach((listener) => {
+      listener({ type: "stateChanged" });
+    });
   };
 }
 

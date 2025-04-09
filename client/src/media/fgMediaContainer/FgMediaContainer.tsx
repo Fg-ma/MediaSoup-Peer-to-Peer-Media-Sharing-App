@@ -205,6 +205,10 @@ export default function FgMediaContainer({
   );
 
   useEffect(() => {
+    setState(initState);
+  }, [initState]);
+
+  useEffect(() => {
     mediaContainerController.attachPositioningListeners();
   }, [JSON.stringify(remoteDataStreams.current)]);
 
@@ -390,7 +394,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         {media && media}
         <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">

@@ -1,19 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   Signals,
   useSignalContext,
 } from "../../context/signalContext/SignalContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
+import FgImageElement from "../../elements/fgImageElement/FgImageElement";
 
 type InstanceType = {
   contentType: StaticContentTypes;
   contentId: string;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
+  instances: {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  }[];
 };
 
 export default function NewInstancesLayer({
@@ -21,15 +25,22 @@ export default function NewInstancesLayer({
 }: {
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
+  const { userMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { addSignalListener, removeSignalListener } = useSignalContext();
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [hideInstances, setHideInstances] = useState(false);
+  const hideInstances = useRef(false);
   const newInstances = useRef<InstanceType[]>([]);
   const newInstanceLayerRef = useRef<HTMLDivElement>(null);
 
   const [_, setRerender] = useState(false);
+
+  const instanceStructureKey = useMemo(() => {
+    return JSON.stringify(
+      newInstances.current.map((inst) => inst.instances.length),
+    );
+  }, [newInstances.current]);
 
   const handleSignals = (event: Signals) => {
     if (!event) return;
@@ -44,10 +55,14 @@ export default function NewInstancesLayer({
             ...instances.map((instance) => ({
               contentType: instance.contentType,
               contentId: instance.contentId,
-              width: instance.width,
-              height: instance.height,
-              x: 0,
-              y: 0,
+              instances: [
+                ...instance.instances.map((ins) => ({
+                  width: ins.width,
+                  height: ins.height,
+                  x: 0,
+                  y: 0,
+                })),
+              ],
             })),
           ];
           setRerender((prev) => !prev);
@@ -55,90 +70,42 @@ export default function NewInstancesLayer({
         break;
       case "stopInstancesDrag":
         {
-          const instancesToUpload = newInstances.current.reduce(
-            (acc, instance) => {
-              const existing = acc.find(
-                (item) =>
-                  item.contentType === instance.contentType &&
-                  item.contentId === instance.contentId,
-              );
+          if (hideInstances.current) {
+            newInstances.current = [];
+            hideInstances.current = false;
+            setRerender((prev) => !prev);
+            return;
+          }
 
-              if (existing) {
-                existing.instances.push({
-                  positioning: {
-                    position: {
-                      left:
-                        (instance.x /
-                          (newInstanceLayerRef.current?.clientWidth ?? 1)) *
-                        100,
-                      top:
-                        (instance.y /
-                          (newInstanceLayerRef.current?.clientHeight ?? 1)) *
-                        100,
-                    },
-                    scale: {
-                      x: instance.width,
-                      y: instance.height,
-                    },
-                    rotation: 0,
-                  },
-                });
-              } else {
-                acc.push({
-                  contentType: instance.contentType,
-                  contentId: instance.contentId,
-                  instances: [
-                    {
-                      positioning: {
-                        position: {
-                          left:
-                            (instance.x /
-                              (newInstanceLayerRef.current?.clientWidth ?? 1)) *
-                            100,
-                          top:
-                            (instance.y /
-                              (newInstanceLayerRef.current?.clientHeight ??
-                                1)) *
-                            100,
-                        },
-                        scale: {
-                          x: instance.width,
-                          y: instance.height,
-                        },
-                        rotation: 0,
-                      },
-                    },
-                  ],
-                });
-              }
-
-              return acc;
-            },
-            [] as {
-              contentType: StaticContentTypes;
-              contentId: string;
-              instances: {
-                positioning: {
-                  position: { left: number; top: number };
-                  scale: { x: number; y: number };
-                  rotation: number;
-                };
-              }[];
-            }[],
-          );
+          const instancesToUpload = newInstances.current.map((instance) => ({
+            contentType: instance.contentType,
+            contentId: instance.contentId,
+            instances: instance.instances.map((ins) => ({
+              instanceId: uuidv4(),
+              positioning: {
+                position: {
+                  left:
+                    (ins.x / (newInstanceLayerRef.current?.clientWidth ?? 1)) *
+                    100,
+                  top:
+                    (ins.y / (newInstanceLayerRef.current?.clientHeight ?? 1)) *
+                    100,
+                },
+                scale: {
+                  x: ins.width,
+                  y: ins.height,
+                },
+                rotation: 0,
+              },
+            })),
+          }));
 
           tableStaticContentSocket.current?.createNewInstances(
-            instancesToUpload.map((instance) => ({
-              contentType: instance.contentType,
-              contentId: instance.contentId,
-              instances: instance.instances.map((inst) => ({
-                instanceId: uuidv4(),
-                positioning: inst.positioning,
-              })),
-            })),
+            instancesToUpload,
           );
 
           newInstances.current = [];
+          hideInstances.current = false;
           setRerender((prev) => !prev);
         }
         break;
@@ -178,9 +145,9 @@ export default function NewInstancesLayer({
         event.clientX > cutoffBox.left + cutoffBox.width ||
         event.clientX < cutoffBox.left
       ) {
-        setHideInstances(true);
+        hideInstances.current = true;
       } else {
-        setHideInstances(false);
+        hideInstances.current = false;
       }
 
       setMousePosition({
@@ -190,13 +157,99 @@ export default function NewInstancesLayer({
     }
   };
 
+  const handleScroll = (event: WheelEvent) => {
+    if (event.shiftKey) {
+      const delta = event.deltaY;
+
+      if (delta < 0) {
+        newInstances.current = newInstances.current.map((instance) => ({
+          ...instance,
+          instances:
+            instance.instances.length < 10
+              ? [
+                  ...instance.instances,
+                  {
+                    width: instance.instances[0].width,
+                    height: instance.instances[0].height,
+                    x: 0,
+                    y: 0,
+                  },
+                ]
+              : instance.instances,
+        }));
+      } else {
+        newInstances.current = newInstances.current.map((instance) => ({
+          ...instance,
+          instances:
+            instance.instances.length >= 2
+              ? instance.instances.slice(0, -1)
+              : instance.instances,
+        }));
+      }
+
+      setRerender((prev) => !prev);
+    }
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.shiftKey) {
+      switch (event.key.toLowerCase()) {
+        case "x":
+          newInstances.current = newInstances.current.map((instance) => ({
+            ...instance,
+            instances:
+              instance.instances.length > 1
+                ? [
+                    {
+                      width: instance.instances[0].width,
+                      height: instance.instances[0].height,
+                      x: 0,
+                      y: 0,
+                    },
+                  ]
+                : instance.instances,
+          }));
+          setRerender((prev) => !prev);
+          break;
+        case "m":
+          newInstances.current = newInstances.current.map((instance) => {
+            const diff = 10 - instance.instances.length;
+
+            return {
+              ...instance,
+              instances:
+                diff > 0
+                  ? [
+                      ...instance.instances,
+                      ...Array.from({ length: diff }).map(() => ({
+                        width: instance.instances[0].width,
+                        height: instance.instances[0].height,
+                        x: 0,
+                        y: 0,
+                      })),
+                    ]
+                  : instance.instances,
+            };
+          });
+          setRerender((prev) => !prev);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
   useEffect(() => {
     if (newInstances.current.length === 0) return;
 
-    window.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("wheel", handleScroll);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("wheel", handleScroll);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [newInstances.current.length]);
 
@@ -216,29 +269,39 @@ export default function NewInstancesLayer({
     const newPositions: InstanceType[] = [];
 
     instances.forEach((instance) => {
-      const widthPx = (containerRect.width * instance.width) / 100;
-      const heightPx = (containerRect.height * instance.height) / 100;
+      const newIns: { width: number; height: number; x: number; y: number }[] =
+        [];
 
-      if (currentX + widthPx > containerRect.width) {
-        currentX = gridLeft;
-        gridBottom = currentRowTop - GAP;
-        currentRowMaxHeight = 0;
-        currentRowTop = gridBottom;
-      }
+      instance.instances.forEach((ins) => {
+        const widthPx = (containerRect.width * ins.width) / 100;
+        const heightPx = (containerRect.height * ins.height) / 100;
 
-      const boxY = gridBottom - heightPx;
-      const boxX = currentX;
+        if (currentX + widthPx > containerRect.width) {
+          currentX = gridLeft;
+          gridBottom = currentRowTop - GAP;
+          currentRowMaxHeight = 0;
+          currentRowTop = gridBottom;
+        }
+
+        const boxY = gridBottom - heightPx;
+        const boxX = currentX;
+
+        newIns.push({
+          ...ins,
+          x: Math.min(containerRect.width - widthPx, boxX),
+          y: Math.max(0, boxY),
+        });
+
+        currentX += widthPx + GAP;
+
+        currentRowMaxHeight = Math.max(currentRowMaxHeight, heightPx);
+        currentRowTop = gridBottom - currentRowMaxHeight;
+      });
 
       newPositions.push({
         ...instance,
-        x: Math.min(containerRect.width - widthPx, boxX),
-        y: Math.max(0, boxY),
+        instances: newIns,
       });
-
-      currentX += widthPx + GAP;
-
-      currentRowMaxHeight = Math.max(currentRowMaxHeight, heightPx);
-      currentRowTop = gridBottom - currentRowMaxHeight;
     });
 
     newInstances.current = newPositions;
@@ -249,26 +312,56 @@ export default function NewInstancesLayer({
     if (newInstances.current.length > 0) {
       placeInstances();
     }
-  }, [mousePosition, newInstances.current.length]);
+  }, [mousePosition, instanceStructureKey]);
 
   return (
     <div
       ref={newInstanceLayerRef}
       className="pointer-events-none absolute left-0 top-0 z-[10000] h-full w-full bg-transparent"
     >
-      {!hideInstances &&
-        newInstances.current.map((instance) => (
-          <div
-            key={instance.contentId}
-            className="absolute rounded border-4 border-dashed border-fg-red border-opacity-80 bg-fg-red-light bg-opacity-45"
-            style={{
-              width: `${instance.width}%`,
-              height: `${instance.height}%`,
-              left: `${instance.x}px`,
-              top: `${instance.y}px`,
-            }}
-          ></div>
-        ))}
+      {!hideInstances.current &&
+        newInstances.current.map((instance) => {
+          let imgSrc: string | null = null;
+          let alt: string = "";
+
+          if (
+            instance.contentType !== "text" &&
+            instance.contentType !== "soundClip"
+          ) {
+            const media =
+              userMedia.current[instance.contentType].all[instance.contentId];
+
+            if (media?.blobURL) {
+              imgSrc = media.blobURL;
+              alt = media.filename;
+            }
+          }
+
+          return (
+            <React.Fragment key={instance.contentId}>
+              {instance.instances.map((ins, i) => (
+                <div
+                  key={instance.contentId + "_" + i}
+                  className="absolute rounded border-4 border-dashed border-fg-red border-opacity-80 bg-fg-red-light bg-opacity-45"
+                  style={{
+                    width: `${ins.width}%`,
+                    height: `${ins.height}%`,
+                    left: `${ins.x}px`,
+                    top: `${ins.y}px`,
+                  }}
+                >
+                  {imgSrc && (
+                    <FgImageElement
+                      className="h-full w-full object-contain"
+                      src={imgSrc}
+                      alt={alt}
+                    />
+                  )}
+                </div>
+              ))}
+            </React.Fragment>
+          );
+        })}
     </div>
   );
 }

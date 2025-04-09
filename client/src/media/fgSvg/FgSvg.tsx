@@ -87,6 +87,8 @@ export default function FgSvg({
     userEffects,
     userEffectsStyles,
     setRerender,
+    subContainerRef,
+    positioning,
   );
 
   useEffect(() => {
@@ -101,28 +103,7 @@ export default function FgSvg({
 
       setRerender((prev) => !prev);
     }
-    svgMediaInstance.svgMedia.addDownloadCompleteListener(() => {
-      if (svgMediaInstance.instanceSvg) {
-        const allSvgs = subContainerRef.current?.querySelectorAll("svg");
-
-        if (allSvgs) {
-          allSvgs.forEach((svgElement) => {
-            svgElement.remove();
-          });
-        }
-
-        subContainerRef.current?.appendChild(svgMediaInstance.instanceSvg);
-
-        positioning.current.scale = {
-          x: svgMediaInstance.svgMedia.aspect
-            ? positioning.current.scale.y * svgMediaInstance.svgMedia.aspect
-            : positioning.current.scale.x,
-          y: positioning.current.scale.y,
-        };
-
-        setRerender((prev) => !prev);
-      }
-    });
+    svgMediaInstance.svgMedia.addSvgListener(svgController.handleSvgMessages);
 
     document.addEventListener("keydown", lowerSvgController.handleKeyDown);
 
@@ -136,6 +117,9 @@ export default function FgSvg({
     return () => {
       document.removeEventListener("keydown", lowerSvgController.handleKeyDown);
       document.removeEventListener("keyup", lowerSvgController.handleKeyUp);
+      svgMediaInstance.svgMedia.removeSvgListener(
+        svgController.handleSvgMessages,
+      );
       tableRef.current?.removeEventListener(
         "scroll",
         svgController.handleTableScroll,

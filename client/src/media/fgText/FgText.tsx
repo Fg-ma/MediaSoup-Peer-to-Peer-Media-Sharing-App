@@ -72,19 +72,21 @@ export default function FgText({
     textAreaContainerRef,
   );
 
-  const textController = new TextController(setSettingsActive);
+  const textController = new TextController(
+    setSettingsActive,
+    textMediaInstance,
+    text,
+    setRerender,
+  );
 
   useEffect(() => {
     if (textMediaInstance.instanceText) {
       text.current = textMediaInstance.instanceText;
       setRerender((prev) => !prev);
     }
-    textMediaInstance.textMedia.addDownloadCompleteListener(() => {
-      if (textMediaInstance.instanceText) {
-        text.current = textMediaInstance.instanceText;
-        setRerender((prev) => !prev);
-      }
-    });
+    textMediaInstance.textMedia.addTextListener(
+      textController.handleTextMessages,
+    );
 
     document.addEventListener("keydown", lowerTextController.handleKeyDown);
 
