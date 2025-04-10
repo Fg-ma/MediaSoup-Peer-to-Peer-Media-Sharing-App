@@ -16,6 +16,7 @@ import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
 import CaptureMedia from "../media/capture/CaptureMedia";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
+import TabledPortal from "./lib/tabledSection/TabledPortal";
 
 export default function FgTableFunctions({
   tableTopRef,
@@ -62,7 +63,7 @@ export default function FgTableFunctions({
   audioBtnRef: React.RefObject<HTMLButtonElement>;
   muteAudio: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   handleDisableEnableBtns: (disabled: boolean) => void;
   gridActive: boolean;
@@ -98,6 +99,9 @@ export default function FgTableFunctions({
   const [captureMediaActive, setCaptureMediaActive] = useState(false);
   const captureMedia = useRef<CaptureMedia | undefined>(undefined);
 
+  const [tabledActive, setTabledActive] = useState(false);
+  const [dragging, setDragging] = useState(false);
+
   const [_, setRerender] = useState(false);
 
   const tableFunctionsController = new TableFunctionsController(
@@ -109,7 +113,7 @@ export default function FgTableFunctions({
     deadbanding,
     captureEffects,
     captureEffectsStyles,
-    setRerender
+    setRerender,
   );
 
   const handleExternalMute = () => {
@@ -133,12 +137,12 @@ export default function FgTableFunctions({
 
   useEffect(() => {
     tableSocket.current?.addMessageListener(
-      tableFunctionsController.handleTableSocketMessage
+      tableFunctionsController.handleTableSocketMessage,
     );
 
     return () => {
       tableSocket.current?.removeMessageListener(
-        tableFunctionsController.handleTableSocketMessage
+        tableFunctionsController.handleTableSocketMessage,
       );
     };
   }, [tableSocket.current]);
@@ -150,8 +154,8 @@ export default function FgTableFunctions({
   }, [captureMediaActive]);
 
   return (
-    <div className='w-full h-16 flex items-center justify-center space-x-5 px-[5%]'>
-      <div className='flex w-max h-full py-2 px-4 space-x-3 bg-fg-tone-black-6 rounded-xl border-2 border-fg-off-white'>
+    <div className="flex h-16 w-full items-center justify-center space-x-5 px-[5%]">
+      <div className="flex h-full w-max space-x-3 rounded-xl border-2 border-fg-off-white bg-fg-tone-black-6 px-4 py-2">
         <MoreTableFunctionsButton
           tableTopRef={tableTopRef}
           mutedAudioRef={mutedAudioRef}
@@ -167,6 +171,8 @@ export default function FgTableFunctions({
           handleExternalMute={handleExternalMute}
           captureMediaActive={captureMediaActive}
           setCaptureMediaActive={setCaptureMediaActive}
+          tabledActive={tabledActive}
+          setTabledActive={setTabledActive}
         />
         <CameraSection
           cameraBtnRef={cameraBtnRef}
@@ -204,6 +210,9 @@ export default function FgTableFunctions({
             tableFunctionsController={tableFunctionsController}
             setCaptureMediaActive={setCaptureMediaActive}
           />
+        )}
+        {tabledActive && (
+          <TabledPortal dragging={dragging} setDragging={setDragging} />
         )}
       </div>
       <MessageTableSection />

@@ -19,7 +19,7 @@ export default function MixGaussianEnvelopeSection({
   const handleChangeMixGaussianEnvelope = (
     index: number,
     valueType: "amplitude" | "mean" | "stdDev",
-    value: number
+    value: number,
   ) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
@@ -60,15 +60,15 @@ export default function MixGaussianEnvelopeSection({
       {settings.envelopeType.mixGausianEnvelope.value.map((gausian, index) => (
         <div
           key={index}
-          className='h-48 w-full bg-fg-tone-black-5 rounded relative border-2 border-fg-white-95'
+          className="relative h-48 w-full rounded border-2 border-fg-white-95 bg-fg-tone-black-5"
         >
-          <div className='font-Josefin text-fg-white absolute top-1 left-1/2 -translate-x-1/2 w-max text-lg'>
+          <div className="absolute left-1/2 top-1 w-max -translate-x-1/2 font-Josefin text-lg text-fg-white">
             Gaussian envelope{" "}
-            <span className='text-fg-red-light'>{index + 1}</span>
+            <span className="text-xl text-fg-red-light">{index + 1}</span>
           </div>
-          <div className='h-16 w-[95%] absolute top-[26px] left-1/2 -translate-x-1/2'>
+          <div className="absolute left-1/2 top-[26px] h-16 w-[95%] -translate-x-1/2">
             <FgSlider
-              className='h-full w-full'
+              className="h-full w-full"
               externalValue={
                 settings.envelopeType.mixGausianEnvelope.value[index].amplitude
               }
@@ -79,7 +79,7 @@ export default function MixGaussianEnvelopeSection({
                 handleChangeMixGaussianEnvelope(
                   index,
                   "amplitude",
-                  value.value
+                  value.value,
                 );
               }}
               options={{
@@ -97,9 +97,9 @@ export default function MixGaussianEnvelopeSection({
               }}
             />
           </div>
-          <div className='h-16 w-[95%] absolute top-[64px] left-1/2 -translate-x-1/2'>
+          <div className="absolute left-1/2 top-[64px] h-16 w-[95%] -translate-x-1/2">
             <FgSlider
-              className='h-full w-full'
+              className="h-full w-full"
               externalValue={
                 settings.envelopeType.mixGausianEnvelope.value[index].mean
               }
@@ -123,9 +123,9 @@ export default function MixGaussianEnvelopeSection({
               }}
             />
           </div>
-          <div className='h-16 w-[95%] absolute top-[102px] left-1/2 -translate-x-1/2'>
+          <div className="absolute left-1/2 top-[102px] h-16 w-[95%] -translate-x-1/2">
             <FgSlider
-              className='h-full w-full'
+              className="h-full w-full"
               externalValue={
                 settings.envelopeType.mixGausianEnvelope.value[index].stdDev
               }
@@ -150,11 +150,11 @@ export default function MixGaussianEnvelopeSection({
             />
           </div>
           <FgButton
-            className='absolute top-[154px] left-1/2 -translate-x-1/2 flex h-6 w-[95%] hover:bg-fg-white hover:text-fg-tone-black-1 rounded-sm items-center justify-center hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 fill-fg-white stroke-fg-white'
+            className="absolute left-1/2 top-[154px] flex h-6 w-[95%] -translate-x-1/2 items-center justify-center rounded-sm fill-fg-white stroke-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1"
             clickFunction={() => handleRemoveGaussian(index)}
             contentFunction={() => (
               <FgSVGElement
-                className='flex h-full aspect-square items-center justify-center'
+                className="flex aspect-square h-full items-center justify-center"
                 src={minusIcon}
                 attributes={[
                   { key: "width", value: "100%" },
@@ -166,12 +166,12 @@ export default function MixGaussianEnvelopeSection({
         </div>
       ))}
       <FgButton
-        className='flex h-8 w-full hover:bg-fg-white hover:text-fg-tone-black-1 rounded items-center justify-center hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 fill-fg-white stroke-fg-white'
+        className="flex h-8 w-full items-center justify-center rounded fill-fg-white stroke-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1"
         style={{ marginTop: "1rem" }}
         clickFunction={handleAddGaussian}
         contentFunction={() => (
           <FgSVGElement
-            className='flex h-full aspect-square items-center justify-center'
+            className="flex aspect-square h-full items-center justify-center"
             src={additionIcon}
             attributes={[
               { key: "width", value: "100%" },

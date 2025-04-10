@@ -34,11 +34,11 @@ const backgroundMusicOffIcon =
   nginxAssetServerBaseUrl + "svgs/audioEffects/backgroundMusicOffIcon.svg";
 
 const AudioMixEffectsPortal = React.lazy(
-  () => import("./AudioMixEffectsPortal")
+  () => import("./AudioMixEffectsPortal"),
 );
 const FgPiano = React.lazy(() => import("../../components/fgPiano/FgPiano"));
 const FgSoundBoard = React.lazy(
-  () => import("../../components/fgSoundBoard/FgSoundBoard")
+  () => import("../../components/fgSoundBoard/FgSoundBoard"),
 );
 
 export default function AudioEffectsSection({
@@ -79,14 +79,14 @@ export default function AudioEffectsSection({
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => void;
   placement: "above" | "below" | "left" | "right";
   referenceElement: React.RefObject<HTMLElement>;
   padding: number;
   handleMute: (
     producerType: "audio" | "screenAudio" | "video",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
   videoContentMute?: React.MutableRefObject<{
@@ -110,7 +110,6 @@ export default function AudioEffectsSection({
   const { mediasoupSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
-  const [cols, setCols] = useState(3);
   // No one in there right mind will ever be able to read this again and I'm ok with that
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
@@ -122,34 +121,38 @@ export default function AudioEffectsSection({
         ? "off"
         : "high"
       : producerType === "video" && videoContentMute && producerId
-      ? videoContentMute.current[producerId]
-        ? "off"
-        : "high"
-      : producerType === "audio" && clientMute
-      ? clientMute.current
-        ? "off"
-        : localMute
-        ? localMute.current
+        ? videoContentMute.current[producerId]
           ? "off"
           : "high"
-        : "high"
-      : producerType === "screenAudio" && screenAudioClientMute && producerId
-      ? screenAudioClientMute.current[producerId]
-        ? "off"
-        : screenAudioLocalMute
-        ? screenAudioLocalMute.current[producerId]
-          ? "off"
-          : "high"
-        : "high"
-      : producerType === "audio" && localMute
-      ? localMute.current
-        ? "off"
-        : "high"
-      : producerType === "screenAudio" && screenAudioLocalMute && producerId
-      ? screenAudioLocalMute.current[producerId]
-        ? "off"
-        : "high"
-      : "high",
+        : producerType === "audio" && clientMute
+          ? clientMute.current
+            ? "off"
+            : localMute
+              ? localMute.current
+                ? "off"
+                : "high"
+              : "high"
+          : producerType === "screenAudio" &&
+              screenAudioClientMute &&
+              producerId
+            ? screenAudioClientMute.current[producerId]
+              ? "off"
+              : screenAudioLocalMute
+                ? screenAudioLocalMute.current[producerId]
+                  ? "off"
+                  : "high"
+                : "high"
+            : producerType === "audio" && localMute
+              ? localMute.current
+                ? "off"
+                : "high"
+              : producerType === "screenAudio" &&
+                  screenAudioLocalMute &&
+                  producerId
+                ? screenAudioLocalMute.current[producerId]
+                  ? "off"
+                  : "high"
+                : "high",
   });
   const [audioMixEffectsActive, setAudioMixEffectsActive] = useState(false);
   const [panioActive, setPanioActive] = useState(false);
@@ -170,34 +173,38 @@ export default function AudioEffectsSection({
         ? "off"
         : "high"
       : producerType === "video" && videoContentMute && producerId
-      ? videoContentMute.current[producerId]
-        ? "off"
-        : "high"
-      : producerType === "audio" && clientMute
-      ? clientMute.current
-        ? "off"
-        : localMute
-        ? localMute.current
+        ? videoContentMute.current[producerId]
           ? "off"
           : "high"
-        : "high"
-      : producerType === "screenAudio" && screenAudioClientMute && producerId
-      ? screenAudioClientMute.current[producerId]
-        ? "off"
-        : screenAudioLocalMute
-        ? screenAudioLocalMute.current[producerId]
-          ? "off"
-          : "high"
-        : "high"
-      : producerType === "audio" && localMute
-      ? localMute.current
-        ? "off"
-        : "high"
-      : producerType === "screenAudio" && screenAudioLocalMute && producerId
-      ? screenAudioLocalMute.current[producerId]
-        ? "off"
-        : "high"
-      : "high";
+        : producerType === "audio" && clientMute
+          ? clientMute.current
+            ? "off"
+            : localMute
+              ? localMute.current
+                ? "off"
+                : "high"
+              : "high"
+          : producerType === "screenAudio" &&
+              screenAudioClientMute &&
+              producerId
+            ? screenAudioClientMute.current[producerId]
+              ? "off"
+              : screenAudioLocalMute
+                ? screenAudioLocalMute.current[producerId]
+                  ? "off"
+                  : "high"
+                : "high"
+            : producerType === "audio" && localMute
+              ? localMute.current
+                ? "off"
+                : "high"
+              : producerType === "screenAudio" &&
+                  screenAudioLocalMute &&
+                  producerId
+                ? screenAudioLocalMute.current[producerId]
+                  ? "off"
+                  : "high"
+                : "high";
 
     if (newTo !== volumeState.to) {
       setVolumeState((prev) => ({ from: prev.to, to: newTo }));
@@ -210,21 +217,6 @@ export default function AudioEffectsSection({
     screenAudioClientMute?.current[producerId ?? ""],
     screenAudioLocalMute?.current[producerId ?? ""],
   ]);
-
-  const gridColumnsChange = () => {
-    if (!audioSectionRef.current) return;
-
-    const width = audioSectionRef.current.clientWidth;
-    if (width < 300) {
-      if (cols !== 3) setCols(3);
-    } else if (width < 500) {
-      if (cols !== 4) setCols(4);
-    } else if (width < 700) {
-      if (cols !== 5) setCols(5);
-    } else if (width >= 700) {
-      if (cols !== 6) setCols(6);
-    }
-  };
 
   const handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
@@ -270,31 +262,26 @@ export default function AudioEffectsSection({
         content={
           <LazyScrollingContainer
             externalRef={audioSectionRef}
-            className={`small-vertical-scroll-bar grid gap-1 min-w-[9.5rem] min-h-[9.5rem] h-full w-full overflow-y-auto py-2 ${
-              cols === 3
-                ? "grid-cols-3"
-                : cols === 4
-                ? "grid-cols-4"
-                : cols === 5
-                ? "grid-cols-5"
-                : "grid-cols-6"
-            }`}
+            className="small-vertical-scroll-bar grid h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(2rem, 5rem))",
+            }}
             items={[
               ...(items ? items : []),
               <FgButton
                 scrollingContainerRef={audioSectionRef}
-                className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                className="flex aspect-square w-full items-center justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                 clickFunction={() => {
                   handleMute(producerType, producerId);
                   setRerender((prev) => !prev);
                 }}
                 contentFunction={() => (
                   <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 100.0001 100.00001'
-                    width='90%'
-                    height='90%'
-                    fill='white'
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 100.0001 100.00001"
+                    width="90%"
+                    height="90%"
+                    fill="white"
                   >
                     <VolumeSVG
                       volumeState={volumeState}
@@ -303,7 +290,7 @@ export default function AudioEffectsSection({
                         volumeSVGPaths.high.left,
                         volumeSVGPaths.high.middle,
                       ]}
-                      color='white'
+                      color="white"
                     />
                     {volumeState.from === "" && volumeState.to === "off" && (
                       <path d={volumeSVGPaths.strike} />
@@ -318,40 +305,40 @@ export default function AudioEffectsSection({
                           ? "Unmute"
                           : "Mute"
                         : producerType === "video" &&
-                          videoContentMute &&
-                          producerId
-                        ? videoContentMute.current[producerId]
-                          ? "off"
-                          : "high"
-                        : producerType === "audio" && clientMute
-                        ? clientMute.current
-                          ? "Unmute"
-                          : localMute
-                          ? localMute.current
-                            ? "Unmute"
-                            : "Mute"
-                          : "Mute"
-                        : producerType === "screenAudio" &&
-                          screenAudioClientMute &&
-                          producerId
-                        ? screenAudioClientMute.current[producerId]
-                          ? "Unmute"
-                          : screenAudioLocalMute
-                          ? screenAudioLocalMute.current[producerId]
-                            ? "Unmute"
-                            : "Mute"
-                          : "Mute"
-                        : producerType === "audio" && localMute
-                        ? localMute.current
-                          ? "Unmute"
-                          : "Mute"
-                        : producerType === "screenAudio" &&
-                          screenAudioLocalMute &&
-                          producerId
-                        ? screenAudioLocalMute.current[producerId]
-                          ? "Unmute"
-                          : "Mute"
-                        : "Mute"
+                            videoContentMute &&
+                            producerId
+                          ? videoContentMute.current[producerId]
+                            ? "off"
+                            : "high"
+                          : producerType === "audio" && clientMute
+                            ? clientMute.current
+                              ? "Unmute"
+                              : localMute
+                                ? localMute.current
+                                  ? "Unmute"
+                                  : "Mute"
+                                : "Mute"
+                            : producerType === "screenAudio" &&
+                                screenAudioClientMute &&
+                                producerId
+                              ? screenAudioClientMute.current[producerId]
+                                ? "Unmute"
+                                : screenAudioLocalMute
+                                  ? screenAudioLocalMute.current[producerId]
+                                    ? "Unmute"
+                                    : "Mute"
+                                  : "Mute"
+                              : producerType === "audio" && localMute
+                                ? localMute.current
+                                  ? "Unmute"
+                                  : "Mute"
+                                : producerType === "screenAudio" &&
+                                    screenAudioLocalMute &&
+                                    producerId
+                                  ? screenAudioLocalMute.current[producerId]
+                                    ? "Unmute"
+                                    : "Mute"
+                                  : "Mute"
                     }
                   />
                 }
@@ -363,7 +350,7 @@ export default function AudioEffectsSection({
               <FgButton
                 scrollingContainerRef={audioSectionRef}
                 externalRef={audioMixEffectsButtonRef}
-                className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                className="w-fullitems-center flex aspect-square justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                 clickFunction={() => {
                   setAudioMixEffectsActive((prev) => !prev);
                 }}
@@ -375,7 +362,7 @@ export default function AudioEffectsSection({
                           ? mixAudioEffectsOffIcon
                           : mixAudioEffectsIcon
                       }
-                      className='flex items-center justify-center'
+                      className="flex items-center justify-center"
                       attributes={[
                         { key: "width", value: "90%" },
                         { key: "height", value: "90%" },
@@ -403,20 +390,20 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={pianoRef}
-                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                  className="flex aspect-square w-full items-center justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                   clickFunction={() => {
                     if (visualMediaContainerRef?.current) {
                       if (
                         visualMediaContainerRef.current.classList.contains(
-                          "in-piano"
+                          "in-piano",
                         )
                       ) {
                         visualMediaContainerRef.current.classList.remove(
-                          "in-piano"
+                          "in-piano",
                         );
                       } else {
                         visualMediaContainerRef.current.classList.add(
-                          "in-piano"
+                          "in-piano",
                         );
                       }
                     }
@@ -426,7 +413,7 @@ export default function AudioEffectsSection({
                     return (
                       <FgSVGElement
                         src={panioActive ? pianoOffIcon : pianoIcon}
-                        className='flex items-center justify-center'
+                        className="flex items-center justify-center"
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
@@ -451,7 +438,7 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={soundBoardButtonRef}
-                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                  className="flex aspect-square w-full items-center justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                   clickFunction={() => {
                     setSoundBoardActive((prev) => !prev);
                   }}
@@ -461,7 +448,7 @@ export default function AudioEffectsSection({
                         src={
                           soundBoardActive ? soundBoardOffIcon : soundBoardIcon
                         }
-                        className='flex items-center justify-center'
+                        className="flex items-center justify-center"
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
@@ -488,7 +475,7 @@ export default function AudioEffectsSection({
                 <FgButton
                   scrollingContainerRef={audioSectionRef}
                   externalRef={backgroundMusicButtonRef}
-                  className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                  className="flex aspect-square w-full items-center justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                   clickFunction={() => {
                     setBackgroundMusicActive((prev) => !prev);
                   }}
@@ -500,7 +487,7 @@ export default function AudioEffectsSection({
                             ? backgroundMusicOffIcon
                             : backgroundMusicIcon
                         }
-                        className='flex items-center justify-center'
+                        className="flex items-center justify-center"
                         attributes={[
                           { key: "width", value: "90%" },
                           { key: "height", value: "90%" },
@@ -547,17 +534,16 @@ export default function AudioEffectsSection({
           placement: placement,
           padding: padding,
         }}
-        initWidth={"278px"}
+        initWidth={"300px"}
         initHeight={"268px"}
-        minWidth={204}
+        minWidth={140}
         minHeight={190}
-        resizeCallback={gridColumnsChange}
         closeCallback={closeCallback ? () => closeCallback() : undefined}
         closeLabelElement={closeLabelElement}
-        closePosition='topRight'
+        closePosition="topRight"
         shadow={{ top: true, bottom: true }}
-        backgroundColor={backgroundColor}
-        secondaryBackgroundColor={secondaryBackgroundColor}
+        backgroundColor={"#161616"}
+        secondaryBackgroundColor={"#212121"}
       />
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>

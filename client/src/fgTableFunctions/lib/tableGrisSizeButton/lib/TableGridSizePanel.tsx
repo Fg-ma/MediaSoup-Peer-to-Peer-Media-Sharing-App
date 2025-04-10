@@ -4,11 +4,13 @@ import FgSlider from "../../../../elements/fgSlider/FgSlider";
 import FgToggleButton from "../../../../elements/fgToggleButton/FgToggleButton";
 
 export default function TableGridSizePanel({
+  gridSizeSectionRef,
   tableGridSizeButtonRef,
   setGridSizePanelActive,
   gridSize,
   setGridSize,
 }: {
+  gridSizeSectionRef: React.RefObject<HTMLDivElement>;
   tableGridSizeButtonRef: React.RefObject<HTMLButtonElement>;
   setGridSizePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   gridSize: {
@@ -27,9 +29,10 @@ export default function TableGridSizePanel({
 
   return (
     <FgPanel
+      externalRef={gridSizeSectionRef}
       content={
-        <div className='h-full w-full flex flex-col items-start justify-center'>
-          <div className='w-[4.5rem] h-8'>
+        <div className="flex h-full w-full flex-col items-start justify-between space-y-2">
+          <div className="h-8 w-[4.5rem]">
             <FgToggleButton
               stateChangeFunction={(state) => {
                 setSquareActive(state === 0 ? false : true);
@@ -68,6 +71,7 @@ export default function TableGridSizePanel({
               precision: 0,
               snapToWholeNum: true,
               orientation: "horizontal",
+              labelsColor: "#d6d6d6",
             }}
           />
           <FgSlider
@@ -100,6 +104,7 @@ export default function TableGridSizePanel({
               precision: 0,
               snapToWholeNum: true,
               orientation: "horizontal",
+              labelsColor: "#d6d6d6",
             }}
           />
         </div>
@@ -114,7 +119,9 @@ export default function TableGridSizePanel({
       minWidth={200}
       minHeight={160}
       closeCallback={() => setGridSizePanelActive(false)}
-      closePosition='topRight'
+      closePosition="topRight"
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

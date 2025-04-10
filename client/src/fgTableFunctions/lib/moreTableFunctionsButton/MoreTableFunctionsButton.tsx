@@ -24,6 +24,8 @@ export default function MoreTableFunctionsButton({
   handleExternalMute,
   captureMediaActive,
   setCaptureMediaActive,
+  tabledActive,
+  setTabledActive,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -47,26 +49,34 @@ export default function MoreTableFunctionsButton({
   handleExternalMute: () => void;
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
+  tabledActive: boolean;
+  setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
   const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
-  const tabledSectionRef = useRef<HTMLDivElement>(null);
   const gamesSectionRef = useRef<HTMLDivElement>(null);
   const tableBackgroundSectionRef = useRef<HTMLDivElement>(null);
+  const gridSizeSectionRef = useRef<HTMLDivElement>(null);
 
   const handlePointerDown = (event: PointerEvent) => {
     if (
       !moreTableFunctionsPanelRef.current?.contains(event.target as Node) &&
       !moreTableFunctionsButtonRef.current?.contains(event.target as Node) &&
-      !tabledSectionRef.current?.contains(event.target as Node) &&
       !gamesSectionRef.current?.contains(event.target as Node) &&
-      !tableBackgroundSectionRef.current?.contains(event.target as Node)
+      !tableBackgroundSectionRef.current?.contains(event.target as Node) &&
+      !gridSizeSectionRef.current?.contains(event.target as Node)
     ) {
       setMoreTableFunctionsActive(false);
     }
   };
+
+  useEffect(() => {
+    if (tabledActive) {
+      setMoreTableFunctionsActive(false);
+    }
+  }, [tabledActive]);
 
   useEffect(() => {
     if (moreTableFunctionsActive) {
@@ -132,9 +142,11 @@ export default function MoreTableFunctionsButton({
           handleExternalMute={handleExternalMute}
           captureMediaActive={captureMediaActive}
           setCaptureMediaActive={setCaptureMediaActive}
-          tabledSectionRef={tabledSectionRef}
           gamesSectionRef={gamesSectionRef}
           tableBackgroundSectionRef={tableBackgroundSectionRef}
+          tabledActive={tabledActive}
+          setTabledActive={setTabledActive}
+          gridSizeSectionRef={gridSizeSectionRef}
         />
       )}
     </>

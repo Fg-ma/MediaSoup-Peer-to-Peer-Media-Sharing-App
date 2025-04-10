@@ -11,6 +11,7 @@ const distanceIcon = nginxAssetServerBaseUrl + "svgs/distanceIcon.svg";
 export default function TableGridSizeButton({
   gridSize,
   setGridSize,
+  gridSizeSectionRef,
 }: {
   gridSize: {
     rows: number;
@@ -22,6 +23,7 @@ export default function TableGridSizeButton({
       cols: number;
     }>
   >;
+  gridSizeSectionRef: React.RefObject<HTMLDivElement>;
 }) {
   const [gridSizePanelActive, setGridSizePanelActive] = useState(false);
   const tableGridSizeButtonRef = useRef<HTMLButtonElement>(null);
@@ -30,16 +32,15 @@ export default function TableGridSizeButton({
     <>
       <FgButton
         externalRef={tableGridSizeButtonRef}
-        className='h-full aspect-square'
+        className="aspect-square h-full"
         clickFunction={() => setGridSizePanelActive((prev) => !prev)}
         contentFunction={() => (
           <FgSVGElement
             src={distanceIcon}
+            className="fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
-              { key: "fill", value: "black" },
-              { key: "stroke", value: "black" },
             ]}
             style={{
               transition: "transform 0.3s ease",
@@ -47,12 +48,13 @@ export default function TableGridSizeButton({
             }}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Change grid size' />}
+        hoverContent={<FgHoverContentStandard content="Change grid size" />}
         options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
         aria-label={"Change table grid size"}
       />
       {gridSizePanelActive && (
         <TableGridSizePanel
+          gridSizeSectionRef={gridSizeSectionRef}
           tableGridSizeButtonRef={tableGridSizeButtonRef}
           setGridSizePanelActive={setGridSizePanelActive}
           gridSize={gridSize}

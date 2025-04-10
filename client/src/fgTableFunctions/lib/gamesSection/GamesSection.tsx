@@ -23,26 +23,11 @@ export default function GamesSection({
   const { table_id, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
-  const [cols, setCols] = useState(3);
   const gamesButtonRef = useRef<HTMLButtonElement>(null);
-
-  const gridColumnsChange = () => {
-    if (!gamesSectionRef.current) return;
-
-    const width = gamesSectionRef.current.clientWidth;
-    if (width < 300) {
-      if (cols !== 3) setCols(3);
-    } else if (width < 500) {
-      if (cols !== 4) setCols(4);
-    } else if (width < 700) {
-      if (cols !== 5) setCols(5);
-    } else if (width >= 700) {
-      if (cols !== 6) setCols(6);
-    }
-  };
+  const gamesScrollingContainerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex aspect-square w-full">
+    <>
       <FgButton
         externalRef={gamesButtonRef}
         clickFunction={() => setGamesActive((prev) => !prev)}
@@ -55,8 +40,8 @@ export default function GamesSection({
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
-                { key: "fill", value: "black", id: "joystickBottom" },
-                { key: "stroke", value: "black" },
+                { key: "fill", value: "#d6d6d6", id: "joystickBottom" },
+                { key: "stroke", value: "#d6d6d6" },
                 ...(gamesActive
                   ? [{ key: "fill", value: "#e62833", id: "joystickTop" }]
                   : [
@@ -80,22 +65,19 @@ export default function GamesSection({
       />
       {gamesActive && (
         <FgPanel
+          externalRef={gamesSectionRef}
           content={
             <LazyScrollingContainer
-              externalRef={gamesSectionRef}
-              className={`small-vertical-scroll-bar grid h-full min-h-[9.5rem] w-full min-w-[9.5rem] gap-1 overflow-y-auto py-2 ${
-                cols === 3
-                  ? "grid-cols-3"
-                  : cols === 4
-                    ? "grid-cols-4"
-                    : cols === 5
-                      ? "grid-cols-5"
-                      : "grid-cols-6"
-              }`}
+              externalRef={gamesScrollingContainerRef}
+              className="small-vertical-scroll-bar grid h-full items-center justify-center gap-1 overflow-y-auto py-2"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
+                gridAutoRows: "max-content",
+              }}
               items={[
                 <FgButton
-                  scrollingContainerRef={gamesSectionRef}
-                  className="flex aspect-square min-w-12 max-w-24 items-center justify-center rounded border-2 border-gray-300 hover:border-3 hover:border-fg-secondary"
+                  scrollingContainerRef={gamesScrollingContainerRef}
+                  className="flex aspect-square items-center justify-center rounded bg-fg-tone-black-1 hover:bg-fg-red-light"
                   contentFunction={() => (
                     <FgSVGElement
                       src={snakeGameIcon}
@@ -134,16 +116,17 @@ export default function GamesSection({
             placement: "below",
             padding: 8,
           }}
-          initWidth={"278px"}
+          initWidth={"308px"}
           initHeight={"268px"}
-          minWidth={204}
+          minWidth={150}
           minHeight={190}
-          resizeCallback={gridColumnsChange}
           closeCallback={() => setGamesActive(false)}
           closePosition="topRight"
           shadow={{ top: true, bottom: true }}
+          backgroundColor={"#161616"}
+          secondaryBackgroundColor={"#212121"}
         />
       )}
-    </div>
+    </>
   );
 }

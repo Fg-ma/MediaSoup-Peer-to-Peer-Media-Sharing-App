@@ -32,7 +32,7 @@ export default function FgSoundBoard({
   const [soundEffects, setSoundEffects] =
     useState<SoundEffects>(defaultSoundEffects);
   const soundEffectsMetaDataRef = useRef<SoundEffectsMetaData>(
-    defaultSoundEffectsMetaData
+    defaultSoundEffectsMetaData,
   );
   const [importButton, setImportButton] = useState<{
     pressed: boolean;
@@ -42,10 +42,10 @@ export default function FgSoundBoard({
 
   const [boardMode, setBoardMode] = useState<BoardModes>("standard");
   const seizureBoardEffectIntevalRef = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
   const seizureBoardEffectTimeoutRef = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
 
   const [focus, setFocus] = useState(true);
@@ -59,7 +59,7 @@ export default function FgSoundBoard({
   const tempImportedFiles = useRef<FileList | undefined>(undefined);
 
   const audioEndTimeouts = useRef<Record<number, NodeJS.Timeout | undefined>>(
-    {}
+    {},
   );
 
   const fgSoundBoardController = new FgSoundBoardController(
@@ -77,7 +77,7 @@ export default function FgSoundBoard({
     setImportedFiles,
     tempImportedFiles,
     userMedia,
-    audioEndTimeouts
+    audioEndTimeouts,
   );
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function FgSoundBoard({
           const updatedClasses = [...newEffects[key].classes];
 
           newEffects[key].classes = updatedClasses.filter(
-            (cls) => cls !== "assignment"
+            (cls) => cls !== "assignment",
           );
         }
 
@@ -116,19 +116,19 @@ export default function FgSoundBoard({
   return (
     <FgPanel
       content={
-        <div className='flex flex-col w-full h-full'>
+        <div className="flex h-full w-full flex-col">
           <input
             ref={fileSelectorRef}
-            className='hidden'
-            type='file'
+            className="hidden"
+            type="file"
             onChange={fgSoundBoardController.handleFileInput}
             multiple
           />
           <motion.div
-            className='w-full min-h-10 h-10 z-[2] px-4 flex items-center justify-between'
+            className="z-[2] flex h-10 min-h-10 w-full items-center justify-between px-4"
             style={{
               // prettier-ignore
-              boxShadow: `0px 10px 5px -5px ${focus ? "#f2f2f2" : "#d6d6d6"}`,
+              boxShadow: `0px 10px 5px -5px ${focus ? "#161616" : "#212121"}`,
             }}
             transition={{
               boxShadow: {
@@ -137,22 +137,27 @@ export default function FgSoundBoard({
               },
             }}
           >
-            <div className='w-24 h-8'>
+            <div className="h-8 w-24">
               <FgTriToggleButton
-                kind='cycle'
+                kind="cycle"
                 initPosition={0}
                 stateChangeFunction={fgSoundBoardController.stateChangeFunction}
                 btnLabels={["Standard", "Crazy", "Seizure"]}
               />
             </div>
-            <div className='select-none font-K2D text-xl truncate'>
+            {(boardMode === "crazy" || boardMode === "seizure") && (
+              <div className="w-max select-none truncate font-K2D text-xl text-fg-off-white">
+                {boardMode === "crazy" ? "Crazy mode" : "Seizure mode"}
+              </div>
+            )}
+            <div className="select-none truncate font-K2D text-xl text-fg-off-white">
               {tempImportedFiles.current &&
                 tempImportedFiles.current[0] &&
                 tempImportedFiles.current[0].name}
             </div>
           </motion.div>
-          <div className='small-multidirectional-scroll-bar p-4 overflow-auto w-full grow relative'>
-            <div className='grid w-full h-full min-h-max min-w-max grid-cols-5 gap-3 items-center justify-center justify-items-center place-items-center'>
+          <div className="small-multidirectional-scroll-bar relative w-full grow overflow-auto p-4">
+            <div className="grid h-full min-h-max w-full min-w-max grid-cols-5 place-items-center items-center justify-center justify-items-center gap-3">
               <FgButton
                 className={`sound-board-btn ${
                   importButton.pressed ? "pressed" : ""
@@ -165,7 +170,7 @@ export default function FgSoundBoard({
                 }
                 contentFunction={() => (
                   <>
-                    <div className='sound-board-btn-alt-1'>
+                    <div className="sound-board-btn-alt-1">
                       <FgSVGElement
                         src={additionIcon}
                         attributes={[
@@ -180,11 +185,11 @@ export default function FgSoundBoard({
                             value: importButton.pressed ? "#e80110" : "#cccccc",
                           },
                         ]}
-                        className='w-full h-full flex items-center justify-center z-[2]'
+                        className="z-[2] flex h-full w-full items-center justify-center"
                       />
                     </div>
-                    <div className='sound-board-btn-alt-2'></div>
-                    <div className='sound-board-btn-alt-3'></div>
+                    <div className="sound-board-btn-alt-2"></div>
+                    <div className="sound-board-btn-alt-3"></div>
                   </>
                 )}
               />
@@ -202,9 +207,9 @@ export default function FgSoundBoard({
                   }
                   contentFunction={() => (
                     <>
-                      <div className='sound-board-btn-alt-1'></div>
-                      <div className='sound-board-btn-alt-2'></div>
-                      <div className='sound-board-btn-alt-3'></div>
+                      <div className="sound-board-btn-alt-1"></div>
+                      <div className="sound-board-btn-alt-2"></div>
+                      <div className="sound-board-btn-alt-3"></div>
                     </>
                   )}
                 />
@@ -221,8 +226,8 @@ export default function FgSoundBoard({
         referenceElement: soundBoardButtonRef,
         placement: "below",
       }}
-      initHeight='645px'
-      initWidth='605px'
+      initHeight="645px"
+      initWidth="605px"
       shadow={{ left: true, right: false, bottom: false, top: false }}
       closeCallback={() => {
         fgSoundBoardController.closeSoundBoard();
@@ -230,8 +235,10 @@ export default function FgSoundBoard({
           closeCallback();
         }
       }}
-      closePosition='topRight'
+      closePosition="topRight"
       focusCallback={(newFocus: boolean) => setFocus(newFocus)}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

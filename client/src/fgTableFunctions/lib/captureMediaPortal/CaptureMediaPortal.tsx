@@ -238,7 +238,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={499999998}
+      zValue={500000000}
       className="h-full w-full"
       content={
         <div
@@ -353,7 +353,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={499999998}
+      zValue={500000000}
       content={
         <div
           ref={captureMediaPortalRef}
@@ -378,7 +378,7 @@ export default function CaptureMediaPortal({
               exit="init"
               transition={CaptureMediaTransition}
             >
-              <div className="flex capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 h-full w-full items-center justify-center">
+              <div className="capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center">
                 <div className="absolute left-0 top-[1%] z-[100] flex h-[12%] max-h-12 min-h-6 w-full items-center justify-center">
                   <CloseButton
                     delaying={delaying}
@@ -403,7 +403,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={499999998}
+      zValue={500000000}
       content={
         <div
           ref={captureMediaPortalRef}
@@ -446,7 +446,7 @@ export default function CaptureMediaPortal({
                   onClick={captureMediaController.handlePausePlay}
                 />
               ) : null}
-              <div className="flex capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 h-full w-full items-center justify-center">
+              <div className="capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center">
                 {finalizedCaptureType.current === "video" && (
                   <div
                     ref={timelineContainerRef}

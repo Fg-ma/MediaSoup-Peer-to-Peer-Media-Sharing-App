@@ -11,7 +11,7 @@ import { UserMediaType } from "../../../context/mediaContext/typeConstant";
 
 class FgSoundBoardController {
   crazyBoardEffectInterval = 75;
-  seizureBoardEffectInterval = 75;
+  seizureBoardEffectInterval = 150;
 
   constructor(
     private soundEffects: SoundEffects,
@@ -46,7 +46,7 @@ class FgSoundBoardController {
     private userMedia: React.MutableRefObject<UserMediaType>,
     private audioEndTimeouts: React.MutableRefObject<
       Record<number, NodeJS.Timeout | undefined>
-    >
+    >,
   ) {}
 
   toggleButton = (key: number) => {
@@ -61,7 +61,7 @@ class FgSoundBoardController {
 
   private carzyBoardEffectUpdater = (
     boardEffect: CrazyBoardEffects,
-    boardIndex: number
+    boardIndex: number,
   ) => {
     this.setSoundEffects((prevEffects) => {
       const newEffects = { ...prevEffects };
@@ -72,17 +72,17 @@ class FgSoundBoardController {
         if (
           boardIndex - 1 >= 0 &&
           crazyBoardEffects[boardEffect].sequence[boardIndex - 1].includes(
-            parseInt(key)
+            parseInt(key),
           )
         ) {
           newEffects[key].classes = updatedClasses.filter(
-            (cls) => cls !== "active"
+            (cls) => cls !== "active",
           );
         }
 
         if (
           crazyBoardEffects[boardEffect].sequence[boardIndex].includes(
-            parseInt(key)
+            parseInt(key),
           )
         ) {
           updatedClasses.push("active");
@@ -97,7 +97,7 @@ class FgSoundBoardController {
         crazyBoardEffects[boardEffect].sequence[boardIndex - 1].includes(1)
       ) {
         this.importButton.classes = updatedClasses.filter(
-          (cls) => cls !== "active"
+          (cls) => cls !== "active",
         );
       }
 
@@ -127,7 +127,7 @@ class FgSoundBoardController {
     crazyBoardEffects[boardEffect].sequence.forEach(async (_, index) => {
       setTimeout(
         () => this.carzyBoardEffectUpdater(boardEffect, index),
-        index * this.crazyBoardEffectInterval
+        index * this.crazyBoardEffectInterval,
       );
     });
 
@@ -151,7 +151,7 @@ class FgSoundBoardController {
 
         if (newEffects[key].seizureColor) {
           updatedClasses = updatedClasses.filter(
-            (cls) => cls !== `active-${newEffects[key].seizureColor}`
+            (cls) => cls !== `active-${newEffects[key].seizureColor}`,
           );
         }
 
@@ -166,7 +166,7 @@ class FgSoundBoardController {
 
       if (this.importButton.seizureColor) {
         updatedClasses = updatedClasses.filter(
-          (cls) => cls !== `active-${this.importButton.seizureColor}`
+          (cls) => cls !== `active-${this.importButton.seizureColor}`,
         );
       }
 
@@ -189,7 +189,7 @@ class FgSoundBoardController {
 
         if (newEffects[key].seizureColor) {
           newEffects[key].classes = updatedClasses.filter(
-            (cls) => cls !== `active-${newEffects[key].seizureColor}`
+            (cls) => cls !== `active-${newEffects[key].seizureColor}`,
           );
         }
       }
@@ -198,7 +198,7 @@ class FgSoundBoardController {
 
       if (this.importButton.seizureColor) {
         this.importButton.classes = updatedClasses.filter(
-          (cls) => cls !== `active-${this.importButton.seizureColor}`
+          (cls) => cls !== `active-${this.importButton.seizureColor}`,
         );
       }
 
@@ -270,7 +270,7 @@ class FgSoundBoardController {
     ) {
       await this.userMedia.current.audio?.audioEffects.fgSoundEffects.loadSoundEffect(
         key,
-        url
+        url,
       );
     } else if (
       this.userMedia.current.audio?.audioEffects.fgSoundEffects.players[key]
@@ -278,7 +278,7 @@ class FgSoundBoardController {
     ) {
       this.userMedia.current.audio?.audioEffects.fgSoundEffects.swapPlayer(
         key,
-        url
+        url,
       );
     }
 
@@ -294,7 +294,7 @@ class FgSoundBoardController {
     return (
       this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
         key,
-        false
+        false,
       ) ?? false
     );
   };
@@ -312,7 +312,7 @@ class FgSoundBoardController {
       succeeded =
         this.userMedia.current.audio?.audioEffects.fgSoundEffects.toggleAudio(
           key,
-          true
+          true,
         ) ?? false;
     } else {
       succeeded = await this.playAudio(key, path);
@@ -409,7 +409,7 @@ class FgSoundBoardController {
 
           // Update tempImportedFiles to remove the first element
           this.tempImportedFiles.current = filesArray.slice(
-            1
+            1,
           ) as unknown as FileList;
 
           if (this.tempImportedFiles.current.length === 0) {
@@ -455,7 +455,7 @@ class FgSoundBoardController {
 
     window.removeEventListener(
       "focus",
-      this.handleImportDerivedWindowFocusChange
+      this.handleImportDerivedWindowFocusChange,
     );
   };
 

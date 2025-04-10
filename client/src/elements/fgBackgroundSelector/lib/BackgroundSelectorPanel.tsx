@@ -70,7 +70,7 @@ export default function BackgroundSelectorPanel({
   const handleSelectBackground = (
     category: Categories | "",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    categorySelection: any
+    categorySelection: any,
   ) => {
     if (activeBackground.categorySelection !== categorySelection) {
       setActiveBackground({
@@ -104,35 +104,32 @@ export default function BackgroundSelectorPanel({
       externalRef={externalPanelRef}
       content={
         activeCategory === "" ? (
-          <div className='flex w-full h-full flex-col items-center justify-center space-y-2'>
+          <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
             <input
               ref={fileSelectorRef}
-              className='hidden'
-              type='file'
+              className="hidden"
+              type="file"
               onChange={handleFileInput}
               multiple
             />
             <LazyScrollingContainer
               externalRef={backgroundSelectionSection}
-              className='grid w-full grow overflow-y-auto grid-cols-3 gap-2 small-vertical-scroll-bar'
+              className="small-vertical-scroll-bar grid w-full grow grid-cols-3 gap-2 overflow-y-auto"
               items={[
                 <FgButton
-                  className='h-full aspect-square border-4 border-fg-red-dark hover:border-fg-red-light rounded'
-                  contentFunction={() => {
-                    return (
-                      <FgSVGElement
-                        src={additionIcon}
-                        attributes={[
-                          { key: "width", value: "100%" },
-                          { key: "height", value: "100%" },
-                          { key: "fill", value: "#e80110" },
-                          { key: "stroke", value: "#e80110" },
-                        ]}
-                      />
-                    );
-                  }}
+                  className="flex aspect-square w-full items-center justify-center rounded border-2 border-fg-red bg-fg-tone-black-4 fill-fg-red stroke-fg-red hover:border-3 hover:border-fg-red-light hover:fill-fg-red-light hover:stroke-fg-red-light"
+                  contentFunction={() => (
+                    <FgSVGElement
+                      src={additionIcon}
+                      className="aspect-square h-[70%]"
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                      ]}
+                    />
+                  )}
                   hoverContent={
-                    <FgHoverContentStandard content='Import background' />
+                    <FgHoverContentStandard content="Import background" />
                   }
                   scrollingContainerRef={backgroundSelectionSection}
                   options={{ hoverTimeoutDuration: 500 }}
@@ -145,10 +142,10 @@ export default function BackgroundSelectorPanel({
                       return (
                         <FgButton
                           key={filename}
-                          className={`aspect-square h-full border-2 hover:border-fg-secondary rounded overflow-clip ${
+                          className={`flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light ${
                             activeBackground.categorySelection === filename
-                              ? "border-fg-secondary"
-                              : "border-fg-white-75"
+                              ? "border-fg-red-light"
+                              : "border-fg-black-35"
                           }`}
                           contentFunction={() => {
                             return (
@@ -178,15 +175,12 @@ export default function BackgroundSelectorPanel({
                   ([categoryName, categoryMetadata]) => (
                     <FgButton
                       key={categoryName}
-                      className='w-full aspect-square border-4 border-fg-white-75 hover:border-fg-secondary rounded overflow-clip'
-                      style={{
-                        boxShadow: "inset 0px 0px 6px rgba(0, 0, 0, 0.5)",
-                      }}
+                      className="flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 border-fg-black-35 shadow shadow-fg-red hover:border-3 hover:border-fg-red-light"
                       contentFunction={() => {
                         return (
                           <FgSVGElement
                             src={categoryMetadata.url}
-                            className='flex items-center justify-center'
+                            className="flex items-center justify-center"
                             attributes={[
                               { key: "width", value: "80%" },
                               { key: "height", value: "80%" },
@@ -205,16 +199,16 @@ export default function BackgroundSelectorPanel({
                       options={{ hoverTimeoutDuration: 500 }}
                       scrollingContainerRef={backgroundSelectionSection}
                     />
-                  )
+                  ),
                 ),
                 activeBackground &&
                 activeBackground.category !== "" &&
                 activeBackground.categorySelection !== "" &&
                 !Object.keys(recommendations).includes(
-                  activeBackground.categorySelection
+                  activeBackground.categorySelection,
                 ) ? (
                   <FgButton
-                    className='aspect-square h-full border-2 border-fg-secondary rounded overflow-clip'
+                    className="flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light"
                     contentFunction={() => {
                       const data =
                         // @ts-expect-error: type correspondance issue
@@ -249,7 +243,7 @@ export default function BackgroundSelectorPanel({
                     clickFunction={() =>
                       handleSelectBackground(
                         activeBackground.category,
-                        activeBackground.categorySelection
+                        activeBackground.categorySelection,
                       )
                     }
                   />
@@ -258,11 +252,11 @@ export default function BackgroundSelectorPanel({
                   ([recommendationName, recommendation]) => (
                     <FgButton
                       key={recommendationName}
-                      className={`aspect-square h-full border-2 hover:border-fg-secondary rounded overflow-clip ${
+                      className={`flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light ${
                         activeBackground.categorySelection ===
                         recommendationName
-                          ? "border-fg-secondary"
-                          : "border-fg-white-75"
+                          ? "border-fg-red-light"
+                          : "border-fg-black-35"
                       }`}
                       contentFunction={() => {
                         return (
@@ -287,29 +281,28 @@ export default function BackgroundSelectorPanel({
                       clickFunction={() =>
                         handleSelectBackground(
                           recommendation.category,
-                          recommendationName
+                          recommendationName,
                         )
                       }
                     />
-                  )
+                  ),
                 ),
               ]}
             />
           </div>
         ) : (
-          <div className='flex w-full h-full flex-col items-center justify-center space-y-2'>
-            <div className='flex w-full min-h-10 h-10 items-center justify-start space-x-2 rounded p-1'>
+          <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+            <div className="flex h-10 min-h-10 w-full items-center justify-start space-x-2 rounded p-1">
               <FgButton
-                className='flex items-center justify-center h-4/5 aspect-square relative'
+                className="relative flex aspect-square h-4/5 items-center justify-center"
                 contentFunction={() => {
                   return (
                     <FgSVGElement
                       src={navigateBack}
+                      className="fill-fg-off-white stroke-fg-off-white"
                       attributes={[
                         { key: "width", value: "100%" },
                         { key: "height", value: "100%" },
-                        { key: "fill", value: "black" },
-                        { key: "stroke", value: "black" },
                       ]}
                     />
                   );
@@ -317,27 +310,32 @@ export default function BackgroundSelectorPanel({
                 clickFunction={() => {
                   setActiveCategory("");
                 }}
-                hoverContent={<FgHoverContentStandard content='Back' />}
+                hoverContent={<FgHoverContentStandard content="Back" />}
                 options={{ hoverType: "above", hoverTimeoutDuration: 750 }}
               />
-              <div className='text-3xl text-black font-Josefin pt-1.5'>
+              <div
+                className="cursor-pointer pt-1.5 font-Josefin text-3xl text-fg-off-white"
+                onClick={() => {
+                  setActiveCategory("");
+                }}
+              >
                 {categoriesMetadata[activeCategory].label}
               </div>
             </div>
             <LazyScrollingContainer
               externalRef={backgroundSelectionSection}
-              className='grid w-full grow overflow-y-auto grid-cols-3 gap-2 small-vertical-scroll-bar'
+              className="small-vertical-scroll-bar grid w-full grow grid-cols-3 gap-2 overflow-y-auto"
               items={[
                 ...Object.entries(categories[activeCategory]).map(
                   ([categorySelection, categorySelectionData]) => {
                     return (
                       <FgButton
                         key={categorySelection}
-                        className={`aspect-square w-full border-2 hover:border-fg-secondary rounded overflow-clip ${
+                        className={`flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light ${
                           activeBackground.categorySelection ===
                           categorySelection
-                            ? "border-fg-secondary"
-                            : "border-fg-white-75"
+                            ? "border-fg-red-light"
+                            : "border-fg-black-35"
                         }`}
                         contentFunction={() => {
                           return (
@@ -362,20 +360,20 @@ export default function BackgroundSelectorPanel({
                         clickFunction={() =>
                           handleSelectBackground(
                             activeCategory,
-                            categorySelection
+                            categorySelection,
                           )
                         }
                       />
                     );
-                  }
+                  },
                 ),
               ]}
             />
           </div>
         )
       }
-      initWidth='400px'
-      initHeight='380px'
+      initWidth="400px"
+      initHeight="380px"
       minWidth={400}
       minHeight={314}
       closePosition={"topRight"}
@@ -385,6 +383,8 @@ export default function BackgroundSelectorPanel({
         placement: "below",
         padding: 4,
       }}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

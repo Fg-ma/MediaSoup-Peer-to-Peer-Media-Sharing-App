@@ -60,29 +60,13 @@ export default function FgBackgroundMusicPortal({
   const [importedFiles, setImportedFiles] = useState<
     Record<number, { file: File; playing: boolean }>
   >({});
-  const [cols, setCols] = useState(3);
   const backgroundMusicContainerRef = useRef<HTMLDivElement>(null);
   const backgroundMusicScrollingContainerRef = useRef<HTMLDivElement>(null);
   const fileSelectorRef = useRef<HTMLInputElement>(null);
 
-  const gridColumnsChange = () => {
-    if (!backgroundMusicContainerRef.current) return;
-
-    const width = backgroundMusicContainerRef.current.clientWidth;
-    if (width < 300) {
-      if (cols !== 3) setCols(3);
-    } else if (width < 500) {
-      if (cols !== 4) setCols(4);
-    } else if (width < 700) {
-      if (cols !== 5) setCols(5);
-    } else if (width >= 700) {
-      if (cols !== 6) setCols(6);
-    }
-  };
-
   const playAudio = async (
     backgroundMusicType: BackgroundMusicTypes,
-    path: string
+    path: string,
   ): Promise<boolean> => {
     // Start playback with Tone.js and load the sound if it hasn't been loaded
     if (
@@ -92,14 +76,14 @@ export default function FgBackgroundMusicPortal({
     ) {
       await userMedia.current.audio?.audioEffects.fgBackgroundMusic.loadBackgroundMusic(
         backgroundMusicType,
-        path
+        path,
       );
     }
 
     return (
       userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleAudio(
         backgroundMusicType,
-        false
+        false,
       ) ?? false
     );
   };
@@ -114,7 +98,7 @@ export default function FgBackgroundMusicPortal({
       succeeded =
         userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleAudio(
           backgroundMusicType,
-          true
+          true,
         ) ?? false;
     } else {
       succeeded = await playAudio(backgroundMusicType, path);
@@ -155,7 +139,7 @@ export default function FgBackgroundMusicPortal({
 
   const playImportedAudio = async (
     key: number,
-    file: File
+    file: File,
   ): Promise<boolean> => {
     // Start playback with Tone.js and load the sound if it hasn't been loaded
     if (
@@ -165,14 +149,14 @@ export default function FgBackgroundMusicPortal({
     ) {
       await userMedia.current.audio?.audioEffects.fgBackgroundMusic.loadImportedBackgroundMusic(
         key,
-        file
+        file,
       );
     }
 
     return (
       userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleImportedAudio(
         key,
-        false
+        false,
       ) ?? false
     );
   };
@@ -186,7 +170,7 @@ export default function FgBackgroundMusicPortal({
       succeeded =
         userMedia.current.audio?.audioEffects.fgBackgroundMusic.toggleImportedAudio(
           key,
-          true
+          true,
         ) ?? false;
     } else {
       succeeded = await playImportedAudio(key, file);
@@ -221,43 +205,36 @@ export default function FgBackgroundMusicPortal({
   return (
     <FgPanel
       content={
-        <div ref={backgroundMusicContainerRef} className='w-full h-full'>
+        <div ref={backgroundMusicContainerRef} className="h-full w-full">
           <input
             ref={fileSelectorRef}
-            className='hidden'
-            type='file'
+            className="hidden"
+            type="file"
             onChange={handleFileInput}
             multiple
           />
           <LazyScrollingContainer
             externalRef={backgroundMusicScrollingContainerRef}
-            className={`small-vertical-scroll-bar overflow-y-auto py-2 w-full h-full grid gap-1 items-center justify-center justify-items-center place-items-center ${
-              cols === 3
-                ? "grid-cols-3"
-                : cols === 4
-                ? "grid-cols-4"
-                : cols === 5
-                ? "grid-cols-5"
-                : "grid-cols-6"
-            }`}
+            className="small-vertical-scroll-bar grid h-full w-full place-items-center items-center justify-center justify-items-center gap-1 overflow-y-auto py-2"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
+            }}
             items={[
               <FgButton
+                className="flex aspect-square w-full items-center justify-center rounded border-2 border-fg-red bg-fg-tone-black-4 fill-fg-red stroke-fg-red hover:border-3 hover:border-fg-red-light hover:fill-fg-red-light hover:stroke-fg-red-light"
                 contentFunction={() => (
-                  <div className='flex bg-white items-center justify-center min-w-12 max-w-24 aspect-square rounded border-2 border-fg-red-dark border-opacity-75 hover:border-3 hover:border-fg-red-light hover:border-opacity-100'>
-                    <FgSVGElement
-                      src={additionIcon}
-                      attributes={[
-                        { key: "width", value: "100%" },
-                        { key: "height", value: "100%" },
-                        { key: "fill", value: "#e80110" },
-                        { key: "stroke", value: "#e80110" },
-                      ]}
-                    />
-                  </div>
+                  <FgSVGElement
+                    src={additionIcon}
+                    className="aspect-square h-[70%]"
+                    attributes={[
+                      { key: "width", value: "100%" },
+                      { key: "height", value: "100%" },
+                    ]}
+                  />
                 )}
                 pointerDownFunction={handleImportEffectClickDown}
                 hoverContent={
-                  <FgHoverContentStandard content='Import background music' />
+                  <FgHoverContentStandard content="Import background music" />
                 }
                 scrollingContainerRef={backgroundMusicScrollingContainerRef}
               />,
@@ -271,9 +248,9 @@ export default function FgBackgroundMusicPortal({
                         <div
                           className={`${
                             file.playing
-                              ? "border-3 border-fg-secondary border-opacity-100"
-                              : "border-2 border-fg-black-35 border-opacity-75"
-                          } font-K2D text-3xl bg-white flex items-center justify-center min-w-12 max-w-24 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:border-opacity-100`}
+                              ? "border-3 border-fg-red-light"
+                              : "border-2 border-fg-black-35"
+                          } flex aspect-square items-center justify-center rounded bg-fg-tone-black-4 font-K2D text-3xl hover:border-3 hover:border-fg-red-light`}
                         >
                           {key}
                         </div>
@@ -289,7 +266,7 @@ export default function FgBackgroundMusicPortal({
                         hoverTimeoutDuration: 750,
                       }}
                     />
-                  )
+                  ),
               ),
               ...Object.entries(backgroundMusic).map(([key, playing]) => (
                 <FgButton
@@ -299,11 +276,11 @@ export default function FgBackgroundMusicPortal({
                     <div
                       className={`${
                         playing
-                          ? "border-3 border-fg-secondary bg-opacity-100"
+                          ? "border-3 border-fg-red-light"
                           : backgroundMusicStatic[key as BackgroundMusicTypes]
-                              .bgColor === "white"
-                          ? "border-2 border-fg-black-35 border-opacity-75"
-                          : "border-2 border-fg-white border-opacity-75"
+                                .bgColor === "white"
+                            ? "border-2 border-fg-black-35"
+                            : "border-2 border-fg-white"
                       } ${
                         backgroundMusicStatic[key as BackgroundMusicTypes]
                           .bgColor === "white"
@@ -312,9 +289,9 @@ export default function FgBackgroundMusicPortal({
                       } ${
                         backgroundMusicStatic[key as BackgroundMusicTypes]
                           .bgColor === "black"
-                          ? "bg-black"
+                          ? "bg-fg-tone-black-1"
                           : ""
-                      } flex items-center justify-center min-w-12 max-w-24 aspect-square rounded hover:border-3 hover:border-fg-secondary hover:bg-opacity-100`}
+                      } flex aspect-square items-center justify-center rounded hover:border-3 hover:border-fg-red-light`}
                       data-background-music-effects-button-value={key}
                     >
                       {backgroundMusicStatic[key as BackgroundMusicTypes]
@@ -371,14 +348,15 @@ export default function FgBackgroundMusicPortal({
         referenceElement: backgroundMusicButtonRef.current ?? undefined,
         placement: "below",
       }}
-      initWidth={"278px"}
+      initWidth={"308px"}
       initHeight={"264px"}
-      minWidth={204}
+      minWidth={150}
       minHeight={190}
       closeCallback={closeCallback}
-      closePosition='topRight'
+      closePosition="topRight"
       shadow={{ bottom: true, top: true }}
-      resizeCallback={gridColumnsChange}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

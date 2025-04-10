@@ -28,7 +28,7 @@ export default function Tools({
   setAdvanced: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <div className="flex h-8 w-max space-x-1">
+    <div className="flex h-12 w-max space-x-1">
       <FgButton
         className="flex aspect-square h-full items-center justify-center rounded bg-fg-red"
         contentFunction={() => (

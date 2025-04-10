@@ -53,7 +53,11 @@ export default function FgInput({
           placeholder={placeholder}
           name={name ? name : "defaultInput"}
           type="text"
-          className={`${fgInputOptions.centerText ? "text-center" : ""} px-[${fgInputOptions.padding}rem] h-full w-full bg-fg-white focus:outline-none`}
+          className={`${fgInputOptions.centerText ? "text-center" : ""} h-full w-full bg-fg-white focus:outline-none`}
+          style={{
+            paddingLeft: `${fgInputOptions.padding}rem`,
+            paddingRight: `${fgInputOptions.padding}rem`,
+          }}
           onChange={onChange}
           onBlur={onUnfocus}
           value={externalValue}

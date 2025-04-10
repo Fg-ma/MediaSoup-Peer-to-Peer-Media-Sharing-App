@@ -18,7 +18,7 @@ export default function TableGridButton({
 }) {
   return (
     <FgButton
-      className='h-full aspect-square'
+      className="aspect-square h-full"
       clickFunction={() => setGridActive((prev) => !prev)}
       contentFunction={() => {
         const src = gridActive ? gridOffIcon : gridIcon;
@@ -26,11 +26,10 @@ export default function TableGridButton({
         return (
           <FgSVGElement
             src={src}
+            className="fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
-              { key: "fill", value: "black" },
-              { key: "stroke", value: "black" },
             ]}
           />
         );

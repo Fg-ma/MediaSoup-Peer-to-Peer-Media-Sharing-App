@@ -3,7 +3,7 @@
   width: 100px;
   height: 100px;
   border-radius: 4px;
-  background-color: #cccccc;
+  background-color: #8c8c8c;
 }
 
 .sound-board-btn-alt-1 {
@@ -13,10 +13,12 @@
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  transition: top 0.05s linear, right 0.05s linear;
+  transition:
+    top 0.05s linear,
+    right 0.05s linear;
   z-index: 1;
-  background-color: white;
-  border: 4px solid #cccccc;
+  background-color: #f2f2f2;
+  border: 4px solid #8c8c8c;
 }
 
 .sound-board-btn-alt-2 {
@@ -27,11 +29,15 @@
   height: 6%;
   transform: skewX(43deg);
   border-top-right-radius: 3px;
-  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+  transition:
+    bottom 0.05s linear,
+    left 0.05s linear,
+    height 0.05s linear,
     border-top-right-radius 0.05s linear,
-    border-bottom-right-radius 0.05s linear, transform 0.05s linear;
+    border-bottom-right-radius 0.05s linear,
+    transform 0.05s linear;
   z-index: 0;
-  background-color: #cccccc;
+  background-color: #8c8c8c;
 }
 
 .sound-board-btn-alt-3 {
@@ -43,10 +49,13 @@
   transform: skewX(49deg);
   border-top-left-radius: 4px;
   border-bottom-left-radius: 2px;
-  transition: bottom 0.05s linear, left 0.05s linear, height 0.05s linear,
+  transition:
+    bottom 0.05s linear,
+    left 0.05s linear,
+    height 0.05s linear,
     border-top-left-radius 0.05s linear;
   z-index: 0;
-  background-color: #cccccc;
+  background-color: #8c8c8c;
 }
 
 .sound-board-btn.pressed:not(.failed) {
@@ -57,7 +66,6 @@
   top: -2.5%;
   right: 2.5%;
   border: 4px solid #e80110;
-  background-color: #fff5ef;
 }
 
 .sound-board-btn.pressed:not(.failed) .sound-board-btn-alt-2 {
@@ -86,7 +94,6 @@
   top: -2.5%;
   right: 2.5%;
   border: 4px solid #f52c2c;
-  background-color: #fbc0c0;
 }
 
 .sound-board-btn.pressed.failed .sound-board-btn-alt-2 {
@@ -113,7 +120,6 @@
 
 .sound-board-btn.active:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #2c92f5;
-  background-color: #eff7ff;
 }
 
 .sound-board-btn.active:not(.pressed) .sound-board-btn-alt-2 {
@@ -129,7 +135,8 @@
 }
 
 .sound-board-btn.assignment .sound-board-btn-alt-1 {
-  animation: flashColorBorder 1s infinite alternate,
+  animation:
+    flashColorBorder 1s infinite alternate,
     flashColorBackground2 1s infinite alternate;
 }
 
@@ -143,7 +150,7 @@
 
 @keyframes flashColorBorder {
   0% {
-    border: 4px solid #cccccc;
+    border: 4px solid #8c8c8c;
   }
   100% {
     border: 4px solid #2c92f5;
@@ -152,7 +159,7 @@
 
 @keyframes flashColorBackground1 {
   0% {
-    background-color: #cccccc;
+    background-color: #8c8c8c;
   }
   100% {
     background-color: #2c92f5;
@@ -161,7 +168,7 @@
 
 @keyframes flashColorBackground2 {
   0% {
-    background-color: white;
+    background-color: #f2f2f2;
   }
   100% {
     background-color: #eff7ff;
@@ -176,7 +183,6 @@
 .sound-board-btn.active-green:not(.pressed):not(.active)
   .sound-board-btn-alt-1 {
   border: 4px solid #2cf55b;
-  background-color: #eafff2;
 }
 
 .sound-board-btn.active-green:not(.pressed):not(.active)
@@ -196,7 +202,6 @@
 
 .sound-board-btn.active-pink:not(.pressed):not(.active) .sound-board-btn-alt-1 {
   border: 4px solid #f52cae;
-  background-color: #ffeaf7;
 }
 
 .sound-board-btn.active-pink:not(.pressed):not(.active) .sound-board-btn-alt-2 {
@@ -215,7 +220,6 @@
 .sound-board-btn.active-yellow:not(.pressed):not(.active)
   .sound-board-btn-alt-1 {
   border: 4px solid #f5d32c;
-  background-color: #fffbe6;
 }
 
 .sound-board-btn.active-yellow:not(.pressed):not(.active)
@@ -236,7 +240,6 @@
 .sound-board-btn.active-purple:not(.pressed):not(.active)
   .sound-board-btn-alt-1 {
   border: 4px solid #a32cf5;
-  background-color: #f3e6ff;
 }
 
 .sound-board-btn.active-purple:not(.pressed):not(.active)
@@ -256,7 +259,6 @@
 
 .sound-board-btn.active-aqua:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #2cf5e5;
-  background-color: #e6fffb;
 }
 
 .sound-board-btn.active-aqua:not(.pressed) .sound-board-btn-alt-2 {
@@ -274,7 +276,6 @@
 
 .sound-board-btn.active-lime:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #b5f52c;
-  background-color: #f5ffe6;
 }
 
 .sound-board-btn.active-lime:not(.pressed) .sound-board-btn-alt-2 {
@@ -292,7 +293,6 @@
 
 .sound-board-btn.active-coral:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #f5425d;
-  background-color: #ffe6ea;
 }
 
 .sound-board-btn.active-coral:not(.pressed) .sound-board-btn-alt-2 {
@@ -310,7 +310,6 @@
 
 .sound-board-btn.active-teal:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #2cf5b1;
-  background-color: #e6fff5;
 }
 
 .sound-board-btn.active-teal:not(.pressed) .sound-board-btn-alt-2 {
@@ -328,7 +327,6 @@
 
 .sound-board-btn.active-magenta:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #f52cd1;
-  background-color: #ffe6f9;
 }
 
 .sound-board-btn.active-magenta:not(.pressed) .sound-board-btn-alt-2 {
@@ -346,7 +344,6 @@
 
 .sound-board-btn.active-sky:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #2cbdf5;
-  background-color: #e6f7ff;
 }
 
 .sound-board-btn.active-sky:not(.pressed) .sound-board-btn-alt-2 {
@@ -364,7 +361,6 @@
 
 .sound-board-btn.active-mint:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #2cf58d;
-  background-color: #e6fff5;
 }
 
 .sound-board-btn.active-mint:not(.pressed) .sound-board-btn-alt-2 {
@@ -382,7 +378,6 @@
 
 .sound-board-btn.active-red:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #f52c2c;
-  background-color: #fbc0c0;
 }
 
 .sound-board-btn.active-red:not(.pressed) .sound-board-btn-alt-2 {
@@ -400,7 +395,6 @@
 
 .sound-board-btn.active-gold:not(.pressed) .sound-board-btn-alt-1 {
   border: 4px solid #f5a32c;
-  background-color: #fff8e6;
 }
 
 .sound-board-btn.active-gold:not(.pressed) .sound-board-btn-alt-2 {

@@ -38,31 +38,9 @@ export default function ReactButton({
     ...reactButtonDefaultOptions,
     ...options,
   };
-  const [cols, setCols] = useState(3);
   const reactionsButtonRef = useRef<HTMLButtonElement>(null);
   const reactionsPanelScrollingContainerRef = useRef<HTMLDivElement>(null);
   const reactionsPanelRef = useRef<HTMLDivElement>(null);
-
-  const gridColumnsChange = () => {
-    if (!reactionsPanelScrollingContainerRef.current) return;
-
-    const width = reactionsPanelScrollingContainerRef.current.clientWidth;
-    if (width < 100) {
-      if (cols !== 3) setCols(3);
-    } else if (width < 300) {
-      if (cols !== 4) setCols(4);
-    } else if (width < 400) {
-      if (cols !== 5) setCols(5);
-    } else if (width < 500) {
-      if (cols !== 6) setCols(6);
-    } else if (width < 600) {
-      if (cols !== 7) setCols(7);
-    } else if (width < 700) {
-      if (cols !== 8) setCols(8);
-    } else if (width >= 800) {
-      if (cols !== 9) setCols(9);
-    }
-  };
 
   const handlePointerDown = (event: PointerEvent) => {
     if (
@@ -120,29 +98,16 @@ export default function ReactButton({
           content={
             <LazyScrollingContainer
               externalRef={reactionsPanelScrollingContainerRef}
-              className={`small-vertical-scroll-bar grid h-full min-h-[9.5rem] w-full min-w-[9.5rem] gap-1 overflow-y-auto py-2 ${
-                cols === 3
-                  ? "grid-cols-3"
-                  : cols === 4
-                    ? "grid-cols-4"
-                    : cols === 5
-                      ? "grid-cols-5"
-                      : cols === 6
-                        ? "grid-cols-6"
-                        : cols === 7
-                          ? "grid-cols-7"
-                          : cols === 8
-                            ? "grid-cols-8"
-                            : cols === 9
-                              ? "grid-cols-9"
-                              : "grid-cols-10"
-              }`}
+              className="small-vertical-scroll-bar grid h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 3.5rem))",
+              }}
               items={[
                 ...Object.entries(reactionsMeta).map(([reaction, meta]) => (
                   <FgButton
                     key={reaction}
                     scrollingContainerRef={reactionsPanelScrollingContainerRef}
-                    className="flex aspect-square w-full min-w-12 items-center justify-center rounded bg-fg-tone-black-1 hover:bg-fg-red-light"
+                    className="flex aspect-square w-full items-center justify-center rounded bg-fg-tone-black-1 hover:bg-fg-red-light"
                     clickFunction={
                       reactionFunction
                         ? () => reactionFunction(reaction as TableReactions)
@@ -182,11 +147,10 @@ export default function ReactButton({
             placement: "above",
             padding: 4,
           }}
-          initWidth={"278px"}
+          initWidth={"290px"}
           initHeight={"268px"}
-          minWidth={204}
+          minWidth={176}
           minHeight={190}
-          resizeCallback={gridColumnsChange}
           closeCallback={clickFunction}
           closeLabelElement={
             <FgHoverContentStandard content="Close (x)" style="dark" />

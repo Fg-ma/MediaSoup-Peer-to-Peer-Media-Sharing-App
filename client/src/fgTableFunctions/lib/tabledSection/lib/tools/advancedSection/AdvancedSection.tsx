@@ -24,7 +24,7 @@ export default function AdvancedSection({
 
   return (
     <div className="flex h-max w-full flex-wrap items-center justify-start">
-      <div className="flex mr-5 h-8 w-max items-center justify-center">
+      <div className="mr-5 flex h-12 w-max items-center justify-center">
         <div className="pb-2 pr-1 font-K2D text-4xl">X:</div>
         <div className="flex h-full grow">
           <FgButton
@@ -120,7 +120,7 @@ export default function AdvancedSection({
           />
         </div>
       </div>
-      <div className="flex mr-5 h-8 w-max items-center justify-center">
+      <div className="mr-5 flex h-12 w-max items-center justify-center">
         <div className="pb-2 pr-1 font-K2D text-4xl">Y:</div>
         <div className="flex h-full grow">
           <FgButton
@@ -216,7 +216,7 @@ export default function AdvancedSection({
           />
         </div>
       </div>
-      <div className="flex h-8 w-max items-center justify-center">
+      <div className="flex h-12 w-max items-center justify-center">
         <div className="pb-2 pr-1 font-K2D text-4xl">Scale:</div>
         <div className="flex h-full grow">
           <FgButton

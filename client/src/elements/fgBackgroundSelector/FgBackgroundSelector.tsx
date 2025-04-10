@@ -99,11 +99,10 @@ export default function FgBackgroundSelector({
                   ? chooseBackgroundOffIcon
                   : chooseBackgroundIcon
               }
+              className="fill-fg-off-white stroke-fg-off-white"
               attributes={[
                 { key: "width", value: "100%" },
                 { key: "height", value: "100%" },
-                { key: "fill", value: "black" },
-                { key: "stroke", value: "black" },
               ]}
             />
           );
@@ -113,10 +112,10 @@ export default function FgBackgroundSelector({
           backgroundSelectorPanelActive ? (
             <></>
           ) : (
-            <FgHoverContentStandard content='Background selector' />
+            <FgHoverContentStandard content="Background selector" />
           )
         }
-        className='flex items-center justify-center h-full aspect-square relative'
+        className="relative flex aspect-square h-full items-center justify-center"
         options={{
           hoverType: hoverType,
           hoverTimeoutDuration: 750,

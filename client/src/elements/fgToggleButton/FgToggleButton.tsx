@@ -75,19 +75,19 @@ export default function FgToggleButton({
   return (
     <div
       ref={containerRef}
-      className='w-full h-full bg-fg-white-95 border-2 border-fg-white-85 rounded-full flex items-center justify-center cursor-pointer'
+      className="flex h-full w-full cursor-pointer items-center justify-center rounded-full border-2 border-fg-off-white bg-fg-tone-black-4"
       onClick={handleClick}
       onPointerMove={hoverable ? handlePointerMove : undefined}
       onPointerEnter={hoverable ? handlePointerEnter : undefined}
       onPointerLeave={hoverable ? handlePointerLeave : undefined}
     >
       <div
-        className='relative'
+        className="relative"
         style={{ width: "calc(100% - 4px)", height: "calc(100% - 4px)" }}
       >
         <motion.div
-          className={`rounded-full h-full aspect-square absolute top-1/2 border-2 border-fg-primary ${
-            btnState === 0 ? "bg-fg-primary-desaturated" : "bg-fg-primary"
+          className={`absolute top-1/2 aspect-square h-full rounded-full border-2 border-fg-red-dark ${
+            btnState === 0 ? "bg-fg-red" : "bg-fg-red-light"
           }`}
           initial={false}
           variants={positionVariants}
@@ -95,7 +95,7 @@ export default function FgToggleButton({
         />
         <div
           ref={invisibleBtnThumbRef}
-          className='rounded-full h-full aspect-square absolute top-1/2 opacity-0'
+          className="absolute top-1/2 aspect-square h-full rounded-full opacity-0"
           style={{
             left: btnState === 0 ? "0%" : "50%",
             transform:
@@ -106,9 +106,9 @@ export default function FgToggleButton({
           <Suspense fallback={<div>Loading...</div>}>
             <FgPortal
               type={portalVisible ? "below" : "mouse"}
-              mouseType='bottomRight'
+              mouseType="bottomRight"
               content={
-                <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
+                <div className="text-md relative bottom-0 mb-1 w-max rounded-md bg-white px-2 py-1 font-K2D text-black shadow-lg">
                   {portalVisible
                     ? btnLabels && btnLabels[btnState]
                     : btnLabels && btnLabels[hoveringState]}

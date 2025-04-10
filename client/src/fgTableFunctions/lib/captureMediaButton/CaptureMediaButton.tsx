@@ -25,22 +25,21 @@ export default function CaptureMediaButton({
 
   return (
     <FgButton
-      className='h-full aspect-square'
+      className="aspect-square h-full"
       clickFunction={handleClick}
       contentFunction={() => (
         <FgSVGElement
           src={cameraIcon}
+          className="fill-fg-off-white stroke-fg-off-white"
           attributes={[
             { key: "width", value: "100%" },
             { key: "height", value: "100%" },
-            { key: "fill", value: "black" },
-            { key: "stroke", value: "black" },
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Capture media' />}
+      hoverContent={<FgHoverContentStandard content="Capture media" />}
       options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
-      aria-label='Capture media'
+      aria-label="Capture media"
     />
   );
 }

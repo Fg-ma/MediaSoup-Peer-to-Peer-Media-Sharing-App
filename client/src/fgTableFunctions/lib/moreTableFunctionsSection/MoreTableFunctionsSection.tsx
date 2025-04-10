@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense } from "react";
 import { AudioEffectTypes } from "../../../../../universal/effectsTypeConstant";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../context/permissionsContext/PermissionsContext";
@@ -35,9 +35,11 @@ export default function MoreTableFunctionsSection({
   handleExternalMute,
   captureMediaActive,
   setCaptureMediaActive,
-  tabledSectionRef,
   gamesSectionRef,
   tableBackgroundSectionRef,
+  gridSizeSectionRef,
+  tabledActive,
+  setTabledActive,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -64,16 +66,16 @@ export default function MoreTableFunctionsSection({
   handleExternalMute: () => void;
   captureMediaActive: boolean;
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
-  tabledSectionRef: React.RefObject<HTMLDivElement>;
   gamesSectionRef: React.RefObject<HTMLDivElement>;
   tableBackgroundSectionRef: React.RefObject<HTMLDivElement>;
+  gridSizeSectionRef: React.RefObject<HTMLDivElement>;
+  tabledActive: boolean;
+  setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
   const { table_id, username, instance } = useUserInfoContext();
-
-  const [dragging, setDragging] = useState(false);
 
   const handleExternalAudioEffectChange = (
     producerType: "audio" | "screenAudio",
@@ -106,15 +108,13 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
-      className={`${dragging ? "!opacity-0 transition-opacity" : ""}`}
       externalRef={moreTableFunctionsPanelRef}
       content={
         <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">
           <div className="my-2 grid h-max w-full grid-cols-3 gap-3">
             <TabledSection
-              tabledSectionRef={tabledSectionRef}
-              dragging={dragging}
-              setDragging={setDragging}
+              tabledActive={tabledActive}
+              setTabledActive={setTabledActive}
             />
             <FgBackgroundSelector
               externalPanelRef={tableBackgroundSectionRef}
@@ -129,13 +129,11 @@ export default function MoreTableFunctionsSection({
               }}
               hoverType="above"
             />
-            {table_id.current && username.current && (
-              <CaptureMediaButton
-                captureMediaActive={captureMediaActive}
-                setCaptureMediaActive={setCaptureMediaActive}
-                setMoreTableFunctionsActive={setMoreTableFunctionsActive}
-              />
-            )}
+            <CaptureMediaButton
+              captureMediaActive={captureMediaActive}
+              setCaptureMediaActive={setCaptureMediaActive}
+              setMoreTableFunctionsActive={setMoreTableFunctionsActive}
+            />
             <GamesSection gamesSectionRef={gamesSectionRef} />
             <TableGridButton
               gridActive={gridActive}
@@ -144,6 +142,7 @@ export default function MoreTableFunctionsSection({
             <TableGridSizeButton
               gridSize={gridSize}
               setGridSize={setGridSize}
+              gridSizeSectionRef={gridSizeSectionRef}
             />
             {isAudio.current && (
               <Suspense fallback={<div>Loading...</div>}>
@@ -161,7 +160,7 @@ export default function MoreTableFunctionsSection({
                   handleMute={handleExternalMute}
                   muteStateRef={mutedAudioRef}
                   options={{
-                    color: "black",
+                    color: "#d6d6d6",
                     placement: "below",
                     hoverTimeoutDuration: 750,
                   }}
@@ -188,6 +187,8 @@ export default function MoreTableFunctionsSection({
       closeCallback={() => setMoreTableFunctionsActive(false)}
       closePosition="topRight"
       shadow={{ top: true, bottom: true }}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }
