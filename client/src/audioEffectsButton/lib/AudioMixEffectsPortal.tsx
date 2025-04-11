@@ -351,17 +351,17 @@ export default function AudioMixEffectsPortal({
     setRerender,
     dynamicMixEffects,
     portalRef,
-    setSliderValues
+    setSliderValues,
   );
 
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(
-      audioMixEffectsPortalController.handleMessage
+      audioMixEffectsPortalController.handleMessage,
     );
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        audioMixEffectsPortalController.handleMessage
+        audioMixEffectsPortalController.handleMessage,
       );
     };
   }, [mediasoupSocket.current]);
@@ -371,12 +371,12 @@ export default function AudioMixEffectsPortal({
       content={
         <div
           ref={portalRef}
-          className='vertical-scroll-bar font-K2D text-md min-w-[18rem] min-h-[18.75rem] h-full w-full overflow-y-auto'
+          className="vertical-scroll-bar text-md h-full min-h-[18.75rem] w-full min-w-[18rem] overflow-y-auto font-K2D"
         >
-          <div className='h-max mb-4 mt-1'>
+          <div className="mb-4 mt-1 h-max">
             <ScrollingContainer
               content={
-                <div className='flex items-center justify-start space-x-3 p-1'>
+                <div className="flex items-center justify-start space-x-3 p-1">
                   {Object.entries(staticMixEffects).map(
                     ([effect, staticMixEffect]) => {
                       return (
@@ -388,20 +388,20 @@ export default function AudioMixEffectsPortal({
                             if (id) {
                               audioMixEffectsPortalController.mixEffectChange(
                                 active,
-                                id as AudioMixEffectsType
+                                id as AudioMixEffectsType,
                               );
                             }
                           }}
                         />
                       );
-                    }
+                    },
                   )}
                 </div>
               }
-              buttonBackgroundColor={focus ? "#f2f2f2" : "#d6d6d6"}
+              buttonBackgroundColor={focus ? "#161616" : "#212121"}
             />
           </div>
-          <div className='relative'>
+          <div className="relative">
             {Object.entries(dynamicMixEffects.current).map(
               ([effect, dynamicMixEffect]) => {
                 if (dynamicMixEffect.active) {
@@ -430,7 +430,7 @@ export default function AudioMixEffectsPortal({
                     />
                   );
                 }
-              }
+              },
             )}
           </div>
         </div>
@@ -451,11 +451,11 @@ export default function AudioMixEffectsPortal({
       resizeCallback={() => {
         if (portalRef.current) {
           const previous = JSON.parse(
-            JSON.stringify(dynamicMixEffects.current)
+            JSON.stringify(dynamicMixEffects.current),
           );
           audioMixEffectsPortalController.getPackedPositions(
             portalRef.current.getBoundingClientRect().width - 28,
-            28
+            28,
           );
           if (!isEqual(dynamicMixEffects.current, previous)) {
             setRerender((prev) => !prev);
@@ -463,9 +463,11 @@ export default function AudioMixEffectsPortal({
         }
       }}
       closeCallback={() => closeCallback()}
-      closePosition='topRight'
+      closePosition="topRight"
       focusCallback={(newFocus) => setFocus(newFocus)}
       shadow={{ top: true, bottom: true }}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

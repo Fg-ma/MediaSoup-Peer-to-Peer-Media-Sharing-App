@@ -44,8 +44,6 @@ class CaptureMediaController {
     private countDownInterval: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private captureMediaPortalRef: React.RefObject<HTMLDivElement>,
     private tableFunctionsController: TableFunctionsController,
     private finalizingCapture: React.MutableRefObject<boolean>,
@@ -67,7 +65,7 @@ class CaptureMediaController {
     private delayCountDownInterval: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private delaying: React.MutableRefObject<boolean>
+    private delaying: React.MutableRefObject<boolean>,
   ) {}
 
   handleEffects = () => {
@@ -84,7 +82,7 @@ class CaptureMediaController {
 
   handleCaptureEffect = async (
     effect: CaptureEffectTypes | "clearAll",
-    blockStateChange: boolean
+    blockStateChange: boolean,
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
@@ -95,7 +93,7 @@ class CaptureMediaController {
       this.captureMedia.current?.changeEffects(
         effect,
         this.tintColor.current,
-        blockStateChange
+        blockStateChange,
       );
     } else {
       this.captureMedia.current?.clearAllEffects();
@@ -120,7 +118,7 @@ class CaptureMediaController {
 
     this.captureContainerRef.current?.addEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.leaveTimer.current) {
@@ -132,7 +130,7 @@ class CaptureMediaController {
   handlePointerLeave = () => {
     this.captureContainerRef.current?.removeEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.captureContainerRef.current) {
@@ -161,7 +159,7 @@ class CaptureMediaController {
       downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value],
       this.settings.downloadImageOptions.samples.value,
       this.settings.downloadImageOptions.antialiasing.value,
-      this.settings.downloadImageOptions.quality.value
+      this.settings.downloadImageOptions.quality.value,
     );
 
     this.countDownTimeout.current = setTimeout(() => {
@@ -180,7 +178,7 @@ class CaptureMediaController {
     this.finalizedCaptureType.current = "image";
 
     this.captureMedia.current?.babylonScene?.addScreenShotSuccessCallback(
-      this.addScreenShotSuccessCallback
+      this.addScreenShotSuccessCallback,
     );
   };
 
@@ -192,7 +190,7 @@ class CaptureMediaController {
       parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4)),
       this.settings.downloadVideoOptions.bitRate.value !== "default"
         ? this.settings.downloadVideoOptions.bitRate.value * 1000000
-        : this.settings.downloadVideoOptions.bitRate.value
+        : this.settings.downloadVideoOptions.bitRate.value,
     );
 
     if (this.mediaType === "10s") {
@@ -230,18 +228,18 @@ class CaptureMediaController {
         }
 
         this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
-          this.addVideoSuccessCallback
+          this.addVideoSuccessCallback,
         );
       },
       this.mediaType === "60s"
         ? 60000
         : this.mediaType === "30s"
-        ? 30000
-        : this.mediaType === "15s"
-        ? 15000
-        : this.mediaType === "10s"
-        ? 10000
-        : 0
+          ? 30000
+          : this.mediaType === "15s"
+            ? 15000
+            : this.mediaType === "10s"
+              ? 10000
+              : 0,
     );
   };
 
@@ -256,7 +254,7 @@ class CaptureMediaController {
       downloadRecordingMimeMap[
         this.settings.downloadVideoOptions.mimeType.value
       ],
-      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4))
+      parseInt(this.settings.downloadVideoOptions.fps.value.slice(0, -4)),
     );
   };
 
@@ -324,7 +322,7 @@ class CaptureMediaController {
         }
 
         this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
-          this.addVideoSuccessCallback
+          this.addVideoSuccessCallback,
         );
       }
 
@@ -349,7 +347,7 @@ class CaptureMediaController {
         this.countDownInterval.current = undefined;
 
         this.captureMedia.current?.babylonScene?.addVideoSuccessCallback(
-          this.addVideoSuccessCallback
+          this.addVideoSuccessCallback,
         );
       }
 
@@ -376,7 +374,7 @@ class CaptureMediaController {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(metadata),
-          }
+          },
         );
 
         const { uploadId } = await metaRes.json();
@@ -391,14 +389,14 @@ class CaptureMediaController {
             downloadRecordingExtensionsMap[
               this.settings.downloadVideoOptions.mimeType.value
             ]
-          }`
+          }`,
         );
 
         const xhr = new XMLHttpRequest();
         xhr.open(
           "POST",
           staticContentServerBaseUrl + `upload-file/${uploadId}`,
-          true
+          true,
         );
 
         xhr.send(formData);
@@ -423,7 +421,7 @@ class CaptureMediaController {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(metadata),
-          }
+          },
         );
 
         const { uploadId } = await metaRes.json();
@@ -434,14 +432,14 @@ class CaptureMediaController {
         formData.append(
           "file",
           blob,
-          `image.${this.settings.downloadImageOptions.mimeType.value}`
+          `image.${this.settings.downloadImageOptions.mimeType.value}`,
         );
 
         const xhr = new XMLHttpRequest();
         xhr.open(
           "POST",
           staticContentServerBaseUrl + `upload-file/${uploadId}`,
-          true
+          true,
         );
 
         xhr.send(formData);
@@ -481,10 +479,10 @@ class CaptureMediaController {
     if (
       !event.key ||
       !this.captureMediaPortalRef.current?.classList.contains(
-        "in-capture-media"
+        "in-capture-media",
       ) ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -493,12 +491,6 @@ class CaptureMediaController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "e":
         this.handleEffects();
         break;
@@ -533,21 +525,6 @@ class CaptureMediaController {
     }
   };
 
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
-    }
-  };
-
   handlePausePlay = () => {
     if (!this.videoRef.current) return;
 
@@ -569,7 +546,7 @@ class CaptureMediaController {
     this.captureMedia.current?.stopVideo();
 
     this.captureMedia.current?.babylonScene?.removeScreenShotSuccessCallback(
-      this.addScreenShotSuccessCallback
+      this.addScreenShotSuccessCallback,
     );
   };
 
@@ -581,7 +558,7 @@ class CaptureMediaController {
     this.captureMedia.current?.stopVideo();
 
     this.captureMedia.current?.babylonScene?.removeVideoSuccessCallback(
-      this.addVideoSuccessCallback
+      this.addVideoSuccessCallback,
     );
   };
 
@@ -603,7 +580,7 @@ class CaptureMediaController {
 
     this.timelineContainerRef.current?.style.setProperty(
       "--progress-position",
-      `${percent}`
+      `${percent}`,
     );
   };
 
@@ -617,7 +594,7 @@ class CaptureMediaController {
 
     document.addEventListener(
       "pointermove",
-      this.handleScrubbingTimelineUpdate
+      this.handleScrubbingTimelineUpdate,
     );
     document.addEventListener("pointerup", this.handleStopScrubbing);
 
@@ -636,7 +613,7 @@ class CaptureMediaController {
 
     document.removeEventListener(
       "pointermove",
-      this.handleScrubbingTimelineUpdate
+      this.handleScrubbingTimelineUpdate,
     );
     document.removeEventListener("pointerup", this.handleStopScrubbing);
 
@@ -665,13 +642,13 @@ class CaptureMediaController {
       Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
     this.timelineContainerRef.current.style.setProperty(
       "--preview-position",
-      `${percent}`
+      `${percent}`,
     );
 
     if (this.isScrubbing.current) {
       this.timelineContainerRef.current.style.setProperty(
         "--progress-position",
-        `${percent}`
+        `${percent}`,
       );
     }
   };
@@ -684,7 +661,7 @@ class CaptureMediaController {
       Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
     this.timelineContainerRef.current.style.setProperty(
       "--preview-position",
-      `${percent}`
+      `${percent}`,
     );
   };
 }

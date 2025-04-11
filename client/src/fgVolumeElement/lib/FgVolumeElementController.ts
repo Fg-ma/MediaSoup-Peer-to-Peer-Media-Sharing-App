@@ -1,9 +1,11 @@
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 import { FgVolumeElementOptions } from "./typeConstant";
+import { Signals } from "../../context/signalContext/SignalContext";
 
 class FgVolumeElementController extends FgVolumeElementSocket {
   constructor(
+    private table_id: string,
     username: string,
     instance: string,
     private producerType: "audio" | "screenAudio",
@@ -33,9 +35,9 @@ class FgVolumeElementController extends FgVolumeElementSocket {
     private tracksColorSetterCallback:
       | ((
           producerType: "audio" | "screenAudio",
-          producerId: string | undefined
+          producerId: string | undefined,
         ) => void)
-      | undefined
+      | undefined,
   ) {
     super(
       username,
@@ -48,7 +50,7 @@ class FgVolumeElementController extends FgVolumeElementSocket {
       localMute,
       screenAudioLocalMute,
       volumeState,
-      setVolumeState
+      setVolumeState,
     );
   }
 
@@ -100,7 +102,7 @@ class FgVolumeElementController extends FgVolumeElementSocket {
       }
 
       const audioElement = document.getElementById(
-        this.producerId
+        this.producerId,
       ) as HTMLAudioElement | null;
 
       if (!audioElement) {
@@ -154,7 +156,7 @@ class FgVolumeElementController extends FgVolumeElementSocket {
       }
 
       const audioElement = document.getElementById(
-        this.producerId
+        this.producerId,
       ) as HTMLAudioElement | null;
       if (!audioElement) {
         return;
@@ -178,6 +180,31 @@ class FgVolumeElementController extends FgVolumeElementSocket {
 
     if (this.tracksColorSetterCallback) {
       this.tracksColorSetterCallback(this.producerType, this.producerId);
+    }
+  };
+
+  handleSignalMessages = (message: Signals) => {
+    switch (message.type) {
+      case "localMuteChange":
+        const {
+          table_id: newTable_id,
+          username: newUsername,
+          instance: newInstance,
+          producerType: newProducerType,
+          producerId: newProducerId,
+        } = message.header;
+        if (
+          newTable_id === this.table_id &&
+          newUsername === this.username &&
+          newInstance === this.instance
+        ) {
+          setTimeout(() => {
+            this.onLocalMuteChange(newProducerType, newProducerId);
+          }, 0);
+        }
+        break;
+      default:
+        break;
     }
   };
 }

@@ -52,8 +52,6 @@ class FgAudioElementContainerController {
     private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private audioContainerRef: React.RefObject<HTMLDivElement>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private setAudioEffectsSectionVisible: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -64,7 +62,7 @@ class FgAudioElementContainerController {
     private isAudio: React.MutableRefObject<boolean>,
     private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
-    private bundleRef: React.RefObject<HTMLDivElement>
+    private bundleRef: React.RefObject<HTMLDivElement>,
   ) {
     this.reactController = new ReactController(
       `audio_${this.table_id}_${this.username}_${this.instance}`,
@@ -72,7 +70,7 @@ class FgAudioElementContainerController {
       "audio",
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
-      this.tableSocket
+      this.tableSocket,
     );
   }
 
@@ -236,10 +234,10 @@ class FgAudioElementContainerController {
     if (
       !event.key ||
       !this.audioContainerRef.current?.classList.contains(
-        "in-audio-container"
+        "in-audio-container",
       ) ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.shiftKey ||
+      event.ctrlKey
     ) {
       return;
     }
@@ -248,12 +246,6 @@ class FgAudioElementContainerController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "e":
         this.handleToggleAudioEffectsSection();
         break;
@@ -262,7 +254,7 @@ class FgAudioElementContainerController {
         break;
       case "s":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "scale"
+          "scale",
         );
         document.addEventListener("pointermove", this.scaleFuntion);
         document.addEventListener("pointerdown", this.scaleFunctionEnd);
@@ -270,14 +262,14 @@ class FgAudioElementContainerController {
       case "g":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "position",
-          { rotationPointPlacement: "topLeft" }
+          { rotationPointPlacement: "topLeft" },
         );
         document.addEventListener("pointermove", this.moveFunction);
         document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "rotation"
+          "rotation",
         );
         document.addEventListener("pointermove", this.rotateFunction);
         document.addEventListener("pointerdown", this.rotateFunctionEnd);
@@ -310,9 +302,6 @@ class FgAudioElementContainerController {
       return;
     }
 
-    const angle =
-      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
-
     const pixelScale = {
       x:
         (this.positioning.current.scale.x / 100) *
@@ -341,12 +330,12 @@ class FgAudioElementContainerController {
           (this.positioning.current.position.top / 100) *
             this.bundleRef.current.clientHeight +
           pixelScale.y / 2,
-      }
+      },
     );
 
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
       "position",
-      { rotationPointPlacement: "middleLeft" }
+      { rotationPointPlacement: "middleLeft" },
     );
   };
 
@@ -391,11 +380,11 @@ class FgAudioElementContainerController {
           (this.positioning.current.position.top / 100) *
             this.bundleRef.current.clientHeight +
           pixelScale.y / 2,
-      }
+      },
     );
 
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-      "scale"
+      "scale",
     );
   };
 
@@ -427,21 +416,6 @@ class FgAudioElementContainerController {
         pixelScale.y / 2,
     });
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
-    }
   };
 }
 

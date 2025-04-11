@@ -48,7 +48,7 @@ export default function ScaleSection({
     return () => {
       scaleSectionContainerRef?.current?.removeEventListener(
         "wheel",
-        handleWheel
+        handleWheel,
       );
     };
   }, [keyVisualizerActive]);
@@ -72,7 +72,7 @@ export default function ScaleSection({
         const [childKey, childOctave] = key.split("-fg-");
 
         const keyElement = document.getElementById(
-          `piano_key_${childOctave}_${childKey}`
+          `piano_key_${childOctave}_${childKey}`,
         );
 
         if (keyElement && keyElement.classList.contains("pressed")) {
@@ -120,14 +120,14 @@ export default function ScaleSection({
       currentPress.current.octave
     ) {
       const keyElement = document.getElementById(
-        `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+        `piano_key_${currentPress.current.octave}_${currentPress.current.note}`,
       );
       keyElement?.classList.remove("pressed");
 
       fgPianoController.playNote(
         currentPress.current.note,
         parseInt(currentPress.current.octave),
-        false
+        false,
       );
     }
 
@@ -183,7 +183,7 @@ export default function ScaleSection({
     ) {
       if (visualizerAnimationFrameRef.current === undefined) {
         visualizerAnimationFrameRef.current = requestAnimationFrame(
-          fgPianoController.updateVisualizerAnimations
+          fgPianoController.updateVisualizerAnimations,
         );
       }
 
@@ -231,7 +231,7 @@ export default function ScaleSection({
 
     if (currentPress.current.note && currentPress.current.octave) {
       const key = document.getElementById(
-        `piano_key_${currentPress.current.octave}_${currentPress.current.note}`
+        `piano_key_${currentPress.current.octave}_${currentPress.current.note}`,
       );
       if (key && key.classList.contains("pressed")) {
         key?.classList.remove("pressed");
@@ -241,7 +241,7 @@ export default function ScaleSection({
             ? currentPress.current.note
             : `${currentPress.current.note[0]}#`,
           parseInt(currentPress.current.octave),
-          false
+          false,
         );
       }
     }
@@ -287,7 +287,7 @@ export default function ScaleSection({
 
       if (visualizerAnimationFrameRef.current === undefined) {
         visualizerAnimationFrameRef.current = requestAnimationFrame(
-          fgPianoController.updateVisualizerAnimations
+          fgPianoController.updateVisualizerAnimations,
         );
       }
     }
@@ -296,7 +296,7 @@ export default function ScaleSection({
 
     if (targetValues.note && targetValues.octave) {
       const key = document.getElementById(
-        `piano_key_${targetValues.octave}_${targetValues.note}`
+        `piano_key_${targetValues.octave}_${targetValues.note}`,
       );
       if (key && !key.classList.contains("pressed")) {
         key.classList.add("pressed");
@@ -304,7 +304,7 @@ export default function ScaleSection({
         fgPianoController.playNote(
           targetValues.note,
           parseInt(targetValues.octave),
-          true
+          true,
         );
       }
 
@@ -313,10 +313,10 @@ export default function ScaleSection({
   };
 
   return (
-    <div className='flex grow w-full items-center justify-center relative overflow-hidden'>
+    <div className="flex relative w-full grow items-center justify-center overflow-hidden">
       <div
         ref={scaleSectionContainerRef}
-        className='scale-section-container hide-scroll-bar'
+        className="scale-section-container hide-scroll-bar"
         onPointerDown={handlePointerDown}
       >
         <VerticalSplitPanes
@@ -330,7 +330,7 @@ export default function ScaleSection({
           bottomContent={
             <div
               ref={scaleSectionRef}
-              className='scale-section space-x-0.25 py-0.25 px-2'
+              className="scale-section space-x-0.25 bg-fg-tone-black-7 px-2 py-0.25"
             >
               <Scale octave={0} visibleOctave={visibleOctave} />
               <Scale octave={1} visibleOctave={visibleOctave} />
@@ -345,7 +345,7 @@ export default function ScaleSection({
             keyVisualizerActive ? (
               <div
                 ref={keyVisualizerContainerRef}
-                className='h-full select-none w-full'
+                className="h-full w-full select-none"
               ></div>
             ) : undefined
           }

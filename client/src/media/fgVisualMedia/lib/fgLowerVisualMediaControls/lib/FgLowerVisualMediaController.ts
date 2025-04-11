@@ -78,8 +78,6 @@ class FgLowerVisualMediaController {
     private visualMediaContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
@@ -92,15 +90,15 @@ class FgLowerVisualMediaController {
     >,
     private handleMute: (
       producerType: "audio" | "screenAudio",
-      producerId: string | undefined
+      producerId: string | undefined,
     ) => void,
     private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
-      blockStateChange?: boolean
+      blockStateChange?: boolean,
     ) => Promise<void>,
     private tracksColorSetterCallback: (
       producerType: "audio" | "screenAudio",
-      producerId: string | undefined
+      producerId: string | undefined,
     ) => void,
     private tintColor: React.MutableRefObject<string>,
     private userEffects: React.MutableRefObject<{
@@ -135,7 +133,7 @@ class FgLowerVisualMediaController {
     >,
     private setReactionsPanelActive: React.Dispatch<
       React.SetStateAction<boolean>
-    >
+    >,
   ) {
     this.initTime = Date.now();
 
@@ -145,7 +143,7 @@ class FgLowerVisualMediaController {
       this.type,
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
-      this.tableSocket
+      this.tableSocket,
     );
   }
 
@@ -265,11 +263,11 @@ class FgLowerVisualMediaController {
     if (
       !event.key ||
       !this.visualMediaContainerRef.current?.classList.contains(
-        "in-visual-media"
+        "in-visual-media",
       ) ||
       this.visualMediaContainerRef.current?.classList.contains("in-piano") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -278,12 +276,6 @@ class FgLowerVisualMediaController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case " ":
         if (tagName === "button") return;
         if (this.fgVisualMediaOptions.isPlayPause) {
@@ -314,7 +306,7 @@ class FgLowerVisualMediaController {
         if (this.fgVisualMediaOptions.isVolume) {
           this.handleMute(
             this.screenAudioStream ? "screenAudio" : "audio",
-            this.screenAudioStream ? `${this.visualMediaId}_audio` : undefined
+            this.screenAudioStream ? `${this.visualMediaId}_audio` : undefined,
           );
         }
         break;
@@ -343,7 +335,7 @@ class FgLowerVisualMediaController {
         break;
       case "s":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "scale"
+          "scale",
         );
         document.addEventListener("pointermove", this.scaleFuntion);
         document.addEventListener("pointerdown", this.scaleFunctionEnd);
@@ -351,14 +343,14 @@ class FgLowerVisualMediaController {
       case "g":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
           "position",
-          { rotationPointPlacement: "topLeft" }
+          { rotationPointPlacement: "topLeft" },
         );
         document.addEventListener("pointermove", this.moveFunction);
         document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
         this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "rotation"
+          "rotation",
         );
         document.addEventListener("pointermove", this.rotateFunction);
         document.addEventListener("pointerdown", this.rotateFunctionEnd);
@@ -429,7 +421,7 @@ class FgLowerVisualMediaController {
         y:
           (this.positioning.current.position.top / 100) *
           this.bundleRef.current.clientHeight,
-      }
+      },
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
@@ -458,7 +450,7 @@ class FgLowerVisualMediaController {
       },
       referencePoint,
       referencePoint,
-      this.aspectRatio.current
+      this.aspectRatio.current,
     );
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
   };
@@ -497,14 +489,14 @@ class FgLowerVisualMediaController {
 
       const newVolume = Math.max(
         0,
-        Math.min(1, this.audioRef.current.volume + volumeChangeAmount)
+        Math.min(1, this.audioRef.current.volume + volumeChangeAmount),
       );
 
       this.audioRef.current.volume = newVolume;
 
       if (this.bundleRef.current) {
         const volumeSliders = this.bundleRef.current.querySelectorAll(
-          `.volume-slider-${producerType}`
+          `.volume-slider-${producerType}`,
         );
 
         volumeSliders.forEach((slider) => {
@@ -518,7 +510,7 @@ class FgLowerVisualMediaController {
       }
 
       const audioElement = document.getElementById(
-        producerId
+        producerId,
       ) as HTMLAudioElement | null;
 
       if (!audioElement) {
@@ -527,7 +519,7 @@ class FgLowerVisualMediaController {
 
       const newVolume = Math.max(
         0,
-        Math.min(1, audioElement.volume + volumeChangeAmount)
+        Math.min(1, audioElement.volume + volumeChangeAmount),
       );
 
       audioElement.volume = newVolume;
@@ -542,21 +534,6 @@ class FgLowerVisualMediaController {
           sliderElement.value = `${newVolume}`;
         });
       }
-    }
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
     }
   };
 
@@ -595,11 +572,12 @@ class FgLowerVisualMediaController {
     if (this.currentTimeRef.current) {
       if (this.videoRef.current?.currentTime !== undefined) {
         this.currentTimeRef.current.textContent = this.formatDuration(
-          this.videoRef.current.currentTime + this.initTimeOffset.current / 1000
+          this.videoRef.current.currentTime +
+            this.initTimeOffset.current / 1000,
         );
       } else {
         this.currentTimeRef.current.textContent = this.formatDuration(
-          (Date.now() - this.initTime - this.initTimeOffset.current) / 1000
+          (Date.now() - this.initTime - this.initTimeOffset.current) / 1000,
         );
       }
     }
@@ -616,35 +594,35 @@ class FgLowerVisualMediaController {
 
     style.setProperty(
       "--closed-captions-font-family",
-      fontFamilyMap[captionOptions.fontFamily.value]
+      fontFamilyMap[captionOptions.fontFamily.value],
     );
     style.setProperty(
       "--closed-captions-font-color",
       `${colorMap[captionOptions.fontColor.value]} ${
         opacityMap[captionOptions.fontOpacity.value]
-      }`
+      }`,
     );
     style.setProperty(
       "--closed-captions-font-size",
-      fontSizeMap[captionOptions.fontSize.value]
+      fontSizeMap[captionOptions.fontSize.value],
     );
     style.setProperty(
       "--closed-captions-background-color",
-      captionOptions.backgroundColor.value
+      captionOptions.backgroundColor.value,
     );
     style.setProperty(
       "--closed-captions-background-opacity",
-      opacityMap[captionOptions.backgroundOpacity.value]
+      opacityMap[captionOptions.backgroundOpacity.value],
     );
     style.setProperty(
       "--closed-captions-character-edge-style",
-      characterEdgeStyleMap[captionOptions.characterEdgeStyle.value]
+      characterEdgeStyleMap[captionOptions.characterEdgeStyle.value],
     );
   };
 
   handleVisualEffect = async (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange: boolean
+    blockStateChange: boolean,
   ) => {
     // Fill stream effects if state change isn't blocked
     if (!blockStateChange) {
@@ -669,13 +647,13 @@ class FgLowerVisualMediaController {
       this.userMedia.current[this.type][this.visualMediaId].changeEffects(
         effect as CameraEffectTypes,
         this.tintColor.current,
-        blockStateChange
+        blockStateChange,
       );
     } else if (this.type === "screen") {
       this.userMedia.current[this.type][this.visualMediaId].changeEffects(
         effect as ScreenEffectTypes,
         this.tintColor.current,
-        blockStateChange
+        blockStateChange,
       );
     }
   };

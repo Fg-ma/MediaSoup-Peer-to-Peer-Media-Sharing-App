@@ -15,8 +15,8 @@ export default function SamplerVolume() {
   const sliderRef = useRef<HTMLInputElement>(null);
   const prevVolume = useRef("1");
 
-  const primaryVolumeSliderColor = "#f57e41";
-  const secondaryVolumeSliderColor = "rgba(150, 150, 150, 0.5)";
+  const primaryVolumeSliderColor = "#b20203";
+  const secondaryVolumeSliderColor = "#d6d6d6";
 
   const handleVolumeChange = (volume: number) => {
     tracksColorSetter(volume);
@@ -87,20 +87,20 @@ export default function SamplerVolume() {
   }, []);
 
   return (
-    <div className='flex volume-container w-max h-full items-center justify-center space-x-1'>
+    <div className="flex volume-container h-full w-max items-center justify-center space-x-1">
       <FgButton
         clickFunction={handleMute}
         contentFunction={() => (
           <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 100 100'
-            width='1.75rem'
-            height='1.75rem'
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            width="1.75rem"
+            height="1.75rem"
           >
             <VolumeSVG
               volumeState={volumeState}
               movingPath={volumeSVGPaths.low.right}
-              color='black'
+              color="#d6d6d6"
               stationaryPaths={[
                 volumeSVGPaths.high.left,
                 volumeSVGPaths.high.middle,
@@ -112,11 +112,11 @@ export default function SamplerVolume() {
       <input
         ref={sliderRef}
         onInput={handleVolumeSlider}
-        className='volume-slider'
-        type='range'
-        min='0'
-        max='1'
-        step='any'
+        className="volume-slider"
+        type="range"
+        min="0"
+        max="1"
+        step="any"
       />
     </div>
   );

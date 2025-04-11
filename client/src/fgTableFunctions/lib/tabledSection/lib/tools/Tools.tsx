@@ -3,6 +3,8 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
+import TabledPortalController from "../TabledPortalController";
+import SearchBar from "./searchBar/SearchBar";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -10,38 +12,38 @@ const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 const paintBrushIcon = nginxAssetServerBaseUrl + "svgs/paintBrushIcon.svg";
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const moreIcon = nginxAssetServerBaseUrl + "svgs/moreIcon.svg";
+const moreOffIcon = nginxAssetServerBaseUrl + "svgs/moreOffIcon.svg";
 
 export default function Tools({
-  selected,
-  setRerender,
+  tabledPortalController,
+  advanced,
   setAdvanced,
+  setTabledActive,
 }: {
-  selected: React.MutableRefObject<
-    {
-      contentType: StaticContentTypes;
-      contentId: string;
-      aspect: number;
-      count: number | "zero";
-    }[]
-  >;
-  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
+  tabledPortalController: TabledPortalController;
+  advanced: boolean;
   setAdvanced: React.Dispatch<React.SetStateAction<boolean>>;
+  setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <div className="flex h-12 w-max space-x-1">
+    <div className="flex h-12 w-full space-x-1">
       <FgButton
         className="flex aspect-square h-full items-center justify-center rounded bg-fg-red"
         contentFunction={() => (
           <FgSVGElement
             src={checkIcon}
-            className="aspect-square h-[90%] fill-fg-off-white stroke-fg-off-white"
+            className="aspect-square h-[70%] fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
             ]}
           />
         )}
-        clickFunction={() => {}}
+        clickFunction={() => {
+          tabledPortalController.placeInstances();
+          tabledPortalController.uploadInstances();
+          setTabledActive(false);
+        }}
         hoverContent={
           <FgHoverContentStandard content="Place content on table" />
         }
@@ -57,7 +59,7 @@ export default function Tools({
         contentFunction={() => (
           <FgSVGElement
             src={paintBrushIcon}
-            className="aspect-square h-[90%] fill-fg-off-white stroke-fg-off-white"
+            className="aspect-square h-[70%] fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
@@ -78,7 +80,7 @@ export default function Tools({
         contentFunction={() => (
           <FgSVGElement
             src={closeIcon}
-            className="aspect-square h-[90%] fill-fg-off-white stroke-fg-off-white"
+            className="aspect-square h-[70%] fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
@@ -86,8 +88,7 @@ export default function Tools({
           />
         )}
         clickFunction={() => {
-          selected.current = [];
-          setRerender((prev) => !prev);
+          tabledPortalController.reset();
         }}
         hoverContent={<FgHoverContentStandard content="Clear selected" />}
         options={{
@@ -101,7 +102,7 @@ export default function Tools({
         className="flex aspect-square h-full items-center justify-center rounded"
         contentFunction={() => (
           <FgSVGElement
-            src={moreIcon}
+            src={advanced ? moreOffIcon : moreIcon}
             className="aspect-square h-[85%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
             attributes={[
               { key: "width", value: "100%" },
@@ -120,6 +121,7 @@ export default function Tools({
           hoverTimeoutDuration: 1250,
         }}
       />
+      <SearchBar />
     </div>
   );
 }

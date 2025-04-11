@@ -3,6 +3,11 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgInput from "../../../../../../elements/fgInput/FgInput";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
+import PositioningIndicator from "../positioningIndicator/PositioningIndicator";
+import { StaticContentTypes } from "../../../../../../../../universal/contentTypeConstant";
+import AlignSection from "../alignSection/AlignSection";
+import { InstanceType } from "../../../TabledPortal";
+import TabledPortalController from "../../TabledPortalController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -11,28 +16,39 @@ const minusIcon = nginxAssetServerBaseUrl + "svgs/minusIcon.svg";
 
 export default function AdvancedSection({
   staticPlacement,
+  selected,
+  setRerender,
+  indicators,
+  tabledPortalController,
 }: {
   staticPlacement: React.MutableRefObject<{
     x: "default" | "hide" | number;
     y: "default" | "hide" | number;
     scale: "hide" | number;
-    alignVertical: "none" | "top" | "center" | "bottom";
-    alignHorizontal: "none" | "right" | "center" | "left";
   }>;
+  selected: React.MutableRefObject<
+    {
+      contentType: StaticContentTypes;
+      contentId: string;
+      aspect: number;
+      count: number | "zero";
+    }[]
+  >;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
+  indicators: React.MutableRefObject<InstanceType[]>;
+  tabledPortalController: TabledPortalController;
 }) {
-  const [_, setRerender] = useState(false);
-
   return (
-    <div className="flex h-max w-full flex-wrap items-center justify-start">
-      <div className="mr-5 flex h-12 w-max items-center justify-center">
-        <div className="pb-2 pr-1 font-K2D text-4xl">X:</div>
+    <div className="flex w-full grow flex-col items-center justify-start space-y-2">
+      <div className="flex h-10 w-full items-center justify-center rounded">
+        <div className="pr-1 font-K2D text-xl">X:</div>
         <div className="flex h-full grow">
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={additionIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -56,7 +72,7 @@ export default function AdvancedSection({
             }}
           />
           <FgInput
-            className="aspect-square max-w-10 grow font-K2D text-xl"
+            className="aspect-square max-w-10 grow bg-fg-off-white font-K2D text-xl"
             onChange={(event) => {
               let newCount: number | "hide" | "default" = parseInt(
                 event.target.value,
@@ -88,14 +104,15 @@ export default function AdvancedSection({
               submitButton: false,
               padding: 0,
               centerText: true,
+              backgroundColor: "#d6d6d6",
             }}
           />
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={minusIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -120,15 +137,15 @@ export default function AdvancedSection({
           />
         </div>
       </div>
-      <div className="mr-5 flex h-12 w-max items-center justify-center">
-        <div className="pb-2 pr-1 font-K2D text-4xl">Y:</div>
+      <div className="flex h-10 w-full items-center justify-center rounded">
+        <div className="pr-1 font-K2D text-xl">Y:</div>
         <div className="flex h-full grow">
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={additionIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -152,7 +169,7 @@ export default function AdvancedSection({
             }}
           />
           <FgInput
-            className="aspect-square max-w-10 grow font-K2D text-xl"
+            className="aspect-square max-w-10 grow bg-fg-off-white font-K2D text-xl"
             onChange={(event) => {
               let newCount: number | "hide" | "default" = parseInt(
                 event.target.value,
@@ -184,14 +201,15 @@ export default function AdvancedSection({
               submitButton: false,
               padding: 0,
               centerText: true,
+              backgroundColor: "#d6d6d6",
             }}
           />
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={minusIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -216,15 +234,15 @@ export default function AdvancedSection({
           />
         </div>
       </div>
-      <div className="flex h-12 w-max items-center justify-center">
-        <div className="pb-2 pr-1 font-K2D text-4xl">Scale:</div>
+      <div className="flex h-10 w-full items-center justify-center rounded">
+        <div className="pr-2 font-K2D text-xl">Scale:</div>
         <div className="flex h-full grow">
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={additionIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -247,11 +265,9 @@ export default function AdvancedSection({
             }}
           />
           <FgInput
-            className="aspect-square max-w-10 grow font-K2D text-xl"
+            className="aspect-square max-w-14 grow bg-fg-off-white font-K2D text-xl"
             onChange={(event) => {
-              let newCount: number | "hide" | "default" = parseInt(
-                event.target.value,
-              );
+              let newCount: number | "hide" = parseFloat(event.target.value);
 
               if (isNaN(newCount)) {
                 newCount = "hide";
@@ -271,20 +287,21 @@ export default function AdvancedSection({
             externalValue={
               staticPlacement.current.scale === "hide"
                 ? ""
-                : `${staticPlacement.current.scale}`
+                : `${parseFloat(staticPlacement.current.scale.toFixed(2))}`
             }
             options={{
               submitButton: false,
               padding: 0,
               centerText: true,
+              backgroundColor: "#d6d6d6",
             }}
           />
           <FgButton
-            className="aspect-square h-full"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={minusIcon}
-                className="h-full w-full fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                className="aspect-square h-[60%] fill-fg-tone-black-1 stroke-fg-tone-black-1"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -308,6 +325,16 @@ export default function AdvancedSection({
           />
         </div>
       </div>
+      <PositioningIndicator
+        staticPlacement={staticPlacement}
+        selected={selected}
+        indicators={indicators}
+        tabledPortalController={tabledPortalController}
+      />
+      <AlignSection
+        staticPlacement={staticPlacement}
+        setRerender={setRerender}
+      />
     </div>
   );
 }

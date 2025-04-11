@@ -44,19 +44,25 @@ export default function FgInput({
 
   return (
     <form
-      className={`${className} flex items-center justify-between overflow-hidden border-fg-white bg-fg-white text-fg-tone-black-3 text-opacity-80 focus-within:border-fg-red hover:border-fg-red`}
+      className={`${className} flex items-center justify-between overflow-hidden border-fg-white text-fg-tone-black-3 text-opacity-80 focus-within:border-fg-red hover:border-fg-red`}
       onSubmit={handleSubmit}
     >
-      <div className="h-max grow">
+      <div
+        className="h-max grow"
+        style={{
+          backgroundColor: fgInputOptions.backgroundColor,
+        }}
+      >
         <input
           ref={inputRef}
           placeholder={placeholder}
           name={name ? name : "defaultInput"}
           type="text"
-          className={`${fgInputOptions.centerText ? "text-center" : ""} h-full w-full bg-fg-white focus:outline-none`}
+          className={`${fgInputOptions.centerText ? "text-center" : ""} h-full w-full focus:outline-none`}
           style={{
             paddingLeft: `${fgInputOptions.padding}rem`,
             paddingRight: `${fgInputOptions.padding}rem`,
+            backgroundColor: fgInputOptions.backgroundColor,
           }}
           onChange={onChange}
           onBlur={onUnfocus}

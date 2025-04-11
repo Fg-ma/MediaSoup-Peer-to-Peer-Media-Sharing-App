@@ -1,103 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   viewBox="0 0 100 100"
-   width="1"
-   height="1"
-   version="1.1"
-   id="svg45"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs1">
-    <filter
-       id="a"
-       color-interpolation-filters="sRGB"
-       x="-0.0159404"
-       y="-0.00796689"
-       width="1.0318809"
-       height="1.0159338">
-      <feMorphology
-         in="SourceAlpha"
-         radius="4.3"
-         result="result91"
-         id="feMorphology1" />
-      <feComposite
-         in="SourceGraphic"
-         in2="result91"
-         operator="out"
-         id="feComposite1" />
-      <feGaussianBlur
-         result="result0"
-         stdDeviation="1.2"
-         id="feGaussianBlur1" />
-      <feDiffuseLighting
-         id="feDiffuseLighting1">
-        <feDistantLight
-           azimuth="225"
-           elevation="66"
-           id="feDistantLight1" />
-      </feDiffuseLighting>
-      <feBlend
-         in2="SourceGraphic"
-         mode="multiply"
-         id="feBlend1" />
-      <feComposite
-         in2="SourceAlpha"
-         operator="in"
-         id="feComposite2" />
-    </filter>
-    <filter
-       id="b"
-       color-interpolation-filters="sRGB"
-       x="-0.025"
-       y="-0.050000001"
-       width="1.05"
-       height="1.1">
-      <feMorphology
-         in="SourceAlpha"
-         radius="4.3"
-         result="result91"
-         id="feMorphology2" />
-      <feComposite
-         in="SourceGraphic"
-         in2="result91"
-         operator="out"
-         id="feComposite3" />
-      <feGaussianBlur
-         result="result0"
-         stdDeviation="1.2"
-         id="feGaussianBlur3" />
-      <feDiffuseLighting
-         id="feDiffuseLighting3">
-        <feDistantLight
-           azimuth="225"
-           elevation="66"
-           id="feDistantLight3" />
-      </feDiffuseLighting>
-      <feBlend
-         in2="SourceGraphic"
-         mode="multiply"
-         id="feBlend3" />
-      <feComposite
-         in2="SourceAlpha"
-         operator="in"
-         id="feComposite4" />
-    </filter>
-  </defs>
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 100 100"
+  width="1"
+  height="1"
+>
   <path
-     d="m 61.629368,87.507975 a 11.632101,9.3056789 1.2339357 0 0 -5.812453,-8.264446 11.632101,9.3056789 1.2339357 0 0 -11.802612,-0.01187 11.632101,9.3056789 1.2339357 0 0 -5.638667,8.25281 z"
-     style="display:inline;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-     id="path44" />
+    d="m 61.629368,87.507975 a 11.632101,9.3056789 1.2339357 0 0 -5.812453,-8.264446 11.632101,9.3056789 1.2339357 0 0 -11.802612,-0.01187 11.632101,9.3056789 1.2339357 0 0 -5.638667,8.25281 z"
+    style="stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"
+	/>
   <path
-     d="M 23.6224,95.160166 38.9412,10.79852 50.2258,4.8311594 61.06,10.787547 76.3776,95.168809 Z"
-     style="display:inline;fill:none;fill-opacity:1;stroke:#000000;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-     id="path45" />
+    d="M 23.6224,95.160166 38.9412,10.79852 50.2258,4.8311594 61.06,10.787547 76.3776,95.168809 Z"
+    style="fill:none;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:round"
+	/>
   <path
-     d="m 42.074373,28.62009 3.228725,-0.270096 7.35233,57.407624 -3.228725,0.270095 z"
-     style="display:inline;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-     id="path42" />
+    d="m 42.074373,28.62009 3.228725,-0.270096 7.35233,57.407624 -3.228725,0.270095 z"
+    style="stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"
+	/>
   <path
-     d="m 45.367441,41.883704 -2.432057,0.251734 -2.683595,-2.180273 -0.251799,-2.431907 9.727792,-1.006943 0.251712,2.431909 -2.18017,2.683741 z"
-     style="display:inline;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-     id="path43-0" />
+    d="m 45.367441,41.883704 -2.432057,0.251734 -2.683595,-2.180273 -0.251799,-2.431907 9.727792,-1.006943 0.251712,2.431909 -2.18017,2.683741 z"
+    style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+	/>
 </svg>

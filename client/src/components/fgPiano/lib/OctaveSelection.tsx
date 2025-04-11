@@ -5,6 +5,7 @@ import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import { Octaves } from "../FgPiano";
 import { navTransition, navVar } from "./SamplerToolbar";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -49,21 +50,22 @@ export default function OctaveSelection({
   };
 
   return (
-    <div className='flex font-K2D text-lg items-center justify-center space-x-1'>
+    <div className="flex items-center justify-center space-x-1 font-K2D text-lg">
       <AnimatePresence>
         {visibleOctaveRef.current !== 0 && (
           <motion.div
             variants={navVar}
-            initial='leftInit'
-            animate='leftAnimate'
-            exit='leftInit'
+            initial="leftInit"
+            animate="leftAnimate"
+            exit="leftInit"
             transition={navTransition}
           >
             <FgButton
-              className='w-6 aspect-square rounded-full flex items-center justify-center pr-0.5'
+              className="flex aspect-square w-6 items-center justify-center rounded-full pr-0.5"
               contentFunction={() => (
                 <FgSVGElement
                   src={navigateBack}
+                  className="fill-fg-off-white stroke-fg-off-white"
                   attributes={[
                     { key: "height", value: "1rem" },
                     { key: "width", value: "1rem" },
@@ -77,7 +79,7 @@ export default function OctaveSelection({
               }}
               clickFunction={() =>
                 scrollToOctave(
-                  Math.max(0, visibleOctaveRef.current - 1) as Octaves
+                  Math.max(0, visibleOctaveRef.current - 1) as Octaves,
                 )
               }
             />
@@ -86,22 +88,18 @@ export default function OctaveSelection({
       </AnimatePresence>
       <div
         ref={octaveDivRef}
-        className='octave-container mb-0.5 cursor-default select-none truncate grow flex'
+        className="octave-container mb-0.5 flex grow cursor-default select-none truncate text-fg-off-white"
         onPointerEnter={handlePointerEnter}
       >
-        <div ref={octaveLabelRef} className='octave-label'>
+        <div ref={octaveLabelRef} className="octave-label">
           Octave
         </div>
         <div>{visibleOctaveRef.current}</div>
       </div>
       {hover && (
         <FgPortal
-          type='below'
-          content={
-            <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-              Octave
-            </div>
-          }
+          type="below"
+          content={<FgHoverContentStandard content="Octave" style="dark" />}
           externalRef={octaveDivRef}
         />
       )}
@@ -109,16 +107,17 @@ export default function OctaveSelection({
         {visibleOctaveRef.current !== 6 && (
           <motion.div
             variants={navVar}
-            initial='rightInit'
-            animate='rightAnimate'
-            exit='rightInit'
+            initial="rightInit"
+            animate="rightAnimate"
+            exit="rightInit"
             transition={navTransition}
           >
             <FgButton
-              className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'
+              className="flex aspect-square w-6 items-center justify-center rounded-full pl-0.5"
               contentFunction={() => (
                 <FgSVGElement
                   src={navigateForward}
+                  className="fill-fg-off-white stroke-fg-off-white"
                   attributes={[
                     { key: "height", value: "1rem" },
                     { key: "width", value: "1rem" },
@@ -127,7 +126,7 @@ export default function OctaveSelection({
               )}
               clickFunction={() =>
                 scrollToOctave(
-                  Math.min(6, visibleOctaveRef.current + 1) as Octaves
+                  Math.min(6, visibleOctaveRef.current + 1) as Octaves,
                 )
               }
               animationOptions={{

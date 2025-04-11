@@ -20,7 +20,7 @@ const scrollButtonsVar: Variants = {
     opacity: 1,
     x: 0,
   },
-  hover: { backgroundColor: "rgb(64 64 64)", fill: "rgb(255, 255, 255)" },
+  hover: { backgroundColor: "rgb(64, 64, 64)", fill: "rgb(242, 242, 242)" },
 };
 
 const scrollButtonsTransition: Transition = {
@@ -39,7 +39,7 @@ const scrollButtonsTransition: Transition = {
 export default function ScrollingContainer({
   externalRef,
   content,
-  buttonBackgroundColor = "#f2f2f2",
+  buttonBackgroundColor = "#161616",
   buttonBackgroundColorTransition = {
     backgroundColor: { duration: 0.3, ease: "linear" },
     boxShadow: {
@@ -134,14 +134,14 @@ export default function ScrollingContainer({
   };
 
   return (
-    <div className='flex w-full items-center justify-start overflow-hidden'>
+    <div className="flex w-full items-center justify-start overflow-hidden">
       <AnimatePresence>
         {showLeftScroll && (
           <motion.div
-            className='flex w-8 h-full bg-white items-center justify-center z-10'
+            className="flex z-10 h-full w-8 items-center justify-center bg-fg-white"
             variants={scrollButtonsVar}
-            initial='leftInit'
-            exit='leftInit'
+            initial="leftInit"
+            exit="leftInit"
             animate={{
               ...scrollButtonsVar.leftAnimate,
               backgroundColor: buttonBackgroundColor,
@@ -149,9 +149,9 @@ export default function ScrollingContainer({
                 ? // prettier-ignore
                   `${-externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : scrollingContainerRef.current
-                ? // prettier-ignore
-                  `${-scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
-                : `1px 0 6px 8px ${buttonBackgroundColor}`,
+                  ? // prettier-ignore
+                    `${-scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                  : `1px 0 6px 8px ${buttonBackgroundColor}`,
             }}
             transition={{
               ...buttonBackgroundColorTransition,
@@ -159,10 +159,11 @@ export default function ScrollingContainer({
             }}
           >
             <FgButton
-              className='w-8 aspect-square rounded-full flex items-center justify-center pr-0.5'
+              className="flex aspect-square w-8 items-center justify-center rounded-full pr-0.5"
               contentFunction={() => (
                 <FgSVGElement
                   src={navigateBack}
+                  className="fill-fg-off-white stroke-fg-off-white"
                   attributes={[
                     { key: "height", value: "1.25rem" },
                     { key: "width", value: "1.25rem" },
@@ -181,7 +182,7 @@ export default function ScrollingContainer({
       </AnimatePresence>
       <div
         ref={externalRef ? externalRef : scrollingContainerRef}
-        className='flex hide-scroll-bar grow items-center justify-start overflow-x-auto w-full'
+        className="flex hide-scroll-bar w-full grow items-center justify-start overflow-x-auto"
         onScroll={handleScroll}
       >
         {content}
@@ -189,13 +190,13 @@ export default function ScrollingContainer({
       <AnimatePresence>
         {showRightScroll && (
           <motion.div
-            className='flex w-8 h-full bg-white items-center justify-center z-10'
+            className="flex z-10 h-full w-8 items-center justify-center bg-fg-tone-black-2"
             style={{
               boxShadow: "-1px 0 6px 8px rgba(255, 255, 255, 1)",
             }}
             variants={scrollButtonsVar}
-            initial='rightInit'
-            exit='rightInit'
+            initial="rightInit"
+            exit="rightInit"
             animate={{
               ...scrollButtonsVar.rightAnimate,
               backgroundColor: buttonBackgroundColor,
@@ -203,9 +204,9 @@ export default function ScrollingContainer({
                 ? // prettier-ignore
                   `${externalRef.current.clientHeight / 3}px 0 ${externalRef.current.clientHeight / 4}px ${externalRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
                 : scrollingContainerRef.current
-                ? // prettier-ignore
-                  `${scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
-                : `1px 0 6px 8px ${buttonBackgroundColor}`,
+                  ? // prettier-ignore
+                    `${scrollingContainerRef.current.clientHeight / 3}px 0 ${scrollingContainerRef.current.clientHeight / 4}px ${scrollingContainerRef.current.clientHeight / 2}px ${buttonBackgroundColor}`
+                  : `1px 0 6px 8px ${buttonBackgroundColor}`,
             }}
             transition={{
               ...buttonBackgroundColorTransition,
@@ -213,10 +214,11 @@ export default function ScrollingContainer({
             }}
           >
             <FgButton
-              className='w-8 aspect-square rounded-full flex items-center justify-center pl-0.5'
+              className="flex aspect-square w-8 items-center justify-center rounded-full pl-0.5"
               contentFunction={() => (
                 <FgSVGElement
                   src={navigateForward}
+                  className="fill-fg-off-white stroke-fg-off-white"
                   attributes={[
                     { key: "height", value: "1.25rem" },
                     { key: "width", value: "1.25rem" },

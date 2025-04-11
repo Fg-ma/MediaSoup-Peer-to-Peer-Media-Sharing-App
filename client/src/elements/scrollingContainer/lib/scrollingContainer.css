@@ -1,12 +1,12 @@
 .scrolling-container-button-underline {
-  background-color: rgb(0, 0, 0);
+  @apply bg-fg-off-white;
 }
 
 .scrolling-container-button.selected .scrolling-container-button-underline {
-  background-color: #e62833;
+  @apply bg-fg-red;
 }
 
 .scrolling-container-button:hover:not(.selected)
   .scrolling-container-button-underline {
-  background-color: rgb(44, 146, 245);
+  @apply bg-fg-red;
 }

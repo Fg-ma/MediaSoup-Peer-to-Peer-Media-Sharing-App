@@ -12,8 +12,6 @@ class LowerImageController {
     private imageInstanceId: string,
     private imageMediaInstance: ImageMediaInstance,
     private imageContainerRef: React.RefObject<HTMLDivElement>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private setImageEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -28,7 +26,7 @@ class LowerImageController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
   ) {}
 
   handleImageEffects = () => {
@@ -39,8 +37,8 @@ class LowerImageController {
     if (
       !event.key ||
       !this.imageContainerRef.current?.classList.contains("in-media") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -49,12 +47,6 @@ class LowerImageController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "e":
         this.handleImageEffects();
         break;
@@ -75,24 +67,9 @@ class LowerImageController {
     }
   };
 
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
-    }
-  };
-
   handleImageEffect = async (
     effect: ImageEffectTypes | "clearAll",
-    blockStateChange: boolean
+    blockStateChange: boolean,
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
@@ -103,7 +80,7 @@ class LowerImageController {
       this.imageMediaInstance.changeEffects(
         effect,
         this.tintColor.current,
-        blockStateChange
+        blockStateChange,
       );
 
       this.tableStaticContentSocket.current?.updateContentEffects(
@@ -111,7 +88,7 @@ class LowerImageController {
         this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
         this.userEffects.current.image[this.imageInstanceId],
-        this.userEffectsStyles.current.image[this.imageInstanceId]
+        this.userEffectsStyles.current.image[this.imageInstanceId],
       );
     } else {
       this.imageMediaInstance.clearAllEffects();
@@ -121,7 +98,7 @@ class LowerImageController {
         this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
         this.userEffects.current.image[this.imageInstanceId],
-        this.userEffectsStyles.current.image[this.imageInstanceId]
+        this.userEffectsStyles.current.image[this.imageInstanceId],
       );
     }
   };
@@ -140,9 +117,9 @@ class LowerImageController {
           parseInt(
             this.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
-              -4
-            )
-          )
+              -4,
+            ),
+          ),
         );
         this.downloadRecordingReady.current = false;
       } else {

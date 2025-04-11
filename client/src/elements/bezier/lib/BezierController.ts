@@ -25,8 +25,6 @@ class BezierController {
     private leavePathTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private settings: Settings,
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -39,7 +37,7 @@ class BezierController {
           d: string,
           blob: Blob,
           name?: string,
-          filters?: string
+          filters?: string,
         ) => void)
       | undefined,
     private selectionBox: {
@@ -59,7 +57,7 @@ class BezierController {
       }>
     >,
     private name: React.MutableRefObject<string | undefined>,
-    private handles: boolean
+    private handles: boolean,
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -69,7 +67,7 @@ class BezierController {
     event.preventDefault();
     event.cancelBubble = true;
 
-    if (this.shiftPressed.current || this.controlPressed.current) return;
+    if (event.shiftKey || event.ctrlKey) return;
 
     switch (event.key.toLowerCase()) {
       case "1":
@@ -99,12 +97,6 @@ class BezierController {
       case "delete":
         this.deleteSelectedAndHovering();
         break;
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "d":
         this.downloadBezierCurve();
         break;
@@ -113,19 +105,6 @@ class BezierController {
         break;
       case "s":
         this.setSettingsActive((prev) => !prev);
-        break;
-      default:
-        break;
-    }
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
         break;
       default:
         break;
@@ -172,7 +151,7 @@ class BezierController {
 
     this.bezierContainerRef.current?.addEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.leaveTimer.current) {
@@ -184,7 +163,7 @@ class BezierController {
   handlePointerLeaveBezier = () => {
     this.bezierContainerRef.current?.removeEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.bezierContainerRef.current) {
@@ -274,20 +253,20 @@ class BezierController {
         const insideX =
           Math.min(
             this.selectionBox.x,
-            this.selectionBox.x + this.selectionBox.width
+            this.selectionBox.x + this.selectionBox.width,
           ) <= point.x &&
           Math.max(
             this.selectionBox.x,
-            this.selectionBox.x + this.selectionBox.width
+            this.selectionBox.x + this.selectionBox.width,
           ) >= point.x;
         const insideY =
           Math.min(
             this.selectionBox.y,
-            this.selectionBox.y + this.selectionBox.height
+            this.selectionBox.y + this.selectionBox.height,
           ) <= point.y &&
           Math.max(
             this.selectionBox.y,
-            this.selectionBox.y + this.selectionBox.height
+            this.selectionBox.y + this.selectionBox.height,
           ) >= point.y;
 
         return {
@@ -304,7 +283,7 @@ class BezierController {
   handlePointerDown = (
     event: React.PointerEvent,
     index: number,
-    controlType?: "controlOne" | "controlTwo"
+    controlType?: "controlOne" | "controlTwo",
   ) => {
     event.preventDefault();
     event.stopPropagation();
@@ -352,7 +331,7 @@ class BezierController {
   handleDrag = (
     index: number,
     event: PointerEvent,
-    controlType?: "controlOne" | "controlTwo"
+    controlType?: "controlOne" | "controlTwo",
   ) => {
     if (
       !this.svgRef.current ||
@@ -375,11 +354,11 @@ class BezierController {
         let angle = Math.atan2(dy, dx);
         let distance = Math.hypot(dx, dy);
 
-        if (this.controlPressed.current) {
+        if (event.ctrlKey) {
           const snapAngle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
           x = this.applyBoardLimits(point.x + Math.cos(snapAngle) * distance);
           y = this.applyBoardLimits(point.y + Math.sin(snapAngle) * distance);
-        } else if (this.shiftPressed.current) {
+        } else if (event.shiftKey) {
           if (Math.abs(dx) > Math.abs(dy)) {
             y = point.y;
           } else {
@@ -435,14 +414,14 @@ class BezierController {
           ) {
             const distance = Math.hypot(
               newPoints[index].controls.controlTwo.x - newPoints[index].x,
-              newPoints[index].controls.controlTwo.y - newPoints[index].y
+              newPoints[index].controls.controlTwo.y - newPoints[index].y,
             );
             newPoints[index].controls.controlTwo = {
               x: this.applyBoardLimits(
-                newPoints[index].x - distance * Math.cos(angle)
+                newPoints[index].x - distance * Math.cos(angle),
               ),
               y: this.applyBoardLimits(
-                newPoints[index].y - distance * Math.sin(angle)
+                newPoints[index].y - distance * Math.sin(angle),
               ),
               dragging: false,
             };
@@ -452,14 +431,14 @@ class BezierController {
           ) {
             const distance = Math.hypot(
               newPoints[index].controls.controlOne.x - newPoints[index].x,
-              newPoints[index].controls.controlOne.y - newPoints[index].y
+              newPoints[index].controls.controlOne.y - newPoints[index].y,
             );
             newPoints[index].controls.controlOne = {
               x: this.applyBoardLimits(
-                newPoints[index].x + distance * Math.cos(angle + Math.PI)
+                newPoints[index].x + distance * Math.cos(angle + Math.PI),
               ),
               y: this.applyBoardLimits(
-                newPoints[index].y + distance * Math.sin(angle + Math.PI)
+                newPoints[index].y + distance * Math.sin(angle + Math.PI),
               ),
               dragging: false,
             };
@@ -670,7 +649,7 @@ class BezierController {
       // Attempt to delete selected points (excluding first/last)
       const newPoints = prev.filter(
         (point, index) =>
-          !point.selected || index === 0 || index === prev.length - 1
+          !point.selected || index === 0 || index === prev.length - 1,
       );
 
       // If no selected point was deleted and length is unchanged
@@ -680,7 +659,7 @@ class BezierController {
           (point, index) =>
             (point.dragging || point.hovering) &&
             index !== 0 &&
-            index !== prev.length - 1
+            index !== prev.length - 1,
         );
 
         // If a hovering/dragging point was found, remove it
@@ -705,7 +684,7 @@ class BezierController {
         .map((point, index) =>
           point.selected && index !== 0 && index !== prev.length - 1
             ? index
-            : -1
+            : -1,
         )
         .filter((index) => index !== -1);
 
@@ -715,7 +694,7 @@ class BezierController {
           (point, index) =>
             (point.hovering || point.dragging) &&
             index !== 0 &&
-            index !== prev.length - 1
+            index !== prev.length - 1,
         );
         if (hoveredIndex !== -1) selectedIndices.push(hoveredIndex);
       }
@@ -745,15 +724,15 @@ class BezierController {
 
             const distance = Math.hypot(
               controlTwo.x - newPoints[index].x,
-              controlTwo.y - newPoints[index].y
+              controlTwo.y - newPoints[index].y,
             );
             newPoints[index].controls.controlTwo = {
               ...controlTwo,
               x: this.applyBoardLimits(
-                newPoints[index].x - distance * Math.cos(angle)
+                newPoints[index].x - distance * Math.cos(angle),
               ),
               y: this.applyBoardLimits(
-                newPoints[index].y - distance * Math.sin(angle)
+                newPoints[index].y - distance * Math.sin(angle),
               ),
             };
           }
@@ -777,7 +756,7 @@ class BezierController {
           .map((point, index) =>
             point.selected && index !== 0 && index !== prev.length - 1
               ? index
-              : -1
+              : -1,
           )
           .filter((index) => index !== -1);
 
@@ -787,7 +766,7 @@ class BezierController {
             (point, index) =>
               (point.hovering || point.dragging) &&
               index !== 0 &&
-              index !== prev.length - 1
+              index !== prev.length - 1,
           );
           if (hoveredIndex !== -1) indicesToUpdate.push(hoveredIndex);
         }
@@ -820,15 +799,15 @@ class BezierController {
 
             const distance = Math.hypot(
               controlTwo.x - newPoints[index].x,
-              controlTwo.y - newPoints[index].y
+              controlTwo.y - newPoints[index].y,
             );
             newPoints[index].controls.controlTwo = {
               ...controlTwo,
               x: this.applyBoardLimits(
-                newPoints[index].x - distance * Math.cos(angle)
+                newPoints[index].x - distance * Math.cos(angle),
               ),
               y: this.applyBoardLimits(
-                newPoints[index].y - distance * Math.sin(angle)
+                newPoints[index].y - distance * Math.sin(angle),
               ),
             };
           }
@@ -843,7 +822,7 @@ class BezierController {
     this.setPoints((prev) => {
       let index = prev.findIndex(
         (point, index) =>
-          point.selected && index !== 0 && index !== prev.length - 1
+          point.selected && index !== 0 && index !== prev.length - 1,
       );
 
       if (index === -1) {
@@ -851,7 +830,7 @@ class BezierController {
           (point, index) =>
             (point.dragging || point.hovering) &&
             index !== 0 &&
-            index !== prev.length - 1
+            index !== prev.length - 1,
         );
       }
 
@@ -867,7 +846,7 @@ class BezierController {
       this.handlePointerDown(
         syntheticEvent as unknown as React.PointerEvent,
         index,
-        controller
+        controller,
       );
 
       return prev;
@@ -891,7 +870,7 @@ class BezierController {
       (point) =>
         point.dragging ||
         point.controls.controlOne.dragging ||
-        point.controls.controlTwo?.dragging
+        point.controls.controlTwo?.dragging,
     );
   };
 
@@ -910,7 +889,7 @@ class BezierController {
         (point) =>
           point.dragging ||
           point.controls.controlOne.dragging ||
-          point.controls.controlTwo?.dragging
+          point.controls.controlTwo?.dragging,
       );
   };
 
@@ -1046,7 +1025,7 @@ class BezierController {
             type='fractalNoise'
             baseFrequency="${this.settings.filters.crackedGlass.density.value}"
             numOctaves="${Math.round(
-              this.settings.filters.crackedGlass.detail.value
+              this.settings.filters.crackedGlass.detail.value,
             )}"
             result='turbulence'
           />
@@ -1180,7 +1159,7 @@ class BezierController {
       svgString,
       mimeType.value,
       compression.value,
-      filename
+      filename,
     );
   };
 
@@ -1201,7 +1180,7 @@ class BezierController {
     svgString: string,
     format: string,
     compression: string,
-    filename: string
+    filename: string,
   ) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -1268,7 +1247,7 @@ class BezierController {
         d,
         blob,
         this.name.current,
-        filters
+        filters,
       );
   };
 

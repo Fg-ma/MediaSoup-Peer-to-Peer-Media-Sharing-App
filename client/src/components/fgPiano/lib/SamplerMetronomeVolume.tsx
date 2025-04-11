@@ -40,7 +40,7 @@ export default function SamplerMetronomeVolume() {
     }
 
     const percentage = value * 100;
-    samplerMetronomeVolumeSliderRef.current.style.background = `linear-gradient(to right, #f57e41 ${percentage}%, rgba(150, 150, 150, 0.5) ${percentage}%)`;
+    samplerMetronomeVolumeSliderRef.current.style.background = `linear-gradient(to right, #b20203 ${percentage}%, #d6d6d6 ${percentage}%)`;
   };
 
   const handleVolumeChange = (volume: number) => {
@@ -105,37 +105,37 @@ export default function SamplerMetronomeVolume() {
   return (
     <AnimatePresence>
       <motion.div
-        className='metronome-volume-container shadow-lg space-y-2'
+        className="metronome-volume-container space-y-2 shadow-lg"
         variants={samplerMetronomeVolumeVar}
-        initial='init'
-        exit='init'
-        animate='animate'
+        initial="init"
+        exit="init"
+        animate="animate"
         transition={samplerMetronomeVolumeTransition}
       >
-        <div className='w-[6.5rem] h-[6.5rem] flex justify-center items-center'>
+        <div className="flex h-[6.5rem] w-[6.5rem] items-center justify-center">
           <input
             ref={samplerMetronomeVolumeSliderRef}
             onInput={handleVolumeSlider}
-            className='metronome-volume-slider'
-            type='range'
-            min='0'
-            max='1'
-            step='any'
+            className="metronome-volume-slider"
+            type="range"
+            min="0"
+            max="1"
+            step="any"
           />
         </div>
         <FgButton
           clickFunction={handleMute}
           contentFunction={() => (
             <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 100 100'
-              width='1.5rem'
-              height='1.5rem'
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+              width="1.5rem"
+              height="1.5rem"
             >
               <VolumeSVG
                 volumeState={volumeState}
                 movingPath={volumeSVGPaths.low.right}
-                color='black'
+                color="#d6d6d6"
                 stationaryPaths={[
                   volumeSVGPaths.high.left,
                   volumeSVGPaths.high.middle,

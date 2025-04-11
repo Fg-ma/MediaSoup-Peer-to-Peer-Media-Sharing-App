@@ -65,7 +65,7 @@ export default function FgKnobButton({
   const [value, setValue] = useState<number>(
     fgKnobButtonOptions.initValue !== undefined
       ? fgKnobButtonOptions.initValue
-      : (fgKnobButtonOptions.rangeMax + fgKnobButtonOptions.rangeMin) / 2
+      : (fgKnobButtonOptions.rangeMax + fgKnobButtonOptions.rangeMin) / 2,
   );
   const [angle, setAngle] = useState<number>(getAngleFromValue(value));
   const [clicked, setClicked] = useState(false);
@@ -159,7 +159,7 @@ export default function FgKnobButton({
   return (
     <div
       id={fgKnobButtonOptions.id}
-      className={`flex flex-col items-center justify-center aspect-square`}
+      className={`flex aspect-square flex-col items-center justify-center`}
       style={{
         // prettier-ignore
         width: `calc(${height}rem - ${fgKnobButtonOptions.topLabel ? "1rem" : "0rem"} - ${fgKnobButtonOptions.bottomLabel ? "1rem" : "0rem"})`,
@@ -167,63 +167,63 @@ export default function FgKnobButton({
       }}
     >
       {fgKnobButtonOptions.topLabel && (
-        <div className='font-K2D text-base leading-4 cursor-default select-none'>
+        <div className="cursor-default select-none font-K2D text-base leading-4 text-fg-off-white">
           {fgKnobButtonOptions.topLabel}
         </div>
       )}
       <div
         ref={knobButtonRef}
-        className='grow aspect-square cursor-pointer relative'
+        className="relative aspect-square grow cursor-pointer"
         onPointerDown={handlePointerDown}
       >
-        <svg className='w-max h-full' viewBox='0 0 100 100'>
+        <svg className="h-full w-max" viewBox="0 0 100 100">
           {/* after path round*/}
           <circle
+            className="fill-fg-off-white"
             cx={x(endAngleSecondArc, radius)}
             cy={y(endAngleSecondArc, radius)}
             r={5}
-            fill='#e6e6e6'
           />
 
           {/* before path round */}
           <circle
+            className="fill-fg-red"
             cx={x(startAngle, radius)}
             cy={y(startAngle, radius)}
             r={5}
-            fill='#f57e41'
           />
 
           {/* before path */}
           <path
+            className="stroke-fg-red"
             d={`M ${x(startAngle, radius)} ${y(
               startAngle,
-              radius
+              radius,
             )} A ${radius} ${radius} 0 ${largeArcFlag(
               startAngle,
-              startAngle + angle
+              startAngle + angle,
             )} ${sweepFlag(startAngle, startAngle + angle)} ${x(
               startAngle + angle,
-              radius
+              radius,
             )} ${y(startAngle + angle, radius)}`}
-            fill='none'
-            stroke='#f57e41'
+            fill="none"
             strokeWidth={10}
           />
 
           {/* after path */}
           <path
+            className="stroke-fg-off-white"
             d={`M ${x(startAngle + angle, radius)} ${y(
               startAngle + angle,
-              radius
+              radius,
             )} A ${radius} ${radius} 0 ${largeArcFlag(
               startAngle + angle,
-              endAngleSecondArc
+              endAngleSecondArc,
             )} ${sweepFlag(startAngle + angle, endAngleSecondArc)} ${x(
               endAngleSecondArc,
-              radius
+              radius,
             )} ${y(endAngleSecondArc, radius)}`}
-            fill='none'
-            stroke='#e6e6e6'
+            fill="none"
             strokeWidth={10}
           />
 
@@ -233,14 +233,14 @@ export default function FgKnobButton({
               ticks.map((tick, index) => (
                 <motion.path
                   key={index}
+                  className="stroke-fg-tone-black-5"
                   d={`M ${x(startAngle + tick, 34)} ${y(
                     startAngle + tick,
-                    34
+                    34,
                   )} L ${x(startAngle + tick, 46)} ${y(startAngle + tick, 46)}`}
-                  fill='none'
-                  stroke='black'
+                  fill="none"
                   strokeWidth={4}
-                  strokeLinecap='round'
+                  strokeLinecap="round"
                   initial={{ opacity: 0, pathLength: 0 }}
                   animate={{ opacity: 1, pathLength: 1 }}
                   exit={{ opacity: 0, pathLength: 0 }}
@@ -251,23 +251,23 @@ export default function FgKnobButton({
 
           {/* pointer path */}
           <path
+            className="stroke-fg-tone-black-6"
             d={`M ${x(startAngle + angle, 28)} ${y(
               startAngle + angle,
-              28
+              28,
             )} L ${x(startAngle + angle, 46)} ${y(startAngle + angle, 46)}`}
-            fill='none'
-            stroke='#333333'
+            fill="none"
             strokeWidth={5}
-            strokeLinecap='round'
+            strokeLinecap="round"
           />
         </svg>
-        <div className='font-K2D text-sm leading-4 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center z-[-1] cursor-default select-none'>
+        <div className="absolute left-1/2 top-1/2 z-[-1] flex -translate-x-1/2 -translate-y-1/2 cursor-default select-none flex-col items-center justify-center font-K2D text-sm leading-4 text-fg-off-white">
           <div>{value}</div>
           {fgKnobButtonOptions.units && <div>{fgKnobButtonOptions.units}</div>}
         </div>
       </div>
       {fgKnobButtonOptions.bottomLabel && (
-        <div className='font-K2D text-base leading-4 cursor-default select-none'>
+        <div className="cursor-default select-none font-K2D text-base leading-4 text-fg-off-white">
           {fgKnobButtonOptions.bottomLabel}
         </div>
       )}

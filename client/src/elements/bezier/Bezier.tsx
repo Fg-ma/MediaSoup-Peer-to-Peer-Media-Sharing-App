@@ -74,14 +74,14 @@ export default function Bezier({
     d: string,
     blob: Blob,
     name?: string,
-    filters?: string
+    filters?: string,
   ) => void;
   closeFunction?: () => void;
   needsName?: boolean;
   handles?: boolean;
 }) {
   const [points, setPoints] = useState<BezierPoint[]>(
-    structuredClone(defaultPoints)
+    structuredClone(defaultPoints),
   );
   const [selectionBox, setSelectionBox] = useState<{
     x: number;
@@ -105,9 +105,6 @@ export default function Bezier({
   const bezierContainerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const leaveTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const movementTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const leavePathTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -115,10 +112,10 @@ export default function Bezier({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [activePages, setActivePages] = useState<ActivePages>(
-    structuredClone(defaultActivePages)
+    structuredClone(defaultActivePages),
   );
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [copied, setCopied] = useState(false);
 
@@ -137,8 +134,6 @@ export default function Bezier({
     leaveTimer,
     movementTimeout,
     leavePathTimeout,
-    shiftPressed,
-    controlPressed,
     settings,
     setSettings,
     setSettingsActive,
@@ -148,21 +143,19 @@ export default function Bezier({
     selectionBox,
     setSelectionBox,
     name,
-    handles
+    handles,
   );
 
   useEffect(() => {
     document.addEventListener("keydown", bezierController.handleKeyDown, true);
-    document.addEventListener("keyup", bezierController.handleKeyUp);
     document.addEventListener("wheel", bezierController.handleWheel);
 
     return () => {
       document.removeEventListener(
         "keydown",
         bezierController.handleKeyDown,
-        true
+        true,
       );
-      document.removeEventListener("keyup", bezierController.handleKeyUp);
       document.removeEventListener("wheel", bezierController.handleWheel);
     };
   }, []);
@@ -196,15 +189,15 @@ export default function Bezier({
 
   return (
     <FgPortal
-      type='staticTopDomain'
+      type="staticTopDomain"
       top={0}
       left={0}
       zValue={500000000001}
-      className='w-screen h-screen'
+      className="h-screen w-screen"
       content={
         <div
           ref={bezierBackgroundContainerRef}
-          className='flex w-full h-full bg-fg-tone-black-4 bg-opacity-45 pointer-events-none items-center justify-center'
+          className="pointer-events-none flex h-full w-full items-center justify-center bg-fg-tone-black-4 bg-opacity-45"
         >
           <div
             ref={bezierContainerRef}
@@ -214,8 +207,8 @@ export default function Bezier({
                   ? "w-[80%]"
                   : "w-[95%]"
                 : aspectSquarish
-                ? "h-[80%]"
-                : "h-[95%]"
+                  ? "h-[80%]"
+                  : "h-[95%]"
             } ${
               !inBezier &&
               !settingsActive &&
@@ -224,7 +217,7 @@ export default function Bezier({
               !bezierController.isOneInSelectionBox(points)
                 ? "cursor-none"
                 : ""
-            } aspect-square relative border-2 rounded`}
+            } relative aspect-square rounded border-2`}
             onPointerEnter={bezierController.handlePointerEnterBezier}
             onPointerLeave={bezierController.handlePointerLeaveBezier}
             style={{
@@ -238,8 +231,8 @@ export default function Bezier({
           >
             <svg
               ref={svgRef}
-              viewBox='0 0 100 100'
-              className='w-full h-full pointer-events-auto rounded overflow-hidden'
+              viewBox="0 0 100 100"
+              className="pointer-events-auto h-full w-full overflow-hidden rounded"
               onDoubleClick={bezierController.handleDoubleClick}
               onPointerDown={bezierController.handleSVGPointerDown}
               onPointerUp={bezierController.handleSVGPointerUp}
@@ -248,185 +241,185 @@ export default function Bezier({
             >
               <defs>
                 <filter
-                  id='bezierShadowFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierShadowFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feGaussianBlur
-                    in='SourceAlpha'
+                    in="SourceAlpha"
                     stdDeviation={settings.filters.shadow.strength.value}
-                    result='blur'
+                    result="blur"
                   />
                   <feOffset
-                    in='blur'
+                    in="blur"
                     dx={settings.filters.shadow.offsetX.value}
                     dy={settings.filters.shadow.offsetY.value}
-                    result='offsetBlur'
+                    result="offsetBlur"
                   />
 
                   <feFlood
                     floodColor={settings.filters.shadow.shadowColor.value}
-                    result='colorBlur'
+                    result="colorBlur"
                   />
                   <feComposite
-                    in='colorBlur'
-                    in2='offsetBlur'
-                    operator='in'
-                    result='coloredBlur'
+                    in="colorBlur"
+                    in2="offsetBlur"
+                    operator="in"
+                    result="coloredBlur"
                   />
 
                   <feMerge>
-                    <feMergeNode in='coloredBlur' />
-                    <feMergeNode in='SourceGraphic' />
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
 
                 <filter
-                  id='bezierBlurFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierBlurFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feGaussianBlur
-                    in='SourceGraphic'
+                    in="SourceGraphic"
                     stdDeviation={settings.filters.blur.strength.value}
                   />
                 </filter>
 
                 <filter
-                  id='bezierGrayscaleFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierGrayscaleFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feColorMatrix
-                    type='saturate'
+                    type="saturate"
                     values={`${settings.filters.grayscale.scale.value}`}
                   />
                 </filter>
 
                 <filter
-                  id='bezierSaturateFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierSaturateFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feColorMatrix
-                    type='saturate'
+                    type="saturate"
                     values={`${settings.filters.saturate.saturation.value}`}
                   />
                 </filter>
 
                 <filter
-                  id='bezierEdgeDetectionFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierEdgeDetectionFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feConvolveMatrix
-                    order='3'
-                    kernelMatrix=' -1 -1 -1 -1 8 -1 -1 -1 -1 '
-                    result='edgeDetected'
+                    order="3"
+                    kernelMatrix=" -1 -1 -1 -1 8 -1 -1 -1 -1 "
+                    result="edgeDetected"
                   />
                 </filter>
 
                 <filter
-                  id='bezierColorOverlayFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierColorOverlayFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feFlood
                     floodColor={
                       settings.filters.colorOverlay.overlayColor.value
                     }
-                    result='flood'
+                    result="flood"
                   />
                   <feComposite
-                    in2='SourceAlpha'
-                    operator='in'
-                    result='overlay'
+                    in2="SourceAlpha"
+                    operator="in"
+                    result="overlay"
                   />
                   <feComposite
-                    in='overlay'
-                    in2='SourceGraphic'
-                    operator='over'
+                    in="overlay"
+                    in2="SourceGraphic"
+                    operator="over"
                   />
                 </filter>
 
                 <filter
-                  id='bezierWaveDistortionFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierWaveDistortionFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feTurbulence
-                    type='fractalNoise'
+                    type="fractalNoise"
                     baseFrequency={
                       settings.filters.waveDistortion.frequency.value
                     }
-                    result='turbulence'
+                    result="turbulence"
                   />
                   <feDisplacementMap
-                    in='SourceGraphic'
-                    in2='turbulence'
+                    in="SourceGraphic"
+                    in2="turbulence"
                     scale={settings.filters.waveDistortion.strength.value}
                   />
                 </filter>
 
                 <filter
-                  id='bezierCrackedGlassFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierCrackedGlassFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feTurbulence
-                    type='fractalNoise'
+                    type="fractalNoise"
                     baseFrequency={settings.filters.crackedGlass.density.value}
                     numOctaves={Math.round(
-                      settings.filters.crackedGlass.detail.value
+                      settings.filters.crackedGlass.detail.value,
                     )}
-                    result='turbulence'
+                    result="turbulence"
                   />
                   <feDisplacementMap
-                    in='SourceGraphic'
-                    in2='turbulence'
+                    in="SourceGraphic"
+                    in2="turbulence"
                     scale={settings.filters.crackedGlass.strength.value}
                   />
                 </filter>
 
                 <filter
-                  id='bezierNeonGlowFilter'
-                  x='-2000'
-                  y='-2000'
-                  width='4000'
-                  height='4000'
+                  id="bezierNeonGlowFilter"
+                  x="-2000"
+                  y="-2000"
+                  width="4000"
+                  height="4000"
                 >
                   <feGaussianBlur
-                    in='SourceAlpha'
-                    stdDeviation='3'
-                    result='blurred'
+                    in="SourceAlpha"
+                    stdDeviation="3"
+                    result="blurred"
                   />
                   <feFlood
                     floodColor={settings.filters.neonGlow.neonColor.value}
-                    result='glowColor'
+                    result="glowColor"
                   />
                   <feComposite
-                    in='glowColor'
-                    in2='blurred'
-                    operator='in'
-                    result='glow'
+                    in="glowColor"
+                    in2="blurred"
+                    operator="in"
+                    result="glow"
                   />
-                  <feComposite in='SourceGraphic' in2='glow' operator='over' />
+                  <feComposite in="SourceGraphic" in2="glow" operator="over" />
                 </filter>
               </defs>
 
@@ -440,10 +433,10 @@ export default function Bezier({
                 <path
                   d={bezierController.getPathData()}
                   stroke={settings.color.value}
-                  fill='none'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
+                  fill="none"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   onPointerEnter={() => setPathHovered(true)}
                   onPointerLeave={() => {
                     if (bezierController.isOneSelected(points)) return;
@@ -463,20 +456,20 @@ export default function Bezier({
                 <rect
                   x={Math.min(
                     selectionBox.x,
-                    selectionBox.x + selectionBox.width
+                    selectionBox.x + selectionBox.width,
                   )}
                   y={Math.min(
                     selectionBox.y,
-                    selectionBox.y + selectionBox.height
+                    selectionBox.y + selectionBox.height,
                   )}
                   width={Math.abs(selectionBox.width)}
                   height={Math.abs(selectionBox.height)}
-                  fill='rgba(29, 105, 202, 0.2)'
-                  stroke='#1d69ca '
+                  fill="rgba(29, 105, 202, 0.2)"
+                  stroke="#1d69ca "
                   rx={0.5}
                   ry={0.5}
-                  strokeWidth='0.5'
-                  strokeDasharray='2'
+                  strokeWidth="0.5"
+                  strokeDasharray="2"
                 />
               )}
 
@@ -494,14 +487,14 @@ export default function Bezier({
                             y1={point.y}
                             x2={basePoint.x}
                             y2={basePoint.y}
-                            stroke='#f78528'
-                            strokeOpacity='0.8'
+                            stroke="#f78528"
+                            strokeOpacity="0.8"
                             strokeDasharray={2}
                             strokeWidth={0.5}
                             {...fadeIn}
                           />
-                        )
-                      )
+                        ),
+                      ),
                   )}
 
                   {/* Points */}
@@ -526,8 +519,8 @@ export default function Bezier({
                             point.hovering
                               ? "#d40213"
                               : point.inSelectionBox
-                              ? "#f78528"
-                              : "#1d69ca"
+                                ? "#f78528"
+                                : "#1d69ca"
                           }
                           onDoubleClick={(event) => {
                             event.stopPropagation();
@@ -549,7 +542,7 @@ export default function Bezier({
                       {point.type !== "endPoint" &&
                         point.controlType === "inlineSymmetric" && (
                           <motion.rect
-                            className={`cursor-pointer svg-editor-split-point-retangle ${
+                            className={`svg-editor-split-point-retangle cursor-pointer ${
                               point.dragging ? "dragging" : ""
                             } ${point.selected ? "selected" : ""} ${
                               point.hovering ? "hovering-square" : ""
@@ -562,8 +555,8 @@ export default function Bezier({
                               point.selected || point.hovering
                                 ? "#d40213"
                                 : point.inSelectionBox
-                                ? "#f78528"
-                                : "#1d69ca"
+                                  ? "#f78528"
+                                  : "#1d69ca"
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
@@ -583,7 +576,7 @@ export default function Bezier({
                       {point.type !== "endPoint" &&
                         point.controlType === "free" && (
                           <motion.rect
-                            className={`cursor-pointer svg-editor-split-point-square ${
+                            className={`svg-editor-split-point-square cursor-pointer ${
                               point.dragging ? "dragging" : ""
                             } ${point.selected ? "selected" : ""} ${
                               point.hovering ? "hovering-square" : ""
@@ -596,8 +589,8 @@ export default function Bezier({
                               point.selected || point.hovering
                                 ? "#d40213"
                                 : point.inSelectionBox
-                                ? "#f78528"
-                                : "#1d69ca"
+                                  ? "#f78528"
+                                  : "#1d69ca"
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
@@ -621,8 +614,8 @@ export default function Bezier({
                               key={`cursor-pointer control-${index}-${controlType}`}
                               cx={basePoint.x}
                               cy={basePoint.y}
-                              r='0.75'
-                              fill='#1a8ca2'
+                              r="0.75"
+                              fill="#1a8ca2"
                               className={`svg-editor-control-point ${
                                 basePoint.dragging ? "dragging" : ""
                               }`}
@@ -630,12 +623,12 @@ export default function Bezier({
                                 bezierController.handlePointerDown(
                                   event,
                                   index,
-                                  controlType as "controlOne" | "controlTwo"
+                                  controlType as "controlOne" | "controlTwo",
                                 )
                               }
                               {...fadeIn}
                             />
-                          )
+                          ),
                         )}
                     </motion.g>
                   ))}
@@ -650,17 +643,17 @@ export default function Bezier({
                 bezierController.isOneHovered(points)) && (
                 <motion.div
                   variants={BezierVar}
-                  initial='init'
-                  animate='animate'
-                  exit='init'
+                  initial="init"
+                  animate="animate"
+                  exit="init"
                   transition={BezierTransition}
                 >
                   <div
                     className={`${
                       largestDim === "width"
-                        ? "top-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
-                        : "bottom-full right-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
-                    } absolute flex items-center justify-center z-20 pointer-events-none`}
+                        ? "left-full top-0 ml-2 h-max w-[10%] min-w-8 max-w-16 flex-col space-y-4"
+                        : "bottom-full right-0 mb-2 h-[10%] max-h-16 min-h-8 w-max space-x-4"
+                    } pointer-events-none absolute z-20 flex items-center justify-center`}
                   >
                     {largestDim === "height" && (
                       <>
@@ -703,9 +696,9 @@ export default function Bezier({
                   <div
                     className={`${
                       largestDim === "width"
-                        ? "bottom-0 left-full ml-2 w-[10%] h-max max-w-16 min-w-8 flex-col space-y-4"
-                        : "bottom-full left-0 mb-2 h-[10%] w-max max-h-16 min-h-8 space-x-4"
-                    } absolute flex items-center justify-center z-20 pointer-events-none`}
+                        ? "bottom-0 left-full ml-2 h-max w-[10%] min-w-8 max-w-16 flex-col space-y-4"
+                        : "bottom-full left-0 mb-2 h-[10%] max-h-16 min-h-8 w-max space-x-4"
+                    } pointer-events-none absolute z-20 flex items-center justify-center`}
                   >
                     <CopyButton
                       bezierController={bezierController}
@@ -729,18 +722,18 @@ export default function Bezier({
                 </motion.div>
               )}
             {getNamePopupActive && (
-              <div className='absolute z-100 top-0 left-0 w-full h-full pointer-events-auto'>
+              <div className="z-100 pointer-events-auto absolute left-0 top-0 h-full w-full">
                 <motion.div
-                  className='absolute left-1/2 -translate-x-1/2 flex flex-col space-y-2 w-[60%] min-w-28'
+                  className="absolute left-1/2 flex w-[60%] min-w-28 -translate-x-1/2 flex-col space-y-2"
                   variants={NamePopupVar}
-                  initial='init'
-                  animate='animate'
-                  exit='init'
+                  initial="init"
+                  animate="animate"
+                  exit="init"
                   transition={NamePopupTransition}
                 >
                   <FgInput
-                    className='h-12 text-2xl rounded-md'
-                    placeholder='Name this beast...'
+                    className="h-12 rounded-md text-2xl"
+                    placeholder="Name this beast..."
                     options={{
                       submitButton: false,
                       autoFocus: true,
@@ -753,9 +746,9 @@ export default function Bezier({
                       name.current = event.target.value;
                     }}
                   />
-                  <div className='flex items-center justify-center space-x-3'>
+                  <div className="flex items-center justify-center space-x-3">
                     <FgButton
-                      className='flex h-10 w-10 bg-fg-red rounded-full items-center justify-center'
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-fg-red"
                       clickFunction={() => {
                         bezierController.confirmBezierCurve();
                         setGetNamePopupActive(false);
@@ -763,7 +756,7 @@ export default function Bezier({
                       contentFunction={() => (
                         <FgSVGElement
                           src={checkIcon}
-                          className='w-[75%] h-[75%]'
+                          className="h-[75%] w-[75%]"
                           attributes={[
                             { key: "width", value: "100%" },
                             { key: "height", value: "100%" },
@@ -774,8 +767,8 @@ export default function Bezier({
                       )}
                       hoverContent={
                         <FgHoverContentStandard
-                          content='Confirm name'
-                          style='light'
+                          content="Confirm name"
+                          style="light"
                         />
                       }
                       options={{
@@ -786,12 +779,12 @@ export default function Bezier({
                       }}
                     />
                     <FgButton
-                      className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-fg-tone-black-4"
                       clickFunction={() => setGetNamePopupActive(false)}
                       contentFunction={() => (
                         <FgSVGElement
                           src={closeIcon}
-                          className='w-[55%] h-[55%]'
+                          className="h-[55%] w-[55%]"
                           attributes={[
                             { key: "width", value: "100%" },
                             { key: "height", value: "100%" },
@@ -802,8 +795,8 @@ export default function Bezier({
                       )}
                       hoverContent={
                         <FgHoverContentStandard
-                          content='Cancel'
-                          style='light'
+                          content="Cancel"
+                          style="light"
                         />
                       }
                       options={{

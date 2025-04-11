@@ -6,8 +6,8 @@ export default function KeyVisualizer({
   keyVisualizerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
-    <div className='w-full h-full flex items-center justify-center bg-fg-white-90'>
-      <div ref={keyVisualizerRef} className='key-visualizer'></div>
+    <div className="flex h-full w-full items-center justify-center bg-fg-tone-black-7">
+      <div ref={keyVisualizerRef} className="key-visualizer"></div>
     </div>
   );
 }

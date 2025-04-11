@@ -49,9 +49,6 @@ export default function FgImage({
     userEffectsStyles.current.image[imageInstanceId].tint.color,
   );
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
@@ -69,8 +66,6 @@ export default function FgImage({
     imageInstanceId,
     imageMediaInstance,
     imageContainerRef,
-    shiftPressed,
-    controlPressed,
     setImageEffectsActive,
     tintColor,
     userEffects,
@@ -115,8 +110,6 @@ export default function FgImage({
 
     document.addEventListener("keydown", lowerImageController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerImageController.handleKeyUp);
-
     tableRef.current?.addEventListener(
       "scroll",
       imageController.handleTableScroll,
@@ -130,7 +123,6 @@ export default function FgImage({
         "keydown",
         lowerImageController.handleKeyDown,
       );
-      document.removeEventListener("keyup", lowerImageController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
         imageController.handleTableScroll,

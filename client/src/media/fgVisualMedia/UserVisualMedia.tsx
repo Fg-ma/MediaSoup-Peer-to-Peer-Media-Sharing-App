@@ -23,7 +23,7 @@ import { AnimatePresence } from "framer-motion";
 import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
 
 const VisualMediaAdjustmentButtons = React.lazy(
-  () => import("./lib/VisualMediaAdjustmentButtons")
+  () => import("./lib/VisualMediaAdjustmentButtons"),
 );
 
 export default function UserVisualMedia({
@@ -70,26 +70,26 @@ export default function UserVisualMedia({
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => void;
   handleMute: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   handleMuteCallback:
     | ((
         producerType: "audio" | "screenAudio",
-        producerId: string | undefined
+        producerId: string | undefined,
       ) => void)
     | undefined;
   handleVolumeSliderCallback: (
     event: React.ChangeEvent<HTMLInputElement>,
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   tracksColorSetterCallback: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
 }) {
   const fgVisualMediaOptions = {
@@ -113,7 +113,7 @@ export default function UserVisualMedia({
 
   const leaveVisualMediaTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const visualMediaMovementTimeout = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
 
   const [pausedState, setPausedState] = useState(false);
@@ -121,9 +121,6 @@ export default function UserVisualMedia({
   const paused = useRef(!fgVisualMediaOptions.autoPlay);
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
-
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
 
   const [visualEffectsActive, setVisualEffectsActive] = useState(false);
 
@@ -164,7 +161,7 @@ export default function UserVisualMedia({
   }>({});
 
   const aspectRatio = useRef(
-    userMedia.current[type][visualMediaId].aspectRatio ?? 1 - 0.01
+    userMedia.current[type][visualMediaId].aspectRatio ?? 1 - 0.01,
   );
 
   const positioning = useRef<{
@@ -184,7 +181,7 @@ export default function UserVisualMedia({
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (effect !== "clearAll") {
       fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
@@ -233,7 +230,7 @@ export default function UserVisualMedia({
     bundleRef,
     positioning,
     setAdjustingDimensions,
-    setRerender
+    setRerender,
   );
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
@@ -250,8 +247,6 @@ export default function UserVisualMedia({
     visualMediaContainerRef,
     panBtnRef,
     setPausedState,
-    shiftPressed,
-    controlPressed,
     paused,
     setCaptionsActive,
     settings,
@@ -272,7 +267,7 @@ export default function UserVisualMedia({
     behindEffectsContainerRef,
     frontEffectsContainerRef,
     tableSocket,
-    setReactionsPanelActive
+    setReactionsPanelActive,
   );
 
   const fgVisualMediaController = new FgVisualMediaController(
@@ -302,7 +297,7 @@ export default function UserVisualMedia({
     visualMediaMovementTimeout,
     setRerender,
     aspectRatio,
-    mediasoupSocket
+    mediasoupSocket,
   );
 
   useEffect(() => {
@@ -320,50 +315,45 @@ export default function UserVisualMedia({
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      fgVisualMediaController.handleMediasoupMessage
+      fgVisualMediaController.handleMediasoupMessage,
     );
 
     tableSocket.current?.addMessageListener(
-      fgVisualMediaController.handleTableMessage
+      fgVisualMediaController.handleTableMessage,
     );
 
     // Keep video time
     fgLowerVisualMediaController.timeUpdate();
     timeUpdateInterval.current = setInterval(
       fgLowerVisualMediaController.timeUpdate,
-      1000
+      1000,
     );
 
     // Add eventlisteners
     if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
-        fgLowerVisualMediaController.handleFullScreenChange
+        fgLowerVisualMediaController.handleFullScreenChange,
       );
     }
 
     document.addEventListener(
       "keydown",
-      fgLowerVisualMediaController.handleKeyDown
-    );
-
-    document.addEventListener(
-      "keyup",
-      fgLowerVisualMediaController.handleKeyUp
+      fgLowerVisualMediaController.handleKeyDown,
     );
 
     document.addEventListener(
       "visibilitychange",
-      fgVisualMediaController.handleVisibilityChange
+      fgVisualMediaController.handleVisibilityChange,
     );
 
     if (fgVisualMediaOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("enter")
+        fgLowerVisualMediaController.handlePictureInPicture("enter"),
       );
 
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("leave")
+        fgLowerVisualMediaController.handlePictureInPicture("leave"),
       );
     }
 
@@ -371,22 +361,22 @@ export default function UserVisualMedia({
 
     if (videoElement) {
       videoElement.addEventListener("loadedmetadata", () =>
-        fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
+        fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
       );
     }
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
+          removeListener(),
+        ),
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleMediasoupMessage
+        fgVisualMediaController.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleTableMessage
+        fgVisualMediaController.handleTableMessage,
       );
 
       if (timeUpdateInterval.current !== undefined) {
@@ -396,32 +386,28 @@ export default function UserVisualMedia({
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
-          fgLowerVisualMediaController.handleFullScreenChange
+          fgLowerVisualMediaController.handleFullScreenChange,
         );
       }
       document.removeEventListener(
         "keydown",
-        fgLowerVisualMediaController.handleKeyDown
-      );
-      document.removeEventListener(
-        "keyup",
-        fgLowerVisualMediaController.handleKeyUp
+        fgLowerVisualMediaController.handleKeyDown,
       );
       document.removeEventListener(
         "visibilitychange",
-        fgVisualMediaController.handleVisibilityChange
+        fgVisualMediaController.handleVisibilityChange,
       );
       if (fgVisualMediaOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("enter")
+          fgLowerVisualMediaController.handlePictureInPicture("enter"),
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("leave")
+          fgLowerVisualMediaController.handlePictureInPicture("leave"),
         );
       }
       if (videoElement) {
         videoElement.removeEventListener("loadedmetadata", () =>
-          fgVisualMediaController.handleVideoMetadataLoaded(videoElement)
+          fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
         );
       }
     };
@@ -442,7 +428,7 @@ export default function UserVisualMedia({
       userMedia.current[type][visualMediaId].canvas.style.width = "100%";
       userMedia.current[type][visualMediaId].canvas.style.height = "100%";
       subContainerRef.current.appendChild(
-        userMedia.current[type][visualMediaId].canvas
+        userMedia.current[type][visualMediaId].canvas,
       );
     }
   }, [visualMediaId, userMedia]);
@@ -462,7 +448,7 @@ export default function UserVisualMedia({
           type,
           producerId: visualMediaId,
           positioning: positioning.current,
-        })
+        }),
       );
     }
   }, [positioning.current]);
@@ -475,7 +461,7 @@ export default function UserVisualMedia({
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
       fgVisualMediaController.attachPositioningListeners(
-        fgVisualMediaOptions.permissions
+        fgVisualMediaOptions.permissions,
       );
     }
   }, [fgVisualMediaOptions.permissions]);
@@ -520,25 +506,25 @@ export default function UserVisualMedia({
       )}
       {adjustingDimensions && (
         <>
-          <div className='animated-border-box-glow'></div>
-          <div className='animated-border-box'></div>
+          <div className="animated-border-box-glow"></div>
+          <div className="animated-border-box"></div>
         </>
       )}
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={frontEffectsContainerRef}
-          className='w-full h-full relative z-[100] pointer-events-none'
+          className="pointer-events-none relative z-[100] h-full w-full"
         />
       </div>
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={behindEffectsContainerRef}
-          className='w-full h-full relative -z-[100] pointer-events-none'
+          className="pointer-events-none relative -z-[100] h-full w-full"
         />
       </div>
       <div
         ref={subContainerRef}
-        className='flex relative items-center justify-center text-white font-K2D h-full w-full rounded-md overflow-hidden'
+        className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         <AnimatePresence>
           {visualEffectsActive && (
@@ -554,12 +540,12 @@ export default function UserVisualMedia({
                 }
                 acceptsVisualEffects={
                   type === "camera"
-                    ? fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
+                    ? (fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
                       defaultFgVisualMediaOptions.permissions
-                        .acceptsCameraEffects
-                    : fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
+                        .acceptsCameraEffects)
+                    : (fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
                       defaultFgVisualMediaOptions.permissions
-                        .acceptsScreenEffects
+                        .acceptsScreenEffects)
                 }
                 handleVisualEffectChange={handleVisualEffectChange}
                 tintColor={tintColor}

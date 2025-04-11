@@ -124,9 +124,6 @@ export default function FgMediaContainer({
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [state, setState] = useState<ContentStateTypes[]>(initState);
 
   const [_, setRerender] = useState(false);
@@ -169,8 +166,6 @@ export default function FgMediaContainer({
     bundleRef,
     mediaContainerRef,
     panBtnRef,
-    shiftPressed,
-    controlPressed,
     fgContentAdjustmentController,
     positioning,
     aspectRatio,
@@ -223,8 +218,6 @@ export default function FgMediaContainer({
 
     document.addEventListener("keydown", lowerController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerController.handleKeyUp);
-
     rootMedia?.addEventListener(
       "load",
       mediaContainerController.handleMetadataLoaded,
@@ -254,7 +247,6 @@ export default function FgMediaContainer({
         mediaContainerController.handleTableMessage,
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
-      document.removeEventListener("keyup", lowerController.handleKeyUp);
       rootMedia?.removeEventListener(
         "load",
         mediaContainerController.handleMetadataLoaded,
@@ -394,7 +386,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="flex sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         {media && media}
         <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">

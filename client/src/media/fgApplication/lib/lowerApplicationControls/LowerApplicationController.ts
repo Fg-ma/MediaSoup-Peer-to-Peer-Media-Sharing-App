@@ -12,8 +12,6 @@ class LowerApplicationController {
     private applicationInstanceId: string,
     private applicationMediaInstance: ApplicationMediaInstance,
     private applicationContainerRef: React.RefObject<HTMLDivElement>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private setApplicationEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
@@ -39,8 +37,8 @@ class LowerApplicationController {
     if (
       !event.key ||
       !this.applicationContainerRef.current?.classList.contains("in-media") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -49,12 +47,6 @@ class LowerApplicationController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "e":
         this.handleApplicationEffects();
         break;
@@ -71,21 +63,6 @@ class LowerApplicationController {
         this.handleSetAsBackground();
         break;
       default:
-        break;
-    }
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
         break;
     }
   };

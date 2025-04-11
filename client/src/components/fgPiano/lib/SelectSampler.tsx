@@ -4,6 +4,7 @@ import FgButton from "../../../elements/fgButton/FgButton";
 import FgSelectionButton from "../../../elements/fgSelectionButton/FgSelectionButton";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
+import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { navTransition, navVar } from "./SamplerToolbar";
 import { FgSamplers } from "../../../audioEffects/fgSamplers";
 
@@ -624,7 +625,7 @@ export default function SelectSampler({
   useEffect(() => {
     const piano: HTMLElement | null = document.querySelector(".piano");
     const selectSamplerLabel: HTMLElement | null = document.querySelector(
-      ".select-sampler-label"
+      ".select-sampler-label",
     );
 
     if (piano && selectSamplerLabel) {
@@ -644,7 +645,7 @@ export default function SelectSampler({
       const noteName = note.slice(0, -1);
 
       const noteElement: HTMLButtonElement | null = document.getElementById(
-        `piano_key_${octave}_${noteName}`
+        `piano_key_${octave}_${noteName}`,
       ) as HTMLButtonElement;
 
       if (
@@ -671,12 +672,13 @@ export default function SelectSampler({
   }, []);
 
   return (
-    <div className='flex font-K2D text-lg items-center justify-center space-x-1'>
+    <div className="flex items-center justify-center space-x-1 font-K2D text-lg">
       <FgButton
-        className='w-6 aspect-square rounded-full flex items-center justify-center pr-0.5'
+        className="flex aspect-square w-6 items-center justify-center rounded-full pr-0.5"
         contentFunction={() => (
           <FgSVGElement
             src={navigateBack}
+            className="fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "height", value: "1rem" },
               { key: "width", value: "1rem" },
@@ -699,17 +701,18 @@ export default function SelectSampler({
         content={
           <div
             ref={selectSamplerLabelRef}
-            className='select-sampler-label'
+            className="select-sampler-label text-fg-off-white"
             onPointerEnter={handlePointerEnter}
           >
             {sampler.label}
             {hover && (
               <FgPortal
-                type='below'
+                type="below"
                 content={
-                  <div className='mb-1 w-max py-1 px-2 text-black font-K2D text-md bg-white shadow-lg rounded-md relative bottom-0'>
-                    {sampler.label}
-                  </div>
+                  <FgHoverContentStandard
+                    style="dark"
+                    content={sampler.label}
+                  />
                 }
                 externalRef={selectSamplerLabelRef}
               />
@@ -731,10 +734,11 @@ export default function SelectSampler({
         options={{ mode: "pick" }}
       />
       <FgButton
-        className='w-6 aspect-square rounded-full flex items-center justify-center pl-0.5'
+        className="flex aspect-square w-6 items-center justify-center rounded-full pl-0.5"
         contentFunction={() => (
           <FgSVGElement
             src={navigateForward}
+            className="fill-fg-off-white stroke-fg-off-white"
             attributes={[
               { key: "height", value: "1rem" },
               { key: "width", value: "1rem" },

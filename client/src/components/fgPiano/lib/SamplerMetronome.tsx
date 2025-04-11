@@ -57,7 +57,7 @@ export default function SamplerMetronome() {
   const handlePointerLeave = () => {
     samplerMetronomeRef.current?.removeEventListener(
       "pointerleave",
-      handlePointerLeave
+      handlePointerLeave,
     );
 
     if (bpmTimeout.current) {
@@ -96,11 +96,11 @@ export default function SamplerMetronome() {
   return (
     <div
       ref={samplerMetronomeRef}
-      className='flex items-center justify-center relative'
+      className="flex relative items-center justify-center"
       onPointerEnter={() => {
         samplerMetronomeRef.current?.addEventListener(
           "pointerleave",
-          handlePointerLeave
+          handlePointerLeave,
         );
 
         bpmTimeout.current = setTimeout(() => {
@@ -115,11 +115,10 @@ export default function SamplerMetronome() {
           return (
             <FgSVGElement
               src={iconSrc}
+              className="fill-fg-off-white stroke-fg-off-white"
               attributes={[
                 { key: "height", value: "95%" },
                 { key: "width", value: "95%" },
-                { key: "fill", value: "black" },
-                { key: "stroke", value: "black" },
               ]}
             />
           );
@@ -144,7 +143,7 @@ export default function SamplerMetronome() {
             />
           ) : undefined
         }
-        className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+        className="flex relative aspect-square h-8 min-h-8 items-center justify-center"
         options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         focusFunction={() => setFocused(true)}
         blurFunction={() => setFocused(false)}
@@ -156,17 +155,17 @@ export default function SamplerMetronome() {
       <AnimatePresence>
         {(hovered || metronomeActive || inputFocused || focused) && (
           <motion.input
-            className='pl-1.5 h-8 text-xl font-K2D bg-transparent outline-none'
+            className="h-8 bg-transparent pl-1.5 font-K2D text-xl text-fg-off-white outline-none"
             style={{
               width: `4ch`,
             }}
-            placeholder='BPM'
+            placeholder="BPM"
             value={bpm === 0 ? "" : bpm}
             onChange={handleChange}
             variants={bpmInputVar}
-            initial='init'
-            exit='init'
-            animate='animate'
+            initial="init"
+            exit="init"
+            animate="animate"
             transition={bpmInputTransition}
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}

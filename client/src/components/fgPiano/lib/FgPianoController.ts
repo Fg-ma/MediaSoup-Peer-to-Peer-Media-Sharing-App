@@ -16,13 +16,13 @@ export const keysMap: { [key: string]: string } = {
   i: "F#",
   o: "G#",
   p: "A#",
-  shift: "shift",
-  control: "control",
 };
 
 class FgPianoController {
   private heightGrowFactor = 5; // Height growth factor for pressed key
   private bottomGrowFactor = 5; // Bottom movement factor for released key
+
+  private lastExecutionTime = 0;
 
   constructor(
     private isUser: boolean,
@@ -38,8 +38,6 @@ class FgPianoController {
     private visibleOctaveRef: React.MutableRefObject<Octaves>,
 
     private keysPressed: React.MutableRefObject<string[]>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
 
     private keyVisualizerActiveRef: React.MutableRefObject<boolean>,
     private keyVisualizerRef: React.RefObject<HTMLDivElement>,
@@ -48,7 +46,7 @@ class FgPianoController {
     >,
     private keyVisualizerNotesStore: React.MutableRefObject<{
       [note in Notes]: NoteStore;
-    }>
+    }>,
   ) {}
 
   playNote = (note: string, octave: number, isPress: boolean) => {
@@ -131,22 +129,20 @@ class FgPianoController {
     if (pianoKey) {
       if (pianoKey === "shift") {
         this.unpressOctave(octave);
-        this.shiftPressed.current = false;
         this.keysPressed.current = this.keysPressed.current.filter(
-          (key) => key !== pianoKey
+          (key) => key !== pianoKey,
         );
       } else if (pianoKey === "control") {
         this.unpressOctave(octave);
-        this.controlPressed.current = false;
         this.keysPressed.current = this.keysPressed.current.filter(
-          (key) => key !== pianoKey
+          (key) => key !== pianoKey,
         );
       } else {
         const key = document.getElementById(`piano_key_${octave}_${pianoKey}`);
         key?.classList.remove("pressed");
 
         this.keysPressed.current = this.keysPressed.current.filter(
-          (k) => k !== pianoKey
+          (k) => k !== pianoKey,
         );
 
         this.playNote(pianoKey, octave, false);
@@ -165,7 +161,7 @@ class FgPianoController {
       if (this.visualizerAnimationFrameRef.current === undefined) {
         // Start the animation loop to update continuously
         this.visualizerAnimationFrameRef.current = requestAnimationFrame(
-          this.updateVisualizerAnimations
+          this.updateVisualizerAnimations,
         );
       }
 
@@ -200,11 +196,9 @@ class FgPianoController {
     if (pianoKey && !this.keysPressed.current.includes(pianoKey)) {
       if (pianoKey === "shift") {
         this.unpressOctave(octave);
-        this.shiftPressed.current = true;
         this.keysPressed.current = [...this.keysPressed.current, pianoKey];
       } else if (pianoKey === "control") {
         this.unpressOctave(octave);
-        this.controlPressed.current = true;
         this.keysPressed.current = [...this.keysPressed.current, pianoKey];
       } else {
         const key = document.getElementById(`piano_key_${octave}_${pianoKey}`);
@@ -232,15 +226,15 @@ class FgPianoController {
 
     this.scaleSectionContainerRef.current.style.setProperty(
       "--key-width",
-      `${this.keyWidth.current}px`
+      `${this.keyWidth.current}px`,
     );
     this.scaleSectionContainerRef.current.style.setProperty(
       "--key-border-style",
-      this.keyWidth.current > 32 ? "solid" : "none"
+      this.keyWidth.current > 32 ? "solid" : "none",
     );
     this.scaleSectionContainerRef.current.style.setProperty(
       "--scale-section-container-width",
-      `${this.scaleSectionContainerRef.current.clientWidth}px`
+      `${this.scaleSectionContainerRef.current.clientWidth}px`,
     );
 
     this.getVisibleOctave();
@@ -260,7 +254,7 @@ class FgPianoController {
     }
 
     const selectSamplerLabel: HTMLElement | null = document.querySelector(
-      ".select-sampler-label"
+      ".select-sampler-label",
     );
 
     if (piano && selectSamplerLabel) {
@@ -275,13 +269,12 @@ class FgPianoController {
       }
     }
   };
-  private lastExecutionTime = 0;
 
   updateVisualizerAnimations = () => {
     const now = performance.now();
     if (now - this.lastExecutionTime < 32) {
       this.visualizerAnimationFrameRef.current = requestAnimationFrame(
-        this.updateVisualizerAnimations
+        this.updateVisualizerAnimations,
       );
       return;
     } // 16ms ~ 60FPS
@@ -292,7 +285,7 @@ class FgPianoController {
       !this.keyVisualizerNotesStore.current
     ) {
       this.visualizerAnimationFrameRef.current = requestAnimationFrame(
-        this.updateVisualizerAnimations
+        this.updateVisualizerAnimations,
       );
       return;
     }
@@ -303,7 +296,7 @@ class FgPianoController {
     const noteStores = Object.keys(this.keyVisualizerNotesStore.current);
     noteStores.forEach((note) => {
       const octaveStores = Object.entries(
-        this.keyVisualizerNotesStore.current[note as Notes]
+        this.keyVisualizerNotesStore.current[note as Notes],
       );
       octaveStores.forEach(([octave, elements]) => {
         elements.forEach((element, index) => {
@@ -313,7 +306,7 @@ class FgPianoController {
           if (classList.contains("key-visualizer-currently-pressed")) {
             const currentHeight = parseInt(
               style.height.slice(0, -2) || "0",
-              10
+              10,
             );
             style.height = `${currentHeight + this.heightGrowFactor}px`;
           } else {
@@ -339,7 +332,7 @@ class FgPianoController {
     if (atLeastOneDiv) {
       // Continue updating using requestAnimationFrame for smooth animation
       this.visualizerAnimationFrameRef.current = requestAnimationFrame(
-        this.updateVisualizerAnimations
+        this.updateVisualizerAnimations,
       );
     } else {
       if (this.visualizerAnimationFrameRef.current) {

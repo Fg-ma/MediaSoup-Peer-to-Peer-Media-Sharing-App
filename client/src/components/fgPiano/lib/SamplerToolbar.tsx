@@ -92,18 +92,18 @@ export default function SamplerToolbar({
     return () => {
       rightScaleSectionToolbarRef.current?.removeEventListener(
         "wheel",
-        handleWheel
+        handleWheel,
       );
     };
   }, []);
 
   return (
-    <div className='flex w-full h-8 justify-between px-2 mb-1'>
+    <div className="flex mb-1 h-8 w-full justify-between px-2">
       <motion.div
-        className='flex w-max h-8 z-20 items-center space-x-2 pr-2 asp'
+        className="flex z-20 h-8 w-max items-center space-x-2 pr-2"
         animate={{
           boxShadow: `8px 0 4px -3px  ${
-            focus ? "rgb(255, 255, 255)" : "rgba(243, 243, 243)"
+            focus ? "rgb(22, 22, 22)" : "rgba(33, 33, 33)"
           }`,
         }}
         transition={{
@@ -119,11 +119,10 @@ export default function SamplerToolbar({
             return (
               <FgSVGElement
                 src={iconSrc}
+                className="fill-fg-off-white stroke-fg-off-white"
                 attributes={[
                   { key: "height", value: "95%" },
                   { key: "width", value: "95%" },
-                  { key: "fill", value: "black" },
-                  { key: "stroke", value: "black" },
                 ]}
               />
             );
@@ -139,7 +138,7 @@ export default function SamplerToolbar({
               }
             />
           }
-          className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+          className="flex relative aspect-square h-8 min-h-8 items-center justify-center"
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
         {keyVisualizerActive && (
@@ -158,11 +157,10 @@ export default function SamplerToolbar({
             return (
               <FgSVGElement
                 src={iconSrc}
+                className="fill-fg-off-white stroke-fg-off-white"
                 attributes={[
                   { key: "height", value: "95%" },
                   { key: "width", value: "95%" },
-                  { key: "fill", value: "black" },
-                  { key: "stroke", value: "black" },
                 ]}
               />
             );
@@ -175,7 +173,7 @@ export default function SamplerToolbar({
               content={samplerEffectsActive ? "Close effects" : "Effects"}
             />
           }
-          className='flex items-center justify-center h-8 min-h-8 aspect-square relative'
+          className="flex relative aspect-square h-8 min-h-8 items-center justify-center"
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
         <SamplerMetronome />
@@ -183,9 +181,9 @@ export default function SamplerToolbar({
       </motion.div>
       <div
         ref={rightScaleSectionToolbarRef}
-        className='hide-scroll-bar w-max h-8 overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+        className="hide-scroll-bar z-10 flex h-8 w-max scale-x-[-1] items-center space-x-2 overflow-x-auto pr-2"
       >
-        <div className='scale-x-[-1] flex space-x-2 items-center'>
+        <div className="flex scale-x-[-1] items-center space-x-2">
           <OctaveSelection
             visibleOctaveRef={visibleOctaveRef}
             scrollToOctave={fgPianoController.scrollToOctave}

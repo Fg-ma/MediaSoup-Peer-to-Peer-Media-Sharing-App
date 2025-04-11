@@ -11,6 +11,7 @@ import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
+import { Signals } from "src/context/signalContext/SignalContext";
 
 class BundleController extends BundleSocket {
   constructor(
@@ -69,9 +70,9 @@ class BundleController extends BundleSocket {
     private handleMuteCallback:
       | ((
           producerType: "audio" | "screenAudio",
-          producerId: string | undefined
+          producerId: string | undefined,
         ) => void)
-      | undefined
+      | undefined,
   ) {
     super(
       mediasoupSocket,
@@ -95,7 +96,7 @@ class BundleController extends BundleSocket {
       screenAudioLocalMute,
       permissions,
       setPermissions,
-      onNewConsumerWasCreatedCallback
+      onNewConsumerWasCreatedCallback,
     );
   }
 
@@ -132,14 +133,14 @@ class BundleController extends BundleSocket {
 
   tracksColorSetterCallback = (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => {
     if (!this.bundleRef.current) {
       return;
     }
 
     const volumeSliders = this.bundleRef.current.querySelectorAll(
-      `.volume-slider-${producerType}${producerId ? producerId : ""}`
+      `.volume-slider-${producerType}${producerId ? producerId : ""}`,
     );
 
     if (producerType === "audio") {
@@ -170,7 +171,7 @@ class BundleController extends BundleSocket {
       }
 
       const audioElement = document.getElementById(
-        producerId
+        producerId,
       ) as HTMLAudioElement | null;
 
       if (!audioElement) {
@@ -200,13 +201,13 @@ class BundleController extends BundleSocket {
   handleVolumeSliderCallback = (
     event: React.ChangeEvent<HTMLInputElement>,
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => {
     const volume = parseFloat(event.target.value);
 
     if (this.bundleRef.current) {
       const volumeSliders = this.bundleRef.current.querySelectorAll(
-        `.volume-slider-${producerType}${producerId ? producerId : ""}`
+        `.volume-slider-${producerType}${producerId ? producerId : ""}`,
       );
 
       volumeSliders.forEach((slider) => {
@@ -220,7 +221,7 @@ class BundleController extends BundleSocket {
 
   handleMute = (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => {
     if (this.handleMuteCallback) {
       this.handleMuteCallback(producerType, producerId);
@@ -234,6 +235,29 @@ class BundleController extends BundleSocket {
 
     if (this.audioRef.current && !this.bundleOptions.isUser) {
       this.audioRef.current.muted = this.localMute.current;
+    }
+  };
+
+  handleSignalMessage = (message: Signals) => {
+    switch (message.type) {
+      case "localMuteChange":
+        const {
+          table_id: newTable_id,
+          username: newUsername,
+          instance: newInstance,
+          producerType: newProducerType,
+          producerId: newProducerId,
+        } = message.header;
+        if (
+          newTable_id === this.table_id &&
+          newUsername === this.username &&
+          newInstance === this.instance
+        ) {
+          this.onLocalMuteChange(newProducerType, newProducerId);
+        }
+        break;
+      default:
+        break;
     }
   };
 }

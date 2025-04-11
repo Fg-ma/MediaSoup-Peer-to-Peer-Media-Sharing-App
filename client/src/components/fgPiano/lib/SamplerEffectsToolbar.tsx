@@ -629,15 +629,15 @@ export default function SamplerEffectsToolbar({ focus }: { focus: boolean }) {
   const samplerEffectsToolbarRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className='px-2 mb-1'>
+    <div className="mb-1 px-2">
       <ScrollingContainer
         externalRef={samplerEffectsToolbarRef}
         content={
-          <div className='h-[7.5rem] flex px-3 items-center justify-center'>
+          <div className="flex h-[7.5rem] items-center justify-center px-3">
             {Object.entries(samplerEffects).map((effect) => (
               <div
                 key={effect[0]}
-                className='flex items-center justify-center h-full'
+                className="flex h-full items-center justify-center"
               >
                 <SamplerEffect
                   samplerEffectsToolbarRef={samplerEffectsToolbarRef}
@@ -647,13 +647,13 @@ export default function SamplerEffectsToolbar({ focus }: { focus: boolean }) {
                   setEffects={setEffects}
                 />
                 {effect[0] !== "vibrato" && (
-                  <div className='h-1/2 w-1 bg-fg-white-65 rounded-full mx-3'></div>
+                  <div className="mx-3 h-1/2 w-1 rounded-full bg-fg-off-white"></div>
                 )}
               </div>
             ))}
           </div>
         }
-        buttonBackgroundColor={focus ? "#f2f2f2" : "#d6d6d6"}
+        buttonBackgroundColor={focus ? "#161616" : "#212121"}
       />
     </div>
   );

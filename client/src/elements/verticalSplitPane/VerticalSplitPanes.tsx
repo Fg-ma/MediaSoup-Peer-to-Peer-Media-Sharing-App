@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import Divider from "./lib/Divider";
 import VerticalSplitPanesController from "./lib/verticalSplitPanesController";
 
-const defaultVerticalSplitPanesOptions = {
+const defaultVerticalSplitPanesOptions: VerticalSplitPanesOptions = {
   dividerHeight: "1rem",
   initialPaneHeight: "60%",
   minPaneHeight: 15,
   maxPaneHeight: 100,
   dividerButton: true,
   stableScrollbarGutter: false,
+  shadowBottom: false,
+  shadowTop: false,
 };
 
 export interface VerticalSplitPanesOptions {
@@ -18,6 +20,8 @@ export interface VerticalSplitPanesOptions {
   maxPaneHeight: number;
   dividerButton: boolean;
   stableScrollbarGutter: boolean;
+  shadowBottom: boolean;
+  shadowTop: boolean;
 }
 
 export default function VerticalSplitPanes({
@@ -46,6 +50,8 @@ export default function VerticalSplitPanes({
     maxPaneHeight?: number;
     dividerButton?: boolean;
     stableScrollbarGutter?: boolean;
+    shadowBottom?: boolean;
+    shadowTop?: boolean;
   };
 }) {
   const verticalSplitPanesOptions = {
@@ -54,9 +60,9 @@ export default function VerticalSplitPanes({
   };
 
   const [paneHeight, setPaneHeight] = useState(
-    verticalSplitPanesOptions.initialPaneHeight
+    verticalSplitPanesOptions.initialPaneHeight,
   );
-  const [headerLightness, setHeaderLightness] = useState(80);
+  const [headerLightness, setHeaderLightness] = useState(83.1);
   const verticalSplitPanesRef = useRef<HTMLDivElement>(null);
   const bottomPaneRef = useRef<HTMLDivElement>(null);
   const topPaneRef = useRef<HTMLDivElement>(null);
@@ -75,7 +81,7 @@ export default function VerticalSplitPanes({
     startPaneHeight,
     maxPaneHeightCallback,
     minPaneHeightCallback,
-    panelSizeChangeCallback
+    panelSizeChangeCallback,
   );
 
   // Gets initial conditions
@@ -97,7 +103,7 @@ export default function VerticalSplitPanes({
     <>
       {floatingTopContent && (
         <div
-          className='absolute z-10'
+          className="absolute z-10"
           style={{
             top: "0px",
             width: "100%",
@@ -109,7 +115,7 @@ export default function VerticalSplitPanes({
       )}
       {floatingBottomContent && (
         <div
-          className='absolute w-max z-10'
+          className="absolute z-10 w-max"
           style={{
             bottom: "0px",
             width: "100%",
@@ -121,12 +127,12 @@ export default function VerticalSplitPanes({
       )}
       <div
         ref={verticalSplitPanesRef}
-        className='flex flex-col relative w-max h-full'
+        className="flex relative h-full w-max flex-col"
       >
         {topContent && (
           <div
             ref={topPaneRef}
-            className='overflow-auto box-border relative'
+            className="relative box-border overflow-auto"
             style={{
               height: paneHeight,
               ...(verticalSplitPanesOptions.stableScrollbarGutter && {
@@ -139,7 +145,7 @@ export default function VerticalSplitPanes({
         )}
         {topContent && bottomContent && (
           <div
-            className='cursor-pointer select-none'
+            className="cursor-pointer select-none"
             onPointerDown={(event) => {
               verticalSplitPanesController.handlePointerDown(event);
             }}
@@ -159,7 +165,7 @@ export default function VerticalSplitPanes({
         {bottomContent && (
           <div
             ref={bottomPaneRef}
-            className='bg-fg-white-95 overflow-auto box-border relative'
+            className="relative box-border overflow-auto bg-fg-white-95"
             style={{
               height: topContent
                 ? `calc(100% - ${paneHeight} - ${verticalSplitPanesOptions.dividerHeight})`
@@ -169,16 +175,18 @@ export default function VerticalSplitPanes({
             {bottomContent}
           </div>
         )}
-        {bottomPaneRef.current && bottomPaneRef.current.clientHeight >= 15 && (
-          <div
-            className='h-3 absolute -bottom-1 left-0 right-0 mx-8 z-40'
-            style={{
-              background: `linear-gradient(to top, rgba(243, 243, 243, 1) 0%, rgba(243, 243, 243, 0.35) 50%, rgba(243, 243, 243, 0) 100%)`,
-              filter: "blur(4px)",
-              width: `calc(100% - 4rem)`,
-            }}
-          ></div>
-        )}
+        {verticalSplitPanesOptions.shadowBottom &&
+          bottomPaneRef.current &&
+          bottomPaneRef.current.clientHeight >= 15 && (
+            <div
+              className="absolute -bottom-1 left-0 right-0 z-40 mx-8 h-3"
+              style={{
+                background: `linear-gradient(to top, rgba(243, 243, 243, 1) 0%, rgba(243, 243, 243, 0.35) 50%, rgba(243, 243, 243, 0) 100%)`,
+                filter: "blur(4px)",
+                width: `calc(100% - 4rem)`,
+              }}
+            ></div>
+          )}
       </div>
     </>
   );

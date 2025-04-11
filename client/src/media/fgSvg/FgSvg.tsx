@@ -51,9 +51,6 @@ export default function FgSvg({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerSvgControlsRef = useRef<HTMLDivElement>(null);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
@@ -68,8 +65,6 @@ export default function FgSvg({
     svgInstanceId,
     svgMediaInstance,
     svgContainerRef,
-    shiftPressed,
-    controlPressed,
     setSvgEffectsActive,
     userEffects,
     userEffectsStyles,
@@ -107,8 +102,6 @@ export default function FgSvg({
 
     document.addEventListener("keydown", lowerSvgController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerSvgController.handleKeyUp);
-
     tableRef.current?.addEventListener(
       "scroll",
       svgController.handleTableScroll,
@@ -116,7 +109,6 @@ export default function FgSvg({
 
     return () => {
       document.removeEventListener("keydown", lowerSvgController.handleKeyDown);
-      document.removeEventListener("keyup", lowerSvgController.handleKeyUp);
       svgMediaInstance.svgMedia.removeSvgListener(
         svgController.handleSvgMessages,
       );

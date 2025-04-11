@@ -82,7 +82,7 @@ export default function FgTableFunctions({
   userDevice: UserDevice;
   deadbanding: Deadbanding;
 }) {
-  const { setSignal } = useSignalContext();
+  const { sendSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
   const { table_id, username, instance } = useUserInfoContext();
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
@@ -119,7 +119,7 @@ export default function FgTableFunctions({
   const handleExternalMute = () => {
     muteAudio("audio", undefined);
 
-    setSignal({
+    sendSignal({
       type: "localMuteChange",
       header: {
         table_id: table_id.current,
@@ -212,7 +212,11 @@ export default function FgTableFunctions({
           />
         )}
         {tabledActive && (
-          <TabledPortal dragging={dragging} setDragging={setDragging} />
+          <TabledPortal
+            dragging={dragging}
+            setDragging={setDragging}
+            setTabledActive={setTabledActive}
+          />
         )}
       </div>
       <MessageTableSection />

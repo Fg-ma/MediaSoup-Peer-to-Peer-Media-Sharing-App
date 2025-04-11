@@ -8,13 +8,13 @@ import { useSocketContext } from "../context/socketContext/SocketContext";
 import BundleController from "./lib/BundleController";
 
 const UserVisualMedia = React.lazy(
-  () => import("../media/fgVisualMedia/UserVisualMedia")
+  () => import("../media/fgVisualMedia/UserVisualMedia"),
 );
 const RemoteVisualMedia = React.lazy(
-  () => import("../media/fgVisualMedia/RemoteVisualMedia")
+  () => import("../media/fgVisualMedia/RemoteVisualMedia"),
 );
 const FgAudioElementContainer = React.lazy(
-  () => import("../media/audio/FgAudioElementContainer")
+  () => import("../media/audio/FgAudioElementContainer"),
 );
 
 export default function Bundle({
@@ -48,7 +48,7 @@ export default function Bundle({
   options?: BundleOptions;
   handleMuteCallback?: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   onRendered?: () => void;
   onNewConsumerWasCreatedCallback?: () => void;
@@ -60,7 +60,7 @@ export default function Bundle({
 
   const { userMedia, remoteMedia } = useMediaContext();
   const { remoteEffectsStyles, remoteEffects } = useEffectsContext();
-  const { signal } = useSignalContext();
+  const { addSignalListener, removeSignalListener } = useSignalContext();
   const { mediasoupSocket } = useSocketContext();
 
   const [cameraStreams, setCameraStreams] = useState<
@@ -82,7 +82,7 @@ export default function Bundle({
     | undefined
   >(initScreenAudioStreams);
   const [audioStream, setAudioStream] = useState<MediaStream | undefined>(
-    initAudioStream
+    initAudioStream,
   );
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -90,13 +90,13 @@ export default function Bundle({
 
   const clientMute = useRef(false); // User audio mute
   const screenAudioClientMute = useRef<{ [screenAudioId: string]: boolean }>(
-    {}
+    {},
   ); // User screen audio mute
   const localMute = useRef(false); // Not user audio mute
   const screenAudioLocalMute = useRef<{ [screenAudioId: string]: boolean }>({}); // Not user screen audio mute
 
   const [permissions, setPermissions] = useState<Permissions>(
-    bundleOptions.permissions
+    bundleOptions.permissions,
   );
 
   const bundleController = new BundleController(
@@ -123,7 +123,7 @@ export default function Bundle({
     permissions,
     setPermissions,
     onNewConsumerWasCreatedCallback,
-    handleMuteCallback
+    handleMuteCallback,
   );
 
   useEffect(() => {
@@ -132,11 +132,13 @@ export default function Bundle({
     }
 
     mediasoupSocket.current?.addMessageListener(bundleController.handleMessage);
+    addSignalListener(bundleController.handleSignalMessage);
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        bundleController.handleMessage
+        bundleController.handleMessage,
       );
+      removeSignalListener(bundleController.handleSignalMessage);
     };
   }, []);
 
@@ -154,33 +156,6 @@ export default function Bundle({
       audioRef.current.srcObject = samplerStream;
     }
   }, [audioRef, audioStream]);
-
-  useEffect(() => {
-    if (!signal) {
-      return;
-    }
-
-    switch (signal.type) {
-      case "localMuteChange":
-        const {
-          table_id: newTable_id,
-          username: newUsername,
-          instance: newInstance,
-          producerType: newProducerType,
-          producerId: newProducerId,
-        } = signal.header;
-        if (
-          newTable_id === table_id &&
-          newUsername === username &&
-          newInstance === instance
-        ) {
-          bundleController.onLocalMuteChange(newProducerType, newProducerId);
-        }
-        break;
-      default:
-        break;
-    }
-  }, [signal]);
 
   useEffect(() => {
     if (bundleOptions.isUser) {
@@ -214,7 +189,7 @@ export default function Bundle({
     <div
       ref={bundleRef}
       id={`${username}_bundle_container`}
-      className='w-full h-full absolute top-0 left-0 pointer-events-none'
+      className="pointer-events-none absolute left-0 top-0 h-full w-full"
     >
       {cameraStreams &&
         Object.keys(cameraStreams).length !== 0 &&
@@ -227,7 +202,7 @@ export default function Bundle({
                 username={username}
                 instance={instance}
                 name={name}
-                type='camera'
+                type="camera"
                 bundleRef={bundleRef}
                 audioStream={audioStream}
                 audioRef={audioRef}
@@ -248,12 +223,12 @@ export default function Bundle({
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
-                    ? audioRef.current.muted
-                      ? "off"
-                      : audioRef.current.volume > 0.5
-                      ? "high"
-                      : "low"
-                    : "high",
+                      ? audioRef.current.muted
+                        ? "off"
+                        : audioRef.current.volume > 0.5
+                          ? "high"
+                          : "low"
+                      : "high",
                 }}
                 handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
@@ -271,7 +246,7 @@ export default function Bundle({
                 username={username}
                 instance={instance}
                 name={name}
-                type='camera'
+                type="camera"
                 bundleRef={bundleRef}
                 videoStream={cameraStream}
                 audioStream={audioStream}
@@ -293,12 +268,12 @@ export default function Bundle({
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
-                    ? audioRef.current.muted
-                      ? "off"
-                      : audioRef.current.volume > 0.5
-                      ? "high"
-                      : "low"
-                    : "high",
+                      ? audioRef.current.muted
+                        ? "off"
+                        : audioRef.current.volume > 0.5
+                          ? "high"
+                          : "low"
+                      : "high",
                 }}
                 handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
@@ -323,7 +298,7 @@ export default function Bundle({
                 username={username}
                 instance={instance}
                 name={name}
-                type='screen'
+                type="screen"
                 bundleRef={bundleRef}
                 audioStream={audioStream}
                 screenAudioStream={
@@ -352,12 +327,12 @@ export default function Bundle({
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
-                    ? audioRef.current.muted
-                      ? "off"
-                      : audioRef.current.volume > 0.5
-                      ? "high"
-                      : "low"
-                    : "high",
+                      ? audioRef.current.muted
+                        ? "off"
+                        : audioRef.current.volume > 0.5
+                          ? "high"
+                          : "low"
+                      : "high",
                 }}
                 handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
@@ -375,7 +350,7 @@ export default function Bundle({
                 username={username}
                 instance={instance}
                 name={name}
-                type='screen'
+                type="screen"
                 bundleRef={bundleRef}
                 videoStream={screenStream}
                 audioStream={audioStream}
@@ -398,12 +373,12 @@ export default function Bundle({
                   initialVolume: bundleOptions.initialVolume
                     ? bundleOptions.initialVolume
                     : audioRef.current
-                    ? audioRef.current.muted
-                      ? "off"
-                      : audioRef.current.volume > 0.5
-                      ? "high"
-                      : "low"
-                    : "high",
+                      ? audioRef.current.muted
+                        ? "off"
+                        : audioRef.current.volume > 0.5
+                          ? "high"
+                          : "low"
+                      : "high",
                 }}
                 handleMute={bundleController.handleMute}
                 handleMuteCallback={handleMuteCallback}
@@ -447,7 +422,7 @@ export default function Bundle({
       <audio
         ref={audioRef}
         id={`${username}_audio_stream`}
-        className='w-0 z-0'
+        className="z-0 w-0"
         autoPlay={true}
       ></audio>
     </div>

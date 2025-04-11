@@ -26,8 +26,6 @@ class LowerController {
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private fgContentAdjustmentController: FgContentAdjustmentController,
     private positioning: React.MutableRefObject<{
       position: {
@@ -70,8 +68,8 @@ class LowerController {
       (!this.mediaContainerRef.current?.classList.contains("in-media") &&
         !this.mediaContainerRef.current?.classList.contains("full-screen")) ||
       this.mediaContainerRef.current?.classList.contains("in-piano") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -80,12 +78,6 @@ class LowerController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "x":
         this.handleClose();
         break;
@@ -277,21 +269,6 @@ class LowerController {
         box.top,
     });
     this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
-    }
   };
 
   handleClose = () => {

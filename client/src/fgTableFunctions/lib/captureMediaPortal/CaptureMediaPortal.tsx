@@ -89,9 +89,6 @@ export default function CaptureMediaPortal({
   const finalizingCapture = useRef(false);
   const finalizedCaptureType = useRef<"image" | "video" | undefined>(undefined);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
     structuredClone(defaultSettings),
@@ -128,8 +125,6 @@ export default function CaptureMediaPortal({
     setFinalizeCapture,
     countDownTimeout,
     countDownInterval,
-    shiftPressed,
-    controlPressed,
     captureMediaPortalRef,
     tableFunctionsController,
     finalizingCapture,
@@ -212,7 +207,6 @@ export default function CaptureMediaPortal({
 
   useEffect(() => {
     document.addEventListener("keydown", captureMediaController.handleKeyDown);
-    document.addEventListener("keyup", captureMediaController.handleKeyUp);
     if (captureMedia.current)
       captureMedia.current.video.addEventListener(
         "loadedmetadata",
@@ -224,7 +218,6 @@ export default function CaptureMediaPortal({
         "keydown",
         captureMediaController.handleKeyDown,
       );
-      document.removeEventListener("keyup", captureMediaController.handleKeyUp);
       if (captureMedia.current)
         captureMedia.current.video.removeEventListener(
           "loadedmetadata",

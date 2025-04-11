@@ -109,39 +109,30 @@ export default function SamplerEffect({
 
   return (
     <div
-      className={`w-max h-full flex overflow-hidden space-y-1 ${
+      className={`flex h-full w-max space-y-1 overflow-hidden ${
         effect.labelPlacement === "top" ? "flex-col" : "flex-col-reverse"
       }`}
       onPointerDown={handlePointerDown}
     >
-      <div className='flex space-x-2 items-center justify-center'>
+      <div className="flex items-center justify-center space-x-2">
         {Object.keys(effect.options).length > 1 && (
           <div
-            className={`w-2 h-0.5 rounded-full ${
-              effects[effectValue].active
-                ? "bg-fg-primary-desaturated"
-                : "bg-fg-white-80"
+            className={`h-0.5 w-2 rounded-full ${
+              effects[effectValue].active ? "bg-fg-red" : "bg-fg-off-white"
             }`}
           ></div>
         )}
         {Object.keys(effect.options).length > 1 && effect.labelIcon && (
           <FgSVGElement
             src={effect.labelIcon}
+            className={`${
+              effects[effectValue].active
+                ? "fill-fg-red stroke-fg-red"
+                : "fill-fg-off-white stroke-fg-off-white"
+            }`}
             attributes={[
               { key: "width", value: "1rem" },
               { key: "height", value: "1rem" },
-              {
-                key: "fill",
-                value: effects[effectValue].active
-                  ? "black"
-                  : "rgb(204 204 204)",
-              },
-              {
-                key: "stroke",
-                value: effects[effectValue].active
-                  ? "black"
-                  : "rgb(204 204 204)",
-              },
             ]}
           />
         )}
@@ -149,8 +140,10 @@ export default function SamplerEffect({
           scrollingContainerRef={samplerEffectsToolbarRef}
           contentFunction={() => (
             <div
-              className={`h-5 text-base leading-4 font-K2D ${
-                effects[effectValue].active ? "text-black" : "text-fg-white-80"
+              className={`h-5 font-K2D text-base leading-4 ${
+                effects[effectValue].active
+                  ? "text-fg-red"
+                  : "text-fg-off-white"
               }`}
             >
               {effect.effectLabel}
@@ -172,15 +165,13 @@ export default function SamplerEffect({
         />
         {Object.keys(effect.options).length > 1 && (
           <div
-            className={`grow h-0.5 rounded-full ${
-              effects[effectValue].active
-                ? "bg-fg-primary-desaturated"
-                : "bg-fg-white-80"
+            className={`h-0.5 grow rounded-full ${
+              effects[effectValue].active ? "bg-fg-red" : "bg-fg-off-white"
             }`}
           ></div>
         )}
       </div>
-      <div className='flex w-max h-max space-x-3'>
+      <div className="flex h-max w-max space-x-3">
         {Object.entries(effect.options).map(([key, option]) => (
           <FgKnobButton
             key={key}

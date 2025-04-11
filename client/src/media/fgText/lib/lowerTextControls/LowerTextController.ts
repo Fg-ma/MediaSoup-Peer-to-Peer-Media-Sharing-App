@@ -4,21 +4,19 @@ class LowerTextController {
   constructor(
     private textMediaInstance: TextMediaInstance,
     private textContainerRef: React.RefObject<HTMLDivElement>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private textAreaRef: React.RefObject<HTMLPreElement>,
     private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
-    private textAreaContainerRef: React.RefObject<HTMLDivElement>
+    private textAreaContainerRef: React.RefObject<HTMLDivElement>,
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
     if (
       !event.key ||
       !this.textContainerRef.current?.classList.contains("in-media") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -27,12 +25,6 @@ class LowerTextController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case "d":
         this.handleDownload();
         break;
@@ -40,21 +32,6 @@ class LowerTextController {
         this.handleSetAsBackground();
         break;
       default:
-        break;
-    }
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
         break;
     }
   };

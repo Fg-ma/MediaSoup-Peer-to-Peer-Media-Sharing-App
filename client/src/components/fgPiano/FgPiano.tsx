@@ -13,7 +13,7 @@ import SamplerToolbar from "./lib/SamplerToolbar";
 import "./lib/pianoStyles.css";
 
 const SamplerEffectsToolbar = React.lazy(
-  () => import("./lib/SamplerEffectsToolbar")
+  () => import("./lib/SamplerEffectsToolbar"),
 );
 
 export type Octaves = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -67,8 +67,6 @@ export default function FgPiano({
   const scaleSectionRef = useRef<HTMLDivElement>(null);
   const keyWidth = useRef(0);
   const isKeydownListenerAdded = useRef(false);
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
   const keysPressed = useRef<string[]>([]);
   const keyVisualizerRef = useRef<HTMLDivElement>(null);
   const keyVisualizerContainerRef = useRef<HTMLDivElement>(null);
@@ -99,12 +97,10 @@ export default function FgPiano({
     setVisibleOctave,
     visibleOctaveRef,
     keysPressed,
-    shiftPressed,
-    controlPressed,
     keyVisualizerActiveRef,
     keyVisualizerRef,
     visualizerAnimationFrameRef,
-    keyVisualizerNotesStore
+    keyVisualizerNotesStore,
   );
 
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -115,10 +111,9 @@ export default function FgPiano({
     }
 
     let octave: number = visibleOctaveRef.current;
-    if (shiftPressed.current) {
+    if (event.shiftKey) {
       octave = Math.min(6, octave + 1);
-    }
-    if (controlPressed.current) {
+    } else if (event.ctrlKey) {
       octave = Math.max(0, octave - 1);
     }
 
@@ -130,23 +125,22 @@ export default function FgPiano({
   };
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    const eventKey = event.key.toLowerCase();
-
     if (event.target instanceof HTMLInputElement) {
-      return;
-    }
-
-    if (!(eventKey in keysMap)) {
       return;
     }
 
     event.preventDefault();
 
-    let octave: number = visibleOctaveRef.current;
-    if (shiftPressed.current) {
-      octave = Math.min(6, octave + 1);
+    const eventKey = event.key.toLowerCase();
+
+    if (!(eventKey in keysMap)) {
+      return;
     }
-    if (controlPressed.current) {
+
+    let octave: number = visibleOctaveRef.current;
+    if (event.shiftKey) {
+      octave = Math.min(6, octave + 1);
+    } else if (event.ctrlKey) {
       octave = Math.max(0, octave - 1);
     }
 
@@ -199,7 +193,7 @@ export default function FgPiano({
   return (
     <FgPanel
       content={
-        <div className='piano'>
+        <div className="piano">
           <SamplerToolbar
             focus={focus}
             fgPianoController={fgPianoController}
@@ -236,7 +230,7 @@ export default function FgPiano({
       resizeCallback={fgPianoController.resize}
       focusCallback={focusCallback}
       closeCallback={closeCallback}
-      closePosition='topRight'
+      closePosition="topRight"
       initPosition={{
         referenceElement,
         placement: "below",
@@ -249,6 +243,8 @@ export default function FgPiano({
         left: true,
         right: true,
       }}
+      backgroundColor={"#161616"}
+      secondaryBackgroundColor={"#212121"}
     />
   );
 }

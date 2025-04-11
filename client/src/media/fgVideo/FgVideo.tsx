@@ -57,9 +57,6 @@ export default function FgVideo({
 
   const paused = useRef(false);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [videoEffectsActive, setVideoEffectsActive] = useState(false);
 
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
@@ -105,8 +102,6 @@ export default function FgVideo({
     videoMediaInstance,
     videoContainerRef,
     setPausedState,
-    shiftPressed,
-    controlPressed,
     paused,
     setCaptionsActive,
     settings,
@@ -183,8 +178,6 @@ export default function FgVideo({
 
     document.addEventListener("keydown", lowerVideoController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerVideoController.handleKeyUp);
-
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -199,7 +192,6 @@ export default function FgVideo({
         "keydown",
         lowerVideoController.handleKeyDown,
       );
-      document.removeEventListener("keyup", lowerVideoController.handleKeyUp);
       videoMediaInstance.instanceVideo?.removeEventListener(
         "enterpictureinpicture",
         () => lowerVideoController.handlePictureInPicture("enter"),

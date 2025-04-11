@@ -22,8 +22,6 @@ class LowerVideoController {
     private videoMediaInstance: VideoMediaInstance,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private shiftPressed: React.MutableRefObject<boolean>,
-    private controlPressed: React.MutableRefObject<boolean>,
     private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
@@ -47,7 +45,7 @@ class LowerVideoController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>
+    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
   ) {}
 
   formatDuration = (time: number) => {
@@ -87,8 +85,8 @@ class LowerVideoController {
       !event.key ||
       !this.videoContainerRef.current?.classList.contains("in-media") ||
       this.videoContainerRef.current?.classList.contains("in-piano") ||
-      this.controlPressed.current ||
-      this.shiftPressed.current
+      event.ctrlKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -97,12 +95,6 @@ class LowerVideoController {
     if (tagName === "input") return;
 
     switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = true;
-        break;
-      case "control":
-        this.controlPressed.current = true;
-        break;
       case " ":
         if (tagName === "button") return;
         this.handlePausePlay();
@@ -158,21 +150,6 @@ class LowerVideoController {
 
   volumeControl = (volumeChangeAmount: number) => {};
 
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!event.key) {
-      return;
-    }
-
-    switch (event.key.toLowerCase()) {
-      case "shift":
-        this.shiftPressed.current = false;
-        break;
-      case "control":
-        this.controlPressed.current = false;
-        break;
-    }
-  };
-
   handleMiniPlayer = () => {
     if (this.videoContainerRef.current?.classList.contains("mini-player")) {
       document.exitPictureInPicture().catch((error) => {
@@ -194,15 +171,15 @@ class LowerVideoController {
       0,
       Math.min(
         this.videoMediaInstance.instanceVideo.currentTime + amount,
-        this.videoMediaInstance.instanceVideo.duration
-      )
+        this.videoMediaInstance.instanceVideo.duration,
+      ),
     );
 
     this.tableStaticContentSocket.current?.updateVideoPosition(
       "video",
       this.videoMediaInstance.videoMedia.videoId,
       this.videoInstanceId,
-      this.videoMediaInstance.instanceVideo.currentTime
+      this.videoMediaInstance.instanceVideo.currentTime,
     );
   };
 
@@ -225,7 +202,7 @@ class LowerVideoController {
       "video",
       this.videoMediaInstance.videoMedia.videoId,
       this.videoInstanceId,
-      this.videoMediaInstance.instanceVideo.currentTime
+      this.videoMediaInstance.instanceVideo.currentTime,
     );
   };
 
@@ -247,7 +224,7 @@ class LowerVideoController {
         this.formatDuration(currentTime);
       this.timelineContainerRef.current?.style.setProperty(
         "--progress-position",
-        `${percent}`
+        `${percent}`,
       );
     }
   };
@@ -263,35 +240,35 @@ class LowerVideoController {
 
     style.setProperty(
       "--closed-captions-font-family",
-      fontFamilyMap[captionOptions.fontFamily.value]
+      fontFamilyMap[captionOptions.fontFamily.value],
     );
     style.setProperty(
       "--closed-captions-font-color",
       `${colorMap[captionOptions.fontColor.value]} ${
         opacityMap[captionOptions.fontOpacity.value]
-      }`
+      }`,
     );
     style.setProperty(
       "--closed-captions-font-size",
-      fontSizeMap[captionOptions.fontSize.value]
+      fontSizeMap[captionOptions.fontSize.value],
     );
     style.setProperty(
       "--closed-captions-background-color",
-      captionOptions.backgroundColor.value
+      captionOptions.backgroundColor.value,
     );
     style.setProperty(
       "--closed-captions-background-opacity",
-      opacityMap[captionOptions.backgroundOpacity.value]
+      opacityMap[captionOptions.backgroundOpacity.value],
     );
     style.setProperty(
       "--closed-captions-character-edge-style",
-      characterEdgeStyleMap[captionOptions.characterEdgeStyle.value]
+      characterEdgeStyleMap[captionOptions.characterEdgeStyle.value],
     );
   };
 
   handleVideoEffect = async (
     effect: VideoEffectTypes | "clearAll",
-    blockStateChange: boolean
+    blockStateChange: boolean,
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
@@ -302,7 +279,7 @@ class LowerVideoController {
       this.videoMediaInstance.changeEffects(
         effect,
         this.tintColor.current,
-        blockStateChange
+        blockStateChange,
       );
 
       this.tableStaticContentSocket.current?.updateContentEffects(
@@ -310,7 +287,7 @@ class LowerVideoController {
         this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
         this.userEffects.current.video[this.videoInstanceId].video,
-        this.userEffectsStyles.current.video[this.videoInstanceId].video
+        this.userEffectsStyles.current.video[this.videoInstanceId].video,
       );
     } else {
       this.videoMediaInstance.clearAllEffects();
@@ -320,7 +297,7 @@ class LowerVideoController {
         this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
         this.userEffects.current.video[this.videoInstanceId].video,
-        this.userEffectsStyles.current.video[this.videoInstanceId].video
+        this.userEffectsStyles.current.video[this.videoInstanceId].video,
       );
     }
   };
@@ -339,9 +316,9 @@ class LowerVideoController {
           parseInt(
             this.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
-              -4
-            )
-          )
+              -4,
+            ),
+          ),
         );
         this.downloadRecordingReady.current = false;
       } else {
@@ -372,7 +349,7 @@ class LowerVideoController {
 
     document.addEventListener(
       "pointermove",
-      this.handleScrubbingTimelineUpdate
+      this.handleScrubbingTimelineUpdate,
     );
     document.addEventListener("pointerup", this.handleStopScrubbing);
 
@@ -394,7 +371,7 @@ class LowerVideoController {
 
     document.removeEventListener(
       "pointermove",
-      this.handleScrubbingTimelineUpdate
+      this.handleScrubbingTimelineUpdate,
     );
     document.removeEventListener("pointerup", this.handleStopScrubbing);
 
@@ -415,7 +392,7 @@ class LowerVideoController {
         "video",
         this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
-        this.videoMediaInstance.instanceVideo.currentTime
+        this.videoMediaInstance.instanceVideo.currentTime,
       );
 
       if (!this.wasPaused.current) {
@@ -434,18 +411,18 @@ class LowerVideoController {
       Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
     this.timelineContainerRef.current.style.setProperty(
       "--preview-position",
-      `${percent}`
+      `${percent}`,
     );
 
     if (this.isScrubbing.current) {
       this.timelineContainerRef.current.style.setProperty(
         "--progress-position",
-        `${percent}`
+        `${percent}`,
       );
 
       if (this.videoMediaInstance.instanceVideo && this.currentTimeRef.current)
         this.currentTimeRef.current.textContent = this.formatDuration(
-          percent * this.videoMediaInstance.instanceVideo.duration
+          percent * this.videoMediaInstance.instanceVideo.duration,
         );
     }
   };
@@ -458,7 +435,7 @@ class LowerVideoController {
       Math.min(Math.max(0, event.clientX - rect.x), rect.width) / rect.width;
     this.timelineContainerRef.current.style.setProperty(
       "--preview-position",
-      `${percent}`
+      `${percent}`,
     );
   };
 

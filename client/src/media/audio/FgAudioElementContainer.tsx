@@ -32,7 +32,7 @@ import "./lib/audioElement.css";
 
 const FgPortal = React.lazy(() => import("../../elements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
-  () => import("../../audioEffectsButton/lib/AudioEffectsSection")
+  () => import("../../audioEffectsButton/lib/AudioEffectsSection"),
 );
 
 const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
@@ -66,11 +66,11 @@ export default function FgAudioElementContainer({
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => void;
   handleMute: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -118,10 +118,10 @@ export default function FgAudioElementContainer({
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings)
+    structuredClone(defaultSettings),
   );
   const [activePages, setActivePages] = useState<ActivePages>(
-    defaultActiveSettingsPages
+    defaultActiveSettingsPages,
   );
 
   const [isBezierCurveEditor, setIsBezierCurveEditor] = useState(false);
@@ -134,9 +134,6 @@ export default function FgAudioElementContainer({
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
   const audioContainerRef = useRef<HTMLDivElement>(null);
-
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
 
   const positioningListeners = useRef<{
     [username: string]: {
@@ -155,14 +152,14 @@ export default function FgAudioElementContainer({
   });
 
   const leaveAudioContainerTimer = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
 
   const fgContentAdjustmentController = new FgContentAdjustmentController(
     bundleRef,
     positioning,
     setAdjustingDimensions,
-    setRerender
+    setRerender,
   );
 
   const fgAudioElementContainerController =
@@ -180,15 +177,13 @@ export default function FgAudioElementContainer({
       behindEffectsContainerRef,
       frontEffectsContainerRef,
       audioContainerRef,
-      shiftPressed,
-      controlPressed,
       setAudioEffectsSectionVisible,
       mediasoupSocket,
       handleDisableEnableBtns,
       isAudio,
       setAudioActive,
       fgContentAdjustmentController,
-      bundleRef
+      bundleRef,
     );
 
   useEffect(() => {
@@ -215,40 +210,32 @@ export default function FgAudioElementContainer({
     }
 
     mediasoupSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleMediasoupMessage
+      fgAudioElementContainerController.handleMediasoupMessage,
     );
     tableSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleTableMessage
+      fgAudioElementContainerController.handleTableMessage,
     );
 
     document.addEventListener(
       "keydown",
-      fgAudioElementContainerController.handleKeyDown
-    );
-    document.addEventListener(
-      "keyup",
-      fgAudioElementContainerController.handleKeyUp
+      fgAudioElementContainerController.handleKeyDown,
     );
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
+          removeListener(),
+        ),
       );
       mediasoupSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleMediasoupMessage
+        fgAudioElementContainerController.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleTableMessage
+        fgAudioElementContainerController.handleTableMessage,
       );
       document.removeEventListener(
         "keydown",
-        fgAudioElementContainerController.handleKeyDown
-      );
-      document.removeEventListener(
-        "keyup",
-        fgAudioElementContainerController.handleKeyUp
+        fgAudioElementContainerController.handleKeyDown,
       );
     };
   }, []);
@@ -283,7 +270,7 @@ export default function FgAudioElementContainer({
           instance,
           type: "audio",
           positioning: positioning.current,
-        })
+        }),
       );
     }
   }, [positioning.current]);
@@ -314,7 +301,7 @@ export default function FgAudioElementContainer({
       xhr.open(
         "POST",
         staticContentServerBaseUrl + `upload-file/${uploadId}`,
-        true
+        true,
       );
 
       xhr.send(formData);
@@ -336,11 +323,11 @@ export default function FgAudioElementContainer({
         top: `${positioning.current.position.top}%`,
         width: `${Math.max(
           positioning.current.scale.x,
-          positioning.current.scale.y
+          positioning.current.scale.y,
         )}%`,
         height: `${Math.max(
           positioning.current.scale.x,
-          positioning.current.scale.y
+          positioning.current.scale.y,
         )}%`,
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 50%",
@@ -361,20 +348,20 @@ export default function FgAudioElementContainer({
       }}
       data-positioning={JSON.stringify(positioning.current)}
     >
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={frontEffectsContainerRef}
-          className='w-full h-full relative z-[100] pointer-events-none'
+          className="pointer-events-none relative z-[100] h-full w-full"
         />
       </div>
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={behindEffectsContainerRef}
-          className='w-full h-full relative -z-[100] pointer-events-none'
+          className="pointer-events-none relative -z-[100] h-full w-full"
         />
       </div>
       <PanButton
-        className='pan-btn min-w-7 w-[8%] max-w-14 aspect-square absolute top-1/2 -translate-y-1/2'
+        className="pan-btn absolute top-1/2 aspect-square w-[8%] min-w-7 max-w-14 -translate-y-1/2"
         style={{ right: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -404,14 +391,14 @@ export default function FgAudioElementContainer({
                 (positioning.current.position.top / 100) *
                   bundleRef.current.clientHeight +
                 pixelScale.y / 2,
-            }
+            },
           );
         }}
         bundleRef={bundleRef}
         pointerDownFunction={() => {
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
             "position",
-            { rotationPointPlacement: "middleLeft" }
+            { rotationPointPlacement: "middleLeft" },
           );
         }}
         pointerUpFunction={
@@ -419,7 +406,7 @@ export default function FgAudioElementContainer({
         }
       />
       <RotateButton
-        className='rotate-btn min-w-7 w-[8%] max-w-14 aspect-square absolute top-1/2 -translate-y-[150%]'
+        className="rotate-btn absolute top-1/2 aspect-square w-[8%] min-w-7 max-w-14 -translate-y-[150%]"
         style={{ left: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
@@ -458,7 +445,7 @@ export default function FgAudioElementContainer({
         }
       />
       <ScaleButton
-        className='scale-btn min-w-6 w-[7.5%] max-w-12 aspect-square absolute top-1/2 translate-y-1/2'
+        className="scale-btn absolute top-1/2 aspect-square w-[7.5%] min-w-6 max-w-12 translate-y-1/2"
         style={{ left: `calc(100% - ${Math.round(containerWidth * 0.05)}px)` }}
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -499,7 +486,7 @@ export default function FgAudioElementContainer({
                 (positioning.current.position.top / 100) *
                   bundleRef.current.clientHeight +
                 pixelScale.y / 2,
-            }
+            },
           );
         }}
         bundleRef={bundleRef}
@@ -509,7 +496,7 @@ export default function FgAudioElementContainer({
           }
 
           fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-            "scale"
+            "scale",
           );
         }}
         pointerUpFunction={
@@ -539,9 +526,9 @@ export default function FgAudioElementContainer({
       {popupVisible && (
         <Suspense fallback={<div>Loading...</div>}>
           <FgPortal
-            type='mouse'
+            type="mouse"
             content={
-              <div className='w-max h-max shadow-lg px-4 py-2 rounded-md text-lg font-Josefin relative z-[50] bg-white'>
+              <div className="relative z-[50] h-max w-max rounded-md bg-white px-4 py-2 font-Josefin text-lg shadow-lg">
                 {name ? name : username}
               </div>
             }
@@ -564,10 +551,10 @@ export default function FgAudioElementContainer({
                 handleAudioEffectChange as (
                   producerType: "audio" | "screenAudio" | "video",
                   producerId: string | undefined,
-                  effect: AudioEffectTypes
+                  effect: AudioEffectTypes,
                 ) => void
               }
-              placement='right'
+              placement="right"
               referenceElement={
                 audioElementSVGRef as unknown as React.RefObject<HTMLElement>
               }
@@ -575,7 +562,7 @@ export default function FgAudioElementContainer({
               handleMute={
                 handleMute as (
                   producerType: "audio" | "screenAudio" | "video",
-                  producerId: string | undefined
+                  producerId: string | undefined,
                 ) => void
               }
               localMute={localMute}
@@ -593,7 +580,7 @@ export default function FgAudioElementContainer({
                   setIsBezierCurveEditor={setIsBezierCurveEditor}
                 />,
                 <ReactButton
-                  className='min-w-12 w-full hover:bg-fg-red-light rounded bg-fg-tone-black-4'
+                  className="w-full min-w-12 rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                   reactionsPanelActive={reactionsPanelActive}
                   setReactionsPanelActive={setReactionsPanelActive}
                   clickFunction={() => setReactionsPanelActive((prev) => !prev)}

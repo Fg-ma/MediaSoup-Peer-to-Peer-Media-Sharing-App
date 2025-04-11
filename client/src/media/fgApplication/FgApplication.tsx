@@ -60,9 +60,6 @@ export default function FgApplication({
     userEffectsStyles.current.application[applicationInstanceId].tint.color,
   );
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const [_rerender, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
@@ -80,8 +77,6 @@ export default function FgApplication({
     applicationInstanceId,
     applicationMediaInstance,
     applicationContainerRef,
-    shiftPressed,
-    controlPressed,
     setApplicationEffectsActive,
     tintColor,
     userEffects,
@@ -124,8 +119,6 @@ export default function FgApplication({
       lowerApplicationController.handleKeyDown,
     );
 
-    document.addEventListener("keyup", lowerApplicationController.handleKeyUp);
-
     tableRef.current?.addEventListener(
       "scroll",
       applicationController.handleTableScroll,
@@ -138,10 +131,6 @@ export default function FgApplication({
       document.removeEventListener(
         "keydown",
         lowerApplicationController.handleKeyDown,
-      );
-      document.removeEventListener(
-        "keyup",
-        lowerApplicationController.handleKeyUp,
       );
       tableRef.current?.removeEventListener(
         "scroll",

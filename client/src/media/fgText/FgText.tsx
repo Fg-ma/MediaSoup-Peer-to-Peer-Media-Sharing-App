@@ -38,9 +38,6 @@ export default function FgText({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerTextControlsRef = useRef<HTMLDivElement>(null);
 
-  const shiftPressed = useRef(false);
-  const controlPressed = useRef(false);
-
   const text = useRef("");
 
   const [settingsActive, setSettingsActive] = useState(false);
@@ -63,8 +60,6 @@ export default function FgText({
   const lowerTextController = new LowerTextController(
     textMediaInstance,
     textContainerRef,
-    shiftPressed,
-    controlPressed,
     setSettings,
     setSettingsActive,
     textAreaRef,
@@ -90,8 +85,6 @@ export default function FgText({
 
     document.addEventListener("keydown", lowerTextController.handleKeyDown);
 
-    document.addEventListener("keyup", lowerTextController.handleKeyUp);
-
     tableRef.current?.addEventListener(
       "scroll",
       textController.handleTableScroll,
@@ -102,7 +95,6 @@ export default function FgText({
         "keydown",
         lowerTextController.handleKeyDown,
       );
-      document.removeEventListener("keyup", lowerTextController.handleKeyUp);
       tableRef.current?.removeEventListener(
         "scroll",
         textController.handleTableScroll,

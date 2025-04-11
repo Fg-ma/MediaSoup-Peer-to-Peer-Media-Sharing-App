@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 
 export type Signals =
-  | undefined
   | {
       type: "localMuteChange";
       header: {
@@ -35,8 +34,6 @@ export interface SignalContextProviderProps {
 }
 
 export interface SignalContextType {
-  signal: Signals;
-  setSignal: React.Dispatch<React.SetStateAction<Signals>>;
   addSignalListener: (listener: (signal: Signals) => void) => void;
   removeSignalListener: (listener: (signal: Signals) => void) => void;
   sendSignal: (signal: Signals) => void;
@@ -57,8 +54,6 @@ export const useSignalContext = () => {
 export function SignalContextProvider({
   children,
 }: SignalContextProviderProps) {
-  const [signal, setSignal] = useState<Signals>(undefined);
-
   const signalListeners: Set<(signal: Signals) => void> = new Set();
 
   const sendSignal = (signal: Signals) => {
@@ -78,8 +73,6 @@ export function SignalContextProvider({
   return (
     <SignalContext.Provider
       value={{
-        signal,
-        setSignal,
         addSignalListener,
         removeSignalListener,
         sendSignal,
