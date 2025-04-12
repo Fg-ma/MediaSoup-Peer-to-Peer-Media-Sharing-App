@@ -30,6 +30,17 @@ export const contentTypeBucketMap: {
   soundClip: "table-sound-clips",
 };
 
+export const contentTypeQdrantMap: {
+  [staticContentType in StaticContentTypes]: string;
+} = {
+  video: "tableVideos",
+  image: "tableImages",
+  svg: "tableSvgs",
+  application: "tableApplications",
+  text: "tableText",
+  soundClip: "tableSoundClips",
+};
+
 export type StaticMimeTypes =
   | "image/jpeg"
   | "image/png"

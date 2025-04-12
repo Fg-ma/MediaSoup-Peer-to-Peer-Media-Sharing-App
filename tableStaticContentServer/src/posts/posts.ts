@@ -5,6 +5,7 @@ import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
 import {
   contentTypeBucketMap,
+  contentTypeQdrantMap,
   mimeToExtension,
   mimeTypeContentTypeMap,
   StaticMimeTypes,
@@ -24,6 +25,8 @@ import {
   ContentStateTypes,
   StaticContentTypes,
 } from "../../../universal/contentTypeConstant";
+import { getEmbedding } from "./embedding";
+import { uploadEmbeddingToQdrant } from "./qdrant";
 
 const tableStaticContentUtils = new Utils();
 
@@ -201,6 +204,32 @@ class Posts {
                 );
                 break;
             }
+
+            const embedding = await getEmbedding(completeFilename);
+            await uploadEmbeddingToQdrant(
+              embedding,
+              session.contentId,
+              contentTypeQdrantMap[staticContentType]
+            );
+
+            console.log(embedding);
+            // Now send it to Qdrant
+            // await axios.put(
+            //   "http://localhost:6333/collections/yourCollection/points",
+            //   {
+            //     points: [
+            //       {
+            //         id: session.contentId,
+            //         vector: embedding,
+            //         payload: {
+            //           filename: completeFilename,
+            //           mimeType,
+            //           tableId: session.table_id,
+            //         },
+            //       },
+            //     ],
+            //   }
+            // );
 
             // Cleanup session
             uploadSessions.delete(uploadId);
