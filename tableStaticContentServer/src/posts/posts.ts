@@ -205,14 +205,14 @@ class Posts {
                 break;
             }
 
-            const embedding = await getEmbedding(completeFilename);
-            await uploadEmbeddingToQdrant(
-              embedding,
-              session.contentId,
-              contentTypeQdrantMap[staticContentType]
-            );
+            // const embedding = await getEmbedding(completeFilename);
+            // await uploadEmbeddingToQdrant(
+            //   embedding,
+            //   session.contentId,
+            //   contentTypeQdrantMap[staticContentType]
+            // );
 
-            console.log(embedding);
+            // console.log(embedding);
             // Now send it to Qdrant
             // await axios.put(
             //   "http://localhost:6333/collections/yourCollection/points",

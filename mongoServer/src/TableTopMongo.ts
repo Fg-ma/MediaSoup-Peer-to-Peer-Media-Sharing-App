@@ -1,4 +1,4 @@
-import { MongoClient, Db } from "mongodb";
+import { MongoClient, Db, MongoClientOptions } from "mongodb";
 import TableImages from "./lib/tableImages/TableImages";
 import TableVideos from "./lib/tableVideos/TableVideos";
 import TableSoundClips from "./lib/tableSoundClips/TableSoundClips";
@@ -36,7 +36,8 @@ import {
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
 
-const uri = "mongodb://localhost:27017";
+const uri =
+  "mongodb://admin:tableTopAbigailDavis@localhost:27017/?tls=true&replicaSet=rs0";
 const dbName = "tableTopMongo";
 
 class TableTopMongo {
@@ -66,7 +67,13 @@ class TableTopMongo {
   };
 
   private getDbConnection = async () => {
-    this.client = new MongoClient(uri);
+    this.client = new MongoClient(uri, {
+      tls: true,
+      tlsCAFile: "/home/fg/Desktop/tableTopSecrets/ca.pem",
+      tlsCertificateKeyFile:
+        "/home/fg/Desktop/tableTopSecrets/mongodb/mongodb.pem",
+      tlsCertificateKeyFilePassword: "tableTopAbigailDavis",
+    });
 
     await this.client.connect();
 
