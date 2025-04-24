@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"./nginx-1.27.3/sbin/nginx\" \"npm run start --prefix ./client\" \"npm run dev --prefix ./cephServer\" \"npm run dev --prefix ./mongoServer\" \"npm run dev --prefix ./gamesServer\" \"npm run dev --prefix ./mediasoupServer\" \"npm run dev --prefix ./tableServer\" \"npm run dev --prefix ./tableStaticContentServer\"",
+    "dev": "concurrently \"./nginx-1.27.3/sbin/nginx\" \"npm run start --prefix ./client\" \"npm run dev --prefix ./cephServer\" \"npm run dev --prefix ./mongoServer\" \"npm run dev --prefix ./gamesServer\" \"npm run dev --prefix ./mediasoupServer\" \"npm run dev --prefix ./tableServer\" \"npm run dev --prefix ./tableStaticContentServer\" \"npm run dev --prefix ./elasticSearchServer\"",
     "start": "webpack-dev-server ."
   },
   "keywords": [],

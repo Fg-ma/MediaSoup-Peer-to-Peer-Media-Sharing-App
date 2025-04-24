@@ -205,32 +205,6 @@ class Posts {
                 break;
             }
 
-            // const embedding = await getEmbedding(completeFilename);
-            // await uploadEmbeddingToQdrant(
-            //   embedding,
-            //   session.contentId,
-            //   contentTypeQdrantMap[staticContentType]
-            // );
-
-            // console.log(embedding);
-            // Now send it to Qdrant
-            // await axios.put(
-            //   "http://localhost:6333/collections/yourCollection/points",
-            //   {
-            //     points: [
-            //       {
-            //         id: session.contentId,
-            //         vector: embedding,
-            //         payload: {
-            //           filename: completeFilename,
-            //           mimeType,
-            //           tableId: session.table_id,
-            //         },
-            //       },
-            //     ],
-            //   }
-            // );
-
             // Cleanup session
             uploadSessions.delete(uploadId);
           });

@@ -11,6 +11,7 @@ import Gets from "./gets/Gets";
 import Posts from "./posts/posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
+import Search from "./lib/Search";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
@@ -19,6 +20,7 @@ dotenv.config({
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
+export const search = new Search(broadcaster);
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);

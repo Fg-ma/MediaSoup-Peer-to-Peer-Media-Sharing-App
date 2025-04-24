@@ -301,6 +301,22 @@ class TableStaticContentSocketController {
     });
   };
 
+  searchTabledContent = (
+    contentType: StaticContentTypes | "all",
+    name: string,
+  ) => {
+    this.sendMessage({
+      type: "searchTabledContentRequest",
+      header: {
+        table_id: this.table_id,
+        username: this.username,
+        instance: this.instance,
+        contentType,
+        name,
+      },
+    });
+  };
+
   private handleMessage = (
     message: { type: undefined } | IncomingTableStaticContentMessages,
   ) => {

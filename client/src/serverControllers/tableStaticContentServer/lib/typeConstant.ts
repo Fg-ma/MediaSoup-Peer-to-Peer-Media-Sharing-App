@@ -36,7 +36,8 @@ export type OutGoingTableStaticContentMessages =
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
-  | onCreateNewInstancesType;
+  | onCreateNewInstancesType
+  | onSearchTabledContentRequestType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -212,6 +213,17 @@ type onCreateNewInstancesType = {
   };
 };
 
+type onSearchTabledContentRequestType = {
+  type: "searchTabledContentRequest";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: StaticContentTypes | "all";
+    name: string;
+  };
+};
+
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
   | onVideoUploadedToTableType
@@ -236,7 +248,8 @@ export type IncomingTableStaticContentMessages =
   | onUpdatedVideoPositionType
   | onRequestedCatchUpVideoPositionType
   | onRespondedCatchUpVideoPositionType
-  | onCreatedNewInstancesType;
+  | onCreatedNewInstancesType
+  | onSearchTabledContentRespondedType;
 
 export type onVideoUploadedToTableType = {
   type: "videoUploadedToTable";
@@ -706,4 +719,9 @@ export type onCreatedNewInstancesType = {
       }[];
     }[];
   };
+};
+
+export type onSearchTabledContentRespondedType = {
+  type: "searchTabledContentResponded";
+  data: any;
 };

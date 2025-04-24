@@ -2,6 +2,7 @@ import {
   cleanup,
   gets,
   metadataController,
+  search,
   tablesController,
   tableTopMongo,
 } from "../index";
@@ -47,6 +48,9 @@ const handleMessage = (
       break;
     case "createNewInstances":
       metadataController.onCreateNewInstances(event);
+      break;
+    case "searchTabledContentRequest":
+      search.onSearchTabledContentRequest(event);
       break;
     default:
       break;

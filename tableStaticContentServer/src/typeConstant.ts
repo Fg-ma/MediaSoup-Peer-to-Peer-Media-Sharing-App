@@ -156,7 +156,19 @@ export type MessageTypes =
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
-  | onCreateNewInstancesType;
+  | onCreateNewInstancesType
+  | onSearchTabledContentRequestType;
+
+export type onSearchTabledContentRequestType = {
+  type: "searchTabledContentRequest";
+  header: {
+    table_id: string;
+    username: string;
+    instance: string;
+    contentType: StaticContentTypes | "all";
+    name: string;
+  };
+};
 
 export type onJoinTableType = {
   type: "joinTable";
