@@ -5,6 +5,7 @@ import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
 import TabledPortalController from "../TabledPortalController";
 import SearchBar from "./searchBar/SearchBar";
+import { Categories } from "../../TabledPortal";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -19,11 +20,28 @@ export default function Tools({
   advanced,
   setAdvanced,
   setTabledActive,
+  activePage,
+  setSearchContent,
+  searchValue,
 }: {
   tabledPortalController: TabledPortalController;
   advanced: boolean;
   setAdvanced: React.Dispatch<React.SetStateAction<boolean>>;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
+  activePage: Categories;
+  setSearchContent: React.Dispatch<
+    React.SetStateAction<
+      {
+        score: number;
+        aid?: string;
+        iid?: string;
+        sid?: string;
+        xid?: string;
+        vid?: string;
+      }[]
+    >
+  >;
+  searchValue: React.MutableRefObject<string>;
 }) {
   return (
     <div className="flex h-12 w-full space-x-1">
@@ -121,7 +139,14 @@ export default function Tools({
           hoverTimeoutDuration: 1250,
         }}
       />
-      <SearchBar />
+      {!advanced && (
+        <SearchBar
+          activePage={activePage}
+          setSearchContent={setSearchContent}
+          advanced={advanced}
+          searchValue={searchValue}
+        />
+      )}
     </div>
   );
 }

@@ -3,33 +3,40 @@ import FgButton from "../fgButton/FgButton";
 import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStandard";
 import FgSVGElement from "../fgSVGElement/FgSVGElement";
 import { defaultInputOptions, InputOptionsType } from "./lib/typeConstant";
+import "./lib/fgInput.css";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function FgInput({
+  externalRef,
   placeholder,
   className,
   name,
+  type = "text",
   onSubmit,
   onChange,
+  onFocus,
   onUnfocus,
   externalValue,
   options,
 }: {
+  externalRef?: React.RefObject<HTMLInputElement>;
   placeholder?: string;
   className?: string;
   name?: string;
+  type?: "number" | "text";
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
   onUnfocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
   externalValue?: string;
   options?: InputOptionsType;
 }) {
   const fgInputOptions = { ...defaultInputOptions, ...options };
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = externalRef ? externalRef : useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (fgInputOptions.autoFocus && inputRef.current) {
@@ -57,17 +64,21 @@ export default function FgInput({
           ref={inputRef}
           placeholder={placeholder}
           name={name ? name : "defaultInput"}
-          type="text"
-          className={`${fgInputOptions.centerText ? "text-center" : ""} h-full w-full focus:outline-none`}
+          type={type}
+          className={`${fgInputOptions.centerText ? "text-center" : ""} ${fgInputOptions.noSpinner ? "no-spinner" : ""} h-full w-full focus:outline-none`}
           style={{
             paddingLeft: `${fgInputOptions.padding}rem`,
             paddingRight: `${fgInputOptions.padding}rem`,
             backgroundColor: fgInputOptions.backgroundColor,
           }}
           onChange={onChange}
+          onFocus={onFocus}
           onBlur={onUnfocus}
           value={externalValue}
           autoComplete={fgInputOptions.autocomplete}
+          min={fgInputOptions.min}
+          max={fgInputOptions.max}
+          step={fgInputOptions.step}
         />
       </div>
       {fgInputOptions.submitButton && (

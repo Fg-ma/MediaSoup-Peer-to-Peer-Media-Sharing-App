@@ -23,6 +23,9 @@ class TabledPortalController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
+    private tabledPortalRef: React.RefObject<HTMLDivElement>,
+    private tabledContentRef: React.RefObject<HTMLDivElement>,
+    private setTabledActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   private setIndicators = () => {
@@ -48,16 +51,24 @@ class TabledPortalController {
           };
         })
         .filter((item): item is InstanceType => item !== null);
+    } else {
+      this.indicators.current = [];
     }
   };
 
   placeInstances = () => {
     this.setIndicators();
 
-    const instances = [...this.indicators.current];
+    if (this.indicators.current.length === 0) {
+      return;
+    }
+
+    // Directly use this.indicators.current to avoid copying the array
+    const instances = this.indicators.current;
     const GAP = 0.5;
     const containerWidth = 100;
 
+    // Calculate gridLeft and gridBottom only once
     const gridLeft =
       this.staticPlacement.current.x === "default" ||
       this.staticPlacement.current.x === "hide"
@@ -76,14 +87,18 @@ class TabledPortalController {
 
     const newPositions: InstanceType[] = [];
 
-    instances.forEach((instance) => {
+    // Use for-loop for better performance on the outer iteration
+    for (let i = 0; i < instances.length; i++) {
+      const instance = instances[i];
       const newIns: { width: number; height: number; x: number; y: number }[] =
         [];
 
-      instance.instances.forEach((ins) => {
-        const width = ins.width;
-        const height = ins.height;
+      // Use for-loop instead of forEach for inner iterations
+      for (let j = 0; j < instance.instances.length; j++) {
+        const ins = instance.instances[j];
+        const { width, height } = ins;
 
+        // Check if the current box exceeds the container width and reset position
         if (currentX + width > containerWidth) {
           currentX = gridLeft;
           gridBottom = currentRowTop - GAP;
@@ -100,19 +115,20 @@ class TabledPortalController {
           y: Math.max(0, boxY),
         });
 
+        // Update currentX and row height
         currentX += width + GAP;
         currentRowMaxHeight = Math.max(currentRowMaxHeight, height);
         currentRowTop = gridBottom - currentRowMaxHeight;
-      });
+      }
 
       newPositions.push({
         ...instance,
         instances: newIns,
       });
-    });
+    }
 
+    // Update indicators only once after processing
     this.indicators.current = newPositions;
-    this.setRerender((prev) => !prev);
   };
 
   uploadInstances = () => {
@@ -145,13 +161,26 @@ class TabledPortalController {
   };
 
   reset = () => {
-    this.selected.current = [];
-    this.staticPlacement.current = {
-      x: "default",
-      y: "default",
-      scale: 1,
-    };
+    if (this.selected.current.length !== 0) {
+      this.selected.current = [];
+      this.staticPlacement.current = {
+        x: "default",
+        y: "default",
+        scale: 1,
+      };
+    } else {
+      this.setTabledActive(false);
+    }
     this.setRerender((prev) => !prev);
+  };
+
+  handlePortalClick = (event: React.PointerEvent) => {
+    if (
+      this.tabledPortalRef.current?.contains(event.target as Node) &&
+      !this.tabledContentRef.current?.contains(event.target as Node)
+    ) {
+      this.setTabledActive(false);
+    }
   };
 }
 

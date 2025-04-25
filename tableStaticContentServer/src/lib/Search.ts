@@ -32,7 +32,15 @@ class Search {
     const boolQuery = {
       bool: {
         filter: [{ term: { tid: table_id } }],
-        must: [{ match: { n: name } }],
+        must: [
+          {
+            wildcard: {
+              n: {
+                value: `*${name.toLowerCase()}*`,
+              },
+            },
+          },
+        ],
       },
     };
 

@@ -20,7 +20,7 @@ const scrollButtonsVar: Variants = {
     opacity: 1,
     x: 0,
   },
-  hover: { backgroundColor: "rgb(64, 64, 64)", fill: "rgb(242, 242, 242)" },
+  hover: { backgroundColor: "rgb(32, 32, 32)", fill: "rgb(242, 242, 242)" },
 };
 
 const scrollButtonsTransition: Transition = {
@@ -38,6 +38,7 @@ const scrollButtonsTransition: Transition = {
 
 export default function ScrollingContainer({
   externalRef,
+  className,
   content,
   buttonBackgroundColor = "#161616",
   buttonBackgroundColorTransition = {
@@ -49,6 +50,7 @@ export default function ScrollingContainer({
   },
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
+  className?: string;
   content: ReactNode;
   buttonBackgroundColor?: string;
   buttonBackgroundColorTransition?: Transition;
@@ -134,11 +136,13 @@ export default function ScrollingContainer({
   };
 
   return (
-    <div className="flex w-full items-center justify-start overflow-hidden">
+    <div
+      className={`${className} flex w-full items-center justify-start overflow-hidden`}
+    >
       <AnimatePresence>
         {showLeftScroll && (
           <motion.div
-            className="flex z-10 h-full w-8 items-center justify-center bg-fg-white"
+            className="z-10 ml-1 flex h-full w-8 items-center justify-center"
             variants={scrollButtonsVar}
             initial="leftInit"
             exit="leftInit"
@@ -182,7 +186,7 @@ export default function ScrollingContainer({
       </AnimatePresence>
       <div
         ref={externalRef ? externalRef : scrollingContainerRef}
-        className="flex hide-scroll-bar w-full grow items-center justify-start overflow-x-auto"
+        className="hide-scroll-bar flex w-full grow items-center justify-start overflow-x-auto"
         onScroll={handleScroll}
       >
         {content}
@@ -190,10 +194,7 @@ export default function ScrollingContainer({
       <AnimatePresence>
         {showRightScroll && (
           <motion.div
-            className="flex z-10 h-full w-8 items-center justify-center bg-fg-tone-black-2"
-            style={{
-              boxShadow: "-1px 0 6px 8px rgba(255, 255, 255, 1)",
-            }}
+            className="z-10 mr-1 flex h-full w-8 items-center justify-center bg-fg-tone-black-2"
             variants={scrollButtonsVar}
             initial="rightInit"
             exit="rightInit"
