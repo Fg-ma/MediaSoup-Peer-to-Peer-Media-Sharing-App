@@ -746,6 +746,10 @@ class ImageMediaInstance {
   forceRedetectFaces = () => {
     if (this.babylonScene) this.babylonScene.imageAlreadyProcessed[0] = 1;
   };
+
+  getAspect = () => {
+    return this.imageMedia.aspect;
+  };
 }
 
 export default ImageMediaInstance;

@@ -40,6 +40,10 @@ const MediaContainerTransition: Transition = {
 };
 
 export default function FgMediaContainer({
+  downloadingState,
+  addDownloadListener,
+  removeDownloadListener,
+  getAspect,
   mediaId,
   mediaInstanceId,
   filename,
@@ -64,6 +68,18 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
+  downloadingState: "downloading" | "downloaded";
+  addDownloadListener?: (
+    listener: (
+      message: { type: "downloadComplete" } | { type: string },
+    ) => void,
+  ) => void;
+  removeDownloadListener?: (
+    listener: (
+      message: { type: "downloadComplete" } | { type: string },
+    ) => void,
+  ) => void;
+  getAspect?: () => number | undefined;
   mediaId: string;
   mediaInstanceId: string;
   filename: string;
@@ -150,12 +166,15 @@ export default function FgMediaContainer({
 
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
 
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender,
-  );
+  const fgContentAdjustmentController =
+    useRef<FgContentAdjustmentController | null>(null);
+  if (!fgContentAdjustmentController.current)
+    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+      bundleRef,
+      positioning,
+      setAdjustingDimensions,
+      setRerender,
+    );
 
   const lowerController = new LowerController(
     tableStaticContentSocket,
@@ -184,7 +203,7 @@ export default function FgMediaContainer({
     mediaId,
     mediaInstanceId,
     kind,
-    rootMedia,
+    getAspect,
     positioningListeners,
     aspectRatio,
     positioning,
@@ -218,15 +237,14 @@ export default function FgMediaContainer({
 
     document.addEventListener("keydown", lowerController.handleKeyDown);
 
-    rootMedia?.addEventListener(
-      "load",
-      mediaContainerController.handleMetadataLoaded,
-    );
-
-    rootMedia?.addEventListener(
-      "loadedmetadata",
-      mediaContainerController.handleMetadataLoaded,
-    );
+    if (downloadingState === "downloading") {
+      if (addDownloadListener)
+        addDownloadListener(mediaContainerController.downloadListener);
+    } else {
+      if (getAspect) {
+        aspectRatio.current = getAspect();
+      }
+    }
 
     document.addEventListener(
       "fullscreenchange",
@@ -247,14 +265,10 @@ export default function FgMediaContainer({
         mediaContainerController.handleTableMessage,
       );
       document.removeEventListener("keydown", lowerController.handleKeyDown);
-      rootMedia?.removeEventListener(
-        "load",
-        mediaContainerController.handleMetadataLoaded,
-      );
-      rootMedia?.removeEventListener(
-        "loadedmetadata",
-        mediaContainerController.handleMetadataLoaded,
-      );
+      if (downloadingState === "downloading") {
+        if (removeDownloadListener)
+          removeDownloadListener(mediaContainerController.downloadListener);
+      }
       document.removeEventListener(
         "fullscreenchange",
         lowerController.handleFullScreenChange,
@@ -293,7 +307,7 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} absolute flex items-center justify-center`}
+      } ${className} selectable absolute flex items-center justify-center`}
       style={
         backgroundMedia
           ? {
@@ -386,7 +400,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         {media && media}
         <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">

@@ -155,12 +155,15 @@ export default function FgAudioElementContainer({
     undefined,
   );
 
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender,
-  );
+  const fgContentAdjustmentController =
+    useRef<FgContentAdjustmentController | null>(null);
+  if (!fgContentAdjustmentController.current)
+    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+      bundleRef,
+      positioning,
+      setAdjustingDimensions,
+      setRerender,
+    );
 
   const fgAudioElementContainerController =
     new FgAudioElementContainerController(
@@ -377,7 +380,7 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgContentAdjustmentController.movementDragFunction(
+          fgContentAdjustmentController.current?.movementDragFunction(
             displacement,
             {
               x: 0,
@@ -396,13 +399,13 @@ export default function FgAudioElementContainer({
         }}
         bundleRef={bundleRef}
         pointerDownFunction={() => {
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "position",
             { rotationPointPlacement: "middleLeft" },
           );
         }}
         pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction
         }
       />
       <RotateButton
@@ -424,7 +427,7 @@ export default function FgAudioElementContainer({
 
           const box = bundleRef.current.getBoundingClientRect();
 
-          fgContentAdjustmentController.rotateDragFunction(event, {
+          fgContentAdjustmentController.current?.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
                 bundleRef.current.clientWidth +
@@ -437,11 +440,12 @@ export default function FgAudioElementContainer({
           });
         }}
         bundleRef={bundleRef}
-        pointerDownFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.current
+            ?.adjustmentBtnPointerDownFunction
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+        pointerUpFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction
         }
       />
       <ScaleButton
@@ -464,7 +468,7 @@ export default function FgAudioElementContainer({
               bundleRef.current.clientHeight,
           };
 
-          fgContentAdjustmentController.scaleDragFunction(
+          fgContentAdjustmentController.current?.scaleDragFunction(
             "square",
             {
               x: displacement.x + Math.sin(angle) * (pixelScale.x / 2),
@@ -495,12 +499,12 @@ export default function FgAudioElementContainer({
             return;
           }
 
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "scale",
           );
         }}
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+        pointerUpFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction
         }
       />
       <FgAudioElement

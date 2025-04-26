@@ -1534,6 +1534,10 @@ class SoundClipMediaInstance {
   getSamplerTrack = () => {
     return this.samplerMediaStreamDestination.stream.getAudioTracks()[0];
   };
+
+  getAspect = () => {
+    return undefined;
+  };
 }
 
 export default SoundClipMediaInstance;

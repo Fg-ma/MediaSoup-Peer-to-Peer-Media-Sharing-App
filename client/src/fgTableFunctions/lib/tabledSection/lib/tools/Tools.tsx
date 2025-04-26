@@ -6,6 +6,7 @@ import { StaticContentTypes } from "../../../../../../../universal/contentTypeCo
 import TabledPortalController from "../TabledPortalController";
 import SearchBar from "./searchBar/SearchBar";
 import { Categories } from "../../TabledPortal";
+import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -23,6 +24,7 @@ export default function Tools({
   activePage,
   setSearchContent,
   searchValue,
+  selected,
 }: {
   tabledPortalController: TabledPortalController;
   advanced: boolean;
@@ -42,7 +44,17 @@ export default function Tools({
     >
   >;
   searchValue: React.MutableRefObject<string>;
+  selected: React.MutableRefObject<
+    {
+      contentType: StaticContentTypes;
+      contentId: string;
+      aspect: number;
+      count: number | "zero";
+    }[]
+  >;
 }) {
+  const { sendSignal } = useSignalContext();
+
   return (
     <div className="flex h-12 w-full space-x-1">
       <FgButton
@@ -84,7 +96,45 @@ export default function Tools({
             ]}
           />
         )}
-        clickFunction={() => {}}
+        clickFunction={() => {
+          if (selected.current.length === 0) return;
+
+          sendSignal({
+            type: "instancesLayerMode",
+            data: {
+              mode: "paint",
+            },
+          });
+
+          sendSignal({
+            type: "startInstancesDrag",
+            data: {
+              instances: selected.current
+                .filter((sel) => sel.count !== "zero" && sel.count !== 0)
+                .map((sel) => ({
+                  contentType: sel.contentType,
+                  contentId: sel.contentId,
+                  instances: Array.from({
+                    // @ts-expect-error "zero" was already filtered out
+                    length: sel.count,
+                  }).map(() => ({
+                    height: 15,
+                    width: 15 * sel.aspect,
+                  })),
+                })),
+            },
+          });
+
+          sendSignal({
+            type: "tableInfoSignal",
+            data: {
+              message: "Press esc/delete to exit",
+              timeout: 4000,
+            },
+          });
+
+          setTabledActive(false);
+        }}
         hoverContent={<FgHoverContentStandard content="Paint content" />}
         options={{
           hoverSpacing: 4,

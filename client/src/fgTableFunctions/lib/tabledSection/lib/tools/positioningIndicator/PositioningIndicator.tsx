@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import throttle from "lodash.throttle";
 import { StaticContentTypes } from "../../../../../../../../universal/contentTypeConstant";
 import { useMediaContext } from "../../../../../../context/mediaContext/MediaContext";
 import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
@@ -36,34 +37,42 @@ export default function PositioningIndicator({
   useEffect(() => {
     tabledPortalController.placeInstances();
     setRerender((prev) => !prev);
-    console.log("bad");
   }, [
     JSON.stringify(staticPlacement.current),
     JSON.stringify(selected.current),
   ]);
 
-  const handlePointerMove = (event: PointerEvent) => {
-    event.preventDefault();
+  const throttledRerender = useRef(
+    throttle(
+      () => {
+        setRerender((prev) => !prev);
+      },
+      80,
+      { leading: true, trailing: true },
+    ),
+  ).current;
 
-    const container = positioningIndicatorRef.current;
-    if (!container) return;
+  const handlePointerMove = useCallback(
+    (event: PointerEvent) => {
+      event.preventDefault();
 
-    const rect = container.getBoundingClientRect();
+      const container = positioningIndicatorRef.current;
+      if (!container) return;
 
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
+      const rect = container.getBoundingClientRect();
+      const rawX = ((event.clientX - rect.left) / rect.width) * 100;
+      const rawY = ((event.clientY - rect.top) / rect.height) * 100;
 
-    const clampedX = Math.min(Math.max(x, 0), 100);
-    const clampedY = Math.min(Math.max(y, 0), 100);
+      staticPlacement.current = {
+        ...staticPlacement.current,
+        x: parseFloat(Math.min(Math.max(rawX, 0), 100).toFixed(2)),
+        y: parseFloat(Math.min(Math.max(rawY, 0), 100).toFixed(2)),
+      };
 
-    staticPlacement.current = {
-      ...staticPlacement.current,
-      x: parseFloat(`${clampedX.toFixed(2)}`),
-      y: parseFloat(`${clampedY.toFixed(2)}`),
-    };
-    tabledPortalController.placeInstances();
-    setRerender((prev) => !prev);
-  };
+      throttledRerender();
+    },
+    [throttledRerender],
+  );
 
   const handlePointerUp = () => {
     document.removeEventListener("pointermove", handlePointerMove);
@@ -104,7 +113,7 @@ export default function PositioningIndicator({
             {instance.instances.map((ins, i) => (
               <div
                 key={instance.contentId + "_" + i}
-                className="pointer-events-none absolute select-none rounded border border-dashed border-fg-red"
+                className="border pointer-events-none absolute select-none rounded border-dashed border-fg-red"
                 style={{
                   width: `${ins.width}%`,
                   height: `${ins.height}%`,

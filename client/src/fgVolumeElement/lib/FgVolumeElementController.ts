@@ -1,7 +1,7 @@
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 import { FgVolumeElementOptions } from "./typeConstant";
-import { Signals } from "../../context/signalContext/SignalContext";
+import { Signals } from "../../context/signalContext/lib/typeConstant";
 
 class FgVolumeElementController extends FgVolumeElementSocket {
   constructor(

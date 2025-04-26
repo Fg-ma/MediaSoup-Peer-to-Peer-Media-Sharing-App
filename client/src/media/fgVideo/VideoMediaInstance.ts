@@ -764,6 +764,10 @@ class VideoMediaInstance {
   getVideoTime = () => {
     return this.instanceVideo?.currentTime;
   };
+
+  getAspect = () => {
+    return this.videoMedia.aspect;
+  };
 }
 
 export default VideoMediaInstance;

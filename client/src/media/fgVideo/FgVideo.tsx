@@ -220,6 +220,18 @@ export default function FgVideo({
 
   return (
     <FgMediaContainer
+      downloadingState={videoMediaInstance.videoMedia.loadingState}
+      addDownloadListener={
+        videoMediaInstance.videoMedia.loadingState === "downloading"
+          ? videoMediaInstance.videoMedia.addVideoListener
+          : undefined
+      }
+      removeDownloadListener={
+        videoMediaInstance.videoMedia.loadingState === "downloading"
+          ? videoMediaInstance.videoMedia.removeVideoListener
+          : undefined
+      }
+      getAspect={videoMediaInstance.getAspect}
       mediaId={videoMediaInstance.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
       filename={videoMediaInstance.videoMedia.filename}

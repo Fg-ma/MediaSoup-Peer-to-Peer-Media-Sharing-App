@@ -1,7 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
-import { Signals } from "../../../context/signalContext/SignalContext";
+import {
+  onInstancesLayerModeType,
+  onStartInstancesDragType,
+  Signals,
+} from "../../../context/signalContext/lib/typeConstant";
 import { InstanceType } from "../NewInstancesLayer";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { InstanceLayerModes } from "./typeConstant";
 
 class NewInstancesLayerController {
   constructor(
@@ -23,6 +28,7 @@ class NewInstancesLayerController {
       TableStaticContentSocketController | undefined
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private mode: React.MutableRefObject<InstanceLayerModes>,
   ) {}
 
   handleMouseMove = (event: MouseEvent) => {
@@ -99,9 +105,9 @@ class NewInstancesLayerController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (event.shiftKey) {
-      switch (event.key.toLowerCase()) {
-        case "x":
+    switch (event.key.toLowerCase()) {
+      case "x":
+        if (event.shiftKey) {
           this.newInstances.current = this.newInstances.current.map(
             (instance) => ({
               ...instance,
@@ -119,8 +125,10 @@ class NewInstancesLayerController {
             }),
           );
           this.setRerender((prev) => !prev);
-          break;
-        case "m":
+        }
+        break;
+      case "m":
+        if (event.shiftKey) {
           this.newInstances.current = this.newInstances.current.map(
             (instance) => {
               const diff = 10 - instance.instances.length;
@@ -143,10 +151,24 @@ class NewInstancesLayerController {
             },
           );
           this.setRerender((prev) => !prev);
-          break;
-        default:
-          break;
-      }
+        }
+        break;
+      case "delete":
+        if (this.mode.current === "paint") {
+          this.newInstances.current = [];
+          this.hideInstances.current = false;
+          this.setRerender((prev) => !prev);
+        }
+        break;
+      case "escape":
+        if (this.mode.current === "paint") {
+          this.newInstances.current = [];
+          this.hideInstances.current = false;
+          this.setRerender((prev) => !prev);
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -206,76 +228,87 @@ class NewInstancesLayerController {
     this.setRerender((prev) => !prev);
   };
 
+  onStartInstancesDrag = (event: onStartInstancesDragType) => {
+    const { instances } = event.data;
+
+    this.newInstances.current = [
+      ...this.newInstances.current,
+      ...instances.map((instance) => ({
+        contentType: instance.contentType,
+        contentId: instance.contentId,
+        instances: [
+          ...instance.instances.map((ins) => ({
+            width: ins.width,
+            height: ins.height,
+            x: 0,
+            y: 0,
+          })),
+        ],
+      })),
+    ];
+    this.setRerender((prev) => !prev);
+  };
+
+  onStopInstancesDrag = () => {
+    if (this.hideInstances.current) {
+      if (this.mode.current === "standard") {
+        this.newInstances.current = [];
+        this.hideInstances.current = false;
+      }
+      this.setRerender((prev) => !prev);
+      return;
+    }
+
+    const instancesToUpload = this.newInstances.current.map((instance) => ({
+      contentType: instance.contentType,
+      contentId: instance.contentId,
+      instances: instance.instances.map((ins) => ({
+        instanceId: uuidv4(),
+        positioning: {
+          position: {
+            left:
+              (ins.x / (this.newInstanceLayerRef.current?.clientWidth ?? 1)) *
+              100,
+            top:
+              (ins.y / (this.newInstanceLayerRef.current?.clientHeight ?? 1)) *
+              100,
+          },
+          scale: {
+            x: ins.width,
+            y: ins.height,
+          },
+          rotation: 0,
+        },
+      })),
+    }));
+
+    this.tableStaticContentSocket.current?.createNewInstances(
+      instancesToUpload,
+    );
+
+    if (this.mode.current === "standard") {
+      this.newInstances.current = [];
+      this.hideInstances.current = false;
+    }
+    this.setRerender((prev) => !prev);
+  };
+
+  onInstancesLayerMode = (event: onInstancesLayerModeType) => {
+    this.mode.current = event.data.mode;
+  };
+
   handleSignals = (event: Signals) => {
     if (!event) return;
 
     switch (event.type) {
       case "startInstancesDrag":
-        {
-          const { instances } = event.data;
-
-          this.newInstances.current = [
-            ...this.newInstances.current,
-            ...instances.map((instance) => ({
-              contentType: instance.contentType,
-              contentId: instance.contentId,
-              instances: [
-                ...instance.instances.map((ins) => ({
-                  width: ins.width,
-                  height: ins.height,
-                  x: 0,
-                  y: 0,
-                })),
-              ],
-            })),
-          ];
-          this.setRerender((prev) => !prev);
-        }
+        this.onStartInstancesDrag(event);
         break;
       case "stopInstancesDrag":
-        {
-          if (this.hideInstances.current) {
-            this.newInstances.current = [];
-            this.hideInstances.current = false;
-            this.setRerender((prev) => !prev);
-            return;
-          }
-
-          const instancesToUpload = this.newInstances.current.map(
-            (instance) => ({
-              contentType: instance.contentType,
-              contentId: instance.contentId,
-              instances: instance.instances.map((ins) => ({
-                instanceId: uuidv4(),
-                positioning: {
-                  position: {
-                    left:
-                      (ins.x /
-                        (this.newInstanceLayerRef.current?.clientWidth ?? 1)) *
-                      100,
-                    top:
-                      (ins.y /
-                        (this.newInstanceLayerRef.current?.clientHeight ?? 1)) *
-                      100,
-                  },
-                  scale: {
-                    x: ins.width,
-                    y: ins.height,
-                  },
-                  rotation: 0,
-                },
-              })),
-            }),
-          );
-
-          this.tableStaticContentSocket.current?.createNewInstances(
-            instancesToUpload,
-          );
-
-          this.newInstances.current = [];
-          this.hideInstances.current = false;
-          this.setRerender((prev) => !prev);
-        }
+        this.onStopInstancesDrag();
+        break;
+      case "instancesLayerMode":
+        this.onInstancesLayerMode(event);
         break;
       default:
         break;

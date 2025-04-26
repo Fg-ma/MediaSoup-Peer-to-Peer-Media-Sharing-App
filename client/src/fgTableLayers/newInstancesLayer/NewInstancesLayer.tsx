@@ -5,6 +5,7 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 import FgImageElement from "../../elements/fgImageElement/FgImageElement";
 import NewInstancesLayerController from "./lib/NewInstancesLayerController";
+import { InstanceLayerModes } from "./lib/typeConstant";
 
 export type InstanceType = {
   contentType: StaticContentTypes;
@@ -30,6 +31,7 @@ export default function NewInstancesLayer({
   const hideInstances = useRef(false);
   const newInstances = useRef<InstanceType[]>([]);
   const newInstanceLayerRef = useRef<HTMLDivElement>(null);
+  const mode = useRef<InstanceLayerModes>("standard");
 
   const [_, setRerender] = useState(false);
 
@@ -42,6 +44,7 @@ export default function NewInstancesLayer({
     setMousePosition,
     tableStaticContentSocket,
     setRerender,
+    mode,
   );
 
   const instanceStructureKey = useMemo(() => {
@@ -95,6 +98,24 @@ export default function NewInstancesLayer({
       newInstancesLayerController.placeInstances();
     }
   }, [mousePosition, instanceStructureKey]);
+
+  useEffect(() => {
+    if (mode.current === "paint") {
+      document.addEventListener(
+        "pointerdown",
+        newInstancesLayerController.onStopInstancesDrag,
+      );
+    }
+
+    return () => {
+      if (mode.current === "paint") {
+        document.removeEventListener(
+          "pointerdown",
+          newInstancesLayerController.onStopInstancesDrag,
+        );
+      }
+    };
+  }, [mode.current]);
 
   return (
     <div

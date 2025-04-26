@@ -1,7 +1,7 @@
 import React from "react";
-import { TableColors } from "../../serverControllers/tableServer/lib/typeConstant";
-import UserBubble from "./UserBubble";
-import { tableColorMap } from "./tableColors";
+import { TableColors } from "../../../serverControllers/tableServer/lib/typeConstant";
+import UserBubble from "../UserBubble";
+import { tableColorMap } from "../tableColors";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -10,7 +10,7 @@ const alien_960x960 =
 const alien_64x64 =
   nginxAssetServerBaseUrl + "backgroundImages/space/alien_64x64.jpg";
 
-export default function LeftTableSection({
+export default function BottomTableSection({
   userData,
   tableContainerRef,
 }: {
@@ -25,33 +25,37 @@ export default function LeftTableSection({
 }) {
   const minDimension = Math.min(
     tableContainerRef.current?.clientWidth ?? 0,
-    tableContainerRef.current?.clientHeight ?? 0
+    tableContainerRef.current?.clientHeight ?? 0,
   );
-  const leftSeats = [13, 14, 15, 16];
-  const leftUsers = Object.entries(userData).filter((data) =>
-    leftSeats.includes(data[1].seat)
+  const bottomSeats = [9, 10, 11, 12];
+  const bottomUsers = Object.entries(userData).filter((data) =>
+    bottomSeats.includes(data[1].seat),
   );
 
   return (
     <div
-      className={`w-max max-w-[8%] h-full flex flex-col items-center ${
-        leftUsers.length > 1 ? "justify-between" : "justify-center"
+      className={`flex h-max w-full items-center ${
+        bottomUsers.length > 1 ? "justify-between" : "justify-center"
       }`}
       style={{
-        maxWidth: `${minDimension * 0.08}px`,
-        ...(leftUsers.length !== 0 && {
-          marginRight: `${minDimension * 0.01}px`,
+        maxHeight: `${minDimension * 0.08}px`,
+        ...(Object.keys(userData).length >= 4 && {
+          paddingLeft: `${minDimension * 0.08}px`,
+          paddingRight: `${minDimension * 0.08}px`,
+        }),
+        ...(bottomUsers.length !== 0 && {
+          marginTop: `${minDimension * 0.01}px`,
         }),
       }}
     >
       <div></div>
-      {leftUsers.map((user) => (
+      {bottomUsers.map((user) => (
         <UserBubble
           key={user[0]}
           username={user[0]}
           userData={userData}
-          fullDim='width'
-          placement='left'
+          fullDim="height"
+          placement="bottom"
           src={alien_960x960}
           srcLoading={alien_64x64}
           primaryColor={tableColorMap[user[1].color].primary}

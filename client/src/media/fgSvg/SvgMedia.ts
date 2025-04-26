@@ -17,10 +17,10 @@ class SvgMedia {
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   blobURL: string | undefined;
+  loadingState: "downloading" | "downloaded" = "downloading";
+  aspect: number | undefined;
 
   private svgListeners: Set<(message: SvgListenerTypes) => void> = new Set();
-
-  aspect: number | undefined;
 
   constructor(
     public svgId: string,
@@ -115,6 +115,8 @@ class SvgMedia {
       this.svg.setAttribute("width", "auto");
 
       this.aspect = this.getSvgAspectRatio();
+
+      this.loadingState = "downloaded";
 
       this.svgListeners.forEach((listener) => {
         listener({ type: "downloadComplete" });

@@ -15,11 +15,7 @@ class MediaContainerController {
     private mediaId: string,
     private mediaInstanceId: string,
     private kind: StaticContentTypes,
-    private rootMedia:
-      | HTMLVideoElement
-      | HTMLImageElement
-      | SVGSVGElement
-      | undefined,
+    private getAspect: (() => number | undefined) | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: () => void;
@@ -47,7 +43,7 @@ class MediaContainerController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private lowerController: LowerController
+    private lowerController: LowerController,
   ) {}
 
   handlePointerMove = () => {
@@ -68,7 +64,7 @@ class MediaContainerController {
 
     this.mediaContainerRef.current?.addEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.leaveTimer.current) {
@@ -80,7 +76,7 @@ class MediaContainerController {
   handlePointerLeave = () => {
     this.mediaContainerRef.current?.removeEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.mediaContainerRef.current) {
@@ -95,37 +91,25 @@ class MediaContainerController {
     }, this.mediaContainerOptions.controlsVanishTime);
   };
 
-  handleMetadataLoaded = () => {
-    if (!this.rootMedia) return;
+  downloadListener = (
+    message: { type: "downloadComplete" } | { type: string },
+  ) => {
+    if (message.type === "downloadComplete" && this.getAspect) {
+      this.aspectRatio.current = this.getAspect();
 
-    const width =
-      this.rootMedia instanceof HTMLVideoElement
-        ? this.rootMedia.videoWidth
-        : this.rootMedia instanceof SVGSVGElement
-        ? this.rootMedia.width.baseVal.value
-        : this.rootMedia.width;
-    const height =
-      this.rootMedia instanceof HTMLVideoElement
-        ? this.rootMedia.videoHeight
-        : this.rootMedia instanceof SVGSVGElement
-        ? this.rootMedia.height.baseVal.value
-        : this.rootMedia.height;
+      if (this.aspectRatio.current) {
+        this.positioning.current.scale.y =
+          this.positioning.current.scale.x / this.aspectRatio.current;
 
-    if (width && height) {
-      const computedAspectRatio = width / height;
-      this.positioning.current.scale.y =
-        this.positioning.current.scale.x / computedAspectRatio;
+        this.setRerender((prev) => !prev);
 
-      this.aspectRatio.current = computedAspectRatio;
-
-      this.setRerender((prev) => !prev);
-
-      this.tableStaticContentSocket.current?.updateContentPositioning(
-        this.kind,
-        this.mediaId,
-        this.mediaInstanceId,
-        { position: this.positioning.current.position }
-      );
+        this.tableStaticContentSocket.current?.updateContentPositioning(
+          this.kind,
+          this.mediaId,
+          this.mediaInstanceId,
+          { position: this.positioning.current.position },
+        );
+      }
     }
   };
 
@@ -142,7 +126,7 @@ class MediaContainerController {
 
   attachPositioningListeners = () => {
     Object.values(this.positioningListeners.current).forEach((userListners) =>
-      Object.values(userListners).forEach((removeListener) => removeListener())
+      Object.values(userListners).forEach((removeListener) => removeListener()),
     );
     this.positioningListeners.current = {};
 
@@ -193,7 +177,7 @@ class MediaContainerController {
       this.lowerController.reactController.handleReaction(
         reaction,
         false,
-        reactionStyle
+        reactionStyle,
       );
     }
   };

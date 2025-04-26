@@ -112,7 +112,7 @@ class FgLowerVisualMediaController {
     }>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private initTimeOffset: React.MutableRefObject<number>,
-    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -334,14 +334,14 @@ class FgLowerVisualMediaController {
         this.volumeControl(-0.05);
         break;
       case "s":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "scale",
         );
         document.addEventListener("pointermove", this.scaleFuntion);
         document.addEventListener("pointerdown", this.scaleFunctionEnd);
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "position",
           { rotationPointPlacement: "topLeft" },
         );
@@ -349,7 +349,7 @@ class FgLowerVisualMediaController {
         document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "rotation",
         );
         document.addEventListener("pointermove", this.rotateFunction);
@@ -361,19 +361,19 @@ class FgLowerVisualMediaController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.scaleFuntion);
     document.removeEventListener("pointerdown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.rotateFunction);
     document.removeEventListener("pointerdown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.moveFunction);
     document.removeEventListener("pointerdown", this.moveFunctionEnd);
   };
@@ -399,7 +399,7 @@ class FgLowerVisualMediaController {
 
     const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
 
-    this.fgContentAdjustmentController.movementDragFunction(
+    this.fgContentAdjustmentController.current?.movementDragFunction(
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -423,7 +423,7 @@ class FgLowerVisualMediaController {
           this.bundleRef.current.clientHeight,
       },
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   scaleFuntion = (event: PointerEvent) => {
@@ -442,7 +442,7 @@ class FgLowerVisualMediaController {
         this.bundleRef.current.clientHeight,
     };
 
-    this.fgContentAdjustmentController.scaleDragFunction(
+    this.fgContentAdjustmentController.current?.scaleDragFunction(
       "aspect",
       {
         x: event.clientX - rect.left,
@@ -452,7 +452,7 @@ class FgLowerVisualMediaController {
       referencePoint,
       this.aspectRatio.current,
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   rotateFunction = (event: PointerEvent) => {
@@ -462,7 +462,7 @@ class FgLowerVisualMediaController {
 
     const box = this.bundleRef.current.getBoundingClientRect();
 
-    this.fgContentAdjustmentController.rotateDragFunction(event, {
+    this.fgContentAdjustmentController.current?.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
           this.bundleRef.current.clientWidth +
@@ -472,7 +472,7 @@ class FgLowerVisualMediaController {
           this.bundleRef.current.clientHeight +
         box.top,
     });
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   volumeControl = (volumeChangeAmount: number) => {

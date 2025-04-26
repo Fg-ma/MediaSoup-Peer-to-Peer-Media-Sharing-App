@@ -26,7 +26,7 @@ class LowerController {
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
-    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -92,7 +92,7 @@ class LowerController {
         if (this.scaling) {
           this.scaleFunctionEnd();
         } else {
-          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "scale",
           );
           document.addEventListener("pointermove", this.scaleFuntion);
@@ -104,7 +104,7 @@ class LowerController {
         if (this.moving) {
           this.moveFunctionEnd();
         } else {
-          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "position",
             { rotationPointPlacement: "topLeft" },
           );
@@ -117,7 +117,7 @@ class LowerController {
         if (this.rotating) {
           this.rotateFunctionEnd();
         } else {
-          this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "rotation",
           );
           document.addEventListener("pointermove", this.rotateFunction);
@@ -136,7 +136,7 @@ class LowerController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.scaleFuntion);
     document.removeEventListener("pointerdown", this.scaleFunctionEnd);
 
@@ -149,7 +149,7 @@ class LowerController {
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.rotateFunction);
     document.removeEventListener("pointerdown", this.rotateFunctionEnd);
 
@@ -162,7 +162,7 @@ class LowerController {
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.moveFunction);
     document.removeEventListener("pointerdown", this.moveFunctionEnd);
 
@@ -195,7 +195,7 @@ class LowerController {
 
     const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
 
-    this.fgContentAdjustmentController.movementDragFunction(
+    this.fgContentAdjustmentController.current?.movementDragFunction(
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -219,7 +219,7 @@ class LowerController {
           this.bundleRef.current.clientHeight,
       },
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   scaleFuntion = (event: PointerEvent) => {
@@ -238,7 +238,7 @@ class LowerController {
         this.bundleRef.current.clientHeight,
     };
 
-    this.fgContentAdjustmentController.scaleDragFunction(
+    this.fgContentAdjustmentController.current?.scaleDragFunction(
       this.mediaContainerOptions.resizeType ?? "aspect",
       {
         x: event.clientX - rect.left,
@@ -248,7 +248,7 @@ class LowerController {
       referencePoint,
       this.aspectRatio.current,
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   rotateFunction = (event: PointerEvent) => {
@@ -258,7 +258,7 @@ class LowerController {
 
     const box = this.bundleRef.current.getBoundingClientRect();
 
-    this.fgContentAdjustmentController.rotateDragFunction(event, {
+    this.fgContentAdjustmentController.current?.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
           this.bundleRef.current.clientWidth +
@@ -268,7 +268,7 @@ class LowerController {
           this.bundleRef.current.clientHeight +
         box.top,
     });
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   handleClose = () => {

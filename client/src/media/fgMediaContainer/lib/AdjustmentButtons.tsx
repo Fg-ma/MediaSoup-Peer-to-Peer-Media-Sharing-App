@@ -35,7 +35,7 @@ export default function AdjustmentButtons({
     };
     rotation: number;
   }>;
-  fgContentAdjustmentController: FgContentAdjustmentController;
+  fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>;
   tableStaticContentSocket: React.MutableRefObject<
     TableStaticContentSocketController | undefined
   >;
@@ -45,7 +45,7 @@ export default function AdjustmentButtons({
   return (
     <>
       <RotateButton
-        className='rotate-btn absolute left-full bottom-full aspect-square z-10 w-[10%] min-w-8 max-w-12'
+        className="rotate-btn absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
             return;
@@ -53,7 +53,7 @@ export default function AdjustmentButtons({
 
           const box = bundleRef.current.getBoundingClientRect();
 
-          fgContentAdjustmentController.rotateDragFunction(event, {
+          fgContentAdjustmentController.current?.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
                 bundleRef.current.clientWidth +
@@ -65,23 +65,23 @@ export default function AdjustmentButtons({
           });
         }}
         bundleRef={bundleRef}
-        pointerDownFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
         pointerUpFunction={() => {
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
 
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
             mediaInstanceId,
-            { rotation: positioning.current.rotation }
+            { rotation: positioning.current.rotation },
           );
         }}
       />
       <PanButton
         externalRef={panBtnRef}
-        className='pan-btn absolute left-full top-1/2 -translate-y-1/2 aspect-square z-10 pl-1 w-[10%] min-w-7 max-w-[2.75rem]'
+        className="pan-btn absolute left-full top-1/2 z-10 aspect-square w-[10%] min-w-7 max-w-[2.75rem] -translate-y-1/2 pl-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -101,7 +101,7 @@ export default function AdjustmentButtons({
 
           const buttonWidth = (panBtnRef.current?.clientWidth ?? 0) / 2;
 
-          fgContentAdjustmentController.movementDragFunction(
+          fgContentAdjustmentController.current?.movementDragFunction(
             displacement,
             {
               x:
@@ -120,29 +120,29 @@ export default function AdjustmentButtons({
               y:
                 (positioning.current.position.top / 100) *
                 bundleRef.current.clientHeight,
-            }
+            },
           );
         }}
         bundleRef={bundleRef}
         pointerDownFunction={() =>
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "position",
-            { rotationPointPlacement: "topLeft" }
+            { rotationPointPlacement: "topLeft" },
           )
         }
         pointerUpFunction={() => {
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
 
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
             mediaInstanceId,
-            { position: positioning.current.position }
+            { position: positioning.current.position },
           );
         }}
       />
       <ScaleButton
-        className='scale-btn absolute left-full top-full aspect-square z-10 pl-1 pt-1 w-[10%] min-w-6 max-w-10'
+        className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -157,26 +157,26 @@ export default function AdjustmentButtons({
               bundleRef.current.clientHeight,
           };
 
-          fgContentAdjustmentController.scaleDragFunction(
+          fgContentAdjustmentController.current?.scaleDragFunction(
             mediaContainerOptions.resizeType ?? "aspect",
             displacement,
             referencePoint,
             referencePoint,
-            aspectRatio.current
+            aspectRatio.current,
           );
         }}
         bundleRef={bundleRef}
-        pointerDownFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
         pointerUpFunction={() => {
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
 
           tableStaticContentSocket.current?.updateContentPositioning(
             kind,
             mediaId,
             mediaInstanceId,
-            { scale: positioning.current.scale }
+            { scale: positioning.current.scale },
           );
         }}
       />

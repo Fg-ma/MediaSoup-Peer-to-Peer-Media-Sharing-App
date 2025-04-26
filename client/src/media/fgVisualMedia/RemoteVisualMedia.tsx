@@ -236,12 +236,15 @@ export default function RemoteVisualMedia({
     }
   };
 
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender,
-  );
+  const fgContentAdjustmentController =
+    useRef<FgContentAdjustmentController | null>(null);
+  if (!fgContentAdjustmentController.current)
+    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+      bundleRef,
+      positioning,
+      setAdjustingDimensions,
+      setRerender,
+    );
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
     mediasoupSocket,

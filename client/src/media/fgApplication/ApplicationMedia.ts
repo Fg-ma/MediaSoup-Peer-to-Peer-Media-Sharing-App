@@ -17,6 +17,7 @@ class ApplicationMedia {
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   blobURL: string | undefined;
+  loadingState: "downloading" | "downloaded" = "downloading";
   aspect: number | undefined;
 
   private applicationListeners: Set<
@@ -101,6 +102,7 @@ class ApplicationMedia {
       this.application.onload = () => {
         this.aspect =
           (this.application?.width ?? 1) / (this.application?.height ?? 1);
+        this.loadingState = "downloading";
 
         this.applicationListeners.forEach((listener) => {
           listener({ type: "downloadComplete" });

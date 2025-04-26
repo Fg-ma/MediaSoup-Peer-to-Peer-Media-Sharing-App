@@ -6,15 +6,17 @@ import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElemen
 import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../fgTableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../fgTableLayers/newInstancesLayer/NewInstancesLayer";
+import SelectTableLayer from "../fgTableLayers/selectTableLayer/SelectTableLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
 import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
-import LeftTableSection from "./lib/LeftTableSection";
-import RightTableSection from "./lib/RightTableSection";
-import TopTableSection from "./lib/TopTableSection";
-import BottomTableSection from "./lib/BottomTableSection";
+import LeftTableSection from "./lib/sideSections/LeftTableSection";
+import RightTableSection from "./lib/sideSections/RightTableSection";
+import TopTableSection from "./lib/sideSections/TopTableSection";
+import BottomTableSection from "./lib/sideSections/BottomTableSection";
 import { TableColors } from "../serverControllers/tableServer/lib/typeConstant";
 import "./lib/fgTable.css";
+import TableInfoPopup from "./lib/tableInfoPopup/TableInfoPopup";
 
 export default function FgTable({
   tableRef,
@@ -115,54 +117,64 @@ export default function FgTable({
           direction={aspectDir.current === "width" ? "vertical" : "horizontal"}
           scrollingContentRef={tableRef}
           content={
-            <div
-              ref={tableRef}
-              className={`fg-table relative h-full w-full rounded-md border-[2px] border-fg-off-white ${
-                aspectDir.current === "width"
-                  ? "overflow-y-auto"
-                  : "overflow-x-auto"
-              }`}
-            >
+            <>
+              <TableInfoPopup />
               <div
-                ref={tableTopRef}
-                className="relative aspect-square overflow-hidden bg-fg-tone-black-6"
-                style={{
-                  ...(aspectDir.current === "width"
-                    ? { width: "100%" }
-                    : { height: "100%" }),
-                }}
+                ref={tableRef}
+                className={`fg-table relative h-full w-full rounded-md border-[2px] border-fg-off-white ${
+                  aspectDir.current === "width"
+                    ? "overflow-y-auto"
+                    : "overflow-x-auto"
+                }`}
               >
-                <UploadTableLayer />
-                <NewInstancesLayer tableRef={tableRef} />
-                {gridActive && (
-                  <TableGridOverlay
-                    gridSize={gridSize}
+                <div
+                  ref={tableTopRef}
+                  className="relative aspect-square overflow-hidden bg-fg-tone-black-6"
+                  style={{
+                    ...(aspectDir.current === "width"
+                      ? { width: "100%" }
+                      : { height: "100%" }),
+                  }}
+                >
+                  <SelectTableLayer
+                    tableContainerRef={tableContainerRef}
+                    tableRef={tableRef}
                     tableTopRef={tableTopRef}
-                    gridColor="#fff"
                   />
-                )}
-                <SharedBundle
-                  userDevice={userDevice}
-                  deadbanding={deadbanding}
-                  tableRef={tableRef}
-                />
-                {bundles &&
-                  Object.keys(bundles).length !== 0 &&
-                  Object.keys(bundles).map(
-                    (username) =>
-                      Object.keys(bundles[username]).length !== 0 &&
-                      Object.entries(bundles[username]).map(([key, bundle]) => (
-                        <div
-                          className="pointer-events-none absolute left-0 top-0 h-full w-full"
-                          key={key}
-                          id={`${key}_bundle`}
-                        >
-                          {bundle}
-                        </div>
-                      )),
+                  <UploadTableLayer />
+                  <NewInstancesLayer tableRef={tableRef} />
+                  {gridActive && (
+                    <TableGridOverlay
+                      gridSize={gridSize}
+                      tableTopRef={tableTopRef}
+                      gridColor="#fff"
+                    />
                   )}
+                  <SharedBundle
+                    userDevice={userDevice}
+                    deadbanding={deadbanding}
+                    tableRef={tableRef}
+                  />
+                  {bundles &&
+                    Object.keys(bundles).length !== 0 &&
+                    Object.keys(bundles).map(
+                      (username) =>
+                        Object.keys(bundles[username]).length !== 0 &&
+                        Object.entries(bundles[username]).map(
+                          ([key, bundle]) => (
+                            <div
+                              className="pointer-events-none absolute left-0 top-0 h-full w-full"
+                              key={key}
+                              id={`${key}_bundle`}
+                            >
+                              {bundle}
+                            </div>
+                          ),
+                        ),
+                    )}
+                </div>
               </div>
-            </div>
+            </>
           }
           style={{
             width: "100%",

@@ -155,6 +155,18 @@ export default function FgImage({
 
   return (
     <FgMediaContainer
+      downloadingState={imageMediaInstance.imageMedia.loadingState}
+      addDownloadListener={
+        imageMediaInstance.imageMedia.loadingState === "downloading"
+          ? imageMediaInstance.imageMedia.addImageListener
+          : undefined
+      }
+      removeDownloadListener={
+        imageMediaInstance.imageMedia.loadingState === "downloading"
+          ? imageMediaInstance.imageMedia.removeImageListener
+          : undefined
+      }
+      getAspect={imageMediaInstance.getAspect}
       mediaId={imageMediaInstance.imageMedia.imageId}
       mediaInstanceId={imageInstanceId}
       filename={imageMediaInstance.imageMedia.filename}

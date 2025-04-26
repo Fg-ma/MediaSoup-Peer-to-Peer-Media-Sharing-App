@@ -61,7 +61,7 @@ class FgAudioElementContainerController {
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private isAudio: React.MutableRefObject<boolean>,
     private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
   ) {
     this.reactController = new ReactController(
@@ -253,14 +253,14 @@ class FgAudioElementContainerController {
         this.handleClose();
         break;
       case "s":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "scale",
         );
         document.addEventListener("pointermove", this.scaleFuntion);
         document.addEventListener("pointerdown", this.scaleFunctionEnd);
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "position",
           { rotationPointPlacement: "topLeft" },
         );
@@ -268,7 +268,7 @@ class FgAudioElementContainerController {
         document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "rotation",
         );
         document.addEventListener("pointermove", this.rotateFunction);
@@ -280,19 +280,19 @@ class FgAudioElementContainerController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.scaleFuntion);
     document.removeEventListener("pointerdown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.rotateFunction);
     document.removeEventListener("pointerdown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.moveFunction);
     document.removeEventListener("pointerdown", this.moveFunctionEnd);
   };
@@ -313,7 +313,7 @@ class FgAudioElementContainerController {
 
     const rect = this.bundleRef.current.getBoundingClientRect();
 
-    this.fgContentAdjustmentController.movementDragFunction(
+    this.fgContentAdjustmentController.current?.movementDragFunction(
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -333,7 +333,7 @@ class FgAudioElementContainerController {
       },
     );
 
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
       "position",
       { rotationPointPlacement: "middleLeft" },
     );
@@ -358,7 +358,7 @@ class FgAudioElementContainerController {
         this.bundleRef.current.clientHeight,
     };
 
-    this.fgContentAdjustmentController.scaleDragFunction(
+    this.fgContentAdjustmentController.current?.scaleDragFunction(
       "square",
       {
         x: event.clientX - rect.left + Math.sin(angle) * (pixelScale.x / 2),
@@ -383,7 +383,7 @@ class FgAudioElementContainerController {
       },
     );
 
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
       "scale",
     );
   };
@@ -404,7 +404,7 @@ class FgAudioElementContainerController {
 
     const box = this.bundleRef.current.getBoundingClientRect();
 
-    this.fgContentAdjustmentController.rotateDragFunction(event, {
+    this.fgContentAdjustmentController.current?.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
           this.bundleRef.current.clientWidth +
@@ -415,7 +415,7 @@ class FgAudioElementContainerController {
         box.top +
         pixelScale.y / 2,
     });
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 }
 

@@ -840,6 +840,10 @@ class SvgMediaInstance {
       console.error("Failed to copy SVG to clipboard:", error);
     }
   };
+
+  getAspect = () => {
+    return this.svgMedia.aspect;
+  };
 }
 
 export default SvgMediaInstance;

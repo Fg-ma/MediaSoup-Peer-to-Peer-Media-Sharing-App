@@ -17,6 +17,7 @@ class ImageMedia {
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   blobURL: string | undefined;
+  loadingState: "downloading" | "downloaded" = "downloading";
   aspect: number | undefined;
 
   private imageListeners: Set<(message: ImageListenerTypes) => void> =
@@ -97,6 +98,8 @@ class ImageMedia {
 
       this.image.onload = () => {
         this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
+
+        this.loadingState = "downloaded";
 
         this.imageListeners.forEach((listener) => {
           listener({ type: "downloadComplete" });

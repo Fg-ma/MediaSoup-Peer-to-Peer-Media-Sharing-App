@@ -52,13 +52,13 @@ class FgContentAdjustmentController {
     private setAdjustingDimensions: React.Dispatch<
       React.SetStateAction<boolean>
     >,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   movementDragFunction = (
     displacement: { x: number; y: number },
     referencePoint: { x: number; y: number },
-    rotationPoint: { x: number; y: number }
+    rotationPoint: { x: number; y: number },
   ) => {
     if (!this.bundleRef.current) {
       return;
@@ -87,7 +87,7 @@ class FgContentAdjustmentController {
       pixelScale.x,
       pixelScale.y,
       rotationPoint.x,
-      rotationPoint.y
+      rotationPoint.y,
     );
 
     if (!isOutside) {
@@ -107,14 +107,14 @@ class FgContentAdjustmentController {
             (left / this.bundleRef.current.clientWidth) * 100 > this.maxLeft
               ? this.maxLeft
               : (left / this.bundleRef.current.clientWidth) * 100 < this.minLeft
-              ? this.minLeft
-              : (left / this.bundleRef.current.clientWidth) * 100,
+                ? this.minLeft
+                : (left / this.bundleRef.current.clientWidth) * 100,
           top:
             (top / this.bundleRef.current.clientHeight) * 100 > this.maxTop
               ? this.maxTop
               : (top / this.bundleRef.current.clientHeight) * 100 < this.minTop
-              ? this.minTop
-              : (top / this.bundleRef.current.clientHeight) * 100,
+                ? this.minTop
+                : (top / this.bundleRef.current.clientHeight) * 100,
         },
       };
       this.setRerender((prev) => !prev);
@@ -126,12 +126,11 @@ class FgContentAdjustmentController {
     displacement: { x: number; y: number },
     referencePoint: { x: number; y: number },
     rotationPoint: { x: number; y: number },
-    aspectRatio?: number
+    aspectRatio?: number,
   ) => {
     if (!this.bundleRef.current) {
       return;
     }
-
     const { x: referenceX, y: referenceY } = referencePoint;
 
     let theta =
@@ -164,7 +163,7 @@ class FgContentAdjustmentController {
     if (ACrossB < 0) {
       height = Math.max(
         2,
-        (BPerpMag / this.bundleRef.current.clientHeight) * 100
+        (BPerpMag / this.bundleRef.current.clientHeight) * 100,
       );
     } else {
       height = 2;
@@ -199,7 +198,7 @@ class FgContentAdjustmentController {
         ? Math.max(ADotB, BPerpMag)
         : (height * this.bundleRef.current.clientHeight) / 100,
       rotationPoint.x,
-      rotationPoint.y
+      rotationPoint.y,
     );
 
     if (!isOutside) {
@@ -223,11 +222,11 @@ class FgContentAdjustmentController {
           rotationPoint.x,
           rotationPoint.y,
           0,
-          0
+          0,
         ) /
           Math.max(
             this.bundleRef.current.clientHeight,
-            this.bundleRef.current.clientWidth
+            this.bundleRef.current.clientWidth,
           )) *
         100;
 
@@ -248,7 +247,7 @@ class FgContentAdjustmentController {
         (this.positioning.current.scale.y / 100) *
           this.bundleRef.current.clientHeight,
         referenceX,
-        referenceY
+        referenceY,
       );
 
       if (!isWidthOutside) {
@@ -261,7 +260,7 @@ class FgContentAdjustmentController {
             rotationPoint.y,
             (this.positioning.current.scale.y / 100) *
               this.bundleRef.current.clientHeight,
-            aspectRatio ?? 1
+            aspectRatio ?? 1,
           ) /
             this.bundleRef.current.clientHeight) *
           100;
@@ -286,7 +285,7 @@ class FgContentAdjustmentController {
             this.bundleRef.current.clientWidth,
           BPerpMag,
           referenceX,
-          referenceY
+          referenceY,
         );
 
         if (!isHeightOutside) {
@@ -299,7 +298,7 @@ class FgContentAdjustmentController {
               rotationPoint.y,
               (this.positioning.current.scale.x / 100) *
                 this.bundleRef.current.clientWidth,
-              aspectRatio ?? 1
+              aspectRatio ?? 1,
             ) /
               this.bundleRef.current.clientWidth) *
             100;
@@ -326,7 +325,7 @@ class FgContentAdjustmentController {
         (this.positioning.current.scale.y / 100) *
           this.bundleRef.current.clientHeight,
         referenceX,
-        referenceY
+        referenceY,
       );
 
       if (!isWidthOutside) {
@@ -339,7 +338,7 @@ class FgContentAdjustmentController {
             rotationPoint.y,
             ADotB,
             (this.positioning.current.scale.y / 100) *
-              this.bundleRef.current.clientHeight
+              this.bundleRef.current.clientHeight,
           ) /
             this.bundleRef.current.clientHeight) *
           100;
@@ -362,7 +361,7 @@ class FgContentAdjustmentController {
             this.bundleRef.current.clientWidth,
           BPerpMag,
           referenceX,
-          referenceY
+          referenceY,
         );
 
         if (!isHeightOutside) {
@@ -375,7 +374,7 @@ class FgContentAdjustmentController {
               rotationPoint.y,
               (this.positioning.current.scale.x / 100) *
                 this.bundleRef.current.clientWidth,
-              BPerpMag
+              BPerpMag,
             ) /
               this.bundleRef.current.clientWidth) *
             100;
@@ -395,7 +394,7 @@ class FgContentAdjustmentController {
 
   rotateDragFunction = (
     event: PointerEvent,
-    referencePoint: { x: number; y: number }
+    referencePoint: { x: number; y: number },
   ) => {
     if (!this.bundleRef.current) {
       return;
@@ -421,7 +420,7 @@ class FgContentAdjustmentController {
       (this.positioning.current.scale.y / 100) *
         this.bundleRef.current.clientHeight,
       referenceX - box.left,
-      referenceY - box.top
+      referenceY - box.top,
     );
 
     if (!isOutside) {
@@ -438,7 +437,7 @@ class FgContentAdjustmentController {
     py: number,
     cx: number,
     cy: number,
-    angle: number
+    angle: number,
   ) => {
     const cosTheta = Math.cos(angle);
     const sinTheta = Math.sin(angle);
@@ -460,7 +459,7 @@ class FgContentAdjustmentController {
     width: number, // Width of Box 2
     height: number, // Height of Box 2
     rotatePointX: number, // X-coordinate of the rotation point
-    rotatePointY: number // Y-coordinate of the rotation point
+    rotatePointY: number, // Y-coordinate of the rotation point
   ) => {
     const corners = [
       [x1, y1], // Top-left
@@ -471,7 +470,7 @@ class FgContentAdjustmentController {
 
     // Rotate each corner around the given rotation point
     const rotatedCorners = corners.map(([px, py]) =>
-      this.rotatePoint(px, py, rotatePointX, rotatePointY, -theta)
+      this.rotatePoint(px, py, rotatePointX, rotatePointY, -theta),
     );
 
     // Check if any corner is outside the bounding box
@@ -499,7 +498,7 @@ class FgContentAdjustmentController {
     width: number,
     height: number,
     cx: number,
-    cy: number
+    cy: number,
   ): { max: number; min: number } => {
     if (!this.bundleRef.current) {
       return { max: -1, min: -1 };
@@ -520,7 +519,7 @@ class FgContentAdjustmentController {
 
     // Rotate all corners around the point (cx, cy)
     const rotatedCorners = corners.map(([px, py]) =>
-      this.rotatePoint(px, py, cx, cy, -theta)
+      this.rotatePoint(px, py, cx, cy, -theta),
     );
 
     // Compute the minimum and maximum y-coordinates of the rotated corners
@@ -550,7 +549,7 @@ class FgContentAdjustmentController {
     width: number,
     height: number,
     cx: number,
-    cy: number
+    cy: number,
   ): { max: number; min: number } => {
     if (!this.bundleRef.current) {
       return { max: -1, min: -1 };
@@ -571,7 +570,7 @@ class FgContentAdjustmentController {
 
     // Rotate all corners around the point (cx, cy)
     const rotatedCorners = corners.map(([px, py]) =>
-      this.rotatePoint(px, py, cx, cy, -theta)
+      this.rotatePoint(px, py, cx, cy, -theta),
     );
 
     // Compute the minimum and maximum x-coordinates of the rotated corners
@@ -603,7 +602,7 @@ class FgContentAdjustmentController {
     rotationPointX: number,
     rotationPointY: number,
     width: number,
-    height: number
+    height: number,
   ) => {
     let isOutside = false;
     let i = -8;
@@ -620,7 +619,7 @@ class FgContentAdjustmentController {
         startDim + i,
         startDim + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -638,7 +637,7 @@ class FgContentAdjustmentController {
         startDim + i,
         startDim + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -652,7 +651,7 @@ class FgContentAdjustmentController {
     rotationPointX: number,
     rotationPointY: number,
     startWidth: number,
-    height: number
+    height: number,
   ) => {
     let isOutside = false;
     let i = -4;
@@ -667,7 +666,7 @@ class FgContentAdjustmentController {
         startWidth + i,
         height,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -685,7 +684,7 @@ class FgContentAdjustmentController {
         startWidth + i,
         height,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -699,7 +698,7 @@ class FgContentAdjustmentController {
     rotationPointX: number,
     rotationPointY: number,
     width: number,
-    startHeight: number
+    startHeight: number,
   ) => {
     let isOutside = false;
     let i = -4;
@@ -714,7 +713,7 @@ class FgContentAdjustmentController {
         width,
         startHeight + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -732,7 +731,7 @@ class FgContentAdjustmentController {
         width,
         startHeight + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -746,7 +745,7 @@ class FgContentAdjustmentController {
     rotationPointX: number,
     rotationPointY: number,
     startWidth: number,
-    aspectRatio: number
+    aspectRatio: number,
   ) => {
     let isOutside = false;
     let i = -4;
@@ -761,7 +760,7 @@ class FgContentAdjustmentController {
         startWidth + i,
         (startWidth + i) / aspectRatio,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -779,7 +778,7 @@ class FgContentAdjustmentController {
         startWidth + i,
         (startWidth + i) / aspectRatio,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -793,7 +792,7 @@ class FgContentAdjustmentController {
     rotationPointX: number,
     rotationPointY: number,
     startHeight: number,
-    aspectRatio: number
+    aspectRatio: number,
   ) => {
     let isOutside = false;
     let i = -4;
@@ -808,7 +807,7 @@ class FgContentAdjustmentController {
         (startHeight + i) * aspectRatio,
         startHeight + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -826,7 +825,7 @@ class FgContentAdjustmentController {
         (startHeight + i) * aspectRatio,
         startHeight + i,
         rotationPointX,
-        rotationPointY
+        rotationPointY,
       );
     }
 
@@ -835,7 +834,7 @@ class FgContentAdjustmentController {
 
   private calculateRotationAngle = (
     pointOfRotation: { x: number; y: number },
-    pointer: { x: number; y: number }
+    pointer: { x: number; y: number },
   ) => {
     // Calculate the target vector from point of rotation to the pointer
     const targetVectorX = pointer.x - pointOfRotation.x;
@@ -853,7 +852,7 @@ class FgContentAdjustmentController {
 
   adjustmentBtnPointerDownFunction = (
     kind?: AdjustmentTypes,
-    details?: AdjustmentBtnPointerDownDetails
+    details?: AdjustmentBtnPointerDownDetails,
   ) => {
     if (kind === "position") {
       if (details && details.rotationPointPlacement) {
@@ -880,7 +879,7 @@ class FgContentAdjustmentController {
           boundaryCheckingRotationPointMap[details.rotationPointPlacement].x *
             pixelScale.x,
           boundaryCheckingRotationPointMap[details.rotationPointPlacement].y *
-            pixelScale.y
+            pixelScale.y,
         );
 
         this.maxLeft = (leftMax / this.bundleRef.current.clientWidth) * 100;
@@ -893,7 +892,7 @@ class FgContentAdjustmentController {
           boundaryCheckingRotationPointMap[details.rotationPointPlacement].x *
             pixelScale.x,
           boundaryCheckingRotationPointMap[details.rotationPointPlacement].y *
-            pixelScale.y
+            pixelScale.y,
         );
 
         this.maxTop = (topMax / this.bundleRef.current.clientHeight) * 100;

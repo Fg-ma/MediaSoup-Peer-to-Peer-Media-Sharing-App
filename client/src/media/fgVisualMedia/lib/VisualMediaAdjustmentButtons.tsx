@@ -24,13 +24,13 @@ export default function VisualMediaAdjustmentButtons({
     };
     rotation: number;
   }>;
-  fgContentAdjustmentController: FgContentAdjustmentController;
+  fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>;
   aspectRatio: React.MutableRefObject<number>;
 }) {
   return (
     <>
       <RotateButton
-        className='rotate-btn absolute left-full bottom-full aspect-square z-10 w-[10%] min-w-8 max-w-12'
+        className="rotate-btn absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
             return;
@@ -38,7 +38,7 @@ export default function VisualMediaAdjustmentButtons({
 
           const box = bundleRef.current.getBoundingClientRect();
 
-          fgContentAdjustmentController.rotateDragFunction(event, {
+          fgContentAdjustmentController.current?.rotateDragFunction(event, {
             x:
               (positioning.current.position.left / 100) *
                 bundleRef.current.clientWidth +
@@ -50,16 +50,16 @@ export default function VisualMediaAdjustmentButtons({
           });
         }}
         bundleRef={bundleRef}
-        pointerDownFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+        pointerUpFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
         }
       />
       <PanButton
         externalRef={panBtnRef}
-        className='pan-btn absolute left-full top-1/2 -translate-y-1/2 aspect-square z-10 pl-1 w-[10%] min-w-7 max-w-[2.75rem]'
+        className="pan-btn absolute left-full top-1/2 z-10 aspect-square w-[10%] min-w-7 max-w-[2.75rem] -translate-y-1/2 pl-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -79,7 +79,7 @@ export default function VisualMediaAdjustmentButtons({
 
           const buttonWidth = (panBtnRef.current?.clientWidth ?? 0) / 2;
 
-          fgContentAdjustmentController.movementDragFunction(
+          fgContentAdjustmentController.current?.movementDragFunction(
             displacement,
             {
               x:
@@ -98,22 +98,22 @@ export default function VisualMediaAdjustmentButtons({
               y:
                 (positioning.current.position.top / 100) *
                 bundleRef.current.clientHeight,
-            }
+            },
           );
         }}
         bundleRef={bundleRef}
         pointerDownFunction={() =>
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
             "position",
-            { rotationPointPlacement: "topLeft" }
+            { rotationPointPlacement: "topLeft" },
           )
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+        pointerUpFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
         }
       />
       <ScaleButton
-        className='scale-btn absolute left-full top-full aspect-square z-10 pl-1 pt-1 w-[10%] min-w-6 max-w-10'
+        className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -128,20 +128,20 @@ export default function VisualMediaAdjustmentButtons({
               bundleRef.current.clientHeight,
           };
 
-          fgContentAdjustmentController.scaleDragFunction(
+          fgContentAdjustmentController.current?.scaleDragFunction(
             "aspect",
             displacement,
             referencePoint,
             referencePoint,
-            aspectRatio.current
+            aspectRatio.current,
           );
         }}
         bundleRef={bundleRef}
-        pointerDownFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerDownFunction
+        pointerDownFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
-        pointerUpFunction={
-          fgContentAdjustmentController.adjustmentBtnPointerUpFunction
+        pointerUpFunction={() =>
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
         }
       />
     </>

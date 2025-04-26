@@ -1,33 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
-
-export type Signals =
-  | {
-      type: "localMuteChange";
-      header: {
-        table_id: string;
-        username: string;
-        instance: string;
-        producerType: "audio" | "screenAudio";
-        producerId: string | undefined;
-      };
-    }
-  | {
-      type: "startInstancesDrag";
-      data: {
-        instances: {
-          contentType: StaticContentTypes;
-          contentId: string;
-          instances: {
-            width: number;
-            height: number;
-          }[];
-        }[];
-      };
-    }
-  | {
-      type: "stopInstancesDrag";
-    };
+import { Signals } from "./lib/typeConstant";
 
 export interface SignalContextProviderProps {
   children: React.ReactNode;

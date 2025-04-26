@@ -25,6 +25,7 @@ class VideoMedia {
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
   blobURL: string | undefined;
+  loadingState: "downloading" | "downloaded" = "downloading";
   aspect: number | undefined;
 
   private videoListeners: Set<(message: VideoListenerTypes) => void> =
@@ -151,6 +152,8 @@ class VideoMedia {
       this.video.addEventListener("loadeddata", () => {
         this.aspect =
           (this.video?.videoWidth ?? 1) / (this.video?.videoHeight ?? 1);
+
+        this.loadingState = "downloaded";
 
         this.audioStream = (this.video as any).captureStream();
 

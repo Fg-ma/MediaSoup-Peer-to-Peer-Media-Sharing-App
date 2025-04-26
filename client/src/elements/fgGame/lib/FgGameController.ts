@@ -56,13 +56,13 @@ class FgGameController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private sharedBundleRef: React.RefObject<HTMLDivElement>,
     private panBtnRef: React.RefObject<HTMLButtonElement>,
-    private fgContentAdjustmentController: FgContentAdjustmentController,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private popupRefs: React.RefObject<HTMLElement>[] | undefined,
     private behindEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
-    >
+    >,
   ) {
     this.reactController = new ReactController(
       this.gameId,
@@ -70,7 +70,7 @@ class FgGameController {
       "game",
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
-      this.tableSocket
+      this.tableSocket,
     );
   }
 
@@ -109,23 +109,23 @@ class FgGameController {
         }
         break;
       case "y":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "scale"
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+          "scale",
         );
         document.addEventListener("pointermove", this.scaleFuntion);
         document.addEventListener("pointerdown", this.scaleFunctionEnd);
         break;
       case "g":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
           "position",
-          { rotationPointPlacement: "topLeft" }
+          { rotationPointPlacement: "topLeft" },
         );
         document.addEventListener("pointermove", this.moveFunction);
         document.addEventListener("pointerdown", this.moveFunctionEnd);
         break;
       case "r":
-        this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction(
-          "rotation"
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+          "rotation",
         );
         document.addEventListener("pointermove", this.rotateFunction);
         document.addEventListener("pointerdown", this.rotateFunctionEnd);
@@ -136,19 +136,19 @@ class FgGameController {
   };
 
   scaleFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.scaleFuntion);
     document.removeEventListener("pointerdown", this.scaleFunctionEnd);
   };
 
   rotateFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.rotateFunction);
     document.removeEventListener("pointerdown", this.rotateFunctionEnd);
   };
 
   moveFunctionEnd = () => {
-    this.fgContentAdjustmentController.adjustmentBtnPointerUpFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     document.removeEventListener("pointermove", this.moveFunction);
     document.removeEventListener("pointerdown", this.moveFunctionEnd);
   };
@@ -174,7 +174,7 @@ class FgGameController {
 
     const buttonWidth = (this.panBtnRef.current?.clientWidth ?? 0) / 2;
 
-    this.fgContentAdjustmentController.movementDragFunction(
+    this.fgContentAdjustmentController.current?.movementDragFunction(
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -196,9 +196,9 @@ class FgGameController {
         y:
           (this.positioning.current.position.top / 100) *
           this.sharedBundleRef.current.clientHeight,
-      }
+      },
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   scaleFuntion = (event: PointerEvent) => {
@@ -217,16 +217,16 @@ class FgGameController {
         this.sharedBundleRef.current.clientHeight,
     };
 
-    this.fgContentAdjustmentController.scaleDragFunction(
+    this.fgContentAdjustmentController.current?.scaleDragFunction(
       "square",
       {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       },
       referencePoint,
-      referencePoint
+      referencePoint,
     );
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   rotateFunction = (event: PointerEvent) => {
@@ -236,7 +236,7 @@ class FgGameController {
 
     const box = this.sharedBundleRef.current.getBoundingClientRect();
 
-    this.fgContentAdjustmentController.rotateDragFunction(event, {
+    this.fgContentAdjustmentController.current?.rotateDragFunction(event, {
       x:
         (this.positioning.current.position.left / 100) *
           this.sharedBundleRef.current.clientWidth +
@@ -246,7 +246,7 @@ class FgGameController {
           this.sharedBundleRef.current.clientHeight +
         box.top,
     });
-    this.fgContentAdjustmentController.adjustmentBtnPointerDownFunction();
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
   };
 
   attachPositioningListeners = () => {
@@ -357,7 +357,7 @@ class FgGameController {
 
     if (this.popupRefs) {
       this.popupRefs.map((ref) =>
-        ref.current?.classList.remove("hide-controls")
+        ref.current?.classList.remove("hide-controls"),
       );
     }
 
@@ -387,7 +387,7 @@ class FgGameController {
     this.setHideControls(false);
     if (this.popupRefs) {
       this.popupRefs.map((ref) =>
-        ref.current?.classList.remove("hide-controls")
+        ref.current?.classList.remove("hide-controls"),
       );
     }
 

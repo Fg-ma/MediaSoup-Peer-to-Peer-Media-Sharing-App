@@ -153,6 +153,18 @@ export default function FgApplication({
 
   return (
     <FgMediaContainer
+      downloadingState={applicationMediaInstance.applicationMedia.loadingState}
+      addDownloadListener={
+        applicationMediaInstance.applicationMedia.loadingState === "downloading"
+          ? applicationMediaInstance.applicationMedia.addApplicationListener
+          : undefined
+      }
+      removeDownloadListener={
+        applicationMediaInstance.applicationMedia.loadingState === "downloading"
+          ? applicationMediaInstance.applicationMedia.removeApplicationListener
+          : undefined
+      }
+      getAspect={applicationMediaInstance.getAspect}
       mediaId={applicationMediaInstance.applicationMedia.applicationId}
       mediaInstanceId={applicationInstanceId}
       filename={applicationMediaInstance.applicationMedia.filename}

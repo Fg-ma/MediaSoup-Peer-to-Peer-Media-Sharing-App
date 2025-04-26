@@ -22,6 +22,7 @@ class TextMedia {
 
   private fileChunks: Uint8Array[] = [];
   private totalSize = 0;
+  loadingState: "downloading" | "downloaded" = "downloading";
 
   private textListeners: Set<(message: TextListenerTypes) => void> = new Set();
 
@@ -87,6 +88,7 @@ class TextMedia {
       }
 
       this.text = new TextDecoder("utf-8").decode(mergedBuffer);
+      this.loadingState = "downloaded";
 
       this.textListeners.forEach((listener) => {
         listener({ type: "downloadComplete" });

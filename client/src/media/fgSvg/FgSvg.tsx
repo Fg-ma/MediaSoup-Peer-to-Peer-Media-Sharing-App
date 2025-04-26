@@ -137,6 +137,18 @@ export default function FgSvg({
   return (
     <>
       <FgMediaContainer
+        downloadingState={svgMediaInstance.svgMedia.loadingState}
+        addDownloadListener={
+          svgMediaInstance.svgMedia.loadingState === "downloading"
+            ? svgMediaInstance.svgMedia.addSvgListener
+            : undefined
+        }
+        removeDownloadListener={
+          svgMediaInstance.svgMedia.loadingState === "downloading"
+            ? svgMediaInstance.svgMedia.removeSvgListener
+            : undefined
+        }
+        getAspect={svgMediaInstance.getAspect}
         mediaId={svgMediaInstance.svgMedia.svgId}
         mediaInstanceId={svgInstanceId}
         filename={svgMediaInstance.svgMedia.filename}

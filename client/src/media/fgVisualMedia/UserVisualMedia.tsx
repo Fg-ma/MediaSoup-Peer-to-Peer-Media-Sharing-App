@@ -226,12 +226,15 @@ export default function UserVisualMedia({
     }
   };
 
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    bundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender,
-  );
+  const fgContentAdjustmentController =
+    useRef<FgContentAdjustmentController | null>(null);
+  if (!fgContentAdjustmentController.current)
+    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+      bundleRef,
+      positioning,
+      setAdjustingDimensions,
+      setRerender,
+    );
 
   const fgLowerVisualMediaController = new FgLowerVisualMediaController(
     mediasoupSocket,
@@ -524,7 +527,7 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
       >
         <AnimatePresence>
           {visualEffectsActive && (

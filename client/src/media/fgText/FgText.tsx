@@ -104,6 +104,17 @@ export default function FgText({
 
   return (
     <FgMediaContainer
+      downloadingState={textMediaInstance.textMedia.loadingState}
+      addDownloadListener={
+        textMediaInstance.textMedia.loadingState === "downloading"
+          ? textMediaInstance.textMedia.addTextListener
+          : undefined
+      }
+      removeDownloadListener={
+        textMediaInstance.textMedia.loadingState === "downloading"
+          ? textMediaInstance.textMedia.removeTextListener
+          : undefined
+      }
       mediaId={textMediaInstance.textMedia.textId}
       mediaInstanceId={textInstanceId}
       filename={textMediaInstance.textMedia.filename}

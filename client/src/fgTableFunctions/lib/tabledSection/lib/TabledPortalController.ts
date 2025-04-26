@@ -28,107 +28,62 @@ class TabledPortalController {
     private setTabledActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
-  private setIndicators = () => {
-    if (this.selected.current.length > 0) {
-      const scale =
-        this.staticPlacement.current.scale === "hide"
-          ? 1
-          : this.staticPlacement.current.scale;
-
-      this.indicators.current = this.selected.current
-        .map((selection) => {
-          if (selection.count === "zero") return null;
-
-          return {
-            contentId: selection.contentId,
-            contentType: selection.contentType,
-            instances: Array.from({ length: Number(selection.count) }, () => ({
-              height: 15 * scale,
-              width: 15 * selection.aspect * scale,
-              x: 0,
-              y: 0,
-            })),
-          };
-        })
-        .filter((item): item is InstanceType => item !== null);
-    } else {
-      this.indicators.current = [];
-    }
-  };
+  private tempInstances: InstanceType[] = [];
 
   placeInstances = () => {
-    this.setIndicators();
-
-    if (this.indicators.current.length === 0) {
+    const sel = this.selected.current;
+    if (!sel.length) {
+      this.indicators.current = [];
       return;
     }
 
-    // Directly use this.indicators.current to avoid copying the array
-    const instances = this.indicators.current;
+    const { scale: rawScale, x, y } = this.staticPlacement.current;
+    const scale = rawScale === "hide" ? 1 : (rawScale as number);
     const GAP = 0.5;
     const containerWidth = 100;
-
-    // Calculate gridLeft and gridBottom only once
-    const gridLeft =
-      this.staticPlacement.current.x === "default" ||
-      this.staticPlacement.current.x === "hide"
-        ? 50
-        : this.staticPlacement.current.x;
-
-    let gridBottom =
-      this.staticPlacement.current.y === "default" ||
-      this.staticPlacement.current.y === "hide"
-        ? 50
-        : this.staticPlacement.current.y;
-
+    const gridLeft = x === "default" || x === "hide" ? 50 : (x as number);
+    let gridBottom = y === "default" || y === "hide" ? 50 : (y as number);
     let currentX = gridLeft;
-    let currentRowMaxHeight = 0;
+    let currentRowMaxH = 0;
     let currentRowTop = gridBottom;
 
-    const newPositions: InstanceType[] = [];
+    // clear and reuse
+    this.tempInstances.length = 0;
 
-    // Use for-loop for better performance on the outer iteration
-    for (let i = 0; i < instances.length; i++) {
-      const instance = instances[i];
-      const newIns: { width: number; height: number; x: number; y: number }[] =
+    for (let si = 0; si < sel.length; si++) {
+      const { count, aspect, contentId, contentType } = sel[si];
+      if (count === "zero") continue;
+
+      const n = Number(count);
+      // reuse a small local array for this group
+      const group: { x: number; y: number; width: number; height: number }[] =
         [];
-
-      // Use for-loop instead of forEach for inner iterations
-      for (let j = 0; j < instance.instances.length; j++) {
-        const ins = instance.instances[j];
-        const { width, height } = ins;
-
-        // Check if the current box exceeds the container width and reset position
-        if (currentX + width > containerWidth) {
+      for (let k = 0; k < n; k++) {
+        const w = 15 * aspect * scale;
+        const h = 15 * scale;
+        // wrap to next row?
+        if (currentX + w > containerWidth) {
           currentX = gridLeft;
           gridBottom = currentRowTop - GAP;
-          currentRowMaxHeight = 0;
+          currentRowMaxH = 0;
           currentRowTop = gridBottom;
         }
 
-        const boxY = gridBottom - height;
-        const boxX = currentX;
+        const posX = Math.min(containerWidth - w, currentX);
+        const posY = Math.max(0, gridBottom - h);
 
-        newIns.push({
-          ...ins,
-          x: Math.min(containerWidth - width, boxX),
-          y: Math.max(0, boxY),
-        });
+        group.push({ x: posX, y: posY, width: w, height: h });
 
-        // Update currentX and row height
-        currentX += width + GAP;
-        currentRowMaxHeight = Math.max(currentRowMaxHeight, height);
-        currentRowTop = gridBottom - currentRowMaxHeight;
+        currentX += w + GAP;
+        currentRowMaxH = Math.max(currentRowMaxH, h);
+        currentRowTop = gridBottom - currentRowMaxH;
       }
 
-      newPositions.push({
-        ...instance,
-        instances: newIns,
-      });
+      this.tempInstances.push({ contentId, contentType, instances: group });
     }
 
-    // Update indicators only once after processing
-    this.indicators.current = newPositions;
+    // one final assignment
+    this.indicators.current = this.tempInstances;
   };
 
   uploadInstances = () => {

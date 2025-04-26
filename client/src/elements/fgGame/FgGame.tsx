@@ -103,24 +103,27 @@ export default function FgGame({
   const panBtnRef = useRef<HTMLButtonElement>(null);
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
-    undefined
+    undefined,
   );
   const pointerLeaveHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
   const pointerStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
-    undefined
+    undefined,
   );
 
   const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
-  const fgContentAdjustmentController = new FgContentAdjustmentController(
-    sharedBundleRef,
-    positioning,
-    setAdjustingDimensions,
-    setRerender
-  );
+  const fgContentAdjustmentController =
+    useRef<FgContentAdjustmentController | null>(null);
+  if (!fgContentAdjustmentController.current)
+    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+      sharedBundleRef,
+      positioning,
+      setAdjustingDimensions,
+      setRerender,
+    );
 
   const fgGameController = new FgGameController(
     mediasoupSocket,
@@ -146,7 +149,7 @@ export default function FgGame({
     popupRefs,
     behindEffectsContainerRef,
     frontEffectsContainerRef,
-    tableSocket
+    tableSocket,
   );
 
   useEffect(() => {
@@ -224,7 +227,7 @@ export default function FgGame({
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(fgGameController.handleMessage);
     tableSocket.current?.addMessageListener(
-      fgGameController.handleTableMessage
+      fgGameController.handleTableMessage,
     );
 
     mediasoupSocket.current?.sendMessage({
@@ -242,14 +245,14 @@ export default function FgGame({
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
-          removeListener()
-        )
+          removeListener(),
+        ),
       );
       mediasoupSocket.current?.removeMessageListener(
-        fgGameController.handleMessage
+        fgGameController.handleMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgGameController.handleTableMessage
+        fgGameController.handleTableMessage,
       );
     };
   }, []);
@@ -271,11 +274,11 @@ export default function FgGame({
 
         ref.current.addEventListener(
           "pointerenter",
-          fgGameController.handlePointerEnter
+          fgGameController.handlePointerEnter,
         );
         ref.current.addEventListener(
           "pointerleave",
-          fgGameController.handlePointerLeave
+          fgGameController.handlePointerLeave,
         );
       }
     }
@@ -289,11 +292,11 @@ export default function FgGame({
 
           ref.current.removeEventListener(
             "pointerenter",
-            fgGameController.handlePointerEnter
+            fgGameController.handlePointerEnter,
           );
           ref.current.removeEventListener(
             "pointerleave",
-            fgGameController.handlePointerLeave
+            fgGameController.handlePointerLeave,
           );
         }
       }
@@ -311,7 +314,7 @@ export default function FgGame({
           gameId,
           type: "games",
           positioning: positioning.current,
-        })
+        }),
       );
     }
   }, [positioning.current]);
@@ -326,44 +329,44 @@ export default function FgGame({
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
         hideControls && !reactionsPanelActive ? "hide-controls" : ""
-      } rounded absolute pointer-events-auto`}
+      } pointer-events-auto absolute rounded`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,
         width: `${Math.max(
           positioning.current.scale.x,
-          positioning.current.scale.y
+          positioning.current.scale.y,
         )}%`,
         height: `${Math.max(
           positioning.current.scale.x,
-          positioning.current.scale.y
+          positioning.current.scale.y,
         )}%`,
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
       variants={GameVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={GameTransition}
     >
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={frontEffectsContainerRef}
-          className='w-full h-full relative z-[100] pointer-events-none'
+          className="pointer-events-none relative z-[100] h-full w-full"
         />
       </div>
-      <div className='w-full h-full absolute top-0 left-0 pointer-events-none'>
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
         <div
           ref={behindEffectsContainerRef}
-          className='w-full h-full relative -z-[100] pointer-events-none'
+          className="pointer-events-none relative -z-[100] h-full w-full"
         />
       </div>
-      <div className='fg-game-left-controls-section absolute right-full bottom-0 flex flex-col items-end justify-between w-[15%] min-w-14 max-w-24 h-full'>
-        <div className='w-full h-max z-20'>{gameFunctionsSection}</div>
+      <div className="fg-game-left-controls-section absolute bottom-0 right-full flex h-full w-[15%] min-w-14 max-w-24 flex-col items-end justify-between">
+        <div className="z-20 h-max w-full">{gameFunctionsSection}</div>
         <PlayersSection players={players} />
       </div>
-      <div className='fg-game-top-controls-section absolute left-0 bottom-full flex items-center justify-between w-full h-[15%] min-h-10 max-h-16 space-x-2 overflow-x-auto'>
+      <div className="fg-game-top-controls-section absolute bottom-full left-0 flex h-[15%] max-h-16 min-h-10 w-full items-center justify-between space-x-2 overflow-x-auto">
         <ControlButtons
           startGameFunction={startGameFunction}
           joinGameFunction={joinGameFunction}
@@ -374,8 +377,8 @@ export default function FgGame({
             (players?.user === undefined ? 0 : 1)
           }
         />
-        <div className='flex w-max h-full items-end justify-center'>
-          <div className='h-[75%] aspect-square pb-1'>
+        <div className="flex h-full w-max items-end justify-center">
+          <div className="aspect-square h-[75%] pb-1">
             <ReactButton
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
