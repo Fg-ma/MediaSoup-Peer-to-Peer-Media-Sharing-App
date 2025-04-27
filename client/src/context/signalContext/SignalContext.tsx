@@ -1,14 +1,32 @@
 import React, { createContext, useContext } from "react";
-import { Signals } from "./lib/typeConstant";
+import {
+  GeneralSignals,
+  GroupSignals,
+  NewInstanceSignals,
+} from "./lib/typeConstant";
 
 export interface SignalContextProviderProps {
   children: React.ReactNode;
 }
 
 export interface SignalContextType {
-  addSignalListener: (listener: (signal: Signals) => void) => void;
-  removeSignalListener: (listener: (signal: Signals) => void) => void;
-  sendSignal: (signal: Signals) => void;
+  addGeneralSignalListener: (
+    listener: (signal: GeneralSignals) => void,
+  ) => void;
+  removeGeneralSignalListener: (
+    listener: (signal: GeneralSignals) => void,
+  ) => void;
+  sendGeneralSignal: (signal: GeneralSignals) => void;
+  addNewInstanceSignalListener: (
+    listener: (signal: NewInstanceSignals) => void,
+  ) => void;
+  removeNewInstanceSignalListener: (
+    listener: (signal: NewInstanceSignals) => void,
+  ) => void;
+  sendNewInstanceSignal: (signal: NewInstanceSignals) => void;
+  addGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
+  removeGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
+  sendGroupSignal: (signal: GroupSignals) => void;
 }
 
 const SignalContext = createContext<SignalContextType | undefined>(undefined);
@@ -26,28 +44,78 @@ export const useSignalContext = () => {
 export function SignalContextProvider({
   children,
 }: SignalContextProviderProps) {
-  const signalListeners: Set<(signal: Signals) => void> = new Set();
+  const generalSignalListeners: Set<(signal: GeneralSignals) => void> =
+    new Set();
+  const newInstanceSignalListeners: Set<(signal: NewInstanceSignals) => void> =
+    new Set();
+  const groupSignalListeners: Set<(signal: GroupSignals) => void> = new Set();
 
-  const sendSignal = (signal: Signals) => {
-    signalListeners.forEach((listener) => {
+  const addGeneralSignalListener = (
+    listener: (signal: GeneralSignals) => void,
+  ): void => {
+    generalSignalListeners.add(listener);
+  };
+
+  const removeGeneralSignalListener = (
+    listener: (signal: GeneralSignals) => void,
+  ): void => {
+    generalSignalListeners.delete(listener);
+  };
+
+  const sendGeneralSignal = (signal: GeneralSignals) => {
+    generalSignalListeners.forEach((listener) => {
       listener(signal);
     });
   };
 
-  const addSignalListener = (listener: (signal: Signals) => void): void => {
-    signalListeners.add(listener);
+  const addNewInstanceSignalListener = (
+    listener: (signal: NewInstanceSignals) => void,
+  ): void => {
+    newInstanceSignalListeners.add(listener);
   };
 
-  const removeSignalListener = (listener: (signal: Signals) => void): void => {
-    signalListeners.delete(listener);
+  const removeNewInstanceSignalListener = (
+    listener: (signal: NewInstanceSignals) => void,
+  ): void => {
+    newInstanceSignalListeners.delete(listener);
+  };
+
+  const sendNewInstanceSignal = (signal: NewInstanceSignals) => {
+    newInstanceSignalListeners.forEach((listener) => {
+      listener(signal);
+    });
+  };
+
+  const addGroupSignalListener = (
+    listener: (signal: GroupSignals) => void,
+  ): void => {
+    groupSignalListeners.add(listener);
+  };
+
+  const removeGroupSignalListener = (
+    listener: (signal: GroupSignals) => void,
+  ): void => {
+    groupSignalListeners.delete(listener);
+  };
+
+  const sendGroupSignal = (signal: GroupSignals) => {
+    groupSignalListeners.forEach((listener) => {
+      listener(signal);
+    });
   };
 
   return (
     <SignalContext.Provider
       value={{
-        addSignalListener,
-        removeSignalListener,
-        sendSignal,
+        addGeneralSignalListener,
+        removeGeneralSignalListener,
+        sendGeneralSignal,
+        addNewInstanceSignalListener,
+        removeNewInstanceSignalListener,
+        sendNewInstanceSignal,
+        addGroupSignalListener,
+        removeGroupSignalListener,
+        sendGroupSignal,
       }}
     >
       {children}

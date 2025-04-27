@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   onInstancesLayerModeType,
   onStartInstancesDragType,
-  Signals,
+  NewInstanceSignals,
 } from "../../../context/signalContext/lib/typeConstant";
 import { InstanceType } from "../NewInstancesLayer";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
@@ -297,7 +297,7 @@ class NewInstancesLayerController {
     this.mode.current = event.data.mode;
   };
 
-  handleSignals = (event: Signals) => {
+  handleSignals = (event: NewInstanceSignals) => {
     if (!event) return;
 
     switch (event.type) {

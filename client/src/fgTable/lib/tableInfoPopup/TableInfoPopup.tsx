@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import { useSignalContext } from "../../../context/signalContext/SignalContext";
-import { Signals } from "../../../context/signalContext/lib/typeConstant";
-import { onTableInfoSignalType } from "src/context/signalContext/lib/typeConstant";
+import {
+  GeneralSignals,
+  onTableInfoSignalType,
+} from "../../../context/signalContext/lib/typeConstant";
 
 const TableInfoPopupVar: Variants = {
   init: { opacity: 0, scale: 0.8, top: 0 },
@@ -25,7 +27,8 @@ const TableInfoPopupTransition: Transition = {
 };
 
 export default function TableInfoPopup() {
-  const { addSignalListener, removeSignalListener } = useSignalContext();
+  const { addGeneralSignalListener, removeGeneralSignalListener } =
+    useSignalContext();
 
   const [visible, setVisible] = useState(false);
   const [infoMessage, setInfoMessage] = useState("");
@@ -43,7 +46,7 @@ export default function TableInfoPopup() {
     }, timeout);
   };
 
-  const handleSignals = (signal: Signals) => {
+  const handleSignals = (signal: GeneralSignals) => {
     switch (signal.type) {
       case "tableInfoSignal":
         onTableInfoSignal(signal);
@@ -54,10 +57,10 @@ export default function TableInfoPopup() {
   };
 
   useEffect(() => {
-    addSignalListener(handleSignals);
+    addGeneralSignalListener(handleSignals);
 
     return () => {
-      removeSignalListener(handleSignals);
+      removeGeneralSignalListener(handleSignals);
     };
   }, []);
 

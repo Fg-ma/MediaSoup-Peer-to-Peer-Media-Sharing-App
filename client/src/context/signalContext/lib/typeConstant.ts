@@ -1,12 +1,18 @@
 import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 import { InstanceLayerModes } from "../../../fgTableLayers/newInstancesLayer/lib/typeConstant";
 
-export type Signals =
-  | onLocalMuteChangeType
+export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
+
+export type NewInstanceSignals =
   | onStartInstancesDragType
   | onStopInstancesDragType
-  | onInstancesLayerModeType
-  | onTableInfoSignalType;
+  | onInstancesLayerModeType;
+
+export type GroupSignals =
+  | onGroupDragStartType
+  | onGroupDragType
+  | onGroupDragEndType
+  | onGroupDeleteType;
 
 export type onLocalMuteChangeType = {
   type: "localMuteChange";
@@ -49,5 +55,53 @@ export type onTableInfoSignalType = {
   data: {
     message: string;
     timeout: number;
+  };
+};
+
+export type onGroupDragStartType = {
+  type: "groupDragStart";
+  data: {
+    affected: {
+      type: string;
+      id: string;
+    }[];
+    startDragPosition: {
+      x: number;
+      y: number;
+    };
+  };
+};
+
+export type onGroupDragType = {
+  type: "groupDrag";
+  data: {
+    affected: {
+      type: string;
+      id: string;
+    }[];
+    dragPosition: {
+      x: number;
+      y: number;
+    };
+  };
+};
+
+export type onGroupDragEndType = {
+  type: "groupDragEnd";
+  data: {
+    affected: {
+      type: string;
+      id: string;
+    }[];
+  };
+};
+
+export type onGroupDeleteType = {
+  type: "groupDelete";
+  data: {
+    affected: {
+      type: string;
+      id: string;
+    }[];
   };
 };

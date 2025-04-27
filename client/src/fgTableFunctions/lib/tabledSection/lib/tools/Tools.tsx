@@ -53,7 +53,7 @@ export default function Tools({
     }[]
   >;
 }) {
-  const { sendSignal } = useSignalContext();
+  const { sendNewInstanceSignal, sendGeneralSignal } = useSignalContext();
 
   return (
     <div className="flex h-12 w-full space-x-1">
@@ -99,14 +99,14 @@ export default function Tools({
         clickFunction={() => {
           if (selected.current.length === 0) return;
 
-          sendSignal({
+          sendNewInstanceSignal({
             type: "instancesLayerMode",
             data: {
               mode: "paint",
             },
           });
 
-          sendSignal({
+          sendNewInstanceSignal({
             type: "startInstancesDrag",
             data: {
               instances: selected.current
@@ -125,7 +125,7 @@ export default function Tools({
             },
           });
 
-          sendSignal({
+          sendGeneralSignal({
             type: "tableInfoSignal",
             data: {
               message: "Press esc/delete to exit",

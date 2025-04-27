@@ -3,6 +3,7 @@ import { motion, Transition, Variants } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import LowerControls from "./lib/lowerControls/LowerControls";
 import MediaContainerController from "./lib/MediaContainerController";
 import LowerController from "./lib/lowerControls/lib/LowerController";
@@ -123,6 +124,8 @@ export default function FgMediaContainer({
   const { mediasoupSocket, tableStaticContentSocket, tableSocket } =
     useSocketContext();
   const { table_id } = useUserInfoContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const mediaContainerRef =
     externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
@@ -198,24 +201,28 @@ export default function FgMediaContainer({
     setState,
   );
 
-  const mediaContainerController = new MediaContainerController(
-    table_id,
-    mediaId,
-    mediaInstanceId,
-    kind,
-    getAspect,
-    positioningListeners,
-    aspectRatio,
-    positioning,
-    remoteDataStreams,
-    mediaContainerRef,
-    mediaContainerOptions,
-    setInMedia,
-    leaveTimer,
-    movementTimeout,
-    setRerender,
-    tableStaticContentSocket,
-    lowerController,
+  const mediaContainerController = useRef(
+    new MediaContainerController(
+      table_id,
+      mediaId,
+      mediaInstanceId,
+      kind,
+      getAspect,
+      positioningListeners,
+      aspectRatio,
+      positioning,
+      remoteDataStreams,
+      mediaContainerRef,
+      mediaContainerOptions,
+      setInMedia,
+      leaveTimer,
+      movementTimeout,
+      setRerender,
+      tableStaticContentSocket,
+      lowerController,
+      fgContentAdjustmentController,
+      bundleRef,
+    ),
   );
 
   useEffect(() => {
@@ -223,23 +230,24 @@ export default function FgMediaContainer({
   }, [initState]);
 
   useEffect(() => {
-    mediaContainerController.attachPositioningListeners();
+    mediaContainerController.current.attachPositioningListeners();
   }, [JSON.stringify(remoteDataStreams.current)]);
 
   useEffect(() => {
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      mediaContainerController.handleMediasoupMessage,
+      mediaContainerController.current.handleMediasoupMessage,
     );
     tableSocket.current?.addMessageListener(
-      mediaContainerController.handleTableMessage,
+      mediaContainerController.current.handleTableMessage,
     );
+    addGroupSignalListener(mediaContainerController.current.handleSignal);
 
     document.addEventListener("keydown", lowerController.handleKeyDown);
 
     if (downloadingState === "downloading") {
       if (addDownloadListener)
-        addDownloadListener(mediaContainerController.downloadListener);
+        addDownloadListener(mediaContainerController.current.downloadListener);
     } else {
       if (getAspect) {
         aspectRatio.current = getAspect();
@@ -259,15 +267,18 @@ export default function FgMediaContainer({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        mediaContainerController.handleMediasoupMessage,
+        mediaContainerController.current.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        mediaContainerController.handleTableMessage,
+        mediaContainerController.current.handleTableMessage,
       );
+      removeGroupSignalListener(mediaContainerController.current.handleSignal);
       document.removeEventListener("keydown", lowerController.handleKeyDown);
       if (downloadingState === "downloading") {
         if (removeDownloadListener)
-          removeDownloadListener(mediaContainerController.downloadListener);
+          removeDownloadListener(
+            mediaContainerController.current.downloadListener,
+          );
       }
       document.removeEventListener(
         "fullscreenchange",
@@ -307,7 +318,7 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} selectable absolute flex items-center justify-center`}
+      } ${className} absolute flex items-center justify-center`}
       style={
         backgroundMedia
           ? {
@@ -328,8 +339,8 @@ export default function FgMediaContainer({
               zIndex: 10,
             }
       }
-      onPointerEnter={mediaContainerController.handlePointerEnter}
-      onPointerLeave={mediaContainerController.handlePointerLeave}
+      onPointerEnter={mediaContainerController.current.handlePointerEnter}
+      onPointerLeave={mediaContainerController.current.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
       variants={MediaContainerVar}
       initial="init"
@@ -400,7 +411,9 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="flex sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        data-selectable-type={kind}
+        data-selectable-id={mediaInstanceId}
       >
         {media && media}
         <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">

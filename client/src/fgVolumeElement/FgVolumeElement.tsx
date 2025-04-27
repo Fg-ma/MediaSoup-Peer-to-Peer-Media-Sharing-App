@@ -68,7 +68,8 @@ export default function FgVolumeElement({
     ...options,
   };
 
-  const { addSignalListener, removeSignalListener } = useSignalContext();
+  const { addGeneralSignalListener, removeGeneralSignalListener } =
+    useSignalContext();
   const { mediasoupSocket } = useSocketContext();
 
   const [volumeState, setVolumeState] = useState({
@@ -119,14 +120,16 @@ export default function FgVolumeElement({
       fgVolumeElementController.handleMessage,
     );
 
-    addSignalListener(fgVolumeElementController.handleSignalMessages);
+    addGeneralSignalListener(fgVolumeElementController.handleSignalMessages);
 
     // Cleanup event listener on unmount
     return () => {
       mediasoupSocket.current?.removeMessageListener(
         fgVolumeElementController.handleMessage,
       );
-      removeSignalListener(fgVolumeElementController.handleSignalMessages);
+      removeGeneralSignalListener(
+        fgVolumeElementController.handleSignalMessages,
+      );
     };
   }, []);
 
@@ -296,7 +299,7 @@ export default function FgVolumeElement({
   return (
     <div
       ref={volumeContainer}
-      className="flex volume-container pointer-events-auto items-center justify-center"
+      className="volume-container pointer-events-auto flex items-center justify-center"
       style={{ height: `calc(${fgVolumeElementOptions.iconSize} * 2)` }}
     >
       <FgButton
@@ -355,7 +358,7 @@ export default function FgVolumeElement({
             />
           ) : undefined
         }
-        className="flex relative aspect-square items-center justify-center"
+        className="relative flex aspect-square items-center justify-center"
         style={{ width: fgVolumeElementOptions.iconSize }}
       />
       {fgVolumeElementOptions.isSlider && (

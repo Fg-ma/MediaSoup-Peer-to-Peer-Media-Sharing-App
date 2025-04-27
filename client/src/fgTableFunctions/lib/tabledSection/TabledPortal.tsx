@@ -55,7 +55,7 @@ export default function TabledPortal({
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
-  const { sendSignal } = useSignalContext();
+  const { sendNewInstanceSignal } = useSignalContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const [advanced, setAdvanced] = useState(false);
@@ -358,14 +358,14 @@ export default function TabledPortal({
                                   selected.current = newSelected;
                                   setRerender((prev) => !prev);
 
-                                  sendSignal({
+                                  sendNewInstanceSignal({
                                     type: "instancesLayerMode",
                                     data: {
                                       mode: "standard",
                                     },
                                   });
 
-                                  sendSignal({
+                                  sendNewInstanceSignal({
                                     type: "startInstancesDrag",
                                     data: {
                                       instances: newSelected
@@ -391,14 +391,14 @@ export default function TabledPortal({
                                 stopDragFunction={() => {
                                   setDragging(false);
 
-                                  sendSignal({
+                                  sendNewInstanceSignal({
                                     type: "instancesLayerMode",
                                     data: {
                                       mode: "standard",
                                     },
                                   });
 
-                                  sendSignal({
+                                  sendNewInstanceSignal({
                                     type: "stopInstancesDrag",
                                   });
                                 }}

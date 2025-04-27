@@ -1,7 +1,7 @@
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import FgVolumeElementSocket from "../../fgVolumeElement/lib/FgVolumeElementSocket";
 import { FgVolumeElementOptions } from "./typeConstant";
-import { Signals } from "../../context/signalContext/lib/typeConstant";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class FgVolumeElementController extends FgVolumeElementSocket {
   constructor(
@@ -183,7 +183,7 @@ class FgVolumeElementController extends FgVolumeElementSocket {
     }
   };
 
-  handleSignalMessages = (message: Signals) => {
+  handleSignalMessages = (message: GeneralSignals) => {
     switch (message.type) {
       case "localMuteChange":
         const {

@@ -11,7 +11,7 @@ import { BundleOptions } from "./typeConstant";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
-import { Signals } from "../../context/signalContext/lib/typeConstant";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class BundleController extends BundleSocket {
   constructor(
@@ -238,7 +238,7 @@ class BundleController extends BundleSocket {
     }
   };
 
-  handleSignalMessage = (message: Signals) => {
+  handleSignalMessage = (message: GeneralSignals) => {
     switch (message.type) {
       case "localMuteChange":
         const {

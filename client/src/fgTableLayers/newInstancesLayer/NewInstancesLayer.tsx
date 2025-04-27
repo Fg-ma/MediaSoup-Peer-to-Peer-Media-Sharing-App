@@ -25,7 +25,8 @@ export default function NewInstancesLayer({
 }) {
   const { userMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { addSignalListener, removeSignalListener } = useSignalContext();
+  const { addNewInstanceSignalListener, removeNewInstanceSignalListener } =
+    useSignalContext();
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const hideInstances = useRef(false);
@@ -54,10 +55,12 @@ export default function NewInstancesLayer({
   }, [newInstances.current]);
 
   useEffect(() => {
-    addSignalListener(newInstancesLayerController.handleSignals);
+    addNewInstanceSignalListener(newInstancesLayerController.handleSignals);
 
     return () => {
-      removeSignalListener(newInstancesLayerController.handleSignals);
+      removeNewInstanceSignalListener(
+        newInstancesLayerController.handleSignals,
+      );
     };
   }, []);
 

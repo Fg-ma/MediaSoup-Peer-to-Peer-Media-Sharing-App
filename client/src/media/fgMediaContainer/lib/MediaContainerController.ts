@@ -8,8 +8,18 @@ import {
 } from "../../../serverControllers/tableServer/lib/typeConstant";
 import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 import LowerController from "./lowerControls/lib/LowerController";
+import {
+  onGroupDragEndType,
+  onGroupDragStartType,
+  onGroupDragType,
+  GroupSignals,
+} from "../../../context/signalContext/lib/typeConstant";
+import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
 class MediaContainerController {
+  groupStartDragPosition: { x: number; y: number } | undefined;
+  savedMediaPosition: { top: number; left: number } | undefined;
+
   constructor(
     private table_id: React.MutableRefObject<string>,
     private mediaId: string,
@@ -44,6 +54,8 @@ class MediaContainerController {
       TableStaticContentSocketController | undefined
     >,
     private lowerController: LowerController,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
+    private bundleRef: React.RefObject<HTMLDivElement>,
   ) {}
 
   handlePointerMove = () => {
@@ -186,6 +198,104 @@ class MediaContainerController {
     switch (event.type) {
       case "reactionOccurred":
         this.reactionOccurred(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onGroupDragStart = (signal: onGroupDragStartType) => {
+    const { affected, startDragPosition } = signal.data;
+
+    if (
+      affected.some(
+        (item) => item.id === this.mediaInstanceId && item.type === this.kind,
+      )
+    ) {
+      this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+        "position",
+        { rotationPointPlacement: "topLeft" },
+      );
+
+      this.groupStartDragPosition = startDragPosition;
+      this.savedMediaPosition = this.positioning.current.position;
+    }
+  };
+
+  onGroupDrag = (signal: onGroupDragType) => {
+    const { affected, dragPosition } = signal.data;
+
+    if (
+      affected.some(
+        (item) => item.id === this.mediaInstanceId && item.type === this.kind,
+      ) &&
+      this.groupStartDragPosition &&
+      this.savedMediaPosition &&
+      this.bundleRef.current
+    ) {
+      this.fgContentAdjustmentController.current?.movementDragFunction(
+        {
+          x:
+            ((this.savedMediaPosition.left +
+              dragPosition.x -
+              this.groupStartDragPosition.x) /
+              100) *
+            this.bundleRef.current.clientWidth,
+          y:
+            ((this.savedMediaPosition.top +
+              dragPosition.y -
+              this.groupStartDragPosition.y) /
+              100) *
+            this.bundleRef.current.clientHeight,
+        },
+        { x: 0, y: 0 },
+        {
+          x:
+            (this.positioning.current.position.left / 100) *
+            this.bundleRef.current.clientWidth,
+          y:
+            (this.positioning.current.position.top / 100) *
+            this.bundleRef.current.clientHeight,
+        },
+      );
+    }
+  };
+
+  onGroupDragEnd = (signal: onGroupDragEndType) => {
+    const { affected } = signal.data;
+
+    if (
+      affected.some(
+        (item) => item.id === this.mediaInstanceId && item.type === this.kind,
+      )
+    ) {
+      this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+      this.tableStaticContentSocket.current?.updateContentPositioning(
+        this.kind,
+        this.mediaId,
+        this.mediaInstanceId,
+        { position: this.positioning.current.position },
+      );
+
+      this.groupStartDragPosition = undefined;
+      this.savedMediaPosition = undefined;
+    }
+  };
+
+  handleSignal = (signal: GroupSignals) => {
+    switch (signal.type) {
+      case "groupDelete":
+        this.lowerController.handleClose();
+        break;
+      case "groupDragStart":
+        this.onGroupDragStart(signal);
+        break;
+      case "groupDrag":
+        this.onGroupDrag(signal);
+        break;
+      case "groupDragEnd":
+        this.onGroupDragEnd(signal);
         break;
       default:
         break;

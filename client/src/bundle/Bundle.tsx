@@ -60,7 +60,8 @@ export default function Bundle({
 
   const { userMedia, remoteMedia } = useMediaContext();
   const { remoteEffectsStyles, remoteEffects } = useEffectsContext();
-  const { addSignalListener, removeSignalListener } = useSignalContext();
+  const { addGeneralSignalListener, removeGeneralSignalListener } =
+    useSignalContext();
   const { mediasoupSocket } = useSocketContext();
 
   const [cameraStreams, setCameraStreams] = useState<
@@ -132,13 +133,13 @@ export default function Bundle({
     }
 
     mediasoupSocket.current?.addMessageListener(bundleController.handleMessage);
-    addSignalListener(bundleController.handleSignalMessage);
+    addGeneralSignalListener(bundleController.handleSignalMessage);
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
         bundleController.handleMessage,
       );
-      removeSignalListener(bundleController.handleSignalMessage);
+      removeGeneralSignalListener(bundleController.handleSignalMessage);
     };
   }, []);
 

@@ -51,6 +51,7 @@ export default function FgTable({
   const [_rerender, setRerender] = useState(false);
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const innerTableContainerRef = useRef<HTMLDivElement>(null);
 
   const fgTableController = new FgTableController(
     username,
@@ -108,7 +109,11 @@ export default function FgTable({
         userData={userData}
         tableContainerRef={tableContainerRef}
       />
-      <div className="flex w-full" style={{ height: "1px", flexGrow: "1" }}>
+      <div
+        ref={innerTableContainerRef}
+        className="flex w-full"
+        style={{ height: "1px", flexGrow: "1" }}
+      >
         <LeftTableSection
           userData={userData}
           tableContainerRef={tableContainerRef}
@@ -137,7 +142,7 @@ export default function FgTable({
                   }}
                 >
                   <SelectTableLayer
-                    tableContainerRef={tableContainerRef}
+                    innerTableContainerRef={innerTableContainerRef}
                     tableRef={tableRef}
                     tableTopRef={tableTopRef}
                   />
