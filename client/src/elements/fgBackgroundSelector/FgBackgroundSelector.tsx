@@ -119,7 +119,6 @@ export default function FgBackgroundSelector({
         options={{
           hoverType: hoverType,
           hoverTimeoutDuration: 750,
-          hoverZValue: 500000000000,
         }}
       />
       {backgroundSelectorPanelActive && (

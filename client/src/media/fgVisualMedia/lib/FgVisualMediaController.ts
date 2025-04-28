@@ -22,13 +22,24 @@ import {
   RemoteDataStreamsType,
   UserMediaType,
 } from "../../../context/mediaContext/typeConstant";
-import MediasoupSocketController from "src/serverControllers/mediasoupServer/MediasoupSocketController";
+import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import {
   IncomingTableMessages,
   onReactionOccurredType,
-} from "src/serverControllers/tableServer/lib/typeConstant";
+} from "../../../serverControllers/tableServer/lib/typeConstant";
+import {
+  GroupSignals,
+  onGroupDeleteType,
+  onGroupDragEndType,
+  onGroupDragStartType,
+  onGroupDragType,
+} from "../../../context/signalContext/lib/typeConstant";
+import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
 class FgVisualMediaController {
+  groupStartDragPosition: { x: number; y: number } | undefined;
+  savedMediaPosition: { top: number; left: number } | undefined;
+
   constructor(
     private table_id: string,
     private username: string,
@@ -66,7 +77,7 @@ class FgVisualMediaController {
     private fgVisualMediaOptions: FgVisualMediaOptions,
     private handleVisualEffectChange: (
       effect: CameraEffectTypes | ScreenEffectTypes,
-      blockStateChange?: boolean
+      blockStateChange?: boolean,
     ) => Promise<void>,
     private setInVisualMedia: React.Dispatch<React.SetStateAction<boolean>>,
     private leaveVisualMediaTimer: React.MutableRefObject<
@@ -79,7 +90,9 @@ class FgVisualMediaController {
     private aspectRatio: React.MutableRefObject<number>,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
-    >
+    >,
+    private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
+    private bundleRef: React.RefObject<HTMLDivElement>,
   ) {}
 
   init = () => {
@@ -91,7 +104,7 @@ class FgVisualMediaController {
     // Set initial track state
     const volumeSliders =
       this.visualMediaContainerRef.current?.querySelectorAll(
-        ".volume-slider-audio"
+        ".volume-slider-audio",
       );
 
     volumeSliders?.forEach((slider) => {
@@ -105,7 +118,7 @@ class FgVisualMediaController {
 
     this.visualMediaContainerRef.current?.style.setProperty(
       "--primary-video-color",
-      `${this.fgVisualMediaOptions.primaryVideoColor}`
+      `${this.fgVisualMediaOptions.primaryVideoColor}`,
     );
   };
 
@@ -153,7 +166,7 @@ class FgVisualMediaController {
         this.userMedia.current.camera[
           this.visualMediaId
         ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
-          hideBackgroundColor
+          hideBackgroundColor,
         );
       }
 
@@ -161,7 +174,7 @@ class FgVisualMediaController {
         this.userMedia.current.camera[
           this.visualMediaId
         ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-          hideBackgroundStyle
+          hideBackgroundStyle,
         );
       }
 
@@ -169,13 +182,13 @@ class FgVisualMediaController {
         this.userMedia.current[this.type][
           this.visualMediaId
         ].babylonScene.babylonShaderController.swapPostProcessEffects(
-          postProcessStyle
+          postProcessStyle,
         );
       }
 
       this.handleVisualEffectChange(
         effect as CameraEffectTypes | ScreenEffectTypes,
-        blockStateChange
+        blockStateChange,
       );
     }
   };
@@ -242,7 +255,7 @@ class FgVisualMediaController {
           }
 
           this.fgLowerVisualMediaController.setInitTimeOffset(
-            data.timeEllapsed
+            data.timeEllapsed,
           );
 
           this.positioning.current = data.positioning;
@@ -255,7 +268,7 @@ class FgVisualMediaController {
           }
 
           this.fgLowerVisualMediaController.setInitTimeOffset(
-            data.timeEllapsed
+            data.timeEllapsed,
           );
 
           this.positioning.current = data.positioning;
@@ -303,7 +316,7 @@ class FgVisualMediaController {
       this.remoteEffects.current[this.username][this.instance][this.type][
         this.visualMediaId
       ] = structuredClone(
-        this.type === "camera" ? defaultCameraEffects : defaultScreenEffects
+        this.type === "camera" ? defaultCameraEffects : defaultScreenEffects,
       );
 
       this.setRerender((prev) => !prev);
@@ -324,7 +337,7 @@ class FgVisualMediaController {
       case "newConsumerWasCreated":
         if (event.header.producerType == "json")
           this.attachPositioningListeners(
-            this.fgVisualMediaOptions.permissions
+            this.fgVisualMediaOptions.permissions,
           );
         break;
       case "requestedClearEffects":
@@ -372,7 +385,7 @@ class FgVisualMediaController {
 
     this.visualMediaContainerRef.current?.addEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.leaveVisualMediaTimer.current) {
@@ -384,7 +397,7 @@ class FgVisualMediaController {
   handlePointerLeave = () => {
     this.visualMediaContainerRef.current?.removeEventListener(
       "pointermove",
-      this.handlePointerMove
+      this.handlePointerMove,
     );
 
     if (this.visualMediaContainerRef.current) {
@@ -401,7 +414,7 @@ class FgVisualMediaController {
 
   attachPositioningListeners = (permissions?: Permissions) => {
     Object.values(this.positioningListeners.current).forEach((userListners) =>
-      Object.values(userListners).forEach((removeListener) => removeListener())
+      Object.values(userListners).forEach((removeListener) => removeListener()),
     );
     this.positioningListeners.current = {};
 
@@ -450,7 +463,7 @@ class FgVisualMediaController {
       this.fgLowerVisualMediaController.reactController.handleReaction(
         reaction,
         false,
-        reactionStyle
+        reactionStyle,
       );
     }
   };
@@ -459,6 +472,113 @@ class FgVisualMediaController {
     switch (event.type) {
       case "reactionOccurred":
         this.reactionOccurred(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onGroupDragStart = (signal: onGroupDragStartType) => {
+    const { affected, startDragPosition } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.visualMediaId && item.type === this.type,
+      )
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+      "position",
+      { rotationPointPlacement: "topLeft" },
+    );
+
+    this.groupStartDragPosition = startDragPosition;
+    this.savedMediaPosition = this.positioning.current.position;
+  };
+
+  onGroupDrag = (signal: onGroupDragType) => {
+    const { affected, dragPosition } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.visualMediaId && item.type === this.type,
+      ) ||
+      !this.groupStartDragPosition ||
+      !this.savedMediaPosition ||
+      !this.bundleRef.current
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.movementDragFunction(
+      {
+        x:
+          ((this.savedMediaPosition.left +
+            dragPosition.x -
+            this.groupStartDragPosition.x) /
+            100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          ((this.savedMediaPosition.top +
+            dragPosition.y -
+            this.groupStartDragPosition.y) /
+            100) *
+          this.bundleRef.current.clientHeight,
+      },
+      { x: 0, y: 0 },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight,
+      },
+    );
+  };
+
+  onGroupDragEnd = (signal: onGroupDragEndType) => {
+    const { affected } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.visualMediaId && item.type === this.type,
+      )
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+    this.groupStartDragPosition = undefined;
+    this.savedMediaPosition = undefined;
+  };
+
+  onGroupDelete = (signal: onGroupDeleteType) => {
+    const { affected } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.visualMediaId && item.type === this.type,
+      )
+    )
+      return;
+
+    this.fgLowerVisualMediaController.handleCloseVideo();
+  };
+
+  handleSignal = (signal: GroupSignals) => {
+    switch (signal.type) {
+      case "groupDelete":
+        this.onGroupDelete(signal);
+        break;
+      case "groupDragStart":
+        this.onGroupDragStart(signal);
+        break;
+      case "groupDrag":
+        this.onGroupDrag(signal);
+        break;
+      case "groupDragEnd":
+        this.onGroupDragEnd(signal);
         break;
       default:
         break;

@@ -432,6 +432,33 @@ class FgContentAdjustmentController {
     }
   };
 
+  getRotatedRectanglePoints = (
+    topLeft: { x: number; y: number },
+    width: number,
+    height: number,
+    angleDeg: number,
+  ): { x: number; y: number }[] => {
+    const angleRad = (angleDeg * Math.PI) / 180;
+    const cos = Math.cos(angleRad);
+    const sin = Math.sin(angleRad);
+
+    // Define the original rectangle corners (relative to top-left)
+    const points: { x: number; y: number }[] = [
+      { x: 0, y: 0 },
+      { x: width, y: 0 },
+      { x: width, y: height },
+      { x: 0, y: height },
+    ];
+
+    // Rotate each point around (0,0) and then translate to topLeft
+    const rotatedPoints = points.map((p) => ({
+      x: topLeft.x + (p.x * cos - p.y * sin),
+      y: topLeft.y + (p.x * sin + p.y * cos),
+    }));
+
+    return rotatedPoints;
+  };
+
   private rotatePoint = (
     px: number,
     py: number,

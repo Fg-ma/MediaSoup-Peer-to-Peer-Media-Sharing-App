@@ -56,13 +56,13 @@ export default function TypeSection({
   useEffect(() => {
     captureMediaTypeContainerRef.current?.addEventListener(
       "wheel",
-      handleWheel
+      handleWheel,
     );
 
     return () => {
       captureMediaTypeContainerRef.current?.removeEventListener(
         "wheel",
-        handleWheel
+        handleWheel,
       );
     };
   }, []);
@@ -114,7 +114,7 @@ export default function TypeSection({
   return (
     <motion.div
       ref={captureMediaTypeContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
       style={{
         bottom: "calc(max(2.5rem, min(13% + 1rem, 4rem)))",
         height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
@@ -124,19 +124,19 @@ export default function TypeSection({
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
       variants={CaptureMediaTypeSectionVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={CaptureMediaTypeSectionTransition}
     >
       <div
         ref={subCaptureMediaTypeContainerRef}
-        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+        className="flex h-full w-max items-center justify-center space-x-2 px-4"
       >
         {Object.entries(captureMediaTypeMeta).map(([key, meta]) => (
           <FgButton
             key={key}
-            className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
+            className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
             clickFunction={() => {
               setMediaType(key as CaptureMediaTypes);
               if (!recording) {
@@ -154,7 +154,7 @@ export default function TypeSection({
             contentFunction={() => (
               <FgSVGElement
                 src={meta.icon}
-                className='flex h-full w-full items-center justify-center'
+                className="flex h-full w-full items-center justify-center"
                 attributes={[
                   { key: "width", value: "75%" },
                   { key: "height", value: "75%" },
@@ -165,7 +165,6 @@ export default function TypeSection({
             hoverContent={<FgHoverContentStandard content={meta.title} />}
             scrollingContainerRef={captureMediaTypeContainerRef}
             options={{
-              hoverZValue: 500000000001,
               hoverTimeoutDuration: 750,
             }}
           />

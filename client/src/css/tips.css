@@ -53,10 +53,10 @@
 .tip-top-right-light::after,
 .tip-bottom-right-light::after,
 .tip-bottom-left-light::after {
-  @apply text-lg font-K2D rounded shadow absolute px-3 py-1 overflow-visible;
+  @apply absolute overflow-visible rounded px-3 py-1 font-K2D text-lg shadow;
   content: attr(data-tip);
   white-space: nowrap;
-  z-index: 50000000000000;
+  z-index: 500000;
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
@@ -70,7 +70,7 @@
 .tip-top-right-dark::after,
 .tip-bottom-right-dark::after,
 .tip-bottom-left-dark::after {
-  @apply text-fg-white bg-fg-tone-black-1;
+  @apply bg-fg-tone-black-1 text-fg-white;
 }
 
 .tip-top-light::after,
@@ -81,7 +81,7 @@
 .tip-top-right-light::after,
 .tip-bottom-right-light::after,
 .tip-bottom-left-light::after {
-  @apply text-fg-tone-black-1 bg-fg-white;
+  @apply bg-fg-white text-fg-tone-black-1;
 }
 
 .tip-top-dark::after,

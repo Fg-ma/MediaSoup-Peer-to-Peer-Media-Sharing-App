@@ -80,7 +80,7 @@
 }
 
 .folder-name {
-  @apply w-full h-8 !font-Josefin text-xl hover:bg-fg-red-light text-fg-red hover:text-fg-white flex items-center justify-start;
+  @apply flex h-8 w-full items-center justify-start !font-Josefin text-xl text-fg-red hover:bg-fg-red-light hover:text-fg-white;
 }
 
 .folder-name-text {
@@ -89,12 +89,12 @@
 }
 
 .folder-name svg {
-  @apply h-6 aspect-square fill-fg-white stroke-fg-white mr-2;
+  @apply mr-2 aspect-square h-6 fill-fg-white stroke-fg-white;
   transition: all 0.1s ease;
 }
 
 .folder-name:hover svg {
-  @apply h-7 mr-1;
+  @apply mr-1 h-7;
 }
 
 .folder-name.active {
@@ -102,11 +102,11 @@
 }
 
 .object-folder {
-  @apply w-full h-max text-fg-white overflow-hidden flex flex-col items-center justify-center bg-fg-tone-black-5;
+  @apply flex h-max w-full flex-col items-center justify-center overflow-hidden bg-fg-tone-black-5 text-fg-white;
 }
 
 .folder-content {
-  @apply flex flex-col items-start justify-center w-full h-max;
+  @apply flex h-max w-full flex-col items-start justify-center;
   display: none;
 }
 
@@ -115,7 +115,11 @@
 }
 
 .folder-item {
-  @apply w-full h-8 !font-K2D hover:bg-fg-red-light text-base flex items-center justify-start;
+  @apply flex h-8 w-full items-center justify-start !font-K2D text-base;
+}
+
+.folder-item:not(.active) {
+  @apply hover:bg-fg-red-dark;
 }
 
 .folder-item.active {
@@ -123,15 +127,15 @@
 }
 
 .folder-item-text {
-  @apply pb-0.5;
+  @apply cursor-pointer select-none pb-0.5;
   max-width: calc(100% - 2rem);
 }
 
 .folder-item svg {
-  @apply h-5 w-5 fill-fg-white stroke-fg-white mr-2;
+  @apply mr-2 h-5 w-5 fill-fg-white stroke-fg-white;
   transition: all 0.1s ease;
 }
 
 .folder-item:hover svg {
-  @apply h-6 w-6 mr-1;
+  @apply mr-1 h-6 w-6;
 }

@@ -40,7 +40,7 @@ export default function OpenKidsTableButton({
         />
       }
       scrollingContainerRef={userPanelRef}
-      options={{ hoverTimeoutDuration: 750, hoverZValue: 5000000000 }}
+      options={{ hoverTimeoutDuration: 750 }}
     />
   );
 }

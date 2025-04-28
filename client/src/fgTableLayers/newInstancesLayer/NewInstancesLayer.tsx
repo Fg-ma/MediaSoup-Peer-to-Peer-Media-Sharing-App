@@ -78,6 +78,7 @@ export default function NewInstancesLayer({
     document.addEventListener(
       "keydown",
       newInstancesLayerController.handleKeyDown,
+      { capture: true },
     );
 
     return () => {
@@ -92,6 +93,7 @@ export default function NewInstancesLayer({
       document.removeEventListener(
         "keydown",
         newInstancesLayerController.handleKeyDown,
+        { capture: true },
       );
     };
   }, [newInstances.current.length]);
@@ -123,7 +125,7 @@ export default function NewInstancesLayer({
   return (
     <div
       ref={newInstanceLayerRef}
-      className="pointer-events-none absolute left-0 top-0 z-[10000] h-full w-full bg-transparent"
+      className="z-new-instances-layer pointer-events-none absolute left-0 top-0 h-full w-full bg-transparent"
     >
       {!hideInstances.current &&
         newInstances.current.map((instance) => {

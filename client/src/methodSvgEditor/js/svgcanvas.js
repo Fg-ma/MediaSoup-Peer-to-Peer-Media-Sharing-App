@@ -203,7 +203,7 @@ $.SvgCanvas = function (container, config) {
           opacity: cur_shape.opacity / 2,
           style: "pointer-events:inherit",
         },
-        100
+        100,
       );
     }
     svgedit.utilities.assignAttributes(shape, data.attr, 100);
@@ -497,7 +497,7 @@ $.SvgCanvas = function (container, config) {
   var runExtensions = (this.runExtensions = function (
     action,
     vars,
-    returnArray
+    returnArray,
   ) {
     var result = false;
     if (returnArray) result = [];
@@ -530,7 +530,7 @@ $.SvgCanvas = function (container, config) {
             svgcontent: svgcontent,
             nonce: getCurrentDrawing().getNonce(),
             selectorManager: selectorManager,
-          })
+          }),
         );
       } else {
         var ext = ext_func;
@@ -541,7 +541,7 @@ $.SvgCanvas = function (container, config) {
       console.log(
         'Cannot add extension "' +
           name +
-          '", an extension by that name already exists"'
+          '", an extension by that name already exists"',
       );
     }
   };
@@ -631,7 +631,7 @@ $.SvgCanvas = function (container, config) {
         if (
           (angle && angle % 90) ||
           svgedit.math.hasMatrixTransform(
-            svgedit.transformlist.getTransformList(elem)
+            svgedit.transformlist.getTransformList(elem),
           )
         ) {
           // Get the BBox from the raw path for these elements
@@ -924,7 +924,7 @@ $.SvgCanvas = function (container, config) {
       var center = transformPoint(
         cx,
         cy,
-        transformListToTransform(tlist).matrix
+        transformListToTransform(tlist).matrix,
       );
       var R_nc = svgroot.createSVGTransform();
       R_nc.setRotate(val, center.x, center.y);
@@ -1089,7 +1089,7 @@ $.SvgCanvas = function (container, config) {
         var chlist = getTransformList(selected);
         var mt = svgroot.createSVGTransform();
         mt.setMatrix(
-          matrixMultiply(transformListToTransform(chlist).matrix, m)
+          matrixMultiply(transformListToTransform(chlist).matrix, m),
         );
         chlist.clear();
         chlist.appendItem(mt);
@@ -1108,7 +1108,7 @@ $.SvgCanvas = function (container, config) {
           var chlist = getTransformList(selected);
           var mt = svgroot.createSVGTransform();
           mt.setMatrix(
-            matrixMultiply(transformListToTransform(chlist).matrix, m)
+            matrixMultiply(transformListToTransform(chlist).matrix, m),
           );
           chlist.clear();
           chlist.appendItem(mt);
@@ -1146,7 +1146,7 @@ $.SvgCanvas = function (container, config) {
           box.y,
           box.width,
           box.height,
-          m
+          m,
         );
         var w = tbox.tr.x - tbox.tl.x,
           h = tbox.bl.y - tbox.tl.y;
@@ -1368,7 +1368,7 @@ $.SvgCanvas = function (container, config) {
   // Returns:
   // Undo command object with the resulting change
   var recalculateDimensions = (this.recalculateDimensions = function (
-    selected
+    selected,
   ) {
     if (selected == null) return null;
     var tlist = getTransformList(selected);
@@ -1429,7 +1429,7 @@ $.SvgCanvas = function (container, config) {
       }
       if (mxs.length === 2) {
         var m_new = svgroot.createSVGTransformFromMatrix(
-          matrixMultiply(mxs[1][0], mxs[0][0])
+          matrixMultiply(mxs[1][0], mxs[0][0]),
         );
         tlist.removeItem(mxs[0][1]);
         tlist.removeItem(mxs[1][1]);
@@ -1447,7 +1447,7 @@ $.SvgCanvas = function (container, config) {
 
         var m = matrixMultiply(
           tlist.getItem(k - 2).matrix,
-          tlist.getItem(k - 1).matrix
+          tlist.getItem(k - 1).matrix,
         );
         mt.setMatrix(m);
         tlist.removeItem(k - 2);
@@ -1556,7 +1556,7 @@ $.SvgCanvas = function (container, config) {
         newcenter = transformPoint(
           box.x + box.width / 2,
           box.y + box.height / 2,
-          transformListToTransform(tlist).matrix
+          transformListToTransform(tlist).matrix,
         ),
         m = svgroot.createSVGMatrix();
 
@@ -1656,7 +1656,7 @@ $.SvgCanvas = function (container, config) {
                 sm,
                 tmn,
                 m,
-                t2n.inverse()
+                t2n.inverse(),
               );
 
               var translateOrigin = svgroot.createSVGTransform(),
@@ -1798,7 +1798,7 @@ $.SvgCanvas = function (container, config) {
 
             var em = matrixMultiply(
               m,
-              transformListToTransform(childTlist).matrix
+              transformListToTransform(childTlist).matrix,
             );
             var e2m = svgroot.createSVGTransform();
             e2m.setMatrix(em);
@@ -1922,7 +1922,7 @@ $.SvgCanvas = function (container, config) {
           newcenter = transformPoint(
             box.x + box.width / 2,
             box.y + box.height / 2,
-            transformListToTransform(tlist).matrix
+            transformListToTransform(tlist).matrix,
           );
 
         var a = (angle * Math.PI) / 180;
@@ -2235,7 +2235,7 @@ $.SvgCanvas = function (container, config) {
   // Parameters:
   // elemsToRemove - an array of elements to remove from selection
   var removeFromSelection = (this.removeFromSelection = function (
-    elemsToRemove
+    elemsToRemove,
   ) {
     if (selectedElements[0] == null) {
       return;
@@ -2479,7 +2479,7 @@ $.SvgCanvas = function (container, config) {
                 height: 0,
                 display: "inline",
               },
-              100
+              100,
             );
           }
           break;
@@ -2497,7 +2497,7 @@ $.SvgCanvas = function (container, config) {
               height: 0,
               display: "inline",
             },
-            100
+            100,
           );
           break;
         case "resize":
@@ -2727,7 +2727,7 @@ $.SvgCanvas = function (container, config) {
           start_y: start_y,
           selectedElements: selectedElements,
         },
-        true
+        true,
       );
 
       $.each(ext_result, function (i, r) {
@@ -2851,7 +2851,7 @@ $.SvgCanvas = function (container, config) {
               width: Math.abs(real_x - r_start_x),
               height: Math.abs(real_y - r_start_y),
             },
-            100
+            100,
           );
 
           // for each selected:
@@ -2994,7 +2994,7 @@ $.SvgCanvas = function (container, config) {
               width: Math.abs(real_x - r_start_x * current_zoom),
               height: Math.abs(real_y - r_start_y * current_zoom),
             },
-            100
+            100,
           );
           break;
         case "text":
@@ -3004,7 +3004,7 @@ $.SvgCanvas = function (container, config) {
               x: x,
               y: y,
             },
-            1000
+            1000,
           );
           break;
         case "line":
@@ -3066,7 +3066,7 @@ $.SvgCanvas = function (container, config) {
               x: new_x,
               y: new_y,
             },
-            1000
+            1000,
           );
 
           break;
@@ -3155,7 +3155,7 @@ $.SvgCanvas = function (container, config) {
                 width: Math.abs(real_x - r_start_x * current_zoom),
                 height: Math.abs(real_y - r_start_y * current_zoom),
               },
-              100
+              100,
             );
           }
           pathActions.mouseMove(evt, x, y);
@@ -3511,7 +3511,7 @@ $.SvgCanvas = function (container, config) {
           mouse_x: mouse_x,
           mouse_y: mouse_y,
         },
-        true
+        true,
       );
 
       $.each(ext_result, function (i, r) {
@@ -3779,7 +3779,7 @@ $.SvgCanvas = function (container, config) {
       for (let i = 0; i < textContent.length; i++) {
         const tspan = document.createElementNS(
           "http://www.w3.org/2000/svg",
-          "tspan"
+          "tspan",
         );
         tspan.textContent = textContent[i];
         textElement.appendChild(tspan);
@@ -3834,7 +3834,7 @@ $.SvgCanvas = function (container, config) {
         bl = ptToScreen(startbb.x, textbb.y + textbb.height),
         br = ptToScreen(
           startbb.x + (endbb.x - startbb.x),
-          textbb.y + textbb.height
+          textbb.y + textbb.height,
         );
 
       var dstr =
@@ -4038,7 +4038,7 @@ $.SvgCanvas = function (container, config) {
         if (
           evt.target !== curtext &&
           !Array.from(curtext.children).some((child) =>
-            child.isEqualNode(evt.target)
+            child.isEqualNode(evt.target),
           ) &&
           mouse_x < last_x + 2 &&
           mouse_x > last_x - 2 &&
@@ -4248,7 +4248,7 @@ $.SvgCanvas = function (container, config) {
             var newpts = svgedit.path.smoothControlPoints(
               prevCtlPt,
               ct1,
-              curpos
+              curpos,
             );
             if (newpts && newpts.length == 2) {
               var prevArr = d[d.length - 1].split(",");
@@ -4339,7 +4339,7 @@ $.SvgCanvas = function (container, config) {
             // set stretchy line to first point
             stretchy.setAttribute(
               "d",
-              ["M", mouse_x, mouse_y, mouse_x, mouse_y].join(" ")
+              ["M", mouse_x, mouse_y, mouse_x, mouse_y].join(" "),
             );
             var index = subpath ? svgedit.path.path.segs.length : 0;
             svgedit.path.addPointGrip(index, mouse_x, mouse_y);
@@ -4398,7 +4398,7 @@ $.SvgCanvas = function (container, config) {
                 if (s_seg.pathSegType === 4) {
                   var newseg = drawn_path.createSVGPathSegLinetoAbs(
                     abs_x,
-                    abs_y
+                    abs_y,
                   );
                 } else {
                   var newseg = drawn_path.createSVGPathSegCurvetoCubicAbs(
@@ -4407,7 +4407,7 @@ $.SvgCanvas = function (container, config) {
                     s_seg.x1 / current_zoom,
                     s_seg.y1 / current_zoom,
                     grip_x,
-                    grip_y
+                    grip_y,
                   );
                 }
                 var endseg = drawn_path.createSVGPathSegClosePath();
@@ -4470,7 +4470,7 @@ $.SvgCanvas = function (container, config) {
               if (s_seg.pathSegType === 4) {
                 var newseg = drawn_path.createSVGPathSegLinetoAbs(
                   round(x),
-                  round(y)
+                  round(y),
                 );
               } else {
                 var newseg = drawn_path.createSVGPathSegCurvetoCubicAbs(
@@ -4479,7 +4479,7 @@ $.SvgCanvas = function (container, config) {
                   s_seg.x1 / current_zoom,
                   s_seg.y1 / current_zoom,
                   s_seg.x2 / current_zoom,
-                  s_seg.y2 / current_zoom
+                  s_seg.y2 / current_zoom,
                 );
               }
 
@@ -4639,7 +4639,7 @@ $.SvgCanvas = function (container, config) {
               height: 0,
               display: "inline",
             },
-            100
+            100,
           );
         }
       },
@@ -4730,7 +4730,7 @@ $.SvgCanvas = function (container, config) {
                   alt_x,
                   alt_y,
                 ],
-                drawn_path
+                drawn_path,
               );
             }
           } else {
@@ -4764,7 +4764,7 @@ $.SvgCanvas = function (container, config) {
                     lastgripx,
                     lastgripy,
                   ],
-                  stretchy
+                  stretchy,
                 );
               } else if (firstCtrl) {
                 svgedit.path.replacePathSeg(
@@ -4778,7 +4778,7 @@ $.SvgCanvas = function (container, config) {
                     mouse_x,
                     mouse_y,
                   ],
-                  stretchy
+                  stretchy,
                 );
               } else {
                 svgedit.path.replacePathSeg(4, 1, [mouse_x, mouse_y], stretchy);
@@ -4794,14 +4794,14 @@ $.SvgCanvas = function (container, config) {
               x: svgedit.path.path.dragging[0],
               y: svgedit.path.path.dragging[1],
             },
-            svgedit.path.path
+            svgedit.path.path,
           );
           var mpt = svgedit.path.getPointFromGrip(
             {
               x: mouse_x,
               y: mouse_y,
             },
-            svgedit.path.path
+            svgedit.path.path,
           );
           var diff_x = mpt.x - pt.x;
           var diff_y = mpt.y - pt.y;
@@ -4910,7 +4910,7 @@ $.SvgCanvas = function (container, config) {
         clearSelection();
         svgedit.path.path.show(true).update();
         svgedit.path.path.oldbbox = svgedit.utilities.getBBox(
-          svgedit.path.path.elem
+          svgedit.path.path.elem,
         );
         subpath = false;
       },
@@ -5124,7 +5124,7 @@ $.SvgCanvas = function (container, config) {
           // Create a line going to the previous "M"
           const newseg = elem.createSVGPathSegLinetoAbs(
             startItem.x,
-            startItem.y
+            startItem.y,
           );
 
           const closer = elem.createSVGPathSegClosePath();
@@ -5472,7 +5472,7 @@ $.SvgCanvas = function (container, config) {
               addToD(
                 [[seg.r1, seg.r2]],
                 [seg.angle, seg.largeArcFlag ? 1 : 0, seg.sweepFlag ? 1 : 0],
-                [x, y]
+                [x, y],
               );
               break;
             case 16: // absolute smooth cubic (S)
@@ -5564,7 +5564,7 @@ $.SvgCanvas = function (container, config) {
     }
 
     var defelems = $(defs).find(
-      "linearGradient, radialGradient, filter, marker, svg, symbol"
+      "linearGradient, radialGradient, filter, marker, svg, symbol",
     );
 
     (defelem_ids = []), (i = defelems.length);
@@ -5686,7 +5686,7 @@ $.SvgCanvas = function (container, config) {
             (vb ? ' viewBox="' + vb + '"' : "") +
             ' xmlns="' +
             svgns +
-            '"'
+            '"',
         );
 
         var nsuris = {};
@@ -6106,7 +6106,7 @@ $.SvgCanvas = function (container, config) {
       if ($(grad).attr("gradientUnits") === "userSpaceOnUse") {
         // TODO: Support more than one element with this ref by duplicating parent grad
         var elems = $(svgcontent).find(
-          '[fill="url(#' + grad.id + ')"],[stroke="url(#' + grad.id + ')"]'
+          '[fill="url(#' + grad.id + ')"],[stroke="url(#' + grad.id + ')"]',
         );
         if (!elems.length) return;
 
@@ -6213,8 +6213,8 @@ $.SvgCanvas = function (container, config) {
         new RemoveElementCommand(
           $elem[0],
           $elem[0].nextSibling,
-          $elem[0].parentNode
-        )
+          $elem[0].parentNode,
+        ),
       );
       $elem.remove();
 
@@ -6247,7 +6247,7 @@ $.SvgCanvas = function (container, config) {
       // Put the dupe gradients back into <defs> (after uniquifying them)
       if (svgedit.browser.isGecko()) {
         $(findDefs()).append(
-          $(g).find("linearGradient,radialGradient,pattern")
+          $(g).find("linearGradient,radialGradient,pattern"),
         );
       }
 
@@ -6262,7 +6262,7 @@ $.SvgCanvas = function (container, config) {
           var nextSibling = elem.nextSibling;
           parent.removeChild(elem);
           batchCmd.addSubCommand(
-            new RemoveElementCommand(elem, nextSibling, parent)
+            new RemoveElementCommand(elem, nextSibling, parent),
           );
         }
         batchCmd.addSubCommand(new InsertElementCommand(g));
@@ -6316,7 +6316,7 @@ $.SvgCanvas = function (container, config) {
         const els = docEl.querySelectorAll(ruleset.selector);
         els.forEach((el) => {
           ruleset.rules.forEach((rule) =>
-            el.setAttribute(rule.directive, rule.value)
+            el.setAttribute(rule.directive, rule.value),
           );
         });
       });
@@ -6348,7 +6348,7 @@ $.SvgCanvas = function (container, config) {
       var nextSibling = svgcontent.nextSibling;
       var oldzoom = svgroot.removeChild(svgcontent);
       batchCmd.addSubCommand(
-        new RemoveElementCommand(oldzoom, nextSibling, svgroot)
+        new RemoveElementCommand(oldzoom, nextSibling, svgroot),
       );
 
       svgcontent = svgdoc.adoptNode(newDoc.documentElement);
@@ -6761,7 +6761,7 @@ $.SvgCanvas = function (container, config) {
       var batchCmd = new BatchCommand("Delete Layer");
       // store in our Undo History
       batchCmd.addSubCommand(
-        new RemoveElementCommand(current_layer, nextSibling, parent)
+        new RemoveElementCommand(current_layer, nextSibling, parent),
       );
       addCommandToHistory(batchCmd);
       clearSelection();
@@ -6782,7 +6782,7 @@ $.SvgCanvas = function (container, config) {
   // true if the current layer was switched, otherwise false
   this.setCurrentLayer = function (name) {
     var result = getCurrentDrawing().setCurrentLayer(
-      svgedit.utilities.toXml(name)
+      svgedit.utilities.toXml(name),
     );
     if (result) {
       clearSelection();
@@ -6828,7 +6828,7 @@ $.SvgCanvas = function (container, config) {
             child.textContent = newname;
 
             batchCmd.addSubCommand(
-              new ChangeElementCommand(child, { "#text": oldname })
+              new ChangeElementCommand(child, { "#text": oldname }),
             );
             addCommandToHistory(batchCmd);
             call("changed", [oldLayer]);
@@ -6885,8 +6885,8 @@ $.SvgCanvas = function (container, config) {
           new MoveElementCommand(
             drawing.current_layer,
             oldNextSibling,
-            svgcontent
-          )
+            svgcontent,
+          ),
         );
 
         identifyLayers();
@@ -6919,8 +6919,8 @@ $.SvgCanvas = function (container, config) {
         new ChangeElementCommand(
           layer,
           { display: oldDisplay },
-          "Layer Visibility"
-        )
+          "Layer Visibility",
+        ),
       );
     } else {
       return false;
@@ -6968,7 +6968,7 @@ $.SvgCanvas = function (container, config) {
       var oldLayer = elem.parentNode;
       layer.appendChild(elem);
       batchCmd.addSubCommand(
-        new MoveElementCommand(elem, oldNextSibling, oldLayer)
+        new MoveElementCommand(elem, oldNextSibling, oldLayer),
       );
     }
 
@@ -6989,8 +6989,8 @@ $.SvgCanvas = function (container, config) {
       new RemoveElementCommand(
         drawing.current_layer,
         layerNextSibling,
-        svgcontent
-      )
+        svgcontent,
+      ),
     );
 
     while (drawing.current_layer.firstChild) {
@@ -6998,7 +6998,7 @@ $.SvgCanvas = function (container, config) {
       if (ch.localName == "title") {
         var chNextSibling = ch.nextSibling;
         batchCmd.addSubCommand(
-          new RemoveElementCommand(ch, chNextSibling, drawing.current_layer)
+          new RemoveElementCommand(ch, chNextSibling, drawing.current_layer),
         );
         drawing.current_layer.removeChild(ch);
         continue;
@@ -7006,7 +7006,7 @@ $.SvgCanvas = function (container, config) {
       var oldNextSibling = ch.nextSibling;
       prev.appendChild(ch);
       batchCmd.addSubCommand(
-        new MoveElementCommand(ch, oldNextSibling, drawing.current_layer)
+        new MoveElementCommand(ch, oldNextSibling, drawing.current_layer),
       );
     }
 
@@ -7216,14 +7216,14 @@ $.SvgCanvas = function (container, config) {
       // Remove title element
       var tsNextSibling = ts.nextSibling;
       batchCmd.addSubCommand(
-        new RemoveElementCommand(ts[0], tsNextSibling, elem)
+        new RemoveElementCommand(ts[0], tsNextSibling, elem),
       );
       ts.remove();
     } else if (ts.length) {
       // Change title contents
       var title = ts[0];
       batchCmd.addSubCommand(
-        new ChangeElementCommand(title, { "#text": title.textContent })
+        new ChangeElementCommand(title, { "#text": title.textContent }),
       );
       title.textContent = val;
     } else {
@@ -7275,7 +7275,7 @@ $.SvgCanvas = function (container, config) {
       doc_title.parentNode.removeChild(doc_title);
     }
     batchCmd.addSubCommand(
-      new ChangeElementCommand(doc_title, { "#text": old_title })
+      new ChangeElementCommand(doc_title, { "#text": old_title }),
     );
     addCommandToHistory(batchCmd);
   };
@@ -7347,17 +7347,17 @@ $.SvgCanvas = function (container, config) {
       this.contentW = x;
       this.contentH = y;
       batchCmd.addSubCommand(
-        new ChangeElementCommand(svgcontent, { width: w, height: h })
+        new ChangeElementCommand(svgcontent, { width: w, height: h }),
       );
 
       svgcontent.setAttribute(
         "viewBox",
-        [0, 0, x / current_zoom, y / current_zoom].join(" ")
+        [0, 0, x / current_zoom, y / current_zoom].join(" "),
       );
       batchCmd.addSubCommand(
         new ChangeElementCommand(svgcontent, {
           viewBox: ["0 0", w, h].join(" "),
-        })
+        }),
       );
 
       addCommandToHistory(batchCmd);
@@ -7427,7 +7427,7 @@ $.SvgCanvas = function (container, config) {
         break;
       case "layer":
         bb = getStrokedBBox(
-          getVisibleElements(getCurrentDrawing().getCurrentLayer())
+          getVisibleElements(getCurrentDrawing().getCurrentLayer()),
         );
         break;
       default:
@@ -7445,7 +7445,7 @@ $.SvgCanvas = function (container, config) {
     var res = getResolution();
     svgcontent.setAttribute(
       "viewBox",
-      "0 0 " + res.w / zoomlevel + " " + res.h / zoomlevel
+      "0 0 " + res.w / zoomlevel + " " + res.h / zoomlevel,
     );
     current_zoom = zoomlevel;
     $.each(selectedElements, function (i, elem) {
@@ -7904,7 +7904,7 @@ $.SvgCanvas = function (container, config) {
     tagName,
     attr,
     defaultVal,
-    id
+    id,
   ) {
     var val = defaultVal !== undefined ? defaultVal : 0;
 
@@ -7966,7 +7966,7 @@ $.SvgCanvas = function (container, config) {
         if (!existingFilter.includes(newFilter)) {
           changeSelectedAttributeNoUndo(
             "filter",
-            existingFilter ? existingFilter + " " + newFilter : newFilter
+            existingFilter ? existingFilter + " " + newFilter : newFilter,
           );
         }
       }
@@ -7977,7 +7977,7 @@ $.SvgCanvas = function (container, config) {
         if (!existingFilter.includes(newFilter)) {
           elem.setAttribute(
             "filter",
-            existingFilter ? existingFilter + " " + newFilter : newFilter
+            existingFilter ? existingFilter + " " + newFilter : newFilter,
           );
         }
       }
@@ -7992,7 +7992,7 @@ $.SvgCanvas = function (container, config) {
       changes,
       extension,
       deleteValue,
-      noFilterCallback
+      noFilterCallback,
     ) {
       if (!filter) {
         noFilterCallback(changes);
@@ -8006,7 +8006,7 @@ $.SvgCanvas = function (container, config) {
         let existingFilter = elem.getAttribute("filter") || "";
         existingFilter = existingFilter.replace(
           "url(#" + elem.id + extension + ")",
-          ""
+          "",
         );
         changeSelectedAttributeNoUndo("filter", existingFilter.trim());
         filterHidden = true;
@@ -8019,7 +8019,7 @@ $.SvgCanvas = function (container, config) {
           if (!existingFilter.includes(newFilter)) {
             changeSelectedAttributeNoUndo(
               "filter",
-              existingFilter ? existingFilter + " " + newFilter : newFilter
+              existingFilter ? existingFilter + " " + newFilter : newFilter,
             );
           }
         }
@@ -8030,7 +8030,7 @@ $.SvgCanvas = function (container, config) {
           if (!existingFilter.includes(newFilter)) {
             elem.setAttribute(
               "filter",
-              existingFilter ? existingFilter + " " + newFilter : newFilter
+              existingFilter ? existingFilter + " " + newFilter : newFilter,
             );
           }
         }
@@ -8040,7 +8040,7 @@ $.SvgCanvas = function (container, config) {
 
           if (matches)
             matches.map((match) =>
-              changeSelectedAttributeNoUndo(change.attr, change.val, [match])
+              changeSelectedAttributeNoUndo(change.attr, change.val, [match]),
             );
         });
         canvas.setOffsets(filter);
@@ -8070,7 +8070,7 @@ $.SvgCanvas = function (container, config) {
           width: "300%",
           height: "300%",
         },
-        100
+        100,
       );
     };
 
@@ -8110,7 +8110,7 @@ $.SvgCanvas = function (container, config) {
       if (!existingFilter.includes(newFilter)) {
         changeSelectedAttribute(
           "filter",
-          existingFilter ? existingFilter + " " + newFilter : newFilter
+          existingFilter ? existingFilter + " " + newFilter : newFilter,
         );
       }
 
@@ -8145,7 +8145,7 @@ $.SvgCanvas = function (container, config) {
       let existingFilter = elem.getAttribute("filter") || "";
       existingFilter = existingFilter.replace(
         "url(#" + elem.id + extension + ")",
-        ""
+        "",
       );
       if (existingFilter) {
         changeSelectedAttributeNoUndo("filter", existingFilter.trim());
@@ -8184,7 +8184,7 @@ $.SvgCanvas = function (container, config) {
       deleteValue,
       getFilterItems,
       offsetsCallback,
-      completeCallback
+      completeCallback,
     ) {
       if (cur_command) {
         finishChange();
@@ -8230,7 +8230,7 @@ $.SvgCanvas = function (container, config) {
         let existingFilter = elem.getAttribute("filter") || "";
         existingFilter = existingFilter.replace(
           "url(#" + elem.id + extension + ")",
-          ""
+          "",
         );
 
         if (existingFilter) {
@@ -8248,7 +8248,7 @@ $.SvgCanvas = function (container, config) {
         if (!existingFilter.includes(newFilter)) {
           changeSelectedAttribute(
             "filter",
-            existingFilter ? existingFilter + " " + newFilter : newFilter
+            existingFilter ? existingFilter + " " + newFilter : newFilter,
           );
         }
 
@@ -8263,7 +8263,7 @@ $.SvgCanvas = function (container, config) {
 
         if (matches)
           matches.map((match) =>
-            canvas.undoMgr.beginUndoableChange(change.attr, [match])
+            canvas.undoMgr.beginUndoableChange(change.attr, [match]),
           );
       });
       if (complete) {
@@ -8432,7 +8432,7 @@ $.SvgCanvas = function (container, config) {
     batchCmd.addSubCommand(
       new ChangeElementCommand(elem, {
         "#href": cur_href,
-      })
+      }),
     );
 
     if (setsize) {
@@ -8485,7 +8485,7 @@ $.SvgCanvas = function (container, config) {
     batchCmd.addSubCommand(
       new ChangeElementCommand(elem, {
         "#href": cur_href,
-      })
+      }),
     );
 
     addCommandToHistory(batchCmd);
@@ -8525,7 +8525,7 @@ $.SvgCanvas = function (container, config) {
           selected.setAttribute("rx", val);
           selected.setAttribute("ry", val);
           addCommandToHistory(
-            new ChangeElementCommand(selected, { rx: r, ry: r }, "Radius")
+            new ChangeElementCommand(selected, { rx: r, ry: r }, "Radius"),
           );
           call("changed", [selected]);
         }
@@ -8608,7 +8608,7 @@ $.SvgCanvas = function (container, config) {
         if (elem.getAttribute(this)) {
           attrs[this] = elem.getAttribute(this);
         }
-      }
+      },
     );
 
     var path = addSvgElementFromJson({
@@ -8754,7 +8754,7 @@ $.SvgCanvas = function (container, config) {
 
       var nextSibling = elem.nextSibling;
       batchCmd.addSubCommand(
-        new RemoveElementCommand(elem, nextSibling, parent)
+        new RemoveElementCommand(elem, nextSibling, parent),
       );
       batchCmd.addSubCommand(new InsertElementCommand(path));
 
@@ -8831,7 +8831,7 @@ $.SvgCanvas = function (container, config) {
           canvas.moveSelectedElements(
             diff_x * current_zoom,
             diff_y * current_zoom,
-            true
+            true,
           );
           continue;
         }
@@ -8875,7 +8875,7 @@ $.SvgCanvas = function (container, config) {
                 var center = transformPoint(
                   box.x + box.width / 2,
                   box.y + box.height / 2,
-                  transformListToTransform(tlist).matrix
+                  transformListToTransform(tlist).matrix,
                 );
                 var cx = center.x,
                   cy = center.y;
@@ -8903,7 +8903,7 @@ $.SvgCanvas = function (container, config) {
   var changeSelectedAttribute = (this.changeSelectedAttribute = function (
     attr,
     val,
-    elems
+    elems,
   ) {
     var elems = elems || selectedElements;
     canvas.undoMgr.beginUndoableChange(attr, elems);
@@ -8950,7 +8950,7 @@ $.SvgCanvas = function (container, config) {
 
       selectedElements[i] = null;
       batchCmd.addSubCommand(
-        new RemoveElementCommand(elem, nextSibling, parent)
+        new RemoveElementCommand(elem, nextSibling, parent),
       );
     }
     if (!batchCmd.isEmpty()) addCommandToHistory(batchCmd);
@@ -8985,7 +8985,7 @@ $.SvgCanvas = function (container, config) {
       selectedCopy.push(selected); //for the copy
       selectedElements[i] = null;
       batchCmd.addSubCommand(
-        new RemoveElementCommand(elem, nextSibling, parent)
+        new RemoveElementCommand(elem, nextSibling, parent),
       );
     }
     if (!batchCmd.isEmpty()) addCommandToHistory(batchCmd);
@@ -9020,7 +9020,7 @@ $.SvgCanvas = function (container, config) {
       if (!getElem(elem.id)) copy.id = elem.id;
       pasted.push(copy);
       (current_group ?? getCurrentDrawing().getCurrentLayer()).appendChild(
-        copy
+        copy,
       );
       batchCmd.addSubCommand(new InsertElementCommand(copy));
     }
@@ -9086,7 +9086,7 @@ $.SvgCanvas = function (container, config) {
       var oldParent = elem.parentNode;
       g.appendChild(elem);
       batchCmd.addSubCommand(
-        new MoveElementCommand(elem, oldNextSibling, oldParent)
+        new MoveElementCommand(elem, oldNextSibling, oldParent),
       );
     }
     if (!batchCmd.isEmpty()) addCommandToHistory(batchCmd);
@@ -9130,7 +9130,7 @@ $.SvgCanvas = function (container, config) {
       if (gattrs.opacity !== null && gattrs.opacity !== 1) {
         var new_opac =
           Math.round(
-            (elem.getAttribute("opacity") || 1) * gattrs.opacity * 100
+            (elem.getAttribute("opacity") || 1) * gattrs.opacity * 100,
           ) / 100;
         changeSelectedAttribute("opacity", new_opac, [elem]);
       }
@@ -9141,7 +9141,7 @@ $.SvgCanvas = function (container, config) {
           "_blur",
           "feGaussianBlur",
           "stdDeviation",
-          0
+          0,
         );
         var orig_cblur = cblur;
         if (!gblur)
@@ -9150,7 +9150,7 @@ $.SvgCanvas = function (container, config) {
             "_blur",
             "feGaussianBlur",
             "stdDeviation",
-            0
+            0,
           );
         if (cblur) {
           // Is this formula correct?
@@ -9164,7 +9164,7 @@ $.SvgCanvas = function (container, config) {
           "_grayscale",
           "feColorMatrix",
           "values",
-          0
+          0,
         );
         var orig_cgrayscale = cgrayscale;
         if (!ggrayscale)
@@ -9173,7 +9173,7 @@ $.SvgCanvas = function (container, config) {
             "_grayscale",
             "feColorMatrix",
             "values",
-            0
+            0,
           );
         if (cgrayscale) {
           // Is this formula correct?
@@ -9263,7 +9263,7 @@ $.SvgCanvas = function (container, config) {
           var coldc = transformPoint(
             cbox.x + cbox.width / 2,
             cbox.y + cbox.height / 2,
-            ceqm
+            ceqm,
           );
 
           // sum group and child's angles
@@ -9381,7 +9381,7 @@ $.SvgCanvas = function (container, config) {
         if (elem.tagName === "title") {
           var nextSibling = elem.nextSibling;
           batchCmd.addSubCommand(
-            new RemoveElementCommand(elem, nextSibling, oldParent)
+            new RemoveElementCommand(elem, nextSibling, oldParent),
           );
           oldParent.removeChild(elem);
           continue;
@@ -9389,7 +9389,7 @@ $.SvgCanvas = function (container, config) {
 
         children[i++] = elem = parent.insertBefore(elem, anchor);
         batchCmd.addSubCommand(
-          new MoveElementCommand(elem, oldNextSibling, oldParent)
+          new MoveElementCommand(elem, oldNextSibling, oldParent),
         );
       }
 
@@ -9423,7 +9423,7 @@ $.SvgCanvas = function (container, config) {
       // event handler.
       if (oldNextSibling != t.nextSibling) {
         batchCmd.addSubCommand(
-          new MoveElementCommand(t, oldNextSibling, oldParent, "top")
+          new MoveElementCommand(t, oldNextSibling, oldParent, "top"),
         );
         call("changed", [t]);
       }
@@ -9455,7 +9455,7 @@ $.SvgCanvas = function (container, config) {
       // event handler.
       if (oldNextSibling != t.nextSibling) {
         batchCmd.addSubCommand(
-          new MoveElementCommand(t, oldNextSibling, oldParent, "bottom")
+          new MoveElementCommand(t, oldNextSibling, oldParent, "bottom"),
         );
         call("changed", [t]);
       }
@@ -9500,7 +9500,7 @@ $.SvgCanvas = function (container, config) {
       // event handler.
       if (oldNextSibling != t.nextSibling) {
         batchCmd.addSubCommand(
-          new MoveElementCommand(t, oldNextSibling, oldParent, "Move " + dir)
+          new MoveElementCommand(t, oldNextSibling, oldParent, "Move " + dir),
         );
         call("changed", [t]);
       }
@@ -9781,7 +9781,7 @@ $.SvgCanvas = function (container, config) {
 
     selectorManager.selectorParentGroup.setAttribute(
       "transform",
-      "translate(" + x + "," + y + ")"
+      "translate(" + x + "," + y + ")",
     );
 
     return {
@@ -9833,7 +9833,7 @@ $.SvgCanvas = function (container, config) {
     var cur_elem = selectedElements[0];
     var elem = false;
     var all_elems = getVisibleElements(
-      current_group ?? getCurrentDrawing().getCurrentLayer()
+      current_group ?? getCurrentDrawing().getCurrentLayer(),
     );
     if (!all_elems.length) return;
     if (cur_elem == null) {

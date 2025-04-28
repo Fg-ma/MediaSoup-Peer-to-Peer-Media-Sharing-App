@@ -15,7 +15,7 @@ export default function DownloadButton({
 }) {
   return (
     <FgButton
-      className='flex z-20 h-full aspect-square items-center justify-center pointer-events-auto'
+      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center"
       clickFunction={(event) => {
         event.stopPropagation();
         captureMediaController.downloadCapture();
@@ -23,7 +23,7 @@ export default function DownloadButton({
       contentFunction={() => (
         <FgSVGElement
           src={downloadIcon}
-          className='w-[85%] aspect-square flex items-center justify-center'
+          className="flex aspect-square w-[85%] items-center justify-center"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -32,12 +32,11 @@ export default function DownloadButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Download' style='light' />}
+      hoverContent={<FgHoverContentStandard content="Download" style="light" />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
       }}
     />
   );

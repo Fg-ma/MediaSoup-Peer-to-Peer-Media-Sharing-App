@@ -43,7 +43,7 @@ MD.Editor = function () {
         editor.paintBox.fill.prep();
         editor.paintBox.stroke.prep();
         svgCanvas.runExtensions("onNewDocument");
-      }
+      },
     );
   }
 
@@ -169,7 +169,7 @@ MD.Editor = function () {
     var stroke = editor.paintBox.stroke.getPaint(
       stroke_color,
       stroke_opacity,
-      "stroke"
+      "stroke",
     );
     var fill = editor.paintBox.fill.getPaint(fill_color, fill_opacity, "fill");
     editor.paintBox.fill.setPaint(stroke, true);
@@ -329,9 +329,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getBlurFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -363,9 +363,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getGrayscaleFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -397,9 +397,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getSaturationFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -440,9 +440,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWaveDistortionStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -483,9 +483,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWaveDistortionFrequencyFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -527,9 +527,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getCrackedGlassFrequencyFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -571,9 +571,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getCrackedGlassDetailFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -615,9 +615,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getCrackedGlassStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -633,7 +633,7 @@ MD.Editor = function () {
         attr: {
           in: "coloredBlur",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -642,7 +642,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -701,9 +701,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getShadowXFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -719,7 +719,7 @@ MD.Editor = function () {
         attr: {
           in: "coloredBlur",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -728,7 +728,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -787,9 +787,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getShadowYFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -805,7 +805,7 @@ MD.Editor = function () {
         attr: {
           in: "coloredBlur",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -814,7 +814,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -873,9 +873,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getShadowStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -891,7 +891,7 @@ MD.Editor = function () {
         attr: {
           in: "coloredBlur",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -900,7 +900,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -966,15 +966,15 @@ MD.Editor = function () {
                 extension,
                 deleteValue,
                 getShadowColorFilterItems,
-                svgCanvas.setOffsets
-              )
-          )
+                svgCanvas.setOffsets,
+              ),
+          ),
       );
     } else {
       svgCanvas.removeEffect("_shadow");
       editor.paintBox.shadow.setPaint(
         { alpha: 100, solidColor: "090909", type: "solidColor" },
-        true
+        true,
       );
     }
   }
@@ -1030,15 +1030,15 @@ MD.Editor = function () {
                 extension,
                 deleteValue,
                 getOverlayColorFilterItems,
-                svgCanvas.setOffsets
-              )
-          )
+                svgCanvas.setOffsets,
+              ),
+          ),
       );
     } else {
       svgCanvas.removeEffect("_overlay");
       editor.paintBox.shadow.setPaint(
         { alpha: 100, solidColor: "d40213", type: "solidColor" },
-        true
+        true,
       );
     }
   }
@@ -1103,15 +1103,15 @@ MD.Editor = function () {
                 extension,
                 deleteValue,
                 getNeonColorFilterItems,
-                svgCanvas.setOffsets
-              )
-          )
+                svgCanvas.setOffsets,
+              ),
+          ),
       );
     } else {
       svgCanvas.removeEffect("_neon");
       editor.paintBox.shadow.setPaint(
         { alpha: 100, solidColor: "d40213", type: "solidColor" },
-        true
+        true,
       );
     }
   }
@@ -1144,9 +1144,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getHueShiftFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1163,7 +1163,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: val + " 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1173,7 +1173,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1183,7 +1183,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     return [feComponentTransfer];
@@ -1207,9 +1207,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getColorHighlightFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1226,7 +1226,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1236,7 +1236,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: val + " 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1246,7 +1246,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     return [feComponentTransfer];
@@ -1270,9 +1270,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getColorHighlightGFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1289,7 +1289,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1299,7 +1299,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: "1 0",
         },
-      })
+      }),
     );
 
     feComponentTransfer.appendChild(
@@ -1309,7 +1309,7 @@ MD.Editor = function () {
           type: "table",
           tableValues: val + " 0",
         },
-      })
+      }),
     );
 
     return [feComponentTransfer];
@@ -1333,9 +1333,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getColorHighlightBFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1385,9 +1385,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getGooeyStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1410,7 +1410,7 @@ MD.Editor = function () {
           values: "1;0.1;1",
           attributeName: "flood-opacity",
         },
-      })
+      }),
     );
 
     feFlood.appendChild(
@@ -1422,7 +1422,7 @@ MD.Editor = function () {
           values: "#00ffff;#ff00ff;#00ffff",
           attributeName: "flood-color",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -1436,7 +1436,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -1445,7 +1445,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -1489,9 +1489,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getCyberpunkStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1514,7 +1514,7 @@ MD.Editor = function () {
           values: "1;0.1;1",
           attributeName: "flood-opacity",
         },
-      })
+      }),
     );
 
     feFlood.appendChild(
@@ -1526,7 +1526,7 @@ MD.Editor = function () {
           values: "#00ffff;#ff00ff;#00ffff",
           attributeName: "flood-color",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -1540,7 +1540,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -1549,7 +1549,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -1593,9 +1593,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getCyberpunkSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1619,7 +1619,7 @@ MD.Editor = function () {
           dur: "0.7s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feFlood = svgCanvas.addSvgElementFromJson({
@@ -1640,7 +1640,7 @@ MD.Editor = function () {
           dur: "0.7s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -1654,7 +1654,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -1663,7 +1663,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -1708,9 +1708,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getFireStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1734,7 +1734,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feFlood = svgCanvas.addSvgElementFromJson({
@@ -1755,7 +1755,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -1769,7 +1769,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -1778,7 +1778,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -1815,9 +1815,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getFireSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -1845,7 +1845,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -1871,7 +1871,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -1898,7 +1898,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -1914,7 +1914,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -1942,7 +1942,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -1959,7 +1959,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -1985,7 +1985,7 @@ MD.Editor = function () {
           values: `${val}; 0; 0; 0`,
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -2011,7 +2011,7 @@ MD.Editor = function () {
           values: `${val}; 0; 0; 0`,
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -2025,7 +2025,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2034,7 +2034,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2043,7 +2043,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -2100,9 +2100,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getGlitchStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2130,7 +2130,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -2156,7 +2156,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -2183,7 +2183,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -2199,7 +2199,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -2227,7 +2227,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -2244,7 +2244,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -2270,7 +2270,7 @@ MD.Editor = function () {
           values: "1.5; 0; 0; 0",
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -2296,7 +2296,7 @@ MD.Editor = function () {
           values: "1.5; 0; 0; 0",
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -2310,7 +2310,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2319,7 +2319,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2328,7 +2328,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -2409,9 +2409,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getGlitchOffsetFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2439,7 +2439,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -2465,7 +2465,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -2492,7 +2492,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -2508,7 +2508,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -2536,7 +2536,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -2553,7 +2553,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -2579,7 +2579,7 @@ MD.Editor = function () {
           values: "0; 0; 0; 0",
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -2605,7 +2605,7 @@ MD.Editor = function () {
           values: "0; 0; 0; 0",
           keyTimes: "0; 0.25; 0.75; 1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -2619,7 +2619,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2628,7 +2628,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2637,7 +2637,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -2669,9 +2669,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getGlitchSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2694,7 +2694,7 @@ MD.Editor = function () {
           dur: "0.3s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -2708,7 +2708,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2717,7 +2717,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -2761,9 +2761,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getElectricityStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2786,7 +2786,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -2800,7 +2800,7 @@ MD.Editor = function () {
         attr: {
           in: "glow",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -2809,7 +2809,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -2853,9 +2853,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getElectricitySpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2880,7 +2880,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     feTurbulence.appendChild(
@@ -2893,7 +2893,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -2915,7 +2915,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap];
@@ -2947,9 +2947,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWavyStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -2974,7 +2974,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     feTurbulence.appendChild(
@@ -2987,7 +2987,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -3009,7 +3009,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap];
@@ -3041,9 +3041,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWavyFrequencyFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3068,7 +3068,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     feTurbulence.appendChild(
@@ -3081,7 +3081,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -3103,7 +3103,7 @@ MD.Editor = function () {
           dur: "1s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap];
@@ -3135,9 +3135,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWavyDetailFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3162,7 +3162,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     feTurbulence.appendChild(
@@ -3175,7 +3175,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -3197,7 +3197,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap];
@@ -3227,9 +3227,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWavySpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3254,7 +3254,7 @@ MD.Editor = function () {
           dur: "0.2s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [
@@ -3296,9 +3296,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getSignalCorruptStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3323,7 +3323,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [
@@ -3358,9 +3358,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getSignalCorruptSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3384,7 +3384,7 @@ MD.Editor = function () {
           values: `0;${val};0`,
           attributeName: "radius",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -3398,7 +3398,7 @@ MD.Editor = function () {
         attr: {
           in: "expanded",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -3407,7 +3407,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [feMorphology, feMerge];
@@ -3431,9 +3431,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getHeartBeatStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3457,7 +3457,7 @@ MD.Editor = function () {
           values: "0;0;0",
           attributeName: "radius",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -3471,7 +3471,7 @@ MD.Editor = function () {
         attr: {
           in: "expanded",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -3480,7 +3480,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [feMorphology, feMerge];
@@ -3504,9 +3504,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getHeartBeatSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3532,7 +3532,7 @@ MD.Editor = function () {
           dur: "0.2s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feTurbulence = svgCanvas.addSvgElementFromJson({
@@ -3554,7 +3554,7 @@ MD.Editor = function () {
           dur: "0.3s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [
@@ -3599,9 +3599,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getFragmentStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3626,7 +3626,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feTurbulence = svgCanvas.addSvgElementFromJson({
@@ -3648,7 +3648,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [
@@ -3683,9 +3683,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getFragmentSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3712,7 +3712,7 @@ MD.Editor = function () {
           dur: "0s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feColorMatrix = svgCanvas.addSvgElementFromJson({
@@ -3735,7 +3735,7 @@ MD.Editor = function () {
           dur: "0.2s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -3749,7 +3749,7 @@ MD.Editor = function () {
         attr: {
           in: "colorShift",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -3758,7 +3758,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -3805,9 +3805,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getSparksStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3832,7 +3832,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feColorMatrix = svgCanvas.addSvgElementFromJson({
@@ -3855,7 +3855,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -3869,7 +3869,7 @@ MD.Editor = function () {
         attr: {
           in: "colorShift",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -3878,7 +3878,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -3916,9 +3916,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getSparksSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -3946,7 +3946,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -3972,7 +3972,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -3999,7 +3999,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -4015,7 +4015,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -4043,7 +4043,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -4060,7 +4060,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -4085,7 +4085,7 @@ MD.Editor = function () {
           values: `${val};0;0;0`,
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -4110,7 +4110,7 @@ MD.Editor = function () {
           values: `${val};0;0;0`,
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -4124,7 +4124,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4133,7 +4133,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4142,7 +4142,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -4192,9 +4192,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getDuoPulseStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -4222,7 +4222,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -4248,7 +4248,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -4275,7 +4275,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -4291,7 +4291,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -4319,7 +4319,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -4336,7 +4336,7 @@ MD.Editor = function () {
           dur: "1.5s",
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -4361,7 +4361,7 @@ MD.Editor = function () {
           values: "0;0;0;0",
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -4386,7 +4386,7 @@ MD.Editor = function () {
           values: "0;0;0;0",
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -4400,7 +4400,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4409,7 +4409,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4418,7 +4418,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -4499,9 +4499,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getDuoPulseOffsetFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -4529,7 +4529,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feColorMatrixRed = svgCanvas.addSvgElementFromJson({
@@ -4555,7 +4555,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "values",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -4582,7 +4582,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetBlue.appendChild(
@@ -4598,7 +4598,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feOffsetRed = svgCanvas.addSvgElementFromJson({
@@ -4626,7 +4626,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     feOffsetRed.appendChild(
@@ -4643,7 +4643,7 @@ MD.Editor = function () {
           dur: val,
           attributeName: "dy",
         },
-      })
+      }),
     );
 
     const feGaussianBlurBlue = svgCanvas.addSvgElementFromJson({
@@ -4668,7 +4668,7 @@ MD.Editor = function () {
           values: "0;0;0;0",
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feGaussianBlurRed = svgCanvas.addSvgElementFromJson({
@@ -4693,7 +4693,7 @@ MD.Editor = function () {
           values: "0;0;0;0",
           keyTimes: "0;0.25;0.75;1",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -4707,7 +4707,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredBlue",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4716,7 +4716,7 @@ MD.Editor = function () {
         attr: {
           in: "blurredRed",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -4725,7 +4725,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -4763,9 +4763,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getDuoPulseSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -4790,7 +4790,7 @@ MD.Editor = function () {
           dur: "2s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -4812,7 +4812,7 @@ MD.Editor = function () {
           dur: "2s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feColorMatrix = svgCanvas.addSvgElementFromJson({
@@ -4834,7 +4834,7 @@ MD.Editor = function () {
           dur: "1.5s",
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap, feColorMatrix];
@@ -4867,9 +4867,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWiggleStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -4893,7 +4893,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -4915,7 +4915,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     const feColorMatrix = svgCanvas.addSvgElementFromJson({
@@ -4937,7 +4937,7 @@ MD.Editor = function () {
           dur: val,
           repeatCount: "indefinite",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap, feColorMatrix];
@@ -4967,9 +4967,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getWiggleSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -4995,7 +4995,7 @@ MD.Editor = function () {
           values: "0.03 0.07; 0.08 0.15; 0.03 0.07",
           attributeName: "baseFrequency",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -5016,7 +5016,7 @@ MD.Editor = function () {
           values: `${smallVal};${val};${smallVal}`,
           attributeName: "scale",
         },
-      })
+      }),
     );
 
     const feMorphology = svgCanvas.addSvgElementFromJson({
@@ -5033,7 +5033,7 @@ MD.Editor = function () {
           values: "1; 4; 1",
           attributeName: "radius",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap, feMorphology];
@@ -5065,9 +5065,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getChaosMachineStrengthFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -5091,7 +5091,7 @@ MD.Editor = function () {
           values: "0.03 0.07; 0.08 0.15; 0.03 0.07",
           attributeName: "baseFrequency",
         },
-      })
+      }),
     );
 
     const feDisplacementMap = svgCanvas.addSvgElementFromJson({
@@ -5112,7 +5112,7 @@ MD.Editor = function () {
           values: "0;0;0",
           attributeName: "scale",
         },
-      })
+      }),
     );
 
     const feMorphology = svgCanvas.addSvgElementFromJson({
@@ -5129,7 +5129,7 @@ MD.Editor = function () {
           values: "1; 4; 1",
           attributeName: "radius",
         },
-      })
+      }),
     );
 
     return [feTurbulence, feDisplacementMap, feMorphology];
@@ -5159,9 +5159,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getChaosMachineSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -5187,7 +5187,7 @@ MD.Editor = function () {
           values: `0;${val * -1};0`,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -5211,7 +5211,7 @@ MD.Editor = function () {
           values: `0;${val};0`,
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -5225,7 +5225,7 @@ MD.Editor = function () {
         attr: {
           in: "redTint",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -5234,7 +5234,7 @@ MD.Editor = function () {
         attr: {
           in: "blueTint",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -5243,7 +5243,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -5314,9 +5314,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getThreeDimOffsetFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 
@@ -5342,7 +5342,7 @@ MD.Editor = function () {
           values: "0;0;0",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     const feOffsetBlue = svgCanvas.addSvgElementFromJson({
@@ -5366,7 +5366,7 @@ MD.Editor = function () {
           values: "0;0;0",
           attributeName: "dx",
         },
-      })
+      }),
     );
 
     const feMerge = svgCanvas.addSvgElementFromJson({
@@ -5380,7 +5380,7 @@ MD.Editor = function () {
         attr: {
           in: "redTint",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -5389,7 +5389,7 @@ MD.Editor = function () {
         attr: {
           in: "blueTint",
         },
-      })
+      }),
     );
 
     feMerge.appendChild(
@@ -5398,7 +5398,7 @@ MD.Editor = function () {
         attr: {
           in: "SourceGraphic",
         },
-      })
+      }),
     );
 
     return [
@@ -5450,9 +5450,9 @@ MD.Editor = function () {
             extension,
             deleteValue,
             getThreeDimSpeedFilterItems,
-            svgCanvas.setOffsets
-          )
-        )
+            svgCanvas.setOffsets,
+          ),
+        ),
     );
   }
 

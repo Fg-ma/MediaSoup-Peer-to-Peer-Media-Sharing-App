@@ -49,11 +49,11 @@ export default function ShutterSVG({
     for (let i = 0; i < +count; i++) {
       edges.current.innerHTML += path(
         i,
-        `fill=none stroke=#3e3e3e d='${edge}'`
+        `fill=none stroke=#3e3e3e d='${edge}'`,
       );
       bodies.current.innerHTML += path(
         i,
-        `fill=#1a1a1a d='${edge}${arc(p1x, p1y, 0)}'`
+        `fill=#1a1a1a d='${edge}${arc(p1x, p1y, 0)}'`,
       );
     }
   };
@@ -111,8 +111,8 @@ export default function ShutterSVG({
 
   return !finished ? (
     <svg
-      viewBox='-100 -100 200 200'
-      className='w-full h-full aspect-square z-[10000000000000000000] absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none'
+      viewBox="-100 -100 200 200"
+      className="pointer-events-none absolute left-1/2 top-1/2 z-[1000] aspect-square h-full w-full -translate-x-1/2 -translate-y-1/2"
     >
       <g ref={bodies}></g>
       <g ref={edges}></g>

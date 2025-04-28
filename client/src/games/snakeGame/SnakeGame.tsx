@@ -69,7 +69,7 @@ function SnakeGame({
     setGameOver,
     setPlayersState,
     playersState,
-    setGridSize
+    setGridSize,
   );
 
   useEffect(() => {
@@ -77,13 +77,13 @@ function SnakeGame({
 
     boardRef.current?.style.setProperty(
       "--nginx-asset-server-base-url",
-      nginxAssetServerBaseUrl ?? ""
+      nginxAssetServerBaseUrl ?? "",
     );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        snakeGameController.handleKeyPress
+        snakeGameController.handleKeyPress,
       );
     };
   }, [started]);
@@ -122,26 +122,28 @@ function SnakeGame({
         content={
           <div
             ref={boardRef}
-            className='flex snake-game-board w-full aspect-square relative rounded overflow-hidden flex-col'
+            className="selectable snake-game-board relative flex aspect-square w-full flex-col overflow-hidden rounded"
+            data-selectable-type="game"
+            data-selectable-id={snakeGameId}
           >
             {snakeGameController.renderBoard()}
             {gameOver && (
               <div
-                className='flex absolute top-0 left-0 w-full h-full items-center justify-center bg-black bg-opacity-30 cursor-pointer'
+                className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-black bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
                 <div
-                  className='flex w-4/5 h-3/5 rounded-lg items-center justify-center font-K2D text-2xl bg-no-repeat bg-cover'
+                  className="flex h-3/5 w-4/5 items-center justify-center rounded-lg bg-cover bg-no-repeat font-K2D text-2xl"
                   style={{ backgroundImage: `url(${gameOverCard})` }}
                 ></div>
               </div>
             )}
             {!started && !gameOver && (
               <div
-                className='flex absolute top-0 left-0 w-full h-full items-center justify-center bg-black bg-opacity-30'
+                className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
-                <div className='flex w-4/5 h-3/5 rounded-lg bg-fg-white-95 items-center justify-center font-K2D text-2xl select-none'>
+                <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 font-K2D text-2xl">
                   Press any key to start
                 </div>
               </div>
@@ -150,13 +152,13 @@ function SnakeGame({
         }
         gameFunctionsSection={
           <div
-            className={`flex flex-col items-center justify-center h-max w-full space-y-2 px-2`}
+            className={`flex h-max w-full flex-col items-center justify-center space-y-2 px-2`}
           >
             {playersState[username.current] &&
               playersState[username.current][instance.current] && (
                 <>
                   <FgButton
-                    className='w-full aspect-square rounded-xl bg-white overflow-hidden border-2 border-gray-300'
+                    className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-white"
                     clickFunction={() =>
                       setSnakeColorPanelActive((prev) => !prev)
                     }
@@ -177,7 +179,7 @@ function SnakeGame({
                   />
                   <FgButton
                     externalRef={snakeColorPickerButtonRef}
-                    className='w-full aspect-square'
+                    className="aspect-square w-full"
                     clickFunction={() =>
                       setSnakeColorPanelActive((prev) => !prev)
                     }
@@ -214,7 +216,7 @@ function SnakeGame({
                   />
                   <FgButton
                     externalRef={snakeGridSizeButtonRef}
-                    className='w-full aspect-square'
+                    className="aspect-square w-full"
                     clickFunction={() =>
                       setGridSizePanelActive((prev) => !prev)
                     }
@@ -270,8 +272,8 @@ function SnakeGame({
                       shadowColor: colorMap[instanceState.snakeColor.primary],
                     };
                   }
-                }
-              )
+                },
+              ),
             )
             .filter((player) => player !== undefined),
         }}

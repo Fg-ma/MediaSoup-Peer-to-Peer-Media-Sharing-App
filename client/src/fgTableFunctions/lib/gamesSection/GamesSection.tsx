@@ -60,7 +60,7 @@ export default function GamesSection({
             content={gamesActive ? "Close games" : "Open games"}
           />
         }
-        options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
+        options={{ hoverTimeoutDuration: 750 }}
         aria-label={"Games"}
       />
       {gamesActive && (

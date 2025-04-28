@@ -423,7 +423,7 @@ export default function Bundle({
       <audio
         ref={audioRef}
         id={`${username}_audio_stream`}
-        className="z-0 w-0"
+        className="w-0"
         autoPlay={true}
       ></audio>
     </div>

@@ -59,11 +59,11 @@ export default function FgGameButton({
   useEffect(() => {
     rimRef.current?.style.setProperty(
       "--primary-color",
-      `${fgGameButtonOptions.primaryColor}`
+      `${fgGameButtonOptions.primaryColor}`,
     );
     rimRef.current?.style.setProperty(
       "--secondary-color",
-      `${fgGameButtonOptions.secondaryColor}`
+      `${fgGameButtonOptions.secondaryColor}`,
     );
   }, []);
 
@@ -75,19 +75,18 @@ export default function FgGameButton({
       contentFunction={() => (
         <div
           ref={rimRef}
-          className='fg-game-button-stationary-rim w-full h-full relative'
+          className="fg-game-button-stationary-rim relative h-full w-full"
           onPointerDown={handlePointerDown}
         >
           <div
             ref={movingPartRef}
-            className='fg-game-button-moving-part absolute top-1/2 left-1/2 w-[90%]'
+            className="fg-game-button-moving-part absolute left-1/2 top-1/2 w-[90%]"
           ></div>
         </div>
       )}
       options={{
         hoverTimeoutDuration: fgGameButtonOptions.hoverTimeoutDuration,
         hoverType: fgGameButtonOptions.hoverType,
-        hoverZValue: 1000000,
         hoverSpacing: fgGameButtonOptions.hoverSpacing,
       }}
     />

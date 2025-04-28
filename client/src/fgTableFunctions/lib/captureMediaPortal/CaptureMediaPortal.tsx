@@ -231,7 +231,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={500000000}
+      zValue={490000}
       className="h-full w-full"
       content={
         <div
@@ -346,7 +346,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={500000000}
+      zValue={490000}
       content={
         <div
           ref={captureMediaPortalRef}
@@ -396,7 +396,7 @@ export default function CaptureMediaPortal({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={500000000}
+      zValue={490000}
       content={
         <div
           ref={captureMediaPortalRef}

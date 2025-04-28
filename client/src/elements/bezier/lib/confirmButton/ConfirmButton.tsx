@@ -23,7 +23,7 @@ export default function ConfirmButton({
     <FgButton
       className={`${
         largestDim === "width" ? "w-full" : "h-full"
-      } flex aspect-square pointer-events-auto items-center justify-center bg-fg-red-light rounded-full`}
+      } pointer-events-auto flex aspect-square items-center justify-center rounded-full bg-fg-red-light`}
       clickFunction={(event) => {
         event.stopPropagation();
         if (!needsName) {
@@ -35,7 +35,7 @@ export default function ConfirmButton({
       contentFunction={() => (
         <FgSVGElement
           src={checkIcon}
-          className='h-[70%] aspect-square'
+          className="aspect-square h-[70%]"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -44,12 +44,11 @@ export default function ConfirmButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Confirm' style='light' />}
+      hoverContent={<FgHoverContentStandard content="Confirm" style="light" />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000002,
       }}
     />
   );

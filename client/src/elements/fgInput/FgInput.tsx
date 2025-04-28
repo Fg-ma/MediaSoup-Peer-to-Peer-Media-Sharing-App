@@ -104,7 +104,6 @@ export default function FgInput({
             hoverSpacing: 4,
             hoverType: "above",
             hoverTimeoutDuration: 3500,
-            hoverZValue: 1000000000000000,
           }}
           type="submit"
         />

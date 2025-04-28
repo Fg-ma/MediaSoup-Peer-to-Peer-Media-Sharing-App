@@ -6,6 +6,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
 import FgLowerVisualMediaControls from "./lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
@@ -101,6 +102,8 @@ export default function UserVisualMedia({
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -301,6 +304,8 @@ export default function UserVisualMedia({
     setRerender,
     aspectRatio,
     mediasoupSocket,
+    fgContentAdjustmentController,
+    bundleRef,
   );
 
   useEffect(() => {
@@ -324,6 +329,8 @@ export default function UserVisualMedia({
     tableSocket.current?.addMessageListener(
       fgVisualMediaController.handleTableMessage,
     );
+
+    addGroupSignalListener(fgVisualMediaController.handleSignal);
 
     // Keep video time
     fgLowerVisualMediaController.timeUpdate();
@@ -381,7 +388,7 @@ export default function UserVisualMedia({
       tableSocket.current?.removeMessageListener(
         fgVisualMediaController.handleTableMessage,
       );
-
+      removeGroupSignalListener(fgVisualMediaController.handleSignal);
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;
@@ -481,7 +488,7 @@ export default function UserVisualMedia({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } flex items-center justify-center`}
+      } z-base-content flex items-center justify-center`}
       style={{
         position: "absolute",
         left: `${positioning.current.position.left}%`,
@@ -527,7 +534,9 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="flex relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        data-selectable-type={type}
+        data-selectable-id={visualMediaId}
       >
         <AnimatePresence>
           {visualEffectsActive && (

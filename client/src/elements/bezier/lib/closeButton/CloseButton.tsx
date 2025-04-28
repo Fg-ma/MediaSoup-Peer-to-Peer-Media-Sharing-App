@@ -18,12 +18,12 @@ export default function CloseButton({
     <FgButton
       className={`${
         largestDim === "width" ? "w-full" : "h-full"
-      } flex shadow z-20 aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto`}
+      } pointer-events-auto z-20 flex aspect-square items-center justify-center rounded-full bg-fg-tone-black-4 bg-opacity-80 shadow`}
       clickFunction={closeFunction}
       contentFunction={() => (
         <FgSVGElement
           src={closeIcon}
-          className='w-[50%] aspect-square'
+          className="aspect-square w-[50%]"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -32,12 +32,11 @@ export default function CloseButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Close' style='light' />}
+      hoverContent={<FgHoverContentStandard content="Close" style="light" />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "below",
-        hoverZValue: 500000000002,
       }}
     />
   );

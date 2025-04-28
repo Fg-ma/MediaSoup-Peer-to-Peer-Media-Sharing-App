@@ -1,7 +1,6 @@
 import { GroupSignals } from "../../../context/signalContext/lib/typeConstant";
 
 class SelectTableLayerController {
-  init = false;
   queryInterval: NodeJS.Timeout | undefined;
 
   selectables: NodeListOf<HTMLElement> | undefined;
@@ -36,7 +35,6 @@ class SelectTableLayerController {
 
   handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
 
     if (this.groupRef.current?.contains(e.target as Node)) return;
 
@@ -54,11 +52,8 @@ class SelectTableLayerController {
 
     this.setDragging(true);
 
-    if (!this.init) {
-      this.selectables =
-        this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
-      this.init = true;
-    }
+    this.selectables =
+      this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
     if (!this.queryInterval) {
       this.queryInterval = setInterval(() => {
         this.selectables =
@@ -254,7 +249,7 @@ class SelectTableLayerController {
     }
   };
 
-  handleKeyPress = (event: KeyboardEvent) => {
+  handleKeyDown = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
 
     switch (key) {
@@ -265,6 +260,11 @@ class SelectTableLayerController {
             data: { affected: this.selectedInfo },
           });
         }
+        this.dragStart.current = undefined;
+        this.dragEnd.current = undefined;
+        this.selected.current = [];
+        this.setDragging(false);
+        this.setRerender((prev) => !prev);
         break;
       case "delete":
         if (this.selectedInfo) {
@@ -273,12 +273,18 @@ class SelectTableLayerController {
             data: { affected: this.selectedInfo },
           });
         }
+        this.dragStart.current = undefined;
+        this.dragEnd.current = undefined;
+        this.selected.current = [];
+        this.setDragging(false);
+        this.setRerender((prev) => !prev);
         break;
       case "escape":
         this.dragStart.current = undefined;
         this.dragEnd.current = undefined;
         this.selected.current = [];
         this.setDragging(false);
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

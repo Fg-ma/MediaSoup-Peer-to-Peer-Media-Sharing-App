@@ -32,12 +32,12 @@ export default function ClearAllButton({
 
   return (
     <FgButton
-      className='h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
+      className="!aspect-square h-full rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
       clickFunction={clickFunction}
       contentFunction={() => (
         <FgSVGElement
           src={closeIcon}
-          className='flex h-full w-full items-center justify-center'
+          className="flex h-full w-full items-center justify-center"
           attributes={[
             { key: "width", value: "50%" },
             { key: "height", value: "50%" },
@@ -45,12 +45,11 @@ export default function ClearAllButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Clear' />}
+      hoverContent={<FgHoverContentStandard content="Clear" />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}
       options={{
-        hoverZValue: 500000000001,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
         holdKind: "toggle",

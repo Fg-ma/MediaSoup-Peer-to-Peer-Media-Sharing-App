@@ -13,6 +13,7 @@ import {
   onGroupDragStartType,
   onGroupDragType,
   GroupSignals,
+  onGroupDeleteType,
 } from "../../../context/signalContext/lib/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
@@ -208,85 +209,101 @@ class MediaContainerController {
     const { affected, startDragPosition } = signal.data;
 
     if (
-      affected.some(
+      !affected.some(
         (item) => item.id === this.mediaInstanceId && item.type === this.kind,
       )
-    ) {
-      this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
-        "position",
-        { rotationPointPlacement: "topLeft" },
-      );
+    )
+      return;
 
-      this.groupStartDragPosition = startDragPosition;
-      this.savedMediaPosition = this.positioning.current.position;
-    }
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+      "position",
+      { rotationPointPlacement: "topLeft" },
+    );
+
+    this.groupStartDragPosition = startDragPosition;
+    this.savedMediaPosition = this.positioning.current.position;
   };
 
   onGroupDrag = (signal: onGroupDragType) => {
     const { affected, dragPosition } = signal.data;
 
     if (
-      affected.some(
+      !affected.some(
         (item) => item.id === this.mediaInstanceId && item.type === this.kind,
-      ) &&
-      this.groupStartDragPosition &&
-      this.savedMediaPosition &&
-      this.bundleRef.current
-    ) {
-      this.fgContentAdjustmentController.current?.movementDragFunction(
-        {
-          x:
-            ((this.savedMediaPosition.left +
-              dragPosition.x -
-              this.groupStartDragPosition.x) /
-              100) *
-            this.bundleRef.current.clientWidth,
-          y:
-            ((this.savedMediaPosition.top +
-              dragPosition.y -
-              this.groupStartDragPosition.y) /
-              100) *
-            this.bundleRef.current.clientHeight,
-        },
-        { x: 0, y: 0 },
-        {
-          x:
-            (this.positioning.current.position.left / 100) *
-            this.bundleRef.current.clientWidth,
-          y:
-            (this.positioning.current.position.top / 100) *
-            this.bundleRef.current.clientHeight,
-        },
-      );
-    }
+      ) ||
+      !this.groupStartDragPosition ||
+      !this.savedMediaPosition ||
+      !this.bundleRef.current
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.movementDragFunction(
+      {
+        x:
+          ((this.savedMediaPosition.left +
+            dragPosition.x -
+            this.groupStartDragPosition.x) /
+            100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          ((this.savedMediaPosition.top +
+            dragPosition.y -
+            this.groupStartDragPosition.y) /
+            100) *
+          this.bundleRef.current.clientHeight,
+      },
+      { x: 0, y: 0 },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth,
+        y:
+          (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight,
+      },
+    );
   };
 
   onGroupDragEnd = (signal: onGroupDragEndType) => {
     const { affected } = signal.data;
 
     if (
-      affected.some(
+      !affected.some(
         (item) => item.id === this.mediaInstanceId && item.type === this.kind,
       )
-    ) {
-      this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+    )
+      return;
 
-      this.tableStaticContentSocket.current?.updateContentPositioning(
-        this.kind,
-        this.mediaId,
-        this.mediaInstanceId,
-        { position: this.positioning.current.position },
-      );
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
 
-      this.groupStartDragPosition = undefined;
-      this.savedMediaPosition = undefined;
-    }
+    this.tableStaticContentSocket.current?.updateContentPositioning(
+      this.kind,
+      this.mediaId,
+      this.mediaInstanceId,
+      { position: this.positioning.current.position },
+    );
+
+    this.groupStartDragPosition = undefined;
+    this.savedMediaPosition = undefined;
+  };
+
+  onGroupDelete = (signal: onGroupDeleteType) => {
+    const { affected } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.mediaInstanceId && item.type === this.kind,
+      )
+    )
+      return;
+
+    this.lowerController.handleClose();
   };
 
   handleSignal = (signal: GroupSignals) => {
     switch (signal.type) {
       case "groupDelete":
-        this.lowerController.handleClose();
+        this.onGroupDelete(signal);
         break;
       case "groupDragStart":
         this.onGroupDragStart(signal);

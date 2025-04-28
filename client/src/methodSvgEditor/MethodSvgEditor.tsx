@@ -36,29 +36,6 @@ import "./css/text.css";
 import "./css/zoom-dropdown.css";
 import "./css/loading.css";
 
-const loadScript = (src: string) => {
-  return new Promise((resolve, reject) => {
-    // Check if script already exists
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve(true);
-      return;
-    }
-
-    // Create and load script
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      resolve(true);
-    };
-    script.onerror = () => {
-      reject(false);
-    };
-  });
-};
-
 declare global {
   interface Window {
     methodEditor: any;
@@ -202,11 +179,11 @@ export default function MethodSvgEditor({
 
   return (
     <div
-      id='methodDrawRoot'
+      id="methodDrawRoot"
       ref={methodDrawRootRef}
-      className='w-full h-full bg-fg-tone-black-1 pointer-events-auto font-K2D'
+      className="pointer-events-auto h-full w-full bg-fg-tone-black-1 font-K2D"
     >
-      <div id='method-draw' className='app'>
+      <div id="method-draw" className="app">
         <Rulers />
 
         <WorkArea />
@@ -217,13 +194,13 @@ export default function MethodSvgEditor({
 
         <ToolPanels finishCallback={finishCallback} />
 
-        <div id='cur_context_panel'></div>
+        <div id="cur_context_panel"></div>
 
         <LeftTools />
 
         <BottomTools />
 
-        <div id='color_picker'></div>
+        <div id="color_picker"></div>
       </div>
 
       <DialogBox />

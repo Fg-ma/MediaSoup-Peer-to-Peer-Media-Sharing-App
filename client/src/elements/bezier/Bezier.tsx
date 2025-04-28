@@ -192,7 +192,6 @@ export default function Bezier({
       type="staticTopDomain"
       top={0}
       left={0}
-      zValue={500000000001}
       className="h-screen w-screen"
       content={
         <div
@@ -775,7 +774,6 @@ export default function Bezier({
                         hoverSpacing: 4,
                         hoverTimeoutDuration: 1250,
                         hoverType: "above",
-                        hoverZValue: 500000000000,
                       }}
                     />
                     <FgButton
@@ -803,7 +801,6 @@ export default function Bezier({
                         hoverSpacing: 4,
                         hoverTimeoutDuration: 1250,
                         hoverType: "above",
-                        hoverZValue: 500000000000,
                       }}
                     />
                   </div>

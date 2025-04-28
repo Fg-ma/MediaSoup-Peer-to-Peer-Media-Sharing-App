@@ -119,6 +119,28 @@ export default {
       boxShadow: {
         FgSlider: "inset 0 0 2.5px rgba(0, 0, 0, 0.3)",
       },
+      zIndex: {
+        /* table layers before content (99000 - 100000) */
+        "grid-overlay": 99200,
+        "select-layer": 99300,
+        /* table content (101000 - 200000) */
+        /* table content formula (111000 + priority + (20000 - last-interaction)) */
+        "background-content": 110000,
+        "base-content": 111000,
+        /* table layers after content (200001 - 201000) */
+        "new-instances-layer": 200700,
+        "upload-layer": 200720,
+        /* top level content (400000 - 500000) */
+        "settings-panel": 460000,
+        "selection-button-panel": 460100,
+        "panel-unfocused": 469800,
+        "panel-focused-hover": 469900,
+        "panel-focused-clicked": 470000,
+        "table-info": 480000,
+        modals: 490000,
+        "hold-content": 499900,
+        "popup-labels": 500000,
+      },
     },
   },
 };

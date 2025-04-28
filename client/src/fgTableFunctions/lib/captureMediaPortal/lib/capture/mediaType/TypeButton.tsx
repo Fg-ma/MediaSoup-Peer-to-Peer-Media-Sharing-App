@@ -58,7 +58,7 @@ export default function TypeButton({
 
   return (
     <FgButton
-      className='max-h-full h-full w-max relative overflow-hidden pointer-events-auto z-20'
+      className="pointer-events-auto relative z-20 h-full max-h-full w-max overflow-hidden"
       clickFunction={(event) => {
         event.stopPropagation();
         captureMediaController.handleCaptureMediaType();
@@ -67,7 +67,7 @@ export default function TypeButton({
         mediaType === "camera" || (mediaType === "video" && !recording) ? (
           <FgSVGElement
             src={captureMediaTypeMeta[mediaType].icon}
-            className='h-full aspect-square'
+            className="aspect-square h-full"
             attributes={[
               { key: "fill", value: "#f2f2f2" },
               { key: "stroke", value: "#f2f2f2" },
@@ -78,7 +78,7 @@ export default function TypeButton({
         ) : (
           <div
             ref={counterRef}
-            className='flex h-full w-max font-Josefin text-fg-white items-center justify-center'
+            className="flex h-full w-max items-center justify-center font-Josefin text-fg-white"
             style={{ fontSize, lineHeight: "0.8lh", paddingTop }}
           >
             {recording && mediaType === "video"
@@ -89,14 +89,13 @@ export default function TypeButton({
       }
       hoverContent={
         !captureMediaEffectsActive && !captureMediaTypeActive ? (
-          <FgHoverContentStandard content='Capture type (h)' style='light' />
+          <FgHoverContentStandard content="Capture type (h)" style="light" />
         ) : undefined
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
       }}
     />
   );

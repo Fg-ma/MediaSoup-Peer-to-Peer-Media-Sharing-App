@@ -92,7 +92,7 @@ export default function SettingsPanel({
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
-    init: boolean = true
+    init: boolean = true,
   ): boolean => {
     // Check if the current object has an 'active' property and if it's true
     if (!init && obj.active === true) {
@@ -201,32 +201,32 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-fg-tone-black-2 font-K2D text-base text-white pointer-events-auto'
+      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={SelectionPanelTransition}
     >
       {/* Main page */}
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
-            className='flex w-full h-full flex-col justify-center items-center space-y-1 px-1'
+            className="flex h-full w-full flex-col items-center justify-center space-y-1 px-1"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             {!finalizeCapture && (
               <FgButton
-                className='w-full'
+                className="w-full"
                 contentFunction={() => (
-                  <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                  <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                     <div>Delay</div>
                     <div>{`${settings.delay.value}s`}</div>
                   </div>
@@ -236,9 +236,9 @@ export default function SettingsPanel({
             )}
             {!finalizeCapture && (
               <FgButton
-                className='w-full'
+                className="w-full"
                 contentFunction={() => (
-                  <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center'>
+                  <div className="flex w-full items-center justify-start text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                     Download options
                   </div>
                 )}
@@ -251,12 +251,12 @@ export default function SettingsPanel({
             )}
             {finalizeCapture && (
               <FgButton
-                className='w-full'
+                className="w-full"
                 contentFunction={() => (
-                  <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                  <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                     <div>Video speed</div>
                     <div>{`${parseFloat(
-                      settings.videoSpeed.value.toFixed(2)
+                      settings.videoSpeed.value.toFixed(2),
                     )}x`}</div>
                   </div>
                 )}
@@ -271,11 +271,11 @@ export default function SettingsPanel({
         {activePages.downloadVideoOptions.active &&
           !isDescendantActive(activePages.downloadVideoOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadVideoOptionsPage
                 setActivePages={setActivePages}
@@ -289,11 +289,11 @@ export default function SettingsPanel({
         {activePages.downloadImageOptions.active &&
           !isDescendantActive(activePages.downloadImageOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadImageOptionsPage
                 setActivePages={setActivePages}
@@ -309,11 +309,11 @@ export default function SettingsPanel({
           isDescendantActive(activePages.downloadVideoOptions) &&
           !activePages.downloadVideoOptions.bitRate.active && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               {downloadVideoOptions.map((option) => {
                 const activePage =
@@ -334,13 +334,13 @@ export default function SettingsPanel({
                       ].map((type) => (
                         <FgButton
                           key={type}
-                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                          className={`w-full min-w-32 rounded bg-opacity-75 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                             type === activeSetting.value
                               ? "bg-fg-white text-fg-tone-black-1"
                               : ""
                           }`}
                           contentFunction={() => (
-                            <div className='flex justify-start items-start'>
+                            <div className="flex items-start justify-start">
                               {type}
                             </div>
                           )}
@@ -389,11 +389,11 @@ export default function SettingsPanel({
           isDescendantActive(activePages.downloadVideoOptions) &&
           activePages.downloadVideoOptions.bitRate.active && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <BitRatePage
                 setActivePages={setActivePages}
@@ -410,11 +410,11 @@ export default function SettingsPanel({
           !activePages.downloadImageOptions.quality.active &&
           !activePages.downloadImageOptions.samples.active && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               {downloadImageOptions.map((option) => {
                 if (option === "antialiasing") {
@@ -432,13 +432,13 @@ export default function SettingsPanel({
                         (type) => (
                           <FgButton
                             key={type}
-                            className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                            className={`w-full min-w-32 rounded bg-opacity-75 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                               type === activeSetting.value
                                 ? "bg-fg-white text-fg-tone-black-1"
                                 : ""
                             }`}
                             contentFunction={() => (
-                              <div className='flex justify-start items-start'>
+                              <div className="flex items-start justify-start">
                                 {type}
                               </div>
                             )}
@@ -453,7 +453,7 @@ export default function SettingsPanel({
                               });
                             }}
                           />
-                        )
+                        ),
                       )}
                       pageTitle={downloadImageOptionsTitles[option]}
                       backFunction={() => {
@@ -479,11 +479,11 @@ export default function SettingsPanel({
           isDescendantActive(activePages.downloadImageOptions) &&
           activePages.downloadImageOptions.quality.active && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <QualityPage
                 setActivePages={setActivePages}
@@ -499,11 +499,11 @@ export default function SettingsPanel({
           isDescendantActive(activePages.downloadImageOptions) &&
           activePages.downloadImageOptions.samples.active && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <SamplesPage
                 setActivePages={setActivePages}
@@ -518,11 +518,11 @@ export default function SettingsPanel({
         {activePages.videoSpeed.active &&
           !isDescendantActive(activePages.videoSpeed) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <VideoSpeedPage
                 captureMediaController={captureMediaController}
@@ -537,11 +537,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.delay.active && !isDescendantActive(activePages.delay) && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <DelayPage
               setActivePages={setActivePages}
@@ -552,6 +552,6 @@ export default function SettingsPanel({
         )}
       </AnimatePresence>
     </motion.div>,
-    document.body
+    document.body,
   );
 }

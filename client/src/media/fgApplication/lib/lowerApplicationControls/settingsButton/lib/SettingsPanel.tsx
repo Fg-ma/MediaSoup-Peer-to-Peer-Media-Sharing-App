@@ -79,7 +79,7 @@ export default function SettingsPanel({
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
-    init: boolean = true
+    init: boolean = true,
   ): boolean => {
     // Check if the current object has an 'active' property and if it's true
     if (!init && obj.active === true) {
@@ -156,35 +156,35 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black bg-opacity-75 font-K2D text-base text-white pointer-events-auto'
+      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-black bg-opacity-75 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={SelectionPanelTransition}
     >
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
-            className='flex w-full h-full flex-col justify-center items-center space-y-1 px-1'
+            className="flex h-full w-full flex-col items-center justify-center space-y-1 px-1"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
                 <div
                   className={`${
                     settings.background.value === "true"
                       ? "bg-fg-white text-fg-tone-black-1"
                       : ""
-                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg`}
+                  } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
                 >
                   Set as background (b)
                 </div>
@@ -192,14 +192,14 @@ export default function SettingsPanel({
               clickFunction={lowerApplicationController.handleSetAsBackground}
             />
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                   <div>Download</div>
                   <div>
                     {Object.prototype.hasOwnProperty.call(
                       downloadTypeSelections,
-                      settings.downloadType.value
+                      settings.downloadType.value,
                     ) && downloadTypeSelections[settings.downloadType.value]}
                   </div>
                 </div>
@@ -213,11 +213,11 @@ export default function SettingsPanel({
         {activePages.downloadType.active &&
           !isDescendantActive(activePages.downloadType) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadTypePage
                 setActivePages={setActivePages}
@@ -232,11 +232,11 @@ export default function SettingsPanel({
           activePages.downloadType.downloadTypeOptions.active &&
           !isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadTypeOptionsPage
                 setActivePages={setActivePages}
@@ -250,11 +250,11 @@ export default function SettingsPanel({
           activePages.downloadType.downloadTypeOptions.active &&
           isDescendantActive(activePages.downloadType.downloadTypeOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               {downloadTypeOptions.map((option) => {
                 const activePage =
@@ -275,13 +275,13 @@ export default function SettingsPanel({
                       ].map((type) => (
                         <FgButton
                           key={type}
-                          className={`w-full rounded bg-opacity-75 min-w-32 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                          className={`w-full min-w-32 rounded bg-opacity-75 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                             type === activeSetting.value
                               ? "bg-fg-white text-fg-tone-black-1"
                               : ""
                           }`}
                           contentFunction={() => (
-                            <div className='flex justify-start items-start'>
+                            <div className="flex items-start justify-start">
                               {type}
                             </div>
                           )}
@@ -325,6 +325,6 @@ export default function SettingsPanel({
           )}
       </AnimatePresence>
     </motion.div>,
-    document.body
+    document.body,
   );
 }

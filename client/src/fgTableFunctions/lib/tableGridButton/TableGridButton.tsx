@@ -39,7 +39,7 @@ export default function TableGridButton({
           content={gridActive ? "Deactivate grid" : "Activate grid"}
         />
       }
-      options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
+      options={{ hoverTimeoutDuration: 750 }}
       aria-label={"Toggle table grid"}
     />
   );

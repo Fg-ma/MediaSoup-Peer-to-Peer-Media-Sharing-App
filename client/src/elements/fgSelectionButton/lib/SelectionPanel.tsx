@@ -168,7 +168,7 @@ export default function SelectionPanel({
     if (!scrollUpButtonRef.current?.contains(event.target as Node)) {
       document.removeEventListener(
         "pointermove",
-        handleHoverScrollUpPointerMove
+        handleHoverScrollUpPointerMove,
       );
 
       if (scrollInterval.current) {
@@ -194,7 +194,7 @@ export default function SelectionPanel({
     if (!scrollDownButtonRef.current?.contains(event.target as Node)) {
       document.removeEventListener(
         "pointermove",
-        handleHoverScrollDownPointerMove
+        handleHoverScrollDownPointerMove,
       );
 
       if (scrollInterval.current) {
@@ -219,14 +219,14 @@ export default function SelectionPanel({
   return ReactDOM.createPortal(
     <div
       ref={externalPanelRef ? externalPanelRef : panelRef}
-      className='max-h-80 w-max absolute z-[99999999999999] flex'
+      className="z-selection-button-panel absolute flex max-h-80 w-max"
       style={{
         top: `${portalPosition?.top}px`,
         left: `${portalPosition?.left}px`,
       }}
     >
       {portalPosition?.position === "right" && (
-        <div className='flex flex-col'>
+        <div className="flex flex-col">
           <div
             className={`${isParentScrolling ? "w-[3.1875rem]" : "w-4"} grow`}
           ></div>
@@ -235,7 +235,7 @@ export default function SelectionPanel({
       {scrollingAvailable && (
         <div
           ref={scrollUpButtonRef}
-          className={`absolute top-0 h-4 z-[999999999999999] ${
+          className={`absolute top-0 z-10 h-4 ${
             portalPosition?.position === "right"
               ? isParentScrolling
                 ? "left-[3.1875rem]"
@@ -250,13 +250,13 @@ export default function SelectionPanel({
         ></div>
       )}
       <div
-        className={`px-2 max-h-80 h-max w-full shadow-md rounded bg-white ${
+        className={`h-max max-h-80 w-full rounded bg-white px-2 shadow-md ${
           scrollingAvailable ? "py-4" : "py-2"
         }`}
       >
         {scrollingAvailable && (
           <div
-            className={`absolute top-4 pointer-events-none z-[999999999999999] ${
+            className={`pointer-events-none absolute top-4 z-10 ${
               portalPosition?.position === "right"
                 ? isParentScrolling
                   ? "left-[3.6875rem]"
@@ -274,22 +274,22 @@ export default function SelectionPanel({
         )}
         <motion.div
           ref={scrollingContainerRef}
-          className='small-vertical-scroll-bar max-h-[18rem] h-max w-full overflow-y-auto font-K2D text-lg flex flex-col space-y-1'
+          className="small-vertical-scroll-bar flex h-max max-h-[18rem] w-full flex-col space-y-1 overflow-y-auto font-K2D text-lg"
           variants={SelectionPanelVar}
-          initial='init'
-          animate='animate'
-          exit='init'
+          initial="init"
+          animate="animate"
+          exit="init"
           transition={SelectionPanelTransition}
         >
-          {scrollingAvailable && <div className='w-full min-h-1.5'></div>}
+          {scrollingAvailable && <div className="min-h-1.5 w-full"></div>}
           {panelElements}
-          {scrollingAvailable && <div className='w-full min-h-1.5'></div>}
+          {scrollingAvailable && <div className="min-h-1.5 w-full"></div>}
         </motion.div>
       </div>
       {scrollingAvailable && (
         <div
           ref={scrollDownButtonRef}
-          className={`absolute bottom-0 h-4 z-[999999999999999] ${
+          className={`absolute bottom-0 z-10 h-4 ${
             portalPosition?.position === "right"
               ? isParentScrolling
                 ? "left-[3.1875rem]"
@@ -304,11 +304,11 @@ export default function SelectionPanel({
         ></div>
       )}
       {portalPosition?.position === "left" && (
-        <div className='flex flex-col'>
-          <div className='w-4 grow'></div>
+        <div className="flex flex-col">
+          <div className="w-4 grow"></div>
         </div>
       )}
     </div>,
-    document.body
+    document.body,
   );
 }

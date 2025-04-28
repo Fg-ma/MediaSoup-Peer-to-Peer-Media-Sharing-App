@@ -19,7 +19,7 @@ export default function DownloadButton({
     <FgButton
       className={`${
         largestDim === "width" ? "w-[75%]" : "h-[75%]"
-      } flex aspect-square pointer-events-auto items-center justify-center`}
+      } pointer-events-auto flex aspect-square items-center justify-center`}
       clickFunction={(event) => {
         event.stopPropagation();
         bezierController.downloadBezierCurve();
@@ -36,13 +36,12 @@ export default function DownloadButton({
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content='Download (d)' style='light' />
+        <FgHoverContentStandard content="Download (d)" style="light" />
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000002,
       }}
     />
   );

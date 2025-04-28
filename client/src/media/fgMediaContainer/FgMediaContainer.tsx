@@ -318,7 +318,7 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${className} absolute flex items-center justify-center`}
+      } ${backgroundMedia ? "z-background-content" : "z-base-content"} ${className} absolute flex items-center justify-center`}
       style={
         backgroundMedia
           ? {
@@ -327,7 +327,6 @@ export default function FgMediaContainer({
               width: "100%",
               height: "100%",
               rotate: "0deg",
-              zIndex: 0,
             }
           : {
               left: `${positioning.current.position.left}%`,
@@ -336,7 +335,6 @@ export default function FgMediaContainer({
               height: `${positioning.current.scale.y}%`,
               rotate: `${positioning.current.rotation}deg`,
               transformOrigin: "0% 0%",
-              zIndex: 10,
             }
       }
       onPointerEnter={mediaContainerController.current.handlePointerEnter}

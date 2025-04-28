@@ -89,7 +89,6 @@ export default function ReactButton({
         options={{
           hoverType: reactButtonOptions.hoverType,
           hoverTimeoutDuration: reactButtonOptions.hoverTimeoutDuration,
-          hoverZValue: 500000000000,
         }}
       />
       {reactionsPanelActive && (

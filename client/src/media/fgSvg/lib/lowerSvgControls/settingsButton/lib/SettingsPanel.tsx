@@ -86,7 +86,7 @@ export default function SettingsPanel({
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
-    init: boolean = true
+    init: boolean = true,
   ): boolean => {
     // Check if the current object has an 'active' property and if it's true
     if (!init && obj.active === true) {
@@ -164,39 +164,39 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-black font-K2D text-base text-white pointer-events-auto'
+      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-black p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={SelectionPanelTransition}
     >
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
-            className='flex w-full h-full flex-col justify-center items-center space-y-1 px-1'
+            className="flex h-full w-full flex-col items-center justify-center space-y-1 px-1"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
                 <div
                   className={`${
                     settings.synced.value
-                      ? "bg-fg-white text-fg-tone-black-1 fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                      ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                       : "fill-fg-white stroke-fg-white"
-                  } flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1`}
+                  } flex h-full w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                 >
                   <FgSVGElement
                     src={settings.synced.value ? desyncIcon : syncIcon}
-                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -209,29 +209,28 @@ export default function SettingsPanel({
               hoverContent={
                 <FgHoverContentStandard
                   content={settings.synced.value ? "Desync (h)" : "Sync (h)"}
-                  style='light'
+                  style="light"
                 />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 3500,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
                 <div
                   className={`${
                     settings.background.value
-                      ? "bg-fg-white text-fg-tone-black-1 fill-fg-tone-black-1 stroke-fg-tone-black-1"
+                      ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                       : "fill-fg-white stroke-fg-white"
-                  } flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1`}
+                  } flex h-full w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                 >
                   <FgSVGElement
                     src={backgroundIcon}
-                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -243,24 +242,23 @@ export default function SettingsPanel({
               clickFunction={lowerSvgController.handleSetAsBackground}
               hoverContent={
                 <FgHoverContentStandard
-                  content='Set as background (b)'
-                  style='light'
+                  content="Set as background (b)"
+                  style="light"
                 />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 3500,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
-                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={editIcon}
-                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -271,22 +269,21 @@ export default function SettingsPanel({
               )}
               clickFunction={lowerSvgController.handleEdit}
               hoverContent={
-                <FgHoverContentStandard content='Edit (q)' style='light' />
+                <FgHoverContentStandard content="Edit (q)" style="light" />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 3500,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
-                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={downloadIcon}
-                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "85%" },
                       { key: "height", value: "85%" },
@@ -297,22 +294,21 @@ export default function SettingsPanel({
               )}
               clickFunction={lowerSvgController.handleDownload}
               hoverContent={
-                <FgHoverContentStandard content='Download (d)' style='light' />
+                <FgHoverContentStandard content="Download (d)" style="light" />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 3500,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='w-full h-7'
+              className="h-7 w-full"
               contentFunction={() => (
-                <div className='flex h-full w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg fill-fg-white stroke-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1'>
+                <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={copyIcon}
-                    className='flex h-full aspect-square items-center justify-center mr-2'
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "100%" },
                       { key: "height", value: "100%" },
@@ -324,21 +320,20 @@ export default function SettingsPanel({
               clickFunction={lowerSvgController.handleCopyToClipBoard}
               hoverContent={
                 <FgHoverContentStandard
-                  content='Copy to clipboard (c)'
-                  style='light'
+                  content="Copy to clipboard (c)"
+                  style="light"
                 />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 3500,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center text-lg'>
+                <div className="flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1">
                   Download options
                 </div>
               )}
@@ -352,11 +347,11 @@ export default function SettingsPanel({
         {activePages.downloadOptions.active &&
           !isDescendantActive(activePages.downloadOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadOptionsPage
                 setActivePages={setActivePages}
@@ -369,11 +364,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.mimeType.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <MimeTypePage
               setActivePages={setActivePages}
@@ -387,11 +382,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.size.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <SizePage
               svgMediaInstance={svgMediaInstance}
@@ -406,11 +401,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.compression.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <CompressionPage
               setActivePages={setActivePages}
@@ -421,6 +416,6 @@ export default function SettingsPanel({
         )}
       </AnimatePresence>
     </motion.div>,
-    document.body
+    document.body,
   );
 }

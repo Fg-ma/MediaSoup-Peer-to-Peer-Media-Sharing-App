@@ -105,6 +105,9 @@ class NewInstancesLayerController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+
     switch (event.key.toLowerCase()) {
       case "x":
         if (event.shiftKey) {

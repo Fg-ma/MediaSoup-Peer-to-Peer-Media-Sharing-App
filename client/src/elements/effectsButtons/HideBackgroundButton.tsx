@@ -35,7 +35,7 @@ export default function HideBackgroundButton({
   };
   clickFunctionCallback?: () => Promise<void>;
   holdFunctionCallback?: (
-    effectType: HideBackgroundEffectTypes
+    effectType: HideBackgroundEffectTypes,
   ) => Promise<void>;
   acceptColorCallback?: (color: string) => Promise<void>;
 }) {
@@ -92,13 +92,13 @@ export default function HideBackgroundButton({
   return (
     <>
       <FgButton
-        className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
+        className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
         clickFunction={clickFunction}
         contentFunction={() => {
           return (
             <FgSVGElement
               src={streamEffects ? hideBackgroundOffIcon : hideBackgroundIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -116,11 +116,11 @@ export default function HideBackgroundButton({
         holdContent={
           <LazyScrollingContainer
             externalRef={hideBackgroundContainerRef}
-            className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+            className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-white border-opacity-75 bg-black bg-opacity-75 p-2 shadow-lg"
             items={[
-              <div className='flex w-full h-full items-center justify-center'>
+              <div className="flex h-full w-full items-center justify-center">
                 <div
-                  className='border-3 border-white border-opacity-75 rounded'
+                  className="rounded border-3 border-white border-opacity-75"
                   style={{
                     backgroundColor: colorRef.current,
                     width: "100%",
@@ -136,14 +136,14 @@ export default function HideBackgroundButton({
                 ([background, choice]) => (
                   <FgButton
                     key={background}
-                    className='flex w-full aspect-square items-center justify-center'
+                    className="flex aspect-square w-full items-center justify-center"
                     contentFunction={() => (
                       <div
                         className={`${
                           background === effectsStyles.style
-                            ? "border-fg-secondary border-3 border-opacity-100"
+                            ? "border-3 border-fg-secondary border-opacity-100"
                             : ""
-                        } border-white flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                        } flex h-full w-full items-center justify-center rounded border-2 border-white border-opacity-75 hover:border-3 hover:border-fg-secondary`}
                         onClick={(event) => {
                           holdFunction(event as unknown as PointerEvent);
                         }}
@@ -173,11 +173,10 @@ export default function HideBackgroundButton({
                     }
                     scrollingContainerRef={hideBackgroundContainerRef}
                     options={{
-                      hoverZValue: 500000000001,
                       hoverTimeoutDuration: 750,
                     }}
                   />
-                )
+                ),
               ),
             ]}
           />
@@ -186,7 +185,6 @@ export default function HideBackgroundButton({
         setCloseHoldToggle={setCloseHoldToggle}
         scrollingContainerRef={scrollingContainerRef}
         options={{
-          hoverZValue: 500000000001,
           defaultDataValue: effectsStyles?.style,
           hoverTimeoutDuration: 750,
           disabled: effectsDisabled,
@@ -194,7 +192,7 @@ export default function HideBackgroundButton({
         }}
       />
       <ColorPickerButton
-        className='h-full'
+        className="h-full"
         scrollingContainerRef={scrollingContainerRef}
         handleAcceptColorCallback={handleAcceptColorCallback}
         externalColorRef={colorRef}

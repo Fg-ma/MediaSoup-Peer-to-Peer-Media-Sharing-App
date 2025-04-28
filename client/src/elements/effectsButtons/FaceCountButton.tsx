@@ -23,31 +23,29 @@ export default function FaceCountButton({
         externalRef={faceCountButtonRef}
         className={`${
           forceDetectingFaces.current ? "force-detect-face-blink" : ""
-        } !aspect-square bg-fg-red-light rounded-full absolute left-1/2 -translate-x-1/2`}
+        } absolute left-1/2 !aspect-square -translate-x-1/2 rounded-full bg-fg-red-light`}
         style={style}
         clickFunction={async () => {
           if (clickFunctionCallback) clickFunctionCallback();
         }}
         hoverContent={
           !forceDetectingFaces.current && !noFacesDetectedWarning ? (
-            <FgHoverContentStandard content='No faces detected! Retry face detection?' />
+            <FgHoverContentStandard content="No faces detected! Retry face detection?" />
           ) : undefined
         }
         options={{
-          hoverZValue: 500000000001,
           hoverTimeoutDuration: 1500,
           disabled: forceDetectingFaces.current,
         }}
       />
       {noFacesDetectedWarning && (
         <FgPortal
-          type='above'
+          type="above"
           spacing={4}
           content={
-            <FgHoverContentStandard style='light' content='No faces detected' />
+            <FgHoverContentStandard style="light" content="No faces detected" />
           }
           externalRef={faceCountButtonRef}
-          zValue={500000000002}
         />
       )}
     </>

@@ -51,7 +51,7 @@ export default function TableGridOverlay({
   return (
     <canvas
       ref={canvasRef}
-      className='w-full h-full absolute top-0 left-0'
+      className="z-grid-overlay absolute left-0 top-0 h-full w-full"
       width={tableTopRef.current?.clientWidth ?? 1}
       height={tableTopRef.current?.clientHeight ?? 1}
     ></canvas>

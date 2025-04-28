@@ -41,17 +41,17 @@ export default function SelectTableLayer({
 
   useEffect(() => {
     if (dragging || selected.current.length) {
-      document.addEventListener("keydown", (event) => {
-        selectTableLayerController.current.handleKeyPress(event);
-        setRerender((prev) => !prev);
-      });
+      document.addEventListener(
+        "keydown",
+        selectTableLayerController.current.handleKeyDown,
+      );
     }
 
     return () => {
       if (dragging || selected.current.length) {
         document.removeEventListener(
           "keydown",
-          selectTableLayerController.current.handleKeyPress,
+          selectTableLayerController.current.handleKeyDown,
         );
       }
     };
@@ -114,7 +114,7 @@ export default function SelectTableLayer({
     <div
       ref={containerRef}
       onPointerDown={selectTableLayerController.current.handlePointerDown}
-      className="absolute left-0 top-0 h-full w-full bg-transparent"
+      className="z-select-layer absolute left-0 top-0 h-full w-full bg-transparent"
     >
       {dragging && (
         <div
@@ -122,7 +122,7 @@ export default function SelectTableLayer({
           style={boxStyle}
         />
       )}
-      {selected.current.length && (
+      {selected.current.length !== 0 && (
         <>
           <div
             className={`${dragging ? "border-fg-white bg-fg-white transition-all" : "transition-color border-fg-red-light bg-fg-red-light"} pointer-events-none absolute rounded border-3 border-dashed bg-opacity-20`}

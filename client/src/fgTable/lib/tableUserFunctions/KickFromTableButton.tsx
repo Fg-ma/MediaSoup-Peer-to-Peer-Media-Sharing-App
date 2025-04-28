@@ -31,9 +31,9 @@ export default function KickFromTableButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Kick from table' />}
+      hoverContent={<FgHoverContentStandard content="Kick from table" />}
       scrollingContainerRef={userPanelRef}
-      options={{ hoverTimeoutDuration: 750, hoverZValue: 5000000000 }}
+      options={{ hoverTimeoutDuration: 750 }}
     />
   );
 }

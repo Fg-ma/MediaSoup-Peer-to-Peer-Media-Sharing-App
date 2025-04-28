@@ -15,7 +15,7 @@ export default function ConfirmButton({
 }) {
   return (
     <FgButton
-      className='flex z-20 h-full aspect-square rounded-full items-center justify-center bg-fg-red-light bg-opacity-80 pointer-events-auto'
+      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light bg-opacity-80"
       clickFunction={(event) => {
         event.stopPropagation();
         captureMediaController.confirmCapture();
@@ -23,7 +23,7 @@ export default function ConfirmButton({
       contentFunction={() => (
         <FgSVGElement
           src={checkIcon}
-          className='w-[75%] aspect-square flex items-center justify-center'
+          className="flex aspect-square w-[75%] items-center justify-center"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -33,13 +33,12 @@ export default function ConfirmButton({
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content='Confirm and upload' style='light' />
+        <FgHoverContentStandard content="Confirm and upload" style="light" />
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
       }}
     />
   );

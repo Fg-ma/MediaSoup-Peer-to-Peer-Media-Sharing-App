@@ -12,9 +12,18 @@ import {
   IncomingTableMessages,
   onReactionOccurredType,
 } from "../../../serverControllers/tableServer/lib/typeConstant";
+import {
+  GroupSignals,
+  onGroupDeleteType,
+  onGroupDragEndType,
+  onGroupDragStartType,
+  onGroupDragType,
+} from "../../../context/signalContext/lib/typeConstant";
 
 class FgGameController {
   reactController: ReactController;
+  groupStartDragPosition: { x: number; y: number } | undefined;
+  savedMediaPosition: { top: number; left: number } | undefined;
 
   constructor(
     private mediasoupSocket: React.MutableRefObject<
@@ -434,6 +443,107 @@ class FgGameController {
     switch (event.type) {
       case "reactionOccurred":
         this.reactionOccurred(event);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onGroupDragStart = (signal: onGroupDragStartType) => {
+    const { affected, startDragPosition } = signal.data;
+
+    if (
+      !affected.some((item) => item.id === this.gameId && item.type === "game")
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+      "position",
+      { rotationPointPlacement: "topLeft" },
+    );
+
+    this.groupStartDragPosition = startDragPosition;
+    this.savedMediaPosition = this.positioning.current.position;
+  };
+
+  onGroupDrag = (signal: onGroupDragType) => {
+    const { affected, dragPosition } = signal.data;
+
+    if (
+      !affected.some(
+        (item) => item.id === this.gameId && item.type === "game",
+      ) ||
+      !this.groupStartDragPosition ||
+      !this.savedMediaPosition ||
+      !this.sharedBundleRef.current
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.movementDragFunction(
+      {
+        x:
+          ((this.savedMediaPosition.left +
+            dragPosition.x -
+            this.groupStartDragPosition.x) /
+            100) *
+          this.sharedBundleRef.current.clientWidth,
+        y:
+          ((this.savedMediaPosition.top +
+            dragPosition.y -
+            this.groupStartDragPosition.y) /
+            100) *
+          this.sharedBundleRef.current.clientHeight,
+      },
+      { x: 0, y: 0 },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          this.sharedBundleRef.current.clientWidth,
+        y:
+          (this.positioning.current.position.top / 100) *
+          this.sharedBundleRef.current.clientHeight,
+      },
+    );
+  };
+
+  onGroupDragEnd = (signal: onGroupDragEndType) => {
+    const { affected } = signal.data;
+
+    if (
+      !affected.some((item) => item.id === this.gameId && item.type === "game")
+    )
+      return;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+    this.groupStartDragPosition = undefined;
+    this.savedMediaPosition = undefined;
+  };
+
+  onGroupDelete = (signal: onGroupDeleteType) => {
+    const { affected } = signal.data;
+
+    if (
+      !affected.some((item) => item.id === this.gameId && item.type === "game")
+    )
+      return;
+
+    if (this.closeGameFunction) this.closeGameFunction();
+  };
+
+  handleSignal = (signal: GroupSignals) => {
+    switch (signal.type) {
+      case "groupDelete":
+        this.onGroupDelete(signal);
+        break;
+      case "groupDragStart":
+        this.onGroupDragStart(signal);
+        break;
+      case "groupDrag":
+        this.onGroupDrag(signal);
+        break;
+      case "groupDragEnd":
+        this.onGroupDragEnd(signal);
         break;
       default:
         break;

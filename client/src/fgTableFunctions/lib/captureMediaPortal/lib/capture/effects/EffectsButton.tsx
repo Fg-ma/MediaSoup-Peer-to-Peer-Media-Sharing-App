@@ -20,7 +20,7 @@ export default function EffectsButton({
 }) {
   return (
     <FgButton
-      className='flex items-center justify-center h-full aspect-square relative pointer-events-auto z-20'
+      className="pointer-events-auto relative z-20 flex aspect-square h-full items-center justify-center"
       clickFunction={(event) => {
         event?.stopPropagation();
         captureMediaController.handleEffects();
@@ -38,14 +38,13 @@ export default function EffectsButton({
       )}
       hoverContent={
         !captureMediaEffectsActive && !captureMediaTypeActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
       }}
     />
   );

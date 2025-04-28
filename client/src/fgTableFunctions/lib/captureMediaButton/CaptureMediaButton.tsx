@@ -38,7 +38,7 @@ export default function CaptureMediaButton({
         />
       )}
       hoverContent={<FgHoverContentStandard content="Capture media" />}
-      options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
+      options={{ hoverTimeoutDuration: 750 }}
       aria-label="Capture media"
     />
   );

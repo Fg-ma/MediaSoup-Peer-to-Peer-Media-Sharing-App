@@ -75,7 +75,7 @@ export default function SettingsPanel({
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
-    init: boolean = true
+    init: boolean = true,
   ): boolean => {
     // Check if the current object has an 'active' property and if it's true
     if (!init && obj.active === true) {
@@ -162,7 +162,7 @@ export default function SettingsPanel({
 
   const handleAcceptColor = (
     colorType: "backgroundColor" | "color",
-    color: string
+    color: string,
   ) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
@@ -176,32 +176,32 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-fg-tone-black-2 font-K2D text-base text-white pointer-events-auto'
+      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={SelectionPanelTransition}
     >
       {/* Main page */}
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
-            className='flex w-full h-full flex-col justify-center items-center space-y-1 px-1'
+            className="flex h-full w-full flex-col items-center justify-center space-y-1 px-1"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
-            <div className='flex w-full text-nowrap justify-between px-2 rounded items-center'>
+            <div className="flex w-full items-center justify-between text-nowrap rounded px-2">
               <div>Background color</div>
               <ColorPickerButton
                 externalColorPickerPanelRef={colorPickerRefs.backgroundColor}
-                className='h-6 aspect-square'
+                className="aspect-square h-6"
                 defaultColor={settings.backgroundColor.value}
                 handleAcceptColorCallback={(_hex, hexa) =>
                   handleAcceptColor("backgroundColor", hexa)
@@ -209,11 +209,11 @@ export default function SettingsPanel({
                 isAlpha={true}
               />
             </div>
-            <div className='flex w-full text-nowrap justify-between px-2 rounded items-center'>
+            <div className="flex w-full items-center justify-between text-nowrap rounded px-2">
               <div>Color</div>
               <ColorPickerButton
                 externalColorPickerPanelRef={colorPickerRefs.color}
-                className='h-6 aspect-square'
+                className="aspect-square h-6"
                 defaultColor={settings.color.value}
                 handleAcceptColorCallback={(_hex, hexa) =>
                   handleAcceptColor("color", hexa)
@@ -222,18 +222,18 @@ export default function SettingsPanel({
               />
             </div>
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center'>
+                <div className="flex w-full items-center justify-start text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                   Filters
                 </div>
               )}
               clickFunction={handleFiltersActive}
             />
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-start px-2 rounded items-center'>
+                <div className="flex w-full items-center justify-start text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                   Download options
                 </div>
               )}
@@ -247,11 +247,11 @@ export default function SettingsPanel({
         {activePages.filters.active &&
           !isDescendantActive(activePages.filters) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <FiltersPage
                 setActivePages={setActivePages}
@@ -267,11 +267,11 @@ export default function SettingsPanel({
         {activePages.downloadOptions.active &&
           !isDescendantActive(activePages.downloadOptions) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <DownloadOptionsPage
                 setActivePages={setActivePages}
@@ -284,11 +284,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.mimeType.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <MimeTypePage
               setActivePages={setActivePages}
@@ -302,11 +302,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.size.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <SizePage
               setActivePages={setActivePages}
@@ -320,11 +320,11 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadOptions.compression.active && (
           <motion.div
-            className='w-full'
+            className="w-full"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
             <CompressionPage
               setActivePages={setActivePages}
@@ -335,6 +335,6 @@ export default function SettingsPanel({
         )}
       </AnimatePresence>
     </motion.div>,
-    document.body
+    document.body,
   );
 }

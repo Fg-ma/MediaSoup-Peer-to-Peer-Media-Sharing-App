@@ -44,7 +44,7 @@ export default function TabledSection({
           }
         />
       }
-      options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
+      options={{ hoverTimeoutDuration: 750 }}
       aria-label={"Tabled content"}
     />
   );

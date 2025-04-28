@@ -262,7 +262,6 @@ export default function FgBackgroundMusicPortal({
                         backgroundMusicScrollingContainerRef
                       }
                       options={{
-                        hoverZValue: 999999999999999,
                         hoverTimeoutDuration: 750,
                       }}
                     />
@@ -335,7 +334,6 @@ export default function FgBackgroundMusicPortal({
                   }
                   scrollingContainerRef={backgroundMusicScrollingContainerRef}
                   options={{
-                    hoverZValue: 999999999999999,
                     hoverTimeoutDuration: 750,
                   }}
                 />

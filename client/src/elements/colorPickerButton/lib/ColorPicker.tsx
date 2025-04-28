@@ -34,16 +34,16 @@ export default function ColorPicker({
     hex: string,
     hexa: string,
     a: number,
-    rgba: { r: number; g: number; a: number }
+    rgba: { r: number; g: number; a: number },
   ) => void;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   isAlpha?: boolean;
 }) {
   const [hexValue, setHexValue] = useState(
-    color.slice(1) + (isAlpha && color.length !== 9 ? "ff" : "")
+    color.slice(1) + (isAlpha && color.length !== 9 ? "ff" : ""),
   );
   const [alpha, setAlpha] = useState(
-    color.length === 9 ? parseInt(color.slice(7), 16) / 255 : 1
+    color.length === 9 ? parseInt(color.slice(7), 16) / 255 : 1,
   );
 
   const hexToRgb = (hex: string) => {
@@ -122,7 +122,7 @@ export default function ColorPicker({
         alpha,
         colorRef.current.length === 9
           ? hexToRgba(colorRef.current)
-          : { ...hexToRgb(colorRef.current), a: alpha }
+          : { ...hexToRgb(colorRef.current), a: alpha },
       );
     }
   };
@@ -133,7 +133,7 @@ export default function ColorPicker({
   };
 
   const handleHexColorChanges = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setHexValue(event.target.value);
 
@@ -152,7 +152,7 @@ export default function ColorPicker({
 
   const handleRGBColorChanges = (
     event: React.ChangeEvent<HTMLInputElement>,
-    type: "r" | "g" | "b"
+    type: "r" | "g" | "b",
   ) => {
     if (!isAlpha) {
       const { r, b, g } = hexToRgb(tempColor);
@@ -314,7 +314,7 @@ export default function ColorPicker({
     <FgPanel
       externalRef={externalColorPickerPanelRef}
       content={
-        <div ref={colorPickerRef} className='flex flex-col space-y-2'>
+        <div ref={colorPickerRef} className="flex flex-col space-y-2">
           <div
             className={`mb-2 flex items-center ${
               isAlpha ? "h-[220px] justify-between" : "h-[200px] justify-center"
@@ -330,7 +330,7 @@ export default function ColorPicker({
             />
             {isAlpha && (
               <FgSlider
-                className='grow pl-2'
+                className="grow pl-2"
                 externalValue={alpha}
                 externalStyleValue={alpha}
                 onValueChange={(value) => handleAlphaSliderChanges(value.value)}
@@ -346,67 +346,67 @@ export default function ColorPicker({
               />
             )}
           </div>
-          <div className='flex space-x-1'>
+          <div className="flex space-x-1">
             <div
-              className={`flex flex-col space-y-1 items-center justify-center ${
+              className={`flex flex-col items-center justify-center space-y-1 ${
                 isAlpha ? "w-[88px]" : "w-[70px]"
               }`}
             >
-              <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
                 <input
-                  type='text'
-                  className='w-full bg-white h-8 rounded-md text-sm text-black pl-1 pr-0.5 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  type="text"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1 pr-0.5 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
                   onChange={handleHexColorChanges}
-                  autoComplete='off'
+                  autoComplete="off"
                   value={hexValue}
                 ></input>
                 Hex
               </label>
             </div>
-            <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
+            <div className="flex w-10 flex-col items-center justify-center space-y-1">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
                 <input
-                  type='text'
-                  className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  type="text"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "r")}
-                  autoComplete='off'
+                  autoComplete="off"
                   value={rgba.r}
                 ></input>
                 R
               </label>
             </div>
-            <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
+            <div className="flex w-10 flex-col items-center justify-center space-y-1">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
                 <input
-                  type='text'
-                  className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  type="text"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "g")}
-                  autoComplete='off'
+                  autoComplete="off"
                   value={rgba.g}
                 ></input>
                 G
               </label>
             </div>
-            <div className='flex flex-col space-y-1 items-center justify-center w-10'>
-              <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
+            <div className="flex w-10 flex-col items-center justify-center space-y-1">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
                 <input
-                  type='text'
-                  className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                  type="text"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "b")}
-                  autoComplete='off'
+                  autoComplete="off"
                   value={rgba.b}
                 ></input>
                 B
               </label>
             </div>
             {isAlpha && (
-              <div className='flex flex-col space-y-1 items-center justify-center w-[3.25rem] pl-1'>
-                <label className='flex text-base text-black cursor-pointer flex-col items-center justify-center'>
+              <div className="flex w-[3.25rem] flex-col items-center justify-center space-y-1 pl-1">
+                <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
                   <input
-                    type='text'
-                    className='w-full bg-white h-8 rounded-md text-sm text-black pl-1.5 pr-1 font-K2D focus:outline-none focus:border-2 focus:border-fg-secondary border border-fg-white-85'
+                    type="text"
+                    className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
                     onChange={(event) => handleAlphaChanges(event)}
-                    autoComplete='off'
+                    autoComplete="off"
                     value={rgba.a}
                   ></input>
                   a
@@ -414,14 +414,14 @@ export default function ColorPicker({
               </div>
             )}
           </div>
-          <div className='flex space-x-2 w-full items-center justify-center'>
+          <div className="flex w-full items-center justify-center space-x-2">
             <FgButton
-              className='flex h-10 w-10 bg-fg-red rounded-full items-center justify-center'
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-fg-red"
               clickFunction={handleAcceptColor}
               contentFunction={() => (
                 <FgSVGElement
                   src={checkIcon}
-                  className='w-[75%] h-[75%]'
+                  className="h-[75%] w-[75%]"
                   attributes={[
                     { key: "width", value: "100%" },
                     { key: "height", value: "100%" },
@@ -431,22 +431,21 @@ export default function ColorPicker({
                 />
               )}
               hoverContent={
-                <FgHoverContentStandard content='Confirm color' style='light' />
+                <FgHoverContentStandard content="Confirm color" style="light" />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 1250,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
             <FgButton
-              className='flex h-10 w-10 bg-fg-tone-black-4 rounded-full items-center justify-center'
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-fg-tone-black-4"
               clickFunction={handleCancelColor}
               contentFunction={() => (
                 <FgSVGElement
                   src={closeIcon}
-                  className='w-[55%] h-[55%]'
+                  className="h-[55%] w-[55%]"
                   attributes={[
                     { key: "width", value: "100%" },
                     { key: "height", value: "100%" },
@@ -456,13 +455,12 @@ export default function ColorPicker({
                 />
               )}
               hoverContent={
-                <FgHoverContentStandard content='Cancel' style='light' />
+                <FgHoverContentStandard content="Cancel" style="light" />
               }
               options={{
                 hoverSpacing: 4,
                 hoverTimeoutDuration: 1250,
                 hoverType: "above",
-                hoverZValue: 500000000000,
               }}
             />
           </div>
@@ -473,8 +471,8 @@ export default function ColorPicker({
         placement: "above",
       }}
       resizeable={false}
-      initHeight='max-content'
-      initWidth='max-content'
+      initHeight="max-content"
+      initWidth="max-content"
     />
   );
 }

@@ -86,7 +86,6 @@ export default function ScaleSection({
           options={{
             hoverSpacing: 4,
             hoverType: "above",
-            hoverZValue: 1000000,
             hoverTimeoutDuration: 3250,
           }}
         />
@@ -194,7 +193,6 @@ export default function ScaleSection({
           options={{
             hoverSpacing: 4,
             hoverType: "above",
-            hoverZValue: 1000000,
             hoverTimeoutDuration: 3250,
           }}
         />

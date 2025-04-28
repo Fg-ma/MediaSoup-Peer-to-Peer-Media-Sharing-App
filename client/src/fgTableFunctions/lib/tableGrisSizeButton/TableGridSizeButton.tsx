@@ -49,7 +49,7 @@ export default function TableGridSizeButton({
           />
         )}
         hoverContent={<FgHoverContentStandard content="Change grid size" />}
-        options={{ hoverTimeoutDuration: 750, hoverZValue: 500000000000 }}
+        options={{ hoverTimeoutDuration: 750 }}
         aria-label={"Change table grid size"}
       />
       {gridSizePanelActive && (

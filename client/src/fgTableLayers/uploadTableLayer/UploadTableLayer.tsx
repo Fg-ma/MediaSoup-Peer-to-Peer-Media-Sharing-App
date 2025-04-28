@@ -81,7 +81,7 @@ export default function UploadTableLayer() {
   return (
     <div
       ref={uploadRef}
-      className="abosulte pointer-events-none left-0 top-0 h-full w-full bg-transparent"
+      className="abosulte z-upload-layer pointer-events-none left-0 top-0 h-full w-full bg-transparent"
       onDragEnter={() => setDraggingFiles(true)}
       onDragLeave={() => setDraggingFiles(false)}
       onDragOver={handleDragOver}

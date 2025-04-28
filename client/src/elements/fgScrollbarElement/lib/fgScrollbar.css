@@ -8,11 +8,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
   opacity: 100%;
   pointer-events: none;
   transform: scale(1);
-  transition: transform 0.2s linear, opacity 0.2s linear;
+  transition:
+    transform 0.2s linear,
+    opacity 0.2s linear;
 }
 
 .fg-scrollbar-track {

@@ -3,6 +3,7 @@ import { Transition, Variants, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
@@ -80,6 +81,8 @@ export default function FgGame({
   const { table_id, username, instance } = useUserInfoContext();
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const [_, setRerender] = useState(false);
   const positioning = useRef<{
@@ -229,6 +232,7 @@ export default function FgGame({
     tableSocket.current?.addMessageListener(
       fgGameController.handleTableMessage,
     );
+    addGroupSignalListener(fgGameController.handleSignal);
 
     mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
@@ -254,6 +258,7 @@ export default function FgGame({
       tableSocket.current?.removeMessageListener(
         fgGameController.handleTableMessage,
       );
+      removeGroupSignalListener(fgGameController.handleSignal);
     };
   }, []);
 
@@ -329,7 +334,7 @@ export default function FgGame({
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
         hideControls && !reactionsPanelActive ? "hide-controls" : ""
-      } pointer-events-auto absolute rounded`}
+      } z-base-content pointer-events-auto absolute rounded`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,

@@ -92,7 +92,7 @@ export default function SettingsPanel({
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: Record<string, any>,
-    init: boolean = true
+    init: boolean = true,
   ): boolean => {
     // Check if the current object has an 'active' property and if it's true
     if (!init && obj.active === true) {
@@ -187,7 +187,7 @@ export default function SettingsPanel({
   };
 
   const handleChangeFrequency = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setExternalNumFixedPointsValue(event.target.value);
 
@@ -216,7 +216,7 @@ export default function SettingsPanel({
   const handleChangeEnvelopeOption = (
     envelopeOption: EnvelopeOptionTypes,
     key: string,
-    value: number
+    value: number,
   ) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
@@ -233,39 +233,39 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className='max-h-80 w-64 absolute z-[99999999999999] flex p-2 h-max shadow-md rounded-md bg-fg-tone-black-1 font-K2D text-base text-white pointer-events-auto'
+      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
       }}
       variants={SelectionPanelVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={SelectionPanelTransition}
     >
       <AnimatePresence>
         {!isDescendantActive(activePages) && (
           <motion.div
-            className='flex w-full h-full flex-col justify-center items-center space-y-1 px-1'
+            className="flex h-full w-full flex-col items-center justify-center space-y-1 px-1"
             variants={panelVariants}
-            initial='init'
-            animate='animate'
-            exit='exit'
+            initial="init"
+            animate="animate"
+            exit="exit"
           >
-            <div className='flex w-full text-nowrap justify-between px-2 rounded items-center'>
-              <div className='pr-8'>Frequency</div>
+            <div className="flex w-full items-center justify-between text-nowrap rounded px-2">
+              <div className="pr-8">Frequency</div>
               <FgInput
-                className='h-6 rounded-sm'
+                className="h-6 rounded-sm"
                 onChange={handleChangeFrequency}
                 externalValue={externalNumFixedPointsValue}
                 options={{ submitButton: false }}
               />
             </div>
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                   <div>Envelope</div>
                   <div>{envelopeTypesTitles[settings.envelopeType.value]}</div>
                 </div>
@@ -273,20 +273,20 @@ export default function SettingsPanel({
               clickFunction={handleEnvelopeTypeActive}
             />
             <FgButton
-              className='w-full'
+              className="w-full"
               contentFunction={() => (
-                <div className='flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-between px-2 rounded items-center'>
+                <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                   <div>Mute style</div>
                   <div>
                     {muteStyleTypes.includes(
-                      settings.muteStyle.value as MuteStyleTypes
+                      settings.muteStyle.value as MuteStyleTypes,
                     )
                       ? muteStylesMeta[
                           settings.muteStyle.value as MuteStyleTypes
                         ].title
-                      : Object.entries(userMedia.current.svg.all).find(
-                          ([svgId]) => svgId === settings.muteStyle.value
-                        )?.[1].filename ?? ""}
+                      : (Object.entries(userMedia.current.svg.all).find(
+                          ([svgId]) => svgId === settings.muteStyle.value,
+                        )?.[1].filename ?? "")}
                   </div>
                 </div>
               )}
@@ -295,14 +295,14 @@ export default function SettingsPanel({
             {Object.entries(colorSettingsTitles).map(([key, title]) => (
               <div
                 key={key}
-                className='flex w-full text-nowrap justify-between px-2 rounded items-center'
+                className="flex w-full items-center justify-between text-nowrap rounded px-2"
               >
                 <div>{title}</div>
                 <ColorPickerButton
                   externalColorPickerPanelRef={
                     colorPickerRefs[key as ColorSettingsTypes]
                   }
-                  className='h-6 aspect-square'
+                  className="aspect-square h-6"
                   defaultColor={settings[key as ColorSettingsTypes].value}
                   handleAcceptColorCallback={(color) =>
                     handleAcceptColor(key as ColorSettingsTypes, color)
@@ -317,11 +317,11 @@ export default function SettingsPanel({
         {activePages.envelopeType.active &&
           !isDescendantActive(activePages.envelopeType) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <EnvelopeTypePage
                 setActivePages={setActivePages}
@@ -335,11 +335,11 @@ export default function SettingsPanel({
         {activePages.muteStyle.active &&
           !isDescendantActive(activePages.muteStyle) && (
             <motion.div
-              className='w-full'
+              className="w-full"
               variants={panelVariants}
-              initial='init'
-              animate='animate'
-              exit='exit'
+              initial="init"
+              animate="animate"
+              exit="exit"
             >
               <MuteStylePage
                 setActivePages={setActivePages}
@@ -358,23 +358,23 @@ export default function SettingsPanel({
                 activePages.envelopeType[`${key}Options` as EnvelopeOptionTypes]
                   .active && (
                   <motion.div
-                    className='w-full'
+                    className="w-full"
                     variants={panelVariants}
-                    initial='init'
-                    animate='animate'
-                    exit='exit'
+                    initial="init"
+                    animate="animate"
+                    exit="exit"
                   >
                     <PageTemplate
                       content={
-                        <div className='flex w-full h-max flex-col'>
+                        <div className="flex h-max w-full flex-col">
                           {Object.keys(
                             settings.envelopeType[
                               `${key}Options` as EnvelopeOptionTypes
-                            ]
+                            ],
                           ).map((envelopeOptionType) => (
                             <FgSlider
                               key={envelopeOptionType}
-                              className='h-16 w-[95%]'
+                              className="h-16 w-[95%]"
                               externalValue={
                                 // @ts-expect-error: key is stupid and not recognized as a key
                                 settings.envelopeType[
@@ -391,7 +391,7 @@ export default function SettingsPanel({
                                 handleChangeEnvelopeOption(
                                   `${key}Options` as EnvelopeOptionTypes,
                                   envelopeOptionType,
-                                  value.value
+                                  value.value,
                                 );
                               }}
                               options={{
@@ -414,16 +414,16 @@ export default function SettingsPanel({
                       pageTitle={title}
                       backFunction={() =>
                         handleCloseEnvelopeOptions(
-                          `${key}Options` as EnvelopeOptionTypes
+                          `${key}Options` as EnvelopeOptionTypes,
                         )
                       }
                     />
                   </motion.div>
                 )}
             </AnimatePresence>
-          )
+          ),
       )}
     </motion.div>,
-    document.body
+    document.body,
   );
 }

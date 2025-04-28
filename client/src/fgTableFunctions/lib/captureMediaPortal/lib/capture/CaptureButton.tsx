@@ -17,7 +17,7 @@ export default function CaptureButton({
 }) {
   return (
     <FgButton
-      className='h-full aspect-square pointer-events-auto z-20'
+      className="pointer-events-auto z-20 aspect-square h-full"
       clickFunction={(event) => {
         event?.stopPropagation();
         captureMediaController.handleCapture();
@@ -45,13 +45,12 @@ export default function CaptureButton({
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content='Capture (k)' style='light' />
+        <FgHoverContentStandard content="Capture (k)" style="light" />
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000,
       }}
     />
   );

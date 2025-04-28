@@ -19,7 +19,7 @@ export default function ResetButton({
     <FgButton
       className={`${
         largestDim === "width" ? "w-full" : "h-full"
-      } flex aspect-square pointer-events-auto items-center justify-center`}
+      } pointer-events-auto flex aspect-square items-center justify-center`}
       clickFunction={(event) => {
         event.stopPropagation();
         bezierController.handleReset();
@@ -27,7 +27,7 @@ export default function ResetButton({
       contentFunction={() => (
         <FgSVGElement
           src={resetIcon}
-          className='flex h-[75%] aspect-square items-center justify-center'
+          className="flex aspect-square h-[75%] items-center justify-center"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -36,12 +36,11 @@ export default function ResetButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='Reset' style='light' />}
+      hoverContent={<FgHoverContentStandard content="Reset" style="light" />}
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "above",
-        hoverZValue: 500000000002,
       }}
     />
   );

@@ -22,20 +22,20 @@ export default function CloseButton({
 }) {
   return (
     <FgButton
-      className='flex shadow z-20 h-full aspect-square rounded-full bg-fg-tone-black-4 bg-opacity-80 items-center justify-center pointer-events-auto'
+      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-tone-black-4 bg-opacity-80 shadow"
       clickFunction={(event) => {
         event.stopPropagation();
 
         delaying.current
           ? captureMediaController.clearDelay()
           : finalizeCapture
-          ? captureMediaController.handleExitFinialization()
-          : tableFunctionsController.stopVideo();
+            ? captureMediaController.handleExitFinialization()
+            : tableFunctionsController.stopVideo();
       }}
       contentFunction={() => (
         <FgSVGElement
           src={closeIcon}
-          className='w-[50%] aspect-square'
+          className="aspect-square w-[50%]"
           attributes={[
             { key: "fill", value: "#f2f2f2" },
             { key: "stroke", value: "#f2f2f2" },
@@ -45,13 +45,12 @@ export default function CloseButton({
         />
       )}
       hoverContent={
-        <FgHoverContentStandard content='Close (x)' style='light' />
+        <FgHoverContentStandard content="Close (x)" style="light" />
       }
       options={{
         hoverSpacing: 4,
         hoverTimeoutDuration: 1750,
         hoverType: "below",
-        hoverZValue: 500000000,
       }}
     />
   );

@@ -26,7 +26,7 @@ export default function BlurButton({
 
   return (
     <FgButton
-      className='flex items-center justify-center h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
+      className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
       clickFunction={async () => {
         setEffectsDisabled(true);
         setRerender((prev) => prev + 1);
@@ -39,7 +39,7 @@ export default function BlurButton({
         return (
           <FgSVGElement
             src={streamEffects ? blurOffIcon : blurIcon}
-            className='flex h-full w-full items-center justify-center'
+            className="flex h-full w-full items-center justify-center"
             attributes={[
               { key: "width", value: "80%" },
               { key: "height", value: "80%" },
@@ -48,10 +48,9 @@ export default function BlurButton({
           />
         );
       }}
-      hoverContent={<FgHoverContentStandard content='Blur' />}
+      hoverContent={<FgHoverContentStandard content="Blur" />}
       scrollingContainerRef={scrollingContainerRef}
       options={{
-        hoverZValue: 500000000001,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,
       }}

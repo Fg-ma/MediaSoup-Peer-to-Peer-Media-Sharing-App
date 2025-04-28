@@ -40,7 +40,7 @@ export default function SvgEffectButton({
     <FgButton
       className={`${
         active ? "border-fg-red-light" : "border-fg-white"
-      } flex items-center justify-center h-full !aspect-square border-2 rounded-full hover:border-fg-red-light`}
+      } flex !aspect-square h-full items-center justify-center rounded-full border-2 hover:border-fg-red-light`}
       clickFunction={async () => {
         if (clickFunctionCallback) clickFunctionCallback();
       }}
@@ -48,13 +48,13 @@ export default function SvgEffectButton({
       hoverContent={<FgHoverContentStandard content={hoverLabel} />}
       holdFunction={() => {}}
       holdContent={
-        <div className='bg-fg-tone-black-2 rounded w-60 h-max p-2 pointer-events-auto text-fg-white text-xl font-K2D'>
+        <div className="pointer-events-auto h-max w-60 rounded bg-fg-tone-black-2 p-2 font-K2D text-xl text-fg-white">
           {filtersMeta[filter].options.length !== 0 &&
             filtersMeta[filter].options.map((option) =>
               option.type === "number" ? (
-                <div key={option.key} className='h-max w-[95%]'>
+                <div key={option.key} className="h-max w-[95%]">
                   <FgSlider
-                    className='h-16'
+                    className="h-16"
                     externalValue={
                       // @ts-ignore-error no coherence between filter and option.key
                       userEffectsStyles.current.svg[svgInstanceId][filter][
@@ -93,11 +93,11 @@ export default function SvgEffectButton({
               ) : (
                 <div
                   key={option.key}
-                  className='flex items-center justify-between w-[95%] h-max'
+                  className="flex h-max w-[95%] items-center justify-between"
                 >
                   {option.title}
                   <ColorPickerButton
-                    className='h-8 aspect-square'
+                    className="aspect-square h-8"
                     defaultColor={
                       // @ts-ignore filter and option.key are strings not types
                       userEffectsStyles.current.svg[svgInstanceId][filter][
@@ -116,7 +116,7 @@ export default function SvgEffectButton({
                     }
                   />
                 </div>
-              )
+              ),
             )}
         </div>
       }
@@ -125,7 +125,6 @@ export default function SvgEffectButton({
         colorPickerRefs ? Object.values(colorPickerRefs) : undefined
       }
       options={{
-        hoverZValue: 500000000001,
         hoverTimeoutDuration: 750,
         holdKind: "toggle",
         holdSpacing: 4,

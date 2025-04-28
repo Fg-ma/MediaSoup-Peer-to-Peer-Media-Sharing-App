@@ -360,7 +360,7 @@ export default function FgButton({
                 content={holdContent}
                 externalRef={externalRef ? externalRef : buttonRef}
                 externalPortalRef={holdContentRef}
-                zValue={9999999999}
+                zValue={499900}
                 spacing={fgButtonOptions.holdSpacing}
               />
             </Suspense>

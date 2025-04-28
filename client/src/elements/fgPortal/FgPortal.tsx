@@ -30,7 +30,7 @@ export default function FgPortal({
   externalRef,
   externalPortalRef,
   insertionPoint,
-  zValue = 51,
+  zValue = 500000,
   top = 50,
   left = 50,
   options = {
@@ -65,7 +65,7 @@ export default function FgPortal({
     spacing,
     type,
     mouseType,
-    setPortalPosition
+    setPortalPosition,
   );
 
   useEffect(() => {
@@ -85,14 +85,14 @@ export default function FgPortal({
     if (type === "mouse")
       window.addEventListener(
         "pointermove",
-        fgPortalController.getDynamicPortalPosition
+        fgPortalController.getDynamicPortalPosition,
       );
 
     if (type === "mouse")
       return () => {
         window.removeEventListener(
           "pointermove",
-          fgPortalController.getDynamicPortalPosition
+          fgPortalController.getDynamicPortalPosition,
         );
       };
   }, [content]);
@@ -124,6 +124,6 @@ export default function FgPortal({
     </motion.div>,
     insertionPoint && insertionPoint.current && type !== "staticTopDomain"
       ? insertionPoint.current
-      : document.body
+      : document.body,
   );
 }

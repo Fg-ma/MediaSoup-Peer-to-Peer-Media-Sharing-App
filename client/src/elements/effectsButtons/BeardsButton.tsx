@@ -62,7 +62,7 @@ export default function BeardsButton({
 
   return (
     <FgButton
-      className='h-full !aspect-square border-2 border-fg-white border-opacity-90 rounded-full hover:border-fg-red-light'
+      className="!aspect-square h-full rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
       clickFunction={clickFunction}
       holdFunction={holdFunction}
       contentFunction={() => {
@@ -80,7 +80,7 @@ export default function BeardsButton({
             return (
               <FgSVGElement
                 src={iconSrc}
-                className='flex h-full w-full items-center justify-center'
+                className="flex h-full w-full items-center justify-center"
                 attributes={[
                   { key: "width", value: "90%" },
                   { key: "height", value: "90%" },
@@ -117,24 +117,24 @@ export default function BeardsButton({
       holdContent={
         <LazyScrollingContainer
           externalRef={beardsContainerRef}
-          className='grid border overflow-y-auto small-vertical-scroll-bar max-h-48 mb-4 grid-cols-3 w-60 gap-x-1 gap-y-1 p-2 border-white border-opacity-75 bg-black bg-opacity-75 shadow-lg rounded-md'
+          className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-white border-opacity-75 bg-black bg-opacity-75 p-2 shadow-lg"
           items={[
             ...Object.entries(beardsEffects).map(([beard, effect]) => (
               <FgButton
                 key={beard}
-                className='flex w-full aspect-square items-center justify-center'
+                className="flex aspect-square w-full items-center justify-center"
                 contentFunction={() => (
                   <div
                     className={`${
                       beard === effectsStyles.style
-                        ? "border-fg-secondary border-3 border-opacity-100"
+                        ? "border-3 border-fg-secondary border-opacity-100"
                         : ""
                     } ${effect.flipped && "scale-x-[-1]"} ${
                       effect.bgColor === "white" &&
-                      "bg-fg-white border-fg-black-35"
+                      "border-fg-black-35 bg-fg-white"
                     } ${
                       effect.bgColor === "black" && "border-fg-white"
-                    } flex items-center justify-center w-full h-full hover:border-fg-secondary rounded border-2 hover:border-3 border-opacity-75`}
+                    } flex h-full w-full items-center justify-center rounded border-2 border-opacity-75 hover:border-3 hover:border-fg-secondary`}
                     onClick={(event) => {
                       holdFunction(event as unknown as PointerEvent);
                     }}
@@ -156,7 +156,6 @@ export default function BeardsButton({
                 }
                 scrollingContainerRef={beardsContainerRef}
                 options={{
-                  hoverZValue: 500000000001,
                   hoverTimeoutDuration: 750,
                 }}
               />
@@ -164,12 +163,11 @@ export default function BeardsButton({
           ]}
         />
       }
-      hoverContent={<FgHoverContentStandard content='Beards' />}
+      hoverContent={<FgHoverContentStandard content="Beards" />}
       closeHoldToggle={closeHoldToggle}
       setCloseHoldToggle={setCloseHoldToggle}
       scrollingContainerRef={scrollingContainerRef}
       options={{
-        hoverZValue: 500000000001,
         defaultDataValue: effectsStyles?.style,
         hoverTimeoutDuration: 750,
         disabled: effectsDisabled,

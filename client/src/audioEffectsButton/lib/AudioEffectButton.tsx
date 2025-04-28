@@ -35,23 +35,23 @@ export default function AudioEffectButton({
     ? producerType === "audio"
       ? userEffects.current[producerType][audioEffect]
       : producerType === "video"
-      ? producerId
-        ? userEffects.current[producerType][producerId].audio[audioEffect]
-        : undefined
-      : producerId
-      ? userEffects.current[producerType][producerId][audioEffect]
-      : undefined
+        ? producerId
+          ? userEffects.current[producerType][producerId].audio[audioEffect]
+          : undefined
+        : producerId
+          ? userEffects.current[producerType][producerId][audioEffect]
+          : undefined
     : producerType === "audio"
-    ? remoteEffects.current[username][instance][producerType][audioEffect]
-    : producerType === "video"
-    ? producerId
-      ? remoteEffects.current[producerType][producerId].audio[audioEffect]
-      : undefined
-    : producerId
-    ? remoteEffects.current[username][instance][producerType][producerId][
-        audioEffect
-      ]
-    : undefined;
+      ? remoteEffects.current[username][instance][producerType][audioEffect]
+      : producerType === "video"
+        ? producerId
+          ? remoteEffects.current[producerType][producerId].audio[audioEffect]
+          : undefined
+        : producerId
+          ? remoteEffects.current[username][instance][producerType][producerId][
+              audioEffect
+            ]
+          : undefined;
 
   useEffect(() => {
     for (let i = 0; i < audioEffectTemplate.attributes.length; i++) {
@@ -72,7 +72,7 @@ export default function AudioEffectButton({
 
   return (
     <FgButton
-      className='flex items-center justify-center min-w-12 w-full aspect-square hover:bg-fg-red-light rounded bg-fg-tone-black-4 overflow-clip relative'
+      className="relative flex aspect-square w-full min-w-12 items-center justify-center overflow-clip rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
       scrollingContainerRef={scrollingContainerRef}
       clickFunction={() => {
         handleAudioEffectChange(audioEffect);
@@ -85,7 +85,7 @@ export default function AudioEffectButton({
                 ? audioEffectTemplate.offIcon
                 : audioEffectTemplate.icon
             }
-            className='flex items-center justify-center'
+            className="flex items-center justify-center"
             attributes={attributes.current}
           />
         );
@@ -101,7 +101,6 @@ export default function AudioEffectButton({
       }
       options={{
         hoverTimeoutDuration: 750,
-        hoverZValue: 500000000000,
       }}
     />
   );

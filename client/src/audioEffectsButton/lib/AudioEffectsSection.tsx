@@ -344,7 +344,6 @@ export default function AudioEffectsSection({
                 }
                 options={{
                   hoverTimeoutDuration: 750,
-                  hoverZValue: 500000000000,
                 }}
               />,
               <FgButton
@@ -383,7 +382,6 @@ export default function AudioEffectsSection({
                 }
                 options={{
                   hoverTimeoutDuration: 750,
-                  hoverZValue: 500000000000,
                 }}
               />,
               isUser ? (
@@ -430,7 +428,6 @@ export default function AudioEffectsSection({
                   }
                   options={{
                     hoverTimeoutDuration: 750,
-                    hoverZValue: 500000000000,
                   }}
                 />
               ) : null,
@@ -467,7 +464,6 @@ export default function AudioEffectsSection({
                   }
                   options={{
                     hoverTimeoutDuration: 750,
-                    hoverZValue: 500000000000,
                   }}
                 />
               ) : null,
@@ -508,7 +504,6 @@ export default function AudioEffectsSection({
                   }
                   options={{
                     hoverTimeoutDuration: 750,
-                    hoverZValue: 500000000000,
                   }}
                 />
               ) : null,

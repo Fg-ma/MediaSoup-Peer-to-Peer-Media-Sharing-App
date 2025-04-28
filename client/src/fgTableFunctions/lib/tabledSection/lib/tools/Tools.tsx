@@ -80,7 +80,6 @@ export default function Tools({
         options={{
           hoverSpacing: 4,
           hoverType: "above",
-          hoverZValue: 1000000,
           hoverTimeoutDuration: 1250,
         }}
       />
@@ -139,7 +138,6 @@ export default function Tools({
         options={{
           hoverSpacing: 4,
           hoverType: "above",
-          hoverZValue: 1000000,
           hoverTimeoutDuration: 1250,
         }}
       />
@@ -162,7 +160,6 @@ export default function Tools({
         options={{
           hoverSpacing: 4,
           hoverType: "above",
-          hoverZValue: 1000000,
           hoverTimeoutDuration: 1250,
         }}
       />
@@ -185,7 +182,6 @@ export default function Tools({
         options={{
           hoverSpacing: 4,
           hoverType: "above",
-          hoverZValue: 1000000,
           hoverTimeoutDuration: 1250,
         }}
       />

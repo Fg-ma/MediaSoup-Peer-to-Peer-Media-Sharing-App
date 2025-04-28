@@ -26,7 +26,7 @@ export default function CopyButton({
         externalRef={copiedButtonRef}
         className={`${
           largestDim === "width" ? "w-[75%]" : "h-[75%]"
-        } flex aspect-square pointer-events-auto items-center justify-center`}
+        } pointer-events-auto flex aspect-square items-center justify-center`}
         clickFunction={(event) => {
           event.stopPropagation();
           bezierController.copyToClipBoardBezierCurve();
@@ -45,8 +45,8 @@ export default function CopyButton({
         hoverContent={
           !copied ? (
             <FgHoverContentStandard
-              content='Copy to clipboard (c)'
-              style='light'
+              content="Copy to clipboard (c)"
+              style="light"
             />
           ) : undefined
         }
@@ -54,16 +54,14 @@ export default function CopyButton({
           hoverSpacing: 4,
           hoverTimeoutDuration: 1750,
           hoverType: "above",
-          hoverZValue: 500000000002,
         }}
       />
       {copied && (
         <FgPortal
-          type='above'
+          type="above"
           spacing={4}
-          content={<FgHoverContentStandard content='Copied' style='light' />}
+          content={<FgHoverContentStandard content="Copied" style="light" />}
           externalRef={copiedButtonRef}
-          zValue={500000000002}
         />
       )}
     </>

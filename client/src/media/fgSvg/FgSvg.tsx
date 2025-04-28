@@ -202,7 +202,7 @@ export default function FgSvg({
           type="staticTopDomain"
           top={0}
           left={0}
-          zValue={10000}
+          zValue={490000}
           className="flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-45"
           content={
             <MethodSvgEditor

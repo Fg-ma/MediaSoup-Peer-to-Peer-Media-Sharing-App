@@ -8,6 +8,7 @@ import {
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgUpperVisualMediaControls from "./lib/fgUpperVisualMediaControls/FgUpperVisualMediaControls";
@@ -110,6 +111,8 @@ export default function RemoteVisualMedia({
   const { mediasoupSocket, tableSocket } = useSocketContext();
   const { username: activeUsername, instance: activeInstance } =
     useUserInfoContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -311,6 +314,8 @@ export default function RemoteVisualMedia({
     setRerender,
     aspectRatio,
     mediasoupSocket,
+    fgContentAdjustmentController,
+    bundleRef,
   );
 
   useEffect(() => {
@@ -325,6 +330,8 @@ export default function RemoteVisualMedia({
     tableSocket.current?.addMessageListener(
       fgVisualMediaController.handleTableMessage,
     );
+
+    addGroupSignalListener(fgVisualMediaController.handleSignal);
 
     // Request initial catch up data
     if (activeUsername.current && activeInstance.current) {
@@ -391,6 +398,7 @@ export default function RemoteVisualMedia({
       tableSocket.current?.removeMessageListener(
         fgVisualMediaController.handleTableMessage,
       );
+      removeGroupSignalListener(fgVisualMediaController.handleSignal);
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
@@ -471,7 +479,7 @@ export default function RemoteVisualMedia({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } flex items-center justify-center`}
+      } z-base-content flex items-center justify-center`}
       style={{
         position: "absolute",
         left: `${positioning.current.position.left}%`,
@@ -517,7 +525,9 @@ export default function RemoteVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        data-selectable-type={type}
+        data-selectable-id={visualMediaId}
       >
         <AnimatePresence>
           {visualEffectsActive && (
