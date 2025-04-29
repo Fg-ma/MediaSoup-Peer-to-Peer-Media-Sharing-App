@@ -1,26 +1,16 @@
 import React, { useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import { useSignalContext } from "../../../context/signalContext/SignalContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import LazyScrollingContainer from "../../../elements/lazyScrollingContainer/LazyScrollingContainer";
-import FgButton from "../../../elements/fgButton/FgButton";
-import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
-import FgInput from "../../../elements/fgInput/FgInput";
-import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import FgImageElement from "../../../elements/fgImageElement/FgImageElement";
 import ScrollingContainer from "../../../elements/scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../../elements/scrollingContainer/lib/ScrollingContainerButton";
 import Tools from "./lib/tools/Tools";
 import AdvancedSection from "./lib/tools/advancedSection/AdvancedSection";
 import TabledPortalController from "./lib/TabledPortalController";
 import SearchBar from "./lib/tools/searchBar/SearchBar";
-
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-
-const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
-const minusIcon = nginxAssetServerBaseUrl + "svgs/minusIcon.svg";
+import TabledItems from "./lib/TabledItems";
 
 export type Categories = StaticContentTypes | "all";
 
@@ -55,7 +45,6 @@ export default function TabledPortal({
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
-  const { sendNewInstanceSignal } = useSignalContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const [advanced, setAdvanced] = useState(false);
@@ -180,435 +169,156 @@ export default function TabledPortal({
                             searchContent.some(
                               (item) => item.sid === svgId,
                             )) ? (
-                            <div className="flex h-max w-full min-w-12 max-w-24 flex-col items-center justify-center space-y-1">
-                              <FgButton
-                                key={svgId}
-                                className={`${selected.current.some((item) => item.contentId === svgId) ? "border-fg-red" : "border-transparent"} flex aspect-square w-full items-center justify-center rounded border-3 hover:border-fg-red`}
-                                contentFunction={() =>
-                                  svgMedia.blobURL ? (
-                                    <FgImageElement
-                                      className="aspect-square h-full object-contain"
-                                      src={svgMedia.blobURL}
-                                      alt={svgMedia.filename}
-                                    />
-                                  ) : undefined
-                                }
-                                clickFunction={(event) => {
-                                  let newSelected: {
-                                    contentType: StaticContentTypes;
-                                    contentId: string;
-                                    aspect: number;
-                                    count: number | "zero";
-                                  }[];
-
-                                  const currentlyActive = selected.current.some(
-                                    (item) => item.contentId === svgId,
-                                  );
-
-                                  const newEntry: {
-                                    contentType: StaticContentTypes;
-                                    contentId: string;
-                                    aspect: number;
-                                    count: number;
-                                  } = {
-                                    contentType: "svg",
-                                    contentId: svgId,
-                                    aspect: svgMedia.aspect ?? 1,
-                                    count: 1,
-                                  };
-
-                                  if (event.shiftKey) {
-                                    if (
-                                      lastPressed.current &&
-                                      lastPressed.current.contentId !== svgId
-                                    ) {
-                                      const buttons =
-                                        tabledSectionScrollingContainerRef.current?.querySelectorAll(
-                                          "button[data-tabled-id]",
-                                        ) || [];
-
-                                      const buttonIds = Array.from(buttons).map(
-                                        (btn) =>
-                                          (btn as HTMLElement).dataset.tabledId,
-                                      );
-
-                                      const startIdx = buttonIds.indexOf(
-                                        lastPressed.current.contentId,
-                                      );
-                                      const endIdx = buttonIds.indexOf(svgId);
-
-                                      if (startIdx !== -1 && endIdx !== -1) {
-                                        const [from, to] = [
-                                          startIdx,
-                                          endIdx,
-                                        ].sort((a, b) => a - b);
-                                        const idsInRange = buttonIds.slice(
-                                          from,
-                                          to + 1,
-                                        );
-
-                                        newSelected = idsInRange
-                                          .map((id) => {
-                                            const foundButton =
-                                              tabledSectionScrollingContainerRef.current?.querySelector(
-                                                `button[data-tabled-id="${id}"]`,
-                                              ) as HTMLButtonElement;
-
-                                            if (!foundButton) return null;
-
-                                            const aspect = parseFloat(
-                                              foundButton?.dataset
-                                                .tabledAspect ?? "1",
-                                            );
-                                            const contentType =
-                                              foundButton?.dataset
-                                                .tabledContentType;
-
-                                            if (!contentType || isNaN(aspect))
-                                              return null;
-
-                                            return {
-                                              contentType,
-                                              contentId: id!,
-                                              aspect,
-                                              count: 1,
-                                            };
-                                          })
-                                          .filter(
-                                            (
-                                              item,
-                                            ): item is {
-                                              contentType: StaticContentTypes;
-                                              contentId: string;
-                                              aspect: number;
-                                              count: number;
-                                            } => item !== null,
-                                          );
-                                      } else {
-                                        newSelected = [newEntry];
-                                      }
-
-                                      lastPressed.current = newEntry;
-                                    } else {
-                                      // Toggle single
-                                      lastPressed.current = currentlyActive
-                                        ? undefined
-                                        : newEntry;
-                                      newSelected = currentlyActive
-                                        ? []
-                                        : [newEntry];
-                                    }
-                                  } else {
-                                    lastPressed.current = currentlyActive
-                                      ? undefined
-                                      : {
-                                          contentType: "svg",
-                                          contentId: svgId,
-                                          aspect: svgMedia.aspect ?? 1,
-                                          count: 1,
-                                        };
-
-                                    newSelected = currentlyActive
-                                      ? selected.current.filter(
-                                          (item) => item.contentId !== svgId,
-                                        )
-                                      : [
-                                          ...selected.current,
-                                          {
-                                            contentType: "svg",
-                                            contentId: svgId,
-                                            aspect: svgMedia.aspect ?? 1,
-                                            count: 1,
-                                          },
-                                        ];
-                                  }
-
-                                  selected.current = newSelected;
-                                  setRerender((prev) => !prev);
-                                }}
-                                startDragFunction={() => {
-                                  setDragging(true);
-
-                                  lastPressed.current = {
-                                    contentType: "svg",
-                                    contentId: svgId,
-                                    aspect: svgMedia.aspect ?? 1,
-                                    count: 1,
-                                  };
-
-                                  const newSelected: {
-                                    contentType: StaticContentTypes;
-                                    contentId: string;
-                                    aspect: number;
-                                    count: number | "zero";
-                                  }[] = selected.current.some(
-                                    (item) => item.contentId === svgId,
-                                  )
-                                    ? selected.current
-                                    : [
-                                        ...selected.current,
-                                        {
-                                          contentType: "svg",
-                                          contentId: svgId,
-                                          aspect: svgMedia.aspect ?? 1,
-                                          count: 1,
-                                        },
-                                      ];
-
-                                  selected.current = newSelected;
-                                  setRerender((prev) => !prev);
-
-                                  sendNewInstanceSignal({
-                                    type: "instancesLayerMode",
-                                    data: {
-                                      mode: "standard",
-                                    },
-                                  });
-
-                                  sendNewInstanceSignal({
-                                    type: "startInstancesDrag",
-                                    data: {
-                                      instances: newSelected
-                                        .filter(
-                                          (sel) =>
-                                            sel.count !== "zero" &&
-                                            sel.count !== 0,
-                                        )
-                                        .map((sel) => ({
-                                          contentType: sel.contentType,
-                                          contentId: sel.contentId,
-                                          instances: Array.from({
-                                            // @ts-expect-error "zero" was already filtered out
-                                            length: sel.count,
-                                          }).map(() => ({
-                                            height: 15,
-                                            width: 15 * sel.aspect,
-                                          })),
-                                        })),
-                                    },
-                                  });
-                                }}
-                                stopDragFunction={() => {
-                                  setDragging(false);
-
-                                  sendNewInstanceSignal({
-                                    type: "instancesLayerMode",
-                                    data: {
-                                      mode: "standard",
-                                    },
-                                  });
-
-                                  sendNewInstanceSignal({
-                                    type: "stopInstancesDrag",
-                                  });
-                                }}
-                                data-tabled-id={svgId}
-                                data-tabled-aspect={svgMedia.aspect}
-                                data-tabled-content-type="svg"
-                                options={{ dragPreventDefault: true }}
-                              />
-                              {selected.current.some(
-                                (item) => item.contentId === svgId,
-                              ) && (
-                                <div className="flex h-max w-full items-center justify-center">
-                                  <FgButton
-                                    className="flex aspect-square w-1/3 items-center justify-center"
-                                    contentFunction={() => (
-                                      <FgSVGElement
-                                        src={additionIcon}
-                                        className="aspect-square h-[70%] fill-fg-white stroke-fg-white"
-                                        attributes={[
-                                          { key: "width", value: "100%" },
-                                          { key: "height", value: "100%" },
-                                        ]}
-                                      />
-                                    )}
-                                    pointerDownFunction={() => {
-                                      if (holdTimeout.current) {
-                                        clearTimeout(holdTimeout.current);
-                                        holdTimeout.current = undefined;
-                                      }
-                                      if (holdInterval.current) {
-                                        clearInterval(holdInterval.current);
-                                        holdInterval.current = undefined;
-                                      }
-
-                                      holdTimeout.current = setTimeout(() => {
-                                        holdInterval.current = setInterval(
-                                          () => {
-                                            const sel = selected.current.find(
-                                              (item) =>
-                                                item.contentId === svgId,
-                                            );
-                                            if (sel)
-                                              sel.count =
-                                                sel.count === "zero"
-                                                  ? 1
-                                                  : Math.min(20, sel.count + 1);
-                                            setRerender((prev) => !prev);
-                                          },
-                                          50,
-                                        );
-                                      }, 1000);
-                                    }}
-                                    pointerUpFunction={() => {
-                                      if (holdTimeout.current) {
-                                        clearTimeout(holdTimeout.current);
-                                        holdTimeout.current = undefined;
-                                      }
-                                      if (holdInterval.current) {
-                                        clearInterval(holdInterval.current);
-                                        holdInterval.current = undefined;
-                                      }
-                                    }}
-                                    clickFunction={() => {
-                                      const sel = selected.current.find(
-                                        (item) => item.contentId === svgId,
-                                      );
-                                      if (sel)
-                                        sel.count =
-                                          sel.count === "zero"
-                                            ? 1
-                                            : Math.min(20, sel.count + 1);
-                                      setRerender((prev) => !prev);
-                                    }}
-                                    hoverContent={
-                                      <FgHoverContentStandard content="Increase new content" />
-                                    }
-                                    options={{
-                                      hoverSpacing: 4,
-                                      hoverType: "above",
-                                      hoverTimeoutDuration: 3250,
-                                    }}
-                                  />
-                                  <FgInput
-                                    className="aspect-square w-1/3 font-K2D text-xl text-fg-white"
-                                    type="number"
-                                    onChange={(event) => {
-                                      let newCount: number | "zero" = parseInt(
-                                        event.target.value,
-                                      );
-
-                                      if (isNaN(newCount)) {
-                                        newCount = "zero";
-                                      } else {
-                                        newCount = Math.max(
-                                          0,
-                                          Math.min(20, newCount),
-                                        );
-                                      }
-
-                                      const sel = selected.current.find(
-                                        (item) => item.contentId === svgId,
-                                      );
-                                      if (sel) sel.count = newCount;
-                                      setRerender((prev) => !prev);
-                                    }}
-                                    onUnfocus={() => {
-                                      const sel = selected.current.find(
-                                        (item) => item.contentId === svgId,
-                                      );
-                                      if (sel && sel.count === "zero") {
-                                        sel.count = 0;
-                                        setRerender((prev) => !prev);
-                                      }
-                                    }}
-                                    externalValue={
-                                      selected.current.find(
-                                        (item) => item.contentId === svgId,
-                                      )?.count !== "zero"
-                                        ? `${
-                                            selected.current.find(
-                                              (item) =>
-                                                item.contentId === svgId,
-                                            )?.count ?? ""
-                                          }`
-                                        : ""
-                                    }
-                                    options={{
-                                      submitButton: false,
-                                      padding: 0,
-                                      centerText: true,
-                                      backgroundColor: "transparent",
-                                      min: 0,
-                                      max: 20,
-                                      step: 1,
-                                      autocomplete: "off",
-                                    }}
-                                  />
-                                  <FgButton
-                                    className="flex aspect-square w-1/3 items-center justify-center"
-                                    contentFunction={() => (
-                                      <FgSVGElement
-                                        src={minusIcon}
-                                        className="aspect-square h-[70%] fill-fg-white stroke-fg-white"
-                                        attributes={[
-                                          { key: "width", value: "100%" },
-                                          { key: "height", value: "100%" },
-                                        ]}
-                                      />
-                                    )}
-                                    pointerDownFunction={() => {
-                                      if (holdTimeout.current) {
-                                        clearTimeout(holdTimeout.current);
-                                        holdTimeout.current = undefined;
-                                      }
-                                      if (holdInterval.current) {
-                                        clearInterval(holdInterval.current);
-                                        holdInterval.current = undefined;
-                                      }
-
-                                      holdTimeout.current = setTimeout(() => {
-                                        holdInterval.current = setInterval(
-                                          () => {
-                                            const sel = selected.current.find(
-                                              (item) =>
-                                                item.contentId === svgId,
-                                            );
-                                            if (sel)
-                                              sel.count =
-                                                sel.count === "zero"
-                                                  ? 0
-                                                  : Math.max(0, sel.count - 1);
-                                            setRerender((prev) => !prev);
-                                          },
-                                          50,
-                                        );
-                                      }, 1000);
-                                    }}
-                                    pointerUpFunction={() => {
-                                      if (holdTimeout.current) {
-                                        clearTimeout(holdTimeout.current);
-                                        holdTimeout.current = undefined;
-                                      }
-                                      if (holdInterval.current) {
-                                        clearInterval(holdInterval.current);
-                                        holdInterval.current = undefined;
-                                      }
-                                    }}
-                                    clickFunction={() => {
-                                      const sel = selected.current.find(
-                                        (item) => item.contentId === svgId,
-                                      );
-                                      if (sel)
-                                        sel.count =
-                                          sel.count === "zero"
-                                            ? 0
-                                            : Math.max(0, sel.count - 1);
-                                      setRerender((prev) => !prev);
-                                    }}
-                                    hoverContent={
-                                      <FgHoverContentStandard content="Decrease new content" />
-                                    }
-                                    options={{
-                                      hoverSpacing: 4,
-                                      hoverType: "above",
-                                      hoverTimeoutDuration: 3250,
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
+                            <TabledItems
+                              contentType="svg"
+                              contentId={svgId}
+                              selected={selected}
+                              blobURL={svgMedia.blobURL}
+                              filename={svgMedia.filename}
+                              aspect={svgMedia.aspect}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
+                          ) : null,
+                      )
+                    : []),
+                  ...(activePage === "all" || activePage === "image"
+                    ? Object.entries(userMedia.current.image.all).map(
+                        ([imageId, imageMedia]) =>
+                          (searchContent.length === 0 &&
+                            imageMedia.state.includes("tabled")) ||
+                          (searchContent.length !== 0 &&
+                            searchContent.some(
+                              (item) => item.iid === imageId,
+                            )) ? (
+                            <TabledItems
+                              contentType="image"
+                              contentId={imageId}
+                              selected={selected}
+                              blobURL={imageMedia.blobURL}
+                              filename={imageMedia.filename}
+                              aspect={imageMedia.aspect}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
+                          ) : null,
+                      )
+                    : []),
+                  ...(activePage === "all" || activePage === "video"
+                    ? Object.entries(userMedia.current.video.all).map(
+                        ([videoId, videoMedia]) =>
+                          (searchContent.length === 0 &&
+                            videoMedia.state.includes("tabled")) ||
+                          (searchContent.length !== 0 &&
+                            searchContent.some(
+                              (item) => item.vid === videoId,
+                            )) ? (
+                            <TabledItems
+                              contentType="video"
+                              contentId={videoId}
+                              selected={selected}
+                              blobURL={videoMedia.blobURL}
+                              filename={videoMedia.filename}
+                              aspect={videoMedia.aspect}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
+                          ) : null,
+                      )
+                    : []),
+                  ...(activePage === "all" || activePage === "soundClip"
+                    ? Object.entries(userMedia.current.soundClip.all).map(
+                        ([soundClipId, soundClipMedia]) =>
+                          (searchContent.length === 0 &&
+                            soundClipMedia.state.includes("tabled")) ||
+                          (searchContent.length !== 0 &&
+                            searchContent.some(
+                              (item) => item.sid === soundClipId,
+                            )) ? (
+                            <TabledItems
+                              contentType="soundClip"
+                              contentId={soundClipId}
+                              selected={selected}
+                              blobURL={soundClipMedia.blobURL}
+                              filename={soundClipMedia.filename}
+                              aspect={undefined}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
+                          ) : null,
+                      )
+                    : []),
+                  ...(activePage === "all" || activePage === "application"
+                    ? Object.entries(userMedia.current.application.all).map(
+                        ([applicationId, applicationMedia]) =>
+                          (searchContent.length === 0 &&
+                            applicationMedia.state.includes("tabled")) ||
+                          (searchContent.length !== 0 &&
+                            searchContent.some(
+                              (item) => item.sid === applicationId,
+                            )) ? (
+                            <TabledItems
+                              contentType="application"
+                              contentId={applicationId}
+                              selected={selected}
+                              blobURL={applicationMedia.blobURL}
+                              filename={applicationMedia.filename}
+                              aspect={applicationMedia.aspect}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
+                          ) : null,
+                      )
+                    : []),
+                  ...(activePage === "all" || activePage === "text"
+                    ? Object.entries(userMedia.current.text.all).map(
+                        ([textId, textMedia]) =>
+                          (searchContent.length === 0 &&
+                            textMedia.state.includes("tabled")) ||
+                          (searchContent.length !== 0 &&
+                            searchContent.some(
+                              (item) => item.sid === textId,
+                            )) ? (
+                            <TabledItems
+                              contentType="text"
+                              contentId={textId}
+                              selected={selected}
+                              blobURL={undefined}
+                              filename={textMedia.filename}
+                              aspect={undefined}
+                              tabledSectionScrollingContainerRef={
+                                tabledSectionScrollingContainerRef
+                              }
+                              lastPressed={lastPressed}
+                              setDragging={setDragging}
+                              holdTimeout={holdTimeout}
+                              holdInterval={holdInterval}
+                            />
                           ) : null,
                       )
                     : []),

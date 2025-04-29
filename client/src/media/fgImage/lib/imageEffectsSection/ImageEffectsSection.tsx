@@ -15,28 +15,28 @@ import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 import ImageMediaInstance from "../../ImageMediaInstance";
 
 const HideBackgroundButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HideBackgroundButton")
+  () => import("../../../../elements/effectsButtons/HideBackgroundButton"),
 );
 const GlassesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/GlassesButton")
+  () => import("../../../../elements/effectsButtons/GlassesButton"),
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/BeardsButton")
+  () => import("../../../../elements/effectsButtons/BeardsButton"),
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MustachesButton")
+  () => import("../../../../elements/effectsButtons/MustachesButton"),
 );
 const MasksButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MasksButton")
+  () => import("../../../../elements/effectsButtons/MasksButton"),
 );
 const HatsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HatsButton")
+  () => import("../../../../elements/effectsButtons/HatsButton"),
 );
 const PetsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/PetsButton")
+  () => import("../../../../elements/effectsButtons/PetsButton"),
 );
 const FaceCountButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/FaceCountButton")
+  () => import("../../../../elements/effectsButtons/FaceCountButton"),
 );
 
 const EffectSectionVar: Variants = {
@@ -81,7 +81,7 @@ export default function ImageEffectsSection({
 
   const [_, setRerender] = useState(false);
 
-  const faceDetectedCount = useRef(imageMediaInstance.detectedFaces);
+  const faceDetectedCount = useRef(imageMediaInstance.imageMedia.detectedFaces);
   const [noFacesDetectedWarning, setNoFacesDetectedWarning] = useState(false);
   const forceDetectingFaces = useRef(false);
   const noFacesDetectedTimeout = useRef<NodeJS.Timeout>(undefined);
@@ -120,20 +120,20 @@ export default function ImageEffectsSection({
   };
 
   useEffect(() => {
-    imageMediaInstance.addFaceCountChangeListener(
-      handleFaceDetectedCountChange
+    imageMediaInstance.imageMedia.addFaceCountChangeListener(
+      handleFaceDetectedCountChange,
     );
     imageMediaInstance.babylonScene?.addForceFaceDetectEndListener(
-      handleForceFaceDetectEnd
+      handleForceFaceDetectEnd,
     );
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
-      imageMediaInstance.removeFaceCountChangeListener(
-        handleFaceDetectedCountChange
+      imageMediaInstance.imageMedia.removeFaceCountChangeListener(
+        handleFaceDetectedCountChange,
       );
       imageMediaInstance.babylonScene?.removeForceFaceDetectEndListener(
-        handleForceFaceDetectEnd
+        handleForceFaceDetectEnd,
       );
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
@@ -172,7 +172,7 @@ export default function ImageEffectsSection({
         subEffectsContainerRef.current.clientWidth;
       setRerender((prev) => !prev);
     }
-  }, [imageMediaInstance.detectedFaces]);
+  }, [imageMediaInstance.imageMedia.detectedFaces]);
 
   return (
     <>
@@ -184,6 +184,7 @@ export default function ImageEffectsSection({
                 ? "calc(max(2rem, min(12% + 0.5rem, 3.5rem)) + max(4.75rem, min(6.75rem, 1.75rem + 10%)) + 0.75rem)"
                 : "calc(max(2rem, min(12% + 0.5rem, 3.5rem)) + max(3rem, min(5rem, 10%)) + 0.75rem)",
               height: "min(max(0.75rem, 4%), 1rem)",
+              pointerEvents: "auto",
             }}
             clickFunctionCallback={() => {
               forceDetectingFaces.current = true;
@@ -199,7 +200,7 @@ export default function ImageEffectsSection({
       )}
       <motion.div
         ref={effectsContainerRef}
-        className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+        className="flex small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 w-full max-w-full items-center rounded"
         style={{
           bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
           height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
@@ -209,14 +210,14 @@ export default function ImageEffectsSection({
           justifyContent: overflow.current ? "flex-start" : "center",
         }}
         variants={EffectSectionVar}
-        initial='init'
-        animate='animate'
-        exit='init'
+        initial="init"
+        animate="animate"
+        exit="init"
         transition={EffectSectionTransition}
       >
         <div
           ref={subEffectsContainerRef}
-          className='flex h-full w-max items-center justify-center px-4 space-x-2'
+          className="flex h-full w-max items-center justify-center space-x-2 px-4"
         >
           <ClearAllButton
             effectsDisabled={effectsDisabled}
@@ -239,12 +240,12 @@ export default function ImageEffectsSection({
             clickFunctionCallback={async () => {
               imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
                 userEffectsStyles.current.image[imageInstanceId].postProcess
-                  .style
+                  .style,
               );
 
               await lowerImageController.handleImageEffect(
                 "postProcess",
-                false
+                false,
               );
             }}
             holdFunctionCallback={async (effectType) => {
@@ -253,12 +254,12 @@ export default function ImageEffectsSection({
               ].postProcess.style = effectType;
 
               imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
-                effectType
+                effectType,
               );
 
               await lowerImageController.handleImageEffect(
                 "postProcess",
-                userEffects.current.image[imageInstanceId].postProcess
+                userEffects.current.image[imageInstanceId].postProcess,
               );
             }}
           />
@@ -281,12 +282,12 @@ export default function ImageEffectsSection({
                       .hideBackground;
 
                   imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                    effectsStyles.style
+                    effectsStyles.style,
                   );
 
                   await lowerImageController.handleImageEffect(
                     "hideBackground",
-                    false
+                    false,
                   );
                 }}
                 holdFunctionCallback={async (effectType) => {
@@ -302,17 +303,17 @@ export default function ImageEffectsSection({
 
                   if (effectType !== "color") {
                     imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                      effectType
+                      effectType,
                     );
                   } else {
                     imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                      effectsStyles.color
+                      effectsStyles.color,
                     );
                   }
 
                   await lowerImageController.handleImageEffect(
                     "hideBackground",
-                    streamEffects
+                    streamEffects,
                   );
                 }}
                 acceptColorCallback={async (color) => {
@@ -323,7 +324,7 @@ export default function ImageEffectsSection({
                     userEffects.current.image[imageInstanceId].hideBackground;
 
                   imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                    color
+                    color,
                   );
 
                   effectsStyles.style = "color";
@@ -331,7 +332,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "hideBackground",
-                    streamEffects
+                    streamEffects,
                   );
                 }}
               />
@@ -364,7 +365,7 @@ export default function ImageEffectsSection({
 
               await lowerImageController.handleImageEffect(
                 "tint",
-                userEffects.current.image[imageInstanceId].tint
+                userEffects.current.image[imageInstanceId].tint,
               );
             }}
           />
@@ -383,7 +384,7 @@ export default function ImageEffectsSection({
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect(
                     "glasses",
-                    false
+                    false,
                   );
                 }}
                 holdFunctionCallback={async (effectType) => {
@@ -393,7 +394,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "glasses",
-                    userEffects.current.image[imageInstanceId].glasses
+                    userEffects.current.image[imageInstanceId].glasses,
                   );
                 }}
               />
@@ -421,7 +422,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "beards",
-                    userEffects.current.image[imageInstanceId].beards
+                    userEffects.current.image[imageInstanceId].beards,
                   );
                 }}
               />
@@ -442,7 +443,7 @@ export default function ImageEffectsSection({
                 clickFunctionCallback={async () => {
                   await lowerImageController.handleImageEffect(
                     "mustaches",
-                    false
+                    false,
                   );
                 }}
                 holdFunctionCallback={async (effectType) => {
@@ -452,7 +453,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "mustaches",
-                    userEffects.current.image[imageInstanceId].mustaches
+                    userEffects.current.image[imageInstanceId].mustaches,
                   );
                 }}
               />
@@ -477,7 +478,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "masks",
-                    userEffects.current.image[imageInstanceId].masks
+                    userEffects.current.image[imageInstanceId].masks,
                   );
                 }}
               />
@@ -502,7 +503,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "hats",
-                    userEffects.current.image[imageInstanceId].hats
+                    userEffects.current.image[imageInstanceId].hats,
                   );
                 }}
               />
@@ -527,7 +528,7 @@ export default function ImageEffectsSection({
 
                   await lowerImageController.handleImageEffect(
                     "pets",
-                    userEffects.current.image[imageInstanceId].pets
+                    userEffects.current.image[imageInstanceId].pets,
                   );
                 }}
               />

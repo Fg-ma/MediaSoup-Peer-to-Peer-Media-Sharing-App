@@ -5,7 +5,6 @@ import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
 import {
   contentTypeBucketMap,
-  contentTypeQdrantMap,
   mimeToExtension,
   mimeTypeContentTypeMap,
   StaticMimeTypes,

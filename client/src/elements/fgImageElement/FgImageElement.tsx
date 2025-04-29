@@ -6,6 +6,7 @@ export default function FgImageElement({
   srcLoading,
   alt,
   className,
+  imageClassName,
   style,
   ...props
 }: {
@@ -13,6 +14,7 @@ export default function FgImageElement({
   srcLoading?: string;
   alt?: string;
   className?: string;
+  imageClassName?: string;
   style?: React.CSSProperties;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,7 @@ export default function FgImageElement({
       {...props}
     >
       <img
-        className="h-full w-full"
+        className={`${imageClassName} h-full w-full`}
         ref={imgRef}
         src={src}
         onLoad={loaded}

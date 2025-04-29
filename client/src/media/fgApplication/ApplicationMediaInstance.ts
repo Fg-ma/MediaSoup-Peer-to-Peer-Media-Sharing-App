@@ -69,7 +69,6 @@ class ApplicationMediaInstance {
       ) as HTMLImageElement;
 
       this.babylonScene = new BabylonScene(
-        this.applicationInstanceId,
         "application",
         this.instanceCanvas,
         this.instanceApplication,
@@ -120,7 +119,6 @@ class ApplicationMediaInstance {
 
     if (!this.babylonScene) {
       this.babylonScene = new BabylonScene(
-        this.applicationInstanceId,
         "application",
         this.instanceCanvas,
         this.instanceApplication,

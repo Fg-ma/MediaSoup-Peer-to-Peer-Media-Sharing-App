@@ -15,25 +15,25 @@ import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
 import VideoMediaInstance from "../../VideoMediaInstance";
 
 const HideBackgroundButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HideBackgroundButton")
+  () => import("../../../../elements/effectsButtons/HideBackgroundButton"),
 );
 const GlassesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/GlassesButton")
+  () => import("../../../../elements/effectsButtons/GlassesButton"),
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/BeardsButton")
+  () => import("../../../../elements/effectsButtons/BeardsButton"),
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MustachesButton")
+  () => import("../../../../elements/effectsButtons/MustachesButton"),
 );
 const MasksButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MasksButton")
+  () => import("../../../../elements/effectsButtons/MasksButton"),
 );
 const HatsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HatsButton")
+  () => import("../../../../elements/effectsButtons/HatsButton"),
 );
 const PetsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/PetsButton")
+  () => import("../../../../elements/effectsButtons/PetsButton"),
 );
 
 const EffectSectionVar: Variants = {
@@ -76,7 +76,9 @@ export default function VideoEffectsSection({
 
   const overflow = useRef(false);
 
-  const faceDetectedCount = useRef(videoMediaInstance.maxFacesDetected);
+  const faceDetectedCount = useRef(
+    videoMediaInstance.videoMedia.maxFacesDetected,
+  );
 
   const [_, setRerender] = useState(false);
 
@@ -99,16 +101,16 @@ export default function VideoEffectsSection({
 
   useEffect(() => {
     if (faceDetectedCount.current === 0) {
-      videoMediaInstance.addFaceCountChangeListener(
-        handleFaceDetectedCountChange
+      videoMediaInstance.videoMedia.addFaceCountChangeListener(
+        handleFaceDetectedCountChange,
       );
     }
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
       if (faceDetectedCount.current === 0) {
-        videoMediaInstance.removeFaceCountChangeListener(
-          handleFaceDetectedCountChange
+        videoMediaInstance.videoMedia.removeFaceCountChangeListener(
+          handleFaceDetectedCountChange,
         );
       }
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
@@ -153,7 +155,7 @@ export default function VideoEffectsSection({
   return (
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className="flex small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 w-full max-w-full items-center rounded"
       style={{
         bottom: overflow.current
           ? "calc(max(2.5rem, min(12% + 1rem, 4rem)))"
@@ -165,14 +167,14 @@ export default function VideoEffectsSection({
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
       variants={EffectSectionVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={EffectSectionTransition}
     >
       <div
         ref={subEffectsContainerRef}
-        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+        className="flex h-full w-max items-center justify-center space-x-2 px-4"
       >
         <ClearAllButton
           effectsDisabled={effectsDisabled}
@@ -195,7 +197,7 @@ export default function VideoEffectsSection({
           clickFunctionCallback={async () => {
             videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
               userEffectsStyles.current.video[videoInstanceId].video.postProcess
-                .style
+                .style,
             );
 
             await lowerVideoController.handleVideoEffect("postProcess", false);
@@ -207,12 +209,12 @@ export default function VideoEffectsSection({
 
             videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
               userEffectsStyles.current.video[videoInstanceId].video.postProcess
-                .style
+                .style,
             );
 
             await lowerVideoController.handleVideoEffect(
               "postProcess",
-              userEffects.current.video[videoInstanceId].video.postProcess
+              userEffects.current.video[videoInstanceId].video.postProcess,
             );
           }}
         />
@@ -235,12 +237,12 @@ export default function VideoEffectsSection({
                     .hideBackground;
 
                 videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                  effectsStyles.style
+                  effectsStyles.style,
                 );
 
                 await lowerVideoController.handleVideoEffect(
                   "hideBackground",
-                  false
+                  false,
                 );
               }}
               holdFunctionCallback={async (effectType) => {
@@ -253,12 +255,12 @@ export default function VideoEffectsSection({
 
                 effectsStyles.style = effectType;
                 videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                  effectType
+                  effectType,
                 );
 
                 await lowerVideoController.handleVideoEffect(
                   "hideBackground",
-                  streamEffects
+                  streamEffects,
                 );
               }}
               acceptColorCallback={async (color) => {
@@ -270,7 +272,7 @@ export default function VideoEffectsSection({
                     .hideBackground;
 
                 videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                  color
+                  color,
                 );
 
                 effectsStyles.style = "color";
@@ -278,7 +280,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "hideBackground",
-                  streamEffects
+                  streamEffects,
                 );
               }}
             />
@@ -311,7 +313,7 @@ export default function VideoEffectsSection({
 
             await lowerVideoController.handleVideoEffect(
               "tint",
-              userEffects.current.video[videoInstanceId].video.tint
+              userEffects.current.video[videoInstanceId].video.tint,
             );
           }}
         />
@@ -337,7 +339,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "glasses",
-                  userEffects.current.video[videoInstanceId].video.glasses
+                  userEffects.current.video[videoInstanceId].video.glasses,
                 );
               }}
             />
@@ -365,7 +367,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "beards",
-                  userEffects.current.video[videoInstanceId].video.beards
+                  userEffects.current.video[videoInstanceId].video.beards,
                 );
               }}
             />
@@ -386,7 +388,7 @@ export default function VideoEffectsSection({
               clickFunctionCallback={async () => {
                 await lowerVideoController.handleVideoEffect(
                   "mustaches",
-                  false
+                  false,
                 );
               }}
               holdFunctionCallback={async (effectType) => {
@@ -396,7 +398,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "mustaches",
-                  userEffects.current.video[videoInstanceId].video.mustaches
+                  userEffects.current.video[videoInstanceId].video.mustaches,
                 );
               }}
             />
@@ -424,7 +426,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "masks",
-                  userEffects.current.video[videoInstanceId].video.masks
+                  userEffects.current.video[videoInstanceId].video.masks,
                 );
               }}
             />
@@ -452,7 +454,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "hats",
-                  userEffects.current.video[videoInstanceId].video.hats
+                  userEffects.current.video[videoInstanceId].video.hats,
                 );
               }}
             />
@@ -480,7 +482,7 @@ export default function VideoEffectsSection({
 
                 await lowerVideoController.handleVideoEffect(
                   "pets",
-                  userEffects.current.video[videoInstanceId].video.pets
+                  userEffects.current.video[videoInstanceId].video.pets,
                 );
               }}
             />

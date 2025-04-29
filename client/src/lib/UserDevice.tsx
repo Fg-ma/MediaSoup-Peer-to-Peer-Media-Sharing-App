@@ -4,6 +4,7 @@ class UserDevice {
   private MAX_FRAME_PROCESSING_TIME = 16;
   private MIN_FRAME_INTERVAL = 16;
   private FACE_MESH_DETECTION_INTERVAL = 4;
+  private SELFIE_SEGMENTATION_DETECTION_INTERVAL = 4;
   private cores = 4;
   private memory = 4;
   private networkSpeed = 0;
@@ -54,6 +55,7 @@ class UserDevice {
       this.MAX_FRAME_PROCESSING_TIME = 8; // Higher processing capability
       this.MIN_FRAME_INTERVAL = 8; // Higher FPS
       this.FACE_MESH_DETECTION_INTERVAL = 4;
+      this.SELFIE_SEGMENTATION_DETECTION_INTERVAL = 4;
     } else if (
       this.networkSpeed > 1000 &&
       this.cores >= 4 &&
@@ -62,10 +64,12 @@ class UserDevice {
       this.MAX_FRAME_PROCESSING_TIME = 16; // Medium processing capability
       this.MIN_FRAME_INTERVAL = 16; // Medium FPS
       this.FACE_MESH_DETECTION_INTERVAL = 6;
+      this.SELFIE_SEGMENTATION_DETECTION_INTERVAL = 6;
     } else {
       this.MAX_FRAME_PROCESSING_TIME = 24; // Lower processing capability
       this.MIN_FRAME_INTERVAL = 24; // Lower FPS
       this.FACE_MESH_DETECTION_INTERVAL = 8;
+      this.SELFIE_SEGMENTATION_DETECTION_INTERVAL = 8;
     }
   }
 
@@ -79,6 +83,10 @@ class UserDevice {
 
   getFaceMeshDetectionInterval() {
     return this.FACE_MESH_DETECTION_INTERVAL;
+  }
+
+  getSelfieSegmentationDetectionInterval() {
+    return this.SELFIE_SEGMENTATION_DETECTION_INTERVAL;
   }
 
   getCores() {

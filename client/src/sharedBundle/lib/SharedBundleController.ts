@@ -85,6 +85,8 @@ class SharedBundleController extends SharedBundleSocket {
           video.filename,
           video.mimeType as TableTopStaticMimeType,
           video.state,
+          this.deadbanding,
+          this.userDevice,
           this.userEffects,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
@@ -121,7 +123,6 @@ class SharedBundleController extends SharedBundleSocket {
               this.deadbanding,
               this.userEffectsStyles,
               this.userEffects,
-              this.userMedia,
               instance.positioning,
               this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
             );
@@ -135,6 +136,8 @@ class SharedBundleController extends SharedBundleSocket {
           image.filename,
           image.mimeType as TableTopStaticMimeType,
           image.state,
+          this.deadbanding,
+          this.userDevice,
           this.tableStaticContentSocket.current.getFile,
           this.tableStaticContentSocket.current.addMessageListener,
           this.tableStaticContentSocket.current.removeMessageListener,
@@ -158,7 +161,6 @@ class SharedBundleController extends SharedBundleSocket {
               this.userEffects,
               this.userDevice,
               this.deadbanding,
-              this.userMedia,
               instance.positioning,
             );
         }
@@ -311,7 +313,6 @@ class SharedBundleController extends SharedBundleSocket {
                   this.userEffects,
                   this.userDevice,
                   this.deadbanding,
-                  this.userMedia,
                   ins.positioning,
                 );
             });
@@ -341,7 +342,6 @@ class SharedBundleController extends SharedBundleSocket {
                     this.deadbanding,
                     this.userEffectsStyles,
                     this.userEffects,
-                    this.userMedia,
                     ins.positioning,
                     this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
                   );
@@ -374,6 +374,8 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
+              this.deadbanding,
+              this.userDevice,
               this.userEffects,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
@@ -390,7 +392,6 @@ class SharedBundleController extends SharedBundleSocket {
                 this.deadbanding,
                 this.userEffectsStyles,
                 this.userEffects,
-                this.userMedia,
                 {
                   position: {
                     left: 50,
@@ -427,6 +428,8 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
+              this.deadbanding,
+              this.userDevice,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener,
@@ -442,7 +445,6 @@ class SharedBundleController extends SharedBundleSocket {
                 this.userEffects,
                 this.userDevice,
                 this.deadbanding,
-                this.userMedia,
                 {
                   position: {
                     left: 50,
@@ -470,6 +472,8 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
+              this.deadbanding,
+              this.userDevice,
               this.tableStaticContentSocket.current.getFile,
               this.tableStaticContentSocket.current.addMessageListener,
               this.tableStaticContentSocket.current.removeMessageListener,

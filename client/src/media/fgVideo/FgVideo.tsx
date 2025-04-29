@@ -19,9 +19,9 @@ import PlayPauseButton from "./lib/lowerVideoControls/playPauseButton/PlayPauseB
 import PictureInPictureButton from "./lib/lowerVideoControls/pictureInPictureButton/PictureInPictureButton";
 import CaptionButton from "./lib/lowerVideoControls/captionsButton/CaptionButton";
 import SettingsButton from "./lib/lowerVideoControls/settingsButton/SettingsButton";
-import "./lib/fgVideoStyles.css";
 import DownloadButton from "./lib/lowerVideoControls/downloadButton/DownloadButton";
 import DownloadRecordingButton from "./lib/lowerVideoControls/downloadButton/DownloadRecordingButton";
+import "./lib/fgVideoStyles.css";
 
 export default function FgVideo({
   videoInstanceId,
@@ -237,7 +237,6 @@ export default function FgVideo({
       filename={videoMediaInstance.videoMedia.filename}
       kind="video"
       initState={videoMediaInstance.videoMedia.state}
-      rootMedia={videoMediaInstance.instanceVideo}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className="video-container"
@@ -253,7 +252,7 @@ export default function FgVideo({
         ) : null,
         <div
           ref={timelineContainerRef}
-          className="timeline-container"
+          className="timeline-container pointer-events-auto"
           onPointerDown={lowerVideoController.handleStartScrubbing}
           onPointerMove={lowerVideoController.handleHoverTimelineUpdate}
         >

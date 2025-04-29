@@ -40,7 +40,7 @@ class ScreenMedia {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
   ) {
     this.effects = {};
 
@@ -52,7 +52,7 @@ class ScreenMedia {
 
     if (!userEffectsStyles.current.screen[this.screenId]) {
       userEffectsStyles.current.screen[this.screenId] = structuredClone(
-        defaultScreenEffectsStyles
+        defaultScreenEffectsStyles,
       );
     }
 
@@ -60,7 +60,6 @@ class ScreenMedia {
     this.video = document.createElement("video");
 
     this.babylonScene = new BabylonScene(
-      this.screenId,
       "screen",
       this.canvas,
       this.video,
@@ -77,7 +76,7 @@ class ScreenMedia {
       undefined,
       this.userDevice,
       [0],
-      this.userMedia
+      this.userMedia,
     );
 
     this.video.srcObject = this.screenStream;
@@ -169,7 +168,7 @@ class ScreenMedia {
           this.babylonScene?.togglePauseEffect(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -183,7 +182,7 @@ class ScreenMedia {
   changeEffects(
     effect: ScreenEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) {
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
@@ -203,7 +202,7 @@ class ScreenMedia {
     if (effect === "tint" && tintColor) {
       this.babylonScene.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -217,7 +216,7 @@ class ScreenMedia {
 
     if (effect === "postProcess") {
       this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
   }
@@ -251,7 +250,7 @@ class ScreenMedia {
         meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
         meshData.initScale,
-        meshData.initRotation
+        meshData.initRotation,
       );
     }
   };

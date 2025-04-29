@@ -45,7 +45,7 @@ class CaptureMedia {
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
     private captureEffects: React.MutableRefObject<CaptureEffectsType>,
-    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
+    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
   ) {
     this.canvas = document.createElement("canvas");
     this.canvas.style.width = "100%";
@@ -56,14 +56,14 @@ class CaptureMedia {
       false,
       "capture",
       this.captureId,
-      this.deadbanding
+      this.deadbanding,
     );
 
     this.faceMeshWorker = new Worker(
       new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceMeshWorker.onmessage = (event) => {
@@ -85,11 +85,11 @@ class CaptureMedia {
     this.faceDetectionWorker = new Worker(
       new URL(
         "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceDetectionWorker.onmessage = (event) => {
@@ -121,11 +121,11 @@ class CaptureMedia {
     this.selfieSegmentationWorker = new Worker(
       new URL(
         "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.selfieSegmentationWorker.onmessage = (event) => {
@@ -148,7 +148,6 @@ class CaptureMedia {
     };
 
     this.babylonScene = new BabylonScene(
-      this.captureId,
       "capture",
       this.canvas,
       this.video,
@@ -165,7 +164,7 @@ class CaptureMedia {
       this.selfieSegmentationProcessing,
       this.userDevice,
       this.maxFaces,
-      undefined
+      undefined,
     );
   }
 
@@ -261,7 +260,7 @@ class CaptureMedia {
               meshData.soundEffectPath,
               [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
-              meshData.initRotation
+              meshData.initRotation,
             );
           }
         }
@@ -311,7 +310,7 @@ class CaptureMedia {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -327,7 +326,7 @@ class CaptureMedia {
   changeEffects = (
     effect: CaptureEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (!this.babylonScene) return;
 
@@ -363,7 +362,7 @@ class CaptureMedia {
     if (effect === "tint" && tintColor) {
       this.babylonScene.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -381,7 +380,7 @@ class CaptureMedia {
 
     if (effect === "postProcess") {
       this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
   };
@@ -416,7 +415,7 @@ class CaptureMedia {
         meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
         meshData.initScale,
-        meshData.initRotation
+        meshData.initRotation,
       );
     }
   };

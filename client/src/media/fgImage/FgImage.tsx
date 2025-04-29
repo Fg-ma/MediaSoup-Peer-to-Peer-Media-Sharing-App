@@ -172,7 +172,6 @@ export default function FgImage({
       filename={imageMediaInstance.imageMedia.filename}
       kind="image"
       initState={imageMediaInstance.imageMedia.state}
-      rootMedia={imageMediaInstance.instanceImage}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className="image-container"

@@ -1,4 +1,3 @@
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   UserEffectsStylesType,
   UserEffectsType,
@@ -10,11 +9,10 @@ import {
 import BabylonScene, {
   EffectType,
   validEffectTypes,
-} from "../../babylon/BabylonScene";
+} from "../../babylonHi/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import FaceLandmarks from "../../babylon/FaceLandmarks";
 import assetMeshes from "../../babylon/meshes";
 import ImageMedia, { ImageListenerTypes } from "./ImageMedia";
 
@@ -28,25 +26,6 @@ class ImageMediaInstance {
     [imageEffect in ImageEffectTypes]?: boolean;
   } = {};
 
-  private maxFaces: [number] = [1];
-  detectedFaces: number = 0;
-
-  private faceLandmarks: FaceLandmarks;
-
-  private faceMeshWorker: Worker;
-  private faceMeshResults: NormalizedLandmarkListList[] = [];
-  private faceMeshProcessing = [false];
-  private faceDetectionWorker: Worker;
-  private faceDetectionProcessing = [false];
-  private selfieSegmentationWorker: Worker;
-  private selfieSegmentationResults: ImageData[] = [];
-  private selfieSegmentationProcessing = [false];
-
-  private faceCountChangeListeners: Set<(facesDetected: number) => void> =
-    new Set();
-
-  forcingFaces = false;
-
   constructor(
     public imageMedia: ImageMedia,
     public imageInstanceId: string,
@@ -54,7 +33,6 @@ class ImageMediaInstance {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     public initPositioning: {
       position: {
         left: number;
@@ -83,96 +61,6 @@ class ImageMediaInstance {
     this.instanceCanvas.style.width = "auto";
     this.instanceCanvas.style.objectFit = "contain";
 
-    this.faceLandmarks = new FaceLandmarks(
-      true,
-      "image",
-      this.imageInstanceId,
-      this.deadbanding,
-    );
-
-    this.faceMeshWorker = new Worker(
-      new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceMeshWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.faceMeshProcessing[0] = false;
-          if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
-            this.faceMeshResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
-    this.faceDetectionWorker = new Worker(
-      new URL(
-        "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceDetectionWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "FACES_DETECTED": {
-          this.faceDetectionProcessing[0] = false;
-          const detectedFaces = event.data.numFacesDetected;
-          this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
-
-          if (detectedFaces !== this.maxFaces[0]) {
-            this.maxFaces[0] = detectedFaces;
-
-            this.faceMeshWorker.postMessage({
-              message: "CHANGE_MAX_FACES",
-              newMaxFace: detectedFaces,
-            });
-            this.rectifyEffectMeshCount();
-
-            this.faceCountChangeListeners.forEach((listener) => {
-              listener(detectedFaces);
-            });
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    };
-
-    this.selfieSegmentationWorker = new Worker(
-      new URL(
-        "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.selfieSegmentationWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.selfieSegmentationProcessing[0] = false;
-          if (event.data.results) {
-            this.selfieSegmentationResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
     if (this.imageMedia.image) {
       this.instanceImage = this.imageMedia.image?.cloneNode(
         true,
@@ -185,26 +73,19 @@ class ImageMediaInstance {
         }
       };
 
-      if (this.instanceImage)
+      if (!this.babylonScene && this.instanceImage)
         this.babylonScene = new BabylonScene(
-          this.imageInstanceId,
+          this.imageMedia.babylonRenderLoopWorker,
           "image",
+          this.imageMedia.aspect ?? 1,
           this.instanceCanvas,
           this.instanceImage,
-          this.faceLandmarks,
+          this.imageMedia.faceLandmarks,
           this.effects,
-          this.userEffectsStyles.current.image[this.imageInstanceId],
-          this.faceMeshWorker,
-          this.faceMeshResults,
-          this.faceMeshProcessing,
-          this.faceDetectionWorker,
-          this.faceDetectionProcessing,
-          this.selfieSegmentationWorker,
-          this.selfieSegmentationResults,
-          this.selfieSegmentationProcessing,
+          this.imageMedia.faceMeshResults,
+          this.imageMedia.selfieSegmentationResults,
           this.userDevice,
-          this.maxFaces,
-          this.userMedia,
+          this.imageMedia.maxFaces,
         );
     }
     this.imageMedia.addImageListener(this.handleImageMessages);
@@ -216,32 +97,22 @@ class ImageMediaInstance {
       this.instanceImage = undefined;
     }
 
-    this.imageMedia.removeImageListener(this.handleImageMessages);
-
     // Remove canvas element
     this.instanceCanvas.remove();
-
-    // Terminate workers to prevent memory leaks
-    if (this.faceMeshWorker) {
-      this.faceMeshWorker.terminate();
-    }
-    if (this.faceDetectionWorker) {
-      this.faceDetectionWorker.terminate();
-    }
-    if (this.selfieSegmentationWorker) {
-      this.selfieSegmentationWorker.terminate();
-    }
 
     // Call the BabylonScene deconstructor
     this.babylonScene?.deconstructor();
 
-    this.faceCountChangeListeners.clear();
+    this.imageMedia.removeImageListener(this.handleImageMessages);
   }
 
   private handleImageMessages = (event: ImageListenerTypes) => {
     switch (event.type) {
       case "downloadComplete":
         this.onDownloadComplete();
+        break;
+      case "rectifyEffectMeshCount":
+        this.rectifyEffectMeshCount();
         break;
       default:
         break;
@@ -262,40 +133,21 @@ class ImageMediaInstance {
 
     if (!this.babylonScene && this.instanceImage) {
       this.babylonScene = new BabylonScene(
-        this.imageInstanceId,
+        this.imageMedia.babylonRenderLoopWorker,
         "image",
+        this.imageMedia.aspect ?? 1,
         this.instanceCanvas,
         this.instanceImage,
-        this.faceLandmarks,
+        this.imageMedia.faceLandmarks,
         this.effects,
-        this.userEffectsStyles.current.image[this.imageInstanceId],
-        this.faceMeshWorker,
-        this.faceMeshResults,
-        this.faceMeshProcessing,
-        this.faceDetectionWorker,
-        this.faceDetectionProcessing,
-        this.selfieSegmentationWorker,
-        this.selfieSegmentationResults,
-        this.selfieSegmentationProcessing,
+        this.imageMedia.faceMeshResults,
+        this.imageMedia.selfieSegmentationResults,
         this.userDevice,
-        this.maxFaces,
-        this.userMedia,
+        this.imageMedia.maxFaces,
       );
     }
 
     this.updateAllEffects();
-  };
-
-  addFaceCountChangeListener = (
-    listener: (facesDetected: number) => void,
-  ): void => {
-    this.faceCountChangeListeners.add(listener);
-  };
-
-  removeFaceCountChangeListener = (
-    listener: (facesDetected: number) => void,
-  ): void => {
-    this.faceCountChangeListeners.delete(listener);
   };
 
   private rectifyEffectMeshCount = () => {
@@ -319,18 +171,18 @@ class ImageMediaInstance {
         }
       }
 
-      if (count < this.maxFaces[0]) {
+      if (count < this.imageMedia.maxFaces[0]) {
         const currentEffectStyle =
           this.userEffectsStyles.current.image[this.imageInstanceId][
             effect as EffectType
           ];
 
         if (effect === "masks" && currentEffectStyle.style === "baseMask") {
-          for (let i = count; i < this.maxFaces[0]; i++) {
+          for (let i = count; i < this.imageMedia.maxFaces[0]; i++) {
             this.babylonScene.babylonMeshes.createFaceMesh(i, []);
           }
         } else {
-          for (let i = count; i < this.maxFaces[0]; i++) {
+          for (let i = count; i < this.imageMedia.maxFaces[0]; i++) {
             const meshData =
               // @ts-expect-error: ts can't verify effect and style correlation
               assetMeshes[effect as EffectType][currentEffectStyle.style];
@@ -354,8 +206,8 @@ class ImageMediaInstance {
             );
           }
         }
-      } else if (count > this.maxFaces[0]) {
-        for (let i = this.maxFaces[0]; i < count; i++) {
+      } else if (count > this.imageMedia.maxFaces[0]) {
+        for (let i = this.imageMedia.maxFaces[0]; i < count; i++) {
           for (const mesh of this.babylonScene.scene.meshes) {
             if (
               mesh.metadata &&
@@ -370,8 +222,39 @@ class ImageMediaInstance {
     }
   };
 
+  private updateNeed = () => {
+    this.imageMedia.babylonRenderLoopWorker?.removeAllNeed(
+      this.imageInstanceId,
+    );
+
+    this.imageMedia.babylonRenderLoopWorker?.addNeed(
+      "faceDetection",
+      this.imageInstanceId,
+    );
+    if (this.effects.hideBackground) {
+      this.imageMedia.babylonRenderLoopWorker?.addNeed(
+        "selfieSegmentation",
+        this.imageInstanceId,
+      );
+    }
+    if (
+      this.effects.masks &&
+      this.userEffectsStyles.current.image[this.imageInstanceId].masks.style !==
+        "baseMask"
+    ) {
+      this.imageMedia.babylonRenderLoopWorker?.addNeed(
+        "smoothFaceLandmarks",
+        this.imageInstanceId,
+      );
+    }
+  };
+
   clearAllEffects = () => {
     if (!this.babylonScene) return;
+
+    this.imageMedia.babylonRenderLoopWorker?.removeAllNeed(
+      this.imageInstanceId,
+    );
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
@@ -399,7 +282,7 @@ class ImageMediaInstance {
 
     this.effects = structuredClone(defaultImageEffects);
 
-    this.deadbanding.update("capture", this.imageInstanceId, this.effects);
+    this.deadbanding.update("image", this.imageInstanceId, this.effects);
   };
 
   updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
@@ -437,7 +320,7 @@ class ImageMediaInstance {
               this.babylonScene?.deleteEffectMeshes(effect);
 
               if (this.effects[effect]) {
-                for (let i = 0; i < this.maxFaces[0]; i++) {
+                for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
                   this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
                 }
               }
@@ -517,7 +400,7 @@ class ImageMediaInstance {
               this.babylonScene?.deleteEffectMeshes(effect);
 
               if (this.effects[effect]) {
-                for (let i = 0; i < this.maxFaces[0]; i++) {
+                for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
                   this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
                 }
               }
@@ -607,6 +490,8 @@ class ImageMediaInstance {
       },
     );
 
+    this.updateNeed();
+
     this.deadbanding.update("image", this.imageInstanceId, this.effects);
 
     this.babylonScene.imageAlreadyProcessed[0] = 1;
@@ -627,6 +512,8 @@ class ImageMediaInstance {
       this.effects[effect] = true;
     }
 
+    this.updateNeed();
+
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
@@ -638,7 +525,7 @@ class ImageMediaInstance {
         this.babylonScene?.deleteEffectMeshes(effect);
 
         if (this.effects[effect]) {
-          for (let i = 0; i < this.maxFaces[0]; i++) {
+          for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
             this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
           }
         }

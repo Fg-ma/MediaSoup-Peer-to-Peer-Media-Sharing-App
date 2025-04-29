@@ -50,7 +50,7 @@ class CameraMedia {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private userMedia: React.MutableRefObject<UserMediaType>
+    private userMedia: React.MutableRefObject<UserMediaType>,
   ) {
     this.effects = {};
 
@@ -62,7 +62,7 @@ class CameraMedia {
 
     if (!userEffectsStyles.current.camera[this.cameraId]) {
       userEffectsStyles.current.camera[this.cameraId] = structuredClone(
-        defaultCameraEffectsStyles
+        defaultCameraEffectsStyles,
       );
     }
 
@@ -70,14 +70,14 @@ class CameraMedia {
       false,
       "camera",
       this.cameraId,
-      this.deadbanding
+      this.deadbanding,
     );
 
     this.faceMeshWorker = new Worker(
       new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceMeshWorker.onmessage = (event) => {
@@ -99,11 +99,11 @@ class CameraMedia {
     this.faceDetectionWorker = new Worker(
       new URL(
         "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.faceDetectionWorker.onmessage = (event) => {
@@ -130,11 +130,11 @@ class CameraMedia {
     this.selfieSegmentationWorker = new Worker(
       new URL(
         "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url
+        import.meta.url,
       ),
       {
         type: "module",
-      }
+      },
     );
 
     this.selfieSegmentationWorker.onmessage = (event) => {
@@ -154,7 +154,6 @@ class CameraMedia {
     this.video = document.createElement("video");
 
     this.babylonScene = new BabylonScene(
-      this.cameraId,
       "camera",
       this.canvas,
       this.video,
@@ -171,7 +170,7 @@ class CameraMedia {
       this.selfieSegmentationProcessing,
       this.userDevice,
       this.maxFaces,
-      this.userMedia
+      this.userMedia,
     );
 
     this.video.srcObject = this.initCameraStream;
@@ -258,7 +257,7 @@ class CameraMedia {
               meshData.soundEffectPath,
               [0, 0, this.babylonScene.threeDimMeshesZCoord],
               meshData.initScale,
-              meshData.initRotation
+              meshData.initRotation,
             );
           }
         }
@@ -309,7 +308,7 @@ class CameraMedia {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-            false
+            false,
           );
         } else {
           this.babylonScene?.deleteEffectMeshes(effect);
@@ -325,7 +324,7 @@ class CameraMedia {
   changeEffects = (
     effect: CameraEffectTypes,
     tintColor?: string,
-    blockStateChange: boolean = false
+    blockStateChange: boolean = false,
   ) => {
     if (this.effects[effect] !== undefined) {
       if (!blockStateChange) {
@@ -360,7 +359,7 @@ class CameraMedia {
     if (effect === "tint" && tintColor) {
       this.babylonScene.toggleTintPlane(
         this.effects[effect],
-        this.hexToNormalizedRgb(tintColor)
+        this.hexToNormalizedRgb(tintColor),
       );
     }
 
@@ -378,7 +377,7 @@ class CameraMedia {
 
     if (effect === "postProcess") {
       this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
-        this.effects[effect]
+        this.effects[effect],
       );
     }
   };
@@ -412,7 +411,7 @@ class CameraMedia {
         meshData.soundEffectPath,
         [0, 0, this.babylonScene.threeDimMeshesZCoord],
         meshData.initScale,
-        meshData.initRotation
+        meshData.initRotation,
       );
     }
   };

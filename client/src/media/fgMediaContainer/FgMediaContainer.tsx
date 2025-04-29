@@ -54,7 +54,6 @@ export default function FgMediaContainer({
   backgroundMedia,
   media,
   floatingTagContent,
-  rootMedia,
   className,
   popupElements,
   leftLowerControls,
@@ -90,7 +89,6 @@ export default function FgMediaContainer({
   backgroundMedia: boolean;
   media?: React.ReactNode;
   floatingTagContent?: React.ReactNode[];
-  rootMedia?: HTMLImageElement | HTMLVideoElement | SVGSVGElement;
   className?: string;
   popupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
@@ -409,7 +407,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >

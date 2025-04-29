@@ -334,7 +334,7 @@ export default function FgGame({
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
         hideControls && !reactionsPanelActive ? "hide-controls" : ""
-      } z-base-content pointer-events-auto absolute rounded`}
+      } pointer-events-auto absolute z-base-content rounded`}
       style={{
         left: `${positioning.current.position.left}%`,
         top: `${positioning.current.position.top}%`,

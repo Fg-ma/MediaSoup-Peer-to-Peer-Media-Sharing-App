@@ -14,7 +14,7 @@ import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
-} from "../../babylon/BabylonScene";
+} from "../../babylonHi/BabylonScene";
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
@@ -26,28 +26,11 @@ class VideoMediaInstance {
 
   private creationTime = Date.now();
 
-  private faceLandmarks: FaceLandmarks;
-
-  private faceMeshWorker: Worker;
-  private faceMeshResults: NormalizedLandmarkListList[] = [];
-  private faceMeshProcessing = [false];
-  private faceDetectionWorker: Worker;
-  private faceDetectionProcessing = [false];
-  private selfieSegmentationWorker: Worker;
-  private selfieSegmentationResults: ImageData[] = [];
-  private selfieSegmentationProcessing = [false];
-
   private effects: {
     [videoEffect in VideoEffectTypes]?: boolean;
   } = {};
 
-  private maxFaces: [number] = [1];
-  maxFacesDetected = 0;
-
   babylonScene: BabylonScene | undefined;
-
-  private faceCountChangeListeners: Set<(facesDetected: number) => void> =
-    new Set();
 
   constructor(
     public videoMedia: VideoMedia,
@@ -56,7 +39,6 @@ class VideoMediaInstance {
     private deadbanding: Deadbanding,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     public initPositioning: {
       position: {
         left: number;
@@ -95,100 +77,7 @@ class VideoMediaInstance {
     this.instanceCanvas = document.createElement("canvas");
     this.instanceCanvas.classList.add("babylonJS-canvas");
     this.instanceCanvas.style.height = "100%";
-    this.instanceCanvas.style.width = "auto";
-
-    this.faceLandmarks = new FaceLandmarks(
-      true,
-      "video",
-      this.videoInstanceId,
-      this.deadbanding,
-    );
-
-    this.faceMeshWorker = new Worker(
-      new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceMeshWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.faceMeshProcessing[0] = false;
-          if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
-            this.faceMeshResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
-    this.faceDetectionWorker = new Worker(
-      new URL(
-        "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceDetectionWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "FACES_DETECTED": {
-          this.faceDetectionProcessing[0] = false;
-          const detectedFaces = event.data.numFacesDetected;
-
-          if (detectedFaces > this.maxFacesDetected) {
-            this.maxFacesDetected = detectedFaces;
-          }
-
-          if (detectedFaces !== this.maxFaces[0]) {
-            this.maxFaces[0] = detectedFaces;
-
-            this.faceMeshWorker.postMessage({
-              message: "CHANGE_MAX_FACES",
-              newMaxFace: detectedFaces,
-            });
-            this.rectifyEffectMeshCount();
-
-            this.faceCountChangeListeners.forEach((listener) => {
-              listener(detectedFaces);
-            });
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    };
-
-    this.selfieSegmentationWorker = new Worker(
-      new URL(
-        "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.selfieSegmentationWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.selfieSegmentationProcessing[0] = false;
-          if (event.data.results) {
-            this.selfieSegmentationResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
+    this.instanceCanvas.style.width = "100%";
 
     if (this.videoMedia.video) this.setVideo();
     this.videoMedia.addVideoListener(this.handleVideoMessages);
@@ -207,20 +96,7 @@ class VideoMediaInstance {
       this.instanceCanvas.remove();
     }
 
-    // Terminate workers to prevent memory leaks
-    if (this.faceMeshWorker) {
-      this.faceMeshWorker.terminate();
-    }
-    if (this.faceDetectionWorker) {
-      this.faceDetectionWorker.terminate();
-    }
-    if (this.selfieSegmentationWorker) {
-      this.selfieSegmentationWorker.terminate();
-    }
-
     this.babylonScene?.deconstructor();
-
-    this.faceCountChangeListeners.clear();
 
     this.videoMedia.removeVideoListener(this.handleVideoMessages);
   }
@@ -229,6 +105,9 @@ class VideoMediaInstance {
     switch (event.type) {
       case "downloadComplete":
         this.setVideo();
+        break;
+      case "rectifyEffectMeshCount":
+        this.rectifyEffectMeshCount();
         break;
       default:
         break;
@@ -254,24 +133,17 @@ class VideoMediaInstance {
 
     if (!this.babylonScene)
       this.babylonScene = new BabylonScene(
-        this.videoInstanceId,
+        this.videoMedia.babylonRenderLoopWorker,
         "video",
+        this.videoMedia.aspect ?? 1,
         this.instanceCanvas,
         this.instanceVideo,
-        this.faceLandmarks,
+        this.videoMedia.faceLandmarks,
         this.effects,
-        this.userEffectsStyles.current.video[this.videoInstanceId],
-        this.faceMeshWorker,
-        this.faceMeshResults,
-        this.faceMeshProcessing,
-        this.faceDetectionWorker,
-        this.faceDetectionProcessing,
-        this.selfieSegmentationWorker,
-        this.selfieSegmentationResults,
-        this.selfieSegmentationProcessing,
+        this.videoMedia.faceMeshResults,
+        this.videoMedia.selfieSegmentationResults,
         this.userDevice,
-        this.maxFaces,
-        this.userMedia,
+        this.videoMedia.maxFaces,
       );
 
     this.updateAllEffects();
@@ -281,18 +153,6 @@ class VideoMediaInstance {
       this.videoMedia.videoId,
       this.videoInstanceId,
     );
-  };
-
-  addFaceCountChangeListener = (
-    listener: (facesDetected: number) => void,
-  ): void => {
-    this.faceCountChangeListeners.add(listener);
-  };
-
-  removeFaceCountChangeListener = (
-    listener: (facesDetected: number) => void,
-  ): void => {
-    this.faceCountChangeListeners.delete(listener);
   };
 
   updateVideoPosition = async (videoPosition: number) => {
@@ -318,18 +178,18 @@ class VideoMediaInstance {
         }
       }
 
-      if (count < this.maxFaces[0]) {
+      if (count < this.videoMedia.maxFaces[0]) {
         const currentEffectStyle =
           this.userEffectsStyles.current.video[this.videoInstanceId].video[
             effect as EffectType
           ];
 
         if (effect === "masks" && currentEffectStyle.style === "baseMask") {
-          for (let i = count; i < this.maxFaces[0]; i++) {
+          for (let i = count; i < this.videoMedia.maxFaces[0]; i++) {
             this.babylonScene.babylonMeshes.createFaceMesh(i, []);
           }
         } else {
-          for (let i = count; i < this.maxFaces[0]; i++) {
+          for (let i = count; i < this.videoMedia.maxFaces[0]; i++) {
             const meshData =
               // @ts-expect-error: ts can't verify effect and style correlation
               assetMeshes[effect as EffectType][currentEffectStyle.style];
@@ -353,8 +213,8 @@ class VideoMediaInstance {
             );
           }
         }
-      } else if (count > this.maxFaces[0]) {
-        for (let i = this.maxFaces[0]; i < count; i++) {
+      } else if (count > this.videoMedia.maxFaces[0]) {
+        for (let i = this.videoMedia.maxFaces[0]; i < count; i++) {
           for (const mesh of this.babylonScene.scene.meshes) {
             if (
               mesh.metadata &&
@@ -366,6 +226,33 @@ class VideoMediaInstance {
           }
         }
       }
+    }
+  };
+
+  private updateNeed = () => {
+    this.videoMedia.babylonRenderLoopWorker?.removeAllNeed(
+      this.videoInstanceId,
+    );
+
+    this.videoMedia.babylonRenderLoopWorker?.addNeed(
+      "faceDetection",
+      this.videoInstanceId,
+    );
+    if (this.effects.hideBackground) {
+      this.videoMedia.babylonRenderLoopWorker?.addNeed(
+        "selfieSegmentation",
+        this.videoInstanceId,
+      );
+    }
+    if (
+      this.effects.masks &&
+      this.userEffectsStyles.current.video[this.videoInstanceId].video.masks
+        .style !== "baseMask"
+    ) {
+      this.videoMedia.babylonRenderLoopWorker?.addNeed(
+        "smoothFaceLandmarks",
+        this.videoInstanceId,
+      );
     }
   };
 
@@ -384,6 +271,10 @@ class VideoMediaInstance {
 
   clearAllEffects = () => {
     if (!this.babylonScene) return;
+
+    this.videoMedia.babylonRenderLoopWorker?.removeAllNeed(
+      this.videoInstanceId,
+    );
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
@@ -452,7 +343,7 @@ class VideoMediaInstance {
             this.babylonScene?.deleteEffectMeshes(effect);
 
             if (this.effects[effect]) {
-              for (let i = 0; i < this.maxFaces[0]; i++) {
+              for (let i = 0; i < this.videoMedia.maxFaces[0]; i++) {
                 this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
               }
             }
@@ -539,7 +430,7 @@ class VideoMediaInstance {
             this.babylonScene?.deleteEffectMeshes(effect);
 
             if (this.effects[effect]) {
-              for (let i = 0; i < this.maxFaces[0]; i++) {
+              for (let i = 0; i < this.videoMedia.maxFaces[0]; i++) {
                 this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
               }
             }
@@ -631,6 +522,8 @@ class VideoMediaInstance {
       }
     });
 
+    this.updateNeed();
+
     this.deadbanding.update("video", this.videoInstanceId, this.effects);
   };
 
@@ -649,6 +542,8 @@ class VideoMediaInstance {
       this.effects[effect] = true;
     }
 
+    this.updateNeed();
+
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
@@ -660,7 +555,7 @@ class VideoMediaInstance {
         this.babylonScene.deleteEffectMeshes(effect);
 
         if (this.effects[effect]) {
-          for (let i = 0; i < this.maxFaces[0]; i++) {
+          for (let i = 0; i < this.videoMedia.maxFaces[0]; i++) {
             this.babylonScene.babylonMeshes.createFaceMesh(i, []);
           }
         }
