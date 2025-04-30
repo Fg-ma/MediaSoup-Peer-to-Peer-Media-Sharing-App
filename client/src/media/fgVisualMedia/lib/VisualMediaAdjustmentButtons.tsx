@@ -30,7 +30,7 @@ export default function VisualMediaAdjustmentButtons({
   return (
     <>
       <RotateButton
-        className="rotate-btn absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
+        className="rotate-btn pointer-events-auto absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
             return;
@@ -59,7 +59,7 @@ export default function VisualMediaAdjustmentButtons({
       />
       <PanButton
         externalRef={panBtnRef}
-        className="pan-btn absolute left-full top-1/2 z-10 aspect-square w-[10%] min-w-7 max-w-[2.75rem] -translate-y-1/2 pl-1"
+        className="pan-btn pointer-events-auto absolute left-full top-1/2 z-10 aspect-square w-[10%] min-w-7 max-w-[2.75rem] -translate-y-1/2 pl-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;
@@ -113,7 +113,7 @@ export default function VisualMediaAdjustmentButtons({
         }
       />
       <ScaleButton
-        className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
+        className="scale-btn pointer-events-auto absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
             return;

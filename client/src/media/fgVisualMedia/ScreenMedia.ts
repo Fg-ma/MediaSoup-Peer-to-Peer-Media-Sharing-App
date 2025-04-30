@@ -25,7 +25,7 @@ class ScreenMedia {
     [screenEffect in ScreenEffectTypes]?: boolean;
   };
 
-  babylonScene: BabylonScene;
+  babylonScene: BabylonScene | undefined;
 
   constructor(
     private table_id: string,
@@ -59,26 +59,6 @@ class ScreenMedia {
     // Start video and render loop
     this.video = document.createElement("video");
 
-    this.babylonScene = new BabylonScene(
-      "screen",
-      this.canvas,
-      this.video,
-      undefined,
-      this.effects,
-      this.userEffectsStyles.current.screen[this.screenId],
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      this.userDevice,
-      [0],
-      this.userMedia,
-    );
-
     this.video.srcObject = this.screenStream;
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
@@ -87,6 +67,20 @@ class ScreenMedia {
       this.aspectRatio = this.video.videoWidth / this.video.videoHeight;
 
       this.video.play();
+
+      this.babylonScene = new BabylonScene(
+        undefined,
+        "screen",
+        this.aspectRatio,
+        this.canvas,
+        this.video,
+        undefined,
+        this.effects,
+        undefined,
+        undefined,
+        this.userDevice,
+        [0],
+      );
     };
 
     this.originalScreenStream
@@ -136,7 +130,7 @@ class ScreenMedia {
     this.canvas.remove();
 
     // Deconstruct base shader
-    this.babylonScene.deconstructor();
+    this.babylonScene?.deconstructor();
   }
 
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
@@ -200,22 +194,22 @@ class ScreenMedia {
       this.setTintColor(tintColor);
     }
     if (effect === "tint" && tintColor) {
-      this.babylonScene.toggleTintPlane(
+      this.babylonScene?.toggleTintPlane(
         this.effects[effect],
         this.hexToNormalizedRgb(tintColor),
       );
     }
 
     if (effect === "blur") {
-      this.babylonScene.toggleBlurEffect(this.effects[effect]);
+      this.babylonScene?.toggleBlurEffect(this.effects[effect]);
     }
 
     if (effect === "pause") {
-      this.babylonScene.togglePauseEffect(this.effects[effect]);
+      this.babylonScene?.togglePauseEffect(this.effects[effect]);
     }
 
     if (effect === "postProcess") {
-      this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
+      this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
         this.effects[effect],
       );
     }
@@ -233,10 +227,10 @@ class ScreenMedia {
     const meshData = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes
-    this.babylonScene.deleteEffectMeshes(effect);
+    this.babylonScene?.deleteEffectMeshes(effect);
 
     if (this.effects[effect as ScreenEffectTypes]) {
-      this.babylonScene.createEffectMeshes(
+      this.babylonScene?.createEffectMeshes(
         meshData.meshType,
         meshData.meshLabel,
         "",
@@ -264,7 +258,7 @@ class ScreenMedia {
   }
 
   setTintColor(newTintColor: string) {
-    this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
+    this.babylonScene?.setTintColor(this.hexToNormalizedRgb(newTintColor));
   }
 
   getPaused = () => {

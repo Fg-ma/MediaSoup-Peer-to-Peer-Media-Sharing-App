@@ -7,12 +7,11 @@ import {
 } from "../../../../universal/effectsTypeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import ApplicationMedia, { ApplicationListenerTypes } from "./ApplicationMedia";
 
 class ApplicationMediaInstance {
   instanceCanvas: HTMLCanvasElement;
-  instanceApplication: HTMLImageElement;
+  instanceApplication: HTMLImageElement | undefined;
 
   babylonScene: BabylonScene | undefined;
 
@@ -26,7 +25,6 @@ class ApplicationMediaInstance {
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     public initPositioning: {
       position: {
         left: number;
@@ -51,12 +49,6 @@ class ApplicationMediaInstance {
         structuredClone(defaultApplicationEffectsStyles);
     }
 
-    this.instanceApplication = document.createElement("img");
-    this.instanceApplication.onloadedmetadata = () => {
-      this.instanceCanvas.width = this.instanceApplication.width;
-      this.instanceCanvas.height = this.instanceApplication.height;
-    };
-
     this.instanceCanvas = document.createElement("canvas");
     this.instanceCanvas.classList.add("babylonJS-canvas");
     this.instanceCanvas.style.width = "100%";
@@ -68,25 +60,27 @@ class ApplicationMediaInstance {
         true,
       ) as HTMLImageElement;
 
-      this.babylonScene = new BabylonScene(
-        "application",
-        this.instanceCanvas,
-        this.instanceApplication,
-        undefined,
-        this.effects,
-        this.userEffectsStyles.current.application[this.applicationInstanceId],
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        this.userDevice,
-        [0],
-        this.userMedia,
-      );
+      this.instanceApplication.onload = () => {
+        if (this.instanceApplication) {
+          this.instanceCanvas.width = this.instanceApplication.width;
+          this.instanceCanvas.height = this.instanceApplication.height;
+        }
+      };
+
+      if (!this.babylonScene && this.instanceApplication)
+        this.babylonScene = new BabylonScene(
+          undefined,
+          "application",
+          this.applicationMedia.aspect ?? 1,
+          this.instanceCanvas,
+          this.instanceApplication,
+          undefined,
+          this.effects,
+          undefined,
+          undefined,
+          this.userDevice,
+          [0],
+        );
     }
 
     this.applicationMedia.addApplicationListener(
@@ -95,7 +89,16 @@ class ApplicationMediaInstance {
   }
 
   deconstructor() {
-    this.instanceApplication.src = "";
+    if (this.instanceApplication) {
+      this.instanceApplication.src = "";
+      this.instanceApplication = undefined;
+    }
+
+    // Remove canvas element
+    this.instanceCanvas.remove();
+
+    // Call the BabylonScene deconstructor
+    this.babylonScene?.deconstructor();
 
     this.applicationMedia.removeApplicationListener(
       this.handleApplicationMessages,
@@ -117,25 +120,26 @@ class ApplicationMediaInstance {
       true,
     ) as HTMLImageElement;
 
-    if (!this.babylonScene) {
+    this.instanceApplication.onload = () => {
+      if (this.instanceApplication) {
+        this.instanceCanvas.width = this.instanceApplication.width;
+        this.instanceCanvas.height = this.instanceApplication.height;
+      }
+    };
+
+    if (!this.babylonScene && this.instanceApplication) {
       this.babylonScene = new BabylonScene(
+        undefined,
         "application",
+        this.applicationMedia.aspect ?? 1,
         this.instanceCanvas,
         this.instanceApplication,
         undefined,
         this.effects,
-        this.userEffectsStyles.current.application[this.applicationInstanceId],
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
         undefined,
         undefined,
         this.userDevice,
         [0],
-        this.userMedia,
       );
     }
 
@@ -148,7 +152,7 @@ class ApplicationMediaInstance {
         ]
       ) {
         if (effect === "postProcess") {
-          this.babylonScene.babylonShaderController.swapPostProcessEffects(
+          this.babylonScene?.babylonShaderController.swapPostProcessEffects(
             this.userEffectsStyles.current.application[
               this.applicationInstanceId
             ].postProcess.style,

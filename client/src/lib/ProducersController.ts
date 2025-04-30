@@ -81,12 +81,12 @@ class ProducersController {
 
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private browserMedia: BrowserMedia
+    private browserMedia: BrowserMedia,
   ) {}
 
   private createCameraProducer = async (
     cameraId: string,
-    cameraBrowserMedia: MediaStream
+    cameraBrowserMedia: MediaStream,
   ) => {
     const newCameraMedia = new CameraMedia(
       cameraId,
@@ -95,7 +95,6 @@ class ProducersController {
       this.userEffects,
       this.userDevice,
       this.deadbanding,
-      this.userMedia
     );
 
     this.userMedia.current.camera[cameraId] = newCameraMedia;
@@ -120,7 +119,7 @@ class ProducersController {
   private createScreenProducer = async (
     screenId: string,
     originalScreenBrowserMedia: MediaStream,
-    screenBrowserMedia: MediaStream
+    screenBrowserMedia: MediaStream,
   ) => {
     const newScreenMedia = new ScreenMedia(
       this.table_id.current,
@@ -133,7 +132,7 @@ class ProducersController {
       this.userEffectsStyles,
       this.userEffects,
       this.userDevice,
-      this.userMedia
+      this.userMedia,
     );
 
     this.userMedia.current.screen[screenId] = newScreenMedia;
@@ -173,13 +172,13 @@ class ProducersController {
 
   private createScreenAudioProducer = async (
     screenId: string,
-    screenAudioBrowserMedia: MediaStream
+    screenAudioBrowserMedia: MediaStream,
   ) => {
     const screenAudioId = `${screenId}_audio`;
     const newScreenAudioMedia = new ScreenAudioMedia(
       screenAudioId,
       screenAudioBrowserMedia,
-      this.userEffects
+      this.userEffects,
     );
 
     this.userMedia.current.screenAudio[screenAudioId] = newScreenAudioMedia;
@@ -221,7 +220,7 @@ class ProducersController {
   };
 
   onProducerTransportCreated = async (
-    event: onProducerTransportCreatedType
+    event: onProducerTransportCreatedType,
   ) => {
     if (event.error) {
       console.error("Producer transport create error: ", event.error);
@@ -252,19 +251,19 @@ class ProducersController {
           },
         });
         const producerConnectedCallback = (
-          event: IncomingMediasoupMessages
+          event: IncomingMediasoupMessages,
         ) => {
           if (event.type === "producerConnected") {
             callback();
             this.mediasoupSocket.current?.removeMessageListener(
-              producerConnectedCallback
+              producerConnectedCallback,
             );
           }
         };
         this.mediasoupSocket.current?.addMessageListener(
-          producerConnectedCallback
+          producerConnectedCallback,
         );
-      }
+      },
     );
 
     // Begin transport on producer
@@ -297,13 +296,13 @@ class ProducersController {
           if (event.type === "newProducerCallback") {
             callback(event.data);
             this.mediasoupSocket.current?.removeMessageListener(
-              producerCallback
+              producerCallback,
             );
           }
         };
         this.mediasoupSocket.current?.addMessageListener(producerCallback);
         return;
-      }
+      },
     );
 
     this.producerTransport.current.on(
@@ -334,13 +333,13 @@ class ProducersController {
           if (event.type === "newJSONProducerCallback") {
             callback(event.data);
             this.mediasoupSocket.current?.removeMessageListener(
-              jsonProducerCallback
+              jsonProducerCallback,
             );
           }
         };
         this.mediasoupSocket.current?.addMessageListener(jsonProducerCallback);
         return;
-      }
+      },
     );
     // end transport producer
 
@@ -368,7 +367,7 @@ class ProducersController {
     if (
       !this.bundles[this.username.current] ||
       !Object.keys(this.bundles[this.username.current]).includes(
-        this.instance.current
+        this.instance.current,
       )
     ) {
       this.createProducerBundle();
@@ -385,7 +384,7 @@ class ProducersController {
 
         console.error(
           "Already existing camera stream for: ",
-          this.username.current
+          this.username.current,
         );
         return;
       }
@@ -411,7 +410,7 @@ class ProducersController {
 
         console.error(
           "Already existing screen stream for: ",
-          this.username.current
+          this.username.current,
         );
         return;
       }
@@ -432,12 +431,12 @@ class ProducersController {
       await this.createScreenProducer(
         producerId,
         screenBrowserMedia,
-        new MediaStream([videoTrack])
+        new MediaStream([videoTrack]),
       );
       if (audioTrack) {
         await this.createScreenAudioProducer(
           producerId,
-          new MediaStream([audioTrack])
+          new MediaStream([audioTrack]),
         );
       }
     } else if (producerType === "audio") {
@@ -447,7 +446,7 @@ class ProducersController {
 
         console.error(
           "Already existing audio stream for: ",
-          this.username.current
+          this.username.current,
         );
         return;
       }
@@ -604,7 +603,7 @@ class ProducersController {
         if (this.userEffectsStyles.current?.[producerType]) {
           if (producerType === "audio") {
             this.userEffectsStyles.current.audio = structuredClone(
-              defaultAudioEffectsStyles
+              defaultAudioEffectsStyles,
             );
           } else if (
             producerType === "camera" ||
@@ -699,7 +698,7 @@ class ProducersController {
             Object.keys(
               this.remoteMedia.current[producerUsername][producerInstance][
                 producerType
-              ] || { break: true }
+              ] || { break: true },
             ).length === 0
           ) {
             delete this.remoteMedia.current[producerUsername][
@@ -710,7 +709,7 @@ class ProducersController {
               Object.keys(
                 this.remoteMedia.current[producerUsername][
                   producerInstance
-                ] || { break: true }
+                ] || { break: true },
               ).length === 0
             ) {
               delete this.remoteMedia.current[producerUsername][
@@ -721,7 +720,7 @@ class ProducersController {
                 Object.keys(
                   this.remoteMedia.current[producerUsername] || {
                     break: true,
-                  }
+                  },
                 ).length === 0
               ) {
                 delete this.remoteMedia.current[producerUsername];
@@ -745,7 +744,7 @@ class ProducersController {
             Object.keys(
               this.remoteMedia.current[producerUsername][producerInstance] || {
                 break: true,
-              }
+              },
             ).length === 0
           ) {
             delete this.remoteMedia.current[producerUsername][producerInstance];
@@ -754,7 +753,7 @@ class ProducersController {
               Object.keys(
                 this.remoteMedia.current[producerUsername] || {
                   break: true,
-                }
+                },
               ).length === 0
             ) {
               delete this.remoteMedia.current[producerUsername];
@@ -779,7 +778,7 @@ class ProducersController {
             Object.keys(
               this.remoteDataStreams.current[producerUsername][
                 producerInstance
-              ] || { break: true }
+              ] || { break: true },
             ).length === 0
           ) {
             delete this.remoteDataStreams.current[producerUsername][
@@ -790,7 +789,7 @@ class ProducersController {
               Object.keys(
                 this.remoteDataStreams.current[producerUsername] || {
                   break: true,
-                }
+                },
               ).length === 0
             ) {
               delete this.remoteDataStreams.current[producerUsername];

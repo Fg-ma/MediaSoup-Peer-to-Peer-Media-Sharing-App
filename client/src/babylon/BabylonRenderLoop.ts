@@ -10,12 +10,6 @@ import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   HideBackgroundEffectTypes,
   CameraEffectTypes,
-  CameraEffectStylesType,
-  ScreenEffectStylesType,
-  AudioEffectStylesType,
-  VideoEffectStylesType,
-  ImageEffectStylesType,
-  ApplicationEffectStylesType,
 } from "../../../universal/effectsTypeConstant";
 import UserDevice from "../lib/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
@@ -24,18 +18,10 @@ import FaceLandmarks from "./FaceLandmarks";
 
 class BabylonRenderLoop {
   private FACE_MESH_DETECTION_INTERVAL: number;
-
-  private finishedProcessingEffects = true;
+  private SELFIE_SEGMENTATION_DETECTION_INTERVAL: number;
 
   private frameCounter = 0;
 
-  private offscreenCanvas: HTMLCanvasElement;
-  private offscreenContext: CanvasRenderingContext2D | null;
-
-  private lastFaceCountCheck: number;
-
-  private hideBackgroundOffscreenCanvas: HTMLCanvasElement;
-  private hideBackgroundOffscreenContext: CanvasRenderingContext2D | null;
   hideBackgroundCanvas: HTMLCanvasElement;
   private hideBackgroundCtx: CanvasRenderingContext2D | null;
   private hideBackgroundEffectImage: HTMLImageElement;
@@ -43,64 +29,31 @@ class BabylonRenderLoop {
   private tempHideBackgroundCanvas: OffscreenCanvas;
   private tempHideBackgroundCtx: OffscreenCanvasRenderingContext2D | null;
 
-  private detectFacesTimeout = 1000;
-
   private hidebackgroundType: "image" | "color" = "image";
 
   constructor(
-    private flip: boolean,
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
+    private aspect: number,
     private canvas: HTMLCanvasElement,
-    private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private effectsStyles:
-      | CameraEffectStylesType
-      | ScreenEffectStylesType
-      | AudioEffectStylesType
-      | VideoEffectStylesType
-      | ImageEffectStylesType
-      | ApplicationEffectStylesType,
-    private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
-    private faceMeshProcessing: boolean[] | undefined,
-    private faceDetectionWorker: Worker | undefined,
-    private faceDetectionProcessing: boolean[] | undefined,
-    private selfieSegmentationWorker: Worker | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
-    private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private hideBackgroundTexture: DynamicTexture | undefined,
     private hideBackgroundMaterial: StandardMaterial | undefined,
-    private babylonMeshes: BabylonMeshes
+    private babylonMeshes: BabylonMeshes,
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.getFaceMeshDetectionInterval();
-
-    this.offscreenCanvas = document.createElement("canvas");
-    this.offscreenContext = this.offscreenCanvas.getContext("2d", {
-      alpha: true,
-      willReadFrequently: true,
-    });
-    this.offscreenCanvas.width = 320;
-    this.offscreenCanvas.height = 180;
-
-    this.lastFaceCountCheck = 0;
+    this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
+      this.userDevice.getSelfieSegmentationDetectionInterval();
 
     this.hideBackgroundEffectImage = new Image();
     this.hideBackgroundEffectImage.crossOrigin = "anonymous";
-
-    this.hideBackgroundOffscreenCanvas = document.createElement("canvas");
-    this.hideBackgroundOffscreenContext =
-      this.hideBackgroundOffscreenCanvas.getContext("2d", {
-        alpha: true,
-        willReadFrequently: true,
-      });
-    this.hideBackgroundOffscreenCanvas.width = 320;
-    this.hideBackgroundOffscreenCanvas.height = (320 / this.canvas.width) * 180;
 
     this.hideBackgroundCanvas = document.createElement("canvas");
     this.hideBackgroundCanvas.width = this.canvas.width;
@@ -111,13 +64,20 @@ class BabylonRenderLoop {
       willReadFrequently: true,
     });
 
-    this.tempHideBackgroundCanvas = new OffscreenCanvas(
-      320,
-      (320 / this.canvas.width) * 180
-    );
+    if (this.aspect > 1) {
+      this.tempHideBackgroundCanvas = new OffscreenCanvas(
+        320,
+        320 / this.aspect,
+      );
+    } else {
+      this.tempHideBackgroundCanvas = new OffscreenCanvas(
+        320 * this.aspect,
+        320,
+      );
+    }
     this.tempHideBackgroundCtx = this.tempHideBackgroundCanvas.getContext(
       "2d",
-      { alpha: true, willReadFrequently: true }
+      { alpha: true, willReadFrequently: true },
     );
 
     setTimeout(() => {
@@ -126,129 +86,30 @@ class BabylonRenderLoop {
   }
 
   renderLoop = () => {
-    if (!this.effects.pause && this.effects.hideBackground) {
-      this.hideBackgroundEffect();
-      this.updateHideBackgroundCanvas();
-    }
-
-    if (!this.effects.pause && this.finishedProcessingEffects) {
-      this.finishedProcessingEffects = false;
-      this.processEffects();
-    }
-  };
-
-  private processEffects = async () => {
     this.frameCounter++;
 
     if (
-      this.FACE_MESH_DETECTION_INTERVAL === 1 ||
+      !this.effects.pause &&
+      this.effects.hideBackground &&
+      this.frameCounter % this.SELFIE_SEGMENTATION_DETECTION_INTERVAL === 0
+    ) {
+      this.updateHideBackgroundCanvas();
+    }
+
+    if (
+      !this.effects.pause &&
       this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
     ) {
-      await this.detectFaces();
+      this.detectFaces();
     }
-
-    if (
-      !this.faceMeshWorker ||
-      !this.faceMeshResults ||
-      !this.faceLandmarks ||
-      !(
-        this.effects.glasses ||
-        this.effects.beards ||
-        this.effects.mustaches ||
-        this.effects.masks ||
-        this.effects.hats ||
-        this.effects.pets
-      )
-    ) {
-      this.finishedProcessingEffects = true;
-      return;
-    }
-
-    this.finishedProcessingEffects = true;
   };
 
-  private detectFaces = async () => {
+  private detectFaces = () => {
     if (
       !this.faceMeshResults ||
       !this.faceLandmarks ||
-      !this.backgroundMedia ||
-      !this.offscreenContext
+      this.faceMeshResults.length === 0
     ) {
-      return;
-    }
-
-    this.frameCounter = 0;
-
-    try {
-      // Clear the offscreen canvas before drawing
-      this.offscreenContext?.clearRect(
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height
-      );
-
-      // Draw the video frame onto the offscreen canvas at the lower resolution
-      this.offscreenContext?.drawImage(
-        this.backgroundMedia,
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height
-      );
-
-      // Get ImageData from the offscreen canvas
-      const imageData = this.offscreenContext.getImageData(
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height
-      );
-
-      // Create a new ArrayBuffer
-      const buffer = new ArrayBuffer(imageData.data.length);
-      const uint8Array = new Uint8Array(buffer);
-      uint8Array.set(imageData.data);
-
-      // Send video frames to the worker for processing
-      if (this.faceMeshProcessing && !this.faceMeshProcessing[0]) {
-        this.faceMeshProcessing[0] = true;
-        this.faceMeshWorker?.postMessage({
-          message: "FRAME",
-          data: buffer, // Send the ArrayBuffer
-          width: this.offscreenCanvas.width,
-          height: this.offscreenCanvas.height,
-          smooth:
-            this.effects.masks &&
-            "masks" in this.effectsStyles &&
-            this.effectsStyles.masks.style === "baseMask"
-              ? true
-              : false,
-          flipped: this.flip,
-        });
-      }
-      if (
-        performance.now() - this.lastFaceCountCheck > this.detectFacesTimeout &&
-        this.faceDetectionProcessing &&
-        !this.faceDetectionProcessing[0] &&
-        this.faceDetectionWorker
-      ) {
-        this.faceDetectionProcessing[0] = true;
-        this.lastFaceCountCheck = performance.now();
-
-        this.faceDetectionWorker?.postMessage({
-          message: "FRAME",
-          data: buffer,
-          width: this.offscreenCanvas.width,
-          height: this.offscreenCanvas.height,
-        });
-      }
-    } catch (error) {
-      console.error("Error sending video frame to faceMesh:", error);
-      return;
-    }
-
-    if (this.faceMeshResults.length === 0) {
       return;
     }
 
@@ -273,59 +134,6 @@ class BabylonRenderLoop {
     }
   };
 
-  private hideBackgroundEffect = async () => {
-    if (
-      !this.hideBackgroundOffscreenContext ||
-      !this.selfieSegmentationWorker
-    ) {
-      return;
-    }
-
-    // Clear the offscreen canvas before drawing
-    this.hideBackgroundOffscreenContext.clearRect(
-      0,
-      0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height
-    );
-
-    // Draw the video frame onto the offscreen canvas at the lower resolution
-    this.hideBackgroundOffscreenContext.drawImage(
-      this.backgroundMedia,
-      0,
-      0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height
-    );
-
-    // Get ImageData from the offscreen canvas
-    const imageData = this.hideBackgroundOffscreenContext.getImageData(
-      0,
-      0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height
-    );
-
-    // Create a new ArrayBuffer
-    const buffer = new ArrayBuffer(imageData.data.length);
-    const uint8Array = new Uint8Array(buffer);
-    uint8Array.set(imageData.data);
-
-    // Send video frames to the worker for processing
-    if (
-      this.selfieSegmentationProcessing &&
-      !this.selfieSegmentationProcessing[0]
-    ) {
-      this.selfieSegmentationProcessing[0] = true;
-      this.selfieSegmentationWorker.postMessage({
-        message: "FRAME",
-        data: buffer, // Send the ArrayBuffer
-        width: this.hideBackgroundOffscreenCanvas.width,
-        height: this.hideBackgroundOffscreenCanvas.height,
-      });
-    }
-  };
-
   private updateHideBackgroundCanvas = () => {
     if (
       !this.hideBackgroundCanvas ||
@@ -341,14 +149,14 @@ class BabylonRenderLoop {
       0,
       0,
       this.hideBackgroundCanvas.width,
-      this.hideBackgroundCanvas.height
+      this.hideBackgroundCanvas.height,
     );
 
     this.tempHideBackgroundCtx.clearRect(
       0,
       0,
       this.tempHideBackgroundCanvas.width,
-      this.tempHideBackgroundCanvas.height
+      this.tempHideBackgroundCanvas.height,
     );
 
     // Step 1: Draw the ImageData onto the canvas at its original size (at 0,0)
@@ -356,7 +164,7 @@ class BabylonRenderLoop {
     this.tempHideBackgroundCtx.putImageData(
       this.selfieSegmentationResults[0],
       0,
-      0
+      0,
     );
 
     // Step 2: Scale the canvas content to fit the full canvas using drawImage
@@ -369,7 +177,7 @@ class BabylonRenderLoop {
       0,
       0,
       this.hideBackgroundCanvas.width,
-      this.hideBackgroundCanvas.height
+      this.hideBackgroundCanvas.height,
     );
 
     this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
@@ -380,7 +188,7 @@ class BabylonRenderLoop {
         0,
         0,
         this.hideBackgroundCanvas.width,
-        this.hideBackgroundCanvas.height
+        this.hideBackgroundCanvas.height,
       );
     } else {
       if (
@@ -393,7 +201,7 @@ class BabylonRenderLoop {
         0,
         0,
         this.hideBackgroundCanvas.width,
-        this.hideBackgroundCanvas.height
+        this.hideBackgroundCanvas.height,
       );
     }
 
@@ -405,7 +213,7 @@ class BabylonRenderLoop {
           0,
           0,
           this.hideBackgroundCanvas.width,
-          this.hideBackgroundCanvas.height
+          this.hideBackgroundCanvas.height,
         );
 
         // Transfer the content of the canvas to the texture
@@ -414,7 +222,7 @@ class BabylonRenderLoop {
           0,
           0,
           this.hideBackgroundCanvas.width,
-          this.hideBackgroundCanvas.height
+          this.hideBackgroundCanvas.height,
         );
 
         // Mark texture as dirty to trigger an update in the rendering engine
@@ -427,7 +235,7 @@ class BabylonRenderLoop {
   };
 
   swapHideBackgroundEffectImage = (
-    hideBackgroundEffect: HideBackgroundEffectTypes
+    hideBackgroundEffect: HideBackgroundEffectTypes,
   ) => {
     this.hidebackgroundType = "image";
     const src = hideBackgroundEffectImagesMap[hideBackgroundEffect];
@@ -445,7 +253,7 @@ class BabylonRenderLoop {
 
   private positionsScreenSpaceToSceneSpace = (
     mesh: AbstractMesh,
-    position: [number, number]
+    position: [number, number],
   ): [number, number, number] => {
     const zPosition = mesh.position.z; // distance from camera
     const cameraFOV = this.camera.fov; // FOV in radians
@@ -464,7 +272,7 @@ class BabylonRenderLoop {
   };
 
   private sceneSpaceToPositionsScreenSpace = (
-    mesh: AbstractMesh
+    mesh: AbstractMesh,
   ): [number, number] => {
     const zPosition = mesh.position.z;
     const cameraFOV = this.camera.fov;
@@ -483,7 +291,7 @@ class BabylonRenderLoop {
 
   private scaleScreenSpaceToSceneSpace = (
     mesh: AbstractMesh,
-    scale: number
+    scale: number,
   ) => {
     const zPosition = mesh.position.z; // distance from camera
     const cameraFOV = this.camera.fov; // FOV in radians
@@ -500,7 +308,7 @@ class BabylonRenderLoop {
   private directionalShift = (
     shiftParallel: number,
     shiftPerpendicular: number,
-    headAngle: number
+    headAngle: number,
   ): { x: number; y: number } => {
     let x = Math.cos(headAngle) * shiftParallel;
     let y = Math.sin(headAngle) * shiftParallel;
@@ -558,7 +366,7 @@ class BabylonRenderLoop {
 
         const distance = Math.sqrt(
           Math.pow(nosePosition.x - meshPosition[0], 2) +
-            Math.pow(nosePosition.y - meshPosition[1], 2)
+            Math.pow(nosePosition.y - meshPosition[1], 2),
         );
         if (
           // @ts-expect-error: no types enforce in mesh metadata
@@ -584,25 +392,25 @@ class BabylonRenderLoop {
           case "forehead":
             position = this.positionsScreenSpaceToSceneSpace(
               mesh,
-              calculatedLandmarks.foreheadPositions[closestTrackerId]
+              calculatedLandmarks.foreheadPositions[closestTrackerId],
             );
             break;
           case "nose":
             position = this.positionsScreenSpaceToSceneSpace(
               mesh,
-              calculatedLandmarks.nosePositions[closestTrackerId]
+              calculatedLandmarks.nosePositions[closestTrackerId],
             );
             break;
           case "chin":
             position = this.positionsScreenSpaceToSceneSpace(
               mesh,
-              calculatedLandmarks.chinPositions[closestTrackerId]
+              calculatedLandmarks.chinPositions[closestTrackerId],
             );
             break;
           case "eyesCenter":
             position = this.positionsScreenSpaceToSceneSpace(
               mesh,
-              calculatedLandmarks.eyesCenterPositions[closestTrackerId]
+              calculatedLandmarks.eyesCenterPositions[closestTrackerId],
             );
             break;
           default:
@@ -620,7 +428,7 @@ class BabylonRenderLoop {
         const offset = this.directionalShift(
           meshMetadata.shiftX * interocularScaleShift,
           meshMetadata.shiftY * interocularScaleShift,
-          calculatedLandmarks.headRotationAngles[closestTrackerId]
+          calculatedLandmarks.headRotationAngles[closestTrackerId],
         );
         position = [
           position[0] + offset.x,
@@ -634,24 +442,24 @@ class BabylonRenderLoop {
         mesh.rotation = new Vector3(
           calculatedLandmarks.headPitchAngles[closestTrackerId],
           calculatedLandmarks.headYawAngles[closestTrackerId],
-          calculatedLandmarks.headRotationAngles[closestTrackerId]
+          calculatedLandmarks.headRotationAngles[closestTrackerId],
         );
 
         const interocularDistance = this.scaleScreenSpaceToSceneSpace(
           mesh,
-          calculatedLandmarks.interocularDistances[closestTrackerId]
+          calculatedLandmarks.interocularDistances[closestTrackerId],
         );
         mesh.scaling = new Vector3(
           mesh.metadata.initScale[0] * interocularDistance,
           mesh.metadata.initScale[1] * interocularDistance,
-          mesh.metadata.initScale[2] * interocularDistance
+          mesh.metadata.initScale[2] * interocularDistance,
         );
       } else if (meshMetadata.positionStyle === "landmarks") {
         const faceLandmarkPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
 
         this.babylonMeshes.updateFaceMesh(
           mesh,
-          faceLandmarkPairs[closestTrackerId].landmarks.slice(0, -10)
+          faceLandmarkPairs[closestTrackerId].landmarks.slice(0, -10),
         );
       }
     }

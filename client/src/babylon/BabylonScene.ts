@@ -21,22 +21,14 @@ import {
   Tools,
 } from "@babylonjs/core";
 import "@babylonjs/inspector";
-import {
-  ApplicationEffectStylesType,
-  AudioEffectStylesType,
-  CameraEffectStylesType,
-  CameraEffectTypes,
-  ImageEffectStylesType,
-  ScreenEffectStylesType,
-  VideoEffectStylesType,
-} from "../../../universal/effectsTypeConstant";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { CameraEffectTypes } from "../../../universal/effectsTypeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../lib/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import FaceLandmarks from "./FaceLandmarks";
+import BabylonRenderLoopWorker from "./BabylonRenderLoopWorker";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -124,6 +116,7 @@ class BabylonScene {
   private forceFaceDetectEndListeners: Set<() => void> = new Set();
 
   constructor(
+    private babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined,
     private type:
       | "camera"
       | "screen"
@@ -132,30 +125,17 @@ class BabylonScene {
       | "application"
       | "text"
       | "capture",
+    private aspect: number,
     private canvas: HTMLCanvasElement,
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceLandmarks: FaceLandmarks | undefined,
     private effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
     },
-    private effectsStyles:
-      | CameraEffectStylesType
-      | ScreenEffectStylesType
-      | AudioEffectStylesType
-      | VideoEffectStylesType
-      | ImageEffectStylesType
-      | ApplicationEffectStylesType,
-    private faceMeshWorker: Worker | undefined,
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
-    private faceMeshProcessing: boolean[] | undefined,
-    private faceDetectionWorker: Worker | undefined,
-    private faceDetectionProcessing: boolean[] | undefined,
-    private selfieSegmentationWorker: Worker | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
-    private selfieSegmentationProcessing: boolean[] | undefined,
     private userDevice: UserDevice,
     private maxFaces: [number],
-    private userMedia: React.MutableRefObject<UserMediaType> | undefined,
   ) {
     this.flip = this.type === "camera" || this.type === "capture";
 
@@ -185,26 +165,17 @@ class BabylonScene {
       this.ambientLightThreeDimMeshes,
       this.ambientLightTwoDimMeshes,
       this.threeDimMeshesZCoord,
-      this.userMedia,
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
-      this.flip,
       this.scene,
       this.camera,
       this.faceLandmarks,
+      this.aspect,
       this.canvas,
-      this.backgroundMedia,
       this.effects,
-      this.effectsStyles,
-      this.faceMeshWorker,
       this.faceMeshResults,
-      this.faceMeshProcessing,
-      this.faceDetectionWorker,
-      this.faceDetectionProcessing,
-      this.selfieSegmentationWorker,
       this.selfieSegmentationResults,
-      this.selfieSegmentationProcessing,
       this.userDevice,
       this.hideBackgroundTexture,
       this.hideBackgroundMaterial,
@@ -260,6 +231,7 @@ class BabylonScene {
     ) {
       this.imageAlreadyProcessed[0] += 1;
 
+      this.babylonRenderLoopWorker?.renderLoop();
       this.babylonRenderLoop.renderLoop();
     } else if (this.imageAlreadyProcessed[0] === 100) {
       this.imageAlreadyProcessed[0] += 1;

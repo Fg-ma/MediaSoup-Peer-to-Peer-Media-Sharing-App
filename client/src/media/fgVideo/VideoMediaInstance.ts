@@ -14,7 +14,7 @@ import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,
-} from "../../babylonHi/BabylonScene";
+} from "../../babylon/BabylonScene";
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";

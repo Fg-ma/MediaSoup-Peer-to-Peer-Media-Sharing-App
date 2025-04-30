@@ -1,3 +1,4 @@
+import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
@@ -6,10 +7,15 @@ import {
   ContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
+import FaceLandmarks from "../../babylon/FaceLandmarks";
+import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
+import Deadbanding from "src/babylon/Deadbanding";
+import UserDevice from "src/lib/UserDevice";
 
 export type ApplicationListenerTypes =
   | { type: "downloadComplete" }
-  | { type: "stateChanged" };
+  | { type: "stateChanged" }
+  | { type: "rectifyEffectMeshCount" };
 
 class ApplicationMedia {
   application: HTMLImageElement | undefined;
@@ -102,6 +108,7 @@ class ApplicationMedia {
       this.application.onload = () => {
         this.aspect =
           (this.application?.width ?? 1) / (this.application?.height ?? 1);
+
         this.loadingState = "downloading";
 
         this.applicationListeners.forEach((listener) => {

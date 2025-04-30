@@ -13,6 +13,7 @@ import BabylonScene, {
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
+import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 
 class CaptureMedia {
   canvas: HTMLCanvasElement;
@@ -38,6 +39,9 @@ class CaptureMedia {
   maxFacesDetected = 0;
 
   babylonScene: BabylonScene | undefined;
+  babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
+
+  aspect: number | undefined;
 
   private videoStopped = false;
 
@@ -145,27 +149,57 @@ class CaptureMedia {
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
       this.canvas.height = this.video.videoHeight;
+
+      this.aspect = this.video.videoWidth / this.video.videoHeight;
+
+      this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
+        true,
+        this.faceLandmarks,
+        this.aspect ?? 1,
+        this.video,
+        this.faceMeshWorker,
+        this.faceMeshProcessing,
+        this.faceDetectionWorker,
+        this.faceDetectionProcessing,
+        this.selfieSegmentationWorker,
+        this.selfieSegmentationProcessing,
+        this.userDevice,
+      );
+
+      this.babylonScene = new BabylonScene(
+        this.babylonRenderLoopWorker,
+        "capture",
+        this.aspect ?? 1,
+        this.canvas,
+        this.video,
+        this.faceLandmarks,
+        this.effects,
+        this.faceMeshResults,
+        this.selfieSegmentationResults,
+        this.userDevice,
+        this.maxFaces,
+      );
     };
 
-    this.babylonScene = new BabylonScene(
-      "capture",
-      this.canvas,
-      this.video,
-      this.faceLandmarks,
-      this.effects,
-      this.captureEffectsStyles.current,
-      this.faceMeshWorker,
-      this.faceMeshResults,
-      this.faceMeshProcessing,
-      this.faceDetectionWorker,
-      this.faceDetectionProcessing,
-      this.selfieSegmentationWorker,
-      this.selfieSegmentationResults,
-      this.selfieSegmentationProcessing,
-      this.userDevice,
-      this.maxFaces,
-      undefined,
-    );
+    // this.babylonScene = new BabylonScene(
+    //   "capture",
+    //   this.canvas,
+    //   this.video,
+    //   this.faceLandmarks,
+    //   this.effects,
+    //   this.captureEffectsStyles.current,
+    //   this.faceMeshWorker,
+    //   this.faceMeshResults,
+    //   this.faceMeshProcessing,
+    //   this.faceDetectionWorker,
+    //   this.faceDetectionProcessing,
+    //   this.selfieSegmentationWorker,
+    //   this.selfieSegmentationResults,
+    //   this.selfieSegmentationProcessing,
+    //   this.userDevice,
+    //   this.maxFaces,
+    //   undefined,
+    // );
   }
 
   deconstructor() {
@@ -280,6 +314,27 @@ class CaptureMedia {
     }
   };
 
+  private updateNeed = () => {
+    this.babylonRenderLoopWorker?.removeAllNeed(this.captureId);
+
+    this.babylonRenderLoopWorker?.addNeed("faceDetection", this.captureId);
+    if (this.effects.hideBackground) {
+      this.babylonRenderLoopWorker?.addNeed(
+        "selfieSegmentation",
+        this.captureId,
+      );
+    }
+    if (
+      this.effects.masks &&
+      this.captureEffectsStyles.current.masks.style !== "baseMask"
+    ) {
+      this.babylonRenderLoopWorker?.addNeed(
+        "smoothFaceLandmarks",
+        this.captureId,
+      );
+    }
+  };
+
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
     // Remove the leading '#' if present
     hex = hex.replace(/^#/, "");
@@ -295,6 +350,8 @@ class CaptureMedia {
 
   clearAllEffects = () => {
     if (!this.babylonScene) return;
+
+    this.babylonRenderLoopWorker?.removeAllNeed(this.captureId);
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
@@ -337,6 +394,8 @@ class CaptureMedia {
     } else {
       this.effects[effect] = true;
     }
+
+    this.updateNeed();
 
     if (validEffectTypes.includes(effect as EffectType)) {
       if (

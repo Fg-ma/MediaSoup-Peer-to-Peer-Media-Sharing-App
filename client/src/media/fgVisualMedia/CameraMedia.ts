@@ -15,6 +15,7 @@ import BabylonScene, {
 import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
+import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -41,7 +42,8 @@ class CameraMedia {
 
   private maxFaces: [number] = [1];
 
-  babylonScene: BabylonScene;
+  babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
+  babylonScene: BabylonScene | undefined;
 
   constructor(
     private cameraId: string,
@@ -50,7 +52,6 @@ class CameraMedia {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: UserDevice,
     private deadbanding: Deadbanding,
-    private userMedia: React.MutableRefObject<UserMediaType>,
   ) {
     this.effects = {};
 
@@ -153,26 +154,6 @@ class CameraMedia {
     // Start video and render loop
     this.video = document.createElement("video");
 
-    this.babylonScene = new BabylonScene(
-      "camera",
-      this.canvas,
-      this.video,
-      this.faceLandmarks,
-      this.effects,
-      this.userEffectsStyles.current.camera[this.cameraId],
-      this.faceMeshWorker,
-      this.faceMeshResults,
-      this.faceMeshProcessing,
-      this.faceDetectionWorker,
-      this.faceDetectionProcessing,
-      this.selfieSegmentationWorker,
-      this.selfieSegmentationResults,
-      this.selfieSegmentationProcessing,
-      this.userDevice,
-      this.maxFaces,
-      this.userMedia,
-    );
-
     this.video.srcObject = this.initCameraStream;
     this.video.onloadedmetadata = () => {
       this.canvas.width = this.video.videoWidth;
@@ -181,6 +162,34 @@ class CameraMedia {
       this.aspectRatio = this.video.videoWidth / this.video.videoHeight;
 
       this.video.play();
+
+      this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
+        true,
+        this.faceLandmarks,
+        this.aspectRatio ?? 1,
+        this.video,
+        this.faceMeshWorker,
+        this.faceMeshProcessing,
+        this.faceDetectionWorker,
+        this.faceDetectionProcessing,
+        this.selfieSegmentationWorker,
+        this.selfieSegmentationProcessing,
+        this.userDevice,
+      );
+
+      this.babylonScene = new BabylonScene(
+        this.babylonRenderLoopWorker,
+        "camera",
+        this.aspectRatio,
+        this.canvas,
+        this.video,
+        this.faceLandmarks,
+        this.effects,
+        this.faceMeshResults,
+        this.selfieSegmentationResults,
+        this.userDevice,
+        this.maxFaces,
+      );
     };
   }
 
@@ -206,10 +215,12 @@ class CameraMedia {
     }
 
     // Call the BabylonScene deconstructor
-    this.babylonScene.deconstructor();
+    this.babylonScene?.deconstructor();
   }
 
   private rectifyEffectMeshCount = () => {
+    if (!this.babylonScene) return;
+
     for (const effect in this.effects) {
       if (
         !this.effects[effect as CameraEffectTypes] ||
@@ -277,6 +288,28 @@ class CameraMedia {
     }
   };
 
+  private updateNeed = () => {
+    this.babylonRenderLoopWorker?.removeAllNeed(this.cameraId);
+
+    this.babylonRenderLoopWorker?.addNeed("faceDetection", this.cameraId);
+    if (this.effects.hideBackground) {
+      this.babylonRenderLoopWorker?.addNeed(
+        "selfieSegmentation",
+        this.cameraId,
+      );
+    }
+    if (
+      this.effects.masks &&
+      this.userEffectsStyles.current.camera[this.cameraId].masks.style !==
+        "baseMask"
+    ) {
+      this.babylonRenderLoopWorker?.addNeed(
+        "smoothFaceLandmarks",
+        this.cameraId,
+      );
+    }
+  };
+
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
     // Remove the leading '#' if present
     hex = hex.replace(/^#/, "");
@@ -292,6 +325,8 @@ class CameraMedia {
 
   clearAllEffects = () => {
     if (!this.babylonScene) return;
+
+    this.babylonRenderLoopWorker?.removeAllNeed(this.cameraId);
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
@@ -334,6 +369,8 @@ class CameraMedia {
       this.effects[effect] = true;
     }
 
+    this.updateNeed();
+
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
@@ -342,11 +379,11 @@ class CameraMedia {
       ) {
         this.drawNewEffect(effect as EffectType);
       } else {
-        this.babylonScene.deleteEffectMeshes(effect);
+        this.babylonScene?.deleteEffectMeshes(effect);
 
         if (this.effects[effect]) {
           for (let i = 0; i < this.maxFaces[0]; i++) {
-            this.babylonScene.babylonMeshes.createFaceMesh(i, []);
+            this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
           }
         }
       }
@@ -357,26 +394,26 @@ class CameraMedia {
       this.setTintColor(tintColor);
     }
     if (effect === "tint" && tintColor) {
-      this.babylonScene.toggleTintPlane(
+      this.babylonScene?.toggleTintPlane(
         this.effects[effect],
         this.hexToNormalizedRgb(tintColor),
       );
     }
 
     if (effect === "blur") {
-      this.babylonScene.toggleBlurEffect(this.effects[effect]);
+      this.babylonScene?.toggleBlurEffect(this.effects[effect]);
     }
 
     if (effect === "pause") {
-      this.babylonScene.togglePauseEffect(this.effects[effect]);
+      this.babylonScene?.togglePauseEffect(this.effects[effect]);
     }
 
     if (effect === "hideBackground") {
-      this.babylonScene.toggleHideBackgroundPlane(this.effects[effect]);
+      this.babylonScene?.toggleHideBackgroundPlane(this.effects[effect]);
     }
 
     if (effect === "postProcess") {
-      this.babylonScene.babylonShaderController.togglePostProcessEffectsActive(
+      this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
         this.effects[effect],
       );
     }
@@ -394,10 +431,10 @@ class CameraMedia {
     const meshData = assetMeshes[effect][currentStyle.style];
 
     // Delete old meshes
-    this.babylonScene.deleteEffectMeshes(effect);
+    this.babylonScene?.deleteEffectMeshes(effect);
 
     if (this.effects[effect]) {
-      this.babylonScene.createEffectMeshes(
+      this.babylonScene?.createEffectMeshes(
         meshData.meshType,
         meshData.meshLabel,
         "",
@@ -425,7 +462,7 @@ class CameraMedia {
   };
 
   setTintColor = (newTintColor: string) => {
-    this.babylonScene.setTintColor(this.hexToNormalizedRgb(newTintColor));
+    this.babylonScene?.setTintColor(this.hexToNormalizedRgb(newTintColor));
   };
 
   getPaused = () => {

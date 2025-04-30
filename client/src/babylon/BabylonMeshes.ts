@@ -47,7 +47,6 @@ class BabylonMeshes {
     private ambientLightThreeDimMeshes: HemisphericLight | undefined,
     private ambientLightTwoDimMeshes: HemisphericLight | undefined,
     private threeDimMeshesZCoord: number,
-    private userMedia: React.MutableRefObject<UserMediaType> | undefined
   ) {
     this.meshLoaders = new MeshLoaders(this.scene);
 
@@ -234,7 +233,7 @@ class BabylonMeshes {
     mesh: AbstractMesh,
     position?: [number, number, number],
     scale?: [number, number, number],
-    rotation?: [number, number, number]
+    rotation?: [number, number, number],
   ) => {
     if (position) {
       mesh.position = new Vector3(position[0], position[1], position[2]);
@@ -255,7 +254,7 @@ class BabylonMeshes {
 
   private applyMeshActions = (
     mesh: AbstractMesh,
-    parentMesh?: AbstractMesh
+    parentMesh?: AbstractMesh,
   ) => {
     let clickTimeout: NodeJS.Timeout | undefined; // To hold the timeout for single click
     let doubleClickRegistered = false; // To check if double click was triggered
@@ -294,7 +293,7 @@ class BabylonMeshes {
           // Reset the double-click registered flag
           doubleClickRegistered = false;
         }, 250); // Small delay to check for double click (in milliseconds)
-      })
+      }),
     );
 
     // Handle double-clicks to toggle gizmo
@@ -351,7 +350,7 @@ class BabylonMeshes {
             this.enableGizmo(nextState, mesh);
           }
         }
-      })
+      }),
     );
 
     // Handle hold event (3 seconds)
@@ -371,7 +370,7 @@ class BabylonMeshes {
             this.disableGizmo(parentMesh ? parentMesh : mesh);
           }, 2000);
         }
-      })
+      }),
     );
 
     mesh.actionManager.registerAction(
@@ -380,7 +379,7 @@ class BabylonMeshes {
           clearTimeout(holdTimeout);
           holdTimeout = undefined;
         }
-      })
+      }),
     );
   };
 
@@ -408,10 +407,6 @@ class BabylonMeshes {
     if (meshMetaData.audioURL === undefined) {
       return;
     }
-
-    this.userMedia?.current.audio?.audioEffects.fgAssetSoundEffects.toggleAudio(
-      meshMetaData.audioURL
-    );
   };
 
   private escapeMesh = (mesh: AbstractMesh) => {
@@ -449,7 +444,7 @@ class BabylonMeshes {
 
   // Helper function to determine the next gizmo state
   private getNextGizmoState = (
-    currentState?: GizmoStateTypes
+    currentState?: GizmoStateTypes,
   ): GizmoStateTypes => {
     switch (currentState) {
       case "none":
@@ -470,7 +465,7 @@ class BabylonMeshes {
   // Helper function to register observables for any gizmo type
   private registerGizmoInteraction = (
     mesh: AbstractMesh,
-    gizmo: IAxisDragGizmo
+    gizmo: IAxisDragGizmo,
   ) => {
     gizmo.dragBehavior?.onDragObservable.add(() => {
       const meshMetaData = mesh.metadata;
@@ -501,17 +496,17 @@ class BabylonMeshes {
           positionGizmo.xGizmo.coloredMaterial.diffuseColor = new Color3(
             0.96078431,
             0.38039215,
-            0.0784313725490196
+            0.0784313725490196,
           ); // Red for X axis
           positionGizmo.yGizmo.coloredMaterial.diffuseColor = new Color3(
             0.17254901,
             0.57254901,
-            0.9607843137254902
+            0.9607843137254902,
           ); // Green for Y axis
           positionGizmo.zGizmo.coloredMaterial.diffuseColor = new Color3(
             0.30980392,
             0.6666666666666666,
-            0.5333333333333333
+            0.5333333333333333,
           ); // Blue for Z axis
 
           if (
@@ -550,17 +545,17 @@ class BabylonMeshes {
           rotationGizmo.xGizmo.coloredMaterial.diffuseColor = new Color3(
             0.96078431,
             0.38039215,
-            0.0784313725490196
+            0.0784313725490196,
           ); // Red for X axis
           rotationGizmo.yGizmo.coloredMaterial.diffuseColor = new Color3(
             0.17254901,
             0.57254901,
-            0.9607843137254902
+            0.9607843137254902,
           ); // Green for Y axis
           rotationGizmo.zGizmo.coloredMaterial.diffuseColor = new Color3(
             0.30980392,
             0.6666666666666666,
-            0.5333333333333333
+            0.5333333333333333,
           ); // Blue for Z axis
 
           if (
@@ -588,17 +583,17 @@ class BabylonMeshes {
           scaleGizmo.xGizmo.coloredMaterial.diffuseColor = new Color3(
             0.96078431,
             0.38039215,
-            0.0784313725490196
+            0.0784313725490196,
           ); // Red for X axis
           scaleGizmo.yGizmo.coloredMaterial.diffuseColor = new Color3(
             0.17254901,
             0.57254901,
-            0.9607843137254902
+            0.9607843137254902,
           ); // Green for Y axis
           scaleGizmo.zGizmo.coloredMaterial.diffuseColor = new Color3(
             0.30980392,
             0.6666666666666666,
-            0.5333333333333333
+            0.5333333333333333,
           ); // Blue for Z axis
 
           if (
@@ -675,7 +670,7 @@ class BabylonMeshes {
     audioURL?: string,
     initPosition?: [number, number, number],
     initScale?: [number, number, number],
-    initRotation?: [number, number, number]
+    initRotation?: [number, number, number],
   ) => {
     if (type === "2D") {
       if (this.meshes["2D"][meshLabel]) {
@@ -699,7 +694,7 @@ class BabylonMeshes {
         meshLabel,
         meshName,
         meshPath,
-        meshFile
+        meshFile,
       );
 
       for (const mesh of newMesh) {
@@ -730,7 +725,7 @@ class BabylonMeshes {
           newMesh[0],
           initPosition,
           initScale,
-          initRotation
+          initRotation,
         );
         for (const mesh of newMesh) {
           this.applyMeshActions(mesh, newMesh[0]);
@@ -743,7 +738,7 @@ class BabylonMeshes {
       const newMesh = await this.meshLoaders.load2D(
         meshLabel,
         meshPath,
-        meshFile
+        meshFile,
       );
 
       this.ambientLightTwoDimMeshes?.includedOnlyMeshes.push(newMesh);
@@ -772,7 +767,7 @@ class BabylonMeshes {
           newMesh,
           initPosition,
           initScale,
-          initRotation
+          initRotation,
         );
         this.applyMeshActions(newMesh);
       } else {
@@ -844,7 +839,7 @@ class BabylonMeshes {
     } catch (error) {
       console.error(
         "There has been a problem with your fetch operation:",
-        error
+        error,
       );
       return undefined;
     }
@@ -853,12 +848,12 @@ class BabylonMeshes {
   private getTriangles = (
     geometryPoints: Point3D[],
     uvPoints: number[],
-    zPosition: number
+    zPosition: number,
   ) => {
     const geometryDelaunay = Delaunay.from(
       geometryPoints,
       (p) => p.x,
-      (p) => p.y
+      (p) => p.y,
     );
     const geometryTrianglesIndices = geometryDelaunay.triangles;
 
@@ -866,7 +861,7 @@ class BabylonMeshes {
     const geometryTriangles: number[][] = []; // Changed to 2D array
     const uvTriangles: number[] = [];
     const vertexNormals: Float32Array = new Float32Array(numVertices * 3).fill(
-      0
+      0,
     );
     const indices: number[] = [];
 
@@ -895,7 +890,7 @@ class BabylonMeshes {
       const normalZ = edge1x * edge2y - edge1y * edge2x;
 
       const length = Math.sqrt(
-        normalX * normalX + normalY * normalY + normalZ * normalZ
+        normalX * normalX + normalY * normalY + normalZ * normalZ,
       );
       const invLength = 1 / length;
       const normalizedNormalX = normalX * invLength;
@@ -931,7 +926,7 @@ class BabylonMeshes {
           -this.screenSpaceToSceneSpaceX(zPosition, v2.x),
           this.screenSpaceToSceneSpaceY(zPosition, v2.y),
           v2.z,
-        ]
+        ],
       );
 
       // Store UV coords
@@ -941,7 +936,7 @@ class BabylonMeshes {
         uvPoints[index1 * 2],
         -uvPoints[index1 * 2 + 1],
         uvPoints[index2 * 2],
-        -uvPoints[index2 * 2 + 1]
+        -uvPoints[index2 * 2 + 1],
       );
     }
 
@@ -964,7 +959,7 @@ class BabylonMeshes {
       normals.push(
         -vertexNormals[vertexIndex * 3],
         -vertexNormals[vertexIndex * 3 + 1],
-        vertexNormals[vertexIndex * 3 + 2]
+        vertexNormals[vertexIndex * 3 + 2],
       );
     }
 
@@ -999,7 +994,7 @@ class BabylonMeshes {
 
   createFaceMesh = async (
     faceId: number,
-    liveLandmarks: NormalizedLandmarkList
+    liveLandmarks: NormalizedLandmarkList,
   ) => {
     // Load uv mesh data
     if (!baseMaskData.data) {
@@ -1011,7 +1006,7 @@ class BabylonMeshes {
       this.getTriangles(
         liveLandmarks,
         baseMaskData.data!.uv_faces,
-        this.threeDimMeshesZCoord
+        this.threeDimMeshesZCoord,
       );
 
     // Flatten the geometry data for Babylon.js
@@ -1056,7 +1051,7 @@ class BabylonMeshes {
 
   updateFaceMesh = async (
     mesh: AbstractMesh,
-    liveLandmarks: NormalizedLandmarkList
+    liveLandmarks: NormalizedLandmarkList,
   ) => {
     // Load uv mesh data
     if (!baseMaskData.data) {
@@ -1068,7 +1063,7 @@ class BabylonMeshes {
       this.getTriangles(
         liveLandmarks,
         baseMaskData.data!.uv_faces,
-        mesh.position.z
+        mesh.position.z,
       );
 
     // Flatten the geometry data for Babylon.js

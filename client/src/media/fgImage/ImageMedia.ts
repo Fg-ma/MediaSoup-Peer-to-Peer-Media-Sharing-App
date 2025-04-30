@@ -7,9 +7,9 @@ import {
   ContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
-import FaceLandmarks from "../../babylonHi/FaceLandmarks";
-import Deadbanding from "../../babylonHi/Deadbanding";
-import BabylonRenderLoopWorker from "../../babylonHi/BabylonRenderLoopWorker";
+import FaceLandmarks from "../../babylon/FaceLandmarks";
+import Deadbanding from "../../babylon/Deadbanding";
+import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 import UserDevice from "../../lib/UserDevice";
 
 export type ImageListenerTypes =

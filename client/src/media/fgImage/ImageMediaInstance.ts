@@ -9,10 +9,9 @@ import {
 import BabylonScene, {
   EffectType,
   validEffectTypes,
-} from "../../babylonHi/BabylonScene";
+} from "../../babylon/BabylonScene";
 import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import assetMeshes from "../../babylon/meshes";
 import ImageMedia, { ImageListenerTypes } from "./ImageMedia";
 
@@ -88,6 +87,7 @@ class ImageMediaInstance {
           this.imageMedia.maxFaces,
         );
     }
+
     this.imageMedia.addImageListener(this.handleImageMessages);
   }
 
