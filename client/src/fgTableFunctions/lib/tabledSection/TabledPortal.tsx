@@ -163,7 +163,7 @@ export default function TabledPortal({
                 }}
                 items={[
                   ...(activePage === "all" || activePage === "svg"
-                    ? Object.entries(userMedia.current.svg.all).map(
+                    ? Object.entries(userMedia.current.svg.table).map(
                         ([svgId, svgMedia]) =>
                           (searchContent.length === 0 &&
                             svgMedia.state.includes("tabled")) ||
@@ -190,7 +190,7 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "image"
-                    ? Object.entries(userMedia.current.image.all).map(
+                    ? Object.entries(userMedia.current.image.table).map(
                         ([imageId, imageMedia]) =>
                           (searchContent.length === 0 &&
                             imageMedia.state.includes("tabled")) ||
@@ -217,7 +217,7 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "video"
-                    ? Object.entries(userMedia.current.video.all).map(
+                    ? Object.entries(userMedia.current.video.table).map(
                         ([videoId, videoMedia]) =>
                           (searchContent.length === 0 &&
                             videoMedia.state.includes("tabled")) ||
@@ -244,7 +244,7 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "soundClip"
-                    ? Object.entries(userMedia.current.soundClip.all).map(
+                    ? Object.entries(userMedia.current.soundClip.table).map(
                         ([soundClipId, soundClipMedia]) =>
                           (searchContent.length === 0 &&
                             soundClipMedia.state.includes("tabled")) ||
@@ -271,7 +271,7 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "application"
-                    ? Object.entries(userMedia.current.application.all).map(
+                    ? Object.entries(userMedia.current.application.table).map(
                         ([applicationId, applicationMedia]) =>
                           (searchContent.length === 0 &&
                             applicationMedia.state.includes("tabled")) ||
@@ -298,7 +298,7 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "text"
-                    ? Object.entries(userMedia.current.text.all).map(
+                    ? Object.entries(userMedia.current.text.table).map(
                         ([textId, textMedia]) =>
                           (searchContent.length === 0 &&
                             textMedia.state.includes("tabled")) ||

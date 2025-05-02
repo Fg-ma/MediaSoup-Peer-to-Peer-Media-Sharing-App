@@ -1,4 +1,4 @@
-import VideoMedia from "../../media/fgVideo/VideoMedia";
+import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import {
   IncomingTableStaticContentMessages,
@@ -7,7 +7,7 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import SharedBundleSocket from "./SharedBundleSocket";
-import ImageMedia from "../../media/fgImage/ImageMedia";
+import TableImageMedia from "../../media/fgTableImage/TableImageMedia";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import {
   ApplicationEffectStylesType,
@@ -27,14 +27,14 @@ import {
 } from "../../../../universal/effectsTypeConstant";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
-import TextMedia from "../../media/fgText/TextMedia";
-import ApplicationMedia from "../../media/fgApplication/ApplicationMedia";
-import SvgMediaInstance from "../../media/fgSvg/SvgMediaInstance";
-import SvgMedia from "../../media/fgSvg/SvgMedia";
-import ImageMediaInstance from "../../media/fgImage/ImageMediaInstance";
-import TextMediaInstance from "../../media/fgText/TextMediaInstance";
-import ApplicationMediaInstance from "../../media/fgApplication/ApplicationMediaInstance";
-import VideoMediaInstance from "../../media/fgVideo/VideoMediaInstance";
+import TableTextMedia from "../../media/fgTableText/TableTextMedia";
+import TableApplicationMedia from "../../media/fgTableApplication/TableApplicationMedia";
+import TableSvgMediaInstance from "../../media/fgTableSvg/TableSvgMediaInstance";
+import TableSvgMedia from "../../media/fgTableSvg/TableSvgMedia";
+import TableImageMediaInstance from "../../media/fgTableImage/TableImageMediaInstance";
+import TableTextMediaInstance from "../../media/fgTableText/TableTextMediaInstance";
+import TableApplicationMediaInstance from "../../media/fgTableApplication/TableApplicationMediaInstance";
+import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaInstance";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -80,7 +80,7 @@ class SharedBundleController extends SharedBundleSocket {
 
     if (videos) {
       for (const video of videos) {
-        const newVideoMedia = new VideoMedia(
+        const newVideoMedia = new TableVideoMedia(
           video.videoId,
           video.filename,
           video.mimeType as TableTopStaticMimeType,
@@ -93,7 +93,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.tableStaticContentSocket.current.removeMessageListener,
         );
 
-        this.userMedia.current.video.all[video.videoId] = newVideoMedia;
+        this.userMedia.current.video.table[video.videoId] = newVideoMedia;
 
         for (const instance of video.instances) {
           if (!this.userEffects.current.video[instance.videoInstanceId]) {
@@ -115,23 +115,24 @@ class SharedBundleController extends SharedBundleSocket {
           this.userEffectsStyles.current.video[instance.videoInstanceId].video =
             instance.effectStyles as VideoEffectStylesType;
 
-          this.userMedia.current.video.instances[instance.videoInstanceId] =
-            new VideoMediaInstance(
-              newVideoMedia,
-              instance.videoInstanceId,
-              this.userDevice,
-              this.deadbanding,
-              this.userEffectsStyles,
-              this.userEffects,
-              instance.positioning,
-              this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
-            );
+          this.userMedia.current.video.tableInstances[
+            instance.videoInstanceId
+          ] = new TableVideoMediaInstance(
+            newVideoMedia,
+            instance.videoInstanceId,
+            this.userDevice,
+            this.deadbanding,
+            this.userEffectsStyles,
+            this.userEffects,
+            instance.positioning,
+            this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
+          );
         }
       }
     }
     if (images) {
       for (const image of images) {
-        const newImageMedia = new ImageMedia(
+        const newImageMedia = new TableImageMedia(
           image.imageId,
           image.filename,
           image.mimeType as TableTopStaticMimeType,
@@ -143,7 +144,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.tableStaticContentSocket.current.removeMessageListener,
         );
 
-        this.userMedia.current.image.all[image.imageId] = newImageMedia;
+        this.userMedia.current.image.table[image.imageId] = newImageMedia;
 
         for (const instance of image.instances) {
           this.userEffects.current.image[instance.imageInstanceId] =
@@ -153,22 +154,23 @@ class SharedBundleController extends SharedBundleSocket {
           this.userEffectsStyles.current.image[instance.imageInstanceId] =
             instance.effectStyles as ImageEffectStylesType;
 
-          this.userMedia.current.image.instances[instance.imageInstanceId] =
-            new ImageMediaInstance(
-              newImageMedia,
-              instance.imageInstanceId,
-              this.userEffectsStyles,
-              this.userEffects,
-              this.userDevice,
-              this.deadbanding,
-              instance.positioning,
-            );
+          this.userMedia.current.image.tableInstances[
+            instance.imageInstanceId
+          ] = new TableImageMediaInstance(
+            newImageMedia,
+            instance.imageInstanceId,
+            this.userEffectsStyles,
+            this.userEffects,
+            this.userDevice,
+            this.deadbanding,
+            instance.positioning,
+          );
         }
       }
     }
     if (svgs) {
       for (const svg of svgs) {
-        const newSvgMedia = new SvgMedia(
+        const newSvgMedia = new TableSvgMedia(
           svg.svgId,
           svg.filename,
           svg.mimeType as TableTopStaticMimeType,
@@ -178,7 +180,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.tableStaticContentSocket.current.removeMessageListener,
         );
 
-        this.userMedia.current.svg.all[svg.svgId] = newSvgMedia;
+        this.userMedia.current.svg.table[svg.svgId] = newSvgMedia;
 
         for (const instance of svg.instances) {
           this.userEffects.current.svg[instance.svgInstanceId] =
@@ -188,8 +190,8 @@ class SharedBundleController extends SharedBundleSocket {
           this.userEffectsStyles.current.svg[instance.svgInstanceId] =
             instance.effectStyles as SvgEffectStylesType;
 
-          this.userMedia.current.svg.instances[instance.svgInstanceId] =
-            new SvgMediaInstance(
+          this.userMedia.current.svg.tableInstances[instance.svgInstanceId] =
+            new TableSvgMediaInstance(
               newSvgMedia,
               instance.svgInstanceId,
               this.userEffectsStyles,
@@ -201,7 +203,7 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (text) {
       for (const textItem of text) {
-        const newTextMedia = new TextMedia(
+        const newTextMedia = new TableTextMedia(
           textItem.textId,
           textItem.filename,
           textItem.mimeType as TableTopStaticMimeType,
@@ -211,11 +213,11 @@ class SharedBundleController extends SharedBundleSocket {
           this.tableStaticContentSocket.current.removeMessageListener,
         );
 
-        this.userMedia.current.text.all[textItem.textId] = newTextMedia;
+        this.userMedia.current.text.table[textItem.textId] = newTextMedia;
 
         for (const instance of textItem.instances) {
-          this.userMedia.current.text.instances[instance.textInstanceId] =
-            new TextMediaInstance(
+          this.userMedia.current.text.tableInstances[instance.textInstanceId] =
+            new TableTextMediaInstance(
               newTextMedia,
               instance.textInstanceId,
               instance.positioning,
@@ -225,7 +227,7 @@ class SharedBundleController extends SharedBundleSocket {
     }
     if (applications) {
       for (const application of applications) {
-        const newApplication = new ApplicationMedia(
+        const newApplication = new TableApplicationMedia(
           application.applicationId,
           application.filename,
           application.mimeType as TableTopStaticMimeType,
@@ -235,7 +237,7 @@ class SharedBundleController extends SharedBundleSocket {
           this.tableStaticContentSocket.current.removeMessageListener,
         );
 
-        this.userMedia.current.application.all[application.applicationId] =
+        this.userMedia.current.application.table[application.applicationId] =
           newApplication;
 
         for (const instance of application.instances) {
@@ -247,9 +249,9 @@ class SharedBundleController extends SharedBundleSocket {
             instance.applicationInstanceId
           ] = instance.effectStyles as ApplicationEffectStylesType;
 
-          this.userMedia.current.application.instances[
+          this.userMedia.current.application.tableInstances[
             instance.applicationInstanceId
-          ] = new ApplicationMediaInstance(
+          ] = new TableApplicationMediaInstance(
             newApplication,
             instance.applicationInstanceId,
             this.userEffectsStyles,
@@ -272,11 +274,11 @@ class SharedBundleController extends SharedBundleSocket {
     newInstances.forEach((instance) => {
       switch (instance.contentType) {
         case "svg":
-          if (this.userMedia.current.svg.all[instance.contentId]) {
+          if (this.userMedia.current.svg.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.svg.instances[ins.instanceId] =
-                new SvgMediaInstance(
-                  this.userMedia.current.svg.all[instance.contentId],
+              this.userMedia.current.svg.tableInstances[ins.instanceId] =
+                new TableSvgMediaInstance(
+                  this.userMedia.current.svg.table[instance.contentId],
                   ins.instanceId,
                   this.userEffectsStyles,
                   this.userEffects,
@@ -286,26 +288,27 @@ class SharedBundleController extends SharedBundleSocket {
           }
           break;
         case "application":
-          if (this.userMedia.current.application.all[instance.contentId]) {
+          if (this.userMedia.current.application.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.application.instances[ins.instanceId] =
-                new ApplicationMediaInstance(
-                  this.userMedia.current.application.all[instance.contentId],
-                  ins.instanceId,
-                  this.userEffectsStyles,
-                  this.userEffects,
-                  this.userDevice,
-                  ins.positioning,
-                );
+              this.userMedia.current.application.tableInstances[
+                ins.instanceId
+              ] = new TableApplicationMediaInstance(
+                this.userMedia.current.application.table[instance.contentId],
+                ins.instanceId,
+                this.userEffectsStyles,
+                this.userEffects,
+                this.userDevice,
+                ins.positioning,
+              );
             });
           }
           break;
         case "image":
-          if (this.userMedia.current.image.all[instance.contentId]) {
+          if (this.userMedia.current.image.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.image.instances[ins.instanceId] =
-                new ImageMediaInstance(
-                  this.userMedia.current.image.all[instance.contentId],
+              this.userMedia.current.image.tableInstances[ins.instanceId] =
+                new TableImageMediaInstance(
+                  this.userMedia.current.image.table[instance.contentId],
                   ins.instanceId,
                   this.userEffectsStyles,
                   this.userEffects,
@@ -317,11 +320,11 @@ class SharedBundleController extends SharedBundleSocket {
           }
           break;
         case "text":
-          if (this.userMedia.current.text.all[instance.contentId]) {
+          if (this.userMedia.current.text.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.text.instances[ins.instanceId] =
-                new TextMediaInstance(
-                  this.userMedia.current.text.all[instance.contentId],
+              this.userMedia.current.text.tableInstances[ins.instanceId] =
+                new TableTextMediaInstance(
+                  this.userMedia.current.text.table[instance.contentId],
                   ins.instanceId,
                   ins.positioning,
                 );
@@ -329,12 +332,12 @@ class SharedBundleController extends SharedBundleSocket {
           }
           break;
         case "video":
-          if (this.userMedia.current.video.all[instance.contentId]) {
+          if (this.userMedia.current.video.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
               if (this.tableStaticContentSocket.current)
-                this.userMedia.current.video.instances[ins.instanceId] =
-                  new VideoMediaInstance(
-                    this.userMedia.current.video.all[instance.contentId],
+                this.userMedia.current.video.tableInstances[ins.instanceId] =
+                  new TableVideoMediaInstance(
+                    this.userMedia.current.video.table[instance.contentId],
                     ins.instanceId,
                     this.userDevice,
                     this.deadbanding,
@@ -367,7 +370,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            const newVideoMedia = new VideoMedia(
+            const newVideoMedia = new TableVideoMedia(
               contentId,
               filename,
               mimeType,
@@ -380,10 +383,10 @@ class SharedBundleController extends SharedBundleSocket {
               this.tableStaticContentSocket.current.removeMessageListener,
             );
 
-            this.userMedia.current.video.all[contentId] = newVideoMedia;
+            this.userMedia.current.video.table[contentId] = newVideoMedia;
 
-            this.userMedia.current.video.instances[instanceId] =
-              new VideoMediaInstance(
+            this.userMedia.current.video.tableInstances[instanceId] =
+              new TableVideoMediaInstance(
                 newVideoMedia,
                 instanceId,
                 this.userDevice,
@@ -421,7 +424,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            const newImageMedia = new ImageMedia(
+            const newImageMedia = new TableImageMedia(
               contentId,
               filename,
               mimeType,
@@ -433,10 +436,10 @@ class SharedBundleController extends SharedBundleSocket {
               this.tableStaticContentSocket.current.removeMessageListener,
             );
 
-            this.userMedia.current.image.all[contentId] = newImageMedia;
+            this.userMedia.current.image.table[contentId] = newImageMedia;
 
-            this.userMedia.current.image.instances[instanceId] =
-              new ImageMediaInstance(
+            this.userMedia.current.image.tableInstances[instanceId] =
+              new TableImageMediaInstance(
                 newImageMedia,
                 instanceId,
                 this.userEffectsStyles,
@@ -465,7 +468,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            this.userMedia.current.image.all[contentId] = new ImageMedia(
+            this.userMedia.current.image.table[contentId] = new TableImageMedia(
               contentId,
               filename,
               mimeType,
@@ -487,7 +490,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            const newSvgMedia = new SvgMedia(
+            const newSvgMedia = new TableSvgMedia(
               contentId,
               filename,
               mimeType,
@@ -497,10 +500,10 @@ class SharedBundleController extends SharedBundleSocket {
               this.tableStaticContentSocket.current.removeMessageListener,
             );
 
-            this.userMedia.current.svg.all[contentId] = newSvgMedia;
+            this.userMedia.current.svg.table[contentId] = newSvgMedia;
 
-            this.userMedia.current.svg.instances[instanceId] =
-              new SvgMediaInstance(
+            this.userMedia.current.svg.tableInstances[instanceId] =
+              new TableSvgMediaInstance(
                 newSvgMedia,
                 instanceId,
                 this.userEffectsStyles,
@@ -528,7 +531,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            this.userMedia.current.svg.all[contentId] = new SvgMedia(
+            this.userMedia.current.svg.table[contentId] = new TableSvgMedia(
               contentId,
               filename,
               mimeType,
@@ -546,7 +549,7 @@ class SharedBundleController extends SharedBundleSocket {
         {
           const { contentId } = message.header;
 
-          this.userMedia.current.svg.all[contentId].reloadContent();
+          this.userMedia.current.svg.table[contentId].reloadContent();
 
           this.setRerender((prev) => !prev);
         }
@@ -557,7 +560,7 @@ class SharedBundleController extends SharedBundleSocket {
           const { filename, mimeType, state } = message.data;
 
           if (this.tableStaticContentSocket.current) {
-            const newTextMedia = new TextMedia(
+            const newTextMedia = new TableTextMedia(
               contentId,
               filename,
               mimeType,
@@ -567,10 +570,10 @@ class SharedBundleController extends SharedBundleSocket {
               this.tableStaticContentSocket.current.removeMessageListener,
             );
 
-            this.userMedia.current.text.all[contentId] = newTextMedia;
+            this.userMedia.current.text.table[contentId] = newTextMedia;
 
-            this.userMedia.current.text.instances[instanceId] =
-              new TextMediaInstance(newTextMedia, instanceId, {
+            this.userMedia.current.text.tableInstances[instanceId] =
+              new TableTextMediaInstance(newTextMedia, instanceId, {
                 position: {
                   left: 50,
                   top: 50,

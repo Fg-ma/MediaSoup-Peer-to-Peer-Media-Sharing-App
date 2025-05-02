@@ -23,7 +23,7 @@ export const useMediaContext = () => {
   const context = useContext(MediaContext);
   if (!context) {
     throw new Error(
-      "useMediaContext must be used within an MediaContextProvider"
+      "useMediaContext must be used within an MediaContextProvider",
     );
   }
   return context;
@@ -35,12 +35,12 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     screen: {},
     screenAudio: {},
     audio: undefined,
-    video: { all: {}, instances: {} },
-    image: { all: {}, instances: {} },
-    svg: { all: {}, instances: {} },
-    application: { all: {}, instances: {} },
-    text: { all: {}, instances: {} },
-    soundClip: { all: {}, instances: {} },
+    video: { user: {}, table: {}, tableInstances: {} },
+    image: { user: {}, table: {}, tableInstances: {} },
+    svg: { user: {}, table: {}, tableInstances: {} },
+    application: { user: {}, table: {}, tableInstances: {} },
+    text: { user: {}, table: {}, tableInstances: {} },
+    soundClip: { user: {}, table: {}, tableInstances: {} },
     gamesSignaling: undefined,
     games: {},
   });

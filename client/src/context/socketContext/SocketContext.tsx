@@ -2,6 +2,7 @@ import React, { createContext, useContext, useRef } from "react";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import UserStaticContentSocketController from "src/serverControllers/userStaticContentServer/UserStaticContentSocketController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;
@@ -14,6 +15,9 @@ export interface SocketContextType {
   >;
   tableStaticContentSocket: React.MutableRefObject<
     TableStaticContentSocketController | undefined
+  >;
+  userStaticContentSocket: React.MutableRefObject<
+    UserStaticContentSocketController | undefined
   >;
 }
 
@@ -37,6 +41,9 @@ export function SocketContextProvider({
   const tableStaticContentSocket = useRef<
     TableStaticContentSocketController | undefined
   >();
+  const userStaticContentSocket = useRef<
+    UserStaticContentSocketController | undefined
+  >();
 
   return (
     <SocketContext.Provider
@@ -44,6 +51,7 @@ export function SocketContextProvider({
         tableSocket,
         mediasoupSocket,
         tableStaticContentSocket,
+        userStaticContentSocket,
       }}
     >
       {children}

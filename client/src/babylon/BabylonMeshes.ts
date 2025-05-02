@@ -18,7 +18,6 @@ import {
   IAxisDragGizmo,
 } from "@babylonjs/core";
 import { Delaunay } from "d3-delaunay";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
 import MeshLoaders from "./MeshLoaders";
 import {
   DefaultMeshPlacementType,

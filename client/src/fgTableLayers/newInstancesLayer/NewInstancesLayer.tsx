@@ -141,7 +141,7 @@ export default function NewInstancesLayer({
             instance.contentType !== "soundClip"
           ) {
             const media =
-              userMedia.current[instance.contentType].all[instance.contentId];
+              userMedia.current[instance.contentType].table[instance.contentId];
 
             if (media?.blobURL) {
               imgSrc = media.blobURL;

@@ -220,12 +220,20 @@ type onSearchTabledContentRequestType = {
     username: string;
     instance: string;
     contentType: StaticContentTypes | "all";
+  };
+  data: {
     name: string;
   };
 };
 
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
+  | onSoundClipUploadedToTableType
+  | onSoundClipUploadedToTabledType
+  | onSoundClipReuploadedType
+  | onApplicationUploadedToTableType
+  | onApplicationUploadedToTabledType
+  | onApplicationReuploadedType
   | onVideoUploadedToTableType
   | onVideoUploadedToTabledType
   | onVideoReuploadedType

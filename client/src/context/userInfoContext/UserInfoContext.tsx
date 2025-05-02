@@ -8,6 +8,7 @@ export interface UserInfoContextProviderProps {
 }
 
 export interface UserInfoContextType {
+  userId: React.MutableRefObject<string>;
   tableId: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
@@ -32,6 +33,7 @@ export const useUserInfoContext = () => {
 export function UserInfoContextProvider({
   children,
 }: UserInfoContextProviderProps) {
+  const userId = useRef("");
   const tableId = useRef("");
   const username = useRef("");
   const instance = useRef(uuidv4());
@@ -40,7 +42,7 @@ export function UserInfoContextProvider({
 
   return (
     <UserInfoContext.Provider
-      value={{ tableId, username, instance, preferences, device }}
+      value={{ userId, tableId, username, instance, preferences, device }}
     >
       {children}
     </UserInfoContext.Provider>

@@ -29,6 +29,7 @@ import "./css/scrollbar.css";
 import "./css/fontStyles.css";
 import "./css/tips.css";
 import CreditPage from "./creditPage/CreditPage";
+import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -41,8 +42,8 @@ export default function Main() {
     captureEffectsStyles,
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
-  const { mediasoupSocket } = useSocketContext();
-  const { tableId, username, instance, device } = useUserInfoContext();
+  const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
+  const { userId, tableId, username, instance, device } = useUserInfoContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -76,6 +77,18 @@ export default function Main() {
   const [gridSize, setGridSize] = useState({ rows: 4, cols: 4 });
 
   const [_rerender, setRerender] = useState(false);
+
+  const signIn = (signedInUserId: string) => {
+    userId.current = signedInUserId;
+
+    userStaticContentSocket.current = new UserStaticContentSocketController(
+      "wss://localhost:8049",
+      userId.current,
+      username.current,
+      instance.current,
+      userMedia,
+    );
+  };
 
   const muteAudio = (
     producerType: "audio" | "screenAudio",

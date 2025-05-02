@@ -312,6 +312,8 @@ class TableStaticContentSocketController {
         username: this.username,
         instance: this.instance,
         contentType,
+      },
+      data: {
         name,
       },
     });
@@ -341,27 +343,23 @@ class TableStaticContentSocketController {
   private onContentDeleted = (event: onContentDeletedType) => {
     const { contentType, contentId, instanceId } = event.header;
 
-    if (
-      this.userMedia.current[contentType] &&
-      this.userMedia.current[contentType].instances[instanceId]
-    ) {
-      this.userMedia.current[contentType].instances[instanceId].deconstructor();
-      delete this.userMedia.current[contentType].instances[instanceId];
+    if (this.userMedia.current[contentType].tableInstances[instanceId]) {
+      this.userMedia.current[contentType].tableInstances[
+        instanceId
+      ].deconstructor();
+      delete this.userMedia.current[contentType].tableInstances[instanceId];
     }
 
     if (
-      this.userMedia.current[contentType] &&
-      Object.keys(this.userMedia.current[contentType].instances).length === 0 &&
-      this.userMedia.current[contentType].all[contentId] &&
-      !this.userMedia.current[contentType].all[contentId].state.includes(
+      Object.keys(this.userMedia.current[contentType].tableInstances).length ===
+        0 &&
+      this.userMedia.current[contentType].table[contentId] &&
+      !this.userMedia.current[contentType].table[contentId].state.includes(
         "tabled",
-      ) &&
-      !this.userMedia.current[contentType].all[contentId].state.includes(
-        "muteStyle",
       )
     ) {
-      this.userMedia.current[contentType].all[contentId].deconstructor();
-      delete this.userMedia.current[contentType].all[contentId];
+      this.userMedia.current[contentType].table[contentId].deconstructor();
+      delete this.userMedia.current[contentType].table[contentId];
     }
   };
 
@@ -369,7 +367,7 @@ class TableStaticContentSocketController {
     const { contentType, contentId } = event.header;
     const { state } = event.data;
 
-    this.userMedia.current[contentType].all[contentId].setState(state);
+    this.userMedia.current[contentType].table[contentId].setState(state);
   };
 
   private onRequestedCatchUpVideoPosition = (
@@ -379,8 +377,8 @@ class TableStaticContentSocketController {
       event.header;
 
     const currentVideoPosition =
-      this.userMedia.current[contentType].instances[instanceId]?.instanceVideo
-        ?.currentTime;
+      this.userMedia.current[contentType].tableInstances[instanceId]
+        ?.instanceVideo?.currentTime;
 
     if (currentVideoPosition) {
       this.sendMessage({
@@ -407,10 +405,11 @@ class TableStaticContentSocketController {
     const { currentVideoPosition } = event.data;
 
     if (
-      this.userMedia.current[contentType].instances[instanceId] &&
-      this.userMedia.current[contentType].instances[instanceId].instanceVideo
+      this.userMedia.current[contentType].tableInstances[instanceId] &&
+      this.userMedia.current[contentType].tableInstances[instanceId]
+        .instanceVideo
     )
-      this.userMedia.current[contentType].instances[
+      this.userMedia.current[contentType].tableInstances[
         instanceId
       ].instanceVideo.currentTime = currentVideoPosition;
   };

@@ -166,6 +166,8 @@ export type onSearchTabledContentRequestType = {
     username: string;
     instance: string;
     contentType: StaticContentTypes | "all";
+  };
+  data: {
     name: string;
   };
 };

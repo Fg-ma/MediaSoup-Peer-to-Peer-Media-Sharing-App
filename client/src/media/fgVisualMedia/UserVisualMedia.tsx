@@ -449,7 +449,7 @@ export default function UserVisualMedia({
         userMedia.current[type][visualMediaId].canvas,
       );
     }
-  }, [visualMediaId, userMedia]);
+  }, [visualMediaId]);
 
   useEffect(() => {
     if (

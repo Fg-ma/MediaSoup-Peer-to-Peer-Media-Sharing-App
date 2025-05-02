@@ -88,7 +88,7 @@ export default function MuteStylePage({
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
-          {Object.entries(userMedia.current.svg.all).map(
+          {Object.entries(userMedia.current.svg.user).map(
             ([svgId, svgMedia]) =>
               svgMedia.state.includes("muteStyle") && (
                 <FgButton

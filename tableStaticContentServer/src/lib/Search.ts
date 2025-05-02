@@ -19,7 +19,8 @@ class Search {
   onSearchTabledContentRequest = async (
     event: onSearchTabledContentRequestType
   ) => {
-    const { tableId, username, instance, contentType, name } = event.header;
+    const { tableId, username, instance, contentType } = event.header;
+    const { name } = event.data;
 
     // build your list of indices
     let indices: string;

@@ -174,66 +174,69 @@ class JoinTableSectionController {
       delete this.userMedia.current.screenAudio[screenAudioId];
     }
 
-    for (const applicationId in this.userMedia.current.application.all) {
-      this.userMedia.current.application.all[applicationId].deconstructor();
-      delete this.userMedia.current.application.all[applicationId];
+    for (const applicationId in this.userMedia.current.application.table) {
+      this.userMedia.current.application.table[applicationId].deconstructor();
+      delete this.userMedia.current.application.table[applicationId];
     }
 
-    for (const applicationId in this.userMedia.current.application.instances) {
-      this.userMedia.current.application.instances[
+    for (const applicationId in this.userMedia.current.application
+      .tableInstances) {
+      this.userMedia.current.application.tableInstances[
         applicationId
       ].deconstructor();
-      delete this.userMedia.current.application.instances[applicationId];
+      delete this.userMedia.current.application.tableInstances[applicationId];
     }
 
-    for (const imageId in this.userMedia.current.image.all) {
-      this.userMedia.current.image.all[imageId].deconstructor();
-      delete this.userMedia.current.image.all[imageId];
+    for (const imageId in this.userMedia.current.image.table) {
+      this.userMedia.current.image.table[imageId].deconstructor();
+      delete this.userMedia.current.image.table[imageId];
     }
 
-    for (const imageId in this.userMedia.current.image.instances) {
-      this.userMedia.current.image.instances[imageId].deconstructor();
-      delete this.userMedia.current.image.instances[imageId];
+    for (const imageId in this.userMedia.current.image.tableInstances) {
+      this.userMedia.current.image.tableInstances[imageId].deconstructor();
+      delete this.userMedia.current.image.tableInstances[imageId];
     }
 
-    for (const soundClipId in this.userMedia.current.soundClip.all) {
-      this.userMedia.current.soundClip.all[soundClipId].deconstructor();
-      delete this.userMedia.current.soundClip.all[soundClipId];
+    for (const soundClipId in this.userMedia.current.soundClip.table) {
+      this.userMedia.current.soundClip.table[soundClipId].deconstructor();
+      delete this.userMedia.current.soundClip.table[soundClipId];
     }
 
-    for (const soundClipId in this.userMedia.current.soundClip.instances) {
-      this.userMedia.current.soundClip.instances[soundClipId].deconstructor();
-      delete this.userMedia.current.soundClip.instances[soundClipId];
+    for (const soundClipId in this.userMedia.current.soundClip.tableInstances) {
+      this.userMedia.current.soundClip.tableInstances[
+        soundClipId
+      ].deconstructor();
+      delete this.userMedia.current.soundClip.tableInstances[soundClipId];
     }
 
-    for (const svgId in this.userMedia.current.svg.all) {
-      this.userMedia.current.svg.all[svgId].deconstructor();
-      delete this.userMedia.current.svg.all[svgId];
+    for (const svgId in this.userMedia.current.svg.table) {
+      this.userMedia.current.svg.table[svgId].deconstructor();
+      delete this.userMedia.current.svg.table[svgId];
     }
 
-    for (const svgId in this.userMedia.current.svg.instances) {
-      this.userMedia.current.svg.instances[svgId].deconstructor();
-      delete this.userMedia.current.svg.instances[svgId];
+    for (const svgId in this.userMedia.current.svg.tableInstances) {
+      this.userMedia.current.svg.tableInstances[svgId].deconstructor();
+      delete this.userMedia.current.svg.tableInstances[svgId];
     }
 
-    for (const textId in this.userMedia.current.text.instances) {
-      this.userMedia.current.text.instances[textId].deconstructor();
-      delete this.userMedia.current.text.instances[textId];
+    for (const textId in this.userMedia.current.text.tableInstances) {
+      this.userMedia.current.text.tableInstances[textId].deconstructor();
+      delete this.userMedia.current.text.tableInstances[textId];
     }
 
-    for (const textId in this.userMedia.current.text.all) {
-      this.userMedia.current.text.all[textId].deconstructor();
-      delete this.userMedia.current.text.all[textId];
+    for (const textId in this.userMedia.current.text.table) {
+      this.userMedia.current.text.table[textId].deconstructor();
+      delete this.userMedia.current.text.table[textId];
     }
 
-    for (const videoId in this.userMedia.current.video.all) {
-      this.userMedia.current.video.all[videoId].deconstructor();
-      delete this.userMedia.current.video.all[videoId];
+    for (const videoId in this.userMedia.current.video.table) {
+      this.userMedia.current.video.table[videoId].deconstructor();
+      delete this.userMedia.current.video.table[videoId];
     }
 
-    for (const videoId in this.userMedia.current.video.instances) {
-      this.userMedia.current.video.instances[videoId].deconstructor();
-      delete this.userMedia.current.video.instances[videoId];
+    for (const videoId in this.userMedia.current.video.tableInstances) {
+      this.userMedia.current.video.tableInstances[videoId].deconstructor();
+      delete this.userMedia.current.video.tableInstances[videoId];
     }
 
     if (this.userMedia.current.audio) {

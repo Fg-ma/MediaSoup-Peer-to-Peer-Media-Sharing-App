@@ -208,13 +208,13 @@ export default function FgAudioElement({
       className="h-full w-full"
       contentFunction={() =>
         (localMute.current || clientMute.current) &&
-        Object.entries(userMedia.current.svg.all).find(
+        Object.entries(userMedia.current.svg.user).find(
           ([svgId]) => svgId === settings.muteStyle.value,
         ) !== undefined ? (
           <FgSVGElement
             externalRef={svgRef}
             src={
-              Object.entries(userMedia.current.svg.all).find(
+              Object.entries(userMedia.current.svg.user).find(
                 ([svgId]) => svgId === settings.muteStyle.value,
               )?.[1].blobURL ?? ""
             }
