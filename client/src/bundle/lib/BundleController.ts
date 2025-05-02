@@ -19,7 +19,7 @@ class BundleController extends BundleSocket {
       MediasoupSocketController | undefined
     >,
     isUser: boolean,
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     bundleOptions: BundleOptions,
@@ -77,7 +77,7 @@ class BundleController extends BundleSocket {
     super(
       mediasoupSocket,
       isUser,
-      table_id,
+      tableId,
       username,
       instance,
       bundleOptions,
@@ -242,14 +242,14 @@ class BundleController extends BundleSocket {
     switch (message.type) {
       case "localMuteChange":
         const {
-          table_id: newTable_id,
+          tableId: newTable_id,
           username: newUsername,
           instance: newInstance,
           producerType: newProducerType,
           producerId: newProducerId,
         } = message.header;
         if (
-          newTable_id === this.table_id &&
+          newTable_id === this.tableId &&
           newUsername === this.username &&
           newInstance === this.instance
         ) {

@@ -6,7 +6,7 @@ class AudioSectionController {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
@@ -19,8 +19,8 @@ class AudioSectionController {
   ) {}
 
   shareAudio = () => {
-    if (!this.table_id.current || !this.username.current) {
-      console.error("Missing table_id or username!");
+    if (!this.tableId.current || !this.username.current) {
+      console.error("Missing tableId or username!");
       return;
     }
     this.handleDisableEnableBtns(true);
@@ -33,7 +33,7 @@ class AudioSectionController {
       this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           username: this.username.current,
           instance: this.instance.current,
           producerType: "audio",

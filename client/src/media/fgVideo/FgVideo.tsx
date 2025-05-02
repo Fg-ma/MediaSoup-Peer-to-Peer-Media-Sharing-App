@@ -330,7 +330,7 @@ export default function FgVideo({
           settingsActive={settingsActive}
         />,
         // <AudioEffectsButton
-        //   table_id={table_id.current}
+        //   tableId={tableId.current}
         //   username={username.current}
         //   instance={instance.current}
         //   isUser={false}

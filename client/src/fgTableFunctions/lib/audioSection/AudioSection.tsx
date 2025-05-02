@@ -41,7 +41,7 @@ export default function AudioSection({
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { mediasoupSocket } = useSocketContext();
-  const { table_id, username, instance } = useUserInfoContext();
+  const { tableId, username, instance } = useUserInfoContext();
 
   const [volumeState, setVolumeState] = useState<{
     from: "off" | "low" | "high" | "";
@@ -54,7 +54,7 @@ export default function AudioSection({
   const audioSectionController = useRef(
     new AudioSectionController(
       mediasoupSocket,
-      table_id,
+      tableId,
       username,
       instance,
       producersController,

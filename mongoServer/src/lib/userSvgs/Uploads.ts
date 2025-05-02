@@ -1,17 +1,21 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
+import { UserContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { userStateEncodingMap } from "../typeConstant";
+import { UserSvgsType } from "./typeConstant";
 
 class Uploads {
   constructor(
-    private userSvgsCollection: Collection,
+    private userSvgsCollection: Collection<UserSvgsType>,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
-    user_id: string;
+    userId: string;
     svgId: string;
     filename: string;
     mimeType: string;
+    state: UserContentStateTypes[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -23,10 +27,11 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { user_id: string; svgId: string },
+    filter: { userId: string; svgId: string },
     updateData: Partial<{
       filename?: string;
       mimeType?: string;
+      state?: UserContentStateTypes[];
     }>
   ) => {
     if (!this.userSvgsCollection) {
@@ -44,9 +49,15 @@ class Uploads {
       updateFields["m"] = updateData.mimeType;
     }
 
+    if (updateData.state !== undefined) {
+      updateFields["s"] = updateData.state.map(
+        (ate) => userStateEncodingMap[ate]
+      );
+    }
+
     try {
       const result = await this.userSvgsCollection.updateOne(
-        { tid: filter.user_id, sid: filter.svgId },
+        { tid: filter.userId, sid: filter.svgId },
         { $set: updateFields }
       );
       return result;

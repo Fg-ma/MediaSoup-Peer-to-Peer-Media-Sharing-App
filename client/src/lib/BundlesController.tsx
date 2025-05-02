@@ -9,7 +9,7 @@ class BundlesController {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
@@ -32,7 +32,7 @@ class BundlesController {
 
     private muteAudio: (
       producerType: "audio" | "screenAudio",
-      producerId: string | undefined
+      producerId: string | undefined,
     ) => void,
 
     private setUpEffectContext: (
@@ -40,13 +40,13 @@ class BundlesController {
       instance: string,
       cameraIds: (string | undefined)[],
       screenIds: (string | undefined)[],
-      screenAudioIds: (string | undefined)[]
+      screenAudioIds: (string | undefined)[],
     ) => void,
 
     private permissions: React.MutableRefObject<Permissions>,
 
     private handleDisableEnableBtns: (disabled: boolean) => void,
-    private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>
+    private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   createProducerBundle = () => {
@@ -74,7 +74,7 @@ class BundlesController {
 
       const newBundle = (
         <Bundle
-          table_id={this.table_id.current}
+          tableId={this.tableId.current}
           username={this.username.current}
           instance={this.instance.current}
           initCameraStreams={
@@ -123,7 +123,7 @@ class BundlesController {
     remoteScreenAudioStreams: {
       [screenAudioId: string]: MediaStream;
     },
-    remoteAudioStream: MediaStream | undefined
+    remoteAudioStream: MediaStream | undefined,
   ) => {
     if (
       !this.bundles[trackUsername] ||
@@ -134,12 +134,12 @@ class BundlesController {
         trackInstance,
         Object.keys(remoteCameraStreams),
         Object.keys(remoteScreenStreams),
-        Object.keys(remoteScreenAudioStreams)
+        Object.keys(remoteScreenAudioStreams),
       );
 
       const newBundle = (
         <Bundle
-          table_id={this.table_id.current}
+          tableId={this.tableId.current}
           username={trackUsername}
           instance={trackInstance}
           initCameraStreams={
@@ -162,7 +162,7 @@ class BundlesController {
             this.mediasoupSocket.current?.sendMessage({
               type: "requestPermissions",
               header: {
-                table_id: this.table_id.current,
+                tableId: this.tableId.current,
                 inquiringUsername: this.username.current,
                 inquiringInstance: this.instance.current,
                 inquiredUsername: trackUsername,
@@ -173,7 +173,7 @@ class BundlesController {
             this.mediasoupSocket.current?.sendMessage({
               type: "requestBundleMetadata",
               header: {
-                table_id: this.table_id.current,
+                tableId: this.tableId.current,
                 inquiringUsername: this.username.current,
                 inquiringInstance: this.instance.current,
                 inquiredUsername: trackUsername,
@@ -185,7 +185,7 @@ class BundlesController {
             this.mediasoupSocket.current?.sendMessage({
               type: "requestClientMuteState",
               header: {
-                table_id: this.table_id.current,
+                tableId: this.tableId.current,
                 username: this.username.current,
                 instance: this.instance.current,
                 producerUsername: trackUsername,

@@ -5,8 +5,8 @@ import {
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import { svgEffectEncodingMap, TableSvgsType } from "./typeConstant";
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
-import { stateEncodingMap } from "../typeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { tableStateEncodingMap } from "../typeConstant";
 
 class Uploads {
   constructor(
@@ -15,11 +15,11 @@ class Uploads {
   ) {}
 
   uploadMetaData = async (data: {
-    table_id: string;
+    tableId: string;
     svgId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       svgInstanceId: string;
       positioning: {
@@ -49,9 +49,9 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { table_id: string; svgId: string },
+    filter: { tableId: string; svgId: string },
     updateData: Partial<{
-      state?: ContentStateTypes[];
+      state?: TableContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -86,14 +86,14 @@ class Uploads {
 
     if (updateData.state !== undefined) {
       generalSetFields["s"] = updateData.state.map(
-        (ate) => stateEncodingMap[ate]
+        (ate) => tableStateEncodingMap[ate]
       );
     }
 
     if (Object.keys(generalSetFields).length > 0) {
       bulkOps.push({
         updateOne: {
-          filter: { tid: filter.table_id, sid: filter.svgId },
+          filter: { tid: filter.tableId, sid: filter.svgId },
           update: { $set: generalSetFields },
         },
       });
@@ -168,7 +168,7 @@ class Uploads {
           bulkOps.push({
             updateOne: {
               filter: {
-                tid: filter.table_id,
+                tid: filter.tableId,
                 sid: filter.svgId,
                 "i.siid": svgInstanceId,
               },
@@ -191,7 +191,7 @@ class Uploads {
   };
 
   addNewInstances = async (
-    filter: { table_id: string; svgId: string },
+    filter: { tableId: string; svgId: string },
     updateData: {
       svgInstanceId: string;
       positioning: {
@@ -264,7 +264,7 @@ class Uploads {
       try {
         const result = await this.tableSvgsCollection.updateOne(
           {
-            tid: filter.table_id,
+            tid: filter.tableId,
             sid: filter.svgId,
           },
           {

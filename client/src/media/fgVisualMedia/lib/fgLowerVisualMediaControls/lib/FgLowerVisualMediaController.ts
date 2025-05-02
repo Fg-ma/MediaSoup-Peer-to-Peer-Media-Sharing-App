@@ -67,7 +67,7 @@ class FgLowerVisualMediaController {
       MediasoupSocketController | undefined
     >,
     private visualMediaId: string,
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private type: "camera" | "screen",
@@ -176,7 +176,7 @@ class FgLowerVisualMediaController {
       this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: this.type,
@@ -188,7 +188,7 @@ class FgLowerVisualMediaController {
         this.mediasoupSocket.current?.sendMessage({
           type: "removeProducer",
           header: {
-            table_id: this.table_id,
+            tableId: this.tableId,
             username: this.username,
             instance: this.instance,
             producerType: "screenAudio",
@@ -200,7 +200,7 @@ class FgLowerVisualMediaController {
       this.mediasoupSocket.current?.sendMessage({
         type: "requestRemoveProducer",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: this.type,
@@ -212,7 +212,7 @@ class FgLowerVisualMediaController {
         this.mediasoupSocket.current?.sendMessage({
           type: "requestRemoveProducer",
           header: {
-            table_id: this.table_id,
+            tableId: this.tableId,
             username: this.username,
             instance: this.instance,
             producerType: "screenAudio",

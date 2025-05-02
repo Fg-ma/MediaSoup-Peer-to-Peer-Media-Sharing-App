@@ -8,10 +8,10 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getImageMetaDataBy_TID_IID = async (table_id: string, imageId: string) => {
+  getImageMetaDataBy_TID_IID = async (tableId: string, imageId: string) => {
     try {
       const imageData = await this.tableImagesCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         iid: imageId,
       });
 
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const imageData = await this.tableImagesCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!imageData || imageData.length === 0) {

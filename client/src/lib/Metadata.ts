@@ -14,13 +14,13 @@ class Metadata {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
     private userMedia: React.MutableRefObject<UserMediaType>,
     private mutedAudioRef: React.MutableRefObject<boolean>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>
+    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
   ) {}
 
   onRequestedCatchUpData = (event: onRequestedCatchUpDataType) => {
@@ -57,7 +57,7 @@ class Metadata {
     } else if (inquiredType === "audio") {
       const dataPositioningValue = document
         .getElementById(
-          `${this.username.current}_${this.instance.current}_audio_element_container`
+          `${this.username.current}_${this.instance.current}_audio_element_container`,
         )
         ?.getAttribute("data-positioning");
       const positioning = JSON.parse(dataPositioningValue || "{}");
@@ -69,7 +69,7 @@ class Metadata {
     this.mediasoupSocket.current?.sendMessage({
       type: "responseCatchUpData",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         inquiringUsername,
         inquiringInstance,
         inquiredUsername: this.username.current,
@@ -87,7 +87,7 @@ class Metadata {
     this.mediasoupSocket.current?.sendMessage({
       type: "bundleMetadataResponse",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         inquiringUsername,
         inquiringInstance,
         inquiredUsername: this.username.current,

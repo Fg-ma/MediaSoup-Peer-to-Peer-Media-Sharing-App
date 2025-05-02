@@ -13,7 +13,7 @@ class MediasoupCleanup {
   constructor() {}
 
   clearTableConsumers(
-    table_id: string,
+    tableId: string,
     username: string,
     instance?: string,
     producerUsername?: string,
@@ -26,14 +26,14 @@ class MediasoupCleanup {
       producerInstance &&
       producerType &&
       Object.keys(
-        tableConsumers[table_id][username][instance][producerUsername][
+        tableConsumers[tableId][username][instance][producerUsername][
           producerInstance
         ][producerType] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableConsumers[table_id][username][instance][producerUsername][
+      delete tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ][producerType];
     }
@@ -43,14 +43,14 @@ class MediasoupCleanup {
       producerUsername &&
       producerInstance &&
       Object.keys(
-        tableConsumers[table_id][username][instance][producerUsername][
+        tableConsumers[tableId][username][instance][producerUsername][
           producerInstance
         ] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableConsumers[table_id][username][instance][producerUsername][
+      delete tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ];
     }
@@ -59,48 +59,48 @@ class MediasoupCleanup {
       instance &&
       producerUsername &&
       Object.keys(
-        tableConsumers[table_id][username][instance][producerUsername] || {
+        tableConsumers[tableId][username][instance][producerUsername] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableConsumers[table_id][username][instance][producerUsername];
+      delete tableConsumers[tableId][username][instance][producerUsername];
     }
 
     if (
       instance &&
       Object.keys(
-        tableConsumers[table_id][username][instance] || {
+        tableConsumers[tableId][username][instance] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableConsumers[table_id][username][instance];
+      delete tableConsumers[tableId][username][instance];
     }
 
     if (
       Object.keys(
-        tableConsumers[table_id][username] || {
+        tableConsumers[tableId][username] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableConsumers[table_id][username];
+      delete tableConsumers[tableId][username];
 
       if (
         Object.keys(
-          tableConsumers[table_id] || {
+          tableConsumers[tableId] || {
             break: true,
           }
         ).length === 0
       ) {
-        delete tableConsumers[table_id];
+        delete tableConsumers[tableId];
       }
     }
   }
 
   clearTableProducers(
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     producerType?: ProducerTypes
@@ -108,163 +108,159 @@ class MediasoupCleanup {
     if (
       producerType &&
       Object.keys(
-        tableProducers[table_id][username][instance][producerType] || {
+        tableProducers[tableId][username][instance][producerType] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableProducers[table_id][username][instance][producerType];
+      delete tableProducers[tableId][username][instance][producerType];
     }
 
     if (
       Object.keys(
-        tableProducers[table_id][username][instance] || {
+        tableProducers[tableId][username][instance] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableProducers[table_id][username][instance];
+      delete tableProducers[tableId][username][instance];
     }
 
     if (
       Object.keys(
-        tableProducers[table_id][username] || {
+        tableProducers[tableId][username] || {
           break: true,
         }
       ).length === 0
     ) {
-      delete tableProducers[table_id][username];
+      delete tableProducers[tableId][username];
 
       if (
         Object.keys(
-          tableProducers[table_id] || {
+          tableProducers[tableId] || {
             break: true,
           }
         ).length === 0
       ) {
-        delete tableProducers[table_id];
+        delete tableProducers[tableId];
       }
     }
   }
 
   deleteProducerTransports(
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string
   ) {
     if (
-      tableProducerTransports[table_id] &&
-      tableProducerTransports[table_id][username] &&
-      tableProducerTransports[table_id][username][instance]
+      tableProducerTransports[tableId] &&
+      tableProducerTransports[tableId][username] &&
+      tableProducerTransports[tableId][username][instance]
     ) {
-      tableProducerTransports[table_id][username][instance].transport.close();
-      delete tableProducerTransports[table_id][username][instance];
+      tableProducerTransports[tableId][username][instance].transport.close();
+      delete tableProducerTransports[tableId][username][instance];
 
       if (
         Object.keys(
-          tableProducerTransports[table_id][username] || {
+          tableProducerTransports[tableId][username] || {
             break: true,
           }
         ).length === 0
       ) {
-        delete tableProducerTransports[table_id][username];
+        delete tableProducerTransports[tableId][username];
 
         if (
-          Object.keys(tableProducerTransports[table_id] || { break: true })
+          Object.keys(tableProducerTransports[tableId] || { break: true })
             .length === 0
         ) {
-          delete tableProducerTransports[table_id];
+          delete tableProducerTransports[tableId];
         }
       }
     }
   }
 
-  deleteConsumerTransport(
-    table_id: string,
-    username: string,
-    instance: string
-  ) {
+  deleteConsumerTransport(tableId: string, username: string, instance: string) {
     if (
-      tableConsumerTransports[table_id] &&
-      tableConsumerTransports[table_id][username] &&
-      tableConsumerTransports[table_id][username][instance]
+      tableConsumerTransports[tableId] &&
+      tableConsumerTransports[tableId][username] &&
+      tableConsumerTransports[tableId][username][instance]
     ) {
-      tableConsumerTransports[table_id][username][instance].transport.close();
-      delete tableConsumerTransports[table_id][username][instance];
+      tableConsumerTransports[tableId][username][instance].transport.close();
+      delete tableConsumerTransports[tableId][username][instance];
 
       if (
         Object.keys(
-          tableConsumerTransports[table_id][username] || {
+          tableConsumerTransports[tableId][username] || {
             break: true,
           }
         ).length === 0
       ) {
-        delete tableConsumerTransports[table_id][username];
+        delete tableConsumerTransports[tableId][username];
 
         if (
           Object.keys(
-            tableConsumerTransports[table_id] || {
+            tableConsumerTransports[tableId] || {
               break: true,
             }
           ).length === 0
         ) {
-          delete tableConsumerTransports[table_id];
+          delete tableConsumerTransports[tableId];
         }
       }
     }
   }
 
-  releaseWorkers(table_id: string) {
+  releaseWorkers(tableId: string) {
     if (
-      !tableProducerTransports[table_id] &&
-      !tableConsumerTransports[table_id]
+      !tableProducerTransports[tableId] &&
+      !tableConsumerTransports[tableId]
     ) {
-      releaseWorker(workersMap[table_id]);
-      delete workersMap[table_id];
+      releaseWorker(workersMap[tableId]);
+      delete workersMap[tableId];
     }
   }
 
-  deleteProducerInstance(table_id: string, username: string, instance: string) {
+  deleteProducerInstance(tableId: string, username: string, instance: string) {
     if (
-      tableProducers[table_id] &&
-      tableProducers[table_id][username] &&
-      tableProducers[table_id][username][instance]
+      tableProducers[tableId] &&
+      tableProducers[tableId][username] &&
+      tableProducers[tableId][username][instance]
     ) {
-      delete tableProducers[table_id][username][instance];
+      delete tableProducers[tableId][username][instance];
 
-      this.clearTableProducers(table_id, username, instance);
+      this.clearTableProducers(tableId, username, instance);
     }
   }
 
-  deleteConsumerInstance(table_id: string, username: string, instance: string) {
+  deleteConsumerInstance(tableId: string, username: string, instance: string) {
     if (
-      tableConsumers[table_id] &&
-      tableConsumers[table_id][username] &&
-      tableConsumers[table_id][username][instance]
+      tableConsumers[tableId] &&
+      tableConsumers[tableId][username] &&
+      tableConsumers[tableId][username][instance]
     ) {
-      delete tableConsumers[table_id][username][instance];
+      delete tableConsumers[tableId][username][instance];
 
-      this.clearTableConsumers(table_id, username);
+      this.clearTableConsumers(tableId, username);
     }
 
-    for (const consumerUsername in tableConsumers[table_id]) {
-      for (const consumerInstance in tableConsumers[table_id][
+    for (const consumerUsername in tableConsumers[tableId]) {
+      for (const consumerInstance in tableConsumers[tableId][
         consumerUsername
       ]) {
-        for (const producerUsername in tableConsumers[table_id][
+        for (const producerUsername in tableConsumers[tableId][
           consumerUsername
         ][consumerInstance]) {
           if (producerUsername === username) {
-            for (const producerInstance in tableConsumers[table_id][
+            for (const producerInstance in tableConsumers[tableId][
               consumerUsername
             ][consumerInstance][producerUsername]) {
               if (producerInstance === instance) {
-                delete tableConsumers[table_id][consumerUsername][
+                delete tableConsumers[tableId][consumerUsername][
                   consumerInstance
                 ][producerUsername][producerInstance];
 
                 this.clearTableConsumers(
-                  table_id,
+                  tableId,
                   consumerUsername,
                   consumerInstance,
                   producerUsername,
@@ -279,7 +275,7 @@ class MediasoupCleanup {
   }
 
   removeProducer(
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     producerType: ProducerTypes,
@@ -289,17 +285,17 @@ class MediasoupCleanup {
     if (
       producerType === "json" &&
       dataStreamType &&
-      tableProducers[table_id] &&
-      tableProducers[table_id][username] &&
-      tableProducers[table_id][username][instance] &&
-      tableProducers[table_id][username][instance][producerType] &&
-      tableProducers[table_id][username][instance][producerType][dataStreamType]
+      tableProducers[tableId] &&
+      tableProducers[tableId][username] &&
+      tableProducers[tableId][username][instance] &&
+      tableProducers[tableId][username][instance][producerType] &&
+      tableProducers[tableId][username][instance][producerType][dataStreamType]
     ) {
-      delete tableProducers[table_id][username][instance][producerType][
+      delete tableProducers[tableId][username][instance][producerType][
         dataStreamType
       ];
 
-      this.clearTableProducers(table_id, username, instance, producerType);
+      this.clearTableProducers(tableId, username, instance, producerType);
     }
 
     if (
@@ -307,48 +303,47 @@ class MediasoupCleanup {
         producerType === "screen" ||
         producerType === "screenAudio") &&
       producerId &&
-      tableProducers[table_id] &&
-      tableProducers[table_id][username] &&
-      tableProducers[table_id][username][instance] &&
-      tableProducers[table_id][username][instance][producerType] &&
-      tableProducers[table_id][username][instance][producerType]?.[producerId]
+      tableProducers[tableId] &&
+      tableProducers[tableId][username] &&
+      tableProducers[tableId][username][instance] &&
+      tableProducers[tableId][username][instance][producerType] &&
+      tableProducers[tableId][username][instance][producerType]?.[producerId]
     ) {
-      delete tableProducers[table_id][username][instance][producerType]?.[
+      delete tableProducers[tableId][username][instance][producerType]?.[
         producerId
       ];
 
-      this.clearTableProducers(table_id, username, instance, producerType);
+      this.clearTableProducers(tableId, username, instance, producerType);
     }
 
     if (
       producerType === "audio" &&
-      tableProducers[table_id] &&
-      tableProducers[table_id][username] &&
-      tableProducers[table_id][username][instance] &&
-      tableProducers[table_id][username][instance][producerType]
+      tableProducers[tableId] &&
+      tableProducers[tableId][username] &&
+      tableProducers[tableId][username][instance] &&
+      tableProducers[tableId][username][instance][producerType]
     ) {
-      delete tableProducers[table_id][username][instance][
+      delete tableProducers[tableId][username][instance][
         producerType as "audio"
       ];
 
       if (
         Object.keys(
-          tableProducers[table_id][username][instance] || { break: true }
+          tableProducers[tableId][username][instance] || { break: true }
         ).length === 0
       ) {
-        delete tableProducers[table_id][username][instance];
+        delete tableProducers[tableId][username][instance];
 
         if (
-          Object.keys(tableProducers[table_id][username] || { break: true })
+          Object.keys(tableProducers[tableId][username] || { break: true })
             .length === 0
         ) {
-          delete tableProducers[table_id][username];
+          delete tableProducers[tableId][username];
 
           if (
-            Object.keys(tableProducers[table_id] || { break: true }).length ===
-            0
+            Object.keys(tableProducers[tableId] || { break: true }).length === 0
           ) {
-            delete tableProducers[table_id];
+            delete tableProducers[tableId];
           }
         }
       }
@@ -356,46 +351,46 @@ class MediasoupCleanup {
   }
 
   removeConsumer(
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     producerType: ProducerTypes,
     producerId?: string,
     dataStreamType?: DataStreamTypes
   ) {
-    for (const consumerUsername in tableConsumers[table_id]) {
-      for (const consumerInstance in tableConsumers[table_id][
+    for (const consumerUsername in tableConsumers[tableId]) {
+      for (const consumerInstance in tableConsumers[tableId][
         consumerUsername
       ]) {
-        for (const producerUsername in tableConsumers[table_id][
+        for (const producerUsername in tableConsumers[tableId][
           consumerUsername
         ][consumerInstance]) {
           if (producerUsername === username) {
-            for (const producerInstance in tableConsumers[table_id][
+            for (const producerInstance in tableConsumers[tableId][
               consumerUsername
             ][consumerInstance][producerUsername]) {
               if (producerInstance === instance) {
-                for (const iterProducerType in tableConsumers[table_id][
+                for (const iterProducerType in tableConsumers[tableId][
                   consumerUsername
                 ][consumerInstance][producerUsername][producerInstance]) {
                   if (iterProducerType === producerType) {
                     if (
                       iterProducerType === "json" &&
                       dataStreamType &&
-                      tableConsumers[table_id][consumerUsername][
+                      tableConsumers[tableId][consumerUsername][
                         consumerInstance
                       ][producerUsername][producerInstance][iterProducerType]?.[
                         dataStreamType
                       ]
                     ) {
-                      delete tableConsumers[table_id][consumerUsername][
+                      delete tableConsumers[tableId][consumerUsername][
                         consumerInstance
                       ][producerUsername][producerInstance][iterProducerType][
                         dataStreamType
                       ];
 
                       this.clearTableConsumers(
-                        table_id,
+                        tableId,
                         consumerUsername,
                         consumerInstance,
                         producerUsername,
@@ -407,20 +402,20 @@ class MediasoupCleanup {
                       iterProducerType === "screen" ||
                       iterProducerType === "screenAudio"
                     ) {
-                      for (const iterProducerId in tableConsumers[table_id][
+                      for (const iterProducerId in tableConsumers[tableId][
                         consumerUsername
                       ][consumerInstance][producerUsername][producerInstance][
                         iterProducerType
                       ]) {
                         if (iterProducerId === producerId) {
-                          delete tableConsumers[table_id][consumerUsername][
+                          delete tableConsumers[tableId][consumerUsername][
                             consumerInstance
                           ][producerUsername][producerInstance][
                             iterProducerType
                           ]?.[iterProducerId];
 
                           this.clearTableConsumers(
-                            table_id,
+                            tableId,
                             consumerUsername,
                             consumerInstance,
                             producerUsername,
@@ -430,12 +425,12 @@ class MediasoupCleanup {
                       }
                     }
                     if (iterProducerType === "audio") {
-                      delete tableConsumers[table_id][consumerUsername][
+                      delete tableConsumers[tableId][consumerUsername][
                         consumerInstance
                       ][producerUsername][producerInstance][iterProducerType];
 
                       this.clearTableConsumers(
-                        table_id,
+                        tableId,
                         consumerUsername,
                         consumerInstance,
                         producerUsername,

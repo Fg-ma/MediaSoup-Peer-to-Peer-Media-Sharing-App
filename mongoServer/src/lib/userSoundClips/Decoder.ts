@@ -1,3 +1,6 @@
+import { UserContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { userStateDecodingMap } from "../typeConstant";
+
 class Decoder {
   constructor() {}
 
@@ -6,19 +9,22 @@ class Decoder {
     sid: string;
     n: string;
     m: string;
+    s: number[];
   }): {
-    user_id: string;
+    userId: string;
     soundClipId: string;
     filename: string;
     mimeType: string;
+    state: UserContentStateTypes[];
   } => {
-    const { uid, sid, n, m } = data;
+    const { uid, sid, n, m, s } = data;
 
     return {
-      user_id: uid,
+      userId: uid,
       soundClipId: sid,
       filename: n,
       mimeType: m,
+      state: s.map((ate) => userStateDecodingMap[ate]),
     };
   };
 }

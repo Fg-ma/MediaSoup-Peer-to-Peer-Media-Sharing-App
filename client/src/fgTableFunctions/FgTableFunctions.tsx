@@ -84,7 +84,7 @@ export default function FgTableFunctions({
 }) {
   const { sendGeneralSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
-  const { table_id, username, instance } = useUserInfoContext();
+  const { tableId, username, instance } = useUserInfoContext();
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
 
   const externalBackgroundChange = useRef(false);
@@ -124,7 +124,7 @@ export default function FgTableFunctions({
     sendGeneralSignal({
       type: "localMuteChange",
       header: {
-        table_id: table_id.current,
+        tableId: tableId.current,
         username: username.current,
         instance: instance.current,
         producerType: "audio",

@@ -17,7 +17,7 @@ export type GroupSignals =
 export type onLocalMuteChangeType = {
   type: "localMuteChange";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";

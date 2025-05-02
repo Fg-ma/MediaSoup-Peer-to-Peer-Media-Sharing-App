@@ -4,17 +4,17 @@ class Broadcaster {
   constructor() {}
 
   broadcastToTable = (
-    table_id: string,
+    tableId: string,
     socketType: SocketTypes,
     gameType: GameTypes | undefined,
     gameId: string | undefined,
     message: object,
     exclude?: { username: string; instance: string }[]
   ) => {
-    if (tables[table_id]) {
+    if (tables[tableId]) {
       const msg = JSON.stringify(message);
 
-      Object.entries(tables[table_id]).forEach(([username, user]) => {
+      Object.entries(tables[tableId]).forEach(([username, user]) => {
         Object.entries(user).forEach(([instance, socket]) => {
           if (exclude && exclude.includes({ username, instance })) {
             return;
@@ -41,17 +41,17 @@ class Broadcaster {
   };
 
   broadcastToUser = (
-    table_id: string,
+    tableId: string,
     username: string,
     socketType: SocketTypes,
     gameType: GameTypes | undefined,
     gameId: string | undefined,
     message: object
   ) => {
-    if (tables[table_id] && tables[table_id][username]) {
+    if (tables[tableId] && tables[tableId][username]) {
       const msg = JSON.stringify(message);
 
-      Object.values(tables[table_id][username]).forEach((socket) => {
+      Object.values(tables[tableId][username]).forEach((socket) => {
         try {
           if (socketType === "signaling" && socket.signaling) {
             socket.signaling.send(msg);
@@ -72,7 +72,7 @@ class Broadcaster {
   };
 
   broadcastToInstance = (
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     socketType: SocketTypes,
@@ -81,13 +81,13 @@ class Broadcaster {
     message: object
   ) => {
     if (
-      tables[table_id] &&
-      tables[table_id][username] &&
-      tables[table_id][username][instance]
+      tables[tableId] &&
+      tables[tableId][username] &&
+      tables[tableId][username][instance]
     ) {
       const msg = JSON.stringify(message);
 
-      const socket = tables[table_id][username][instance];
+      const socket = tables[tableId][username][instance];
 
       if (socketType === "signaling" && socket.signaling) {
         socket.signaling.send(msg);

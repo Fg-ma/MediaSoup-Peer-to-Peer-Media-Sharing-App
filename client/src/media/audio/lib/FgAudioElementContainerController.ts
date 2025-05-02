@@ -18,7 +18,7 @@ class FgAudioElementContainerController {
 
   constructor(
     private isUser: boolean,
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private positioning: React.MutableRefObject<{
@@ -65,7 +65,7 @@ class FgAudioElementContainerController {
     private bundleRef: React.RefObject<HTMLDivElement>,
   ) {
     this.reactController = new ReactController(
-      `audio_${this.table_id}_${this.username}_${this.instance}`,
+      `audio_${this.tableId}_${this.username}_${this.instance}`,
       undefined,
       "audio",
       this.behindEffectsContainerRef,
@@ -102,7 +102,7 @@ class FgAudioElementContainerController {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (
-              data.table_id === this.table_id &&
+              data.tableId === this.tableId &&
               data.username === this.username &&
               data.instance === this.instance &&
               data.type === "audio"
@@ -148,7 +148,7 @@ class FgAudioElementContainerController {
             const data = JSON.parse(message);
             if (
               this.permissions.acceptsAudioEffects &&
-              data.table_id === this.table_id &&
+              data.tableId === this.tableId &&
               data.username === this.username &&
               data.instance === this.instance &&
               data.type === "audio"
@@ -177,7 +177,7 @@ class FgAudioElementContainerController {
 
     if (
       contentType === "audio" &&
-      contentId === `audio_${this.table_id}_${this.username}_${this.instance}`
+      contentId === `audio_${this.tableId}_${this.username}_${this.instance}`
     ) {
       this.reactController.handleReaction(reaction, false, reactionStyle);
     }
@@ -198,8 +198,8 @@ class FgAudioElementContainerController {
   };
 
   handleClose = () => {
-    if (!this.table_id || !this.username) {
-      console.error("Missing table_id or username!");
+    if (!this.tableId || !this.username) {
+      console.error("Missing tableId or username!");
       return;
     }
 
@@ -211,7 +211,7 @@ class FgAudioElementContainerController {
       this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: "audio",
@@ -221,7 +221,7 @@ class FgAudioElementContainerController {
       this.mediasoupSocket.current?.sendMessage({
         type: "requestRemoveProducer",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: "audio",

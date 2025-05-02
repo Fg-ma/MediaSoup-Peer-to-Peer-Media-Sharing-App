@@ -50,9 +50,9 @@ const main = async () => {
       },
       close: (ws) => {
         const mediasoupWS = ws as MediasoupWebSocket;
-        const { table_id, username, instance } = mediasoupWS;
+        const { tableId, username, instance } = mediasoupWS;
 
-        tables.leaveTable(table_id, username, instance);
+        tables.leaveTable(tableId, username, instance);
       },
     })
     .listen(8000, (token) => {

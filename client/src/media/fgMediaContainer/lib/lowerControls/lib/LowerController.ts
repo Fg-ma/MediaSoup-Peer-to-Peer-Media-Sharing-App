@@ -2,7 +2,7 @@ import TableStaticContentSocketController from "../../../../../serverControllers
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { MediaContainerOptions } from "../../typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../../../../universal/contentTypeConstant";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
@@ -49,8 +49,10 @@ class LowerController {
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
     >,
-    private state: ContentStateTypes[],
-    private setState: React.Dispatch<React.SetStateAction<ContentStateTypes[]>>,
+    private state: TableContentStateTypes[],
+    private setState: React.Dispatch<
+      React.SetStateAction<TableContentStateTypes[]>
+    >,
   ) {
     this.reactController = new ReactController(
       this.mediaId,

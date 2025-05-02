@@ -13,7 +13,7 @@ import {
 import "./lib/fgVolumeElement.css";
 
 export default function FgVolumeElement({
-  table_id,
+  tableId,
   username,
   instance,
   isUser,
@@ -31,7 +31,7 @@ export default function FgVolumeElement({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   isUser: boolean;
@@ -81,7 +81,7 @@ export default function FgVolumeElement({
 
   const fgVolumeElementController = useRef(
     new FgVolumeElementController(
-      table_id,
+      tableId,
       username,
       instance,
       producerType,

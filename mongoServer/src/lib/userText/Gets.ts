@@ -1,16 +1,17 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserTextType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userTextCollection: Collection,
+    private userTextCollection: Collection<UserTextType>,
     private decoder: Decoder
   ) {}
 
-  getTextMetaDataBy_UID_XID = async (user_id: string, textId: string) => {
+  getTextMetaDataBy_UID_XID = async (userId: string, textId: string) => {
     try {
       const textData = await this.userTextCollection.findOne({
-        uid: user_id,
+        uid: userId,
         xid: textId,
       });
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(textData);
     } catch (err) {
       console.error("Error retrieving text data:", err);
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const textData = await this.userTextCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!textData || textData.length === 0) {
@@ -37,10 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return textData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return textData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

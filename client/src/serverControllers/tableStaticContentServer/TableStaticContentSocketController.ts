@@ -14,7 +14,7 @@ import {
   OutGoingTableStaticContentMessages,
 } from "./lib/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
@@ -26,7 +26,7 @@ class TableStaticContentSocketController {
 
   constructor(
     private url: string,
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -70,7 +70,7 @@ class TableStaticContentSocketController {
       this.sendMessage({
         type: "requestCatchUpTableData",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
         },
@@ -100,7 +100,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "joinTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -111,7 +111,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "leaveTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -126,7 +126,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "getFile",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         contentType,
@@ -145,7 +145,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "deleteContent",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
         instanceId,
@@ -175,7 +175,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "updateContentPositioning",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
         instanceId,
@@ -202,7 +202,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "updateContentEffects",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
         instanceId,
@@ -217,12 +217,12 @@ class TableStaticContentSocketController {
   changeContentState = (
     contentType: StaticContentTypes,
     contentId: string,
-    state: ContentStateTypes[],
+    state: TableContentStateTypes[],
   ) => {
     this.sendMessage({
       type: "changeContentState",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
       },
@@ -241,7 +241,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "updateVideoPosition",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
         instanceId,
@@ -260,7 +260,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "requestCatchUpVideoPosition",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         contentType,
@@ -293,7 +293,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "createNewInstances",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
       },
       data: {
         updates,
@@ -308,7 +308,7 @@ class TableStaticContentSocketController {
     this.sendMessage({
       type: "searchTabledContentRequest",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         contentType,
@@ -386,7 +386,7 @@ class TableStaticContentSocketController {
       this.sendMessage({
         type: "responseCatchUpVideoPosition",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username,
           instance,
           contentType,

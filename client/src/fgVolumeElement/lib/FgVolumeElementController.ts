@@ -5,7 +5,7 @@ import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class FgVolumeElementController extends FgVolumeElementSocket {
   constructor(
-    private table_id: string,
+    private tableId: string,
     username: string,
     instance: string,
     private producerType: "audio" | "screenAudio",
@@ -187,14 +187,14 @@ class FgVolumeElementController extends FgVolumeElementSocket {
     switch (message.type) {
       case "localMuteChange":
         const {
-          table_id: newTable_id,
+          tableId: newTable_id,
           username: newUsername,
           instance: newInstance,
           producerType: newProducerType,
           producerId: newProducerId,
         } = message.header;
         if (
-          newTable_id === this.table_id &&
+          newTable_id === this.tableId &&
           newUsername === this.username &&
           newInstance === this.instance
         ) {

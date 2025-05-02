@@ -17,7 +17,7 @@ const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 
 class CaptureMediaController {
   constructor(
-    private table_id: React.RefObject<string>,
+    private tableId: React.RefObject<string>,
     private captureEffects: React.MutableRefObject<{
       [effectType in CameraEffectTypes]: boolean;
     }>,
@@ -358,7 +358,7 @@ class CaptureMediaController {
   confirmCapture = async () => {
     if (this.videoRef.current && this.videoRef.current.src) {
       const metadata = {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         contentId: uuidv4(),
         instanceId: uuidv4(),
         direction: "toTable",
@@ -405,7 +405,7 @@ class CaptureMediaController {
       }
     } else if (this.imageRef.current && this.imageRef.current.src) {
       const metadata = {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         contentId: uuidv4(),
         instanceId: uuidv4(),
         direction: "toTable",

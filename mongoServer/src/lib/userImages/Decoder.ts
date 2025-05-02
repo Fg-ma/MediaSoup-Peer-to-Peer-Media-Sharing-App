@@ -1,3 +1,6 @@
+import { UserContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { userStateDecodingMap } from "../typeConstant";
+
 class Decoder {
   constructor() {}
 
@@ -6,19 +9,22 @@ class Decoder {
     iid: string;
     n: string;
     m: string;
+    s: number[];
   }): {
-    user_id: string;
+    userId: string;
     imageId: string;
     filename: string;
     mimeType: string;
+    state: UserContentStateTypes[];
   } => {
-    const { uid, iid, n, m } = data;
+    const { uid, iid, n, m, s } = data;
 
     return {
-      user_id: uid,
+      userId: uid,
       imageId: iid,
       filename: n,
       mimeType: m,
+      state: s.map((ate) => userStateDecodingMap[ate]),
     };
   };
 }

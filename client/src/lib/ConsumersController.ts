@@ -22,7 +22,7 @@ class ConsumersController {
     >,
     private device: React.MutableRefObject<types.Device | undefined>,
 
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
@@ -38,7 +38,7 @@ class ConsumersController {
       instance: string,
       cameraIds: (string | undefined)[],
       screenIds: (string | undefined)[],
-      screenAudioIds: (string | undefined)[]
+      screenAudioIds: (string | undefined)[],
     ) => void,
 
     private createConsumerBundle: (
@@ -53,8 +53,8 @@ class ConsumersController {
       remoteScreenAudioStreams: {
         [screenId: string]: MediaStream;
       },
-      remoteAudioStream: MediaStream | undefined
-    ) => void
+      remoteAudioStream: MediaStream | undefined,
+    ) => void,
   ) {}
 
   async onSubscribed(event: onSubscribedType) {
@@ -215,7 +215,7 @@ class ConsumersController {
         this.mediasoupSocket.current?.sendMessage({
           type: "connectConsumerTransport",
           header: {
-            table_id: this.table_id.current,
+            tableId: this.tableId.current,
             username: this.username.current,
             instance: this.instance.current,
           },
@@ -225,19 +225,19 @@ class ConsumersController {
           },
         });
         const consumerTransportConnectedCallback = (
-          event: IncomingMediasoupMessages
+          event: IncomingMediasoupMessages,
         ) => {
           if (event.type === "consumerTransportConnected") {
             callback();
             this.mediasoupSocket.current?.removeMessageListener(
-              consumerTransportConnectedCallback
+              consumerTransportConnectedCallback,
             );
           }
         };
         this.mediasoupSocket.current?.addMessageListener(
-          consumerTransportConnectedCallback
+          consumerTransportConnectedCallback,
         );
-      }
+      },
     );
 
     this.consumerTransport.current.on(
@@ -257,7 +257,7 @@ class ConsumersController {
                   .camera) {
                   const remoteCameraStream = new MediaStream();
                   remoteCameraStream.addTrack(
-                    this.remoteMedia.current[username][instance].camera![key]
+                    this.remoteMedia.current[username][instance].camera![key],
                   );
                   remoteCameraStreams[key] = remoteCameraStream;
                 }
@@ -269,7 +269,7 @@ class ConsumersController {
                   .screen) {
                   const remoteScreenStream = new MediaStream();
                   remoteScreenStream.addTrack(
-                    this.remoteMedia.current[username][instance].screen![key]
+                    this.remoteMedia.current[username][instance].screen![key],
                   );
                   remoteScreenStreams[key] = remoteScreenStream;
                 }
@@ -283,7 +283,7 @@ class ConsumersController {
                   remoteScreenAudioStream.addTrack(
                     this.remoteMedia.current[username][instance].screenAudio![
                       key
-                    ]
+                    ],
                   );
                   remoteScreenAudioStreams[key] = remoteScreenAudioStream;
                 }
@@ -292,7 +292,7 @@ class ConsumersController {
                 if (this.remoteMedia.current[username][instance].audio) {
                   remoteAudioStream = new MediaStream();
                   remoteAudioStream.addTrack(
-                    this.remoteMedia.current[username][instance].audio!
+                    this.remoteMedia.current[username][instance].audio!,
                   );
                 }
 
@@ -302,7 +302,7 @@ class ConsumersController {
                   remoteCameraStreams,
                   remoteScreenStreams,
                   remoteScreenAudioStreams,
-                  remoteAudioStream
+                  remoteAudioStream,
                 );
               }
             }
@@ -310,7 +310,7 @@ class ConsumersController {
             this.mediasoupSocket.current?.sendMessage({
               type: "resume",
               header: {
-                table_id: this.table_id.current,
+                tableId: this.tableId.current,
                 username: this.username.current,
                 instance: this.instance.current,
               },
@@ -324,7 +324,7 @@ class ConsumersController {
           default:
             break;
         }
-      }
+      },
     );
 
     const { rtpCapabilities } = this.device.current;
@@ -332,7 +332,7 @@ class ConsumersController {
     this.mediasoupSocket.current?.sendMessage({
       type: "consume",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
       },
@@ -399,24 +399,24 @@ class ConsumersController {
       producerInstance,
       producerType === "camera" ? [producerId] : [],
       producerType === "screen" ? [producerId] : [],
-      producerType === "screenAudio" ? [producerId] : []
+      producerType === "screenAudio" ? [producerId] : [],
     );
 
     if (
       Object.keys(
-        this.remoteMedia.current[producerUsername][producerInstance] || {}
+        this.remoteMedia.current[producerUsername][producerInstance] || {},
       ).length === 1 &&
       (Object.keys(
         this.remoteMedia.current[producerUsername][producerInstance].camera ||
-          {}
+          {},
       ).length === 1 ||
         Object.keys(
           this.remoteMedia.current[producerUsername][producerInstance].screen ||
-            {}
+            {},
         ).length === 1 ||
         Object.keys(
           this.remoteMedia.current[producerUsername][producerInstance]
-            .screenAudio || {}
+            .screenAudio || {},
         ).length === 1 ||
         this.remoteMedia.current[producerUsername][producerInstance].audio)
     ) {
@@ -430,7 +430,7 @@ class ConsumersController {
           const remoteCameraStream = new MediaStream();
           remoteCameraStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .camera![key]
+              .camera![key],
           );
           remoteCameraStreams[key] = remoteCameraStream;
         }
@@ -446,7 +446,7 @@ class ConsumersController {
           const remoteScreenStream = new MediaStream();
           remoteScreenStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screen![key]
+              .screen![key],
           );
           remoteScreenStreams[key] = remoteScreenStream;
         }
@@ -464,7 +464,7 @@ class ConsumersController {
           const remoteScreenAudioStream = new MediaStream();
           remoteScreenAudioStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screenAudio![key]
+              .screenAudio![key],
           );
           remoteScreenAudioStreams[key] = remoteScreenAudioStream;
         }
@@ -477,7 +477,7 @@ class ConsumersController {
       ) {
         remoteAudioStream = new MediaStream();
         remoteAudioStream.addTrack(
-          this.remoteMedia.current[producerUsername][producerInstance].audio!
+          this.remoteMedia.current[producerUsername][producerInstance].audio!,
         );
       }
 
@@ -487,14 +487,14 @@ class ConsumersController {
         remoteCameraStreams,
         remoteScreenStreams,
         remoteScreenAudioStreams,
-        remoteAudioStream
+        remoteAudioStream,
       );
     }
 
     this.mediasoupSocket.current?.sendMessage({
       type: "resume",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
       },
@@ -503,7 +503,7 @@ class ConsumersController {
     this.mediasoupSocket.current?.sendMessage({
       type: "newConsumerCreated",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
       },
@@ -554,7 +554,7 @@ class ConsumersController {
     this.mediasoupSocket.current?.sendMessage({
       type: "newConsumerCreated",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
       },

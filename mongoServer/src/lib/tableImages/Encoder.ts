@@ -1,4 +1,4 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ImageEffectStylesType,
   ImageEffectTypes,
@@ -12,7 +12,7 @@ import {
   mustachesEffectEncodingMap,
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
-  stateEncodingMap,
+  tableStateEncodingMap,
 } from "../typeConstant";
 import { imageEffectEncodingMap } from "./typeConstant";
 
@@ -20,11 +20,11 @@ class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     imageId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       imageInstanceId: string;
       positioning: {
@@ -95,14 +95,14 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, imageId, filename, mimeType, state, instances } = data;
+    const { tableId, imageId, filename, mimeType, state, instances } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       iid: imageId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(
         ({ imageInstanceId, positioning, effects, effectStyles }) => ({
           iiid: imageInstanceId,

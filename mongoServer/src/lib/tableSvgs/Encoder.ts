@@ -1,20 +1,20 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   SvgEffectStylesType,
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { stateEncodingMap } from "../typeConstant";
+import { tableStateEncodingMap } from "../typeConstant";
 import { svgEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     svgId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       svgInstanceId: string;
       positioning: {
@@ -79,14 +79,14 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, svgId, filename, mimeType, state, instances } = data;
+    const { tableId, svgId, filename, mimeType, state, instances } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       sid: svgId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(
         ({ svgInstanceId, positioning, effects, effectStyles }) => ({
           siid: svgInstanceId,

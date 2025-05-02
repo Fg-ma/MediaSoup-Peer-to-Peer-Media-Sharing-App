@@ -1,5 +1,5 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
-import { stateDecodingMap } from "../typeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { tableStateDecodingMap } from "../typeConstant";
 
 class Decoder {
   constructor() {}
@@ -25,11 +25,11 @@ class Decoder {
       };
     }[];
   }): {
-    table_id: string;
+    tableId: string;
     textId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       textInstanceId: string;
       positioning: {
@@ -48,11 +48,11 @@ class Decoder {
     const { tid, xid, n, m, s, i } = data;
 
     return {
-      table_id: tid,
+      tableId: tid,
       textId: xid,
       filename: n,
       mimeType: m,
-      state: s.map((ate) => stateDecodingMap[ate]),
+      state: s.map((ate) => tableStateDecodingMap[ate]),
       instances: i.map(({ xiid, p }) => ({
         textInstanceId: xiid,
         positioning: {

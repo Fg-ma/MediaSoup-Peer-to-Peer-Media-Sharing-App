@@ -36,7 +36,7 @@ class JoinTableSectionController {
     >,
     private tableIdRef: React.RefObject<HTMLInputElement>,
     private usernameRef: React.RefObject<HTMLInputElement>,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
     private setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
@@ -79,24 +79,24 @@ class JoinTableSectionController {
   ) {}
 
   joinTable = () => {
-    const previousTableId = this.table_id.current;
+    const previousTableId = this.tableId.current;
     const previousUsername = this.username.current;
 
     if (
-      this.table_id.current === this.tableIdRef.current?.value &&
+      this.tableId.current === this.tableIdRef.current?.value &&
       this.username.current === this.usernameRef.current?.value
     ) {
       return;
     }
 
     if (this.tableIdRef.current) {
-      this.table_id.current = this.tableIdRef.current?.value;
+      this.tableId.current = this.tableIdRef.current?.value;
     }
     if (this.usernameRef.current) {
       this.username.current = this.usernameRef.current?.value;
     }
     if (
-      this.table_id.current.trim() !== "" &&
+      this.tableId.current.trim() !== "" &&
       this.username.current.trim() !== ""
     ) {
       // Leave previous table if there is one
@@ -106,7 +106,7 @@ class JoinTableSectionController {
 
       this.tableSocket.current = new TableSocketController(
         "wss://localhost:8043",
-        this.table_id.current,
+        this.tableId.current,
         this.username.current,
         this.instance.current,
       );
@@ -114,14 +114,14 @@ class JoinTableSectionController {
       this.tableStaticContentSocket.current =
         new TableStaticContentSocketController(
           "wss://localhost:8045",
-          this.table_id.current,
+          this.tableId.current,
           this.username.current,
           this.instance.current,
           this.userMedia,
         );
 
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
-        this.table_id.current,
+        this.tableId.current,
         this.username.current,
         this.instance.current,
         "wss://localhost:8042",
@@ -131,7 +131,7 @@ class JoinTableSectionController {
 
       this.mediasoupSocket.current = new MediasoupSocketController(
         "wss://localhost:8000",
-        this.table_id.current,
+        this.tableId.current,
         this.username.current,
         this.instance.current,
         this.producersController,
@@ -302,7 +302,7 @@ class JoinTableSectionController {
       this.mediasoupSocket.current?.sendMessage({
         type: "unsubscribe",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           username: this.username.current,
           instance: this.instance.current,
         },
@@ -319,7 +319,7 @@ class JoinTableSectionController {
     this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
         producerType: "json",
@@ -329,8 +329,8 @@ class JoinTableSectionController {
   };
 
   private subscribe = () => {
-    if (!this.table_id.current || !this.username.current) {
-      console.error("Missing table_id or username!");
+    if (!this.tableId.current || !this.username.current) {
+      console.error("Missing tableId or username!");
       return;
     }
     this.isSubscribed.current = !this.isSubscribed.current;
@@ -339,7 +339,7 @@ class JoinTableSectionController {
       this.mediasoupSocket.current?.sendMessage({
         type: "createConsumerTransport",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           username: this.username.current,
           instance: this.instance.current,
         },
@@ -351,7 +351,7 @@ class JoinTableSectionController {
     this.mediasoupSocket.current?.sendMessage({
       type: "createProducerTransport",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
       },

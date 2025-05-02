@@ -4,10 +4,10 @@ import { TableSvgsType } from "./typeConstant";
 class Deletes {
   constructor(private tableSvgsCollection: Collection<TableSvgsType>) {}
 
-  deleteMetaDataBy_TID_SID = async (table_id: string, svgId: string) => {
+  deleteMetaDataBy_TID_SID = async (tableId: string, svgId: string) => {
     try {
       await this.tableSvgsCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
         sid: svgId,
       });
     } catch (err) {
@@ -16,14 +16,14 @@ class Deletes {
   };
 
   deleteInstanceBy_TID_SID_SIID = async (
-    table_id: string,
+    tableId: string,
     svgId: string,
     svgInstanceId: string
   ): Promise<null | TableSvgsType> => {
     try {
       const result = await this.tableSvgsCollection.findOneAndUpdate(
         {
-          tid: table_id,
+          tid: tableId,
           sid: svgId,
         },
         {

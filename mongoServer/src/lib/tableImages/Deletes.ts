@@ -4,10 +4,10 @@ import { TableImagesType } from "./typeConstant";
 class Deletes {
   constructor(private tableImagesCollection: Collection<TableImagesType>) {}
 
-  deleteMetaDataBy_TID_IID = async (table_id: string, imageId: string) => {
+  deleteMetaDataBy_TID_IID = async (tableId: string, imageId: string) => {
     try {
       await this.tableImagesCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
         iid: imageId,
       });
     } catch (err) {
@@ -16,14 +16,14 @@ class Deletes {
   };
 
   deleteInstanceBy_TID_IID_IIID = async (
-    table_id: string,
+    tableId: string,
     imageId: string,
     imageInstanceId: string
   ): Promise<null | TableImagesType> => {
     try {
       const result = await this.tableImagesCollection.findOneAndUpdate(
         {
-          tid: table_id,
+          tid: tableId,
           iid: imageId,
         },
         {

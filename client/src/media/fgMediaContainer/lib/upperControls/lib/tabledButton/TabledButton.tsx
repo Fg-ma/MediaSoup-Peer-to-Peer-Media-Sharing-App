@@ -3,7 +3,7 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerController from "../../../lowerControls/lib/LowerController";
-import { ContentStateTypes } from "../../../../../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,7 +16,7 @@ export default function TabledButton({
   state,
   lowerController,
 }: {
-  state: ContentStateTypes[];
+  state: TableContentStateTypes[];
   lowerController: React.MutableRefObject<LowerController>;
 }) {
   return (

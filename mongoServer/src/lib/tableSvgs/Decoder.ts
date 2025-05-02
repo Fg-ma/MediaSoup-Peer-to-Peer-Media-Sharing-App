@@ -1,9 +1,9 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   SvgEffectStylesType,
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { stateDecodingMap, stateEncodingMap } from "../typeConstant";
+import { tableStateDecodingMap, tableStateEncodingMap } from "../typeConstant";
 import { svgEffectEncodingMap } from "./typeConstant";
 
 class Decoder {
@@ -63,11 +63,11 @@ class Decoder {
       };
     }[];
   }): {
-    table_id: string;
+    tableId: string;
     svgId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       svgInstanceId: string;
       positioning: {
@@ -90,11 +90,11 @@ class Decoder {
     const { tid, sid, n, m, s, i } = data;
 
     return {
-      table_id: tid,
+      tableId: tid,
       svgId: sid,
       filename: n,
       mimeType: m,
-      state: s.map((ate) => stateDecodingMap[ate]),
+      state: s.map((ate) => tableStateDecodingMap[ate]),
       instances: i.map(({ siid, p, e, es }) => ({
         svgInstanceId: siid,
         positioning: {

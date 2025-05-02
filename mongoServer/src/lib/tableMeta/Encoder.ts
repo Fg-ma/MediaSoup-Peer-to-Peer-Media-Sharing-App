@@ -4,7 +4,7 @@ class Encoder {
   constructor() {}
 
   encodeMetaData = (data: {
-    table_id: string;
+    tableId: string;
     tableName: string;
     owner: string;
     members: {
@@ -43,7 +43,7 @@ class Encoder {
     bi: string | null;
   } => {
     const {
-      table_id,
+      tableId,
       tableName,
       owner,
       members,
@@ -53,7 +53,7 @@ class Encoder {
     } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       tn: tableName,
       ow: owner,
       mm: members.map((member) => ({

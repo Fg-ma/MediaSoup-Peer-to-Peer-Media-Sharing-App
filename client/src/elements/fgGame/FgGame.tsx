@@ -78,7 +78,7 @@ export default function FgGame({
     relativeToBoundaries?: "center";
   };
 }) {
-  const { table_id, username, instance } = useUserInfoContext();
+  const { tableId, username, instance } = useUserInfoContext();
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
@@ -130,7 +130,7 @@ export default function FgGame({
   const fgGameController = useRef(
     new FgGameController(
       mediasoupSocket,
-      table_id,
+      tableId,
       gameId,
       hideControls,
       gameStarted,
@@ -240,7 +240,7 @@ export default function FgGame({
     mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
       header: {
-        table_id: table_id.current,
+        tableId: tableId.current,
         inquiringUsername: username.current,
         inquiringInstance: instance.current,
         gameId: gameId,
@@ -324,7 +324,7 @@ export default function FgGame({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id: table_id.current,
+          tableId: tableId.current,
           gameId,
           type: "games",
           positioning: positioning.current,

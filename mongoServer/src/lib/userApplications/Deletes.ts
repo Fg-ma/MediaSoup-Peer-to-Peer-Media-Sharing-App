@@ -1,12 +1,15 @@
 import { Collection } from "mongodb";
+import { UserApplicationsType } from "./typeConstant";
 
 class Deletes {
-  constructor(private userApplicationsCollection: Collection) {}
+  constructor(
+    private userApplicationsCollection: Collection<UserApplicationsType>
+  ) {}
 
-  deleteMetaDataBy_UID_AID = async (user_id: string, applicationId: string) => {
+  deleteMetaDataBy_UID_AID = async (userId: string, applicationId: string) => {
     try {
       await this.userApplicationsCollection.deleteOne({
-        tid: user_id,
+        uid: userId,
         aid: applicationId,
       });
     } catch (err) {

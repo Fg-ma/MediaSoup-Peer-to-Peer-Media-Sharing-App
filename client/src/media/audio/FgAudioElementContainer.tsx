@@ -38,7 +38,7 @@ const AudioEffectsSection = React.lazy(
 const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function FgAudioElementContainer({
-  table_id,
+  tableId,
   username,
   instance,
   name,
@@ -56,7 +56,7 @@ export default function FgAudioElementContainer({
   setAudioActive,
   options,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   name?: string;
@@ -167,7 +167,7 @@ export default function FgAudioElementContainer({
   const fgAudioElementContainerController = useRef(
     new FgAudioElementContainerController(
       isUser,
-      table_id,
+      tableId,
       username,
       instance,
       positioning,
@@ -202,7 +202,7 @@ export default function FgAudioElementContainer({
       mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
-          table_id: table_id,
+          tableId: tableId,
           inquiringUsername: activeUsername.current,
           inquiringInstance: activeInstance.current,
           inquiredUsername: username,
@@ -268,7 +268,7 @@ export default function FgAudioElementContainer({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id,
+          tableId,
           username,
           instance,
           type: "audio",
@@ -280,7 +280,7 @@ export default function FgAudioElementContainer({
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
     const metadata = {
-      table_id: table_id,
+      tableId: tableId,
       contentId: uuidv4(),
       direction: "toMuteStyle",
       state: ["muteStyle"],
@@ -544,7 +544,7 @@ export default function FgAudioElementContainer({
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsSection
               externalRef={audioEffectsSectionRef}
-              table_id={table_id}
+              tableId={tableId}
               username={username}
               instance={instance}
               isUser={isUser}

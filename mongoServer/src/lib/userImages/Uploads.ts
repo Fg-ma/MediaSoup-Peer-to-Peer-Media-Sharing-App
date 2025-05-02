@@ -1,17 +1,21 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
+import { UserContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { userStateEncodingMap } from "../typeConstant";
+import { UserImagesType } from "./typeConstant";
 
 class Uploads {
   constructor(
-    private userImagesCollection: Collection,
+    private userImagesCollection: Collection<UserImagesType>,
     private encoder: Encoder
   ) {}
 
   uploadMetaData = async (data: {
-    user_id: string;
+    userId: string;
     imageId: string;
     filename: string;
     mimeType: string;
+    state: UserContentStateTypes[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
 
@@ -23,10 +27,11 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { user_id: string; imageId: string },
+    filter: { userId: string; imageId: string },
     updateData: Partial<{
       filename?: string;
       mimeType?: string;
+      state?: UserContentStateTypes[];
     }>
   ) => {
     if (!this.userImagesCollection) {
@@ -44,9 +49,15 @@ class Uploads {
       updateFields["m"] = updateData.mimeType;
     }
 
+    if (updateData.state !== undefined) {
+      updateFields["s"] = updateData.state.map(
+        (ate) => userStateEncodingMap[ate]
+      );
+    }
+
     try {
       const result = await this.userImagesCollection.updateOne(
-        { uid: filter.user_id, iid: filter.imageId },
+        { uid: filter.userId, iid: filter.imageId },
         { $set: updateFields }
       );
       return result;

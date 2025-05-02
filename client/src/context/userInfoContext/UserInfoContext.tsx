@@ -8,7 +8,7 @@ export interface UserInfoContextProviderProps {
 }
 
 export interface UserInfoContextType {
-  table_id: React.MutableRefObject<string>;
+  tableId: React.MutableRefObject<string>;
   username: React.MutableRefObject<string>;
   instance: React.MutableRefObject<string>;
   preferences: React.MutableRefObject<UserPreferences>;
@@ -16,14 +16,14 @@ export interface UserInfoContextType {
 }
 
 const UserInfoContext = createContext<UserInfoContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useUserInfoContext = () => {
   const context = useContext(UserInfoContext);
   if (!context) {
     throw new Error(
-      "useUserInfoContext must be used within an UserInfoContextProvider"
+      "useUserInfoContext must be used within an UserInfoContextProvider",
     );
   }
   return context;
@@ -32,7 +32,7 @@ export const useUserInfoContext = () => {
 export function UserInfoContextProvider({
   children,
 }: UserInfoContextProviderProps) {
-  const table_id = useRef("");
+  const tableId = useRef("");
   const username = useRef("");
   const instance = useRef(uuidv4());
   const preferences = useRef({ soundEffects: false });
@@ -40,7 +40,7 @@ export function UserInfoContextProvider({
 
   return (
     <UserInfoContext.Provider
-      value={{ table_id, username, instance, preferences, device }}
+      value={{ tableId, username, instance, preferences, device }}
     >
       {children}
     </UserInfoContext.Provider>

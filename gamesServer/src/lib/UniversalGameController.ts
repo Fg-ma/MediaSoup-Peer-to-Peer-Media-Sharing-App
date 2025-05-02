@@ -17,23 +17,23 @@ class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
 
   onInitiateGame = (event: onInitiateGameType) => {
-    const { table_id, gameType, gameId } = event.header;
+    const { tableId, gameType, gameId } = event.header;
     const { initiator } = event.data;
 
     if (gameType === "snake") {
-      if (!snakeGames[table_id]) {
-        snakeGames[table_id] = {};
+      if (!snakeGames[tableId]) {
+        snakeGames[tableId] = {};
       }
 
-      snakeGames[table_id][gameId] = new SnakeGame(
+      snakeGames[tableId][gameId] = new SnakeGame(
         this.broadcaster,
-        table_id,
+        tableId,
         gameId
       );
     }
 
     this.broadcaster.broadcastToTable(
-      table_id,
+      tableId,
       "signaling",
       undefined,
       undefined,
@@ -51,43 +51,43 @@ class UniversalGameController {
   };
 
   onStartGame = (event: onStartGameType) => {
-    const { table_id, gameType, gameId } = event.header;
+    const { tableId, gameType, gameId } = event.header;
 
     if (gameType === "snake") {
-      snakeGames[table_id][gameId].startGame();
+      snakeGames[tableId][gameId].startGame();
     }
 
-    this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
+    this.broadcaster.broadcastToTable(tableId, "games", gameType, gameId, {
       type: "gameStarted",
     });
   };
 
   onCloseGame = (event: onCloseGameType) => {
-    const { table_id, gameType, gameId } = event.header;
+    const { tableId, gameType, gameId } = event.header;
 
-    for (const username in tables[table_id]) {
-      for (const instance in tables[table_id][username]) {
+    for (const username in tables[tableId]) {
+      for (const instance in tables[tableId][username]) {
         if (
-          tables[table_id][username][instance].games[gameType] &&
-          tables[table_id][username][instance].games[gameType][gameId]
+          tables[tableId][username][instance].games[gameType] &&
+          tables[tableId][username][instance].games[gameType][gameId]
         ) {
-          tables[table_id][username][instance].games[gameType][gameId].close();
+          tables[tableId][username][instance].games[gameType][gameId].close();
 
-          delete tables[table_id][username][instance].games[gameType]?.[gameId];
+          delete tables[tableId][username][instance].games[gameType]?.[gameId];
 
           if (
             Object.keys(
-              tables[table_id][username][instance].games[gameType] || {}
+              tables[tableId][username][instance].games[gameType] || {}
             ).length === 0
           ) {
-            delete tables[table_id][username][instance].games[gameType];
+            delete tables[tableId][username][instance].games[gameType];
           }
         }
       }
     }
 
     this.broadcaster.broadcastToTable(
-      table_id,
+      tableId,
       "signaling",
       undefined,
       undefined,
@@ -102,12 +102,12 @@ class UniversalGameController {
   };
 
   onJoinGame = (event: onJoinGameType) => {
-    const { table_id, username, instance, gameType, gameId } = event.header;
+    const { tableId, username, instance, gameType, gameId } = event.header;
     const data = event.data;
 
     switch (gameType) {
       case "snake":
-        snakeGames[table_id][gameId].joinGame(
+        snakeGames[tableId][gameId].joinGame(
           username,
           instance,
           data as { snakeColor?: SnakeColorsType }
@@ -119,11 +119,11 @@ class UniversalGameController {
   };
 
   onLeaveGame = (event: onLeaveGameType) => {
-    const { table_id, username, instance, gameType, gameId } = event.header;
+    const { tableId, username, instance, gameType, gameId } = event.header;
 
     switch (gameType) {
       case "snake":
-        snakeGames[table_id][gameId].leaveGame(username, instance);
+        snakeGames[tableId][gameId].leaveGame(username, instance);
         break;
       default:
         break;
@@ -131,20 +131,20 @@ class UniversalGameController {
   };
 
   onGetPlayersState = (event: onGetPlayersStateType) => {
-    const { table_id, username, instance, gameType, gameId } = event.header;
+    const { tableId, username, instance, gameType, gameId } = event.header;
 
     let playersState = {};
 
     switch (gameType) {
       case "snake":
-        playersState = snakeGames[table_id][gameId].getPlayersState();
+        playersState = snakeGames[tableId][gameId].getPlayersState();
         break;
       default:
         break;
     }
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       username,
       instance,
       "games",
@@ -160,20 +160,20 @@ class UniversalGameController {
   };
 
   onGetIntialGameStates = (event: onGetIntialGameStatesType) => {
-    const { table_id, username, instance, gameType, gameId } = event.header;
+    const { tableId, username, instance, gameType, gameId } = event.header;
 
     let initialGameStates = {};
 
     switch (gameType) {
       case "snake":
-        initialGameStates = snakeGames[table_id][gameId].getIntialGameStates();
+        initialGameStates = snakeGames[tableId][gameId].getIntialGameStates();
         break;
       default:
         break;
     }
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       username,
       instance,
       "games",

@@ -1,24 +1,30 @@
+import { UserContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { userStateEncodingMap } from "../typeConstant";
+
 class Encoder {
   constructor() {}
 
   encodeMetaData = (data: {
-    user_id: string;
+    userId: string;
     applicationId: string;
     filename: string;
     mimeType: string;
+    state: UserContentStateTypes[];
   }): {
     uid: string;
     aid: string;
     n: string;
     m: string;
+    s: number[];
   } => {
-    const { user_id, applicationId, filename, mimeType } = data;
+    const { userId, applicationId, filename, mimeType, state } = data;
 
     return {
-      uid: user_id,
+      uid: userId,
       aid: applicationId,
       n: filename,
       m: mimeType,
+      s: state.map((ate) => userStateEncodingMap[ate]),
     };
   };
 }

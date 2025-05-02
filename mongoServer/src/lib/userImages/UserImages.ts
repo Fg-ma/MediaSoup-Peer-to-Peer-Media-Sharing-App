@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { UserImagesType } from "./typeConstant";
 
 class UserImages {
-  private userImagesCollection: Collection;
+  private userImagesCollection: Collection<UserImagesType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

@@ -4,10 +4,10 @@ import { TableTextType } from "./typeConstant";
 class Deletes {
   constructor(private tableTextCollection: Collection<TableTextType>) {}
 
-  deleteMetaDataBy_TID_XID = async (table_id: string, textId: string) => {
+  deleteMetaDataBy_TID_XID = async (tableId: string, textId: string) => {
     try {
       await this.tableTextCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
         xid: textId,
       });
     } catch (err) {
@@ -16,14 +16,14 @@ class Deletes {
   };
 
   deleteInstanceBy_TID_XID_XIID = async (
-    table_id: string,
+    tableId: string,
     textId: string,
     textInstanceId: string
   ): Promise<null | TableTextType> => {
     try {
       const result = await this.tableTextCollection.findOneAndUpdate(
         {
-          tid: table_id,
+          tid: tableId,
           xid: textId,
         },
         {

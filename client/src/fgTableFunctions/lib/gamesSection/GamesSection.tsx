@@ -20,7 +20,7 @@ export default function GamesSection({
   gamesSectionRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-  const { table_id, username, instance } = useUserInfoContext();
+  const { tableId, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
   const gamesButtonRef = useRef<HTMLButtonElement>(null);
@@ -90,7 +90,7 @@ export default function GamesSection({
                   )}
                   clickFunction={() => {
                     if (
-                      !table_id.current ||
+                      !tableId.current ||
                       !username.current ||
                       !instance.current
                     ) {

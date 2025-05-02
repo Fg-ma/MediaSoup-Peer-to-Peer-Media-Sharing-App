@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { UserSvgsType } from "./typeConstant";
 
 class UserSvgs {
-  private userSvgsCollection: Collection;
+  private userSvgsCollection: Collection<UserSvgsType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

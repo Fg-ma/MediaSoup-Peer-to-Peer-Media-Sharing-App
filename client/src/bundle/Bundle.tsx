@@ -18,7 +18,7 @@ const FgAudioElementContainer = React.lazy(
 );
 
 export default function Bundle({
-  table_id,
+  tableId,
   username,
   instance,
   name,
@@ -34,7 +34,7 @@ export default function Bundle({
   onRendered,
   onNewConsumerWasCreatedCallback,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   name?: string;
@@ -104,7 +104,7 @@ export default function Bundle({
     new BundleController(
       mediasoupSocket,
       bundleOptions.isUser,
-      table_id,
+      tableId,
       username,
       instance,
       bundleOptions,
@@ -203,7 +203,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 visualMediaId={key}
-                table_id={table_id}
+                tableId={tableId}
                 username={username}
                 instance={instance}
                 name={name}
@@ -247,7 +247,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 visualMediaId={key}
-                table_id={table_id}
+                tableId={tableId}
                 username={username}
                 instance={instance}
                 name={name}
@@ -299,7 +299,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 visualMediaId={key}
-                table_id={table_id}
+                tableId={tableId}
                 username={username}
                 instance={instance}
                 name={name}
@@ -351,7 +351,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 visualMediaId={key}
-                table_id={table_id}
+                tableId={tableId}
                 username={username}
                 instance={instance}
                 name={name}
@@ -405,7 +405,7 @@ export default function Bundle({
           (!bundleOptions.isUser && screenAudioStreams)) && (
           <Suspense fallback={<div>Loading...</div>}>
             <FgAudioElementContainer
-              table_id={table_id}
+              tableId={tableId}
               username={username}
               instance={instance}
               name={name}

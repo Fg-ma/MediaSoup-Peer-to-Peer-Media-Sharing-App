@@ -33,28 +33,28 @@ uWS
 
     close: (ws) => {
       const gameWS = ws as GameWebSocket;
-      const { table_id, username, instance, socketType, gameType, gameId } =
+      const { tableId, username, instance, socketType, gameType, gameId } =
         gameWS;
 
       if (socketType === "signaling") {
         if (
-          tables[table_id] &&
-          tables[table_id][username] &&
-          tables[table_id][username][instance] &&
-          tables[table_id][username][instance].signaling
+          tables[tableId] &&
+          tables[tableId][username] &&
+          tables[tableId][username][instance] &&
+          tables[tableId][username][instance].signaling
         ) {
-          delete tables[table_id][username][instance].signaling;
+          delete tables[tableId][username][instance].signaling;
 
           if (
-            Object.keys(tables[table_id][username][instance].games).length === 0
+            Object.keys(tables[tableId][username][instance].games).length === 0
           ) {
-            delete tables[table_id][username][instance];
+            delete tables[tableId][username][instance];
 
-            if (Object.keys(tables[table_id][username]).length === 0) {
-              delete tables[table_id][username];
+            if (Object.keys(tables[tableId][username]).length === 0) {
+              delete tables[tableId][username];
 
-              if (Object.keys(tables[table_id]).length === 0) {
-                delete tables[table_id];
+              if (Object.keys(tables[tableId]).length === 0) {
+                delete tables[tableId];
               }
             }
           }
@@ -65,31 +65,31 @@ uWS
         }
 
         if (
-          tables[table_id] &&
-          tables[table_id][username] &&
-          tables[table_id][username][instance].games[gameType] &&
-          tables[table_id][username][instance].games[gameType][gameId]
+          tables[tableId] &&
+          tables[tableId][username] &&
+          tables[tableId][username][instance].games[gameType] &&
+          tables[tableId][username][instance].games[gameType][gameId]
         ) {
-          delete tables[table_id][username][instance].games[gameType][gameId];
+          delete tables[tableId][username][instance].games[gameType][gameId];
 
           if (
-            Object.keys(tables[table_id][username][instance].games[gameType])
+            Object.keys(tables[tableId][username][instance].games[gameType])
               .length === 0
           ) {
-            delete tables[table_id][username][instance].games[gameType];
+            delete tables[tableId][username][instance].games[gameType];
 
             if (
-              Object.keys(tables[table_id][username][instance].games).length ===
+              Object.keys(tables[tableId][username][instance].games).length ===
                 0 &&
-              !tables[table_id][username][instance].signaling
+              !tables[tableId][username][instance].signaling
             ) {
-              delete tables[table_id][username][instance];
+              delete tables[tableId][username][instance];
 
-              if (Object.keys(tables[table_id][username]).length === 0) {
-                delete tables[table_id][username];
+              if (Object.keys(tables[tableId][username]).length === 0) {
+                delete tables[tableId][username];
 
-                if (Object.keys(tables[table_id]).length === 0) {
-                  delete tables[table_id];
+                if (Object.keys(tables[tableId]).length === 0) {
+                  delete tables[tableId];
                 }
               }
             }
@@ -98,13 +98,13 @@ uWS
 
         switch (gameType) {
           case "snake":
-            if (snakeGames[table_id] && snakeGames[table_id][gameId]) {
-              snakeGames[table_id][gameId].closeGame();
+            if (snakeGames[tableId] && snakeGames[tableId][gameId]) {
+              snakeGames[tableId][gameId].closeGame();
 
-              delete snakeGames[table_id][gameId];
+              delete snakeGames[tableId][gameId];
 
-              if (Object.keys(snakeGames[table_id]).length === 0) {
-                delete snakeGames[table_id];
+              if (Object.keys(snakeGames[tableId]).length === 0) {
+                delete snakeGames[tableId];
               }
             }
             break;

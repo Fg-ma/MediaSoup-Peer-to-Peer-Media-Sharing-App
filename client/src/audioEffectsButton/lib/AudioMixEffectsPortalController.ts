@@ -20,7 +20,7 @@ class AudioMixEffectsPortalController {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private producerType: "audio" | "screenAudio" | "video",
@@ -39,13 +39,13 @@ class AudioMixEffectsPortalController {
           [option in MixEffectsOptionsType]?: number;
         };
       }>
-    >
+    >,
   ) {}
 
   updateSliderExternalSliderValues = (
     id: string,
     value?: number,
-    styleValue?: number
+    styleValue?: number,
   ) => {
     const [effect, option] = id.split("_");
 
@@ -83,10 +83,10 @@ class AudioMixEffectsPortalController {
     // Sort rectangles by their largest possible size (width * height)
     activeRectangles.sort((a, b) => {
       const maxSizeA = Math.max(
-        ...Object.values(a.possibleSizes).map(([w, h]) => w * h)
+        ...Object.values(a.possibleSizes).map(([w, h]) => w * h),
       );
       const maxSizeB = Math.max(
-        ...Object.values(b.possibleSizes).map(([w, h]) => w * h)
+        ...Object.values(b.possibleSizes).map(([w, h]) => w * h),
       );
       return maxSizeB - maxSizeA;
     });
@@ -95,7 +95,7 @@ class AudioMixEffectsPortalController {
       x: number,
       y: number,
       width: number,
-      height: number
+      height: number,
     ) => {
       return (
         x + width + padding <= containerWidth &&
@@ -107,7 +107,7 @@ class AudioMixEffectsPortalController {
       let placed = false;
 
       for (const [orientation, [width, height]] of Object.entries(
-        rect.possibleSizes
+        rect.possibleSizes,
       )) {
         if (placed) break;
 
@@ -119,7 +119,7 @@ class AudioMixEffectsPortalController {
                   x < space.x + space.width + padding &&
                   x + width + padding > space.x &&
                   y < space.y + space.height + padding &&
-                  y + height + padding > space.y
+                  y + height + padding > space.y,
               );
 
               if (!doesOverlap) {
@@ -178,7 +178,7 @@ class AudioMixEffectsPortalController {
     if (this.portalRef.current) {
       this.getPackedPositions(
         this.portalRef.current.getBoundingClientRect().width - 28,
-        28
+        28,
       );
     }
 
@@ -193,7 +193,7 @@ class AudioMixEffectsPortalController {
       this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectActivityChange",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: this.producerType,
@@ -220,7 +220,7 @@ class AudioMixEffectsPortalController {
         this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectActivityChange",
           header: {
-            table_id: this.table_id,
+            tableId: this.tableId,
             requestedUsername: this.username,
             requestedInstance: this.instance,
             requestedProducerType: this.producerType,
@@ -239,7 +239,7 @@ class AudioMixEffectsPortalController {
     effect: AudioMixEffectsType,
     option: MixEffectsOptionsType,
     value: number,
-    styleValue: number
+    styleValue: number,
   ) => {
     if (
       this.dynamicMixEffects.current[effect] &&
@@ -251,7 +251,7 @@ class AudioMixEffectsPortalController {
     this.updateSliderExternalSliderValues(
       `${effect}_${option}`,
       value,
-      styleValue
+      styleValue,
     );
 
     const effects = [
@@ -276,7 +276,7 @@ class AudioMixEffectsPortalController {
       this.mediasoupSocket.current?.sendMessage({
         type: "clientMixEffectValueChange",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: this.producerType,
@@ -300,7 +300,7 @@ class AudioMixEffectsPortalController {
         effect as AudioMixEffectsType,
         option as MixEffectsOptionsType,
         event.value,
-        event.styleValue
+        event.styleValue,
       );
     } else {
       if (
@@ -312,7 +312,7 @@ class AudioMixEffectsPortalController {
         this.mediasoupSocket.current?.sendMessage({
           type: "requestMixEffectValueChange",
           header: {
-            table_id: this.table_id,
+            tableId: this.tableId,
             requestedUsername: this.username,
             requestedInstance: this.instance,
             requestedProducerType: this.producerType,
@@ -333,7 +333,7 @@ class AudioMixEffectsPortalController {
     effect: AudioMixEffectsType,
     option: MixEffectsOptionsType,
     value: number,
-    styleValue: number
+    styleValue: number,
   ) => {
     if (
       this.dynamicMixEffects.current[effect] &&
@@ -345,14 +345,14 @@ class AudioMixEffectsPortalController {
     this.updateSliderExternalSliderValues(
       `${effect}_${option}`,
       value,
-      styleValue
+      styleValue,
     );
     this.setRerender((prev) => !prev);
   };
 
   private remoteMixEffectChange = (
     active: boolean,
-    effect: AudioMixEffectsType
+    effect: AudioMixEffectsType,
   ) => {
     this.dynamicMixEffects.current = {
       ...this.dynamicMixEffects.current,
@@ -365,7 +365,7 @@ class AudioMixEffectsPortalController {
     if (this.portalRef.current) {
       this.getPackedPositions(
         this.portalRef.current.getBoundingClientRect().width - 28,
-        28
+        28,
       );
     }
 
@@ -392,7 +392,7 @@ class AudioMixEffectsPortalController {
   };
 
   onMixEffectActivityChangeRequested = (
-    event: onMixEffectActivityChangeRequestedType
+    event: onMixEffectActivityChangeRequestedType,
   ) => {
     const { requestedProducerType, requestedProducerId } = event.header;
     const { active, effect } = event.data;
@@ -412,7 +412,7 @@ class AudioMixEffectsPortalController {
   };
 
   onClientMixEffectActivityChanged = (
-    event: onClientMixEffectActivityChangedType
+    event: onClientMixEffectActivityChangedType,
   ) => {
     const { active, effect } = event.data;
 
@@ -420,7 +420,7 @@ class AudioMixEffectsPortalController {
   };
 
   onMixEffectValueChangeRequested = (
-    event: onMixEffectValueChangeRequestedType
+    event: onMixEffectValueChangeRequestedType,
   ) => {
     const { requestedProducerType, requestedProducerId } = event.header;
     const { effect, option, value, styleValue } = event.data;
@@ -440,7 +440,7 @@ class AudioMixEffectsPortalController {
   };
 
   onClientMixEffectValueChanged = (
-    event: onClientMixEffectValueChangedType
+    event: onClientMixEffectValueChangedType,
   ) => {
     const { effect, option, value, styleValue } = event.data;
 

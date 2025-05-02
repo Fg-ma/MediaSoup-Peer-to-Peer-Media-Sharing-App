@@ -33,7 +33,7 @@ export default function FgSvg({
   const { userMedia } = useMediaContext();
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { table_id } = useUserInfoContext();
+  const { tableId } = useUserInfoContext();
 
   const [editing, setEditing] = useState(false);
 
@@ -257,7 +257,7 @@ export default function FgSvg({
                 );
 
                 const metadata = {
-                  table_id: table_id.current,
+                  tableId: tableId.current,
                   contentId: svgMediaInstance.svgMedia.svgId,
                   direction: "reupload",
                 };

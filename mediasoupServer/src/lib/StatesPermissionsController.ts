@@ -9,7 +9,7 @@ class StatesPermissionsController {
 
   onRequestPermissions = (event: onRequestPermissionsType) => {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -25,7 +25,7 @@ class StatesPermissionsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiredUsername,
       inquiredInstance,
       msg
@@ -34,7 +34,7 @@ class StatesPermissionsController {
 
   onPermissionsResponse(event: onPermissionsResponseType) {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -54,7 +54,7 @@ class StatesPermissionsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       msg

@@ -1,17 +1,17 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import { SoundClipEffectTypes } from "../../../../universal/effectsTypeConstant";
-import { stateEncodingMap } from "../typeConstant";
+import { tableStateEncodingMap } from "../typeConstant";
 import { soundClipEffectEncodingMap } from "./typeConstant";
 
 class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     soundClipId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       soundClipInstanceId: string;
       positioning: {
@@ -51,15 +51,14 @@ class Encoder {
       e: number[];
     }[];
   } {
-    const { table_id, soundClipId, filename, mimeType, state, instances } =
-      data;
+    const { tableId, soundClipId, filename, mimeType, state, instances } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       sid: soundClipId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(({ soundClipInstanceId, positioning, effects }) => ({
         siid: soundClipInstanceId,
         p: {

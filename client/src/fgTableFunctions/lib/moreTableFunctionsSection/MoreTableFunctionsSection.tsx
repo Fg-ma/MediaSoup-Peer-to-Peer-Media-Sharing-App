@@ -75,7 +75,7 @@ export default function MoreTableFunctionsSection({
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
-  const { table_id, username, instance } = useUserInfoContext();
+  const { tableId, username, instance } = useUserInfoContext();
 
   const handleExternalAudioEffectChange = (
     producerType: "audio" | "screenAudio",
@@ -92,7 +92,7 @@ export default function MoreTableFunctionsSection({
       mediasoupSocket.current?.sendMessage({
         type: "clientEffectChange",
         header: {
-          table_id: table_id.current,
+          tableId: tableId.current,
           username: username.current,
           instance: instance.current,
           producerType,
@@ -147,7 +147,7 @@ export default function MoreTableFunctionsSection({
             {isAudio.current && (
               <Suspense fallback={<div>Loading...</div>}>
                 <AudioEffectsButton
-                  table_id={table_id.current}
+                  tableId={tableId.current}
                   username={username.current}
                   instance={instance.current}
                   isUser={true}

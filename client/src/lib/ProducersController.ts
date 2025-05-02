@@ -42,7 +42,7 @@ class ProducersController {
     >,
     private device: React.MutableRefObject<types.Device | undefined>,
 
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
@@ -122,7 +122,7 @@ class ProducersController {
     screenBrowserMedia: MediaStream,
   ) => {
     const newScreenMedia = new ScreenMedia(
-      this.table_id.current,
+      this.tableId.current,
       this.username.current,
       this.instance.current,
       screenId,
@@ -242,7 +242,7 @@ class ProducersController {
         this.mediasoupSocket.current?.sendMessage({
           type: "connectProducerTransport",
           header: {
-            table_id: this.table_id.current,
+            tableId: this.tableId.current,
             username: this.username.current,
             instance: this.instance.current,
           },
@@ -275,7 +275,7 @@ class ProducersController {
         this.mediasoupSocket.current?.sendMessage({
           type: "createNewProducer",
           header: {
-            table_id: this.table_id.current,
+            tableId: this.tableId.current,
             username: this.username.current,
             instance: this.instance.current,
             producerType: appData.producerType as
@@ -314,7 +314,7 @@ class ProducersController {
         this.mediasoupSocket.current?.sendMessage({
           type: "createNewJSONProducer",
           header: {
-            table_id: this.table_id.current,
+            tableId: this.tableId.current,
             username: this.username.current,
             instance: this.instance.current,
             producerType: appData.producerType as "json",
@@ -472,7 +472,7 @@ class ProducersController {
     this.mediasoupSocket.current?.sendMessage({
       type: "newProducerCreated",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
         producerType,
@@ -495,7 +495,7 @@ class ProducersController {
       this.mediasoupSocket.current?.sendMessage({
         type: "newConsumer",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           username: this.username.current,
           instance: this.instance.current,
         },
@@ -529,7 +529,7 @@ class ProducersController {
       this.mediasoupSocket.current?.sendMessage({
         type: "newJSONConsumer",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           username: this.username.current,
           instance: this.instance.current,
         },
@@ -902,7 +902,7 @@ class ProducersController {
     this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         username: this.username.current,
         instance: this.instance.current,
         producerType,

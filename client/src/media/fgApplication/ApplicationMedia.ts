@@ -1,16 +1,11 @@
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   IncomingTableStaticContentMessages,
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
-import FaceLandmarks from "../../babylon/FaceLandmarks";
-import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
-import Deadbanding from "src/babylon/Deadbanding";
-import UserDevice from "src/lib/UserDevice";
 
 export type ApplicationListenerTypes =
   | { type: "downloadComplete" }
@@ -34,7 +29,7 @@ class ApplicationMedia {
     public applicationId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private getApplication: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -146,7 +141,7 @@ class ApplicationMedia {
     this.applicationListeners.delete(listener);
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.applicationListeners.forEach((listener) => {

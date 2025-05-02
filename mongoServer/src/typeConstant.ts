@@ -5,8 +5,9 @@ import {
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
+  UserContentStateTypes,
 } from "../../universal/contentTypeConstant";
 
 export type TableTopStaticMimeType =
@@ -67,7 +68,7 @@ export const mimeToExtension: { [key: string]: string } = {
 export type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -90,7 +91,7 @@ export type onUpdateContentPositioningType = {
 export type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -111,7 +112,7 @@ export type onUpdateContentEffectsType = {
 export type onUpdateVideoPositionType = {
   type: "updateVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: "video";
     contentId: string;
     instanceId: string;
@@ -119,22 +120,34 @@ export type onUpdateVideoPositionType = {
   data: { videoPosition: number };
 };
 
-export type onChangeContentStateType = {
+export type onChangeTableContentStateType = {
   type: "changeContentState";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
+  };
+};
+
+export type onChangeUserContentStateType = {
+  type: "changeContentState";
+  header: {
+    userId: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    state: UserContentStateTypes[];
   };
 };
 
 export type onCreateNewInstancesType = {
   type: "createNewInstances";
   header: {
-    table_id: string;
+    tableId: string;
   };
   data: {
     updates: {

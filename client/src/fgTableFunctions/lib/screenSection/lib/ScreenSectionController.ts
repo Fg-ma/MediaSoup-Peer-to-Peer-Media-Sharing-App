@@ -9,7 +9,7 @@ class ScreenSectionController {
       MediasoupSocketController | undefined
     >,
     private device: React.MutableRefObject<types.Device | undefined>,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
@@ -24,8 +24,8 @@ class ScreenSectionController {
   ) {}
 
   shareScreen = () => {
-    if (!this.table_id.current || !this.username.current) {
-      console.error("Missing table_id or username!");
+    if (!this.tableId.current || !this.username.current) {
+      console.error("Missing tableId or username!");
       return;
     }
     this.handleDisableEnableBtns(true);
@@ -41,7 +41,7 @@ class ScreenSectionController {
         this.mediasoupSocket.current?.sendMessage({
           type: "removeProducer",
           header: {
-            table_id: this.table_id.current,
+            tableId: this.tableId.current,
             username: this.username.current,
             instance: this.instance.current,
             producerType: "screen",
@@ -57,7 +57,7 @@ class ScreenSectionController {
           this.mediasoupSocket.current?.sendMessage({
             type: "removeProducer",
             header: {
-              table_id: this.table_id.current,
+              tableId: this.tableId.current,
               username: this.username.current,
               instance: this.instance.current,
               producerType: "screenAudio",
@@ -70,8 +70,8 @@ class ScreenSectionController {
   };
 
   shareNewScreen = () => {
-    if (!this.table_id.current || !this.username.current) {
-      console.error("Missing table_id or username!");
+    if (!this.tableId.current || !this.username.current) {
+      console.error("Missing tableId or username!");
       return;
     }
     this.handleDisableEnableBtns(true);

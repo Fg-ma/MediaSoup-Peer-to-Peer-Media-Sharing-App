@@ -14,19 +14,19 @@ class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
   onRequestCatchUpTableData = async (event: onRequestCatchUpTableDataType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
-    const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(table_id);
-    const svgs = await tableTopMongo.tableSvgs?.gets.getAllBy_TID(table_id);
-    const videos = await tableTopMongo.tableVideos?.gets.getAllBy_TID(table_id);
-    const text = await tableTopMongo.tableText?.gets.getAllBy_TID(table_id);
+    const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(tableId);
+    const svgs = await tableTopMongo.tableSvgs?.gets.getAllBy_TID(tableId);
+    const videos = await tableTopMongo.tableVideos?.gets.getAllBy_TID(tableId);
+    const text = await tableTopMongo.tableText?.gets.getAllBy_TID(tableId);
     const soundClips = await tableTopMongo.tableSoundClips?.gets.getAllBy_TID(
-      table_id
+      tableId
     );
     const applications =
-      await tableTopMongo.tableApplications?.gets.getAllBy_TID(table_id);
+      await tableTopMongo.tableApplications?.gets.getAllBy_TID(tableId);
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "responsedCatchUpTableData",
       data: { images, svgs, videos, text, soundClips, applications },
     });
@@ -35,33 +35,33 @@ class MetadataController {
   onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
     tableTopMongo.onUpdateContentEffects(event);
 
-    const { table_id, contentType, contentId, instanceId } = event.header;
+    const { tableId, contentType, contentId, instanceId } = event.header;
 
     const msg = {
       type: "updatedContentEffects",
       header: { contentType, contentId, instanceId },
       data: event.data,
     };
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onChangeContentState = (event: onChangeContentStateType) => {
-    tableTopMongo.onChangeContentState(event);
+    tableTopMongo.onChangeTableContentState(event);
 
-    const { table_id, contentType, contentId } = event.header;
+    const { tableId, contentType, contentId } = event.header;
 
     const msg = {
       type: "contentStateChanged",
       header: { contentType, contentId },
       data: event.data,
     };
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
     await tableTopMongo.onUpdateVideoPosition(event);
 
-    const { table_id, contentType, contentId, instanceId } = event.header;
+    const { tableId, contentType, contentId, instanceId } = event.header;
     const { videoPosition } = event.data;
 
     const msg = {
@@ -69,16 +69,16 @@ class MetadataController {
       header: { contentType, contentId, instanceId },
       data: { videoPosition },
     };
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onRequestCatchUpVideoPosition = (
     event: onRequestCatchUpVideoPositionType
   ) => {
-    const { table_id, username, instance, contentType, contentId, instanceId } =
+    const { tableId, username, instance, contentType, contentId, instanceId } =
       event.header;
 
-    this.broadcaster.broadcastToFirstFoundInstance(table_id, {
+    this.broadcaster.broadcastToFirstFoundInstance(tableId, {
       type: "requestedCatchUpVideoPosition",
       header: {
         username,
@@ -93,11 +93,11 @@ class MetadataController {
   onResponseCatchUpVideoPosition = (
     event: onResponseCatchUpVideoPositionType
   ) => {
-    const { table_id, username, instance, contentType, contentId, instanceId } =
+    const { tableId, username, instance, contentType, contentId, instanceId } =
       event.header;
     const { currentVideoPosition } = event.data;
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "respondedCatchUpVideoPosition",
       header: {
         contentType,
@@ -113,10 +113,10 @@ class MetadataController {
   onCreateNewInstances = (event: onCreateNewInstancesType) => {
     tableTopMongo.onCreateNewInstances(event);
 
-    const { table_id } = event.header;
+    const { tableId } = event.header;
     const { updates } = event.data;
 
-    this.broadcaster.broadcastToTable(table_id, {
+    this.broadcaster.broadcastToTable(tableId, {
       type: "createdNewInstances",
       data: {
         newInstances: updates,

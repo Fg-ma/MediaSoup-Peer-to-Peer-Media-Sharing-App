@@ -15,7 +15,7 @@ class EffectsController {
 
   onRequestEffectChange = (event: onRequestEffectChangeType) => {
     const {
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
@@ -47,7 +47,7 @@ class EffectsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       msg
@@ -55,7 +55,7 @@ class EffectsController {
   };
 
   onClientEffectChange = (event: onClientEffectChangeType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
     const { effect, effectStyle, blockStateChange } = event.data;
 
@@ -74,13 +74,13 @@ class EffectsController {
       },
     };
 
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onClientMixEffectActivityChange = (
     event: onClientMixEffectActivityChangeType
   ) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
     const { effect, active } = event.data;
 
@@ -98,14 +98,14 @@ class EffectsController {
       },
     };
 
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onRequestMixEffectActivityChange = (
     event: onRequestMixEffectActivityChangeType
   ) => {
     const {
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
@@ -126,7 +126,7 @@ class EffectsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       msg
@@ -134,7 +134,7 @@ class EffectsController {
   };
 
   onClientMixEffectValueChange = (event: onClientMixEffectValueChangeType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
     const { effect, option, value, styleValue } = event.data;
 
@@ -154,14 +154,14 @@ class EffectsController {
       },
     };
 
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onRequestMixEffectValueChange = (
     event: onRequestMixEffectValueChangeType
   ) => {
     const {
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
@@ -184,7 +184,7 @@ class EffectsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       msg
@@ -193,7 +193,7 @@ class EffectsController {
 
   onRequestClearEffects = (event: onRequestClearEffectsType) => {
     const {
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
@@ -209,7 +209,7 @@ class EffectsController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       requestedUsername,
       requestedInstance,
       msg
@@ -217,7 +217,7 @@ class EffectsController {
   };
 
   onClientClearEffects = (event: onClientClearEffectsType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
 
     const msg = {
@@ -230,7 +230,7 @@ class EffectsController {
       },
     };
 
-    this.broadcaster.broadcastToTable(table_id, msg);
+    this.broadcaster.broadcastToTable(tableId, msg);
   };
 }
 

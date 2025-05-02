@@ -8,10 +8,10 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getTextMetaDataBy_TID_XID = async (table_id: string, textId: string) => {
+  getTextMetaDataBy_TID_XID = async (tableId: string, textId: string) => {
     try {
       const textData = await this.tableTextCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         xid: textId,
       });
 
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const textData = await this.tableTextCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!textData || textData.length === 0) {

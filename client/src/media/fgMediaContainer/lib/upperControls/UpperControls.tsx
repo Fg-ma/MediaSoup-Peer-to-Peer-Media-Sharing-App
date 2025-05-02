@@ -4,7 +4,7 @@ import CloseButton from "./lib/closeButton/CloseButton";
 import { MediaContainerOptions } from "../typeConstant";
 import ReactButton from "../../../../elements/reactButton/ReactButton";
 import TabledButton from "./lib/tabledButton/TabledButton";
-import { ContentStateTypes } from "../../../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
 
 export default function UpperControls({
   reactionsPanelActive,
@@ -25,7 +25,7 @@ export default function UpperControls({
   mediaContainerOptions: MediaContainerOptions;
   fullscreen: boolean;
   backgroundMedia: boolean;
-  state: ContentStateTypes[];
+  state: TableContentStateTypes[];
 }) {
   return (
     <div

@@ -55,20 +55,20 @@ app
 
     close: (ws) => {
       const tableWS = ws as TableStaticContentWebSocket;
-      const { table_id, username, instance } = tableWS;
+      const { tableId, username, instance } = tableWS;
 
       if (
-        tables[table_id] &&
-        tables[table_id][username] &&
-        tables[table_id][username][instance]
+        tables[tableId] &&
+        tables[tableId][username] &&
+        tables[tableId][username][instance]
       ) {
-        delete tables[table_id][username][instance];
+        delete tables[tableId][username][instance];
 
-        if (Object.keys(tables[table_id][username]).length === 0) {
-          delete tables[table_id][username];
+        if (Object.keys(tables[tableId][username]).length === 0) {
+          delete tables[tableId][username];
 
-          if (Object.keys(tables[table_id]).length === 0) {
-            delete tables[table_id];
+          if (Object.keys(tables[tableId]).length === 0) {
+            delete tables[tableId];
           }
         }
       }

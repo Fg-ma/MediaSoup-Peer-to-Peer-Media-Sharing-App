@@ -28,7 +28,7 @@ class BundleSocket {
       MediasoupSocketController | undefined
     >,
     protected isUser: boolean,
-    protected table_id: string,
+    protected tableId: string,
     protected username: string,
     protected instance: string,
     protected bundleOptions: BundleOptions,
@@ -74,13 +74,13 @@ class BundleSocket {
     }>,
     protected permissions: Permissions,
     protected setPermissions: React.Dispatch<React.SetStateAction<Permissions>>,
-    protected onNewConsumerWasCreatedCallback: (() => void) | undefined
+    protected onNewConsumerWasCreatedCallback: (() => void) | undefined,
   ) {}
 
   handleAudioEffectChange = (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => {
     if (this.bundleOptions.isUser) {
       if (producerType === "audio") {
@@ -88,7 +88,7 @@ class BundleSocket {
       } else if (producerType === "screenAudio" && producerId) {
         this.userMedia.current.screenAudio[producerId].changeEffects(
           effect,
-          false
+          false,
         );
       }
 
@@ -100,7 +100,7 @@ class BundleSocket {
         this.mediasoupSocket.current?.sendMessage({
           type: "clientEffectChange",
           header: {
-            table_id: this.table_id,
+            tableId: this.tableId,
             username: this.username,
             instance: this.instance,
             producerType,
@@ -120,7 +120,7 @@ class BundleSocket {
       this.mediasoupSocket.current?.sendMessage({
         type: "requestEffectChange",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           requestedUsername: this.username,
           requestedInstance: this.instance,
           requestedProducerType: producerType,
@@ -297,7 +297,7 @@ class BundleSocket {
 
   onLocalMuteChange = (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => {
     if (producerType === "audio") {
       if (this.clientMute.current) {
@@ -318,7 +318,7 @@ class BundleSocket {
         !this.screenAudioLocalMute.current[producerId];
 
       const audioElement = document.getElementById(
-        producerId
+        producerId,
       ) as HTMLAudioElement | null;
       if (!this.isUser && audioElement) {
         audioElement.muted = this.localMute.current;
@@ -376,7 +376,7 @@ class BundleSocket {
         requestedProducerType,
         requestedProducerId,
         // @ts-expect-error: effect and requestedProducerType have no strict correlation enforcement
-        effect
+        effect,
       );
     }
   };

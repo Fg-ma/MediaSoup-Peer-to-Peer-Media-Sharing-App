@@ -43,7 +43,7 @@ const FgSoundBoard = React.lazy(
 
 export default function AudioEffectsSection({
   externalRef,
-  table_id,
+  tableId,
   username,
   instance,
   isUser,
@@ -69,7 +69,7 @@ export default function AudioEffectsSection({
   items,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   isUser: boolean;
@@ -543,7 +543,7 @@ export default function AudioEffectsSection({
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioMixEffectsPortal
-            table_id={table_id}
+            tableId={tableId}
             username={username}
             instance={instance}
             producerType={producerType}

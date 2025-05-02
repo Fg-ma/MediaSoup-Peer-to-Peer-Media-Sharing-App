@@ -1,16 +1,17 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserImagesType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userImagesCollection: Collection,
+    private userImagesCollection: Collection<UserImagesType>,
     private decoder: Decoder
   ) {}
 
-  getImageMetaDataBy_UID_IID = async (user_id: string, imageId: string) => {
+  getImageMetaDataBy_UID_IID = async (userId: string, imageId: string) => {
     try {
       const imageData = await this.userImagesCollection.findOne({
-        uid: user_id,
+        uid: userId,
         iid: imageId,
       });
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(imageData);
     } catch (err) {
       console.error("Error retrieving image data:", err);
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const imageData = await this.userImagesCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!imageData || imageData.length === 0) {
@@ -37,10 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return imageData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return imageData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

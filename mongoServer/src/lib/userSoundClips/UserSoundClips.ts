@@ -4,9 +4,10 @@ import Decoder from "./Decoder";
 import Gets from "./Gets";
 import Uploads from "./Uploads";
 import Deletes from "./Deletes";
+import { UserSoundClipsType } from "./typeConstant";
 
 class UserSoundClips {
-  private userSoundClipsCollection: Collection;
+  private userSoundClipsCollection: Collection<UserSoundClipsType>;
 
   private encoder: Encoder;
   private decoder: Decoder;

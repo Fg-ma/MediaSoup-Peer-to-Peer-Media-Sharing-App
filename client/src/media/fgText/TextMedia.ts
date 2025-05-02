@@ -1,5 +1,5 @@
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 import {
@@ -30,7 +30,7 @@ class TextMedia {
     public textId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private getText: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -131,7 +131,7 @@ class TextMedia {
     this.textListeners.delete(listener);
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.textListeners.forEach((listener) => {

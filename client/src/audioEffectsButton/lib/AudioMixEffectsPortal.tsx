@@ -15,7 +15,7 @@ import {
 import AudioMixEffectsPortalController from "./AudioMixEffectsPortalController";
 
 export default function AudioMixEffectsPortal({
-  table_id,
+  tableId,
   username,
   instance,
   producerType,
@@ -25,7 +25,7 @@ export default function AudioMixEffectsPortal({
   audioMixEffectsButtonRef,
   closeCallback,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   producerType: "audio" | "screenAudio" | "video";
@@ -341,7 +341,7 @@ export default function AudioMixEffectsPortal({
   const audioMixEffectsPortalController = useRef(
     new AudioMixEffectsPortalController(
       mediasoupSocket,
-      table_id,
+      tableId,
       username,
       instance,
       producerType,

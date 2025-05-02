@@ -1,4 +1,4 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ImageEffectStylesType,
   ImageEffectTypes,
@@ -12,7 +12,7 @@ import {
   mustachesEffectDecodingMap,
   petsEffectDecodingMap,
   postProcessEffectDecodingMap,
-  stateDecodingMap,
+  tableStateDecodingMap,
 } from "../typeConstant";
 import { imageEffectEncodingMap } from "./typeConstant";
 
@@ -71,11 +71,11 @@ class Decoder {
       };
     }[];
   }): {
-    table_id: string;
+    tableId: string;
     imageId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       imageInstanceId: string;
       positioning: {
@@ -98,11 +98,11 @@ class Decoder {
     const { tid, iid, n, m, s, i } = data;
 
     return {
-      table_id: tid,
+      tableId: tid,
       imageId: iid,
       filename: n,
       mimeType: m,
-      state: s.map((ate) => stateDecodingMap[ate]),
+      state: s.map((ate) => tableStateDecodingMap[ate]),
       instances: i.map(({ iiid, p, e, es }) => ({
         imageInstanceId: iiid,
         positioning: {

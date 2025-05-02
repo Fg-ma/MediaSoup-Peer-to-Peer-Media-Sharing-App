@@ -14,7 +14,7 @@ class MetadataController {
 
   onRequestBundleMetadata = (event: onRequestBundleMetadataType) => {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -30,7 +30,7 @@ class MetadataController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiredUsername,
       inquiredInstance,
       msg
@@ -39,7 +39,7 @@ class MetadataController {
 
   onBundleMetadataResponse = (event: onBundleMetadataResponseType) => {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -61,7 +61,7 @@ class MetadataController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       msg
@@ -70,7 +70,7 @@ class MetadataController {
 
   onRequestCatchUpData = (event: onRequestCatchUpDataType) => {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -90,7 +90,7 @@ class MetadataController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiredUsername,
       inquiredInstance,
       msg
@@ -98,15 +98,15 @@ class MetadataController {
   };
 
   onRequestGameCatchUpData = (event: onRequestGameCatchUpDataType) => {
-    const { table_id, inquiringUsername, inquiringInstance, gameId } =
+    const { tableId, inquiringUsername, inquiringInstance, gameId } =
       event.header;
 
     let validUser: { username: string; instance: string } | undefined =
       undefined;
 
-    for (const username in tableProducers[table_id]) {
+    for (const username in tableProducers[tableId]) {
       if (username !== inquiringUsername) {
-        for (const instance in tableProducers[table_id][username]) {
+        for (const instance in tableProducers[tableId][username]) {
           if (instance !== inquiringInstance) {
             validUser = { username, instance };
           }
@@ -124,7 +124,7 @@ class MetadataController {
         },
       };
       this.broadcaster.broadcastToInstance(
-        table_id,
+        tableId,
         validUser.username,
         validUser.instance,
         msg
@@ -134,7 +134,7 @@ class MetadataController {
 
   onResponseCatchUpData = (event: onResponseCatchUpDataType) => {
     const {
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
@@ -155,7 +155,7 @@ class MetadataController {
     };
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       msg
@@ -163,7 +163,7 @@ class MetadataController {
   };
 
   onResponseGameCatchUpData = (event: onResponseGameCatchUpDataType) => {
-    const { table_id, inquiringUsername, inquiringInstance, gameId } =
+    const { tableId, inquiringUsername, inquiringInstance, gameId } =
       event.header;
     const { positioning } = event.data;
 
@@ -177,7 +177,7 @@ class MetadataController {
       },
     };
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       inquiringUsername,
       inquiringInstance,
       msg

@@ -55,7 +55,7 @@ export default function CaptureMediaPortal({
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
-  const { table_id, preferences } = useUserInfoContext();
+  const { tableId, preferences } = useUserInfoContext();
 
   const [inCaptureMedia, setInCaptureMedia] = useState(false);
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
@@ -109,7 +109,7 @@ export default function CaptureMediaPortal({
 
   const captureMediaController = useRef(
     new CaptureMediaController(
-      table_id,
+      tableId,
       captureEffects,
       captureMedia,
       captureContainerRef,

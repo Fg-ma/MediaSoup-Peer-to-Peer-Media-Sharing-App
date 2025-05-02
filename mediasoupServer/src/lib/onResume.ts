@@ -2,20 +2,20 @@ import Broadcaster from "./Broadcaster";
 import { onResumeType, tableConsumers } from "../typeConstant";
 
 const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
-  const { table_id, username, instance } = event.header;
+  const { tableId, username, instance } = event.header;
 
-  for (const producerUsername in tableConsumers[table_id][username][instance]) {
-    for (const producerInstance in tableConsumers[table_id][username][instance][
+  for (const producerUsername in tableConsumers[tableId][username][instance]) {
+    for (const producerInstance in tableConsumers[tableId][username][instance][
       producerUsername
     ]) {
       try {
         if (
-          tableConsumers[table_id][username][instance][producerUsername][
+          tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].camera
         ) {
           const cameraConsumers =
-            tableConsumers[table_id][username][instance][producerUsername][
+            tableConsumers[tableId][username][instance][producerUsername][
               producerInstance
             ].camera;
           for (const cameraId in cameraConsumers) {
@@ -23,12 +23,12 @@ const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
           }
         }
         if (
-          tableConsumers[table_id][username][instance][producerUsername][
+          tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].screen
         ) {
           const screenConsumers =
-            tableConsumers[table_id][username][instance][producerUsername][
+            tableConsumers[tableId][username][instance][producerUsername][
               producerInstance
             ].screen;
           for (const screenId in screenConsumers) {
@@ -36,12 +36,12 @@ const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
           }
         }
         if (
-          tableConsumers[table_id][username][instance][producerUsername][
+          tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].screenAudio
         ) {
           const screenAudioConsumers =
-            tableConsumers[table_id][username][instance][producerUsername][
+            tableConsumers[tableId][username][instance][producerUsername][
               producerInstance
             ].screenAudio;
           for (const screenAudioId in screenAudioConsumers) {
@@ -49,21 +49,21 @@ const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
           }
         }
         if (
-          tableConsumers[table_id][username][instance][producerUsername][
+          tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].audio
         ) {
-          await tableConsumers[table_id][username][instance][producerUsername][
+          await tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].audio!.consumer?.resume();
         }
         if (
-          tableConsumers[table_id][username][instance][producerUsername][
+          tableConsumers[tableId][username][instance][producerUsername][
             producerInstance
           ].json
         ) {
           const jsonConsumers =
-            tableConsumers[table_id][username][instance][producerUsername][
+            tableConsumers[tableId][username][instance][producerUsername][
               producerInstance
             ].json;
           for (const jsonId in jsonConsumers) {
@@ -81,7 +81,7 @@ const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
     }
   }
 
-  broadcaster.broadcastToInstance(table_id, username, instance, {
+  broadcaster.broadcastToInstance(tableId, username, instance, {
     type: "resumed",
     data: "resumed",
   });

@@ -7,7 +7,7 @@ import {
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import VideoAudioMedia from "./VideoAudioMedia";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
@@ -65,7 +65,7 @@ class VideoMedia {
     public videoId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
@@ -423,7 +423,7 @@ class VideoMedia {
     this.videoListeners.delete(listener);
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.videoListeners.forEach((listener) => {

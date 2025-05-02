@@ -11,26 +11,26 @@ class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = (ws: TableStaticContentWebSocket, event: onJoinTableType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
     ws.id = uuidv4();
-    ws.table_id = table_id;
+    ws.tableId = tableId;
     ws.username = username;
     ws.instance = instance;
 
-    if (!tables[table_id]) {
-      tables[table_id] = {};
+    if (!tables[tableId]) {
+      tables[tableId] = {};
     }
-    if (!tables[table_id][username]) {
-      tables[table_id][username] = {};
+    if (!tables[tableId][username]) {
+      tables[tableId][username] = {};
     }
 
-    tables[table_id][username][instance] = ws;
+    tables[tableId][username][instance] = ws;
 
-    this.broadcaster.broadcastToTable(table_id, {
+    this.broadcaster.broadcastToTable(tableId, {
       type: "userJoinedTable",
       header: {
-        table_id,
+        tableId,
         username,
         instance,
       },
@@ -38,19 +38,19 @@ class TablesController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
     if (
-      tables[table_id] &&
-      tables[table_id][username] &&
-      tables[table_id][username][instance]
+      tables[tableId] &&
+      tables[tableId][username] &&
+      tables[tableId][username][instance]
     ) {
-      tables[table_id][username][instance].close();
+      tables[tableId][username][instance].close();
     }
 
-    this.broadcaster.broadcastToTable(table_id, {
+    this.broadcaster.broadcastToTable(tableId, {
       type: "userLeftTable",
-      header: { table_id, username, instance },
+      header: { tableId, username, instance },
     });
   };
 }

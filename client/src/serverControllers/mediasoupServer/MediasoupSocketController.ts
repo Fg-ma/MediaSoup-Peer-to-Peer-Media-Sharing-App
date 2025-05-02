@@ -15,7 +15,7 @@ class MediasoupSocketController {
 
   constructor(
     private url: string,
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private producersController: React.MutableRefObject<ProducersController>,
@@ -132,7 +132,7 @@ class MediasoupSocketController {
     this.sendMessage({
       type: "joinTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -143,7 +143,7 @@ class MediasoupSocketController {
     this.sendMessage({
       type: "getRouterRtpCapabilities",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },

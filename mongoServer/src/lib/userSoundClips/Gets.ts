@@ -1,19 +1,20 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserSoundClipsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userSoundClipsCollection: Collection,
+    private userSoundClipsCollection: Collection<UserSoundClipsType>,
     private decoder: Decoder
   ) {}
 
   getSoundClipMetaDataBy_UID_AID = async (
-    user_id: string,
+    userId: string,
     soundClipId: string
   ) => {
     try {
       const soundClipData = await this.userSoundClipsCollection.findOne({
-        tid: user_id,
+        tid: userId,
         sid: soundClipId,
       });
 
@@ -21,7 +22,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(soundClipData);
     } catch (err) {
       console.error("Error retrieving sound clip data:", err);
@@ -29,10 +29,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const soundClipsData = await this.userSoundClipsCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!soundClipsData || soundClipsData.length === 0) {
@@ -40,10 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return soundClipsData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return soundClipsData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

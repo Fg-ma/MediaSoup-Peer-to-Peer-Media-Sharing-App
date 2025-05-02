@@ -1,7 +1,7 @@
 import { Collection } from "mongodb";
 import {
   postProcessEffectEncodingMap,
-  stateEncodingMap,
+  tableStateEncodingMap,
 } from "../typeConstant";
 import Encoder from "./Encoder";
 import {
@@ -12,7 +12,7 @@ import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 
 class Uploads {
   constructor(
@@ -21,11 +21,11 @@ class Uploads {
   ) {}
 
   uploadMetaData = async (data: {
-    table_id: string;
+    tableId: string;
     applicationId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       applicationInstanceId: string;
       positioning: {
@@ -55,9 +55,9 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { table_id: string; applicationId: string },
+    filter: { tableId: string; applicationId: string },
     updateData: Partial<{
-      state?: ContentStateTypes[];
+      state?: TableContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -92,13 +92,13 @@ class Uploads {
 
     if (updateData.state !== undefined) {
       generalSetFields["s"] = updateData.state.map(
-        (ate) => stateEncodingMap[ate]
+        (ate) => tableStateEncodingMap[ate]
       );
     }
     if (Object.keys(generalSetFields).length > 0) {
       bulkOps.push({
         updateOne: {
-          filter: { tid: filter.table_id, aid: filter.applicationId },
+          filter: { tid: filter.tableId, aid: filter.applicationId },
           update: { $set: generalSetFields },
         },
       });
@@ -160,7 +160,7 @@ class Uploads {
           bulkOps.push({
             updateOne: {
               filter: {
-                tid: filter.table_id,
+                tid: filter.tableId,
                 aid: filter.applicationId,
                 "i.aiid": applicationInstanceId,
               },
@@ -185,7 +185,7 @@ class Uploads {
   };
 
   addNewInstances = async (
-    filter: { table_id: string; applicationId: string },
+    filter: { tableId: string; applicationId: string },
     updateData: {
       applicationInstanceId: string;
       positioning: {
@@ -245,7 +245,7 @@ class Uploads {
       try {
         const result = await this.tableApplicationsCollection.updateOne(
           {
-            tid: filter.table_id,
+            tid: filter.tableId,
             aid: filter.applicationId,
           },
           {

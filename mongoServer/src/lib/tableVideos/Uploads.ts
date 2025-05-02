@@ -8,7 +8,7 @@ import {
   mustachesEffectEncodingMap,
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
-  stateEncodingMap,
+  tableStateEncodingMap,
 } from "../typeConstant";
 import Encoder from "./Encoder";
 import { TableVideosType, videoEffectEncodingMap } from "./typeConstant";
@@ -16,7 +16,7 @@ import {
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 
 class Uploads {
   constructor(
@@ -25,11 +25,11 @@ class Uploads {
   ) {}
 
   uploadMetaData = async (data: {
-    table_id: string;
+    tableId: string;
     videoId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       videoInstanceId: string;
       positioning: {
@@ -60,9 +60,9 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { table_id: string; videoId: string },
+    filter: { tableId: string; videoId: string },
     updateData: Partial<{
-      state?: ContentStateTypes[];
+      state?: TableContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -98,14 +98,14 @@ class Uploads {
 
     if (updateData.state !== undefined) {
       generalSetFields["s"] = updateData.state.map(
-        (ate) => stateEncodingMap[ate]
+        (ate) => tableStateEncodingMap[ate]
       );
     }
 
     if (Object.keys(generalSetFields).length > 0) {
       bulkOps.push({
         updateOne: {
-          filter: { tid: filter.table_id, vid: filter.videoId },
+          filter: { tid: filter.tableId, vid: filter.videoId },
           update: { $set: generalSetFields },
         },
       });
@@ -195,7 +195,7 @@ class Uploads {
           bulkOps.push({
             updateOne: {
               filter: {
-                tid: filter.table_id,
+                tid: filter.tableId,
                 vid: filter.videoId,
                 "i.viid": videoInstanceId,
               },
@@ -218,7 +218,7 @@ class Uploads {
   };
 
   addNewInstances = async (
-    filter: { table_id: string; videoId: string },
+    filter: { tableId: string; videoId: string },
     updateData: {
       videoInstanceId: string;
       positioning: {
@@ -311,7 +311,7 @@ class Uploads {
       try {
         const result = await this.tableVideosCollection.updateOne(
           {
-            tid: filter.table_id,
+            tid: filter.tableId,
             vid: filter.videoId,
           },
           {

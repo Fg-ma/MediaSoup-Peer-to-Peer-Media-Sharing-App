@@ -10,7 +10,7 @@ type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
 type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -19,7 +19,7 @@ type onJoinTableType = {
 type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     socketType: "signaling";
@@ -29,7 +29,7 @@ type onLeaveTableType = {
 type onInitiateGameType = {
   type: "initiateGame";
   header: {
-    table_id: string;
+    tableId: string;
     gameType: GameTypes;
     gameId: string;
   };
@@ -74,7 +74,7 @@ class GamesSignalingMedia {
   private messageListeners: Set<(message: MessageEvent) => void> = new Set();
 
   constructor(
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private url: string,
@@ -157,7 +157,7 @@ class GamesSignalingMedia {
           this.userMedia.current.games.snake = {};
         }
         const snakeGameMedia = new SnakeGameMedia(
-          this.table_id,
+          this.tableId,
           this.username,
           this.instance,
           gameId,
@@ -209,7 +209,7 @@ class GamesSignalingMedia {
             this.userMedia.current.games.snake = {};
           }
           const snakeGameMedia = new SnakeGameMedia(
-            this.table_id,
+            this.tableId,
             this.username,
             this.instance,
             activeGame.gameId,
@@ -230,7 +230,7 @@ class GamesSignalingMedia {
     this.sendMessage({
       type: "joinTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -241,7 +241,7 @@ class GamesSignalingMedia {
     this.sendMessage({
       type: "leaveTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         socketType: "signaling",
@@ -253,7 +253,7 @@ class GamesSignalingMedia {
     this.sendMessage({
       type: "initiateGame",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         gameType,
         gameId,
       },

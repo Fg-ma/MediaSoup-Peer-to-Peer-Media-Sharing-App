@@ -4,7 +4,7 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
@@ -54,7 +54,7 @@ class ImageMedia {
     public imageId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private getImage: (
@@ -271,7 +271,7 @@ class ImageMedia {
     this.imageListeners.delete(listener);
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.imageListeners.forEach((listener) => {

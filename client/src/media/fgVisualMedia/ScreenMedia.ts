@@ -28,7 +28,7 @@ class ScreenMedia {
   babylonScene: BabylonScene | undefined;
 
   constructor(
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private screenId: string,
@@ -96,7 +96,7 @@ class ScreenMedia {
     this.mediasoupSocket.current?.sendMessage({
       type: "removeProducer",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         producerType: "screen",
@@ -108,7 +108,7 @@ class ScreenMedia {
       this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: "screenAudio",

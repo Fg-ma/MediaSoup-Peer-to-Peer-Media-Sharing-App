@@ -16,9 +16,9 @@ class TableSocketController {
 
   constructor(
     private url: string,
-    private table_id: string,
+    private tableId: string,
     private username: string,
-    private instance: string
+    private instance: string,
   ) {
     this.connect(this.url);
   }
@@ -54,13 +54,13 @@ class TableSocketController {
   };
 
   addMessageListener = (
-    listener: (message: IncomingTableMessages) => void
+    listener: (message: IncomingTableMessages) => void,
   ): void => {
     this.messageListeners.add(listener);
   };
 
   removeMessageListener = (
-    listener: (message: IncomingTableMessages) => void
+    listener: (message: IncomingTableMessages) => void,
   ): void => {
     this.messageListeners.delete(listener);
   };
@@ -75,7 +75,7 @@ class TableSocketController {
     this.sendMessage({
       type: "joinTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -86,7 +86,7 @@ class TableSocketController {
     this.sendMessage({
       type: "leaveTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -97,7 +97,7 @@ class TableSocketController {
     this.sendMessage({
       type: "changeTableBackground",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
       },
@@ -109,7 +109,7 @@ class TableSocketController {
     this.sendMessage({
       type: "moveSeats",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username,
       },
       data: { direction },
@@ -122,7 +122,7 @@ class TableSocketController {
     this.sendMessage({
       type: "swapSeats",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         targetUsername,
       },
@@ -135,7 +135,7 @@ class TableSocketController {
     this.sendMessage({
       type: "kickFromTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         targetUsername,
       },
@@ -147,12 +147,12 @@ class TableSocketController {
     reaction: TableReactions,
     reactionStyle: TableReactionStyles,
     contentId?: string,
-    instanceId?: string
+    instanceId?: string,
   ) => {
     this.sendMessage({
       type: "reaction",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         contentType,
         contentId,
         instanceId,

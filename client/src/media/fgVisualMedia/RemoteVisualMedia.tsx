@@ -31,7 +31,7 @@ const VisualMediaAdjustmentButtons = React.lazy(
 );
 
 export default function RemoteVisualMedia({
-  table_id,
+  tableId,
   visualMediaId,
   username,
   instance,
@@ -54,7 +54,7 @@ export default function RemoteVisualMedia({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  table_id: string;
+  tableId: string;
   visualMediaId: string;
   username: string;
   instance: string;
@@ -205,7 +205,7 @@ export default function RemoteVisualMedia({
         mediasoupSocket?.current?.sendMessage({
           type: "requestEffectChange",
           header: {
-            table_id,
+            tableId,
             requestedUsername: username,
             requestedInstance: instance,
             requestedProducerType: type,
@@ -228,7 +228,7 @@ export default function RemoteVisualMedia({
         mediasoupSocket?.current?.sendMessage({
           type: "requestClearEffects",
           header: {
-            table_id,
+            tableId,
             requestedUsername: username,
             requestedInstance: instance,
             requestedProducerType: type,
@@ -252,7 +252,7 @@ export default function RemoteVisualMedia({
     new FgLowerVisualMediaController(
       mediasoupSocket,
       visualMediaId,
-      table_id,
+      tableId,
       username,
       instance,
       type,
@@ -289,7 +289,7 @@ export default function RemoteVisualMedia({
 
   const fgVisualMediaController = useRef(
     new FgVisualMediaController(
-      table_id,
+      tableId,
       username,
       instance,
       type,
@@ -341,7 +341,7 @@ export default function RemoteVisualMedia({
       mediasoupSocket.current?.sendMessage({
         type: "requestCatchUpData",
         header: {
-          table_id,
+          tableId,
           inquiringUsername: activeUsername.current,
           inquiringInstance: activeInstance.current,
           inquiredUsername: username,
@@ -447,7 +447,7 @@ export default function RemoteVisualMedia({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id,
+          tableId,
           username,
           instance,
           type,
@@ -534,7 +534,7 @@ export default function RemoteVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
       >
@@ -584,7 +584,7 @@ export default function RemoteVisualMedia({
           setReactionsPanelActive={setReactionsPanelActive}
         />
         <FgLowerVisualMediaControls
-          table_id={table_id}
+          tableId={tableId}
           username={username}
           instance={instance}
           type={type}

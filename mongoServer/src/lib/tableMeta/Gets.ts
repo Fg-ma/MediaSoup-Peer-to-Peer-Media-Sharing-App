@@ -7,10 +7,10 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getTableMetaBy_TID = async (table_id: string) => {
+  getTableMetaBy_TID = async (tableId: string) => {
     try {
       const tableMetaData = await this.tablesMetaCollection.findOne({
-        tid: table_id,
+        tid: tableId,
       });
 
       if (!tableMetaData) {

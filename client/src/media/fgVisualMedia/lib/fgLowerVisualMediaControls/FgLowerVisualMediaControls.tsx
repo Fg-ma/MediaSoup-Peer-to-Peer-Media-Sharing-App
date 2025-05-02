@@ -109,7 +109,7 @@ export interface ActivePages {
 }
 
 export default function FgLowerVisualMediaControls({
-  table_id,
+  tableId,
   username,
   instance,
   type,
@@ -139,7 +139,7 @@ export default function FgLowerVisualMediaControls({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   type: "camera" | "screen";
@@ -250,7 +250,7 @@ export default function FgLowerVisualMediaControls({
   return (
     <div className="visual-media-lower-controls pointer-events-none absolute bottom-[1%] left-0 z-20 flex h-[12%] max-h-12 min-h-6 w-full justify-between px-3">
       <div
-        className="flex z-20 h-full w-max items-center space-x-2"
+        className="z-20 flex h-full w-max items-center space-x-2"
         style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
       >
         {fgVisualMediaOptions.isPlayPause && (
@@ -270,7 +270,7 @@ export default function FgLowerVisualMediaControls({
                 ?.acceptsScreenAudioEffects))) && (
           <Suspense fallback={<div>Loading...</div>}>
             <FgVolumeElement
-              table_id={table_id}
+              tableId={tableId}
               username={username}
               instance={instance}
               isUser={
@@ -392,7 +392,7 @@ export default function FgLowerVisualMediaControls({
             screenAudioStream)) && (
           <Suspense fallback={<div>Loading...</div>}>
             <AudioEffectsButton
-              table_id={table_id}
+              tableId={tableId}
               username={username}
               instance={instance}
               isUser={

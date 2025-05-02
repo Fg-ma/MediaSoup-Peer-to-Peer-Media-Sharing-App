@@ -13,7 +13,7 @@ const audioEffectOffIcon =
   nginxAssetServerBaseUrl + "svgs/audioEffects/audioEffectOffIcon.svg";
 
 const AudioEffectsSection = React.lazy(
-  () => import("./lib/AudioEffectsSection")
+  () => import("./lib/AudioEffectsSection"),
 );
 
 const defaultAudioEffectsButtonOptions: {
@@ -23,7 +23,7 @@ const defaultAudioEffectsButtonOptions: {
 } = { color: "#f2f2f2", placement: "above", hoverTimeoutDuration: 0 };
 
 export default function AudioEffectsButton({
-  table_id,
+  tableId,
   username,
   instance,
   isUser,
@@ -47,7 +47,7 @@ export default function AudioEffectsButton({
   style,
   options,
 }: {
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   isUser: boolean;
@@ -59,11 +59,11 @@ export default function AudioEffectsButton({
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio" | "video",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => void;
   handleMute: (
     producerType: "audio" | "screenAudio" | "video",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   muteStateRef?: React.MutableRefObject<boolean>;
   videoContentMute?: React.MutableRefObject<{
@@ -122,7 +122,7 @@ export default function AudioEffectsButton({
               {hoverLabelElement ? (
                 hoverLabelElement
               ) : (
-                <FgHoverContentStandard content='Audio effects' style='dark' />
+                <FgHoverContentStandard content="Audio effects" style="dark" />
               )}
             </>
           ) : (
@@ -130,7 +130,7 @@ export default function AudioEffectsButton({
           )
         }
         scrollingContainerRef={scrollingContainerRef}
-        className='flex items-center justify-center h-full aspect-square pointer-events-auto'
+        className="pointer-events-auto flex aspect-square h-full items-center justify-center"
         style={style}
         options={{
           hoverTimeoutDuration: audioEffectsButtonOptions.hoverTimeoutDuration,
@@ -139,7 +139,7 @@ export default function AudioEffectsButton({
       {audioEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>
           <AudioEffectsSection
-            table_id={table_id}
+            tableId={tableId}
             username={username}
             instance={instance}
             isUser={isUser}

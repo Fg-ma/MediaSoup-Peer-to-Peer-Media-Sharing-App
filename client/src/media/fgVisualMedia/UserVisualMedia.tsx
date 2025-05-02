@@ -28,7 +28,7 @@ const VisualMediaAdjustmentButtons = React.lazy(
 );
 
 export default function UserVisualMedia({
-  table_id,
+  tableId,
   visualMediaId,
   username,
   instance,
@@ -50,7 +50,7 @@ export default function UserVisualMedia({
   tracksColorSetterCallback,
 }: {
   visualMediaId: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   name?: string;
@@ -201,7 +201,7 @@ export default function UserVisualMedia({
         mediasoupSocket?.current?.sendMessage({
           type: "clientEffectChange",
           header: {
-            table_id,
+            tableId,
             username,
             instance,
             producerType: type,
@@ -222,7 +222,7 @@ export default function UserVisualMedia({
       mediasoupSocket?.current?.sendMessage({
         type: "clientClearEffects",
         header: {
-          table_id,
+          tableId,
           username,
           instance,
           producerType: type,
@@ -245,7 +245,7 @@ export default function UserVisualMedia({
     new FgLowerVisualMediaController(
       mediasoupSocket,
       visualMediaId,
-      table_id,
+      tableId,
       username,
       instance,
       type,
@@ -282,7 +282,7 @@ export default function UserVisualMedia({
 
   const fgVisualMediaController = useRef(
     new FgVisualMediaController(
-      table_id,
+      tableId,
       username,
       instance,
       type,
@@ -460,7 +460,7 @@ export default function UserVisualMedia({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id,
+          tableId,
           username,
           instance,
           type,
@@ -542,7 +542,7 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
       >
@@ -583,7 +583,7 @@ export default function UserVisualMedia({
           setReactionsPanelActive={setReactionsPanelActive}
         />
         <FgLowerVisualMediaControls
-          table_id={table_id}
+          tableId={tableId}
           username={username}
           instance={instance}
           type={type}

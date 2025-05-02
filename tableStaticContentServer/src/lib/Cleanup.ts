@@ -6,31 +6,26 @@ class Cleanup {
   constructor(private broadcaster: Broadcaster) {}
 
   onDeleteContent = async (event: onDeleteContentType) => {
-    const { table_id, contentType, contentId, instanceId } = event.header;
+    const { tableId, contentType, contentId, instanceId } = event.header;
     const { filename } = event.data;
 
     const document = await tableTopMongo.deleteTableDocumentInstance(
-      table_id,
+      tableId,
       contentType,
       contentId,
       instanceId
     );
 
-    if (
-      document &&
-      document.i.length === 0 &&
-      !document.s.includes(0) &&
-      !document.s.includes(1)
-    ) {
+    if (document && document.i.length === 0 && !document.s.includes(0)) {
       await tableTopCeph.deleteFile(
         contentTypeBucketMap[contentType],
         filename
       );
 
-      await tableTopMongo.deleteTableDocument(table_id, contentType, contentId);
+      await tableTopMongo.deleteTableDocument(tableId, contentType, contentId);
     }
 
-    this.broadcaster.broadcastToTable(table_id, {
+    this.broadcaster.broadcastToTable(tableId, {
       type: "contentDeleted",
       header: {
         contentType,

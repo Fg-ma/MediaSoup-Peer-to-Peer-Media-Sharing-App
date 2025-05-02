@@ -3,7 +3,7 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
@@ -25,7 +25,7 @@ class SoundClipMedia {
     public soundClipId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private getSoundClip: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -113,7 +113,7 @@ class SoundClipMedia {
     this.soundClipListeners.delete(listener);
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.soundClipListeners.forEach((listener) => {

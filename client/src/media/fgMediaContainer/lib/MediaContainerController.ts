@@ -22,7 +22,7 @@ class MediaContainerController {
   savedMediaPosition: { top: number; left: number } | undefined;
 
   constructor(
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private mediaId: string,
     private mediaInstanceId: string,
     private kind: StaticContentTypes,
@@ -155,7 +155,7 @@ class MediaContainerController {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (
-              data.table_id === this.table_id.current &&
+              data.tableId === this.tableId.current &&
               data.kind === this.kind &&
               data.mediaId === this.mediaId &&
               data.mediaInstanceId === this.mediaInstanceId

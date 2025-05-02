@@ -75,7 +75,7 @@ export default function JoinTableSection({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
     useSocketContext();
-  const { table_id, username, instance, device } = useUserInfoContext();
+  const { tableId, username, instance, device } = useUserInfoContext();
   const [isInTable, setIsInTable] = useState(false);
   const tableIdRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -87,7 +87,7 @@ export default function JoinTableSection({
       mediasoupSocket,
       tableIdRef,
       usernameRef,
-      table_id,
+      tableId,
       username,
       instance,
       setIsInTable,

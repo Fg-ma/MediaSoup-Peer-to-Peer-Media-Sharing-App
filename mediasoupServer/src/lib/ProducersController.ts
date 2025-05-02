@@ -22,41 +22,41 @@ class ProducersController {
   ) {}
 
   onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
     // Get the next available worker and router if one doesn't already exist
     let mediasoupRouter;
-    if (!workersMap[table_id]) {
+    if (!workersMap[tableId]) {
       const { router, workerIdx } = getNextWorker();
-      workersMap[table_id] = workerIdx;
+      workersMap[tableId] = workerIdx;
       mediasoupRouter = router;
     } else {
-      const { router } = getWorkerByIdx(workersMap[table_id]);
+      const { router } = getWorkerByIdx(workersMap[tableId]);
       mediasoupRouter = router;
     }
 
     if (
-      !tableProducerTransports[table_id] ||
-      !tableProducerTransports[table_id][username] ||
-      !tableProducerTransports[table_id][username][instance]
+      !tableProducerTransports[tableId] ||
+      !tableProducerTransports[tableId][username] ||
+      !tableProducerTransports[tableId][username][instance]
     ) {
       const { transport, params } = await createWebRtcTransport(
         mediasoupRouter
       );
 
-      if (!tableProducerTransports[table_id]) {
-        tableProducerTransports[table_id] = {};
+      if (!tableProducerTransports[tableId]) {
+        tableProducerTransports[tableId] = {};
       }
-      if (!tableProducerTransports[table_id][username]) {
-        tableProducerTransports[table_id][username] = {};
+      if (!tableProducerTransports[tableId][username]) {
+        tableProducerTransports[tableId][username] = {};
       }
 
-      tableProducerTransports[table_id][username][instance] = {
+      tableProducerTransports[tableId][username][instance] = {
         transport,
         isConnected: false,
       };
 
-      this.broadcaster.broadcastToInstance(table_id, username, instance, {
+      this.broadcaster.broadcastToInstance(tableId, username, instance, {
         type: "producerTransportCreated",
         data: {
           params,
@@ -68,41 +68,41 @@ class ProducersController {
   onConnectProducerTransport = async (
     event: onConnectProducerTransportType
   ) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const { dtlsParameters } = event.data;
 
     if (
-      !tableProducerTransports[table_id] ||
-      !tableProducerTransports[table_id][username] ||
-      !tableProducerTransports[table_id][username][instance]
+      !tableProducerTransports[tableId] ||
+      !tableProducerTransports[tableId][username] ||
+      !tableProducerTransports[tableId][username][instance]
     ) {
       return;
     }
 
-    if (!tableProducerTransports[table_id][username][instance].isConnected) {
-      await tableProducerTransports[table_id][username][
+    if (!tableProducerTransports[tableId][username][instance].isConnected) {
+      await tableProducerTransports[tableId][username][
         instance
       ].transport.connect({
         dtlsParameters: dtlsParameters,
       });
-      tableProducerTransports[table_id][username][instance].isConnected = true;
+      tableProducerTransports[tableId][username][instance].isConnected = true;
     }
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "producerConnected",
       data: "producer connected",
     });
   };
 
   onCreateNewProducer = async (event: onCreateNewProducerType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
     const { kind, rtpParameters } = event.data;
 
     if (
-      !tableProducerTransports[table_id] ||
-      !tableProducerTransports[table_id][username] ||
-      !tableProducerTransports[table_id][username][instance]
+      !tableProducerTransports[tableId] ||
+      !tableProducerTransports[tableId][username] ||
+      !tableProducerTransports[tableId][username][instance]
     ) {
       return;
     }
@@ -112,38 +112,38 @@ class ProducersController {
         producerType === "screen" ||
         producerType === "screenAudio") &&
         producerId &&
-        tableProducers[table_id]?.[username]?.[instance]?.[producerType]?.[
+        tableProducers[tableId]?.[username]?.[instance]?.[producerType]?.[
           producerId
         ]) ||
       (producerType === "audio" &&
-        tableProducers[table_id]?.[username]?.[instance]?.[producerType])
+        tableProducers[tableId]?.[username]?.[instance]?.[producerType])
     ) {
       return;
     }
 
-    const newProducer = await tableProducerTransports[table_id][username][
+    const newProducer = await tableProducerTransports[tableId][username][
       instance
     ].transport.produce({
       kind,
       rtpParameters,
     });
 
-    if (!tableProducers[table_id]) {
-      tableProducers[table_id] = {};
+    if (!tableProducers[tableId]) {
+      tableProducers[tableId] = {};
     }
-    if (!tableProducers[table_id][username]) {
-      tableProducers[table_id][username] = {};
+    if (!tableProducers[tableId][username]) {
+      tableProducers[tableId][username] = {};
     }
-    if (!tableProducers[table_id][username][instance]) {
-      tableProducers[table_id][username][instance] = {};
+    if (!tableProducers[tableId][username][instance]) {
+      tableProducers[tableId][username][instance] = {};
     }
     if (
       (producerType === "camera" ||
         producerType === "screen" ||
         producerType === "screenAudio") &&
-      !tableProducers[table_id][username][instance][producerType]
+      !tableProducers[tableId][username][instance][producerType]
     ) {
-      tableProducers[table_id][username][instance][producerType] = {};
+      tableProducers[tableId][username][instance][producerType] = {};
     }
 
     if (
@@ -152,12 +152,11 @@ class ProducersController {
       producerType === "screenAudio"
     ) {
       if (producerId) {
-        tableProducers[table_id][username][instance][producerType]![
-          producerId
-        ] = newProducer;
+        tableProducers[tableId][username][instance][producerType]![producerId] =
+          newProducer;
       }
     } else {
-      tableProducers[table_id][username][instance][producerType] = newProducer;
+      tableProducers[tableId][username][instance][producerType] = newProducer;
     }
 
     const msg = {
@@ -169,8 +168,8 @@ class ProducersController {
         producerId,
       },
     };
-    this.broadcaster.broadcastToTable(table_id, msg);
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToTable(tableId, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "newProducerCallback",
       data: {
         id: newProducer.id,
@@ -179,15 +178,15 @@ class ProducersController {
   };
 
   onCreateNewJSONProducer = async (event: onCreateNewJSONProducerType) => {
-    const { table_id, username, instance, producerId, dataStreamType } =
+    const { tableId, username, instance, producerId, dataStreamType } =
       event.header;
     const { label, protocol, sctpStreamParameters } = event.data;
 
     // Validate that the transport and producer type are correctly set up
     if (
-      !tableProducerTransports[table_id] ||
-      !tableProducerTransports[table_id][username] ||
-      !tableProducerTransports[table_id][username][instance]
+      !tableProducerTransports[tableId] ||
+      !tableProducerTransports[tableId][username] ||
+      !tableProducerTransports[tableId][username][instance]
     ) {
       console.error(
         "Producer transport not found for the given table, username, or instance."
@@ -197,7 +196,7 @@ class ProducersController {
 
     // Check if a producer of this type already exists, and avoid creating a new one if it does
     if (
-      tableProducers[table_id]?.[username]?.[instance]?.json?.[dataStreamType]
+      tableProducers[tableId]?.[username]?.[instance]?.json?.[dataStreamType]
     ) {
       return;
     }
@@ -205,7 +204,7 @@ class ProducersController {
     // Now, produce the new JSON producer
     try {
       const transport =
-        tableProducerTransports[table_id][username][instance].transport;
+        tableProducerTransports[tableId][username][instance].transport;
       const newProducer = await transport.produceData({
         label,
         protocol,
@@ -214,22 +213,22 @@ class ProducersController {
       });
 
       // Make sure the producers object structure exists for the new producer
-      if (!tableProducers[table_id]) {
-        tableProducers[table_id] = {};
+      if (!tableProducers[tableId]) {
+        tableProducers[tableId] = {};
       }
-      if (!tableProducers[table_id][username]) {
-        tableProducers[table_id][username] = {};
+      if (!tableProducers[tableId][username]) {
+        tableProducers[tableId][username] = {};
       }
-      if (!tableProducers[table_id][username][instance]) {
-        tableProducers[table_id][username][instance] = {};
+      if (!tableProducers[tableId][username][instance]) {
+        tableProducers[tableId][username][instance] = {};
       }
-      if (!tableProducers[table_id][username][instance].json) {
-        tableProducers[table_id][username][instance].json = {};
+      if (!tableProducers[tableId][username][instance].json) {
+        tableProducers[tableId][username][instance].json = {};
       }
 
       // Store the new JSON producer under the appropriate keys
       if (producerId) {
-        tableProducers[table_id][username][instance].json[dataStreamType] =
+        tableProducers[tableId][username][instance].json[dataStreamType] =
           newProducer;
       }
 
@@ -245,8 +244,8 @@ class ProducersController {
         },
       };
 
-      this.broadcaster.broadcastToTable(table_id, msg);
-      this.broadcaster.broadcastToInstance(table_id, username, instance, {
+      this.broadcaster.broadcastToTable(tableId, msg);
+      this.broadcaster.broadcastToInstance(tableId, username, instance, {
         type: "newJSONProducerCallback",
         data: {
           id: newProducer.id,
@@ -258,7 +257,7 @@ class ProducersController {
   };
 
   onNewProducerCreated = (event: onNewProducerCreatedType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
 
     const msg = {
@@ -269,12 +268,12 @@ class ProducersController {
       },
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   };
 
   onRemoveProducer = (event: onRemoveProducerType) => {
     const {
-      table_id,
+      tableId,
       username,
       instance,
       producerType,
@@ -284,7 +283,7 @@ class ProducersController {
 
     try {
       this.mediasoupCleanup.removeProducer(
-        table_id,
+        tableId,
         username,
         instance,
         producerType,
@@ -294,7 +293,7 @@ class ProducersController {
 
       // Remove consumers
       this.mediasoupCleanup.removeConsumer(
-        table_id,
+        tableId,
         username,
         instance,
         producerType,
@@ -302,7 +301,7 @@ class ProducersController {
         dataStreamType
       );
 
-      this.mediasoupCleanup.releaseWorkers(table_id);
+      this.mediasoupCleanup.releaseWorkers(tableId);
 
       const msg = {
         type: "producerDisconnected",
@@ -315,14 +314,14 @@ class ProducersController {
         },
       };
 
-      this.broadcaster.broadcastToTable(table_id, msg);
+      this.broadcaster.broadcastToTable(tableId, msg);
     } catch (error) {
       console.error(error);
     }
   };
 
   onRequestRemoveProducer = (event: onRequestRemoveProducerType) => {
-    const { table_id, username, instance, producerType, producerId } =
+    const { tableId, username, instance, producerType, producerId } =
       event.header;
 
     const msg = {
@@ -333,7 +332,7 @@ class ProducersController {
       },
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   };
 }
 

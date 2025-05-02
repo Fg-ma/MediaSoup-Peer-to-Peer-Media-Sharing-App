@@ -1,4 +1,4 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   VideoEffectStylesType,
   VideoEffectTypes,
@@ -12,7 +12,7 @@ import {
   mustachesEffectEncodingMap,
   petsEffectEncodingMap,
   postProcessEffectEncodingMap,
-  stateEncodingMap,
+  tableStateEncodingMap,
 } from "../typeConstant";
 import { videoEffectEncodingMap } from "./typeConstant";
 
@@ -20,11 +20,11 @@ class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     videoId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       videoInstanceId: string;
       positioning: {
@@ -91,14 +91,14 @@ class Encoder {
       vp: number;
     }[];
   } {
-    const { table_id, videoId, filename, mimeType, state, instances } = data;
+    const { tableId, videoId, filename, mimeType, state, instances } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       vid: videoId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(
         ({
           videoInstanceId,

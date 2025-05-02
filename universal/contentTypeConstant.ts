@@ -18,4 +18,6 @@ export type StaticContentTypes =
   | "text"
   | "soundClip";
 
-export type ContentStateTypes = "tabled" | "muteStyle";
+export type TableContentStateTypes = "tabled";
+
+export type UserContentStateTypes = "muteStyle";

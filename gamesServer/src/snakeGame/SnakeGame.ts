@@ -32,7 +32,7 @@ class SnakeGame {
 
   constructor(
     private broadcaster: Broadcaster,
-    private table_id: string,
+    private tableId: string,
     private snakeGameId: string
   ) {}
 
@@ -264,7 +264,7 @@ class SnakeGame {
 
   private broadcastPlayersState = () => {
     this.broadcaster.broadcastToTable(
-      this.table_id,
+      this.tableId,
       "games",
       "snake",
       this.snakeGameId,
@@ -279,7 +279,7 @@ class SnakeGame {
 
   private broadcastGameState = () => {
     this.broadcaster.broadcastToTable(
-      this.table_id,
+      this.tableId,
       "games",
       "snake",
       this.snakeGameId,
@@ -292,7 +292,7 @@ class SnakeGame {
 
   private broadcastGridSize = () => {
     this.broadcaster.broadcastToTable(
-      this.table_id,
+      this.tableId,
       "games",
       "snake",
       this.snakeGameId,
@@ -307,7 +307,7 @@ class SnakeGame {
 
   private broadcastGameOver = () => {
     this.broadcaster.broadcastToTable(
-      this.table_id,
+      this.tableId,
       "games",
       "snake",
       this.snakeGameId,

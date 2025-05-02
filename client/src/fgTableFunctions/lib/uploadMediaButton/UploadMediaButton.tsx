@@ -11,7 +11,7 @@ const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
 export default function UploadMediaButton() {
-  const { table_id } = useUserInfoContext();
+  const { tableId } = useUserInfoContext();
 
   const file = useRef<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +34,7 @@ export default function UploadMediaButton() {
     }
 
     const metadata = {
-      table_id: table_id.current,
+      tableId: tableId.current,
       contentId: uuidv4(),
       instanceId: uuidv4(),
       direction: "toTable",
@@ -59,7 +59,7 @@ export default function UploadMediaButton() {
       xhr.open(
         "POST",
         staticContentServerBaseUrl + `upload-file/${uploadId}`,
-        true
+        true,
       );
 
       xhr.send(formData);
@@ -72,17 +72,17 @@ export default function UploadMediaButton() {
     <>
       <input
         ref={fileInputRef}
-        className='hidden'
-        type='file'
+        className="hidden"
+        type="file"
         onChange={handleFileChange}
       />
       <FgButton
-        className='flex h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white"
         clickFunction={clickFunction}
         contentFunction={() => (
           <FgSVGElement
             src={uploadIcon}
-            className='h-[75%] aspect-square flex justify-center items-center'
+            className="flex aspect-square h-[75%] items-center justify-center"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
@@ -90,7 +90,7 @@ export default function UploadMediaButton() {
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Upload to table' />}
+        hoverContent={<FgHoverContentStandard content="Upload to table" />}
         options={{ hoverTimeoutDuration: 100 }}
         aria-label={"Upload file to table"}
       />

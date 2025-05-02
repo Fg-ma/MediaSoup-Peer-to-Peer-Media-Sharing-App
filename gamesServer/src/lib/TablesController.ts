@@ -13,30 +13,30 @@ class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = (ws: GameWebSocket, event: onJoinTableType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
-    if (!tables[table_id]) {
-      tables[table_id] = {};
+    if (!tables[tableId]) {
+      tables[tableId] = {};
     }
-    if (!tables[table_id][username]) {
-      tables[table_id][username] = {};
+    if (!tables[tableId][username]) {
+      tables[tableId][username] = {};
     }
-    if (!tables[table_id][username][instance]) {
-      tables[table_id][username][instance] = { games: {} };
+    if (!tables[tableId][username][instance]) {
+      tables[tableId][username][instance] = { games: {} };
     }
 
-    tables[table_id][username][instance].signaling = ws;
+    tables[tableId][username][instance].signaling = ws;
 
     ws.id = uuidv4();
-    ws.table_id = table_id;
+    ws.tableId = tableId;
     ws.username = username;
     ws.instance = instance;
     ws.socketType = "signaling";
 
-    const activeGames = this.getUniqueGames(table_id);
+    const activeGames = this.getUniqueGames(tableId);
 
     this.broadcaster.broadcastToInstance(
-      table_id,
+      tableId,
       username,
       instance,
       "signaling",
@@ -50,25 +50,25 @@ class TablesController {
   };
 
   onNewGameSocket = (ws: GameWebSocket, event: onNewGameSocketType) => {
-    const { table_id, username, instance, gameType, gameId } = event.header;
+    const { tableId, username, instance, gameType, gameId } = event.header;
 
-    if (!tables[table_id]) {
-      tables[table_id] = {};
+    if (!tables[tableId]) {
+      tables[tableId] = {};
     }
-    if (!tables[table_id][username]) {
-      tables[table_id][username] = {};
+    if (!tables[tableId][username]) {
+      tables[tableId][username] = {};
     }
-    if (!tables[table_id][username][instance]) {
-      tables[table_id][username][instance] = { games: {} };
+    if (!tables[tableId][username][instance]) {
+      tables[tableId][username][instance] = { games: {} };
     }
-    if (!tables[table_id][username][instance].games[gameType]) {
-      tables[table_id][username][instance].games[gameType] = {};
+    if (!tables[tableId][username][instance].games[gameType]) {
+      tables[tableId][username][instance].games[gameType] = {};
     }
 
-    tables[table_id][username][instance].games[gameType][gameId] = ws;
+    tables[tableId][username][instance].games[gameType][gameId] = ws;
 
     ws.id = uuidv4();
-    ws.table_id = table_id;
+    ws.tableId = tableId;
     ws.username = username;
     ws.instance = instance;
     ws.socketType = "games";
@@ -77,46 +77,46 @@ class TablesController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
-    const { table_id, username, instance, socketType, gameType, gameId } =
+    const { tableId, username, instance, socketType, gameType, gameId } =
       event.header;
 
     if (socketType === "signaling") {
       if (
-        tables[table_id] &&
-        tables[table_id][username] &&
-        tables[table_id][username][instance] &&
-        tables[table_id][username][instance].signaling
+        tables[tableId] &&
+        tables[tableId][username] &&
+        tables[tableId][username][instance] &&
+        tables[tableId][username][instance].signaling
       ) {
-        tables[table_id][username][instance].signaling.close();
+        tables[tableId][username][instance].signaling.close();
       }
     } else if (socketType === "games") {
       if (
         gameType &&
         gameId &&
-        tables[table_id] &&
-        tables[table_id][username] &&
-        tables[table_id][username][instance].games[gameType] &&
-        tables[table_id][username][instance].games[gameType][gameId]
+        tables[tableId] &&
+        tables[tableId][username] &&
+        tables[tableId][username][instance].games[gameType] &&
+        tables[tableId][username][instance].games[gameType][gameId]
       ) {
-        tables[table_id][username][instance].games[gameType][gameId].close();
+        tables[tableId][username][instance].games[gameType][gameId].close();
       }
     }
 
-    this.broadcaster.broadcastToTable(table_id, "games", gameType, gameId, {
+    this.broadcaster.broadcastToTable(tableId, "games", gameType, gameId, {
       type: "userLeftTable",
-      header: { table_id, username, instance, socketType, gameType, gameId },
+      header: { tableId, username, instance, socketType, gameType, gameId },
     });
   };
 
   private getUniqueGames = (
-    table_id: string
+    tableId: string
   ): { gameType: GameTypes; gameId: string }[] => {
     const uniqueGames = new Set<string>();
     const result: { gameType: GameTypes; gameId: string }[] = [];
 
-    if (!tables[table_id]) return result;
+    if (!tables[tableId]) return result;
 
-    const usernames = Object.values(tables[table_id]);
+    const usernames = Object.values(tables[tableId]);
     for (const username of usernames) {
       const instances = Object.values(username);
       for (const instance of instances) {

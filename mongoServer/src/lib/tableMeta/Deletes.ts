@@ -3,10 +3,10 @@ import { Collection } from "mongodb";
 class Deletes {
   constructor(private tablesMetaCollection: Collection) {}
 
-  deleteMetaDataBy_TID_VID = async (table_id: string) => {
+  deleteMetaDataBy_TID_VID = async (tableId: string) => {
     try {
       await this.tablesMetaCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
       });
     } catch (err) {
       console.log(err);

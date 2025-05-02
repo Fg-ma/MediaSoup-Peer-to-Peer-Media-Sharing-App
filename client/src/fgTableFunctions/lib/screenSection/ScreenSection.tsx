@@ -32,13 +32,13 @@ export default function ScreenSection({
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
-  const { table_id, username, instance, device } = useUserInfoContext();
+  const { tableId, username, instance, device } = useUserInfoContext();
 
   const screenSectionController = useRef(
     new ScreenSectionController(
       mediasoupSocket,
       device,
-      table_id,
+      tableId,
       username,
       instance,
       isScreen,

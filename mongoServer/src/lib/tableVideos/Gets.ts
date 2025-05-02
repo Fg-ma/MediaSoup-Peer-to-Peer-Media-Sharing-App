@@ -8,10 +8,10 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getVideoMetaDataBy_TID_IID = async (table_id: string, videoId: string) => {
+  getVideoMetaDataBy_TID_IID = async (tableId: string, videoId: string) => {
     try {
       const videoData = await this.tableVideosCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         vid: videoId,
       });
 
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const videoData = await this.tableVideosCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!videoData || videoData.length === 0) {

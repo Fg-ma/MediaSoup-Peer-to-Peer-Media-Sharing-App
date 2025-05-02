@@ -42,7 +42,7 @@ export default function Main() {
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket } = useSocketContext();
-  const { table_id, username, instance, device } = useUserInfoContext();
+  const { tableId, username, instance, device } = useUserInfoContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -97,7 +97,7 @@ export default function Main() {
     mediasoupSocket.current?.sendMessage({
       type: "clientMute",
       header: {
-        table_id: table_id.current,
+        tableId: tableId.current,
         username: username.current,
         instance: instance.current,
         producerType,
@@ -217,7 +217,7 @@ export default function Main() {
   const bundlesController = useRef(
     new BundlesController(
       mediasoupSocket,
-      table_id,
+      tableId,
       username,
       instance,
       userMedia,
@@ -259,7 +259,7 @@ export default function Main() {
     new ProducersController(
       mediasoupSocket,
       device,
-      table_id,
+      tableId,
       username,
       instance,
       permissions,
@@ -293,7 +293,7 @@ export default function Main() {
     new ConsumersController(
       mediasoupSocket,
       device,
-      table_id,
+      tableId,
       username,
       instance,
       consumerTransport,
@@ -307,7 +307,7 @@ export default function Main() {
   const metadata = useRef(
     new Metadata(
       mediasoupSocket,
-      table_id,
+      tableId,
       username,
       instance,
       userMedia,
@@ -320,7 +320,7 @@ export default function Main() {
   const permissionsController = useRef(
     new PermissionsController(
       mediasoupSocket,
-      table_id,
+      tableId,
       username,
       instance,
       permissions,

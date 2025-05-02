@@ -35,7 +35,7 @@ export type OutGoingTableMessages =
 type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -44,7 +44,7 @@ type onJoinTableType = {
 type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -53,7 +53,7 @@ type onLeaveTableType = {
 type onChangeTableBackgroundType = {
   type: "changeTableBackground";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -63,7 +63,7 @@ type onChangeTableBackgroundType = {
 type onMoveSeatsType = {
   type: "moveSeats";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
   };
   data: { direction: "left" | "right" };
@@ -72,7 +72,7 @@ type onMoveSeatsType = {
 type onSwapSeatsType = {
   type: "swapSeats";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     targetUsername: string;
   };
@@ -81,7 +81,7 @@ type onSwapSeatsType = {
 type onKickFromTableType = {
   type: "kickFromTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     targetUsername: string;
   };
@@ -90,7 +90,7 @@ type onKickFromTableType = {
 type onReactionType = {
   type: "reaction";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: ContentTypes;
     contentId: string | undefined;
     instanceId: string | undefined;

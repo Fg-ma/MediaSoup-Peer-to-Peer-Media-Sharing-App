@@ -1,11 +1,11 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import {
   postProcessEffectEncodingMap,
-  stateEncodingMap,
+  tableStateEncodingMap,
 } from "../typeConstant";
 import { applicationEffectEncodingMap } from "./typeConstant";
 
@@ -13,11 +13,11 @@ class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     applicationId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       applicationInstanceId: string;
       positioning: {
@@ -66,15 +66,15 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, applicationId, filename, mimeType, state, instances } =
+    const { tableId, applicationId, filename, mimeType, state, instances } =
       data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       aid: applicationId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(
         ({ applicationInstanceId, positioning, effects, effectStyles }) => ({
           aiid: applicationInstanceId,

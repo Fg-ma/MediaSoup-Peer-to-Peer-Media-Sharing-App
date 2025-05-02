@@ -29,7 +29,7 @@ class FgGameController {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private gameId: string,
     private hideControls: boolean,
     private gameStarted: boolean,
@@ -271,7 +271,7 @@ class FgGameController {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (
-              data.table_id === this.table_id.current &&
+              data.tableId === this.tableId.current &&
               data.gameId === this.gameId &&
               data.type === "games"
             ) {
@@ -300,7 +300,7 @@ class FgGameController {
       this.mediasoupSocket.current?.sendMessage({
         type: "responseGameCatchUpData",
         header: {
-          table_id: this.table_id.current,
+          tableId: this.tableId.current,
           inquiringUsername,
           inquiringInstance,
           gameId,

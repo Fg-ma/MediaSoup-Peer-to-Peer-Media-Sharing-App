@@ -7,7 +7,7 @@ export type SocketTypes = "signaling" | "games";
 export type GameTypes = "snake";
 
 export interface Tables {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: {
         signaling?: GameWebSocket;
@@ -21,7 +21,7 @@ export interface Tables {
 
 export interface GameWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   socketType: SocketTypes;
@@ -31,7 +31,7 @@ export interface GameWebSocket extends uWS.WebSocket<SocketData> {
 
 export interface SocketData {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
   socketType: SocketTypes;
@@ -57,7 +57,7 @@ export type MessageTypes =
 export type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -66,7 +66,7 @@ export type onJoinTableType = {
 export type onNewGameSocketType = {
   type: "newGameSocket";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameType: GameTypes;
@@ -77,7 +77,7 @@ export type onNewGameSocketType = {
 export type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     socketType: SocketTypes;
@@ -90,7 +90,7 @@ export type onLeaveTableType = {
 export type onInitiateGameType = {
   type: "initiateGame";
   header: {
-    table_id: string;
+    tableId: string;
     gameType: GameTypes;
     gameId: string;
   };
@@ -102,7 +102,7 @@ export type onInitiateGameType = {
 export type onStartGameType = {
   type: "startGame";
   header: {
-    table_id: string;
+    tableId: string;
     gameType: GameTypes;
     gameId: string;
   };
@@ -111,7 +111,7 @@ export type onStartGameType = {
 export type onCloseGameType = {
   type: "closeGame";
   header: {
-    table_id: string;
+    tableId: string;
     gameType: GameTypes;
     gameId: string;
   };
@@ -120,7 +120,7 @@ export type onCloseGameType = {
 export type onJoinGameType = {
   type: "joinGame";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameType: GameTypes;
@@ -132,7 +132,7 @@ export type onJoinGameType = {
 export type onLeaveGameType = {
   type: "leaveGame";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameType: GameTypes;
@@ -143,7 +143,7 @@ export type onLeaveGameType = {
 export type onGetPlayersStateType = {
   type: "getPlayersState";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameType: GameTypes;
@@ -154,7 +154,7 @@ export type onGetPlayersStateType = {
 export type onGetIntialGameStatesType = {
   type: "getIntialGameStates";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameType: GameTypes;
@@ -166,7 +166,7 @@ export type onGetIntialGameStatesType = {
 export type onSnakeDirectionChangeType = {
   type: "snakeDirectionChange";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameId: string;
@@ -179,7 +179,7 @@ export type onSnakeDirectionChangeType = {
 export type onChangeGridSizeType = {
   type: "changeGridSize";
   header: {
-    table_id: string;
+    tableId: string;
     gameId: string;
   };
   data: {
@@ -190,7 +190,7 @@ export type onChangeGridSizeType = {
 export type onChangeSnakeColorType = {
   type: "changeSnakeColor";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     gameId: string;
@@ -201,7 +201,7 @@ export type onChangeSnakeColorType = {
 };
 
 export type SnakeGames = {
-  [table_id: string]: { [snakeGameId: string]: SnakeGame };
+  [tableId: string]: { [snakeGameId: string]: SnakeGame };
 };
 
 export const tables: Tables = {};

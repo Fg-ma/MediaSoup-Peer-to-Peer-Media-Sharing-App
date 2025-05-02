@@ -11,7 +11,7 @@ import {
 } from "../typeConstant";
 
 const createConsumer = async (
-  table_id: string,
+  tableId: string,
   username: string,
   instance: string,
   producers: {
@@ -34,7 +34,7 @@ const createConsumer = async (
 
   // Get the consumer transport associated with the user
   const transport =
-    tableConsumerTransports[table_id][username][instance].transport;
+    tableConsumerTransports[tableId][username][instance].transport;
 
   if (!transport) {
     console.error("No transport found for: ", username);

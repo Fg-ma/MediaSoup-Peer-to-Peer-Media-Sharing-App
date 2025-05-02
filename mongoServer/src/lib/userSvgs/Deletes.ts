@@ -1,12 +1,13 @@
 import { Collection } from "mongodb";
+import { UserSvgsType } from "./typeConstant";
 
 class Deletes {
-  constructor(private userSvgsCollection: Collection) {}
+  constructor(private userSvgsCollection: Collection<UserSvgsType>) {}
 
-  deleteMetaDataBy_UID_SID = async (user_id: string, svgId: string) => {
+  deleteMetaDataBy_UID_SID = async (userId: string, svgId: string) => {
     try {
       await this.userSvgsCollection.deleteOne({
-        uid: user_id,
+        uid: userId,
         sid: svgId,
       });
     } catch (err) {

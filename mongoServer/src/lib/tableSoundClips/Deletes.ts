@@ -6,10 +6,10 @@ class Deletes {
     private tableSoundClipsCollection: Collection<TableSoundClipsType>
   ) {}
 
-  deleteMetaDataBy_TID_SID = async (table_id: string, soundClipId: string) => {
+  deleteMetaDataBy_TID_SID = async (tableId: string, soundClipId: string) => {
     try {
       await this.tableSoundClipsCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
         sid: soundClipId,
       });
     } catch (err) {
@@ -18,14 +18,14 @@ class Deletes {
   };
 
   deleteInstanceBy_TID_SID_SIID = async (
-    table_id: string,
+    tableId: string,
     soundClipId: string,
     soundClipInstanceId: string
   ): Promise<null | TableSoundClipsType> => {
     try {
       const result = await this.tableSoundClipsCollection.findOneAndUpdate(
         {
-          tid: table_id,
+          tid: tableId,
           sid: soundClipId,
         },
         {

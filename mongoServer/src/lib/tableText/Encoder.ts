@@ -1,15 +1,15 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
-import { stateEncodingMap } from "../typeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { tableStateEncodingMap } from "../typeConstant";
 
 class Encoder {
   constructor() {}
 
   encodeMetaData(data: {
-    table_id: string;
+    tableId: string;
     textId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       textInstanceId: string;
       positioning: {
@@ -39,14 +39,14 @@ class Encoder {
       };
     }[];
   } {
-    const { table_id, textId, filename, mimeType, state, instances } = data;
+    const { tableId, textId, filename, mimeType, state, instances } = data;
 
     return {
-      tid: table_id,
+      tid: tableId,
       xid: textId,
       n: filename,
       m: mimeType,
-      s: state.map((ate) => stateEncodingMap[ate]),
+      s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(({ textInstanceId, positioning }) => ({
         xiid: textInstanceId,
         p: {

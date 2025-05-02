@@ -1,7 +1,7 @@
 import uWS from "uWebSockets.js";
 import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../universal/contentTypeConstant";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../../universal/effectsTypeConstant";
 
 export interface Tables {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: TableStaticContentWebSocket;
     };
@@ -132,14 +132,14 @@ export const mimeToExtension: {
 
 export interface TableStaticContentWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
 
 export interface SocketData {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
@@ -162,7 +162,7 @@ export type MessageTypes =
 export type onSearchTabledContentRequestType = {
   type: "searchTabledContentRequest";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: StaticContentTypes | "all";
@@ -173,7 +173,7 @@ export type onSearchTabledContentRequestType = {
 export type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -182,7 +182,7 @@ export type onJoinTableType = {
 export type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -191,7 +191,7 @@ export type onLeaveTableType = {
 export type onRequestCatchUpTableDataType = {
   type: "requestCatchUpTableData";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -200,7 +200,7 @@ export type onRequestCatchUpTableDataType = {
 export type onDeleteContentType = {
   type: "deleteContent";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -213,7 +213,7 @@ export type onDeleteContentType = {
 export type onGetFileType = {
   type: "getFile";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: StaticContentTypes;
@@ -227,7 +227,7 @@ export type onGetFileType = {
 export type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -250,7 +250,7 @@ export type onUpdateContentPositioningType = {
 export type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -270,7 +270,7 @@ export type onUpdateContentEffectsType = {
 export type onRequestCatchUpVideoPositionType = {
   type: "requestCatchUpVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: "video";
@@ -282,7 +282,7 @@ export type onRequestCatchUpVideoPositionType = {
 export type onResponseCatchUpVideoPositionType = {
   type: "responseCatchUpVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: "video";
@@ -297,19 +297,19 @@ export type onResponseCatchUpVideoPositionType = {
 export type onChangeContentStateType = {
   type: "changeContentState";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
 export type onCreateNewInstancesType = {
   type: "createNewInstances";
   header: {
-    table_id: string;
+    tableId: string;
   };
   data: {
     updates: {

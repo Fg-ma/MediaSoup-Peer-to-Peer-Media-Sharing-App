@@ -9,12 +9,12 @@ class Gets {
   ) {}
 
   getApplicationMetaDataBy_TID_IID = async (
-    table_id: string,
+    tableId: string,
     applicationId: string
   ) => {
     try {
       const applicationData = await this.tableApplicationsCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         aid: applicationId,
       });
 
@@ -29,10 +29,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const applicationData = await this.tableApplicationsCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!applicationData || applicationData.length === 0) {

@@ -10,55 +10,51 @@ class Tables {
   ) {}
 
   joinTable = (mediasoupWS: MediasoupWebSocket, event: onJoinTableType) => {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
     mediasoupWS.id = uuidv4();
-    mediasoupWS.table_id = table_id;
+    mediasoupWS.tableId = tableId;
     mediasoupWS.username = username;
     mediasoupWS.instance = instance;
 
-    if (!tables[table_id]) {
-      tables[table_id] = {};
+    if (!tables[tableId]) {
+      tables[tableId] = {};
     }
-    if (!tables[table_id][username]) {
-      tables[table_id][username] = {};
+    if (!tables[tableId][username]) {
+      tables[tableId][username] = {};
     }
 
-    tables[table_id][username][instance] = mediasoupWS;
+    tables[tableId][username][instance] = mediasoupWS;
   };
 
-  leaveTable = (table_id: string, username: string, instance: string) => {
+  leaveTable = (tableId: string, username: string, instance: string) => {
     if (
-      tables[table_id] &&
-      tables[table_id][username] &&
-      tables[table_id][username][instance]
+      tables[tableId] &&
+      tables[tableId][username] &&
+      tables[tableId][username][instance]
     ) {
-      delete tables[table_id][username][instance];
+      delete tables[tableId][username][instance];
 
-      if (Object.keys(tables[table_id][username]).length === 0) {
-        delete tables[table_id][username];
+      if (Object.keys(tables[tableId][username]).length === 0) {
+        delete tables[tableId][username];
 
-        if (Object.keys(tables[table_id]).length === 0) {
-          delete tables[table_id];
+        if (Object.keys(tables[tableId]).length === 0) {
+          delete tables[tableId];
         }
       }
     }
 
-    this.mediasoupCleanup.deleteProducerTransports(
-      table_id,
-      username,
-      instance
-    );
+    this.mediasoupCleanup.deleteProducerTransports(tableId, username, instance);
 
-    this.mediasoupCleanup.deleteConsumerTransport(table_id, username, instance);
+    this.mediasoupCleanup.deleteConsumerTransport(tableId, username, instance);
 
-    this.mediasoupCleanup.releaseWorkers(table_id);
+    this.mediasoupCleanup.releaseWorkers(tableId);
 
-    this.mediasoupCleanup.deleteProducerInstance(table_id, username, instance);
+    this.mediasoupCleanup.deleteProducerInstance(tableId, username, instance);
 
-    this.mediasoupCleanup.deleteConsumerInstance(table_id, username, instance);
+    this.mediasoupCleanup.deleteConsumerInstance(tableId, username, instance);
 
-    this.broadcaster.broadcastToTable(table_id, {
+    this.broadcaster.broadcastToTable(tableId, {
       type: "userLeftTable",
       header: {
         username,

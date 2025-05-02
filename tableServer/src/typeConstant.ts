@@ -43,7 +43,7 @@ export const tableColorEncodingMap = {
 };
 
 export interface Tables {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: TableWebSocket;
     };
@@ -51,21 +51,21 @@ export interface Tables {
 }
 
 export interface TablesUserData {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: { color: TableColors; seat: number; online: boolean };
   };
 }
 
 export interface TableWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
 
 export interface SocketData {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
@@ -82,7 +82,7 @@ export type MessageTypes =
 export type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -91,7 +91,7 @@ export type onJoinTableType = {
 export type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -100,7 +100,7 @@ export type onLeaveTableType = {
 export type onChangeTableBackgroundType = {
   type: "changeTableBackground";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -110,7 +110,7 @@ export type onChangeTableBackgroundType = {
 export type onMoveSeatsType = {
   type: "moveSeats";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
   };
   data: { direction: "left" | "right" };
@@ -119,7 +119,7 @@ export type onMoveSeatsType = {
 export type onSwapSeatsType = {
   type: "swapSeats";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     targetUsername: string;
   };
@@ -128,7 +128,7 @@ export type onSwapSeatsType = {
 export type onKickFromTableType = {
   type: "kickFromTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     targetUsername: string;
   };
@@ -137,7 +137,7 @@ export type onKickFromTableType = {
 export type onReactionType = {
   type: "reaction";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: ContentTypes;
     contentId: string | undefined;
     instanceId: string | undefined;

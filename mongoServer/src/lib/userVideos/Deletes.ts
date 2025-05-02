@@ -1,12 +1,13 @@
 import { Collection } from "mongodb";
+import { UserVideosType } from "./typeConstant";
 
 class Deletes {
-  constructor(private userVideosCollection: Collection) {}
+  constructor(private userVideosCollection: Collection<UserVideosType>) {}
 
-  deleteMetaDataBy_UID_VID = async (user_id: string, videoId: string) => {
+  deleteMetaDataBy_UID_VID = async (userId: string, videoId: string) => {
     try {
       await this.userVideosCollection.deleteOne({
-        uid: user_id,
+        uid: userId,
         vid: videoId,
       });
     } catch (err) {

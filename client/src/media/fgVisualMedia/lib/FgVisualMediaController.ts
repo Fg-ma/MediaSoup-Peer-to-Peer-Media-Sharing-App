@@ -41,7 +41,7 @@ class FgVisualMediaController {
   savedMediaPosition: { top: number; left: number } | undefined;
 
   constructor(
-    private table_id: string,
+    private tableId: string,
     private username: string,
     private instance: string,
     private type: "camera" | "screen",
@@ -293,7 +293,7 @@ class FgVisualMediaController {
       this.mediasoupSocket?.current?.sendMessage({
         type: "clientClearEffects",
         header: {
-          table_id: this.table_id,
+          tableId: this.tableId,
           username: this.username,
           instance: this.instance,
           producerType: this.type,
@@ -431,7 +431,7 @@ class FgVisualMediaController {
             const data = JSON.parse(message);
             if (
               permissions?.acceptsPositionScaleRotationManipulation &&
-              data.table_id === this.table_id &&
+              data.tableId === this.tableId &&
               data.username === this.username &&
               data.instance === this.instance &&
               data.type === this.type &&

@@ -4,7 +4,7 @@ type OutGoingUniversalMessages =
   | {
       type: "newGameSocket";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameType: GameTypes;
@@ -14,7 +14,7 @@ type OutGoingUniversalMessages =
   | {
       type: "leaveTable";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         socketType: "games";
@@ -25,7 +25,7 @@ type OutGoingUniversalMessages =
   | {
       type: "startGame";
       header: {
-        table_id: string;
+        tableId: string;
         gameType: GameTypes;
         gameId: string;
       };
@@ -33,7 +33,7 @@ type OutGoingUniversalMessages =
   | {
       type: "closeGame";
       header: {
-        table_id: string;
+        tableId: string;
         gameType: GameTypes;
         gameId: string;
       };
@@ -41,7 +41,7 @@ type OutGoingUniversalMessages =
   | {
       type: "joinGame";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameType: GameTypes;
@@ -52,7 +52,7 @@ type OutGoingUniversalMessages =
   | {
       type: "leaveGame";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameType: GameTypes;
@@ -62,7 +62,7 @@ type OutGoingUniversalMessages =
   | {
       type: "getPlayersState";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameType: GameTypes;
@@ -72,7 +72,7 @@ type OutGoingUniversalMessages =
   | {
       type: "getIntialGameStates";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameType: GameTypes;
@@ -84,11 +84,11 @@ class GameMediaUniversalFunctions {
   ws: WebSocket | undefined;
 
   constructor(
-    protected table_id: string,
+    protected tableId: string,
     protected username: string,
     protected instance: string,
     protected gameType: GameTypes,
-    protected gameId: string
+    protected gameId: string,
   ) {}
 
   sendUniversalMessage = (message: OutGoingUniversalMessages) => {
@@ -101,7 +101,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "newGameSocket",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,
@@ -114,7 +114,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "leaveTable",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         socketType: "games",
@@ -128,7 +128,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "startGame",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         gameType: this.gameType,
         gameId: this.gameId,
       },
@@ -139,7 +139,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "closeGame",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         gameType: this.gameType,
         gameId: this.gameId,
       },
@@ -150,7 +150,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "joinGame",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,
@@ -164,7 +164,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "leaveGame",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,
@@ -177,7 +177,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "getPlayersState",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,
@@ -190,7 +190,7 @@ class GameMediaUniversalFunctions {
     this.sendUniversalMessage({
       type: "getIntialGameStates",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameType: this.gameType,

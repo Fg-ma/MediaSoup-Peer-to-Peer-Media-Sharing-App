@@ -9,12 +9,12 @@ class Gets {
   ) {}
 
   getSoundClipMetaDataBy_TID_AID = async (
-    table_id: string,
+    tableId: string,
     soundClipId: string
   ) => {
     try {
       const soundClipData = await this.tableSoundClipsCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         sid: soundClipId,
       });
 
@@ -29,10 +29,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const soundClipsData = await this.tableSoundClipsCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!soundClipsData || soundClipsData.length === 0) {

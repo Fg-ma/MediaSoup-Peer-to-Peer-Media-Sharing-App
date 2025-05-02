@@ -15,7 +15,7 @@ import {
 import Gradient from "./lib/Gradient";
 import UpperControls from "./lib/upperControls/UpperControls";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 import "./lib/mediaContainerStyles.css";
@@ -84,7 +84,7 @@ export default function FgMediaContainer({
   mediaInstanceId: string;
   filename: string;
   kind: StaticContentTypes;
-  initState: ContentStateTypes[];
+  initState: TableContentStateTypes[];
   bundleRef: React.RefObject<HTMLDivElement>;
   backgroundMedia: boolean;
   media?: React.ReactNode;
@@ -121,7 +121,7 @@ export default function FgMediaContainer({
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket, tableStaticContentSocket, tableSocket } =
     useSocketContext();
-  const { table_id } = useUserInfoContext();
+  const { tableId } = useUserInfoContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
@@ -141,7 +141,7 @@ export default function FgMediaContainer({
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
-  const [state, setState] = useState<ContentStateTypes[]>(initState);
+  const [state, setState] = useState<TableContentStateTypes[]>(initState);
 
   const [_, setRerender] = useState(false);
 
@@ -202,7 +202,7 @@ export default function FgMediaContainer({
 
   const mediaContainerController = useRef(
     new MediaContainerController(
-      table_id,
+      tableId,
       mediaId,
       mediaInstanceId,
       kind,
@@ -296,7 +296,7 @@ export default function FgMediaContainer({
     ) {
       userDataStreams.current.positionScaleRotation?.send(
         JSON.stringify({
-          table_id: table_id.current,
+          tableId: tableId.current,
           kind,
           mediaId,
           mediaInstanceId,

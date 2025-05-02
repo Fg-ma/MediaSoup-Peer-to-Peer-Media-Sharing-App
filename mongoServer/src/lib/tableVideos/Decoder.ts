@@ -1,4 +1,4 @@
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import {
   VideoEffectStylesType,
   VideoEffectTypes,
@@ -12,7 +12,7 @@ import {
   mustachesEffectDecodingMap,
   petsEffectDecodingMap,
   postProcessEffectDecodingMap,
-  stateDecodingMap,
+  tableStateDecodingMap,
 } from "../typeConstant";
 import { videoEffectEncodingMap } from "./typeConstant";
 
@@ -72,11 +72,11 @@ class Decoder {
       vp: number;
     }[];
   }): {
-    table_id: string;
+    tableId: string;
     videoId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       videoInstanceId: string;
       positioning: {
@@ -100,11 +100,11 @@ class Decoder {
     const { tid, vid, n, m, s, i } = data;
 
     return {
-      table_id: tid,
+      tableId: tid,
       videoId: vid,
       filename: n,
       mimeType: m,
-      state: s.map((ate) => stateDecodingMap[ate]),
+      state: s.map((ate) => tableStateDecodingMap[ate]),
       instances: i.map(({ viid, p, e, es, vp }) => ({
         videoInstanceId: viid,
         positioning: {

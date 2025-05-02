@@ -1,16 +1,17 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserVideosType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userVideosCollection: Collection,
+    private userVideosCollection: Collection<UserVideosType>,
     private decoder: Decoder
   ) {}
 
-  getVideoMetaDataBy_UID_IID = async (user_id: string, videoId: string) => {
+  getVideoMetaDataBy_UID_IID = async (userId: string, videoId: string) => {
     try {
       const videoData = await this.userVideosCollection.findOne({
-        uid: user_id,
+        uid: userId,
         vid: videoId,
       });
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(videoData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const videoData = await this.userVideosCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!videoData || videoData.length === 0) {
@@ -37,10 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return videoData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return videoData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

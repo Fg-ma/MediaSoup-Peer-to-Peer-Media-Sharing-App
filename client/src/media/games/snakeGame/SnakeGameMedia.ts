@@ -5,7 +5,7 @@ type OutGoingMessages =
   | {
       type: "snakeDirectionChange";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameId: string;
@@ -17,7 +17,7 @@ type OutGoingMessages =
   | {
       type: "changeGridSize";
       header: {
-        table_id: string;
+        tableId: string;
         gameId: string;
       };
       data: {
@@ -27,7 +27,7 @@ type OutGoingMessages =
   | {
       type: "changeSnakeColor";
       header: {
-        table_id: string;
+        tableId: string;
         username: string;
         instance: string;
         gameId: string;
@@ -41,14 +41,14 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
   initiator = false;
 
   constructor(
-    table_id: string,
+    tableId: string,
     username: string,
     instance: string,
     gameId: string,
     private url: string,
-    initiator: boolean
+    initiator: boolean,
   ) {
-    super(table_id, username, instance, "snake", gameId);
+    super(tableId, username, instance, "snake", gameId);
 
     this.initiator = initiator;
   }
@@ -94,7 +94,7 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     this.sendMessage({
       type: "snakeDirectionChange",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,
@@ -109,7 +109,7 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     this.sendMessage({
       type: "changeGridSize",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         gameId: this.gameId,
       },
       data: {
@@ -122,7 +122,7 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     this.sendMessage({
       type: "changeSnakeColor",
       header: {
-        table_id: this.table_id,
+        tableId: this.tableId,
         username: this.username,
         instance: this.instance,
         gameId: this.gameId,

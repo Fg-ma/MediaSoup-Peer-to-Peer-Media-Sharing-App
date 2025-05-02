@@ -23,7 +23,7 @@ interface MediasoupWorker {
 }
 
 export interface Tables {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: MediasoupWebSocket;
     };
@@ -31,7 +31,7 @@ export interface Tables {
 }
 
 export type TableProducerTransports = {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: {
         transport: Transport;
@@ -41,7 +41,7 @@ export type TableProducerTransports = {
   };
 };
 export type TableConsumerTransports = {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: {
         transport: Transport;
@@ -52,7 +52,7 @@ export type TableConsumerTransports = {
 };
 
 export type TableProducers = {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: {
         camera?: { [cameraId: string]: Producer };
@@ -121,7 +121,7 @@ export type ConsumerInstance = {
   };
 };
 export type TableConsumers = {
-  [table_id: string]: {
+  [tableId: string]: {
     [username: string]: {
       [instance: string]: {
         [producerUsername: string]: {
@@ -134,14 +134,14 @@ export type TableConsumers = {
 
 export interface MediasoupWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
 
 export interface SocketData {
   id: string;
-  table_id: string;
+  tableId: string;
   username: string;
   instance: string;
 }
@@ -221,7 +221,7 @@ export type MediasoupSocketEvents =
 export type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -230,7 +230,7 @@ export type onJoinTableType = {
 export type onGetRouterRtpCapabilitiesType = {
   type: "getRouterRtpCapabilities";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -239,7 +239,7 @@ export type onGetRouterRtpCapabilitiesType = {
 export type onCreateProducerTransportType = {
   type: "createProducerTransport";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -248,7 +248,7 @@ export type onCreateProducerTransportType = {
 export type onConnectProducerTransportType = {
   type: "connectProducerTransport";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -260,7 +260,7 @@ export type onConnectProducerTransportType = {
 export type onCreateNewProducerType = {
   type: "createNewProducer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
@@ -276,7 +276,7 @@ export type onCreateNewProducerType = {
 export type onCreateNewJSONProducerType = {
   type: "createNewJSONProducer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "json";
@@ -294,7 +294,7 @@ export type onCreateNewJSONProducerType = {
 export type onCreateConsumerTransportType = {
   type: "createConsumerTransport";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -303,7 +303,7 @@ export type onCreateConsumerTransportType = {
 export type onConnectConsumerTransportType = {
   type: "connectConsumerTransport";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -316,7 +316,7 @@ export type onConnectConsumerTransportType = {
 export type onResumeType = {
   type: "resume";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -325,7 +325,7 @@ export type onResumeType = {
 export type onConsumeType = {
   type: "consume";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -337,7 +337,7 @@ export type onConsumeType = {
 export type onNewConsumerType = {
   type: "newConsumer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -353,7 +353,7 @@ export type onNewConsumerType = {
 export type onNewJSONConsumerType = {
   type: "newJSONConsumer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -370,7 +370,7 @@ export type onNewJSONConsumerType = {
 export type onRemoveProducerType = {
   type: "removeProducer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
@@ -382,7 +382,7 @@ export type onRemoveProducerType = {
 export type onUnsubscribeType = {
   type: "unsubscribe";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -391,7 +391,7 @@ export type onUnsubscribeType = {
 export type onClientMuteType = {
   type: "clientMute";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
@@ -405,7 +405,7 @@ export type onClientMuteType = {
 export type onNewProducerCreatedType = {
   type: "newProducerCreated";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
@@ -416,7 +416,7 @@ export type onNewProducerCreatedType = {
 export type onNewConsumerCreatedType = {
   type: "newConsumerCreated";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -431,7 +431,7 @@ export type onNewConsumerCreatedType = {
 export type onRequestEffectChangeType = {
   type: "requestEffectChange";
   header: {
-    table_id: string;
+    tableId: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: ProducerTypes;
@@ -450,7 +450,7 @@ export type onRequestEffectChangeType = {
 export type onClientEffectChangeType = {
   type: "clientEffectChange";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
@@ -466,7 +466,7 @@ export type onClientEffectChangeType = {
 export type onRequestPermissionsType = {
   type: "requestPermissions";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -477,7 +477,7 @@ export type onRequestPermissionsType = {
 export type onRequestBundleMetadataType = {
   type: "requestBundleMetadata";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -488,7 +488,7 @@ export type onRequestBundleMetadataType = {
 export type onPermissionsResponseType = {
   type: "permissionsResponse";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -502,7 +502,7 @@ export type onPermissionsResponseType = {
 export type onBundleMetadataResponseType = {
   type: "bundleMetadataResponse";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -518,7 +518,7 @@ export type onBundleMetadataResponseType = {
 export type onRequestCatchUpDataType = {
   type: "requestCatchUpData";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -531,7 +531,7 @@ export type onRequestCatchUpDataType = {
 export type onRequestGameCatchUpDataType = {
   type: "requestGameCatchUpData";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     gameId: string;
@@ -541,7 +541,7 @@ export type onRequestGameCatchUpDataType = {
 export type onResponseCatchUpDataType = {
   type: "responseCatchUpData";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     inquiredUsername: string;
@@ -599,7 +599,7 @@ export type onResponseCatchUpDataType = {
 export type onResponseGameCatchUpDataType = {
   type: "responseGameCatchUpData";
   header: {
-    table_id: string;
+    tableId: string;
     inquiringUsername: string;
     inquiringInstance: string;
     gameId: string;
@@ -622,7 +622,7 @@ export type onResponseGameCatchUpDataType = {
 export type onRequestMixEffectActivityChangeType = {
   type: "requestMixEffectActivityChange";
   header: {
-    table_id: string;
+    tableId: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: "audio" | "screenAudio";
@@ -637,7 +637,7 @@ export type onRequestMixEffectActivityChangeType = {
 export type onClientMixEffectActivityChangeType = {
   type: "clientMixEffectActivityChange";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
@@ -652,7 +652,7 @@ export type onClientMixEffectActivityChangeType = {
 export type onRequestMixEffectValueChangeType = {
   type: "requestMixEffectValueChange";
   header: {
-    table_id: string;
+    tableId: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: "audio" | "screenAudio";
@@ -669,7 +669,7 @@ export type onRequestMixEffectValueChangeType = {
 export type onClientMixEffectValueChangeType = {
   type: "clientMixEffectValueChange";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "audio" | "screenAudio";
@@ -686,7 +686,7 @@ export type onClientMixEffectValueChangeType = {
 export type onRequestRemoveProducerType = {
   type: "requestRemoveProducer";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: ProducerTypes;
@@ -697,7 +697,7 @@ export type onRequestRemoveProducerType = {
 export type onRequestClearEffectsType = {
   type: "requestClearEffects";
   header: {
-    table_id: string;
+    tableId: string;
     requestedUsername: string;
     requestedInstance: string;
     requestedProducerType: "camera" | "screen" | "screenAudio" | "audio";
@@ -708,7 +708,7 @@ export type onRequestClearEffectsType = {
 export type onClientClearEffectsType = {
   type: "clientClearEffects";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     producerType: "camera" | "screen" | "screenAudio" | "audio";
@@ -726,5 +726,5 @@ export const tableConsumers: TableConsumers = {};
 
 export const workers: MediasoupWorker[] = [];
 export const workersMap: {
-  [table_id: string]: number;
+  [tableId: string]: number;
 } = {};

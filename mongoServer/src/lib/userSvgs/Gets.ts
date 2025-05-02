@@ -1,16 +1,17 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserSvgsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userSvgsCollection: Collection,
+    private userSvgsCollection: Collection<UserSvgsType>,
     private decoder: Decoder
   ) {}
 
-  getSvgMetaDataBy_UID_SID = async (user_id: string, svgId: string) => {
+  getSvgMetaDataBy_UID_SID = async (userId: string, svgId: string) => {
     try {
       const svgData = await this.userSvgsCollection.findOne({
-        uid: user_id,
+        uid: userId,
         sid: svgId,
       });
 
@@ -18,7 +19,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(svgData);
     } catch (err) {
       console.error("Error retrieving svg data:", err);
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const svgData = await this.userSvgsCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!svgData || svgData.length === 0) {
@@ -37,12 +37,9 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return svgData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return svgData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
-      console.error("Error retrieving data by TID:", err);
+      console.error("Error retrieving data by UID:", err);
       return [];
     }
   };

@@ -32,13 +32,13 @@ export default function CameraSection({
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
-  const { table_id, username, instance, device } = useUserInfoContext();
+  const { tableId, username, instance, device } = useUserInfoContext();
 
   const cameraSectionController = useRef(
     new CameraSectionController(
       mediasoupSocket,
       device,
-      table_id,
+      tableId,
       username,
       instance,
       isCamera,

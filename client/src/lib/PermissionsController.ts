@@ -7,10 +7,10 @@ class PermissionsController {
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
-    private table_id: React.MutableRefObject<string>,
+    private tableId: React.MutableRefObject<string>,
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
-    private permissions: React.MutableRefObject<Permissions>
+    private permissions: React.MutableRefObject<Permissions>,
   ) {}
 
   onPermissionsRequested = (event: onPermissionsRequestedType) => {
@@ -19,7 +19,7 @@ class PermissionsController {
     this.mediasoupSocket.current?.sendMessage({
       type: "permissionsResponse",
       header: {
-        table_id: this.table_id.current,
+        tableId: this.tableId.current,
         inquiringUsername,
         inquiringInstance,
         inquiredUsername: this.username.current,

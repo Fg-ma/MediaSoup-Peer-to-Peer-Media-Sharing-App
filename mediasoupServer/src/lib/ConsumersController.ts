@@ -31,34 +31,34 @@ class ConsumersController {
   ) {}
 
   async onCreateConsumerTransport(event: onCreateConsumerTransportType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
     // Get the next available worker and router if one doesn't already exist
     let mediasoupRouter;
-    if (!workersMap[table_id]) {
+    if (!workersMap[tableId]) {
       const { router, workerIdx } = getNextWorker();
-      workersMap[table_id] = workerIdx;
+      workersMap[tableId] = workerIdx;
       mediasoupRouter = router;
     } else {
-      const { router } = getWorkerByIdx(workersMap[table_id]);
+      const { router } = getWorkerByIdx(workersMap[tableId]);
       mediasoupRouter = router;
     }
 
     const { transport, params } = await createWebRtcTransport(mediasoupRouter);
 
-    if (!tableConsumerTransports[table_id]) {
-      tableConsumerTransports[table_id] = {};
+    if (!tableConsumerTransports[tableId]) {
+      tableConsumerTransports[tableId] = {};
     }
-    if (!tableConsumerTransports[table_id][username]) {
-      tableConsumerTransports[table_id][username] = {};
+    if (!tableConsumerTransports[tableId][username]) {
+      tableConsumerTransports[tableId][username] = {};
     }
 
-    tableConsumerTransports[table_id][username][instance] = {
+    tableConsumerTransports[tableId][username][instance] = {
       transport,
       isConnected: false,
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "consumerTransportCreated",
       data: {
         params: params,
@@ -67,64 +67,64 @@ class ConsumersController {
   }
 
   async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const { dtlsParameters } = event.data;
 
     if (
-      !tableConsumerTransports[table_id] ||
-      !tableConsumerTransports[table_id][username] ||
-      !tableConsumerTransports[table_id][username][instance]
+      !tableConsumerTransports[tableId] ||
+      !tableConsumerTransports[tableId][username] ||
+      !tableConsumerTransports[tableId][username][instance]
     ) {
       return;
     }
 
-    if (!tableConsumerTransports[table_id][username][instance].isConnected) {
-      await tableConsumerTransports[table_id][username][
+    if (!tableConsumerTransports[tableId][username][instance].isConnected) {
+      await tableConsumerTransports[tableId][username][
         instance
       ].transport.connect({
         dtlsParameters: dtlsParameters,
       });
-      tableConsumerTransports[table_id][username][instance].isConnected = true;
+      tableConsumerTransports[tableId][username][instance].isConnected = true;
     }
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "consumerTransportConnected",
       data: "consumer transport connected",
     });
   }
 
   async onConsume(event: onConsumeType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const { rtpCapabilities } = event.data;
 
     // Get the next available worker and router
-    const { router: mediasoupRouter } = getWorkerByIdx(workersMap[table_id]);
+    const { router: mediasoupRouter } = getWorkerByIdx(workersMap[tableId]);
 
     const consumers = await createConsumer(
-      table_id,
+      tableId,
       username,
       instance,
-      tableProducers[table_id],
+      tableProducers[tableId],
       rtpCapabilities,
       mediasoupRouter
     );
 
-    if (!tableConsumers[table_id]) {
-      tableConsumers[table_id] = {};
+    if (!tableConsumers[tableId]) {
+      tableConsumers[tableId] = {};
     }
-    if (!tableConsumers[table_id][username]) {
-      tableConsumers[table_id][username] = {};
+    if (!tableConsumers[tableId][username]) {
+      tableConsumers[tableId][username] = {};
     }
-    if (!tableConsumers[table_id][username][instance]) {
-      tableConsumers[table_id][username][instance] = {};
+    if (!tableConsumers[tableId][username][instance]) {
+      tableConsumers[tableId][username][instance] = {};
     }
-    if (!tableConsumers[table_id][username][instance]) {
-      tableConsumers[table_id][username][instance] = {};
+    if (!tableConsumers[tableId][username][instance]) {
+      tableConsumers[tableId][username][instance] = {};
     }
     if (consumers) {
-      tableConsumers[table_id][username][instance] = consumers;
+      tableConsumers[tableId][username][instance] = consumers;
     } else {
-      this.mediasoupCleanup.clearTableConsumers(table_id, username, instance);
+      this.mediasoupCleanup.clearTableConsumers(tableId, username, instance);
     }
 
     const newConsumers: {
@@ -353,14 +353,14 @@ class ConsumersController {
       }
     }
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "subscribed",
       data: newConsumers,
     });
   }
 
   async onNewConsumer(event: onNewConsumerType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const {
       producerType,
       producerId,
@@ -381,18 +381,18 @@ class ConsumersController {
 
     // Get the consumer transport associated with the user
     const transport =
-      tableConsumerTransports[table_id][username][instance].transport;
+      tableConsumerTransports[tableId][username][instance].transport;
 
     const producer =
       producerType === "camera" ||
       producerType === "screen" ||
       producerType === "screenAudio"
         ? producerId
-          ? tableProducers[table_id][producerUsername][producerInstance]?.[
+          ? tableProducers[tableId][producerUsername][producerInstance]?.[
               producerType
             ]?.[producerId]
           : undefined
-        : tableProducers[table_id][producerUsername][producerInstance][
+        : tableProducers[tableId][producerUsername][producerInstance][
             producerType
           ];
 
@@ -424,24 +424,24 @@ class ConsumersController {
       return;
     }
 
-    if (!tableConsumers[table_id]) {
-      tableConsumers[table_id] = {};
+    if (!tableConsumers[tableId]) {
+      tableConsumers[tableId] = {};
     }
-    if (!tableConsumers[table_id][username]) {
-      tableConsumers[table_id][username] = {};
+    if (!tableConsumers[tableId][username]) {
+      tableConsumers[tableId][username] = {};
     }
-    if (!tableConsumers[table_id][username][instance]) {
-      tableConsumers[table_id][username][instance] = {};
+    if (!tableConsumers[tableId][username][instance]) {
+      tableConsumers[tableId][username][instance] = {};
     }
-    if (!tableConsumers[table_id][username][instance][producerUsername]) {
-      tableConsumers[table_id][username][instance][producerUsername] = {};
+    if (!tableConsumers[tableId][username][instance][producerUsername]) {
+      tableConsumers[tableId][username][instance][producerUsername] = {};
     }
     if (
-      !tableConsumers[table_id][username][instance][producerUsername][
+      !tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ]
     ) {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ] = {};
     }
@@ -449,11 +449,11 @@ class ConsumersController {
       (producerType === "camera" ||
         producerType === "screen" ||
         producerType === "screenAudio") &&
-      !tableConsumers[table_id][username][instance][producerUsername][
+      !tableConsumers[tableId][username][instance][producerUsername][
         producerType
       ]
     ) {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ][producerType] = {};
     }
@@ -464,12 +464,12 @@ class ConsumersController {
       producerType === "screenAudio"
     ) {
       if (producerId) {
-        tableConsumers[table_id][username][instance][producerUsername][
+        tableConsumers[tableId][username][instance][producerUsername][
           producerInstance
         ][producerType]![producerId] = newConsumer;
       }
     } else {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ][producerType] = newConsumer;
     }
@@ -492,11 +492,11 @@ class ConsumersController {
       },
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
   async onNewJSONConsumer(event: onNewJSONConsumerType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const {
       producerUsername,
       producerInstance,
@@ -518,10 +518,10 @@ class ConsumersController {
 
     // Get the consumer transport associated with the user
     const transport =
-      tableConsumerTransports[table_id][username][instance].transport;
+      tableConsumerTransports[tableId][username][instance].transport;
 
     const producer =
-      tableProducers[table_id][producerUsername][producerInstance]?.[
+      tableProducers[tableId][producerUsername][producerInstance]?.[
         producerType
       ]?.[dataStreamType];
     if (!producer) {
@@ -548,39 +548,39 @@ class ConsumersController {
       return;
     }
 
-    if (!tableConsumers[table_id]) {
-      tableConsumers[table_id] = {};
+    if (!tableConsumers[tableId]) {
+      tableConsumers[tableId] = {};
     }
-    if (!tableConsumers[table_id][username]) {
-      tableConsumers[table_id][username] = {};
+    if (!tableConsumers[tableId][username]) {
+      tableConsumers[tableId][username] = {};
     }
-    if (!tableConsumers[table_id][username][instance]) {
-      tableConsumers[table_id][username][instance] = {};
+    if (!tableConsumers[tableId][username][instance]) {
+      tableConsumers[tableId][username][instance] = {};
     }
-    if (!tableConsumers[table_id][username][instance][producerUsername]) {
-      tableConsumers[table_id][username][instance][producerUsername] = {};
+    if (!tableConsumers[tableId][username][instance][producerUsername]) {
+      tableConsumers[tableId][username][instance][producerUsername] = {};
     }
     if (
-      !tableConsumers[table_id][username][instance][producerUsername][
+      !tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ]
     ) {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ] = {};
     }
     if (
-      !tableConsumers[table_id][username][instance][producerUsername][
+      !tableConsumers[tableId][username][instance][producerUsername][
         producerType
       ]
     ) {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ][producerType] = {};
     }
 
     if (incomingProducerId) {
-      tableConsumers[table_id][username][instance][producerUsername][
+      tableConsumers[tableId][username][instance][producerUsername][
         producerInstance
       ][producerType]![dataStreamType] = newConsumer;
     }
@@ -605,11 +605,11 @@ class ConsumersController {
       },
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
   onNewConsumerCreated(event: onNewConsumerCreatedType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
     const { producerUsername, producerInstance, producerType, producerId } =
       event.data;
 
@@ -623,30 +623,30 @@ class ConsumersController {
       },
     };
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
   onUnsubscribe(event: onUnsubscribeType) {
-    const { table_id, username, instance } = event.header;
+    const { tableId, username, instance } = event.header;
 
-    this.mediasoupCleanup.deleteConsumerTransport(table_id, username, instance);
+    this.mediasoupCleanup.deleteConsumerTransport(tableId, username, instance);
 
-    this.mediasoupCleanup.releaseWorkers(table_id);
+    this.mediasoupCleanup.releaseWorkers(tableId);
 
     if (
-      tableConsumers[table_id] &&
-      tableConsumers[table_id][username] &&
-      tableConsumers[table_id][username][instance]
+      tableConsumers[tableId] &&
+      tableConsumers[tableId][username] &&
+      tableConsumers[tableId][username][instance]
     ) {
-      delete tableConsumers[table_id][username][instance];
+      delete tableConsumers[tableId][username][instance];
 
-      this.mediasoupCleanup.clearTableConsumers(table_id, username, instance);
+      this.mediasoupCleanup.clearTableConsumers(tableId, username, instance);
     }
 
     const msg = {
       type: "unsubscribed",
     };
-    this.broadcaster.broadcastToInstance(table_id, username, instance, msg);
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 }
 

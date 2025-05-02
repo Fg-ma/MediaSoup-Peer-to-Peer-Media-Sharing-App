@@ -3,7 +3,7 @@ import {
   TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 
@@ -26,7 +26,7 @@ class SvgMedia {
     public svgId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    public state: ContentStateTypes[],
+    public state: TableContentStateTypes[],
     private getSVG: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -163,7 +163,7 @@ class SvgMedia {
     return undefined;
   };
 
-  setState = (state: ContentStateTypes[]) => {
+  setState = (state: TableContentStateTypes[]) => {
     this.state = state;
 
     this.svgListeners.forEach((listener) => {

@@ -19,7 +19,7 @@ class Search {
   onSearchTabledContentRequest = async (
     event: onSearchTabledContentRequestType
   ) => {
-    const { table_id, username, instance, contentType, name } = event.header;
+    const { tableId, username, instance, contentType, name } = event.header;
 
     // build your list of indices
     let indices: string;
@@ -31,7 +31,7 @@ class Search {
 
     const boolQuery = {
       bool: {
-        filter: [{ term: { tid: table_id } }],
+        filter: [{ term: { tid: tableId } }],
         must: [
           {
             wildcard: {
@@ -66,7 +66,7 @@ class Search {
       return [];
     });
 
-    this.broadcaster.broadcastToInstance(table_id, username, instance, {
+    this.broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "searchTabledContentResponded",
       data: transformed,
     });

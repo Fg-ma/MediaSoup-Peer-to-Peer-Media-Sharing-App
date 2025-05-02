@@ -1,19 +1,20 @@
 import { Collection } from "mongodb";
 import Decoder from "./Decoder";
+import { UserApplicationsType } from "./typeConstant";
 
 class Gets {
   constructor(
-    private userApplicationsCollection: Collection,
+    private userApplicationsCollection: Collection<UserApplicationsType>,
     private decoder: Decoder
   ) {}
 
   getApplicationMetaDataBy_UID_IID = async (
-    user_id: string,
+    userId: string,
     applicationId: string
   ) => {
     try {
       const applicationData = await this.userApplicationsCollection.findOne({
-        uid: user_id,
+        uid: userId,
         aid: applicationId,
       });
 
@@ -21,7 +22,6 @@ class Gets {
         return null;
       }
 
-      // @ts-expect-error: mongo doesn't have typing
       return this.decoder.decodeMetaData(applicationData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
@@ -29,10 +29,10 @@ class Gets {
     }
   };
 
-  getAllBy_UID = async (user_id: string) => {
+  getAllBy_UID = async (userId: string) => {
     try {
       const applicationData = await this.userApplicationsCollection
-        .find({ uid: user_id })
+        .find({ uid: userId })
         .toArray();
 
       if (!applicationData || applicationData.length === 0) {
@@ -40,10 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return applicationData.map((data) =>
-        // @ts-expect-error: mongo doesn't have typing
-        this.decoder.decodeMetaData(data)
-      );
+      return applicationData.map((data) => this.decoder.decodeMetaData(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

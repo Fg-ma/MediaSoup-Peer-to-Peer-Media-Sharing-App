@@ -5,7 +5,7 @@ import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContex
 const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function UploadTableLayer() {
-  const { table_id } = useUserInfoContext();
+  const { tableId } = useUserInfoContext();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [draggingFiles, setDraggingFiles] = useState(false);
@@ -18,7 +18,7 @@ export default function UploadTableLayer() {
     }
 
     const metadata = {
-      table_id: table_id.current,
+      tableId: tableId.current,
       contentId: uuidv4(),
       instanceId: uuidv4(),
       direction: "toTable",
@@ -81,7 +81,7 @@ export default function UploadTableLayer() {
   return (
     <div
       ref={uploadRef}
-      className="abosulte z-upload-layer pointer-events-none left-0 top-0 h-full w-full bg-transparent"
+      className="abosulte pointer-events-none left-0 top-0 z-upload-layer h-full w-full bg-transparent"
       onDragEnter={() => setDraggingFiles(true)}
       onDragLeave={() => setDraggingFiles(false)}
       onDragOver={handleDragOver}

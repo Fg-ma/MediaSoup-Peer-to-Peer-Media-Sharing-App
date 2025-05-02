@@ -1,4 +1,7 @@
-import { ContentStateTypes } from "../../../universal/contentTypeConstant";
+import {
+  TableContentStateTypes,
+  UserContentStateTypes,
+} from "../../../universal/contentTypeConstant";
 import {
   BeardsEffectTypes,
   GlassesEffectTypes,
@@ -10,15 +13,23 @@ import {
   PostProcessEffectTypes,
 } from "../../../universal/effectsTypeConstant";
 
-export const stateEncodingMap: Record<ContentStateTypes, number> = {
+export const tableStateEncodingMap: Record<TableContentStateTypes, number> = {
   tabled: 0,
-  muteStyle: 1,
 };
-export const stateDecodingMap: Record<number, ContentStateTypes> =
-  Object.entries(stateEncodingMap).reduce((acc, [key, value]) => {
-    acc[value] = key as ContentStateTypes;
+export const tableStateDecodingMap: Record<number, TableContentStateTypes> =
+  Object.entries(tableStateEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as TableContentStateTypes;
     return acc;
-  }, {} as Record<number, ContentStateTypes>);
+  }, {} as Record<number, TableContentStateTypes>);
+
+export const userStateEncodingMap: Record<UserContentStateTypes, number> = {
+  muteStyle: 0,
+};
+export const userStateDecodingMap: Record<number, UserContentStateTypes> =
+  Object.entries(userStateEncodingMap).reduce((acc, [key, value]) => {
+    acc[value] = key as UserContentStateTypes;
+    return acc;
+  }, {} as Record<number, UserContentStateTypes>);
 
 export const postProcessEffectEncodingMap: Record<
   PostProcessEffectTypes,

@@ -1,8 +1,8 @@
 import { Collection } from "mongodb";
 import Encoder from "./Encoder";
 import { TableTextType } from "./typeConstant";
-import { ContentStateTypes } from "../../../../universal/contentTypeConstant";
-import { stateEncodingMap } from "../typeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
+import { tableStateEncodingMap } from "../typeConstant";
 
 class Uploads {
   constructor(
@@ -11,11 +11,11 @@ class Uploads {
   ) {}
 
   uploadMetaData = async (data: {
-    table_id: string;
+    tableId: string;
     textId: string;
     filename: string;
     mimeType: string;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
     instances: {
       textInstanceId: string;
       positioning: {
@@ -41,9 +41,9 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { table_id: string; textId: string },
+    filter: { tableId: string; textId: string },
     updateData: Partial<{
-      state?: ContentStateTypes[];
+      state?: TableContentStateTypes[];
       filename?: string;
       mimeType?: string;
       instances?: {
@@ -76,14 +76,14 @@ class Uploads {
 
     if (updateData.state !== undefined) {
       generalSetFields["s"] = updateData.state.map(
-        (ate) => stateEncodingMap[ate]
+        (ate) => tableStateEncodingMap[ate]
       );
     }
 
     if (Object.keys(generalSetFields).length > 0) {
       bulkOps.push({
         updateOne: {
-          filter: { tid: filter.table_id, xid: filter.textId },
+          filter: { tid: filter.tableId, xid: filter.textId },
           update: { $set: generalSetFields },
         },
       });
@@ -118,7 +118,7 @@ class Uploads {
           bulkOps.push({
             updateOne: {
               filter: {
-                tid: filter.table_id,
+                tid: filter.tableId,
                 xid: filter.textId,
                 "i.xiid": textInstanceId,
               },
@@ -141,7 +141,7 @@ class Uploads {
   };
 
   addNewInstances = async (
-    filter: { table_id: string; textId: string },
+    filter: { tableId: string; textId: string },
     updateData: {
       textInstanceId: string;
       positioning: {
@@ -181,7 +181,7 @@ class Uploads {
       try {
         const result = await this.tableTextCollection.updateOne(
           {
-            tid: filter.table_id,
+            tid: filter.tableId,
             xid: filter.textId,
           },
           {

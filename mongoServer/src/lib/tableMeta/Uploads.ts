@@ -9,7 +9,7 @@ class Uploads {
   ) {}
 
   uploadMetaData = async (data: {
-    table_id: string;
+    tableId: string;
     tableName: string;
     owner: string;
     members: {
@@ -38,7 +38,7 @@ class Uploads {
   };
 
   editMetaData = async (
-    filter: { table_id: string },
+    filter: { tableId: string },
     updateData: Partial<{
       tableName?: string;
       owner?: string;
@@ -133,7 +133,7 @@ class Uploads {
       const options = arrayFilters.length > 0 ? { arrayFilters } : {};
 
       const result = await this.tablesMetaCollection.updateOne(
-        { tid: filter.table_id },
+        { tid: filter.tableId },
         updateQuery,
         options
       );

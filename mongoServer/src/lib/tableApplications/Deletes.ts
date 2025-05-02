@@ -6,13 +6,10 @@ class Deletes {
     private tableApplicationsCollection: Collection<TableApplicationsType>
   ) {}
 
-  deleteMetaDataBy_TID_AID = async (
-    table_id: string,
-    applicationId: string
-  ) => {
+  deleteMetaDataBy_TID_AID = async (tableId: string, applicationId: string) => {
     try {
       await this.tableApplicationsCollection.deleteOne({
-        tid: table_id,
+        tid: tableId,
         aid: applicationId,
       });
     } catch (err) {
@@ -21,14 +18,14 @@ class Deletes {
   };
 
   deleteInstanceBy_TID_AID_AIID = async (
-    table_id: string,
+    tableId: string,
     applicationId: string,
     applicationInstanceId: string
   ): Promise<null | TableApplicationsType> => {
     try {
       const result = await this.tableApplicationsCollection.findOneAndUpdate(
         {
-          tid: table_id,
+          tid: tableId,
           aid: applicationId,
         },
         {

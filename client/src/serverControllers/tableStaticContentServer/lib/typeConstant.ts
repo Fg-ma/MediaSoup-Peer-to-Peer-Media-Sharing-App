@@ -1,5 +1,5 @@
 import {
-  ContentStateTypes,
+  TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../../universal/contentTypeConstant";
 import {
@@ -42,7 +42,7 @@ export type OutGoingTableStaticContentMessages =
 type onJoinTableType = {
   type: "joinTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -51,7 +51,7 @@ type onJoinTableType = {
 type onLeaveTableType = {
   type: "leaveTable";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -60,7 +60,7 @@ type onLeaveTableType = {
 type onRequestCatchUpTableDataType = {
   type: "requestCatchUpTableData";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
   };
@@ -69,7 +69,7 @@ type onRequestCatchUpTableDataType = {
 type onDeleteContentType = {
   type: "deleteContent";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -82,7 +82,7 @@ type onDeleteContentType = {
 type onGetFileType = {
   type: "getFile";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: StaticContentTypes;
@@ -94,7 +94,7 @@ type onGetFileType = {
 type onUpdateContentPositioningType = {
   type: "updateContentPositioning";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -117,7 +117,7 @@ type onUpdateContentPositioningType = {
 type onUpdateContentEffectsType = {
   type: "updateContentEffects";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
@@ -137,7 +137,7 @@ type onUpdateContentEffectsType = {
 type onUpdateVideoPositionType = {
   type: "updateVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: "video";
     contentId: string;
     instanceId: string;
@@ -150,7 +150,7 @@ type onUpdateVideoPositionType = {
 type onRequestCatchUpVideoPositionType = {
   type: "requestCatchUpVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: "video";
@@ -162,7 +162,7 @@ type onRequestCatchUpVideoPositionType = {
 type onResponseCatchUpVideoPositionType = {
   type: "responseCatchUpVideoPosition";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: "video";
@@ -177,19 +177,19 @@ type onResponseCatchUpVideoPositionType = {
 type onChangeContentStateType = {
   type: "changeContentState";
   header: {
-    table_id: string;
+    tableId: string;
     contentType: StaticContentTypes;
     contentId: string;
   };
   data: {
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
 type onCreateNewInstancesType = {
   type: "createNewInstances";
   header: {
-    table_id: string;
+    tableId: string;
   };
   data: {
     updates: {
@@ -216,7 +216,7 @@ type onCreateNewInstancesType = {
 type onSearchTabledContentRequestType = {
   type: "searchTabledContentRequest";
   header: {
-    table_id: string;
+    tableId: string;
     username: string;
     instance: string;
     contentType: StaticContentTypes | "all";
@@ -260,7 +260,7 @@ export type onVideoUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -272,7 +272,7 @@ export type onVideoUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -302,7 +302,7 @@ export type onImageUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -314,7 +314,7 @@ export type onImageUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -334,7 +334,7 @@ export type onSvgUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -346,7 +346,7 @@ export type onSvgUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -366,7 +366,7 @@ export type onTextUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -378,7 +378,7 @@ export type onTextUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -398,7 +398,7 @@ export type onApplicationUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -410,7 +410,7 @@ export type onApplicationUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -430,7 +430,7 @@ export type onSoundClipUploadedToTableType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -442,7 +442,7 @@ export type onSoundClipUploadedToTabledType = {
   data: {
     filename: string;
     mimeType: TableTopStaticMimeType;
-    state: ContentStateTypes[];
+    state: TableContentStateTypes[];
   };
 };
 
@@ -479,11 +479,11 @@ export type onResponsedCatchUpTableDataType = {
   data: {
     images:
       | {
-          table_id: string;
+          tableId: string;
           imageId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             imageInstanceId: string;
             positioning: {
@@ -504,11 +504,11 @@ export type onResponsedCatchUpTableDataType = {
       | undefined;
     svgs:
       | {
-          table_id: string;
+          tableId: string;
           svgId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             svgInstanceId: string;
             positioning: {
@@ -529,11 +529,11 @@ export type onResponsedCatchUpTableDataType = {
       | undefined;
     videos:
       | {
-          table_id: string;
+          tableId: string;
           videoId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             videoInstanceId: string;
             positioning: {
@@ -555,11 +555,11 @@ export type onResponsedCatchUpTableDataType = {
       | undefined;
     text:
       | {
-          table_id: string;
+          tableId: string;
           textId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             textInstanceId: string;
             positioning: {
@@ -578,11 +578,11 @@ export type onResponsedCatchUpTableDataType = {
       | undefined;
     soundClips:
       | {
-          table_id: string;
+          tableId: string;
           soundClipId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             soundClipInstanceId: string;
             positioning: {
@@ -602,11 +602,11 @@ export type onResponsedCatchUpTableDataType = {
       | undefined;
     applications:
       | {
-          table_id: string;
+          tableId: string;
           applicationId: string;
           filename: string;
           mimeType: string;
-          state: ContentStateTypes[];
+          state: TableContentStateTypes[];
           instances: {
             applicationInstanceId: string;
             positioning: {
@@ -640,7 +640,7 @@ export type onContentDeletedType = {
 export type onContentStateChangedType = {
   type: "contentStateChanged";
   header: { contentType: StaticContentTypes; contentId: string };
-  data: { state: ContentStateTypes[] };
+  data: { state: TableContentStateTypes[] };
 };
 
 export type onUpdatedContentEffectsType = {

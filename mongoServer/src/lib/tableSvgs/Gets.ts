@@ -8,10 +8,10 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getSvgMetaDataBy_TID_SID = async (table_id: string, svgId: string) => {
+  getSvgMetaDataBy_TID_SID = async (tableId: string, svgId: string) => {
     try {
       const svgData = await this.tableSvgsCollection.findOne({
-        tid: table_id,
+        tid: tableId,
         sid: svgId,
       });
 
@@ -26,10 +26,10 @@ class Gets {
     }
   };
 
-  getAllBy_TID = async (table_id: string) => {
+  getAllBy_TID = async (tableId: string) => {
     try {
       const svgData = await this.tableSvgsCollection
-        .find({ tid: table_id })
+        .find({ tid: tableId })
         .toArray();
 
       if (!svgData || svgData.length === 0) {

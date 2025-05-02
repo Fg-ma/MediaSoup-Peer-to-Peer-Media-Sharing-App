@@ -23,7 +23,7 @@ class Decoder {
     bm: string | null;
     bi: string | null;
   }): {
-    table_id: string;
+    tableId: string;
     tableName: string;
     owner: string;
     members: {
@@ -45,7 +45,7 @@ class Decoder {
     const { tid, tn, ow, mm, io, bm, bi } = data;
 
     return {
-      table_id: tid,
+      tableId: tid,
       tableName: tn,
       owner: ow,
       members: mm.map((member) => ({
