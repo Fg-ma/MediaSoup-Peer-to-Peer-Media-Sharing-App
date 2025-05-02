@@ -22,7 +22,7 @@ export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
 export const search = new Search(broadcaster);
 export const tablesController = new TablesController();
-export const metadataController = new MetadataController();
+export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup();
 

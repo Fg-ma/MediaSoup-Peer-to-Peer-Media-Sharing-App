@@ -6,7 +6,8 @@ import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+const tableStaticContentServerBaseUrl =
+  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
@@ -42,13 +43,16 @@ export default function UploadMediaButton() {
     };
 
     try {
-      const metaRes = await fetch(staticContentServerBaseUrl + "upload-meta", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const metaRes = await fetch(
+        tableStaticContentServerBaseUrl + "upload-meta",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metadata),
         },
-        body: JSON.stringify(metadata),
-      });
+      );
 
       const { uploadId } = await metaRes.json();
 
@@ -58,7 +62,7 @@ export default function UploadMediaButton() {
       const xhr = new XMLHttpRequest();
       xhr.open(
         "POST",
-        staticContentServerBaseUrl + `upload-file/${uploadId}`,
+        tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
         true,
       );
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../elements/fgButton/FgButton";
@@ -21,6 +21,7 @@ import FgInput from "../../../../../elements/fgInput/FgInput";
 import PageTemplate from "./PageTemplate";
 import FgSlider from "../../../../../elements/fgSlider/FgSlider";
 import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../../../../context/socketContext/SocketContext";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -81,6 +82,7 @@ export default function SettingsPanel({
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
+  const { userStaticContentSocket } = useSocketContext();
 
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -88,6 +90,8 @@ export default function SettingsPanel({
   } | null>(null);
   const [externalNumFixedPointsValue, setExternalNumFixedPointsValue] =
     useState(`${settings.numFixedPoints.value}`);
+
+  const firstMuteStylesPage = useRef(false);
 
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -230,10 +234,18 @@ export default function SettingsPanel({
     });
   };
 
+  useEffect(() => {
+    if (!activePages.muteStyle.active || firstMuteStylesPage.current) return;
+
+    firstMuteStylesPage.current = true;
+
+    userStaticContentSocket.current?.requestMuteStyles();
+  }, [activePages.muteStyle.active]);
+
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
+      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -276,17 +288,19 @@ export default function SettingsPanel({
               className="w-full"
               contentFunction={() => (
                 <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
-                  <div>Mute style</div>
-                  <div>
+                  <div className="mr-3">Mute style</div>
+                  <div className="h-full grow truncate text-right">
                     {muteStyleTypes.includes(
                       settings.muteStyle.value as MuteStyleTypes,
                     )
                       ? muteStylesMeta[
                           settings.muteStyle.value as MuteStyleTypes
                         ].title
-                      : (Object.entries(userMedia.current.svg.user).find(
-                          ([svgId]) => svgId === settings.muteStyle.value,
-                        )?.[1].filename ?? "")}
+                      : (Object.entries(userMedia.current.svg.user)
+                          .find(
+                            ([svgId]) => svgId === settings.muteStyle.value,
+                          )?.[1]
+                          .filename.slice(0, -4) ?? "")}
                   </div>
                 </div>
               )}

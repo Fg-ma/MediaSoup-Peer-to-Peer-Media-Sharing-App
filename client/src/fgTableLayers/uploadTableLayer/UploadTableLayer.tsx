@@ -2,7 +2,8 @@ import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 
-const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+const tableStaticContentServerBaseUrl =
+  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function UploadTableLayer() {
   const { tableId } = useUserInfoContext();
@@ -26,13 +27,16 @@ export default function UploadTableLayer() {
     };
 
     try {
-      const metaRes = await fetch(staticContentServerBaseUrl + "upload-meta", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const metaRes = await fetch(
+        tableStaticContentServerBaseUrl + "upload-meta",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metadata),
         },
-        body: JSON.stringify(metadata),
-      });
+      );
 
       const { uploadId } = await metaRes.json();
 
@@ -42,7 +46,7 @@ export default function UploadTableLayer() {
       const xhr = new XMLHttpRequest();
       xhr.open(
         "POST",
-        staticContentServerBaseUrl + `upload-file/${uploadId}`,
+        tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
         true,
       );
 

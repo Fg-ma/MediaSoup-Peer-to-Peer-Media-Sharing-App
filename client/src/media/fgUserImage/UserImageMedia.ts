@@ -1,4 +1,3 @@
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import {
   IncomingUserStaticContentMessages,
   TableTopStaticMimeType,
@@ -7,15 +6,10 @@ import {
   UserContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
-import FaceLandmarks from "../../babylon/FaceLandmarks";
-import Deadbanding from "../../babylon/Deadbanding";
-import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
-import UserDevice from "../../lib/UserDevice";
 
 export type ImageListenerTypes =
   | { type: "downloadComplete" }
-  | { type: "stateChanged" }
-  | { type: "rectifyEffectMeshCount" };
+  | { type: "stateChanged" };
 
 class UserImageMedia {
   image: HTMLImageElement | undefined;
@@ -34,7 +28,6 @@ class UserImageMedia {
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: UserContentStateTypes[],
-    private userDevice: React.MutableRefObject<UserDevice>,
     private getImage: (
       contentType: StaticContentTypes,
       contentId: string,

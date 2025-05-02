@@ -19,7 +19,8 @@ export type OutGoingUserStaticContentMessages =
   | onDeleteContentType
   | onGetFileType
   | onChangeContentStateType
-  | onSearchUserContentRequestType;
+  | onSearchUserContentRequestType
+  | onMuteStylesRequestType;
 
 type onConnectType = {
   type: "connect";
@@ -43,7 +44,6 @@ type onDeleteContentType = {
     userId: string;
     contentType: StaticContentTypes;
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -54,7 +54,6 @@ type onGetFileType = {
   type: "getFile";
   header: {
     userId: string;
-    username: string;
     instance: string;
     contentType: StaticContentTypes;
     contentId: string;
@@ -78,12 +77,19 @@ type onSearchUserContentRequestType = {
   type: "searchUserContentRequest";
   header: {
     userId: string;
-    username: string;
     instance: string;
     contentType: StaticContentTypes | "all";
   };
   data: {
     name: string;
+  };
+};
+
+type onMuteStylesRequestType = {
+  type: "muteStylesRequest";
+  header: {
+    userId: string;
+    instance: string;
   };
 };
 
@@ -98,13 +104,13 @@ export type IncomingUserStaticContentMessages =
   | onChunkType
   | onDownloadCompleteType
   | onContentDeletedType
-  | onContentStateChangedType;
+  | onContentStateChangedType
+  | onMuteStylesResponseType;
 
 export type onVideoUploadedToUserContentType = {
   type: "videoUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -117,7 +123,6 @@ export type onImageUploadedToUserContentType = {
   type: "imageUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -130,7 +135,6 @@ export type onSvgUploadedToUserContentType = {
   type: "svgUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -143,7 +147,6 @@ export type onTextUploadedToUserContentType = {
   type: "textUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -156,7 +159,6 @@ export type onApplicationUploadedToUserContentType = {
   type: "applicationUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -169,7 +171,6 @@ export type onSoundClipUploadedToUserContentType = {
   type: "soundClipUploadedToUserContent";
   header: {
     contentId: string;
-    instanceId: string;
   };
   data: {
     filename: string;
@@ -216,4 +217,17 @@ export type onContentStateChangedType = {
 export type onSearchUserContentRespondedType = {
   type: "searchUserContentResponded";
   data: any;
+};
+
+export type onMuteStylesResponseType = {
+  type: "muteStylesResponse";
+  data: {
+    svgs: {
+      userId: string;
+      svgId: string;
+      filename: string;
+      mimeType: TableTopStaticMimeType;
+      state: UserContentStateTypes[];
+    }[];
+  };
 };

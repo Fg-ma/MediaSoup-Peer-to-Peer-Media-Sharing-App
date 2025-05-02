@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { types } from "mediasoup-client";
 import { useMediaContext } from "./context/mediaContext/MediaContext";
 import { useEffectsContext } from "./context/effectsContext/EffectsContext";
@@ -84,11 +84,14 @@ export default function Main() {
     userStaticContentSocket.current = new UserStaticContentSocketController(
       "wss://localhost:8049",
       userId.current,
-      username.current,
       instance.current,
       userMedia,
     );
   };
+
+  useEffect(() => {
+    signIn("hi");
+  }, []);
 
   const muteAudio = (
     producerType: "audio" | "screenAudio",

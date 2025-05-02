@@ -19,7 +19,8 @@ import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
 import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
 
-const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+const tableStaticContentServerBaseUrl =
+  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function FgTableSvg({
   svgInstanceId,
@@ -264,7 +265,7 @@ export default function FgTableSvg({
 
                 try {
                   const metaRes = await fetch(
-                    staticContentServerBaseUrl + "upload-meta",
+                    tableStaticContentServerBaseUrl + "upload-meta",
                     {
                       method: "POST",
                       headers: {
@@ -282,7 +283,7 @@ export default function FgTableSvg({
                   const xhr = new XMLHttpRequest();
                   xhr.open(
                     "POST",
-                    staticContentServerBaseUrl + `upload-file/${uploadId}`,
+                    tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
                     true,
                   );
 

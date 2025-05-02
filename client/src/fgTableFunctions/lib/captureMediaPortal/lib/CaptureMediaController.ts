@@ -13,7 +13,8 @@ import {
   Settings,
 } from "./typeConstant";
 
-const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+const tableStaticContentServerBaseUrl =
+  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 class CaptureMediaController {
   constructor(
@@ -367,7 +368,7 @@ class CaptureMediaController {
 
       try {
         const metaRes = await fetch(
-          staticContentServerBaseUrl + "upload-meta",
+          tableStaticContentServerBaseUrl + "upload-meta",
           {
             method: "POST",
             headers: {
@@ -395,7 +396,7 @@ class CaptureMediaController {
         const xhr = new XMLHttpRequest();
         xhr.open(
           "POST",
-          staticContentServerBaseUrl + `upload-file/${uploadId}`,
+          tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
           true,
         );
 
@@ -414,7 +415,7 @@ class CaptureMediaController {
 
       try {
         const metaRes = await fetch(
-          staticContentServerBaseUrl + "upload-meta",
+          tableStaticContentServerBaseUrl + "upload-meta",
           {
             method: "POST",
             headers: {
@@ -438,7 +439,7 @@ class CaptureMediaController {
         const xhr = new XMLHttpRequest();
         xhr.open(
           "POST",
-          staticContentServerBaseUrl + `upload-file/${uploadId}`,
+          tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
           true,
         );
 

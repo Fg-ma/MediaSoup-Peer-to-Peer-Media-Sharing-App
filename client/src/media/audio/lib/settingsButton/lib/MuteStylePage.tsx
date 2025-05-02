@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import {
@@ -8,6 +8,9 @@ import {
   muteStylesMeta,
 } from "../../typeConstant";
 import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../../../../context/socketContext/SocketContext";
+import { IncomingUserStaticContentMessages } from "../../../../../serverControllers/userStaticContentServer/lib/typeConstant";
+import { SvgListenerTypes } from "../../../../../media/fgUserSvg/UserSvgMedia";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -25,7 +28,9 @@ export default function MuteStylePage({
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
+  const { userStaticContentSocket } = useSocketContext();
 
+  const [_, setRerender] = useState(false);
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const setMuteStyle = (muteStyle: MuteStyleTypes | string) => {
@@ -47,6 +52,40 @@ export default function MuteStylePage({
       return newActivePages;
     });
   };
+
+  const handleUserStaticContentMessage = (
+    message: IncomingUserStaticContentMessages,
+  ) => {
+    if (message.type !== "muteStylesResponse") return;
+
+    setRerender((prev) => !prev);
+
+    for (const svgMedia of Object.values(userMedia.current.svg.user)) {
+      if (!svgMedia.state.includes("muteStyle")) return;
+
+      const listener = (message: SvgListenerTypes) => {
+        if ((message.type = "downloadComplete")) {
+          setRerender((prev) => !prev);
+
+          svgMedia.removeSvgListener(listener);
+        }
+      };
+
+      svgMedia.addSvgListener(listener);
+    }
+  };
+
+  useEffect(() => {
+    userStaticContentSocket.current?.addMessageListener(
+      handleUserStaticContentMessage,
+    );
+
+    return () => {
+      userStaticContentSocket.current?.removeMessageListener(
+        handleUserStaticContentMessage,
+      );
+    };
+  }, []);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
@@ -80,7 +119,7 @@ export default function MuteStylePage({
       >
         <div className="flex h-max w-full flex-col space-y-1">
           <FgButton
-            className="flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1"
+            className="flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-tone-black-6"
             contentFunction={() => (
               <div className="flex w-full items-center justify-start bg-opacity-75 px-2 text-lg">
                 Make your own
@@ -93,10 +132,10 @@ export default function MuteStylePage({
               svgMedia.state.includes("muteStyle") && (
                 <FgButton
                   key={svgId}
-                  className={`flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                  className={`flex w-full items-center justify-center text-nowrap rounded ${
                     svgId === settings.muteStyle.value
-                      ? "bg-fg-white text-fg-tone-black-1"
-                      : ""
+                      ? "bg-fg-tone-black-8"
+                      : "hover:bg-fg-tone-black-7"
                   }`}
                   contentFunction={() => (
                     <div
@@ -104,15 +143,19 @@ export default function MuteStylePage({
                         svgMedia.filename ? "justify-between" : "justify-start"
                       } flex w-full items-center bg-opacity-75 px-2 text-lg`}
                     >
-                      <>{svgMedia.filename}</>
-                      <FgSVGElement
-                        src={svgMedia.blobURL ?? ""}
-                        className="aspect-square h-6"
-                        attributes={[
-                          { key: "height", value: "100%" },
-                          { key: "width", value: "100%" },
-                        ]}
-                      />
+                      <div className="h-full grow truncate text-left">
+                        {svgMedia.filename.slice(0, -4)}
+                      </div>
+                      {svgMedia.blobURL && (
+                        <FgSVGElement
+                          src={svgMedia.blobURL}
+                          className="ml-2 aspect-square h-6"
+                          attributes={[
+                            { key: "height", value: "100%" },
+                            { key: "width", value: "100%" },
+                          ]}
+                        />
+                      )}
                     </div>
                   )}
                   clickFunction={() => {
@@ -124,10 +167,10 @@ export default function MuteStylePage({
           {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}
-              className={`flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`mute-style-container flex w-full items-center justify-center text-nowrap rounded ${
                 key === settings.muteStyle.value
-                  ? "bg-fg-white text-fg-tone-black-1"
-                  : ""
+                  ? "bg-fg-tone-black-8"
+                  : "hover:bg-fg-tone-black-7"
               }`}
               contentFunction={() => (
                 <div
@@ -139,7 +182,7 @@ export default function MuteStylePage({
                   {meta.url && (
                     <FgSVGElement
                       src={meta.url}
-                      className="aspect-square h-6 stroke-fg-white"
+                      className="mute-style-icon aspect-square h-6 stroke-fg-white"
                       attributes={[
                         { key: "height", value: "100%" },
                         { key: "width", value: "100%" },

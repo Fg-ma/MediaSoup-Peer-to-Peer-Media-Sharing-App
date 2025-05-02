@@ -35,7 +35,8 @@ const AudioEffectsSection = React.lazy(
   () => import("../../audioEffectsButton/lib/AudioEffectsSection"),
 );
 
-const staticContentServerBaseUrl = process.env.STATIC_CONTENT_SERVER_BASE_URL;
+const userStaticContentServerBaseUrl =
+  process.env.USER_STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function FgAudioElementContainer({
   tableId,
@@ -100,10 +101,12 @@ export default function FgAudioElementContainer({
   };
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
-  const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
-    useSocketContext();
-  const { username: activeUsername, instance: activeInstance } =
-    useUserInfoContext();
+  const { mediasoupSocket, tableSocket } = useSocketContext();
+  const {
+    username: activeUsername,
+    instance: activeInstance,
+    userId,
+  } = useUserInfoContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
@@ -280,30 +283,33 @@ export default function FgAudioElementContainer({
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
     const metadata = {
-      tableId: tableId,
+      userId: userId.current,
       contentId: uuidv4(),
       direction: "toMuteStyle",
       state: ["muteStyle"],
     };
 
     try {
-      const metaRes = await fetch(staticContentServerBaseUrl + "upload-meta", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const metaRes = await fetch(
+        userStaticContentServerBaseUrl + "upload-meta",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metadata),
         },
-        body: JSON.stringify(metadata),
-      });
+      );
 
       const { uploadId } = await metaRes.json();
 
       const formData = new FormData();
-      formData.append("file", blob, `${name ? name : "image"}`);
+      formData.append("file", blob, `${name ? name + ".svg" : "image"}`);
 
       const xhr = new XMLHttpRequest();
       xhr.open(
         "POST",
-        staticContentServerBaseUrl + `upload-file/${uploadId}`,
+        userStaticContentServerBaseUrl + `upload-file/${uploadId}`,
         true,
       );
 

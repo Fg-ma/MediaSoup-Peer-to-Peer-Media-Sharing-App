@@ -1,11 +1,24 @@
 import { tableTopMongo } from "src";
-import { onChangeContentStateType } from "../typeConstant";
+import { onMuteStylesRequestType } from "../typeConstant";
+import Broadcaster from "./Broadcaster";
 
 class MetadataController {
-  constructor() {}
+  constructor(private broadcaster: Broadcaster) {}
 
-  onChangeContentState = (event: onChangeContentStateType) => {
-    tableTopMongo.onChangeUserContentState(event);
+  onMuteStylesRequest = async (event: onMuteStylesRequestType) => {
+    const { userId, instance } = event.header;
+
+    const userSvgs = await tableTopMongo.userSvgs?.gets.getAllBy_UID(userId);
+
+    if (userSvgs)
+      this.broadcaster.broadcastToInstance(userId, instance, {
+        type: "muteStylesResponse",
+        data: {
+          svgs: userSvgs.filter((userSvg) =>
+            userSvg.state.includes("muteStyle")
+          ),
+        },
+      });
   };
 }
 

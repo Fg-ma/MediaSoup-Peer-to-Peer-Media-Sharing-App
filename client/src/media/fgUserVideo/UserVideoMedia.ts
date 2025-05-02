@@ -1,6 +1,4 @@
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import shaka from "shaka-player";
-import { UserEffectsType } from "../../../../universal/effectsTypeConstant";
 import {
   IncomingUserStaticContentMessages,
   TableTopStaticMimeType,
@@ -10,15 +8,10 @@ import {
   UserContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
-import FaceLandmarks from "../../babylon/FaceLandmarks";
-import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
-import Deadbanding from "src/babylon/Deadbanding";
-import UserDevice from "src/lib/UserDevice";
 
 export type VideoListenerTypes =
   | { type: "downloadComplete" }
-  | { type: "stateChanged" }
-  | { type: "rectifyEffectMeshCount" };
+  | { type: "stateChanged" };
 
 class UserVideoMedia {
   video: HTMLVideoElement | undefined;
@@ -40,35 +33,11 @@ class UserVideoMedia {
   private audioStream?: MediaStream;
   private videoAudioMedia?: UserVideoAudioMedia;
 
-  maxFaces: [number] = [1];
-  detectedFaces: number = 0;
-  maxFacesDetected = 0;
-
-  faceLandmarks: FaceLandmarks;
-
-  faceMeshWorker: Worker;
-  faceMeshResults: NormalizedLandmarkListList[] = [];
-  faceMeshProcessing = [false];
-  faceDetectionWorker: Worker;
-  faceDetectionProcessing = [false];
-  selfieSegmentationWorker: Worker;
-  selfieSegmentationResults: ImageData[] = [];
-  selfieSegmentationProcessing = [false];
-
-  faceCountChangeListeners: Set<(facesDetected: number) => void> = new Set();
-
-  forcingFaces = false;
-
-  babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
-
   constructor(
     public videoId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: UserContentStateTypes[],
-    private deadbanding: React.MutableRefObject<Deadbanding>,
-    private userDevice: React.MutableRefObject<UserDevice>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
     private getVideo: (
       contentType: StaticContentTypes,
       contentId: string,
@@ -105,102 +74,6 @@ class UserVideoMedia {
     //   this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
     // }
 
-    this.faceLandmarks = new FaceLandmarks(
-      true,
-      "video",
-      this.videoId,
-      this.deadbanding,
-    );
-
-    this.faceMeshWorker = new Worker(
-      new URL("../../webWorkers/faceMeshWebWorker.worker", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceMeshWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.faceMeshProcessing[0] = false;
-          if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
-            this.faceMeshResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
-    this.faceDetectionWorker = new Worker(
-      new URL(
-        "../../webWorkers/faceDetectionWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.faceDetectionWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "FACES_DETECTED": {
-          this.faceDetectionProcessing[0] = false;
-          const detectedFaces = event.data.numFacesDetected;
-          this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
-
-          if (detectedFaces > this.maxFacesDetected) {
-            this.maxFacesDetected = detectedFaces;
-          }
-
-          if (detectedFaces !== this.maxFaces[0]) {
-            this.maxFaces[0] = detectedFaces;
-
-            this.faceMeshWorker.postMessage({
-              message: "CHANGE_MAX_FACES",
-              newMaxFace: detectedFaces,
-            });
-            this.videoListeners.forEach((listener) => {
-              listener({ type: "rectifyEffectMeshCount" });
-            });
-
-            this.faceCountChangeListeners.forEach((listener) => {
-              listener(detectedFaces);
-            });
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    };
-
-    this.selfieSegmentationWorker = new Worker(
-      new URL(
-        "../../webWorkers/selfieSegmentationWebWorker.worker",
-        import.meta.url,
-      ),
-      {
-        type: "module",
-      },
-    );
-
-    this.selfieSegmentationWorker.onmessage = (event) => {
-      switch (event.data.message) {
-        case "PROCESSED_FRAME":
-          this.selfieSegmentationProcessing[0] = false;
-          if (event.data.results) {
-            this.selfieSegmentationResults[0] = event.data.results;
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
     this.getVideo("video", this.videoId, this.filename);
     this.addMessageListener(this.getVideoListener);
   }
@@ -233,19 +106,6 @@ class UserVideoMedia {
     }
 
     this.videoListeners.clear();
-
-    // Terminate workers to prevent memory leaks
-    if (this.faceMeshWorker) {
-      this.faceMeshWorker.terminate();
-    }
-    if (this.faceDetectionWorker) {
-      this.faceDetectionWorker.terminate();
-    }
-    if (this.selfieSegmentationWorker) {
-      this.selfieSegmentationWorker.terminate();
-    }
-
-    this.faceCountChangeListeners.clear();
   }
 
   private getVideoListener = (message: IncomingUserStaticContentMessages) => {
@@ -291,21 +151,6 @@ class UserVideoMedia {
         this.aspect =
           (this.video?.videoWidth ?? 1) / (this.video?.videoHeight ?? 1);
 
-        if (this.video)
-          this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
-            false,
-            this.faceLandmarks,
-            this.aspect,
-            this.video,
-            this.faceMeshWorker,
-            this.faceMeshProcessing,
-            this.faceDetectionWorker,
-            this.faceDetectionProcessing,
-            this.selfieSegmentationWorker,
-            this.selfieSegmentationProcessing,
-            this.userDevice,
-          );
-
         this.loadingState = "downloaded";
 
         this.audioStream = (this.video as any).captureStream();
@@ -314,7 +159,6 @@ class UserVideoMedia {
           this.videoAudioMedia = new UserVideoAudioMedia(
             this.videoId,
             this.audioStream,
-            this.userEffects,
           );
         }
 

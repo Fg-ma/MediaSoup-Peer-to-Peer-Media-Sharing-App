@@ -139,7 +139,8 @@ export type MessageTypes =
   | onDeleteContentType
   | onGetFileType
   | onChangeContentStateType
-  | onSearchUserContentRequestType;
+  | onSearchUserContentRequestType
+  | onMuteStylesRequestType;
 
 export type onConnectType = {
   type: "connect";
@@ -203,6 +204,14 @@ export type onChangeContentStateType = {
   };
   data: {
     state: UserContentStateTypes[];
+  };
+};
+
+export type onMuteStylesRequestType = {
+  type: "muteStylesRequest";
+  header: {
+    userId: string;
+    instance: string;
   };
 };
 

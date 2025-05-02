@@ -4,6 +4,7 @@ import {
   metadataController,
   search,
   tablesController,
+  tableTopMongo,
 } from "../index";
 import { MessageTypes, UserStaticContentWebSocket } from "../typeConstant";
 
@@ -22,10 +23,13 @@ const handleMessage = (ws: UserStaticContentWebSocket, event: MessageTypes) => {
       gets.getFile(event);
       break;
     case "changeContentState":
-      metadataController.onChangeContentState(event);
+      tableTopMongo.onChangeUserContentState(event);
       break;
     case "searchUserContentRequest":
       search.onSearchUserContentRequest(event);
+      break;
+    case "muteStylesRequest":
+      metadataController.onMuteStylesRequest(event);
       break;
     default:
       break;

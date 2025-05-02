@@ -23,14 +23,12 @@ const uploadSessions = new Map<
   | {
       direction: "toMuteStyle";
       userId: string;
-      instance: string;
       contentId: string;
       state: UserContentStateTypes[];
     }
   | {
       direction: "toUserContent";
       userId: string;
-      instance: string;
       contentId: string;
       state: UserContentStateTypes[];
     }
@@ -63,7 +61,7 @@ class Posts {
 
           try {
             const metadata = JSON.parse(buffer);
-            const { userId, instance, contentId, direction, state } = metadata;
+            const { userId, contentId, direction, state } = metadata;
 
             const uploadId = uuidv4();
 
@@ -72,7 +70,6 @@ class Posts {
                 uploadSessions.set(uploadId, {
                   direction,
                   userId,
-                  instance,
                   contentId,
                   state,
                 });
@@ -81,7 +78,6 @@ class Posts {
                 uploadSessions.set(uploadId, {
                   direction,
                   userId,
-                  instance,
                   contentId,
                   state,
                 });
@@ -171,7 +167,6 @@ class Posts {
                 if (staticContentType === "svg") {
                   await this.handleToMuteStyle(
                     session.userId,
-                    session.instance,
                     session.contentId,
                     mimeType as StaticMimeTypes,
                     completeFilename,
@@ -183,7 +178,6 @@ class Posts {
                 await this.handleToUserContent(
                   staticContentType,
                   session.userId,
-                  session.instance,
                   session.contentId,
                   mimeType as StaticMimeTypes,
                   completeFilename,
@@ -227,7 +221,6 @@ class Posts {
 
   private handleToMuteStyle = async (
     userId: string,
-    instance: string,
     contentId: string,
     mimeType: StaticMimeTypes,
     completeFilename: string,
@@ -241,8 +234,8 @@ class Posts {
       state
     );
 
-    broadcaster.broadcastToInstance(userId, instance, {
-      type: "svgUploadedToMuteStyle",
+    broadcaster.broadcastToUser(userId, {
+      type: "svgUploadedToUserContent",
       header: { contentId },
       data: { filename: completeFilename, mimeType, state },
     });
@@ -251,7 +244,6 @@ class Posts {
   private handleToUserContent = async (
     staticContentType: StaticContentTypes,
     userId: string,
-    instance: string,
     contentId: string,
     mimeType: StaticMimeTypes,
     completeFilename: string,
@@ -267,7 +259,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "videoUploadedToUserContent",
           header: {
             contentId,
@@ -317,7 +309,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "imageUploadedToUserContent",
           header: { contentId },
           data: { filename: completeFilename, mimeType, state },
@@ -332,7 +324,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "svgUploadedToUserContent",
           header: { contentId },
           data: { filename: completeFilename, mimeType, state },
@@ -347,7 +339,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "soundClipUploadedToUserContent",
           header: { contentId },
           data: { filename: completeFilename, mimeType, state },
@@ -362,7 +354,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "applicationUploadedToUserContent",
           header: { contentId },
           data: { filename: completeFilename, mimeType },
@@ -377,7 +369,7 @@ class Posts {
           state
         );
 
-        broadcaster.broadcastToInstance(userId, instance, {
+        broadcaster.broadcastToUser(userId, {
           type: "textUploadedToUserContent",
           header: { contentId },
           data: { filename: completeFilename, mimeType, state },
