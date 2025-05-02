@@ -27,7 +27,7 @@ export default function PositioningIndicator({
     }[]
   >;
   indicators: React.MutableRefObject<InstanceType[]>;
-  tabledPortalController: TabledPortalController;
+  tabledPortalController: React.MutableRefObject<TabledPortalController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia } = useMediaContext();
@@ -35,7 +35,7 @@ export default function PositioningIndicator({
   const positioningIndicatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    tabledPortalController.placeInstances();
+    tabledPortalController.current.placeInstances();
     setRerender((prev) => !prev);
   }, [
     JSON.stringify(staticPlacement.current),
@@ -113,7 +113,7 @@ export default function PositioningIndicator({
             {instance.instances.map((ins, i) => (
               <div
                 key={instance.contentId + "_" + i}
-                className="border pointer-events-none absolute select-none rounded border-dashed border-fg-red"
+                className="pointer-events-none absolute select-none rounded border border-dashed border-fg-red"
                 style={{
                   width: `${ins.width}%`,
                   height: `${ins.height}%`,

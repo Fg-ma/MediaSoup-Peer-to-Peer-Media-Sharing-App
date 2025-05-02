@@ -95,15 +95,17 @@ export default function TabledPortal({
 
   const [_, setRerender] = useState(false);
 
-  const tabledPortalController = new TabledPortalController(
-    indicators,
-    staticPlacement,
-    selected,
-    setRerender,
-    tableStaticContentSocket,
-    tabledPortalRef,
-    tabledContentRef,
-    setTabledActive,
+  const tabledPortalController = useRef(
+    new TabledPortalController(
+      indicators,
+      staticPlacement,
+      selected,
+      setRerender,
+      tableStaticContentSocket,
+      tabledPortalRef,
+      tabledContentRef,
+      setTabledActive,
+    ),
   );
 
   return (
@@ -117,7 +119,7 @@ export default function TabledPortal({
       content={
         <div
           className="flex h-full w-full items-center justify-center"
-          onPointerDown={tabledPortalController.handlePortalClick}
+          onPointerDown={tabledPortalController.current.handlePortalClick}
         >
           <div
             ref={tabledContentRef}

@@ -16,7 +16,7 @@ export default function FullScreenButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -26,7 +26,7 @@ export default function FullScreenButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleFullScreen();
+        fgLowerVisualMediaController.current.handleFullScreen();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
@@ -35,7 +35,7 @@ export default function FullScreenButton({
         return (
           <FgSVGElement
             src={iconSrc}
-            className='flex items-center justify-center'
+            className="flex items-center justify-center"
             attributes={[
               { key: "width", value: "85%" },
               { key: "height", value: "85%" },
@@ -46,11 +46,11 @@ export default function FullScreenButton({
       }}
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Full screen (f)' style='light' />
+          <FgHoverContentStandard content="Full screen (f)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

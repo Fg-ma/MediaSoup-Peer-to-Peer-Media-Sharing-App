@@ -15,23 +15,21 @@ export default function PlayPauseButton({
   settingsActive,
   pausedState,
 }: {
-  lowerVideoController: LowerVideoController;
+  lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   pausedState: boolean;
 }) {
   return (
     <FgButton
-      clickFunction={() => {
-        lowerVideoController.handlePausePlay();
-      }}
+      clickFunction={lowerVideoController.current.handlePausePlay}
       contentFunction={() => {
         const iconSrc = pausedState ? playIcon : pauseIcon;
 
         return (
           <FgSVGElement
             src={iconSrc}
-            className='flex items-center justify-center'
+            className="flex items-center justify-center"
             attributes={[
               { key: "width", value: "85%" },
               { key: "height", value: "85%" },
@@ -44,11 +42,11 @@ export default function PlayPauseButton({
         !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={pausedState ? "Play (k)" : "Pause (k)"}
-            style='light'
+            style="light"
           />
         ) : undefined
       }
-      className='flex items-center justify-center h-full aspect-square pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full items-center justify-center"
     />
   );
 }

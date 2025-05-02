@@ -59,13 +59,15 @@ export default function FgPortal({
   const internalPortalRef = useRef<HTMLDivElement>(null);
   const portalRef = externalPortalRef ?? internalPortalRef;
 
-  const fgPortalController = new FgPortalController(
-    externalRef,
-    portalRef,
-    spacing,
-    type,
-    mouseType,
-    setPortalPosition,
+  const fgPortalController = useRef(
+    new FgPortalController(
+      externalRef,
+      portalRef,
+      spacing,
+      type,
+      mouseType,
+      setPortalPosition,
+    ),
   );
 
   useEffect(() => {
@@ -78,21 +80,21 @@ export default function FgPortal({
         type === "left" ||
         type === "right"
       ) {
-        fgPortalController.getStaticPortalPosition();
+        fgPortalController.current.getStaticPortalPosition();
       }
     }
 
     if (type === "mouse")
       window.addEventListener(
         "pointermove",
-        fgPortalController.getDynamicPortalPosition,
+        fgPortalController.current.getDynamicPortalPosition,
       );
 
     if (type === "mouse")
       return () => {
         window.removeEventListener(
           "pointermove",
-          fgPortalController.getDynamicPortalPosition,
+          fgPortalController.current.getDynamicPortalPosition,
         );
       };
   }, [content]);

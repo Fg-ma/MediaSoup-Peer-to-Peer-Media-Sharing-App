@@ -15,7 +15,7 @@ export default function SvgEffectsButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  lowerSvgController: LowerSvgController;
+  lowerSvgController: React.MutableRefObject<LowerSvgController>;
   svgEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -23,7 +23,7 @@ export default function SvgEffectsButton({
   return (
     <FgButton
       clickFunction={() => {
-        lowerSvgController.handleSvgEffects();
+        lowerSvgController.current.handleSvgEffects();
       }}
       contentFunction={() => (
         <FgSVGElement
@@ -38,11 +38,11 @@ export default function SvgEffectsButton({
       )}
       hoverContent={
         !svgEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto relative flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

@@ -54,7 +54,7 @@ export default function CaptionButton({
   scrollingContainerRef,
   containerRef,
 }: {
-  lowerVideoController: LowerVideoController;
+  lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   settings: Settings;
@@ -73,11 +73,13 @@ export default function CaptionButton({
     path: string;
   }>();
 
-  const captionsController = new CaptionsController(
-    loadedVoskModel,
-    setLoadedVoskModel,
-    voskRecognizer,
-    setVoskCaptions
+  const captionsController = useRef(
+    new CaptionsController(
+      loadedVoskModel,
+      setLoadedVoskModel,
+      voskRecognizer,
+      setVoskCaptions,
+    ),
   );
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function CaptionButton({
       return;
     }
 
-    captionsController.voskProcessAudioStream(audioStream);
+    captionsController.current.voskProcessAudioStream(audioStream);
   }, [audioStream, voskRecognizer.current]);
 
   useEffect(() => {
@@ -93,7 +95,9 @@ export default function CaptionButton({
       return;
     }
 
-    captionsController.loadVoskModel(voskModels[settings.closedCaption.value]);
+    captionsController.current.loadVoskModel(
+      voskModels[settings.closedCaption.value],
+    );
   }, [settings.closedCaption.value]);
 
   return (
@@ -101,40 +105,40 @@ export default function CaptionButton({
       <FgButton
         clickFunction={() => {
           if (!active) {
-            captionsController.loadVoskModel(
-              voskModels[settings.closedCaption.value]
+            captionsController.current.loadVoskModel(
+              voskModels[settings.closedCaption.value],
             );
           }
 
           setActive((prev) => !prev);
 
-          lowerVideoController.handleClosedCaptions();
+          lowerVideoController.current.handleClosedCaptions();
 
-          lowerVideoController.updateCaptionsStyles();
+          lowerVideoController.current.updateCaptionsStyles();
         }}
         contentFunction={() => {
           return (
             <>
               <FgSVGElement
                 src={captionsIcon}
-                className='flex items-center justify-center'
+                className="flex items-center justify-center"
                 attributes={[
                   { key: "width", value: "85%" },
                   { key: "height", value: "85%" },
                   { key: "fill", value: "#f2f2f2" },
                 ]}
               />
-              {active && <div className='caption-button-underline'></div>}
+              {active && <div className="caption-button-underline"></div>}
             </>
           );
         }}
         hoverContent={
           !videoEffectsActive && !settingsActive ? (
-            <FgHoverContentStandard content='Captions (c)' style='light' />
+            <FgHoverContentStandard content="Captions (c)" style="light" />
           ) : undefined
         }
         scrollingContainerRef={scrollingContainerRef}
-        className='h-full aspect-square flex-col items-center justify-center scale-x-[-1] pointer-events-auto'
+        className="pointer-events-auto aspect-square h-full scale-x-[-1] flex-col items-center justify-center"
       />
       {active && (
         <Captions

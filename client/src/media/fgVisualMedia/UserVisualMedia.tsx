@@ -187,7 +187,10 @@ export default function UserVisualMedia({
     blockStateChange: boolean = false,
   ) => {
     if (effect !== "clearAll") {
-      fgLowerVisualMediaController.handleVisualEffect(effect, blockStateChange);
+      fgLowerVisualMediaController.current.handleVisualEffect(
+        effect,
+        blockStateChange,
+      );
 
       if (
         (type === "camera" &&
@@ -229,83 +232,86 @@ export default function UserVisualMedia({
     }
   };
 
-  const fgContentAdjustmentController =
-    useRef<FgContentAdjustmentController | null>(null);
-  if (!fgContentAdjustmentController.current)
-    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+  const fgContentAdjustmentController = useRef<FgContentAdjustmentController>(
+    new FgContentAdjustmentController(
       bundleRef,
       positioning,
       setAdjustingDimensions,
       setRerender,
-    );
-
-  const fgLowerVisualMediaController = new FgLowerVisualMediaController(
-    mediasoupSocket,
-    visualMediaId,
-    table_id,
-    username,
-    instance,
-    type,
-    fgVisualMediaOptions,
-    bundleRef,
-    videoRef,
-    audioRef,
-    visualMediaContainerRef,
-    panBtnRef,
-    setPausedState,
-    paused,
-    setCaptionsActive,
-    settings,
-    currentTimeRef,
-    setVisualEffectsActive,
-    setAudioEffectsActive,
-    handleMute,
-    handleVisualEffectChange,
-    tracksColorSetterCallback,
-    tintColor,
-    userEffects,
-    userMedia,
-    initTimeOffset,
-    fgContentAdjustmentController,
-    positioning,
-    aspectRatio,
-    screenAudioStream,
-    behindEffectsContainerRef,
-    frontEffectsContainerRef,
-    tableSocket,
-    setReactionsPanelActive,
+    ),
   );
 
-  const fgVisualMediaController = new FgVisualMediaController(
-    table_id,
-    username,
-    instance,
-    type,
-    visualMediaId,
-    fgLowerVisualMediaController,
-    undefined,
-    positioningListeners,
-    positioning,
-    setPausedState,
-    paused,
-    userMedia,
-    remoteEffects,
-    userEffectsStyles,
-    remoteEffectsStyles,
-    remoteDataStreams,
-    videoRef,
-    visualMediaContainerRef,
-    audioRef,
-    fgVisualMediaOptions,
-    handleVisualEffectChange,
-    setInVisualMedia,
-    leaveVisualMediaTimer,
-    visualMediaMovementTimeout,
-    setRerender,
-    aspectRatio,
-    mediasoupSocket,
-    fgContentAdjustmentController,
-    bundleRef,
+  const fgLowerVisualMediaController = useRef(
+    new FgLowerVisualMediaController(
+      mediasoupSocket,
+      visualMediaId,
+      table_id,
+      username,
+      instance,
+      type,
+      fgVisualMediaOptions,
+      bundleRef,
+      videoRef,
+      audioRef,
+      visualMediaContainerRef,
+      panBtnRef,
+      setPausedState,
+      paused,
+      setCaptionsActive,
+      settings,
+      currentTimeRef,
+      setVisualEffectsActive,
+      setAudioEffectsActive,
+      handleMute,
+      handleVisualEffectChange,
+      tracksColorSetterCallback,
+      tintColor,
+      userEffects,
+      userMedia,
+      initTimeOffset,
+      fgContentAdjustmentController,
+      positioning,
+      aspectRatio,
+      screenAudioStream,
+      behindEffectsContainerRef,
+      frontEffectsContainerRef,
+      tableSocket,
+      setReactionsPanelActive,
+    ),
+  );
+
+  const fgVisualMediaController = useRef(
+    new FgVisualMediaController(
+      table_id,
+      username,
+      instance,
+      type,
+      visualMediaId,
+      fgLowerVisualMediaController,
+      undefined,
+      positioningListeners,
+      positioning,
+      setPausedState,
+      paused,
+      userMedia,
+      remoteEffects,
+      userEffectsStyles,
+      remoteEffectsStyles,
+      remoteDataStreams,
+      videoRef,
+      visualMediaContainerRef,
+      audioRef,
+      fgVisualMediaOptions,
+      handleVisualEffectChange,
+      setInVisualMedia,
+      leaveVisualMediaTimer,
+      visualMediaMovementTimeout,
+      setRerender,
+      aspectRatio,
+      mediasoupSocket,
+      fgContentAdjustmentController,
+      bundleRef,
+    ),
   );
 
   useEffect(() => {
@@ -319,23 +325,23 @@ export default function UserVisualMedia({
     }
 
     // Set up initial conditions
-    fgVisualMediaController.init();
+    fgVisualMediaController.current.init();
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      fgVisualMediaController.handleMediasoupMessage,
+      fgVisualMediaController.current.handleMediasoupMessage,
     );
 
     tableSocket.current?.addMessageListener(
-      fgVisualMediaController.handleTableMessage,
+      fgVisualMediaController.current.handleTableMessage,
     );
 
-    addGroupSignalListener(fgVisualMediaController.handleSignal);
+    addGroupSignalListener(fgVisualMediaController.current.handleSignal);
 
     // Keep video time
-    fgLowerVisualMediaController.timeUpdate();
+    fgLowerVisualMediaController.current.timeUpdate();
     timeUpdateInterval.current = setInterval(
-      fgLowerVisualMediaController.timeUpdate,
+      fgLowerVisualMediaController.current.timeUpdate,
       1000,
     );
 
@@ -343,27 +349,27 @@ export default function UserVisualMedia({
     if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
-        fgLowerVisualMediaController.handleFullScreenChange,
+        fgLowerVisualMediaController.current.handleFullScreenChange,
       );
     }
 
     document.addEventListener(
       "keydown",
-      fgLowerVisualMediaController.handleKeyDown,
+      fgLowerVisualMediaController.current.handleKeyDown,
     );
 
     document.addEventListener(
       "visibilitychange",
-      fgVisualMediaController.handleVisibilityChange,
+      fgVisualMediaController.current.handleVisibilityChange,
     );
 
     if (fgVisualMediaOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("enter"),
+        fgLowerVisualMediaController.current.handlePictureInPicture("enter"),
       );
 
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("leave"),
+        fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
       );
     }
 
@@ -371,7 +377,7 @@ export default function UserVisualMedia({
 
     if (videoElement) {
       videoElement.addEventListener("loadedmetadata", () =>
-        fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
+        fgVisualMediaController.current.handleVideoMetadataLoaded(videoElement),
       );
     }
 
@@ -383,12 +389,12 @@ export default function UserVisualMedia({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleMediasoupMessage,
+        fgVisualMediaController.current.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleTableMessage,
+        fgVisualMediaController.current.handleTableMessage,
       );
-      removeGroupSignalListener(fgVisualMediaController.handleSignal);
+      removeGroupSignalListener(fgVisualMediaController.current.handleSignal);
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;
@@ -396,35 +402,37 @@ export default function UserVisualMedia({
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
-          fgLowerVisualMediaController.handleFullScreenChange,
+          fgLowerVisualMediaController.current.handleFullScreenChange,
         );
       }
       document.removeEventListener(
         "keydown",
-        fgLowerVisualMediaController.handleKeyDown,
+        fgLowerVisualMediaController.current.handleKeyDown,
       );
       document.removeEventListener(
         "visibilitychange",
-        fgVisualMediaController.handleVisibilityChange,
+        fgVisualMediaController.current.handleVisibilityChange,
       );
       if (fgVisualMediaOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("enter"),
+          fgLowerVisualMediaController.current.handlePictureInPicture("enter"),
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("leave"),
+          fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
         );
       }
       if (videoElement) {
         videoElement.removeEventListener("loadedmetadata", () =>
-          fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
+          fgVisualMediaController.current.handleVideoMetadataLoaded(
+            videoElement,
+          ),
         );
       }
     };
   }, []);
 
   useEffect(() => {
-    fgLowerVisualMediaController.updateCaptionsStyles();
+    fgLowerVisualMediaController.current.updateCaptionsStyles();
   }, [settings]);
 
   useEffect(() => {
@@ -470,7 +478,7 @@ export default function UserVisualMedia({
       (type === "screen" &&
         fgVisualMediaOptions.permissions.acceptsScreenEffects)
     ) {
-      fgVisualMediaController.attachPositioningListeners(
+      fgVisualMediaController.current.attachPositioningListeners(
         fgVisualMediaOptions.permissions,
       );
     }
@@ -498,8 +506,8 @@ export default function UserVisualMedia({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onPointerEnter={() => fgVisualMediaController.handlePointerEnter()}
-      onPointerLeave={() => fgVisualMediaController.handlePointerLeave()}
+      onPointerEnter={fgVisualMediaController.current.handlePointerEnter}
+      onPointerLeave={fgVisualMediaController.current.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
     >
       {fgVisualMediaOptions.permissions
@@ -534,7 +542,7 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
       >

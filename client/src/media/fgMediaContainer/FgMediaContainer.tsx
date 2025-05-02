@@ -167,36 +167,37 @@ export default function FgMediaContainer({
 
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
 
-  const fgContentAdjustmentController =
-    useRef<FgContentAdjustmentController | null>(null);
-  if (!fgContentAdjustmentController.current)
-    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+  const fgContentAdjustmentController = useRef<FgContentAdjustmentController>(
+    new FgContentAdjustmentController(
       bundleRef,
       positioning,
       setAdjustingDimensions,
       setRerender,
-    );
+    ),
+  );
 
-  const lowerController = new LowerController(
-    tableStaticContentSocket,
-    mediaId,
-    mediaInstanceId,
-    filename,
-    kind,
-    bundleRef,
-    mediaContainerRef,
-    panBtnRef,
-    fgContentAdjustmentController,
-    positioning,
-    aspectRatio,
-    setFullScreen,
-    mediaContainerOptions,
-    setReactionsPanelActive,
-    behindEffectsContainerRef,
-    frontEffectsContainerRef,
-    tableSocket,
-    state,
-    setState,
+  const lowerController = useRef(
+    new LowerController(
+      tableStaticContentSocket,
+      mediaId,
+      mediaInstanceId,
+      filename,
+      kind,
+      bundleRef,
+      mediaContainerRef,
+      panBtnRef,
+      fgContentAdjustmentController,
+      positioning,
+      aspectRatio,
+      setFullScreen,
+      mediaContainerOptions,
+      setReactionsPanelActive,
+      behindEffectsContainerRef,
+      frontEffectsContainerRef,
+      tableSocket,
+      state,
+      setState,
+    ),
   );
 
   const mediaContainerController = useRef(
@@ -241,7 +242,7 @@ export default function FgMediaContainer({
     );
     addGroupSignalListener(mediaContainerController.current.handleSignal);
 
-    document.addEventListener("keydown", lowerController.handleKeyDown);
+    document.addEventListener("keydown", lowerController.current.handleKeyDown);
 
     if (downloadingState === "downloading") {
       if (addDownloadListener)
@@ -254,7 +255,7 @@ export default function FgMediaContainer({
 
     document.addEventListener(
       "fullscreenchange",
-      lowerController.handleFullScreenChange,
+      lowerController.current.handleFullScreenChange,
     );
 
     return () => {
@@ -271,7 +272,10 @@ export default function FgMediaContainer({
         mediaContainerController.current.handleTableMessage,
       );
       removeGroupSignalListener(mediaContainerController.current.handleSignal);
-      document.removeEventListener("keydown", lowerController.handleKeyDown);
+      document.removeEventListener(
+        "keydown",
+        lowerController.current.handleKeyDown,
+      );
       if (downloadingState === "downloading") {
         if (removeDownloadListener)
           removeDownloadListener(
@@ -280,7 +284,7 @@ export default function FgMediaContainer({
       }
       document.removeEventListener(
         "fullscreenchange",
-        lowerController.handleFullScreenChange,
+        lowerController.current.handleFullScreenChange,
       );
     };
   }, []);
@@ -407,7 +411,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >

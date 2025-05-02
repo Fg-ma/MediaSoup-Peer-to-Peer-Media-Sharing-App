@@ -54,7 +54,7 @@ class MediaContainerController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private lowerController: LowerController,
+    private lowerController: React.MutableRefObject<LowerController>,
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
   ) {}
@@ -187,7 +187,7 @@ class MediaContainerController {
       contentId === this.mediaId &&
       instanceId === this.mediaInstanceId
     ) {
-      this.lowerController.reactController.handleReaction(
+      this.lowerController.current.reactController.handleReaction(
         reaction,
         false,
         reactionStyle,
@@ -297,7 +297,7 @@ class MediaContainerController {
     )
       return;
 
-    this.lowerController.handleClose();
+    this.lowerController.current.handleClose();
   };
 
   handleSignal = (signal: GroupSignals) => {

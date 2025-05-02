@@ -46,8 +46,8 @@ class CaptureMedia {
   private videoStopped = false;
 
   constructor(
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
     private captureEffects: React.MutableRefObject<CaptureEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
   ) {
@@ -377,7 +377,7 @@ class CaptureMedia {
 
     this.effects = structuredClone(defaultCaptureEffects);
 
-    this.deadbanding.update("capture", this.captureId, this.effects);
+    this.deadbanding.current.update("capture", this.captureId, this.effects);
   };
 
   changeEffects = (
@@ -413,7 +413,7 @@ class CaptureMedia {
         }
       }
     }
-    this.deadbanding.update("capture", this.captureId, this.effects);
+    this.deadbanding.current.update("capture", this.captureId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);

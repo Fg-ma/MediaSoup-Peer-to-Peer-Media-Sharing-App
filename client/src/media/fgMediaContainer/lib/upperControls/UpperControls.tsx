@@ -19,7 +19,7 @@ export default function UpperControls({
 }: {
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  lowerController: LowerController;
+  lowerController: React.MutableRefObject<LowerController>;
   leftUpperControls?: (React.ReactNode | null)[];
   rightUpperControls?: (React.ReactNode | null)[];
   mediaContainerOptions: MediaContainerOptions;
@@ -48,8 +48,10 @@ export default function UpperControls({
         <ReactButton
           reactionsPanelActive={reactionsPanelActive}
           setReactionsPanelActive={setReactionsPanelActive}
-          clickFunction={lowerController.handleReact}
-          reactionFunction={lowerController.reactController.handleReaction}
+          clickFunction={lowerController.current.handleReact}
+          reactionFunction={
+            lowerController.current.reactController.handleReaction
+          }
         />
         <CloseButton lowerController={lowerController} />
       </div>

@@ -46,7 +46,7 @@ class FgVisualMediaController {
     private instance: string,
     private type: "camera" | "screen",
     private visualMediaId: string,
-    private fgLowerVisualMediaController: FgLowerVisualMediaController,
+    private fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>,
     private videoStream: MediaStream | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
@@ -165,7 +165,7 @@ class FgVisualMediaController {
       if (effect === "hideBackground" && hideBackgroundColor !== undefined) {
         this.userMedia.current.camera[
           this.visualMediaId
-        ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
+        ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
           hideBackgroundColor,
         );
       }
@@ -173,7 +173,7 @@ class FgVisualMediaController {
       if (effect === "hideBackground" && hideBackgroundStyle !== undefined) {
         this.userMedia.current.camera[
           this.visualMediaId
-        ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
+        ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
           hideBackgroundStyle,
         );
       }
@@ -181,7 +181,7 @@ class FgVisualMediaController {
       if (effect === "postProcess" && postProcessStyle !== undefined) {
         this.userMedia.current[this.type][
           this.visualMediaId
-        ].babylonScene.babylonShaderController.swapPostProcessEffects(
+        ].babylonScene?.babylonShaderController.swapPostProcessEffects(
           postProcessStyle,
         );
       }
@@ -254,7 +254,7 @@ class FgVisualMediaController {
             this.setPausedState((prev) => !prev);
           }
 
-          this.fgLowerVisualMediaController.setInitTimeOffset(
+          this.fgLowerVisualMediaController.current.setInitTimeOffset(
             data.timeEllapsed,
           );
 
@@ -267,7 +267,7 @@ class FgVisualMediaController {
             this.setPausedState((prev) => !prev);
           }
 
-          this.fgLowerVisualMediaController.setInitTimeOffset(
+          this.fgLowerVisualMediaController.current.setInitTimeOffset(
             data.timeEllapsed,
           );
 
@@ -358,11 +358,11 @@ class FgVisualMediaController {
 
     if (document.hidden) {
       if (!this.visualMediaContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVisualMediaController.handlePausePlay();
+        this.fgLowerVisualMediaController.current.handlePausePlay();
       }
     } else {
       if (this.visualMediaContainerRef.current?.classList.contains("paused")) {
-        this.fgLowerVisualMediaController.handlePausePlay();
+        this.fgLowerVisualMediaController.current.handlePausePlay();
       }
     }
   };
@@ -460,7 +460,7 @@ class FgVisualMediaController {
     const { reaction, reactionStyle } = event.data;
 
     if (contentType === this.type && contentId === this.visualMediaId) {
-      this.fgLowerVisualMediaController.reactController.handleReaction(
+      this.fgLowerVisualMediaController.current.reactController.handleReaction(
         reaction,
         false,
         reactionStyle,
@@ -563,7 +563,7 @@ class FgVisualMediaController {
     )
       return;
 
-    this.fgLowerVisualMediaController.handleCloseVideo();
+    this.fgLowerVisualMediaController.current.handleCloseVideo();
   };
 
   handleSignal = (signal: GroupSignals) => {

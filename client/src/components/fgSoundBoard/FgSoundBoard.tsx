@@ -62,22 +62,24 @@ export default function FgSoundBoard({
     {},
   );
 
-  const fgSoundBoardController = new FgSoundBoardController(
-    soundEffects,
-    setSoundEffects,
-    soundEffectsMetaDataRef,
-    boardMode,
-    setBoardMode,
-    seizureBoardEffectIntevalRef,
-    seizureBoardEffectTimeoutRef,
-    importButton,
-    setImportButton,
-    fileSelectorRef,
-    importedFiles,
-    setImportedFiles,
-    tempImportedFiles,
-    userMedia,
-    audioEndTimeouts,
+  const fgSoundBoardController = useRef(
+    new FgSoundBoardController(
+      soundEffects,
+      setSoundEffects,
+      soundEffectsMetaDataRef,
+      boardMode,
+      setBoardMode,
+      seizureBoardEffectIntevalRef,
+      seizureBoardEffectTimeoutRef,
+      importButton,
+      setImportButton,
+      fileSelectorRef,
+      importedFiles,
+      setImportedFiles,
+      tempImportedFiles,
+      userMedia,
+      audioEndTimeouts,
+    ),
   );
 
   useEffect(() => {
@@ -121,7 +123,7 @@ export default function FgSoundBoard({
             ref={fileSelectorRef}
             className="hidden"
             type="file"
-            onChange={fgSoundBoardController.handleFileInput}
+            onChange={fgSoundBoardController.current.handleFileInput}
             multiple
           />
           <motion.div
@@ -141,7 +143,9 @@ export default function FgSoundBoard({
               <FgTriToggleButton
                 kind="cycle"
                 initPosition={0}
-                stateChangeFunction={fgSoundBoardController.stateChangeFunction}
+                stateChangeFunction={
+                  fgSoundBoardController.current.stateChangeFunction
+                }
                 btnLabels={["Standard", "Crazy", "Seizure"]}
               />
             </div>
@@ -163,10 +167,10 @@ export default function FgSoundBoard({
                   importButton.pressed ? "pressed" : ""
                 } ${importButton.classes.join(" ")}`}
                 pointerDownFunction={
-                  fgSoundBoardController.handleImportEffectClickDown
+                  fgSoundBoardController.current.handleImportEffectClickDown
                 }
                 pointerUpFunction={
-                  fgSoundBoardController.handleImportEffectClickUp
+                  fgSoundBoardController.current.handleImportEffectClickUp
                 }
                 contentFunction={() => (
                   <>
@@ -200,10 +204,10 @@ export default function FgSoundBoard({
                     effect.pressed ? "pressed" : ""
                   } ${effect.classes.join(" ")}`}
                   pointerDownFunction={() =>
-                    fgSoundBoardController.clickDown(parseInt(key))
+                    fgSoundBoardController.current.clickDown(parseInt(key))
                   }
                   pointerUpFunction={() =>
-                    fgSoundBoardController.clickUp(parseInt(key))
+                    fgSoundBoardController.current.clickUp(parseInt(key))
                   }
                   contentFunction={() => (
                     <>
@@ -230,7 +234,8 @@ export default function FgSoundBoard({
       initWidth="605px"
       shadow={{ left: true, right: false, bottom: false, top: false }}
       closeCallback={() => {
-        fgSoundBoardController.closeSoundBoard();
+        fgSoundBoardController.current.closeSoundBoard();
+
         if (closeCallback) {
           closeCallback();
         }

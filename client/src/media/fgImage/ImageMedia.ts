@@ -55,8 +55,8 @@ class ImageMedia {
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: ContentStateTypes[],
-    private deadbanding: Deadbanding,
-    private userDevice: UserDevice,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
+    private userDevice: React.MutableRefObject<UserDevice>,
     private getImage: (
       contentType: StaticContentTypes,
       contentId: string,

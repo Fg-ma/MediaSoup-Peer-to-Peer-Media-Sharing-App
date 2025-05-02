@@ -14,7 +14,7 @@ export default function EffectsButton({
   captureMediaEffectsActive,
   captureMediaTypeActive,
 }: {
-  captureMediaController: CaptureMediaController;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
   captureMediaEffectsActive: boolean;
   captureMediaTypeActive: boolean;
 }) {
@@ -23,7 +23,7 @@ export default function EffectsButton({
       className="pointer-events-auto relative z-20 flex aspect-square h-full items-center justify-center"
       clickFunction={(event) => {
         event?.stopPropagation();
-        captureMediaController.handleEffects();
+        captureMediaController.current.handleEffects();
       }}
       contentFunction={() => (
         <FgSVGElement

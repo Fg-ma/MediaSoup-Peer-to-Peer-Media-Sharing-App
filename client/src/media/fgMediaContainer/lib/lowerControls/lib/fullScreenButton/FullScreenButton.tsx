@@ -15,7 +15,7 @@ export default function FullScreenButton({
   preventLowerLabelsVariables,
   scrollingContainerRef,
 }: {
-  lowerController: LowerController;
+  lowerController: React.MutableRefObject<LowerController>;
   preventLowerLabelsVariables?: boolean[];
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -23,9 +23,9 @@ export default function FullScreenButton({
 
   return (
     <FgButton
-      className='flex items-center justify-center h-full !aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex !aspect-square h-full scale-x-[-1] items-center justify-center"
       clickFunction={() => {
-        lowerController.handleFullScreen();
+        lowerController.current.handleFullScreen();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
@@ -44,7 +44,7 @@ export default function FullScreenButton({
       }}
       hoverContent={
         !preventLowerLabelsVariables?.some(Boolean) ? (
-          <FgHoverContentStandard content='Full screen (f)' style='light' />
+          <FgHoverContentStandard content="Full screen (f)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}

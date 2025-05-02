@@ -11,14 +11,14 @@ const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
 export default function ConfirmButton({
   captureMediaController,
 }: {
-  captureMediaController: CaptureMediaController;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
 }) {
   return (
     <FgButton
       className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light bg-opacity-80"
       clickFunction={(event) => {
         event.stopPropagation();
-        captureMediaController.confirmCapture();
+        captureMediaController.current.confirmCapture();
       }}
       contentFunction={() => (
         <FgSVGElement

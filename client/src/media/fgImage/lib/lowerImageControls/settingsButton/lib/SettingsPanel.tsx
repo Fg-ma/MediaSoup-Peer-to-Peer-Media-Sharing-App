@@ -68,7 +68,7 @@ export default function SettingsPanel({
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
-  lowerImageController: LowerImageController;
+  lowerImageController: React.MutableRefObject<LowerImageController>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -156,7 +156,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-black bg-opacity-75 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-black bg-opacity-75 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -189,7 +189,7 @@ export default function SettingsPanel({
                   Set as background (b)
                 </div>
               )}
-              clickFunction={lowerImageController.handleSetAsBackground}
+              clickFunction={lowerImageController.current.handleSetAsBackground}
             />
             <FgButton
               className="w-full"

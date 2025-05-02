@@ -79,9 +79,9 @@ class ProducersController {
       }>
     >,
 
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
-    private browserMedia: BrowserMedia,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
+    private browserMedia: React.MutableRefObject<BrowserMedia>,
   ) {}
 
   private createCameraProducer = async (
@@ -389,7 +389,8 @@ class ProducersController {
         return;
       }
 
-      const cameraBrowserMedia = await this.browserMedia.getCameraMedia();
+      const cameraBrowserMedia =
+        await this.browserMedia.current.getCameraMedia();
 
       if (!cameraBrowserMedia) {
         // Reenable buttons
@@ -415,7 +416,8 @@ class ProducersController {
         return;
       }
 
-      const screenBrowserMedia = await this.browserMedia.getScreenMedia();
+      const screenBrowserMedia =
+        await this.browserMedia.current.getScreenMedia();
 
       if (!screenBrowserMedia) {
         // Reenable buttons
@@ -451,7 +453,7 @@ class ProducersController {
         return;
       }
 
-      const audioBrowserMedia = await this.browserMedia.getAudioMedia();
+      const audioBrowserMedia = await this.browserMedia.current.getAudioMedia();
 
       if (!audioBrowserMedia) {
         // Reenable buttons

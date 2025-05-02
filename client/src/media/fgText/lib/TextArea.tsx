@@ -11,7 +11,7 @@ export default function TextArea({
   setIsEditing,
   textAreaContainerRef,
 }: {
-  lowerTextController: LowerTextController;
+  lowerTextController: React.MutableRefObject<LowerTextController>;
   text: React.MutableRefObject<string>;
   settings: Settings;
   textAreaRef: React.RefObject<HTMLPreElement>;
@@ -43,7 +43,7 @@ export default function TextArea({
 
     document.addEventListener(
       "pointerdown",
-      lowerTextController.handlePointerDown
+      lowerTextController.current.handlePointerDown,
     );
   };
 
@@ -57,7 +57,7 @@ export default function TextArea({
 
       document.addEventListener(
         "pointerdown",
-        lowerTextController.handlePointerDown
+        lowerTextController.current.handlePointerDown,
       );
 
       setTimeout(() => {
@@ -74,11 +74,11 @@ export default function TextArea({
   return (
     <div
       ref={textAreaContainerRef}
-      className='grow h-max min-h-full'
+      className="h-max min-h-full grow"
       onDoubleClick={handleContainerDoubleClick}
       onPointerDown={handleEditingPointerDown}
     >
-      <div className='h-full w-max min-w-full'>
+      <div className="h-full w-max min-w-full">
         <pre
           ref={textAreaRef}
           contentEditable={isEditing}
@@ -86,7 +86,7 @@ export default function TextArea({
           onDoubleClick={handleDoubleClick}
           className={`${
             !isEditing ? "cursor-default" : ""
-          } min-w-full w-max h-max outline-none font-K2D text-lg`}
+          } h-max w-max min-w-full font-K2D text-lg outline-none`}
           style={{
             color: settings.colors.textColor.value,
             whiteSpace: "pre",

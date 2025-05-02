@@ -66,8 +66,8 @@ class VideoMedia {
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: ContentStateTypes[],
-    private deadbanding: Deadbanding,
-    private userDevice: UserDevice,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
+    private userDevice: React.MutableRefObject<UserDevice>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private getVideo: (
       contentType: StaticContentTypes,

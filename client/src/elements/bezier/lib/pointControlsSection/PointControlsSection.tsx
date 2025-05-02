@@ -17,7 +17,7 @@ export default function PointControlsSection({
   bezierController,
   largestDim,
 }: {
-  bezierController: BezierController;
+  bezierController: React.MutableRefObject<BezierController>;
   largestDim: "width" | "height";
 }) {
   return (
@@ -34,7 +34,7 @@ export default function PointControlsSection({
         } pointer-events-auto flex aspect-square items-center justify-center`}
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.deleteSelectedAndHovering();
+          bezierController.current.deleteSelectedAndHovering();
         }}
         contentFunction={() => (
           <FgSVGElement
@@ -60,7 +60,7 @@ export default function PointControlsSection({
         } pointer-events-auto aspect-square`}
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.swapControlType("inline");
+          bezierController.current.swapControlType("inline");
         }}
         contentFunction={() => (
           <FgSVGElement
@@ -86,7 +86,7 @@ export default function PointControlsSection({
         } pointer-events-auto aspect-square`}
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.swapControlType("inlineSymmetric");
+          bezierController.current.swapControlType("inlineSymmetric");
         }}
         contentFunction={() => (
           <FgSVGElement
@@ -115,7 +115,7 @@ export default function PointControlsSection({
         } pointer-events-auto aspect-square`}
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.swapControlType("free");
+          bezierController.current.swapControlType("free");
         }}
         contentFunction={() => (
           <FgSVGElement

@@ -79,29 +79,31 @@ export default function FgVolumeElement({
   const volumeContainer = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
 
-  const fgVolumeElementController = new FgVolumeElementController(
-    table_id,
-    username,
-    instance,
-    producerType,
-    producerId,
-    isUser,
-    fgVolumeElementOptions,
-    audioRef,
-    sliderRef,
-    clientMute,
-    screenAudioClientMute,
-    localMute,
-    screenAudioLocalMute,
-    volumeState,
-    setVolumeState,
-    tracksColorSetterCallback,
+  const fgVolumeElementController = useRef(
+    new FgVolumeElementController(
+      table_id,
+      username,
+      instance,
+      producerType,
+      producerId,
+      isUser,
+      fgVolumeElementOptions,
+      audioRef,
+      sliderRef,
+      clientMute,
+      screenAudioClientMute,
+      localMute,
+      screenAudioLocalMute,
+      volumeState,
+      setVolumeState,
+      tracksColorSetterCallback,
+    ),
   );
 
   // Initial functions
   useEffect(() => {
     // Set initial volume slider
-    fgVolumeElementController.tracksColorSetter();
+    fgVolumeElementController.current.tracksColorSetter();
 
     volumeContainer.current?.style.setProperty(
       "--volume-slider-width",
@@ -117,18 +119,20 @@ export default function FgVolumeElement({
     );
 
     mediasoupSocket.current?.addMessageListener(
-      fgVolumeElementController.handleMessage,
+      fgVolumeElementController.current.handleMessage,
     );
 
-    addGeneralSignalListener(fgVolumeElementController.handleSignalMessages);
+    addGeneralSignalListener(
+      fgVolumeElementController.current.handleSignalMessages,
+    );
 
     // Cleanup event listener on unmount
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        fgVolumeElementController.handleMessage,
+        fgVolumeElementController.current.handleMessage,
       );
       removeGeneralSignalListener(
-        fgVolumeElementController.handleSignalMessages,
+        fgVolumeElementController.current.handleSignalMessages,
       );
     };
   }, []);
@@ -161,9 +165,9 @@ export default function FgVolumeElement({
       sliderRef.current.value = `${volume}`;
     }
 
-    fgVolumeElementController.tracksColorSetter();
+    fgVolumeElementController.current.tracksColorSetter();
 
-    fgVolumeElementController.volumeSliderChangeHandler();
+    fgVolumeElementController.current.volumeSliderChangeHandler();
 
     if (handleVolumeSliderCallback) {
       handleVolumeSliderCallback(event, producerType, producerId);

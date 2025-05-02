@@ -70,18 +70,20 @@ export default function VerticalSplitPanes({
   const startPointerPosition = useRef(0);
   const startPaneHeight = useRef(0);
 
-  const verticalSplitPanesController = new VerticalSplitPanesController(
-    verticalSplitPanesOptions,
-    paneHeight,
-    setPaneHeight,
-    setHeaderLightness,
-    verticalSplitPanesRef,
-    isResizing,
-    startPointerPosition,
-    startPaneHeight,
-    maxPaneHeightCallback,
-    minPaneHeightCallback,
-    panelSizeChangeCallback,
+  const verticalSplitPanesController = useRef(
+    new VerticalSplitPanesController(
+      verticalSplitPanesOptions,
+      paneHeight,
+      setPaneHeight,
+      setHeaderLightness,
+      verticalSplitPanesRef,
+      isResizing,
+      startPointerPosition,
+      startPaneHeight,
+      maxPaneHeightCallback,
+      minPaneHeightCallback,
+      panelSizeChangeCallback,
+    ),
   );
 
   // Gets initial conditions
@@ -94,7 +96,7 @@ export default function VerticalSplitPanes({
 
     // Set the initial lightness based on the initial height
     const initialLightness =
-      verticalSplitPanesController.getLightness(initialHeight);
+      verticalSplitPanesController.current.getLightness(initialHeight);
 
     setHeaderLightness(initialLightness);
   }, [topContent === undefined, bottomContent === undefined]);
@@ -127,7 +129,7 @@ export default function VerticalSplitPanes({
       )}
       <div
         ref={verticalSplitPanesRef}
-        className="flex relative h-full w-max flex-col"
+        className="relative flex h-full w-max flex-col"
       >
         {topContent && (
           <div
@@ -147,15 +149,17 @@ export default function VerticalSplitPanes({
           <div
             className="cursor-pointer select-none"
             onPointerDown={(event) => {
-              verticalSplitPanesController.handlePointerDown(event);
+              verticalSplitPanesController.current.handlePointerDown(event);
             }}
             onTouchStart={(event) => {
-              verticalSplitPanesController.handleTouchDown(event);
+              verticalSplitPanesController.current.handleTouchDown(event);
             }}
           >
             <Divider
               lightness={headerLightness}
-              togglePaneHeight={verticalSplitPanesController.togglePaneHeight}
+              togglePaneHeight={
+                verticalSplitPanesController.current.togglePaneHeight
+              }
               dividerContent={dividerContent}
               dividerHeight={verticalSplitPanesOptions.dividerHeight}
               dividerButton={verticalSplitPanesOptions.dividerButton}

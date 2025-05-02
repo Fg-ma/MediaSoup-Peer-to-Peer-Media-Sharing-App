@@ -100,31 +100,33 @@ export default function Bundle({
     bundleOptions.permissions,
   );
 
-  const bundleController = new BundleController(
-    mediasoupSocket,
-    bundleOptions.isUser,
-    table_id,
-    username,
-    instance,
-    bundleOptions,
-    setCameraStreams,
-    setScreenStreams,
-    setScreenAudioStreams,
-    setAudioStream,
-    remoteMedia,
-    remoteEffects,
-    remoteEffectsStyles,
-    userMedia,
-    bundleRef,
-    audioRef,
-    clientMute,
-    screenAudioClientMute,
-    localMute,
-    screenAudioLocalMute,
-    permissions,
-    setPermissions,
-    onNewConsumerWasCreatedCallback,
-    handleMuteCallback,
+  const bundleController = useRef(
+    new BundleController(
+      mediasoupSocket,
+      bundleOptions.isUser,
+      table_id,
+      username,
+      instance,
+      bundleOptions,
+      setCameraStreams,
+      setScreenStreams,
+      setScreenAudioStreams,
+      setAudioStream,
+      remoteMedia,
+      remoteEffects,
+      remoteEffectsStyles,
+      userMedia,
+      bundleRef,
+      audioRef,
+      clientMute,
+      screenAudioClientMute,
+      localMute,
+      screenAudioLocalMute,
+      permissions,
+      setPermissions,
+      onNewConsumerWasCreatedCallback,
+      handleMuteCallback,
+    ),
   );
 
   useEffect(() => {
@@ -132,14 +134,16 @@ export default function Bundle({
       onRendered();
     }
 
-    mediasoupSocket.current?.addMessageListener(bundleController.handleMessage);
-    addGeneralSignalListener(bundleController.handleSignalMessage);
+    mediasoupSocket.current?.addMessageListener(
+      bundleController.current.handleMessage,
+    );
+    addGeneralSignalListener(bundleController.current.handleSignalMessage);
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        bundleController.handleMessage,
+        bundleController.current.handleMessage,
       );
-      removeGeneralSignalListener(bundleController.handleSignalMessage);
+      removeGeneralSignalListener(bundleController.current.handleSignalMessage);
     };
   }, []);
 
@@ -208,7 +212,7 @@ export default function Bundle({
                 audioStream={audioStream}
                 audioRef={audioRef}
                 handleAudioEffectChange={
-                  bundleController.handleAudioEffectChange
+                  bundleController.current.handleAudioEffectChange
                 }
                 clientMute={clientMute}
                 screenAudioClientMute={screenAudioClientMute}
@@ -231,13 +235,13 @@ export default function Bundle({
                           : "low"
                       : "high",
                 }}
-                handleMute={bundleController.handleMute}
+                handleMute={bundleController.current.handleMute}
                 handleMuteCallback={handleMuteCallback}
                 handleVolumeSliderCallback={
-                  bundleController.handleVolumeSliderCallback
+                  bundleController.current.handleVolumeSliderCallback
                 }
                 tracksColorSetterCallback={
-                  bundleController.tracksColorSetterCallback
+                  bundleController.current.tracksColorSetterCallback
                 }
               />
             ) : (
@@ -253,7 +257,7 @@ export default function Bundle({
                 audioStream={audioStream}
                 audioRef={audioRef}
                 handleAudioEffectChange={
-                  bundleController.handleAudioEffectChange
+                  bundleController.current.handleAudioEffectChange
                 }
                 clientMute={clientMute}
                 screenAudioClientMute={screenAudioClientMute}
@@ -276,13 +280,13 @@ export default function Bundle({
                           : "low"
                       : "high",
                 }}
-                handleMute={bundleController.handleMute}
+                handleMute={bundleController.current.handleMute}
                 handleMuteCallback={handleMuteCallback}
                 handleVolumeSliderCallback={
-                  bundleController.handleVolumeSliderCallback
+                  bundleController.current.handleVolumeSliderCallback
                 }
                 tracksColorSetterCallback={
-                  bundleController.tracksColorSetterCallback
+                  bundleController.current.tracksColorSetterCallback
                 }
               />
             )}
@@ -312,7 +316,7 @@ export default function Bundle({
                 }
                 audioRef={audioRef}
                 handleAudioEffectChange={
-                  bundleController.handleAudioEffectChange
+                  bundleController.current.handleAudioEffectChange
                 }
                 clientMute={clientMute}
                 screenAudioClientMute={screenAudioClientMute}
@@ -335,13 +339,13 @@ export default function Bundle({
                           : "low"
                       : "high",
                 }}
-                handleMute={bundleController.handleMute}
+                handleMute={bundleController.current.handleMute}
                 handleMuteCallback={handleMuteCallback}
                 handleVolumeSliderCallback={
-                  bundleController.handleVolumeSliderCallback
+                  bundleController.current.handleVolumeSliderCallback
                 }
                 tracksColorSetterCallback={
-                  bundleController.tracksColorSetterCallback
+                  bundleController.current.tracksColorSetterCallback
                 }
               />
             ) : (
@@ -358,7 +362,7 @@ export default function Bundle({
                 screenAudioStream={screenAudioStreams?.[`${key}_audio`]}
                 audioRef={audioRef}
                 handleAudioEffectChange={
-                  bundleController.handleAudioEffectChange
+                  bundleController.current.handleAudioEffectChange
                 }
                 clientMute={clientMute}
                 screenAudioClientMute={screenAudioClientMute}
@@ -381,13 +385,13 @@ export default function Bundle({
                           : "low"
                       : "high",
                 }}
-                handleMute={bundleController.handleMute}
+                handleMute={bundleController.current.handleMute}
                 handleMuteCallback={handleMuteCallback}
                 handleVolumeSliderCallback={
-                  bundleController.handleVolumeSliderCallback
+                  bundleController.current.handleVolumeSliderCallback
                 }
                 tracksColorSetterCallback={
-                  bundleController.tracksColorSetterCallback
+                  bundleController.current.tracksColorSetterCallback
                 }
               />
             )}
@@ -408,8 +412,10 @@ export default function Bundle({
               audioStream={audioStream}
               audioRef={audioRef}
               bundleRef={bundleRef}
-              handleAudioEffectChange={bundleController.handleAudioEffectChange}
-              handleMute={bundleController.handleMute}
+              handleAudioEffectChange={
+                bundleController.current.handleAudioEffectChange
+              }
+              handleMute={bundleController.current.handleMute}
               localMute={localMute}
               isUser={bundleOptions.isUser}
               permissions={permissions}

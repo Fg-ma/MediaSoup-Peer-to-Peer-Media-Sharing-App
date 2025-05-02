@@ -30,8 +30,8 @@ class ImageMediaInstance {
     public imageInstanceId: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
     public initPositioning: {
       position: {
         left: number;
@@ -282,7 +282,11 @@ class ImageMediaInstance {
 
     this.effects = structuredClone(defaultImageEffects);
 
-    this.deadbanding.update("image", this.imageInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "image",
+      this.imageInstanceId,
+      this.effects,
+    );
   };
 
   updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
@@ -492,7 +496,11 @@ class ImageMediaInstance {
 
     this.updateNeed();
 
-    this.deadbanding.update("image", this.imageInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "image",
+      this.imageInstanceId,
+      this.effects,
+    );
 
     this.babylonScene.imageAlreadyProcessed[0] = 1;
   };
@@ -531,7 +539,11 @@ class ImageMediaInstance {
         }
       }
     }
-    this.deadbanding.update("image", this.imageInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "image",
+      this.imageInstanceId,
+      this.effects,
+    );
 
     if (tintColor) {
       this.setTintColor(tintColor);

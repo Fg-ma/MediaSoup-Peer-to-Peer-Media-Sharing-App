@@ -42,15 +42,15 @@ class BabylonRenderLoop {
     },
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
-    private userDevice: UserDevice,
+    private userDevice: React.MutableRefObject<UserDevice>,
     private hideBackgroundTexture: DynamicTexture | undefined,
     private hideBackgroundMaterial: StandardMaterial | undefined,
     private babylonMeshes: BabylonMeshes,
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
-      this.userDevice.getFaceMeshDetectionInterval();
+      this.userDevice.current.getFaceMeshDetectionInterval();
     this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
-      this.userDevice.getSelfieSegmentationDetectionInterval();
+      this.userDevice.current.getSelfieSegmentationDetectionInterval();
 
     this.hideBackgroundEffectImage = new Image();
     this.hideBackgroundEffectImage.crossOrigin = "anonymous";

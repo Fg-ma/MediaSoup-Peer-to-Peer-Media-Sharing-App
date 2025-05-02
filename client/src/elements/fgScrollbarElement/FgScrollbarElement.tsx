@@ -22,17 +22,19 @@ export default function FgScrollbarElement({
   const scrollStart = useRef({ x: 0, y: 0 });
   const startScrollPosition = useRef({ top: 0, left: 0 });
 
-  const fgScrollbarElementController = new FgScrollbarElementController(
-    scrollingContentRef,
-    scrollbarElementRef,
-    scrollbarRef,
-    scrollbarTrackRef,
-    scrollbarThumbRef,
-    scrollTimeout,
-    direction,
-    dragging,
-    scrollStart,
-    startScrollPosition
+  const fgScrollbarElementController = useRef(
+    new FgScrollbarElementController(
+      scrollingContentRef,
+      scrollbarElementRef,
+      scrollbarRef,
+      scrollbarTrackRef,
+      scrollbarThumbRef,
+      scrollTimeout,
+      direction,
+      dragging,
+      scrollStart,
+      startScrollPosition,
+    ),
   );
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function FgScrollbarElement({
       if (scrollbarRef.current) {
         scrollbarRef.current.style.right = "0%";
       }
-      fgScrollbarElementController.updateVerticalScrollbar();
+      fgScrollbarElementController.current.updateVerticalScrollbar();
     } else {
       if (scrollbarThumbRef.current) {
         scrollbarThumbRef.current.style.height = "100%";
@@ -53,29 +55,29 @@ export default function FgScrollbarElement({
       if (scrollbarRef.current) {
         scrollbarRef.current.style.bottom = "0%";
       }
-      fgScrollbarElementController.updateHorizontalScrollbar();
+      fgScrollbarElementController.current.updateHorizontalScrollbar();
     }
 
     scrollingContentRef.current?.addEventListener(
       "scroll",
-      fgScrollbarElementController.scrollFunction
+      fgScrollbarElementController.current.scrollFunction,
     );
     if (direction === "horizontal") {
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        fgScrollbarElementController.horizontalScrollWheel
+        fgScrollbarElementController.current.horizontalScrollWheel,
       );
     }
 
     return () => {
       scrollingContentRef.current?.removeEventListener(
         "scroll",
-        fgScrollbarElementController.scrollFunction
+        fgScrollbarElementController.current.scrollFunction,
       );
       if (direction === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          fgScrollbarElementController.horizontalScrollWheel
+          fgScrollbarElementController.current.horizontalScrollWheel,
         );
       }
     };
@@ -84,10 +86,10 @@ export default function FgScrollbarElement({
   return (
     <div
       ref={scrollbarElementRef}
-      className='relative hide-fg-scrollbar'
+      className="hide-fg-scrollbar relative"
       style={style}
-      onPointerMove={fgScrollbarElementController.hideTableScrollBar}
-      onPointerLeave={fgScrollbarElementController.pointerLeaveFunction}
+      onPointerMove={fgScrollbarElementController.current.hideTableScrollBar}
+      onPointerLeave={fgScrollbarElementController.current.pointerLeaveFunction}
     >
       <div
         ref={scrollbarRef}
@@ -104,7 +106,7 @@ export default function FgScrollbarElement({
               ? "fg-vertical-scrollbar-track"
               : "fg-horizontal-scrollbar-track"
           }`}
-          onPointerDown={fgScrollbarElementController.trackPointerDown}
+          onPointerDown={fgScrollbarElementController.current.trackPointerDown}
         >
           <div
             ref={scrollbarThumbRef}
@@ -113,7 +115,7 @@ export default function FgScrollbarElement({
                 ? "fg-vertical-scrollbar-thumb"
                 : "fg-horizontal-scrollbar-thumb"
             }`}
-            onPointerDown={fgScrollbarElementController.thumbDragStart}
+            onPointerDown={fgScrollbarElementController.current.thumbDragStart}
           ></div>
         </div>
       </div>

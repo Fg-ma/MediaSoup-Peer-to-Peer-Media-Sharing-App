@@ -57,23 +57,28 @@ function SnakeGame({
   const snakeGridSizePanelRef = useRef<HTMLDivElement>(null);
   const userSnakeColor = useRef<SnakeColorsType | undefined>(undefined);
 
-  const snakeGameController = new SnakeGameController(
-    snakeGameId,
-    userMedia,
-    gridSize,
-    gameState,
-    setGameState,
-    focused,
-    started,
-    setStarted,
-    setGameOver,
-    setPlayersState,
-    playersState,
-    setGridSize,
+  const snakeGameController = useRef(
+    new SnakeGameController(
+      snakeGameId,
+      userMedia,
+      gridSize,
+      gameState,
+      setGameState,
+      focused,
+      started,
+      setStarted,
+      setGameOver,
+      setPlayersState,
+      playersState,
+      setGridSize,
+    ),
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", snakeGameController.handleKeyPress);
+    document.addEventListener(
+      "keydown",
+      snakeGameController.current.handleKeyPress,
+    );
 
     boardRef.current?.style.setProperty(
       "--nginx-asset-server-base-url",
@@ -83,7 +88,7 @@ function SnakeGame({
     return () => {
       document.removeEventListener(
         "keydown",
-        snakeGameController.handleKeyPress,
+        snakeGameController.current.handleKeyPress,
       );
     };
   }, [started]);
@@ -103,7 +108,7 @@ function SnakeGame({
 
     userMedia.current.games.snake[snakeGameId].ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      snakeGameController.handleMessage(message);
+      snakeGameController.current.handleMessage(message);
     };
   }, [userMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
 
@@ -126,11 +131,11 @@ function SnakeGame({
             data-selectable-type="game"
             data-selectable-id={snakeGameId}
           >
-            {snakeGameController.renderBoard()}
+            {snakeGameController.current.renderBoard()}
             {gameOver && (
               <div
                 className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-black bg-opacity-30"
-                onClick={snakeGameController.startGameClick}
+                onClick={snakeGameController.current.startGameClick}
               >
                 <div
                   className="flex h-3/5 w-4/5 items-center justify-center rounded-lg bg-cover bg-no-repeat font-K2D text-2xl"
@@ -141,7 +146,7 @@ function SnakeGame({
             {!started && !gameOver && (
               <div
                 className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-30"
-                onClick={snakeGameController.startGameClick}
+                onClick={snakeGameController.current.startGameClick}
               >
                 <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 font-K2D text-2xl">
                   Press any key to start

@@ -36,12 +36,12 @@ class BabylonRenderLoopWorker {
     private faceDetectionProcessing: boolean[] | undefined,
     private selfieSegmentationWorker: Worker | undefined,
     private selfieSegmentationProcessing: boolean[] | undefined,
-    private userDevice: UserDevice,
+    private userDevice: React.MutableRefObject<UserDevice>,
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
-      this.userDevice.getFaceMeshDetectionInterval();
+      this.userDevice.current.getFaceMeshDetectionInterval();
     this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
-      this.userDevice.getSelfieSegmentationDetectionInterval();
+      this.userDevice.current.getSelfieSegmentationDetectionInterval();
 
     this.offscreenCanvas = document.createElement("canvas");
     this.offscreenContext = this.offscreenCanvas.getContext("2d", {

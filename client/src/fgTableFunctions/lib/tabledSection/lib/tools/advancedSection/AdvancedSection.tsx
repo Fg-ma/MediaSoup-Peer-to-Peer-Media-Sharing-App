@@ -28,7 +28,7 @@ export default function AdvancedSection({
     }[]
   >;
   indicators: React.MutableRefObject<InstanceType[]>;
-  tabledPortalController: TabledPortalController;
+  tabledPortalController: React.MutableRefObject<TabledPortalController>;
 }) {
   const [_, setRerender] = useState(false);
 

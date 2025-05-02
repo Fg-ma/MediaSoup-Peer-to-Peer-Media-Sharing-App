@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
@@ -13,10 +13,10 @@ const shareAudioIcon = nginxAssetServerBaseUrl + "svgs/shareAudioIcon.svg";
 const removeAudioIcon = nginxAssetServerBaseUrl + "svgs/removeAudioIcon.svg";
 
 const FgButton = React.lazy(
-  () => import("../../../elements/fgButton/FgButton")
+  () => import("../../../elements/fgButton/FgButton"),
 );
 const VolumeSVG = React.lazy(
-  () => import("../../../fgVolumeElement/lib/VolumeSVG")
+  () => import("../../../fgVolumeElement/lib/VolumeSVG"),
 );
 
 export default function AudioSection({
@@ -37,7 +37,7 @@ export default function AudioSection({
   audioActive: boolean;
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   handleExternalMute: () => void;
-  producersController: ProducersController;
+  producersController: React.MutableRefObject<ProducersController>;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { mediasoupSocket } = useSocketContext();
@@ -51,18 +51,17 @@ export default function AudioSection({
     to: mutedAudioRef.current ? "off" : "high",
   });
 
-  const audioSectionController = new AudioSectionController(
-    mediasoupSocket,
-    table_id,
-    username,
-    instance,
-
-    producersController,
-
-    isAudio,
-    setAudioActive,
-
-    handleDisableEnableBtns
+  const audioSectionController = useRef(
+    new AudioSectionController(
+      mediasoupSocket,
+      table_id,
+      username,
+      instance,
+      producersController,
+      isAudio,
+      setAudioActive,
+      handleDisableEnableBtns,
+    ),
   );
 
   useEffect(() => {
@@ -74,17 +73,17 @@ export default function AudioSection({
   }, [mutedAudioRef.current]);
 
   return (
-    <div className='flex space-x-4 h-full'>
+    <div className="flex h-full space-x-4">
       <FgButton
         externalRef={audioBtnRef}
-        clickFunction={() => audioSectionController.shareAudio()}
-        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        clickFunction={() => audioSectionController.current.shareAudio()}
+        className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25"
         contentFunction={() => {
           if (audioActive) {
             return (
               <FgSVGElement
                 src={removeAudioIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -96,7 +95,7 @@ export default function AudioSection({
             return (
               <FgSVGElement
                 src={shareAudioIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -125,13 +124,13 @@ export default function AudioSection({
               }));
               handleExternalMute();
             }}
-            className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+            className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25"
             contentFunction={() => (
               <svg
-                className='h-[75%] aspect-square'
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 100.0001 100.00001'
-                fill='white'
+                className="aspect-square h-[75%]"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100.0001 100.00001"
+                fill="white"
               >
                 <VolumeSVG
                   volumeState={volumeState}
@@ -140,7 +139,7 @@ export default function AudioSection({
                     volumeSVGPaths.high.left,
                     volumeSVGPaths.high.middle,
                   ]}
-                  color='white'
+                  color="white"
                 />
                 {volumeState.from === "" && volumeState.to === "off" && (
                   <path d={volumeSVGPaths.strike} />

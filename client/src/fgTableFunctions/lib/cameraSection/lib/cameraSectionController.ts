@@ -18,9 +18,9 @@ class CameraSectionController {
 
     private userMedia: React.MutableRefObject<UserMediaType>,
 
-    private producersController: ProducersController,
+    private producersController: React.MutableRefObject<ProducersController>,
 
-    private handleDisableEnableBtns: (disabled: boolean) => void
+    private handleDisableEnableBtns: (disabled: boolean) => void,
   ) {}
 
   shareCamera = () => {
@@ -34,7 +34,7 @@ class CameraSectionController {
     this.setCameraActive((prev) => !prev);
 
     if (this.isCamera.current) {
-      this.producersController.createNewProducer("camera");
+      this.producersController.current.createNewProducer("camera");
     } else if (!this.isCamera.current) {
       const cameraIds = Object.keys(this.userMedia.current.camera);
 
@@ -61,7 +61,7 @@ class CameraSectionController {
     this.handleDisableEnableBtns(true);
 
     if (this.device.current) {
-      this.producersController.createNewProducer("camera");
+      this.producersController.current.createNewProducer("camera");
     }
   };
 }

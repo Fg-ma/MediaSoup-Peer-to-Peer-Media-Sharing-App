@@ -16,7 +16,7 @@ export default function TypeButton({
   mediaType: CaptureMediaTypes;
   recording: boolean;
   recordingCount: number;
-  captureMediaController: CaptureMediaController;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
   captureMediaEffectsActive: boolean;
   captureMediaTypeActive: boolean;
 }) {
@@ -61,7 +61,7 @@ export default function TypeButton({
       className="pointer-events-auto relative z-20 h-full max-h-full w-max overflow-hidden"
       clickFunction={(event) => {
         event.stopPropagation();
-        captureMediaController.handleCaptureMediaType();
+        captureMediaController.current.handleCaptureMediaType();
       }}
       contentFunction={() =>
         mediaType === "camera" || (mediaType === "video" && !recording) ? (

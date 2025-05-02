@@ -97,13 +97,13 @@ class FaceLandmarks {
     private flip: boolean,
     private type: DeadbandingMediaTypes,
     private id: string,
-    private deadbanding: Deadbanding
+    private deadbanding: React.MutableRefObject<Deadbanding>,
   ) {
     this.smoothLandmarksUtils = new SmoothLandmarksUtils(
       this.type,
       this.id,
       this.calculatedLandmarks,
-      this.deadbanding
+      this.deadbanding,
     );
   }
 
@@ -132,7 +132,7 @@ class FaceLandmarks {
       for (const tracker of this.faceTrackers) {
         const distance = Math.sqrt(
           Math.pow(nosePosition.x - tracker.x, 2) +
-            Math.pow(nosePosition.y - tracker.y, 2)
+            Math.pow(nosePosition.y - tracker.y, 2),
         );
         if (distance < closestDistance) {
           closestDistance = distance;
@@ -162,7 +162,7 @@ class FaceLandmarks {
         if (!foundFaces.includes(this.faceTrackers.indexOf(tracker))) {
           const distance = Math.sqrt(
             Math.pow(nosePosition.x - tracker.x, 2) +
-              Math.pow(nosePosition.y - tracker.y, 2)
+              Math.pow(nosePosition.y - tracker.y, 2),
           );
 
           if (distance < closestDistance) {
@@ -195,7 +195,7 @@ class FaceLandmarks {
     leftEye: NormalizedLandmark,
     noseBridge: NormalizedLandmark,
     leftNoseBase: NormalizedLandmark,
-    rightNoseBase: NormalizedLandmark
+    rightNoseBase: NormalizedLandmark,
   ) => {
     // Calculate the difference in coordinated of eyes
     const dxEyes = (leftEye.x - rightEye.x) * (this.flip ? -1 : 1);
@@ -206,20 +206,20 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headRotationAngles",
       faceId,
-      Math.atan2(dyEyes, dxEyes) / 1.35
+      Math.atan2(dyEyes, dxEyes) / 1.35,
     );
 
     // Calculate head angle y axis
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headYawAngles",
       faceId,
-      (Math.atan2(dzEyes, dxEyes) / 1.4) * (this.flip ? -1 : 1)
+      (Math.atan2(dzEyes, dxEyes) / 1.4) * (this.flip ? -1 : 1),
     );
 
     // Calculate the pitch using the distances between points
     const depthDistance = noseBridge.z - (leftNoseBase.z + rightNoseBase.z) / 2;
     const verticalDistance = Math.abs(
-      noseBridge.y - (leftNoseBase.y + rightNoseBase.y) / 2
+      noseBridge.y - (leftNoseBase.y + rightNoseBase.y) / 2,
     );
 
     let headPitchAngle = Math.atan2(depthDistance, verticalDistance);
@@ -233,7 +233,7 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "headPitchAngles",
       faceId,
-      headPitchAngle
+      headPitchAngle,
     );
 
     return [dxEyes, dyEyes, dzEyes];
@@ -245,7 +245,7 @@ class FaceLandmarks {
     rightEye: NormalizedLandmark,
     dxEyes: number,
     dyEyes: number,
-    dzEyes: number
+    dzEyes: number,
   ) => {
     // Set eye center positions
     const eyesCenterPosition: [number, number] = [
@@ -255,21 +255,21 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothTwoDimVariables(
       "eyesCenterPositions",
       faceId,
-      eyesCenterPosition
+      eyesCenterPosition,
     );
 
     // Calculate the basic 2D interocular distance
     const interocularDistance2D = Math.sqrt(
       dxEyes * dxEyes +
         (dyEyes / 2) * (dyEyes / 2) +
-        (dzEyes / 2.5) * (dzEyes / 2.5)
+        (dzEyes / 2.5) * (dzEyes / 2.5),
     );
 
     // Update InterocularDistance
     this.smoothLandmarksUtils.smoothOneDimVariables(
       "interocularDistances",
       faceId,
-      interocularDistance2D
+      interocularDistance2D,
     );
   };
 
@@ -291,7 +291,7 @@ class FaceLandmarks {
     this.smoothLandmarksUtils.smoothTwoDimVariables(
       "foreheadPositions",
       faceId,
-      [forehead.x, forehead.y]
+      [forehead.x, forehead.y],
     );
   };
 
@@ -314,7 +314,7 @@ class FaceLandmarks {
         leftEye,
         noseBridge,
         leftNoseBase,
-        rightNoseBase
+        rightNoseBase,
       );
 
       this.updateEyes(faceId, rightEye, leftEye, dxEyes, dyEyes, dzEyes);

@@ -61,29 +61,33 @@ export default function FgSvg({
     structuredClone(defaultActivePages),
   );
 
-  const lowerSvgController = new LowerSvgController(
-    svgInstanceId,
-    svgMediaInstance,
-    svgContainerRef,
-    setSvgEffectsActive,
-    userEffects,
-    userEffectsStyles,
-    setSettingsActive,
-    settings,
-    tableStaticContentSocket,
-    setSettings,
-    setEditing,
+  const lowerSvgController = useRef(
+    new LowerSvgController(
+      svgInstanceId,
+      svgMediaInstance,
+      svgContainerRef,
+      setSvgEffectsActive,
+      userEffects,
+      userEffectsStyles,
+      setSettingsActive,
+      settings,
+      tableStaticContentSocket,
+      setSettings,
+      setEditing,
+    ),
   );
 
-  const svgController = new SvgController(
-    svgInstanceId,
-    svgMediaInstance,
-    setSettingsActive,
-    userEffects,
-    userEffectsStyles,
-    setRerender,
-    subContainerRef,
-    positioning,
+  const svgController = useRef(
+    new SvgController(
+      svgInstanceId,
+      svgMediaInstance,
+      setSettingsActive,
+      userEffects,
+      userEffectsStyles,
+      setRerender,
+      subContainerRef,
+      positioning,
+    ),
   );
 
   useEffect(() => {
@@ -98,23 +102,31 @@ export default function FgSvg({
 
       setRerender((prev) => !prev);
     }
-    svgMediaInstance.svgMedia.addSvgListener(svgController.handleSvgMessages);
+    svgMediaInstance.svgMedia.addSvgListener(
+      svgController.current.handleSvgMessages,
+    );
 
-    document.addEventListener("keydown", lowerSvgController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      lowerSvgController.current.handleKeyDown,
+    );
 
     tableRef.current?.addEventListener(
       "scroll",
-      svgController.handleTableScroll,
+      svgController.current.handleTableScroll,
     );
 
     return () => {
-      document.removeEventListener("keydown", lowerSvgController.handleKeyDown);
+      document.removeEventListener(
+        "keydown",
+        lowerSvgController.current.handleKeyDown,
+      );
       svgMediaInstance.svgMedia.removeSvgListener(
-        svgController.handleSvgMessages,
+        svgController.current.handleSvgMessages,
       );
       tableRef.current?.removeEventListener(
         "scroll",
-        svgController.handleTableScroll,
+        svgController.current.handleTableScroll,
       );
     };
   }, []);
@@ -125,12 +137,12 @@ export default function FgSvg({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      svgController.handleTableStaticContentMessage,
+      svgController.current.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        svgController.handleTableStaticContentMessage,
+        svgController.current.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -154,7 +166,6 @@ export default function FgSvg({
         filename={svgMediaInstance.svgMedia.filename}
         kind="svg"
         initState={svgMediaInstance.svgMedia.state}
-        rootMedia={svgMediaInstance.instanceSvg}
         bundleRef={bundleRef}
         backgroundMedia={settings.background.value}
         className="svg-container"

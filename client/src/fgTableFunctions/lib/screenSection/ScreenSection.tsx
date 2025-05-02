@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
@@ -27,42 +27,40 @@ export default function ScreenSection({
   isScreen: React.MutableRefObject<boolean>;
   screenActive: boolean;
   setScreenActive: React.Dispatch<React.SetStateAction<boolean>>;
-  producersController: ProducersController;
+  producersController: React.MutableRefObject<ProducersController>;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
   const { table_id, username, instance, device } = useUserInfoContext();
 
-  const screenSectionController = new ScreenSectionController(
-    mediasoupSocket,
-    device,
-    table_id,
-    username,
-    instance,
-
-    isScreen,
-    setScreenActive,
-
-    userMedia,
-
-    producersController,
-
-    handleDisableEnableBtns
+  const screenSectionController = useRef(
+    new ScreenSectionController(
+      mediasoupSocket,
+      device,
+      table_id,
+      username,
+      instance,
+      isScreen,
+      setScreenActive,
+      userMedia,
+      producersController,
+      handleDisableEnableBtns,
+    ),
   );
 
   return (
-    <div className='flex space-x-4 h-full'>
+    <div className="flex h-full space-x-4">
       <FgButton
         externalRef={screenBtnRef}
-        clickFunction={() => screenSectionController.shareScreen()}
-        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        clickFunction={screenSectionController.current.shareScreen}
+        className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25"
         contentFunction={() => {
           if (screenActive) {
             return (
               <FgSVGElement
                 src={removeScreenIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -74,7 +72,7 @@ export default function ScreenSection({
             return (
               <FgSVGElement
                 src={shareScreenIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -94,14 +92,14 @@ export default function ScreenSection({
       />
       <FgButton
         externalRef={newScreenBtnRef}
-        clickFunction={() => screenSectionController.shareNewScreen()}
+        clickFunction={screenSectionController.current.shareNewScreen}
         className={`${
           screenActive ? "visible" : "hidden"
-        } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
+        } relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25`}
         contentFunction={() => (
           <FgSVGElement
             src={shareScreenIcon}
-            className='h-[80%] aspect-square'
+            className="aspect-square h-[80%]"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
@@ -109,7 +107,7 @@ export default function ScreenSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Share a new screen' />}
+        hoverContent={<FgHoverContentStandard content="Share a new screen" />}
         options={{ hoverTimeoutDuration: 100 }}
         aria-label={"Share a new screen"}
       />

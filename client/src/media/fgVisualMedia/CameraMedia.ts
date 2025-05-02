@@ -6,7 +6,6 @@ import {
   defaultCameraEffects,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 import BabylonScene, {
   EffectType,
@@ -50,8 +49,8 @@ class CameraMedia {
     private initCameraStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
   ) {
     this.effects = {};
 
@@ -353,7 +352,7 @@ class CameraMedia {
 
     this.effects = structuredClone(defaultCameraEffects);
 
-    this.deadbanding.update("capture", this.cameraId, this.effects);
+    this.deadbanding.current.update("capture", this.cameraId, this.effects);
   };
 
   changeEffects = (
@@ -388,7 +387,7 @@ class CameraMedia {
         }
       }
     }
-    this.deadbanding.update("camera", this.cameraId, this.effects);
+    this.deadbanding.current.update("camera", this.cameraId, this.effects);
 
     if (tintColor) {
       this.setTintColor(tintColor);

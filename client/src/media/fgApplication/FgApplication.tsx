@@ -73,31 +73,35 @@ export default function FgApplication({
   const recording = useRef(false);
   const downloadRecordingReady = useRef(false);
 
-  const lowerApplicationController = new LowerApplicationController(
-    applicationInstanceId,
-    applicationMediaInstance,
-    applicationContainerRef,
-    setApplicationEffectsActive,
-    tintColor,
-    userEffects,
-    userEffectsStyles,
-    setSettingsActive,
-    settings,
-    recording,
-    downloadRecordingReady,
-    setRerender,
-    tableStaticContentSocket,
-    setSettings,
+  const lowerApplicationController = useRef(
+    new LowerApplicationController(
+      applicationInstanceId,
+      applicationMediaInstance,
+      applicationContainerRef,
+      setApplicationEffectsActive,
+      tintColor,
+      userEffects,
+      userEffectsStyles,
+      setSettingsActive,
+      settings,
+      recording,
+      downloadRecordingReady,
+      setRerender,
+      tableStaticContentSocket,
+      setSettings,
+    ),
   );
 
-  const applicationController = new ApplicationController(
-    applicationContainerRef,
-    applicationOptions,
-    setSettingsActive,
-    applicationMediaInstance,
-    subContainerRef,
-    positioning,
-    setRerender,
+  const applicationController = useRef(
+    new ApplicationController(
+      applicationContainerRef,
+      applicationOptions,
+      setSettingsActive,
+      applicationMediaInstance,
+      subContainerRef,
+      positioning,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
@@ -108,33 +112,33 @@ export default function FgApplication({
     }
 
     // Set up initial conditions
-    applicationController.init();
+    applicationController.current.init();
 
     applicationMediaInstance.applicationMedia.addApplicationListener(
-      applicationController.handleApplicationMessages,
+      applicationController.current.handleApplicationMessages,
     );
 
     document.addEventListener(
       "keydown",
-      lowerApplicationController.handleKeyDown,
+      lowerApplicationController.current.handleKeyDown,
     );
 
     tableRef.current?.addEventListener(
       "scroll",
-      applicationController.handleTableScroll,
+      applicationController.current.handleTableScroll,
     );
 
     return () => {
       applicationMediaInstance.applicationMedia.removeApplicationListener(
-        applicationController.handleApplicationMessages,
+        applicationController.current.handleApplicationMessages,
       );
       document.removeEventListener(
         "keydown",
-        lowerApplicationController.handleKeyDown,
+        lowerApplicationController.current.handleKeyDown,
       );
       tableRef.current?.removeEventListener(
         "scroll",
-        applicationController.handleTableScroll,
+        applicationController.current.handleTableScroll,
       );
     };
   }, []);
@@ -170,7 +174,6 @@ export default function FgApplication({
       filename={applicationMediaInstance.applicationMedia.filename}
       kind="application"
       initState={applicationMediaInstance.applicationMedia.state}
-      rootMedia={applicationMediaInstance.instanceApplication}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value === "true"}
       className="application-container"

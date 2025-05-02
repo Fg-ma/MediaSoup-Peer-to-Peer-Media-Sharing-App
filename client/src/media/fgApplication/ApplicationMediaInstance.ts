@@ -24,7 +24,7 @@ class ApplicationMediaInstance {
     public applicationInstanceId: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userDevice: UserDevice,
+    private userDevice: React.MutableRefObject<UserDevice>,
     public initPositioning: {
       position: {
         left: number;

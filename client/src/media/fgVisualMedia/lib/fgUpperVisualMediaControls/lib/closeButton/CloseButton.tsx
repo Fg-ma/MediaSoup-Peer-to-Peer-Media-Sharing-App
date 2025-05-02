@@ -11,18 +11,18 @@ const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 export default function CloseButton({
   fgLowerVisualMediaController,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleCloseVideo();
+        fgLowerVisualMediaController.current.handleCloseVideo();
       }}
       contentFunction={() => {
         return (
           <FgSVGElement
             src={closeIcon}
-            className='flex items-center justify-start'
+            className="flex items-center justify-start"
             attributes={[
               { key: "width", value: "60%" },
               { key: "height", value: "60%" },
@@ -33,9 +33,9 @@ export default function CloseButton({
         );
       }}
       hoverContent={
-        <FgHoverContentStandard content='Close (x)' style='light' />
+        <FgHoverContentStandard content="Close (x)" style="light" />
       }
-      className='flex items-center justify-end h-full aspect-square pointer-events-auto'
+      className="flex pointer-events-auto aspect-square h-full items-center justify-end"
       options={{ hoverType: "below" }}
     />
   );

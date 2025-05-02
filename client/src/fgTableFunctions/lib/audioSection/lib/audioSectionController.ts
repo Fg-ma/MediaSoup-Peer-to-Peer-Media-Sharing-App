@@ -10,12 +10,12 @@ class AudioSectionController {
     private username: React.MutableRefObject<string>,
     private instance: React.MutableRefObject<string>,
 
-    private producersController: ProducersController,
+    private producersController: React.MutableRefObject<ProducersController>,
 
     private isAudio: React.MutableRefObject<boolean>,
     private setAudioActive: (value: React.SetStateAction<boolean>) => void,
 
-    private handleDisableEnableBtns: (disabled: boolean) => void
+    private handleDisableEnableBtns: (disabled: boolean) => void,
   ) {}
 
   shareAudio = () => {
@@ -28,7 +28,7 @@ class AudioSectionController {
     this.setAudioActive((prev) => !prev);
 
     if (this.isAudio.current) {
-      this.producersController.createNewProducer("audio");
+      this.producersController.current.createNewProducer("audio");
     } else if (!this.isAudio.current) {
       this.mediasoupSocket.current?.sendMessage({
         type: "removeProducer",

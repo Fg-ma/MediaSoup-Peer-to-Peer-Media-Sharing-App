@@ -239,99 +239,102 @@ export default function RemoteVisualMedia({
     }
   };
 
-  const fgContentAdjustmentController =
-    useRef<FgContentAdjustmentController | null>(null);
-  if (!fgContentAdjustmentController.current)
-    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+  const fgContentAdjustmentController = useRef(
+    new FgContentAdjustmentController(
       bundleRef,
       positioning,
       setAdjustingDimensions,
       setRerender,
-    );
-
-  const fgLowerVisualMediaController = new FgLowerVisualMediaController(
-    mediasoupSocket,
-    visualMediaId,
-    table_id,
-    username,
-    instance,
-    type,
-    fgVisualMediaOptions,
-    bundleRef,
-    videoRef,
-    audioRef,
-    visualMediaContainerRef,
-    panBtnRef,
-    setPausedState,
-    paused,
-    setCaptionsActive,
-    settings,
-    currentTimeRef,
-    setVisualEffectsActive,
-    setAudioEffectsActive,
-    handleMute,
-    handleVisualEffectChange,
-    tracksColorSetterCallback,
-    tintColor,
-    userEffects,
-    userMedia,
-    initTimeOffset,
-    fgContentAdjustmentController,
-    positioning,
-    aspectRatio,
-    screenAudioStream,
-    behindEffectsContainerRef,
-    frontEffectsContainerRef,
-    tableSocket,
-    setReactionsPanelActive,
+    ),
   );
 
-  const fgVisualMediaController = new FgVisualMediaController(
-    table_id,
-    username,
-    instance,
-    type,
-    visualMediaId,
-    fgLowerVisualMediaController,
-    videoStream,
-    positioningListeners,
-    positioning,
-    setPausedState,
-    paused,
-    userMedia,
-    remoteEffects,
-    userEffectsStyles,
-    remoteEffectsStyles,
-    remoteDataStreams,
-    videoRef,
-    visualMediaContainerRef,
-    audioRef,
-    fgVisualMediaOptions,
-    handleVisualEffectChange,
-    setInVisualMedia,
-    leaveVisualMediaTimer,
-    visualMediaMovementTimeout,
-    setRerender,
-    aspectRatio,
-    mediasoupSocket,
-    fgContentAdjustmentController,
-    bundleRef,
+  const fgLowerVisualMediaController = useRef(
+    new FgLowerVisualMediaController(
+      mediasoupSocket,
+      visualMediaId,
+      table_id,
+      username,
+      instance,
+      type,
+      fgVisualMediaOptions,
+      bundleRef,
+      videoRef,
+      audioRef,
+      visualMediaContainerRef,
+      panBtnRef,
+      setPausedState,
+      paused,
+      setCaptionsActive,
+      settings,
+      currentTimeRef,
+      setVisualEffectsActive,
+      setAudioEffectsActive,
+      handleMute,
+      handleVisualEffectChange,
+      tracksColorSetterCallback,
+      tintColor,
+      userEffects,
+      userMedia,
+      initTimeOffset,
+      fgContentAdjustmentController,
+      positioning,
+      aspectRatio,
+      screenAudioStream,
+      behindEffectsContainerRef,
+      frontEffectsContainerRef,
+      tableSocket,
+      setReactionsPanelActive,
+    ),
+  );
+
+  const fgVisualMediaController = useRef(
+    new FgVisualMediaController(
+      table_id,
+      username,
+      instance,
+      type,
+      visualMediaId,
+      fgLowerVisualMediaController,
+      videoStream,
+      positioningListeners,
+      positioning,
+      setPausedState,
+      paused,
+      userMedia,
+      remoteEffects,
+      userEffectsStyles,
+      remoteEffectsStyles,
+      remoteDataStreams,
+      videoRef,
+      visualMediaContainerRef,
+      audioRef,
+      fgVisualMediaOptions,
+      handleVisualEffectChange,
+      setInVisualMedia,
+      leaveVisualMediaTimer,
+      visualMediaMovementTimeout,
+      setRerender,
+      aspectRatio,
+      mediasoupSocket,
+      fgContentAdjustmentController,
+      bundleRef,
+    ),
   );
 
   useEffect(() => {
     // Set up initial conditions
-    fgVisualMediaController.init();
+    fgVisualMediaController.current.init();
 
     // Listen for messages on mediasoupSocket
     mediasoupSocket.current?.addMessageListener(
-      fgVisualMediaController.handleMediasoupMessage,
+      fgVisualMediaController.current.handleMediasoupMessage,
     );
 
     tableSocket.current?.addMessageListener(
-      fgVisualMediaController.handleTableMessage,
+      fgVisualMediaController.current.handleTableMessage,
     );
 
-    addGroupSignalListener(fgVisualMediaController.handleSignal);
+    addGroupSignalListener(fgVisualMediaController.current.handleSignal);
 
     // Request initial catch up data
     if (activeUsername.current && activeInstance.current) {
@@ -353,27 +356,27 @@ export default function RemoteVisualMedia({
     if (fgVisualMediaOptions.isFullScreen) {
       document.addEventListener(
         "fullscreenchange",
-        fgLowerVisualMediaController.handleFullScreenChange,
+        fgLowerVisualMediaController.current.handleFullScreenChange,
       );
     }
 
     document.addEventListener(
       "keydown",
-      fgLowerVisualMediaController.handleKeyDown,
+      fgLowerVisualMediaController.current.handleKeyDown,
     );
 
     document.addEventListener(
       "visibilitychange",
-      fgVisualMediaController.handleVisibilityChange,
+      fgVisualMediaController.current.handleVisibilityChange,
     );
 
     if (fgVisualMediaOptions.isPictureInPicture) {
       videoRef.current?.addEventListener("enterpictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("enter"),
+        fgLowerVisualMediaController.current.handlePictureInPicture("enter"),
       );
 
       videoRef.current?.addEventListener("leavepictureinpicture", () =>
-        fgLowerVisualMediaController.handlePictureInPicture("leave"),
+        fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
       );
     }
 
@@ -381,7 +384,7 @@ export default function RemoteVisualMedia({
 
     if (videoElement) {
       videoElement.addEventListener("loadedmetadata", () =>
-        fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
+        fgVisualMediaController.current.handleVideoMetadataLoaded(videoElement),
       );
     }
 
@@ -393,44 +396,46 @@ export default function RemoteVisualMedia({
       );
       positioningListeners.current = {};
       mediasoupSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleMediasoupMessage,
+        fgVisualMediaController.current.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgVisualMediaController.handleTableMessage,
+        fgVisualMediaController.current.handleTableMessage,
       );
-      removeGroupSignalListener(fgVisualMediaController.handleSignal);
+      removeGroupSignalListener(fgVisualMediaController.current.handleSignal);
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",
-          fgLowerVisualMediaController.handleFullScreenChange,
+          fgLowerVisualMediaController.current.handleFullScreenChange,
         );
       }
       document.removeEventListener(
         "keydown",
-        fgLowerVisualMediaController.handleKeyDown,
+        fgLowerVisualMediaController.current.handleKeyDown,
       );
       document.removeEventListener(
         "visibilitychange",
-        fgVisualMediaController.handleVisibilityChange,
+        fgVisualMediaController.current.handleVisibilityChange,
       );
       if (fgVisualMediaOptions.isPictureInPicture) {
         videoRef.current?.removeEventListener("enterpictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("enter"),
+          fgLowerVisualMediaController.current.handlePictureInPicture("enter"),
         );
         videoRef.current?.removeEventListener("leavepictureinpicture", () =>
-          fgLowerVisualMediaController.handlePictureInPicture("leave"),
+          fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
         );
       }
       if (videoElement) {
         videoElement.removeEventListener("loadedmetadata", () =>
-          fgVisualMediaController.handleVideoMetadataLoaded(videoElement),
+          fgVisualMediaController.current.handleVideoMetadataLoaded(
+            videoElement,
+          ),
         );
       }
     };
   }, []);
 
   useEffect(() => {
-    fgLowerVisualMediaController.updateCaptionsStyles();
+    fgLowerVisualMediaController.current.updateCaptionsStyles();
   }, [settings]);
 
   useEffect(() => {
@@ -462,7 +467,7 @@ export default function RemoteVisualMedia({
   }, [screenAudioStream]);
 
   useEffect(() => {
-    fgVisualMediaController.attachPositioningListeners(
+    fgVisualMediaController.current.attachPositioningListeners(
       fgVisualMediaOptions.permissions,
     );
   }, [fgVisualMediaOptions.permissions]);
@@ -489,8 +494,12 @@ export default function RemoteVisualMedia({
         rotate: `${positioning.current.rotation}deg`,
         transformOrigin: "0% 0%",
       }}
-      onPointerEnter={() => fgVisualMediaController.handlePointerEnter()}
-      onPointerLeave={() => fgVisualMediaController.handlePointerLeave()}
+      onPointerEnter={() =>
+        fgVisualMediaController.current.handlePointerEnter()
+      }
+      onPointerLeave={() =>
+        fgVisualMediaController.current.handlePointerLeave()
+      }
       data-positioning={JSON.stringify(positioning.current)}
     >
       {fgVisualMediaOptions.permissions
@@ -525,7 +534,7 @@ export default function RemoteVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
       >
@@ -560,7 +569,7 @@ export default function RemoteVisualMedia({
         <video
           ref={videoRef}
           id={visualMediaId}
-          onTimeUpdate={() => fgLowerVisualMediaController.timeUpdate()}
+          onTimeUpdate={() => fgLowerVisualMediaController.current.timeUpdate()}
           className="main-video absolute left-0 top-0 h-full w-full"
           controls={false}
           autoPlay={fgVisualMediaOptions.autoPlay}

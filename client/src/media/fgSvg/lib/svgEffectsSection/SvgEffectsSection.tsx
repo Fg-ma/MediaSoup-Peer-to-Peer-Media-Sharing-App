@@ -59,7 +59,7 @@ export default function SvgEffectsSection({
 }: {
   svgInstanceId: string;
   svgMediaInstance: SvgMediaInstance;
-  lowerSvgController: LowerSvgController;
+  lowerSvgController: React.MutableRefObject<LowerSvgController>;
   svgContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffects, userEffectsStyles } = useEffectsContext();
@@ -123,7 +123,7 @@ export default function SvgEffectsSection({
   return (
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
       style={{
         bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
         height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
@@ -133,14 +133,14 @@ export default function SvgEffectsSection({
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
       variants={EffectSectionVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={EffectSectionTransition}
     >
       <div
         ref={subEffectsContainerRef}
-        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+        className="flex h-full w-max items-center justify-center space-x-2 px-4"
       >
         <ClearAllButton
           effectsDisabled={effectsDisabled}
@@ -149,11 +149,11 @@ export default function SvgEffectsSection({
           clickFunctionCallback={async () => {
             svgMediaInstance.clearAllEffects();
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <ColorPickerButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           defaultColor={
             svgMediaInstance.getBackgroundColor() === "transparent" ||
             svgMediaInstance.getBackgroundColor() === "none" ||
@@ -168,7 +168,7 @@ export default function SvgEffectsSection({
           isAlpha={true}
         />
         <ColorPickerButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           defaultColor={
             svgMediaInstance.getPathColor() === undefined
               ? "#000000ff"
@@ -181,7 +181,7 @@ export default function SvgEffectsSection({
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='shadow'
+          filter="shadow"
           active={userEffects.current.svg[svgInstanceId].shadow}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -194,15 +194,15 @@ export default function SvgEffectsSection({
                 `${style.shadowColor}`,
                 `${style.strength}`,
                 `${style.offsetX}`,
-                `${style.offsetY}`
+                `${style.offsetY}`,
               );
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgShadowFilter_" + svgInstanceId
+                "#fgSvgShadowFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -213,7 +213,7 @@ export default function SvgEffectsSection({
                   ? shadowOffIcon
                   : shadowIcon
               }
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -222,7 +222,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Shadow'
+          hoverLabel="Shadow"
           colorPickerRefs={{ shadowColor: shadowColorPickerRef }}
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
@@ -239,10 +239,10 @@ export default function SvgEffectsSection({
               `${style.shadowColor}`,
               `${style.strength}`,
               `${style.offsetX}`,
-              `${style.offsetY}`
+              `${style.offsetY}`,
             );
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
           handleAcceptColor={(_key, hexa) => {
             userEffectsStyles.current.svg[svgInstanceId].shadow.shadowColor =
@@ -257,15 +257,15 @@ export default function SvgEffectsSection({
               `${style.shadowColor}`,
               `${style.strength}`,
               `${style.offsetX}`,
-              `${style.offsetY}`
+              `${style.offsetY}`,
             );
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='blur'
+          filter="blur"
           active={userEffects.current.svg[svgInstanceId].blur}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -277,11 +277,11 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyBlurEffect(`${style.strength}`);
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgBlurFilter_" + svgInstanceId
+                "#fgSvgBlurFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -292,7 +292,7 @@ export default function SvgEffectsSection({
                   ? blurOffIcon
                   : blurIcon
               }
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
@@ -301,7 +301,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Blur'
+          hoverLabel="Blur"
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
             userEffectsStyles.current.svg[svgInstanceId].blur[key] = value;
@@ -315,12 +315,12 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyBlurEffect(`${style.strength}`);
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='colorOverlay'
+          filter="colorOverlay"
           active={userEffects.current.svg[svgInstanceId].colorOverlay}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -333,18 +333,18 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyColorOverlayEffect(`${style.overlayColor}`);
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgColorOverlayFilter_" + svgInstanceId
+                "#fgSvgColorOverlayFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={colorOverlayIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "75%" },
                 { key: "height", value: "75%" },
@@ -353,7 +353,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Color overlay'
+          hoverLabel="Color overlay"
           colorPickerRefs={{ overlayColor: overlayColorPickerRef }}
           handleAcceptColor={(_key, hexa) => {
             userEffectsStyles.current.svg[
@@ -370,12 +370,12 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyColorOverlayEffect(`${style.overlayColor}`);
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='saturate'
+          filter="saturate"
           active={userEffects.current.svg[svgInstanceId].saturate}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -387,18 +387,18 @@ export default function SvgEffectsSection({
               svgMediaInstance.applySaturateEffect(`${style.saturation}`);
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgSaturateFilter_" + svgInstanceId
+                "#fgSvgSaturateFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={saturateIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -407,7 +407,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Saturate'
+          hoverLabel="Saturate"
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
             userEffectsStyles.current.svg[svgInstanceId].saturate[key] = value;
@@ -421,12 +421,12 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applySaturateEffect(`${style.saturation}`);
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='grayscale'
+          filter="grayscale"
           active={userEffects.current.svg[svgInstanceId].grayscale}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -439,11 +439,11 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyGrayscaleEffect(`${style.scale}`);
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgGrayscaleFilter_" + svgInstanceId
+                "#fgSvgGrayscaleFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -454,7 +454,7 @@ export default function SvgEffectsSection({
                   ? grayscaleOffIcon
                   : grayscaleIcon
               }
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -463,7 +463,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Grayscale'
+          hoverLabel="Grayscale"
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
             userEffectsStyles.current.svg[svgInstanceId].grayscale[key] = value;
@@ -478,12 +478,12 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyGrayscaleEffect(`${style.scale}`);
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='edgeDetection'
+          filter="edgeDetection"
           active={userEffects.current.svg[svgInstanceId].edgeDetection}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -494,18 +494,18 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyEdgeDetectionEffect();
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgEdgeDetectionFilter_" + svgInstanceId
+                "#fgSvgEdgeDetectionFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={edgeDetectionIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "65%" },
                 { key: "height", value: "65%" },
@@ -514,11 +514,11 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Edge dectection'
+          hoverLabel="Edge dectection"
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='neonGlow'
+          filter="neonGlow"
           active={userEffects.current.svg[svgInstanceId].neonGlow}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -530,18 +530,18 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyNeonGlowEffect(`${style.neonColor}`);
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgNeonGlowFilter_" + svgInstanceId
+                "#fgSvgNeonGlowFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={neonGlowIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "80%" },
                 { key: "height", value: "80%" },
@@ -550,7 +550,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Neon glow'
+          hoverLabel="Neon glow"
           colorPickerRefs={{ neonColor: neonColorPickerRef }}
           handleAcceptColor={(_key, hexa) => {
             userEffectsStyles.current.svg[svgInstanceId].neonGlow.neonColor =
@@ -565,12 +565,12 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyNeonGlowEffect(`${style.neonColor}`);
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='waveDistortion'
+          filter="waveDistortion"
           active={userEffects.current.svg[svgInstanceId].waveDistortion}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -582,22 +582,22 @@ export default function SvgEffectsSection({
             if (userEffects.current.svg[svgInstanceId].waveDistortion) {
               svgMediaInstance.applyWaveDistortionEffect(
                 `${style.frequency}`,
-                `${style.strength}`
+                `${style.strength}`,
               );
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgWaveDistortionFilter_" + svgInstanceId
+                "#fgSvgWaveDistortionFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={waveDistortionIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -606,7 +606,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Wave distortion'
+          hoverLabel="Wave distortion"
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
             userEffectsStyles.current.svg[svgInstanceId].waveDistortion[key] =
@@ -622,15 +622,15 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyWaveDistortionEffect(
               `${style.frequency}`,
-              `${style.strength}`
+              `${style.strength}`,
             );
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
           svgInstanceId={svgInstanceId}
-          filter='crackedGlass'
+          filter="crackedGlass"
           active={userEffects.current.svg[svgInstanceId].crackedGlass}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={() => {
@@ -643,22 +643,22 @@ export default function SvgEffectsSection({
               svgMediaInstance.applyCrackedGlassEffect(
                 `${style.density}`,
                 `${style.detail}`,
-                `${style.strength}`
+                `${style.strength}`,
               );
             } else {
               svgMediaInstance.removeEffect(
-                "#fgSvgCrackedGlassFilter_" + svgInstanceId
+                "#fgSvgCrackedGlassFilter_" + svgInstanceId,
               );
             }
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
           content={
             <FgSVGElement
               src={crackedGlassIcon}
-              className='flex h-full w-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               attributes={[
                 { key: "width", value: "70%" },
                 { key: "height", value: "70%" },
@@ -667,7 +667,7 @@ export default function SvgEffectsSection({
               ]}
             />
           }
-          hoverLabel='Cracked glass'
+          hoverLabel="Cracked glass"
           handleValueChange={(key, value) => {
             // @ts-expect-error key isn't typed
             userEffectsStyles.current.svg[svgInstanceId].crackedGlass[key] =
@@ -684,10 +684,10 @@ export default function SvgEffectsSection({
             svgMediaInstance.applyCrackedGlassEffect(
               `${style.density}`,
               `${style.detail}`,
-              `${style.strength}`
+              `${style.strength}`,
             );
 
-            lowerSvgController.handleAlertSvgEffect();
+            lowerSvgController.current.handleAlertSvgEffect();
           }}
         />
       </div>

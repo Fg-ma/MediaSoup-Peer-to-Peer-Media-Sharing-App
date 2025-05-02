@@ -61,14 +61,14 @@ export default function JoinTableSection({
   setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
   isSubscribed: React.MutableRefObject<boolean>;
   handleDisableEnableBtns: (disabled: boolean) => void;
-  bundlesController: BundlesController;
-  producersController: ProducersController;
-  consumersController: ConsumersController;
-  permissionsController: PermissionsController;
-  metadata: Metadata;
-  userDevice: UserDevice;
-  deadbanding: Deadbanding;
-  cleanupController: CleanupController;
+  bundlesController: React.MutableRefObject<BundlesController>;
+  producersController: React.MutableRefObject<ProducersController>;
+  consumersController: React.MutableRefObject<ConsumersController>;
+  permissionsController: React.MutableRefObject<PermissionsController>;
+  metadata: React.MutableRefObject<Metadata>;
+  userDevice: React.MutableRefObject<UserDevice>;
+  deadbanding: React.MutableRefObject<Deadbanding>;
+  cleanupController: React.MutableRefObject<CleanupController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
@@ -80,83 +80,83 @@ export default function JoinTableSection({
   const tableIdRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
 
-  const tableFunctionsController = new JoinTableSectionController(
-    tableSocket,
-    tableStaticContentSocket,
-    mediasoupSocket,
-    tableIdRef,
-    usernameRef,
-    table_id,
-    username,
-    instance,
-    setIsInTable,
-    userMedia,
-    userDataStreams,
-    remoteMedia,
-    userEffects,
-    userEffectsStyles,
-    handleDisableEnableBtns,
-    setBundles,
-    consumerTransport,
-    producerTransport,
-    isCamera,
-    setCameraActive,
-    isScreen,
-    setScreenActive,
-    isAudio,
-    setAudioActive,
-    setMutedAudio,
-    mutedAudioRef,
-    isSubscribed,
-    device,
-    bundlesController,
-    producersController,
-    consumersController,
-    permissionsController,
-    metadata,
-    userDevice,
-    deadbanding,
-    cleanupController,
-    setRerender
+  const tableFunctionsController = useRef(
+    new JoinTableSectionController(
+      tableSocket,
+      tableStaticContentSocket,
+      mediasoupSocket,
+      tableIdRef,
+      usernameRef,
+      table_id,
+      username,
+      instance,
+      setIsInTable,
+      userMedia,
+      userDataStreams,
+      remoteMedia,
+      userEffects,
+      userEffectsStyles,
+      handleDisableEnableBtns,
+      setBundles,
+      consumerTransport,
+      producerTransport,
+      isCamera,
+      setCameraActive,
+      isScreen,
+      setScreenActive,
+      isAudio,
+      setAudioActive,
+      setMutedAudio,
+      mutedAudioRef,
+      isSubscribed,
+      device,
+      bundlesController,
+      producersController,
+      consumersController,
+      permissionsController,
+      metadata,
+      userDevice,
+      deadbanding,
+      cleanupController,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(
-      tableFunctionsController.handleMediasoupSocketMessage
+      tableFunctionsController.current.handleMediasoupSocketMessage,
     );
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        tableFunctionsController.handleMediasoupSocketMessage
+        tableFunctionsController.current.handleMediasoupSocketMessage,
       );
     };
   }, [mediasoupSocket.current]);
 
   return (
-    <div className='flex justify-center mt-5'>
+    <div className="mt-5 flex justify-center">
       <input
         ref={tableIdRef}
-        id='tableIdyInputField'
-        type='text'
-        className='border border-gray-400 px-4 py-2 mr-2'
-        placeholder='Enter room name'
+        id="tableIdyInputField"
+        type="text"
+        className="mr-2 border border-gray-400 px-4 py-2"
+        placeholder="Enter room name"
       />
       <input
         ref={usernameRef}
-        id='usernameInputField'
-        type='text'
-        className='border border-gray-400 px-4 py-2 mr-2'
-        placeholder='Enter username'
+        id="usernameInputField"
+        type="text"
+        className="mr-2 border border-gray-400 px-4 py-2"
+        placeholder="Enter username"
       />
       <button
-        onClick={() => {
-          tableFunctionsController.joinTable();
-        }}
+        onClick={tableFunctionsController.current.joinTable}
         className={`${
           isInTable
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } text-white font-bold py-2 px-4 max-h-[42px] font-Josefin`}
+        } max-h-[42px] px-4 py-2 font-Josefin font-bold text-white`}
       >
         {isInTable ? "Join New Room" : "Join Room"}
       </button>

@@ -186,33 +186,35 @@ export default function FgButton({
     [toggleClickContentRef, setIsClickToggle, setExternalClickToggleState],
   );
 
-  const fgButtonController = new FgButtonController(
-    fgButtonOptions,
-    clickFunction,
-    pointerDownFunction,
-    pointerUpFunction,
-    doubleClickFunction,
-    holdFunction,
-    dragFunction,
-    toggleHold,
-    togglePopup,
-    hoverContent,
-    toggleClickContent,
-    clickTimeout,
-    holdTimeout,
-    hoverTimeout,
-    isClicked,
-    setIsClickToggle,
-    setExternalClickToggleState,
-    isClickToggle,
-    setIsHeld,
-    isHeldRef,
-    setIsHeldToggle,
-    setIsHover,
-    startDragPosition,
-    buttonRef,
-    externalRef,
-    referenceDragElement,
+  const fgButtonController = useRef(
+    new FgButtonController(
+      fgButtonOptions,
+      clickFunction,
+      pointerDownFunction,
+      pointerUpFunction,
+      doubleClickFunction,
+      holdFunction,
+      dragFunction,
+      toggleHold,
+      togglePopup,
+      hoverContent,
+      toggleClickContent,
+      clickTimeout,
+      holdTimeout,
+      hoverTimeout,
+      isClicked,
+      setIsClickToggle,
+      setExternalClickToggleState,
+      isClickToggle,
+      setIsHeld,
+      isHeldRef,
+      setIsHeldToggle,
+      setIsHover,
+      startDragPosition,
+      buttonRef,
+      externalRef,
+      referenceDragElement,
+    ),
   );
 
   useEffect(() => {
@@ -228,13 +230,13 @@ export default function FgButton({
 
     document.addEventListener(
       "visibilitychange",
-      fgButtonController.handleVisibilityChange,
+      fgButtonController.current.handleVisibilityChange,
     );
 
     return () => {
       document.removeEventListener(
         "visibilitychange",
-        fgButtonController.handleVisibilityChange,
+        fgButtonController.current.handleVisibilityChange,
       );
     };
   }, [isHover]);
@@ -243,7 +245,7 @@ export default function FgButton({
     if (scrollingContainerRef && scrollingContainerRef.current) {
       scrollingContainerRef.current.addEventListener(
         "scroll",
-        fgButtonController.handleScrollingContainerScroll,
+        fgButtonController.current.handleScrollingContainerScroll,
       );
     }
 
@@ -251,7 +253,7 @@ export default function FgButton({
       if (scrollingContainerRef && scrollingContainerRef.current) {
         scrollingContainerRef.current.removeEventListener(
           "scroll",
-          fgButtonController.handleScrollingContainerScroll,
+          fgButtonController.current.handleScrollingContainerScroll,
         );
       }
     };
@@ -268,9 +270,9 @@ export default function FgButton({
         id={externalId}
         className={className}
         style={style}
-        onPointerDown={fgButtonController.handlePointerDown}
-        onDoubleClick={fgButtonController.handleDoubleClick}
-        onPointerEnter={fgButtonController.handlePointerEnter}
+        onPointerDown={fgButtonController.current.handlePointerDown}
+        onDoubleClick={fgButtonController.current.handleDoubleClick}
+        onPointerEnter={fgButtonController.current.handlePointerEnter}
         onFocus={focusFunction}
         onBlur={blurFunction}
         draggable={
@@ -297,7 +299,7 @@ export default function FgButton({
         })}
         {...(dragFunction && {
           onDrag: (event: PointerEvent) => {
-            fgButtonController.handleDragPointerMove(event);
+            fgButtonController.current.handleDragPointerMove(event);
           },
         })}
         {...(stopDragFunction && {

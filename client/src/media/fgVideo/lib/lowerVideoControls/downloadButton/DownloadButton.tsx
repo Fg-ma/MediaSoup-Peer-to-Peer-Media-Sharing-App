@@ -21,29 +21,27 @@ export default function DownloadButton({
 }: {
   settings: Settings;
   recording: React.MutableRefObject<boolean>;
-  lowerVideoController: LowerVideoController;
+  lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
-      clickFunction={() => {
-        lowerVideoController.handleDownload();
-      }}
+      clickFunction={lowerVideoController.current.handleDownload}
       contentFunction={() => {
         const src =
           settings.downloadType.value === "snapShot"
             ? snapShotIcon
             : settings.downloadType.value === "original"
-            ? downloadIcon
-            : recording.current
-            ? recordOffIcon
-            : recordIcon;
+              ? downloadIcon
+              : recording.current
+                ? recordOffIcon
+                : recordIcon;
 
         return (
           <FgSVGElement
             src={src}
-            className='flex items-center justify-center'
+            className="flex items-center justify-center"
             attributes={[
               { key: "width", value: "85%" },
               { key: "height", value: "85%" },
@@ -60,17 +58,17 @@ export default function DownloadButton({
               settings.downloadType.value === "snapShot"
                 ? "Take snap shot (d)"
                 : settings.downloadType.value === "original"
-                ? "Download (d)"
-                : recording.current
-                ? "Stop recording (d)"
-                : "Start recording (d)"
+                  ? "Download (d)"
+                  : recording.current
+                    ? "Stop recording (d)"
+                    : "Start recording (d)"
             }
-            style='light'
+            style="light"
           />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

@@ -15,7 +15,7 @@ export default function VisualEffectsButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -23,7 +23,7 @@ export default function VisualEffectsButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleVisualEffects();
+        fgLowerVisualMediaController.current.handleVisualEffects();
       }}
       contentFunction={() => {
         const iconSrc = visualEffectsActive ? effectOffIcon : effectIcon;
@@ -31,7 +31,7 @@ export default function VisualEffectsButton({
         return (
           <FgSVGElement
             src={iconSrc}
-            className='flex items-center justify-center'
+            className="flex items-center justify-center"
             attributes={[
               { key: "width", value: "85%" },
               { key: "height", value: "85%" },
@@ -43,11 +43,11 @@ export default function VisualEffectsButton({
       }}
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-10 aspect-square relative scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto relative flex aspect-square h-10 scale-x-[-1] items-center justify-center"
     />
   );
 }

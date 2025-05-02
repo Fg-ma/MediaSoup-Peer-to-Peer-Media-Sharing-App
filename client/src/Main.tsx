@@ -79,7 +79,7 @@ export default function Main() {
 
   const muteAudio = (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => {
     if (producerType === "audio") {
       setMutedAudio((prev) => !prev);
@@ -125,7 +125,7 @@ export default function Main() {
     instance: string,
     cameraIds: (string | undefined)[],
     screenIds: (string | undefined)[],
-    screenAudioIds: (string | undefined)[]
+    screenAudioIds: (string | undefined)[],
   ) => {
     if (!remoteEffects.current[username]) {
       remoteEffects.current[username] = {};
@@ -204,116 +204,132 @@ export default function Main() {
     }
   };
 
-  const cleanupController = new CleanupController(
-    remoteMedia,
-    remoteDataStreams,
-    remoteEffects,
-    remoteEffectsStyles,
-    setBundles
+  const cleanupController = useRef(
+    new CleanupController(
+      remoteMedia,
+      remoteDataStreams,
+      remoteEffects,
+      remoteEffectsStyles,
+      setBundles,
+    ),
   );
 
-  const bundlesController = new BundlesController(
-    mediasoupSocket,
-    table_id,
-    username,
-    instance,
-    userMedia,
-    tableRef,
-    isCamera,
-    isScreen,
-    isAudio,
-    bundles,
-    setBundles,
-    muteAudio,
-    setUpEffectContext,
-    permissions,
-    handleDisableEnableBtns,
-    setAudioActive
+  const bundlesController = useRef(
+    new BundlesController(
+      mediasoupSocket,
+      table_id,
+      username,
+      instance,
+      userMedia,
+      tableRef,
+      isCamera,
+      isScreen,
+      isAudio,
+      bundles,
+      setBundles,
+      muteAudio,
+      setUpEffectContext,
+      permissions,
+      handleDisableEnableBtns,
+      setAudioActive,
+    ),
   );
 
-  const userDevice = new UserDevice();
+  const userDevice = useRef(new UserDevice());
 
-  const deadbanding = new Deadbanding(userEffectsStyles, captureEffectsStyles);
-
-  const browserMedia = new BrowserMedia(
-    device,
-    userMedia,
-    isCamera,
-    setCameraActive,
-    isScreen,
-    setScreenActive,
-    isAudio,
-    setAudioActive,
-    handleDisableEnableBtns
+  const deadbanding = useRef(
+    new Deadbanding(userEffectsStyles, captureEffectsStyles),
   );
 
-  const producersController = new ProducersController(
-    mediasoupSocket,
-    device,
-    table_id,
-    username,
-    instance,
-    permissions,
-    userMedia,
-    userEffectsStyles,
-    remoteEffectsStyles,
-    userEffects,
-    remoteEffects,
-    remoteMedia,
-    userDataStreams,
-    remoteDataStreams,
-    isCamera,
-    isScreen,
-    isAudio,
-    isSubscribed,
-    handleDisableEnableBtns,
-    producerTransport,
-    setCameraActive,
-    setScreenActive,
-    setAudioActive,
-    bundlesController.createProducerBundle,
-    bundles,
-    setBundles,
-    userDevice,
-    deadbanding,
-    browserMedia
+  const browserMedia = useRef(
+    new BrowserMedia(
+      device,
+      userMedia,
+      isCamera,
+      setCameraActive,
+      isScreen,
+      setScreenActive,
+      isAudio,
+      setAudioActive,
+      handleDisableEnableBtns,
+    ),
   );
 
-  const consumersController = new ConsumersController(
-    mediasoupSocket,
-    device,
-    table_id,
-    username,
-    instance,
-    consumerTransport,
-    remoteMedia,
-    remoteDataStreams,
-    setUpEffectContext,
-    bundlesController.createConsumerBundle
+  const producersController = useRef(
+    new ProducersController(
+      mediasoupSocket,
+      device,
+      table_id,
+      username,
+      instance,
+      permissions,
+      userMedia,
+      userEffectsStyles,
+      remoteEffectsStyles,
+      userEffects,
+      remoteEffects,
+      remoteMedia,
+      userDataStreams,
+      remoteDataStreams,
+      isCamera,
+      isScreen,
+      isAudio,
+      isSubscribed,
+      handleDisableEnableBtns,
+      producerTransport,
+      setCameraActive,
+      setScreenActive,
+      setAudioActive,
+      bundlesController.current.createProducerBundle,
+      bundles,
+      setBundles,
+      userDevice,
+      deadbanding,
+      browserMedia,
+    ),
   );
 
-  const metadata = new Metadata(
-    mediasoupSocket,
-    table_id,
-    username,
-    instance,
-    userMedia,
-    mutedAudioRef,
-    userEffects,
-    userEffectsStyles
+  const consumersController = useRef(
+    new ConsumersController(
+      mediasoupSocket,
+      device,
+      table_id,
+      username,
+      instance,
+      consumerTransport,
+      remoteMedia,
+      remoteDataStreams,
+      setUpEffectContext,
+      bundlesController.current.createConsumerBundle,
+    ),
   );
 
-  const permissionsController = new PermissionsController(
-    mediasoupSocket,
-    table_id,
-    username,
-    instance,
-    permissions
+  const metadata = useRef(
+    new Metadata(
+      mediasoupSocket,
+      table_id,
+      username,
+      instance,
+      userMedia,
+      mutedAudioRef,
+      userEffects,
+      userEffectsStyles,
+    ),
+  );
+
+  const permissionsController = useRef(
+    new PermissionsController(
+      mediasoupSocket,
+      table_id,
+      username,
+      instance,
+      permissions,
+    ),
   );
 
   return (
     // <CreditPage />
-    <div className='w-screen h-screen flex flex-col space-y-[1.5%] p-[1.5%] overflow-hidden bg-fg-tone-black-1'>
+    <div className="flex h-screen w-screen flex-col space-y-[1.5%] overflow-hidden bg-fg-tone-black-1 p-[1.5%]">
       <FgTable
         tableRef={tableRef}
         tableTopRef={tableTopRef}

@@ -39,8 +39,8 @@ export default function FgTable({
     rows: number;
     cols: number;
   };
-  userDevice: UserDevice;
-  deadbanding: Deadbanding;
+  userDevice: React.MutableRefObject<UserDevice>;
+  deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { tableSocket } = useSocketContext();
   const { username, instance } = useUserInfoContext();
@@ -53,17 +53,19 @@ export default function FgTable({
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
 
-  const fgTableController = new FgTableController(
-    username,
-    instance,
-    tableRef,
-    setUserData,
-    aspectDir,
-    setRerender,
+  const fgTableController = useRef(
+    new FgTableController(
+      username,
+      instance,
+      tableRef,
+      setUserData,
+      aspectDir,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
-    fgTableController.getAspectDir();
+    fgTableController.current.getAspectDir();
 
     setTimeout(() => {
       if (tableRef.current) {
@@ -84,21 +86,24 @@ export default function FgTable({
       }
     }, 100);
 
-    window.addEventListener("resize", fgTableController.getAspectDir);
+    window.addEventListener("resize", fgTableController.current.getAspectDir);
 
     return () => {
-      window.removeEventListener("resize", fgTableController.getAspectDir);
+      window.removeEventListener(
+        "resize",
+        fgTableController.current.getAspectDir,
+      );
     };
   }, []);
 
   useEffect(() => {
     tableSocket.current?.addMessageListener(
-      fgTableController.handleTableMessage,
+      fgTableController.current.handleTableMessage,
     );
 
     return () => {
       tableSocket.current?.removeMessageListener(
-        fgTableController.handleTableMessage,
+        fgTableController.current.handleTableMessage,
       );
     };
   }, [tableSocket.current]);

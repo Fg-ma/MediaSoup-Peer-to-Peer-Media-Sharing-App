@@ -88,19 +88,21 @@ export default function FgPiano({
     B: { "0": [], "1": [], "2": [], "3": [], "4": [], "5": [], "6": [] },
   });
 
-  const fgPianoController = new FgPianoController(
-    isUser,
-    userMedia,
-    scaleSectionContainerRef,
-    scaleSectionRef,
-    keyWidth,
-    setVisibleOctave,
-    visibleOctaveRef,
-    keysPressed,
-    keyVisualizerActiveRef,
-    keyVisualizerRef,
-    visualizerAnimationFrameRef,
-    keyVisualizerNotesStore,
+  const fgPianoController = useRef(
+    new FgPianoController(
+      isUser,
+      userMedia,
+      scaleSectionContainerRef,
+      scaleSectionRef,
+      keyWidth,
+      setVisibleOctave,
+      visibleOctaveRef,
+      keysPressed,
+      keyVisualizerActiveRef,
+      keyVisualizerRef,
+      visualizerAnimationFrameRef,
+      keyVisualizerNotesStore,
+    ),
   );
 
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -117,7 +119,7 @@ export default function FgPiano({
       octave = Math.max(0, octave - 1);
     }
 
-    fgPianoController.handleKeyUp(eventKey, octave as Octaves);
+    fgPianoController.current.handleKeyUp(eventKey, octave as Octaves);
 
     if (keysPressed.current.length === 0) {
       document.removeEventListener("keyup", handleKeyUp);
@@ -148,7 +150,7 @@ export default function FgPiano({
       document.addEventListener("keyup", handleKeyUp);
     }
 
-    fgPianoController.handleKeyDown(eventKey, octave as Octaves);
+    fgPianoController.current.handleKeyDown(eventKey, octave as Octaves);
   }, []);
 
   const focusCallback = (focus: boolean) => {
@@ -168,9 +170,9 @@ export default function FgPiano({
   };
 
   useEffect(() => {
-    fgPianoController.resize();
+    fgPianoController.current.resize();
 
-    fgPianoController.scrollToOctave(initialOctave);
+    fgPianoController.current.scrollToOctave(initialOctave);
 
     return () => {
       if (isKeydownListenerAdded.current) {
@@ -227,7 +229,7 @@ export default function FgPiano({
           />
         </div>
       }
-      resizeCallback={fgPianoController.resize}
+      resizeCallback={fgPianoController.current.resize}
       focusCallback={focusCallback}
       closeCallback={closeCallback}
       closePosition="topRight"

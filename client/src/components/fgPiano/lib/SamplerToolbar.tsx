@@ -54,7 +54,7 @@ export default function SamplerToolbar({
   keyVisualizerContainerRef,
 }: {
   focus: boolean;
-  fgPianoController: FgPianoController;
+  fgPianoController: React.MutableRefObject<FgPianoController>;
   visibleOctaveRef: React.MutableRefObject<Octaves>;
   samplerEffectsActive: boolean;
   setSamplerEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -98,9 +98,9 @@ export default function SamplerToolbar({
   }, []);
 
   return (
-    <div className="flex mb-1 h-8 w-full justify-between px-2">
+    <div className="mb-1 flex h-8 w-full justify-between px-2">
       <motion.div
-        className="flex z-20 h-8 w-max items-center space-x-2 pr-2"
+        className="z-20 flex h-8 w-max items-center space-x-2 pr-2"
         animate={{
           boxShadow: `8px 0 4px -3px  ${
             focus ? "rgb(22, 22, 22)" : "rgba(33, 33, 33)"
@@ -138,7 +138,7 @@ export default function SamplerToolbar({
               }
             />
           }
-          className="flex relative aspect-square h-8 min-h-8 items-center justify-center"
+          className="relative flex aspect-square h-8 min-h-8 items-center justify-center"
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
         {keyVisualizerActive && (
@@ -173,7 +173,7 @@ export default function SamplerToolbar({
               content={samplerEffectsActive ? "Close effects" : "Effects"}
             />
           }
-          className="flex relative aspect-square h-8 min-h-8 items-center justify-center"
+          className="relative flex aspect-square h-8 min-h-8 items-center justify-center"
           options={{ hoverType: "below", hoverTimeoutDuration: 750 }}
         />
         <SamplerMetronome />
@@ -186,7 +186,7 @@ export default function SamplerToolbar({
         <div className="flex scale-x-[-1] items-center space-x-2">
           <OctaveSelection
             visibleOctaveRef={visibleOctaveRef}
-            scrollToOctave={fgPianoController.scrollToOctave}
+            scrollToOctave={fgPianoController.current.scrollToOctave}
           />
           <SelectSampler sampler={sampler} setSampler={setSampler} />
         </div>

@@ -18,11 +18,11 @@ class TableFunctionsController {
       React.SetStateAction<boolean>
     >,
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
     private captureEffects: React.MutableRefObject<CaptureEffectsType>,
     private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   handleTableSocketMessage = (message: IncomingTableMessages) => {
@@ -43,7 +43,7 @@ class TableFunctionsController {
         this.userDevice,
         this.deadbanding,
         this.captureEffects,
-        this.captureEffectsStyles
+        this.captureEffectsStyles,
       );
 
       this.captureMedia.current.video.srcObject = stream;

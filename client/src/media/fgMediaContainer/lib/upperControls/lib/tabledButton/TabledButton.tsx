@@ -17,14 +17,12 @@ export default function TabledButton({
   lowerController,
 }: {
   state: ContentStateTypes[];
-  lowerController: LowerController;
+  lowerController: React.MutableRefObject<LowerController>;
 }) {
   return (
     <FgButton
       className="pointer-events-auto flex !aspect-square h-full items-center justify-end"
-      clickFunction={() => {
-        lowerController.handleTable();
-      }}
+      clickFunction={lowerController.current.handleTable}
       contentFunction={() => {
         return (
           <FgSVGElement

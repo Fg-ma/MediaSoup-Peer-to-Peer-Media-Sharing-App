@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
@@ -27,42 +27,40 @@ export default function CameraSection({
   isCamera: React.MutableRefObject<boolean>;
   setCameraActive: React.Dispatch<React.SetStateAction<boolean>>;
   cameraActive: boolean;
-  producersController: ProducersController;
+  producersController: React.MutableRefObject<ProducersController>;
   handleDisableEnableBtns: (disabled: boolean) => void;
 }) {
   const { userMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
   const { table_id, username, instance, device } = useUserInfoContext();
 
-  const cameraSectionController = new CameraSectionController(
-    mediasoupSocket,
-    device,
-    table_id,
-    username,
-    instance,
-
-    isCamera,
-    setCameraActive,
-
-    userMedia,
-
-    producersController,
-
-    handleDisableEnableBtns
+  const cameraSectionController = useRef(
+    new CameraSectionController(
+      mediasoupSocket,
+      device,
+      table_id,
+      username,
+      instance,
+      isCamera,
+      setCameraActive,
+      userMedia,
+      producersController,
+      handleDisableEnableBtns,
+    ),
   );
 
   return (
-    <div className='flex h-full space-x-4'>
+    <div className="flex h-full space-x-4">
       <FgButton
         externalRef={cameraBtnRef}
-        clickFunction={() => cameraSectionController.shareCamera()}
-        className='flex disabled:opacity-25 h-full aspect-square rounded-full items-center justify-center relative hover:border-2 hover:border-fg-off-white'
+        clickFunction={cameraSectionController.current.shareCamera}
+        className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25"
         contentFunction={() => {
           if (cameraActive) {
             return (
               <FgSVGElement
                 src={removeCameraIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -74,7 +72,7 @@ export default function CameraSection({
             return (
               <FgSVGElement
                 src={shareCameraIcon}
-                className='h-[80%] aspect-square'
+                className="aspect-square h-[80%]"
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
@@ -94,14 +92,14 @@ export default function CameraSection({
       />
       <FgButton
         externalRef={newCameraBtnRef}
-        clickFunction={() => cameraSectionController.shareNewCamera()}
+        clickFunction={cameraSectionController.current.shareNewCamera}
         className={`${
           cameraActive ? "" : "hidden"
-        } disabled:opacity-25 h-full aspect-square rounded-full flex items-center justify-center relative hover:border-2 hover:border-fg-off-white`}
+        } relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white disabled:opacity-25`}
         contentFunction={() => (
           <FgSVGElement
             src={shareCameraIcon}
-            className='h-[80%] aspect-square'
+            className="aspect-square h-[80%]"
             attributes={[
               { key: "width", value: "100%" },
               { key: "height", value: "100%" },
@@ -109,7 +107,7 @@ export default function CameraSection({
             ]}
           />
         )}
-        hoverContent={<FgHoverContentStandard content='Add new camera' />}
+        hoverContent={<FgHoverContentStandard content="Add new camera" />}
         options={{ hoverTimeoutDuration: 100 }}
         aria-label={"Add new camera"}
       />

@@ -9,7 +9,7 @@ export default function PictureInPictureButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   visualEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -19,20 +19,20 @@ export default function PictureInPictureButton({
   return (
     <FgButton
       clickFunction={() => {
-        fgLowerVisualMediaController.handleMiniPlayer();
+        fgLowerVisualMediaController.current.handleMiniPlayer();
         setActive((prev) => !prev);
       }}
       contentFunction={() => {
         return (
-          <div className='flex h-[90%] aspect-square items-center justify-center'>
+          <div className="flex aspect-square h-[90%] items-center justify-center">
             <div
-              className={`border-3 border-white w-[80%] h-[65%] rounded-md flex ${
-                active ? "justify-start items-start" : "justify-end items-end"
+              className={`flex h-[65%] w-[80%] rounded-md border-3 border-white ${
+                active ? "items-start justify-start" : "items-end justify-end"
               }`}
             >
               <div
-                className={`bg-white w-[60%] h-[50%] rounded-sm ${
-                  active ? "ml-[10%] mt-[10%]" : "mr-[10%] mb-[10%]"
+                className={`h-[50%] w-[60%] rounded-sm bg-white ${
+                  active ? "ml-[10%] mt-[10%]" : "mb-[10%] mr-[10%]"
                 }`}
               ></div>
             </div>
@@ -42,13 +42,13 @@ export default function PictureInPictureButton({
       hoverContent={
         !visualEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
-            content='Picture in picture (i)'
-            style='light'
+            content="Picture in picture (i)"
+            style="light"
           />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

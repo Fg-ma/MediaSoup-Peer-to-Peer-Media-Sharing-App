@@ -155,17 +155,16 @@ export default function FgAudioElementContainer({
     undefined,
   );
 
-  const fgContentAdjustmentController =
-    useRef<FgContentAdjustmentController | null>(null);
-  if (!fgContentAdjustmentController.current)
-    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+  const fgContentAdjustmentController = useRef<FgContentAdjustmentController>(
+    new FgContentAdjustmentController(
       bundleRef,
       positioning,
       setAdjustingDimensions,
       setRerender,
-    );
+    ),
+  );
 
-  const fgAudioElementContainerController =
+  const fgAudioElementContainerController = useRef(
     new FgAudioElementContainerController(
       isUser,
       table_id,
@@ -187,14 +186,15 @@ export default function FgAudioElementContainer({
       setAudioActive,
       fgContentAdjustmentController,
       bundleRef,
-    );
+    ),
+  );
 
   useEffect(() => {
     if (
       !remoteDataStreams.current ||
       (isUser && !permissions.acceptsAudioEffects)
     ) {
-      fgAudioElementContainerController.attachListeners();
+      fgAudioElementContainerController.current.attachListeners();
     }
 
     // Request initial catch up data
@@ -213,15 +213,15 @@ export default function FgAudioElementContainer({
     }
 
     mediasoupSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleMediasoupMessage,
+      fgAudioElementContainerController.current.handleMediasoupMessage,
     );
     tableSocket.current?.addMessageListener(
-      fgAudioElementContainerController.handleTableMessage,
+      fgAudioElementContainerController.current.handleTableMessage,
     );
 
     document.addEventListener(
       "keydown",
-      fgAudioElementContainerController.handleKeyDown,
+      fgAudioElementContainerController.current.handleKeyDown,
     );
 
     return () => {
@@ -231,14 +231,14 @@ export default function FgAudioElementContainer({
         ),
       );
       mediasoupSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleMediasoupMessage,
+        fgAudioElementContainerController.current.handleMediasoupMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgAudioElementContainerController.handleTableMessage,
+        fgAudioElementContainerController.current.handleTableMessage,
       );
       document.removeEventListener(
         "keydown",
-        fgAudioElementContainerController.handleKeyDown,
+        fgAudioElementContainerController.current.handleKeyDown,
       );
     };
   }, []);
@@ -589,7 +589,7 @@ export default function FgAudioElementContainer({
                   setReactionsPanelActive={setReactionsPanelActive}
                   clickFunction={() => setReactionsPanelActive((prev) => !prev)}
                   reactionFunction={
-                    fgAudioElementContainerController.reactController
+                    fgAudioElementContainerController.current.reactController
                       .handleReaction
                   }
                   options={{ hoverType: "above", hoverTimeoutDuration: 750 }}

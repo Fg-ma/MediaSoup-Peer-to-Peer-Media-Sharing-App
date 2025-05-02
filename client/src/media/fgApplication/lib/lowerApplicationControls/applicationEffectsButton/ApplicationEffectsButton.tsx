@@ -14,14 +14,14 @@ export default function ApplicationEffectsButton({
   applicationEffectsActive,
   scrollingContainerRef,
 }: {
-  lowerApplicationController: LowerApplicationController;
+  lowerApplicationController: React.MutableRefObject<LowerApplicationController>;
   applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationController.handleApplicationEffects();
+        lowerApplicationController.current.handleApplicationEffects();
       }}
       contentFunction={() => {
         const iconSrc = applicationEffectsActive ? effectOffIcon : effectIcon;
@@ -40,11 +40,11 @@ export default function ApplicationEffectsButton({
       }}
       hoverContent={
         !applicationEffectsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto relative flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

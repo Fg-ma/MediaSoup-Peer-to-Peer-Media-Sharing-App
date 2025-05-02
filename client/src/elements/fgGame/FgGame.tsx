@@ -118,41 +118,42 @@ export default function FgGame({
   const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
 
-  const fgContentAdjustmentController =
-    useRef<FgContentAdjustmentController | null>(null);
-  if (!fgContentAdjustmentController.current)
-    fgContentAdjustmentController.current = new FgContentAdjustmentController(
+  const fgContentAdjustmentController = useRef<FgContentAdjustmentController>(
+    new FgContentAdjustmentController(
       sharedBundleRef,
       positioning,
       setAdjustingDimensions,
       setRerender,
-    );
+    ),
+  );
 
-  const fgGameController = new FgGameController(
-    mediasoupSocket,
-    table_id,
-    gameId,
-    hideControls,
-    gameStarted,
-    setHideControls,
-    pointerLeaveHideControlsTimeout,
-    pointerStillHideControlsTimeout,
-    gameRef,
-    closeGameFunction,
-    startGameFunction,
-    joinGameFunction,
-    leaveGameFunction,
-    remoteDataStreams,
-    positioningListeners,
-    positioning,
-    setRerender,
-    sharedBundleRef,
-    panBtnRef,
-    fgContentAdjustmentController,
-    popupRefs,
-    behindEffectsContainerRef,
-    frontEffectsContainerRef,
-    tableSocket,
+  const fgGameController = useRef(
+    new FgGameController(
+      mediasoupSocket,
+      table_id,
+      gameId,
+      hideControls,
+      gameStarted,
+      setHideControls,
+      pointerLeaveHideControlsTimeout,
+      pointerStillHideControlsTimeout,
+      gameRef,
+      closeGameFunction,
+      startGameFunction,
+      joinGameFunction,
+      leaveGameFunction,
+      remoteDataStreams,
+      positioningListeners,
+      positioning,
+      setRerender,
+      sharedBundleRef,
+      panBtnRef,
+      fgContentAdjustmentController,
+      popupRefs,
+      behindEffectsContainerRef,
+      frontEffectsContainerRef,
+      tableSocket,
+    ),
   );
 
   useEffect(() => {
@@ -228,11 +229,13 @@ export default function FgGame({
   }, [positioning.current.scale]);
 
   useEffect(() => {
-    mediasoupSocket.current?.addMessageListener(fgGameController.handleMessage);
-    tableSocket.current?.addMessageListener(
-      fgGameController.handleTableMessage,
+    mediasoupSocket.current?.addMessageListener(
+      fgGameController.current.handleMessage,
     );
-    addGroupSignalListener(fgGameController.handleSignal);
+    tableSocket.current?.addMessageListener(
+      fgGameController.current.handleTableMessage,
+    );
+    addGroupSignalListener(fgGameController.current.handleSignal);
 
     mediasoupSocket.current?.sendMessage({
       type: "requestGameCatchUpData",
@@ -244,7 +247,7 @@ export default function FgGame({
       },
     });
 
-    fgGameController.attachPositioningListeners();
+    fgGameController.current.attachPositioningListeners();
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
@@ -253,20 +256,26 @@ export default function FgGame({
         ),
       );
       mediasoupSocket.current?.removeMessageListener(
-        fgGameController.handleMessage,
+        fgGameController.current.handleMessage,
       );
       tableSocket.current?.removeMessageListener(
-        fgGameController.handleTableMessage,
+        fgGameController.current.handleTableMessage,
       );
-      removeGroupSignalListener(fgGameController.handleSignal);
+      removeGroupSignalListener(fgGameController.current.handleSignal);
     };
   }, []);
 
   useEffect(() => {
-    document.addEventListener("keydown", fgGameController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      fgGameController.current.handleKeyDown,
+    );
 
     return () => {
-      document.removeEventListener("keydown", fgGameController.handleKeyDown);
+      document.removeEventListener(
+        "keydown",
+        fgGameController.current.handleKeyDown,
+      );
     };
   }, [hideControls]);
 
@@ -279,11 +288,11 @@ export default function FgGame({
 
         ref.current.addEventListener(
           "pointerenter",
-          fgGameController.handlePointerEnter,
+          fgGameController.current.handlePointerEnter,
         );
         ref.current.addEventListener(
           "pointerleave",
-          fgGameController.handlePointerLeave,
+          fgGameController.current.handlePointerLeave,
         );
       }
     }
@@ -297,11 +306,11 @@ export default function FgGame({
 
           ref.current.removeEventListener(
             "pointerenter",
-            fgGameController.handlePointerEnter,
+            fgGameController.current.handlePointerEnter,
           );
           ref.current.removeEventListener(
             "pointerleave",
-            fgGameController.handlePointerLeave,
+            fgGameController.current.handlePointerLeave,
           );
         }
       }
@@ -327,9 +336,9 @@ export default function FgGame({
   return (
     <motion.div
       ref={gameRef}
-      onPointerEnter={fgGameController.handlePointerEnter}
-      onPointerLeave={fgGameController.handlePointerLeave}
-      onPointerMove={fgGameController.handlePointerMove}
+      onPointerEnter={fgGameController.current.handlePointerEnter}
+      onPointerLeave={fgGameController.current.handlePointerLeave}
+      onPointerMove={fgGameController.current.handlePointerMove}
       className={`fg-game ${
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
@@ -388,7 +397,9 @@ export default function FgGame({
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               clickFunction={() => setReactionsPanelActive((prev) => !prev)}
-              reactionFunction={fgGameController.reactController.handleReaction}
+              reactionFunction={
+                fgGameController.current.reactController.handleReaction
+              }
             />
           </div>
           <EndGameButton closeGameFunction={closeGameFunction} />

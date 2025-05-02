@@ -73,7 +73,7 @@ export default function SettingsPanel({
   finalizeCapture,
   mediaType,
 }: {
-  captureMediaController: CaptureMediaController;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -201,7 +201,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,

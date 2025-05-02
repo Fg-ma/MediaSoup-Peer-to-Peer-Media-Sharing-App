@@ -15,7 +15,7 @@ export default function VideoEffectsButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  lowerVideoController: LowerVideoController;
+  lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -23,7 +23,7 @@ export default function VideoEffectsButton({
   return (
     <FgButton
       clickFunction={() => {
-        lowerVideoController.handleVideoEffects();
+        lowerVideoController.current.handleVideoEffects();
       }}
       contentFunction={() => {
         const iconSrc = videoEffectsActive ? effectOffIcon : effectIcon;
@@ -42,11 +42,11 @@ export default function VideoEffectsButton({
       }}
       hoverContent={
         !videoEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto relative flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

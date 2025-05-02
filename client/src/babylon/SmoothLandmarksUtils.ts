@@ -7,7 +7,6 @@ import {
 } from "./FaceLandmarks";
 
 class SmoothLandmarksUtils {
-  // Smoothing and deadbanding
   private minSmoothingFactor = 0.7;
   private maxSmoothingFactor = 0.3;
   private smoothingFactorThreshold = 0.001;
@@ -16,7 +15,7 @@ class SmoothLandmarksUtils {
     private type: DeadbandingMediaTypes,
     private id: string,
     private calculatedLandmarks: CalculatedLandmarkInterface,
-    private deadbanding: Deadbanding
+    private deadbanding: React.MutableRefObject<Deadbanding>,
   ) {}
 
   getAdaptiveSmoothingFactor = (distance: number) => {
@@ -31,13 +30,13 @@ class SmoothLandmarksUtils {
     featureType: LandmarkTypes,
     previousValue: number,
     currentValue: number,
-    smoothingFactor: number
+    smoothingFactor: number,
   ) => {
     const deltaValue = currentValue - previousValue;
 
     if (
       Math.abs(deltaValue) <
-      (this.deadbanding.getDeadbandingMapById(this.type, this.id)?.[
+      (this.deadbanding.current.getDeadbandingMapById(this.type, this.id)?.[
         featureType
       ] ?? Infinity)
     ) {
@@ -52,7 +51,7 @@ class SmoothLandmarksUtils {
   smoothOneDimVariables = (
     featureType: OneDimLandmarkTypes,
     faceId: number,
-    value: number
+    value: number,
   ) => {
     if (Array.isArray(this.calculatedLandmarks[featureType][faceId])) {
       return;
@@ -65,7 +64,7 @@ class SmoothLandmarksUtils {
 
     // Calculate distance (in this case, difference in width values)
     const deltaWidth = Math.abs(
-      value - this.calculatedLandmarks[featureType][faceId]
+      value - this.calculatedLandmarks[featureType][faceId],
     );
 
     // Adaptive smoothing factor calculation based on deltaWidth
@@ -76,14 +75,14 @@ class SmoothLandmarksUtils {
       featureType,
       this.calculatedLandmarks[featureType][faceId],
       value,
-      smoothingFactor
+      smoothingFactor,
     );
   };
 
   smoothTwoDimVariables = (
     featureType: TwoDimLandmarkTypes,
     faceId: number,
-    value: [number, number]
+    value: [number, number],
   ) => {
     // Initialize smoothed width if not already initialized
     if (!this.calculatedLandmarks[featureType][faceId]) {
@@ -107,13 +106,13 @@ class SmoothLandmarksUtils {
       featureType,
       prevX,
       currentX,
-      smoothingFactorX
+      smoothingFactorX,
     );
     const smoothedY = this.applyDeadbanding(
       featureType,
       prevY,
       currentY,
-      smoothingFactorY
+      smoothingFactorY,
     );
 
     // Store the smoothed value back into the calculatedLandmarks object

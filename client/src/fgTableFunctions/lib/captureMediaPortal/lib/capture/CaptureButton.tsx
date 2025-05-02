@@ -13,14 +13,14 @@ export default function CaptureButton({
   captureMediaController,
 }: {
   recording: boolean;
-  captureMediaController: CaptureMediaController;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
 }) {
   return (
     <FgButton
       className="pointer-events-auto z-20 aspect-square h-full"
       clickFunction={(event) => {
         event?.stopPropagation();
-        captureMediaController.handleCapture();
+        captureMediaController.current.handleCapture();
       }}
       contentFunction={() => (
         <FgSVGElement

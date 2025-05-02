@@ -26,7 +26,7 @@ export default function Tools({
   searchValue,
   selected,
 }: {
-  tabledPortalController: TabledPortalController;
+  tabledPortalController: React.MutableRefObject<TabledPortalController>;
   advanced: boolean;
   setAdvanced: React.Dispatch<React.SetStateAction<boolean>>;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -70,8 +70,8 @@ export default function Tools({
           />
         )}
         clickFunction={() => {
-          tabledPortalController.placeInstances();
-          tabledPortalController.uploadInstances();
+          tabledPortalController.current.placeInstances();
+          tabledPortalController.current.uploadInstances();
           setTabledActive(false);
         }}
         hoverContent={
@@ -154,7 +154,7 @@ export default function Tools({
           />
         )}
         clickFunction={() => {
-          tabledPortalController.reset();
+          tabledPortalController.current.reset();
         }}
         hoverContent={<FgHoverContentStandard content="Clear selected" />}
         options={{

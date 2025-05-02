@@ -14,7 +14,7 @@ export default function ConfirmButton({
   needsName,
   setGetNamePopupActive,
 }: {
-  bezierController: BezierController;
+  bezierController: React.MutableRefObject<BezierController>;
   largestDim: "width" | "height";
   needsName: boolean;
   setGetNamePopupActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,7 +27,7 @@ export default function ConfirmButton({
       clickFunction={(event) => {
         event.stopPropagation();
         if (!needsName) {
-          bezierController.confirmBezierCurve();
+          bezierController.current.confirmBezierCurve();
         } else {
           setGetNamePopupActive((prev) => !prev);
         }

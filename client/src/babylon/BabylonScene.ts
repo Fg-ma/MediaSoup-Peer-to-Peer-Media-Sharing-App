@@ -134,7 +134,7 @@ class BabylonScene {
     },
     private faceMeshResults: NormalizedLandmarkListList[] | undefined,
     private selfieSegmentationResults: ImageData[] | undefined,
-    private userDevice: UserDevice,
+    private userDevice: React.MutableRefObject<UserDevice>,
     private maxFaces: [number],
   ) {
     this.flip = this.type === "camera" || this.type === "capture";

@@ -109,26 +109,28 @@ export default function FgPanel({
     undefined,
   );
 
-  const fgPanelController = new FgPanelController(
-    setRerender,
-    setPosition,
-    size,
-    setSize,
-    setFocus,
-    setFocusClicked,
-    panelRef,
-    containerRef,
-    closeButtonRef,
-    isDragging,
-    startPosition,
-    isResizing,
-    resizingDirection,
-    minWidth,
-    minHeight,
-    closeCallback,
-    panelBoundariesRef,
-    panelBoundariesScrollingContainerRef,
-    panelInsertionPointRef,
+  const fgPanelController = useRef(
+    new FgPanelController(
+      setRerender,
+      setPosition,
+      size,
+      setSize,
+      setFocus,
+      setFocusClicked,
+      panelRef,
+      containerRef,
+      closeButtonRef,
+      isDragging,
+      startPosition,
+      isResizing,
+      resizingDirection,
+      minWidth,
+      minHeight,
+      closeCallback,
+      panelBoundariesRef,
+      panelBoundariesScrollingContainerRef,
+      panelInsertionPointRef,
+    ),
   );
 
   useEffect(() => {
@@ -260,14 +262,17 @@ export default function FgPanel({
 
   useEffect(() => {
     if (closeCallback && isHover) {
-      document.addEventListener("keydown", fgPanelController.handleKeyDown);
+      document.addEventListener(
+        "keydown",
+        fgPanelController.current.handleKeyDown,
+      );
     }
 
     return () => {
       if (closeCallback && isHover) {
         document.removeEventListener(
           "keydown",
-          fgPanelController.handleKeyDown,
+          fgPanelController.current.handleKeyDown,
         );
       }
     };
@@ -276,13 +281,13 @@ export default function FgPanel({
   useEffect(() => {
     document.addEventListener(
       "pointerdown",
-      fgPanelController.handlePanelClick,
+      fgPanelController.current.handlePanelClick,
     );
 
     return () => {
       document.removeEventListener(
         "pointerdown",
-        fgPanelController.handlePanelClick,
+        fgPanelController.current.handlePanelClick,
       );
     };
   }, []);
@@ -337,7 +342,7 @@ export default function FgPanel({
       </div>
       {moveable && (
         <div
-          onPointerDown={fgPanelController.handleDragPointerDown}
+          onPointerDown={fgPanelController.current.handleDragPointerDown}
           className="absolute top-0 h-3 cursor-pointer"
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -347,7 +352,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onPointerDown={fgPanelController.handleDragPointerDown}
+          onPointerDown={fgPanelController.current.handleDragPointerDown}
           className="absolute bottom-0 h-3 cursor-pointer"
           style={{
             width: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -357,7 +362,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onPointerDown={fgPanelController.handleDragPointerDown}
+          onPointerDown={fgPanelController.current.handleDragPointerDown}
           className="absolute left-0 w-3 cursor-pointer"
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -367,7 +372,7 @@ export default function FgPanel({
       )}
       {moveable && (
         <div
-          onPointerDown={fgPanelController.handleDragPointerDown}
+          onPointerDown={fgPanelController.current.handleDragPointerDown}
           className="absolute right-0 w-3 cursor-pointer"
           style={{
             height: `calc(100% - ${resizeable ? "1.5rem" : "0rem"})`,
@@ -378,7 +383,7 @@ export default function FgPanel({
       {resizeable && (closePosition !== "bottomLeft" || !closeCallback) && (
         <div
           onPointerDown={(event) =>
-            fgPanelController.handleResizePointerDown(event, "se")
+            fgPanelController.current.handleResizePointerDown(event, "se")
           }
           className="absolute bottom-0 right-0 aspect-square w-3 cursor-se-resize"
         />
@@ -386,7 +391,7 @@ export default function FgPanel({
       {resizeable && (closePosition !== "bottomRight" || !closeCallback) && (
         <div
           onPointerDown={(event) =>
-            fgPanelController.handleResizePointerDown(event, "sw")
+            fgPanelController.current.handleResizePointerDown(event, "sw")
           }
           className="absolute bottom-0 left-0 aspect-square w-3 cursor-sw-resize"
         />
@@ -394,7 +399,7 @@ export default function FgPanel({
       {resizeable && (closePosition !== "topLeft" || !closeCallback) && (
         <div
           onPointerDown={(event) =>
-            fgPanelController.handleResizePointerDown(event, "nw")
+            fgPanelController.current.handleResizePointerDown(event, "nw")
           }
           className="absolute left-0 top-0 aspect-square w-3 cursor-nw-resize"
         />
@@ -402,7 +407,7 @@ export default function FgPanel({
       {resizeable && (closePosition !== "topRight" || !closeCallback) && (
         <div
           onPointerDown={(event) =>
-            fgPanelController.handleResizePointerDown(event, "ne")
+            fgPanelController.current.handleResizePointerDown(event, "ne")
           }
           className="absolute right-0 top-0 aspect-square w-3 cursor-ne-resize"
         />

@@ -18,11 +18,11 @@ class MediasoupSocketController {
     private table_id: string,
     private username: string,
     private instance: string,
-    private producersController: ProducersController,
-    private consumersController: ConsumersController,
-    private permissionsController: PermissionsController,
-    private metadata: Metadata,
-    private cleanupController: CleanupController
+    private producersController: React.MutableRefObject<ProducersController>,
+    private consumersController: React.MutableRefObject<ConsumersController>,
+    private permissionsController: React.MutableRefObject<PermissionsController>,
+    private metadata: React.MutableRefObject<Metadata>,
+    private cleanupController: React.MutableRefObject<CleanupController>,
   ) {
     this.connect(this.url);
   }
@@ -60,13 +60,13 @@ class MediasoupSocketController {
   };
 
   addMessageListener = (
-    listener: (message: IncomingMediasoupMessages) => void
+    listener: (message: IncomingMediasoupMessages) => void,
   ): void => {
     this.messageListeners.add(listener);
   };
 
   removeMessageListener = (
-    listener: (message: IncomingMediasoupMessages) => void
+    listener: (message: IncomingMediasoupMessages) => void,
   ): void => {
     this.messageListeners.delete(listener);
   };
@@ -74,47 +74,47 @@ class MediasoupSocketController {
   handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "producerTransportCreated":
-        this.producersController.onProducerTransportCreated(event);
+        this.producersController.current.onProducerTransportCreated(event);
         break;
       case "consumerTransportCreated":
-        this.consumersController.onConsumerTransportCreated(event);
+        this.consumersController.current.onConsumerTransportCreated(event);
         break;
       case "resumed":
         break;
       case "subscribed":
-        this.consumersController.onSubscribed(event);
+        this.consumersController.current.onSubscribed(event);
         break;
       case "newConsumerSubscribed":
-        this.consumersController.onNewConsumerSubscribed(event);
+        this.consumersController.current.onNewConsumerSubscribed(event);
         break;
       case "newJSONConsumerSubscribed":
-        this.consumersController.onNewJSONConsumerSubscribed(event);
+        this.consumersController.current.onNewJSONConsumerSubscribed(event);
         break;
       case "newProducerAvailable":
-        this.producersController.onNewProducerAvailable(event);
+        this.producersController.current.onNewProducerAvailable(event);
         break;
       case "newJSONProducerAvailable":
-        this.producersController.onNewJSONProducerAvailable(event);
+        this.producersController.current.onNewJSONProducerAvailable(event);
         break;
       case "producerDisconnected":
-        this.producersController.onProducerDisconnected(event);
+        this.producersController.current.onProducerDisconnected(event);
         break;
       case "permissionsRequested":
-        this.permissionsController.onPermissionsRequested(event);
+        this.permissionsController.current.onPermissionsRequested(event);
         break;
       case "bundleMetadataRequested":
-        this.metadata.onBundleMetadataRequested(event);
+        this.metadata.current.onBundleMetadataRequested(event);
         break;
       case "requestedCatchUpData":
-        this.metadata.onRequestedCatchUpData(event);
+        this.metadata.current.onRequestedCatchUpData(event);
         break;
       case "removeProducerRequested":
-        this.producersController.onRemoveProducerRequested(event);
+        this.producersController.current.onRemoveProducerRequested(event);
         break;
       case "userLeftTable":
-        this.cleanupController.handleUserLeftCleanup(
+        this.cleanupController.current.handleUserLeftCleanup(
           event.header.username,
-          event.header.instance
+          event.header.instance,
         );
         break;
       default:

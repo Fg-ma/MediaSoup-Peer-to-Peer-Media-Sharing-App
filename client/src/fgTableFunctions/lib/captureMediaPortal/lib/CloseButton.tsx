@@ -17,8 +17,8 @@ export default function CloseButton({
 }: {
   delaying: React.MutableRefObject<boolean>;
   finalizeCapture: boolean;
-  tableFunctionsController: TableFunctionsController;
-  captureMediaController: CaptureMediaController;
+  tableFunctionsController: React.MutableRefObject<TableFunctionsController>;
+  captureMediaController: React.MutableRefObject<CaptureMediaController>;
 }) {
   return (
     <FgButton
@@ -27,10 +27,10 @@ export default function CloseButton({
         event.stopPropagation();
 
         delaying.current
-          ? captureMediaController.clearDelay()
+          ? captureMediaController.current.clearDelay()
           : finalizeCapture
-            ? captureMediaController.handleExitFinialization()
-            : tableFunctionsController.stopVideo();
+            ? captureMediaController.current.handleExitFinialization()
+            : tableFunctionsController.current.stopVideo();
       }}
       contentFunction={() => (
         <FgSVGElement

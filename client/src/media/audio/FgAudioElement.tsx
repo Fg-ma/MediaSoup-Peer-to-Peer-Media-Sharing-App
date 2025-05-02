@@ -32,7 +32,7 @@ export default function FgAudioElement({
   setPopupVisible: React.Dispatch<React.SetStateAction<boolean>>;
   handleMute: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   clientMute: React.MutableRefObject<boolean>;
   localMute: React.MutableRefObject<boolean>;
@@ -44,10 +44,10 @@ export default function FgAudioElement({
   const { userMedia } = useMediaContext();
 
   const [movingY, setMovingY] = useState<number[]>(
-    Array(settings.numFixedPoints.value - 1).fill(50)
+    Array(settings.numFixedPoints.value - 1).fill(50),
   );
   const [fixedY, setFixedY] = useState<number[]>(
-    Array(settings.numFixedPoints.value - 1).fill(50)
+    Array(settings.numFixedPoints.value - 1).fill(50),
   );
   const [leftHandlePosition, setLeftHandlePosition] = useState({ x: 4, y: 50 });
   const [rightHandlePosition, setRightHandlePosition] = useState({
@@ -82,7 +82,7 @@ export default function FgAudioElement({
           ? movingY[index]
           : fixedY[index - movingY.length],
       config: { duration: fgAudioElementContainerOptions.springDuration },
-    })
+    }),
   );
 
   useEffect(() => {
@@ -95,25 +95,27 @@ export default function FgAudioElement({
     }));
   }, [movingY, fixedY, api]);
 
-  const fgAudioElementController = new FgAudioElementController(
-    isUser,
-    localMute,
-    clientMute,
-    fixedPointsX,
-    sineCurveY,
-    envelopeY,
-    setMovingY,
-    svgRef,
-    audioRef,
-    pathGenerator,
-    timerRef,
-    sideDragging,
-    setLeftHandlePosition,
-    setRightHandlePosition,
-    setPopupVisible,
-    handleMute,
-    settings,
-    setRerender
+  const fgAudioElementController = useRef(
+    new FgAudioElementController(
+      isUser,
+      localMute,
+      clientMute,
+      fixedPointsX,
+      sineCurveY,
+      envelopeY,
+      setMovingY,
+      svgRef,
+      audioRef,
+      pathGenerator,
+      timerRef,
+      sideDragging,
+      setLeftHandlePosition,
+      setRightHandlePosition,
+      setPopupVisible,
+      handleMute,
+      settings,
+      setRerender,
+    ),
   );
 
   const updateFixedY = () => {
@@ -133,7 +135,7 @@ export default function FgAudioElement({
     setMovingY(Array(settings.numFixedPoints.value - 1).fill(50));
     updateFixedY();
 
-    fgAudioElementController.init();
+    fgAudioElementController.current.init();
   }, [settings.numFixedPoints.value]);
 
   useEffect(() => {
@@ -143,17 +145,17 @@ export default function FgAudioElement({
   useEffect(() => {
     pathGenerator.current = new PathGenerator();
 
-    fgAudioElementController.init();
+    fgAudioElementController.current.init();
 
     window.addEventListener(
       "pointermove",
-      fgAudioElementController.onPointerMove
+      fgAudioElementController.current.onPointerMove,
     );
 
     return () => {
       window.removeEventListener(
         "pointermove",
-        fgAudioElementController.onPointerMove
+        fgAudioElementController.current.onPointerMove,
       );
     };
   }, []);
@@ -168,11 +170,11 @@ export default function FgAudioElement({
 
     audioAnalyzer.current = new AudioAnalyser(
       fgAudioElementContainerOptions.noiseThreshold,
-      fgAudioElementController.updateMovingY,
+      fgAudioElementController.current.updateMovingY,
       audioStream,
       localMute,
       clientMute,
-      settings
+      settings,
     );
 
     // Cleanup on unmount
@@ -182,7 +184,7 @@ export default function FgAudioElement({
   }, [audioStream]);
 
   useEffect(() => {
-    fgAudioElementController.handleEnvelopeChange();
+    fgAudioElementController.current.handleEnvelopeChange();
   }, [settings.envelopeType.value, JSON.stringify(settings.envelopeType)]);
 
   const ySpringsArray = springs.map(({ y }) => y.get());
@@ -196,27 +198,27 @@ export default function FgAudioElement({
         localMute,
         clientMute,
         leftHandlePosition,
-        rightHandlePosition
-      ) ?? ""
+        rightHandlePosition,
+      ) ?? "",
   );
 
   return (
     <FgButton
-      clickFunction={fgAudioElementController.onClick}
-      className='w-full h-full'
+      clickFunction={fgAudioElementController.current.onClick}
+      className="h-full w-full"
       contentFunction={() =>
         (localMute.current || clientMute.current) &&
         Object.entries(userMedia.current.svg.all).find(
-          ([svgId]) => svgId === settings.muteStyle.value
+          ([svgId]) => svgId === settings.muteStyle.value,
         ) !== undefined ? (
           <FgSVGElement
             externalRef={svgRef}
             src={
               Object.entries(userMedia.current.svg.all).find(
-                ([svgId]) => svgId === settings.muteStyle.value
+                ([svgId]) => svgId === settings.muteStyle.value,
               )?.[1].blobURL ?? ""
             }
-            className='h-full w-full'
+            className="h-full w-full"
             attributes={[
               { key: "height", value: "100%" },
               { key: "width", value: "100%" },
@@ -224,175 +226,175 @@ export default function FgAudioElement({
           />
         ) : (
           <svg
-            className='w-full h-full'
+            className="h-full w-full"
             ref={svgRef}
             viewBox={`0 0 ${viewBoxSize.w} ${viewBoxSize.h}`}
           >
             <defs>
               <filter id={`${username}_shadow`}>
                 <feGaussianBlur
-                  in='SourceAlpha'
-                  stdDeviation='0.75'
-                  result='blur'
+                  in="SourceAlpha"
+                  stdDeviation="0.75"
+                  result="blur"
                 />
-                <feOffset in='blur' dx='0.25' dy='0.5' result='offsetBlur' />
+                <feOffset in="blur" dx="0.25" dy="0.5" result="offsetBlur" />
 
                 <feFlood
                   floodColor={settings.shadowColor.value}
-                  result='colorBlur'
+                  result="colorBlur"
                 />
                 <feComposite
-                  in='colorBlur'
-                  in2='offsetBlur'
-                  operator='in'
-                  result='coloredBlur'
+                  in="colorBlur"
+                  in2="offsetBlur"
+                  operator="in"
+                  result="coloredBlur"
                 />
 
                 <feMerge>
-                  <feMergeNode in='coloredBlur' />
-                  <feMergeNode in='SourceGraphic' />
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
 
               <mask id={`${username}_mask`}>
                 <rect
-                  x='0'
-                  y='0'
+                  x="0"
+                  y="0"
                   width={viewBoxSize.w}
                   height={viewBoxSize.h}
-                  fill='black'
+                  fill="black"
                 />
                 <animated.path
                   d={animatedPathData}
-                  stroke='white'
-                  strokeWidth='4'
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
+                  stroke="white"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </mask>
 
               {settings.muteStyle.value === "morse" && (
                 <linearGradient
                   id={`${username}_mute_morse_gradient`}
-                  x1='0%'
-                  y1='0%'
-                  x2='100%'
-                  y2='0%'
-                  gradientUnits='userSpaceOnUse'
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                  gradientUnits="userSpaceOnUse"
                 >
                   {/* m */}
                   <stop
-                    offset='6%'
+                    offset="6%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='15.34%'
+                    offset="15.34%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='16.216%'
+                    offset="16.216%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='18.59%'
+                    offset="18.59%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='19.47%'
+                    offset="19.47%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='28.369%'
+                    offset="28.369%"
                     stopColor={settings.primaryMuteColor.value}
                   />
 
                   <stop
-                    offset='29.249%'
+                    offset="29.249%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='38.146%'
+                    offset="38.146%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
 
                   {/* u */}
                   <stop
-                    offset='39.026%'
+                    offset="39.026%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='41.40%'
+                    offset="41.40%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='42.28%'
+                    offset="42.28%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='44.658%'
+                    offset="44.658%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='45.538%'
+                    offset="45.538%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='47.91%'
+                    offset="47.91%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='48.79%'
+                    offset="48.79%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='51.17%'
+                    offset="51.17%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='52.05%'
+                    offset="52.05%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='60.947%'
+                    offset="60.947%"
                     stopColor={settings.primaryMuteColor.value}
                   />
 
                   <stop
-                    offset='61.827%'
+                    offset="61.827%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='70.72%'
+                    offset="70.72%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
 
                   {/* t */}
                   <stop
-                    offset='71.60%'
+                    offset="71.60%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='80.50%'
+                    offset="80.50%"
                     stopColor={settings.primaryMuteColor.value}
                   />
 
                   <stop
-                    offset='81.38%'
+                    offset="81.38%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
                   <stop
-                    offset='90.27%'
+                    offset="90.27%"
                     stopColor={settings.secondaryMuteColor.value}
                   />
 
                   {/* e */}
                   <stop
-                    offset='91.16%'
+                    offset="91.16%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                   <stop
-                    offset='94%'
+                    offset="94%"
                     stopColor={settings.primaryMuteColor.value}
                   />
                 </linearGradient>
@@ -403,64 +405,64 @@ export default function FgAudioElement({
                 <>
                   <linearGradient
                     id={`${username}_top_gradient`}
-                    x1='0%'
-                    y1='0%'
-                    x2='0%'
-                    y2='100%'
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
                   >
                     <stop
-                      offset='45%'
+                      offset="45%"
                       stopColor={settings.volumeHandleColor.value}
                     />
-                    <stop offset='95%' stopColor={settings.color.value} />
+                    <stop offset="95%" stopColor={settings.color.value} />
                   </linearGradient>
 
                   <linearGradient
                     id={`${username}_bottom_gradient`}
-                    x1='0%'
-                    y1='0%'
-                    x2='0%'
-                    y2='100%'
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
                   >
-                    <stop offset='5%' stopColor={settings.color.value} />
+                    <stop offset="5%" stopColor={settings.color.value} />
                     <stop
-                      offset='55%'
+                      offset="55%"
                       stopColor={settings.volumeHandleColor.value}
                     />
                   </linearGradient>
 
                   <pattern
                     id={`${username}_background_matrix`}
-                    x='0'
-                    y='0'
+                    x="0"
+                    y="0"
                     width={viewBoxSize.w}
                     height={viewBoxSize.h}
-                    patternUnits='userSpaceOnUse'
+                    patternUnits="userSpaceOnUse"
                   >
                     <rect
-                      x='0'
-                      y='0'
+                      x="0"
+                      y="0"
                       width={viewBoxSize.w * patternSize.w}
                       height={viewBoxSize.h * patternSize.h}
                       fill={`url(#${username}_top_gradient)`}
                     ></rect>
                     <rect
                       x={viewBoxSize.w * patternSize.w}
-                      y='0'
+                      y="0"
                       width={viewBoxSize.w * (1 - 2 * patternSize.w)}
                       height={viewBoxSize.h * patternSize.h}
                       fill={settings.color.value}
                     ></rect>
                     <rect
                       x={viewBoxSize.w * (1 - patternSize.w)}
-                      y='0'
+                      y="0"
                       width={viewBoxSize.w * patternSize.w}
                       height={viewBoxSize.h * patternSize.h}
                       fill={`url(#${username}_top_gradient)`}
                     ></rect>
 
                     <rect
-                      x='0'
+                      x="0"
                       y={viewBoxSize.h * patternSize.h}
                       width={viewBoxSize.w * patternSize.w}
                       height={viewBoxSize.h * (1 - 2 * patternSize.h)}
@@ -482,7 +484,7 @@ export default function FgAudioElement({
                     ></rect>
 
                     <rect
-                      x='0'
+                      x="0"
                       y={viewBoxSize.h * (1 - patternSize.h)}
                       width={viewBoxSize.w * patternSize.w}
                       height={viewBoxSize.h * patternSize.h}
@@ -508,8 +510,8 @@ export default function FgAudioElement({
             </defs>
             <g filter={`url(#${username}_shadow)`}>
               <rect
-                x='0'
-                y='0'
+                x="0"
+                y="0"
                 width={viewBoxSize.w}
                 height={viewBoxSize.h}
                 fill={
@@ -517,9 +519,9 @@ export default function FgAudioElement({
                   settings.muteStyle.value === "morse"
                     ? `url(#${username}_mute_morse_gradient)`
                     : leftHandlePosition.y !== 50 ||
-                      rightHandlePosition.y !== 50
-                    ? `url(#${username}_background_matrix)`
-                    : settings.color.value
+                        rightHandlePosition.y !== 50
+                      ? `url(#${username}_background_matrix)`
+                      : settings.color.value
                 }
                 mask={`url(#${username}_mask)`}
               />
@@ -529,7 +531,7 @@ export default function FgAudioElement({
                 ref={leftHandleRef}
                 onPointerDown={(event) => {
                   if (!isUser)
-                    fgAudioElementController.startDrag(event, "left");
+                    fgAudioElementController.current.startDrag(event, "left");
                 }}
                 x={4}
                 y={47}
@@ -537,8 +539,8 @@ export default function FgAudioElement({
                 height={6}
                 rx={3}
                 ry={3}
-                fill='transparent'
-                stroke='transparent'
+                fill="transparent"
+                stroke="transparent"
                 style={{ cursor: "pointer" }}
               />
             )}
@@ -547,7 +549,7 @@ export default function FgAudioElement({
                 ref={rightHandleRef}
                 onPointerDown={(event) => {
                   if (!isUser)
-                    fgAudioElementController.startDrag(event, "right");
+                    fgAudioElementController.current.startDrag(event, "right");
                 }}
                 x={80}
                 y={47}
@@ -555,8 +557,8 @@ export default function FgAudioElement({
                 height={6}
                 rx={3}
                 ry={3}
-                fill='transparent'
-                stroke='transparent'
+                fill="transparent"
+                stroke="transparent"
                 style={{ cursor: "pointer" }}
               />
             )}
@@ -566,8 +568,8 @@ export default function FgAudioElement({
       doubleClickFunction={
         doubleClickFunction &&
         ((event) => {
-          const validDoubleClick = fgAudioElementController.isOnPath(
-            event as unknown as React.PointerEvent
+          const validDoubleClick = fgAudioElementController.current.isOnPath(
+            event as unknown as React.PointerEvent,
           );
 
           if (validDoubleClick) doubleClickFunction();

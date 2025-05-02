@@ -33,7 +33,7 @@ export default function ApplicationEffectsSection({
   applicationContainerRef,
 }: {
   applicationInstanceId: string;
-  lowerApplicationController: LowerApplicationController;
+  lowerApplicationController: React.MutableRefObject<LowerApplicationController>;
   tintColor: React.MutableRefObject<string>;
   applicationMediaInstance: ApplicationMediaInstance;
   applicationContainerRef: React.RefObject<HTMLDivElement>;
@@ -131,7 +131,7 @@ export default function ApplicationEffectsSection({
                 .postProcess.style,
             );
 
-            await lowerApplicationController.handleApplicationEffect(
+            await lowerApplicationController.current.handleApplicationEffect(
               "postProcess",
               false,
             );
@@ -145,7 +145,7 @@ export default function ApplicationEffectsSection({
               effectType,
             );
 
-            await lowerApplicationController.handleApplicationEffect(
+            await lowerApplicationController.current.handleApplicationEffect(
               "postProcess",
               userEffects.current.application[applicationInstanceId]
                 .postProcess,
@@ -160,7 +160,7 @@ export default function ApplicationEffectsSection({
             userEffects.current.application[applicationInstanceId].blur
           }
           clickFunctionCallback={async () => {
-            await lowerApplicationController.handleApplicationEffect(
+            await lowerApplicationController.current.handleApplicationEffect(
               "blur",
               false,
             );
@@ -179,7 +179,7 @@ export default function ApplicationEffectsSection({
               applicationInstanceId
             ].tint.color = tintColor.current;
 
-            await lowerApplicationController.handleApplicationEffect(
+            await lowerApplicationController.current.handleApplicationEffect(
               "tint",
               false,
             );
@@ -189,7 +189,7 @@ export default function ApplicationEffectsSection({
               applicationInstanceId
             ].tint.color = tintColor.current;
 
-            await lowerApplicationController.handleApplicationEffect(
+            await lowerApplicationController.current.handleApplicationEffect(
               "tint",
               userEffects.current.application[applicationInstanceId].tint,
             );

@@ -45,7 +45,7 @@ class CaptureMediaController {
       NodeJS.Timeout | undefined
     >,
     private captureMediaPortalRef: React.RefObject<HTMLDivElement>,
-    private tableFunctionsController: TableFunctionsController,
+    private tableFunctionsController: React.MutableRefObject<TableFunctionsController>,
     private finalizingCapture: React.MutableRefObject<boolean>,
     private finalizedCaptureType: React.MutableRefObject<
       "video" | "image" | undefined
@@ -517,7 +517,7 @@ class CaptureMediaController {
         } else if (this.finalizingCapture.current) {
           this.handleExitFinialization();
         } else {
-          this.tableFunctionsController.stopVideo();
+          this.tableFunctionsController.current.stopVideo();
         }
         break;
       default:

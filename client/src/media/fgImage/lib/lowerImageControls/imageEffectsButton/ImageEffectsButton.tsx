@@ -15,7 +15,7 @@ export default function ImageEffectsButton({
   settingsActive,
   scrollingContainerRef,
 }: {
-  lowerImageController: LowerImageController;
+  lowerImageController: React.MutableRefObject<LowerImageController>;
   imageEffectsActive: boolean;
   settingsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -23,7 +23,7 @@ export default function ImageEffectsButton({
   return (
     <FgButton
       clickFunction={() => {
-        lowerImageController.handleImageEffects();
+        lowerImageController.current.handleImageEffects();
       }}
       contentFunction={() => {
         const iconSrc = imageEffectsActive ? effectOffIcon : effectIcon;
@@ -42,11 +42,11 @@ export default function ImageEffectsButton({
       }}
       hoverContent={
         !imageEffectsActive && !settingsActive ? (
-          <FgHoverContentStandard content='Effects (e)' style='light' />
+          <FgHoverContentStandard content="Effects (e)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square relative scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto relative flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

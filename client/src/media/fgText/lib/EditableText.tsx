@@ -15,7 +15,7 @@ export default function EditableText({
   setIsEditing,
   textAreaContainerRef,
 }: {
-  lowerTextController: LowerTextController;
+  lowerTextController: React.MutableRefObject<LowerTextController>;
   text: React.MutableRefObject<string>;
   settings: Settings;
   expandLineNumbersButtonRef: React.RefObject<HTMLButtonElement>;
@@ -27,7 +27,7 @@ export default function EditableText({
 }) {
   return (
     <div
-      className='flex w-full h-full overflow-auto px-4 py-3 small-multidirectional-scroll-bar pointer-events-auto'
+      className="small-multidirectional-scroll-bar pointer-events-auto flex h-full w-full overflow-auto px-4 py-3"
       style={{
         backgroundColor: settings.colors.backgroundColor.value,
       }}

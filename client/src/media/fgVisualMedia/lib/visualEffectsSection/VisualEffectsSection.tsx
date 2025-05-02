@@ -25,25 +25,25 @@ const BabylonPostProcessEffectsButton = React.lazy(
   () =>
     import(
       "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton"
-    )
+    ),
 );
 const GlassesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/GlassesButton")
+  () => import("../../../../elements/effectsButtons/GlassesButton"),
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/BeardsButton")
+  () => import("../../../../elements/effectsButtons/BeardsButton"),
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MustachesButton")
+  () => import("../../../../elements/effectsButtons/MustachesButton"),
 );
 const MasksButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MasksButton")
+  () => import("../../../../elements/effectsButtons/MasksButton"),
 );
 const HatsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HatsButton")
+  () => import("../../../../elements/effectsButtons/HatsButton"),
 );
 const PetsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/PetsButton")
+  () => import("../../../../elements/effectsButtons/PetsButton"),
 );
 
 const EffectSectionVar: Variants = {
@@ -86,7 +86,7 @@ export default function VisualEffectsSection({
     blockStateChange?: boolean,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffectTypes
+    postProcessStyle?: PostProcessEffectTypes,
   ) => Promise<void>;
   tintColor: React.MutableRefObject<string>;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
@@ -179,7 +179,7 @@ export default function VisualEffectsSection({
   return (
     <motion.div
       ref={effectsContainerRef}
-      className='flex small-horizontal-scroll-bar z-30 w-full max-w-full left-1/2 rounded absolute items-center pointer-events-auto'
+      className="flex small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 w-full max-w-full items-center rounded"
       style={{
         bottom: overflow.current
           ? "calc(max(1.5rem, min(13% + 1rem, 3rem)))"
@@ -191,14 +191,14 @@ export default function VisualEffectsSection({
         justifyContent: overflow.current ? "flex-start" : "center",
       }}
       variants={EffectSectionVar}
-      initial='init'
-      animate='animate'
-      exit='init'
+      initial="init"
+      animate="animate"
+      exit="init"
       transition={EffectSectionTransition}
     >
       <div
         ref={subEffectsContainerRef}
-        className='flex h-full w-max items-center justify-center px-4 space-x-2'
+        className="flex h-full w-max items-center justify-center space-x-2 px-4"
       >
         <ClearAllButton
           effectsDisabled={effectsDisabled}
@@ -235,8 +235,8 @@ export default function VisualEffectsSection({
             if (isUser) {
               userMedia.current[type][
                 visualMediaId
-              ].babylonScene.babylonShaderController.swapPostProcessEffects(
-                effectsStyles.style
+              ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+                effectsStyles.style,
               );
             }
 
@@ -245,7 +245,7 @@ export default function VisualEffectsSection({
               false,
               undefined,
               undefined,
-              effectsStyles.style
+              effectsStyles.style,
             );
           }}
           holdFunctionCallback={async (effectType) => {
@@ -264,8 +264,8 @@ export default function VisualEffectsSection({
             if (isUser) {
               userMedia.current[type][
                 visualMediaId
-              ].babylonScene.babylonShaderController.swapPostProcessEffects(
-                effectType
+              ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+                effectType,
               );
             }
 
@@ -274,7 +274,7 @@ export default function VisualEffectsSection({
               streamEffects,
               undefined,
               undefined,
-              effectType
+              effectType,
             );
           }}
         />
@@ -310,15 +310,15 @@ export default function VisualEffectsSection({
                 if (isUser) {
                   userMedia.current[type][
                     visualMediaId
-                  ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-                    effectsStyles.style
+                  ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                    effectsStyles.style,
                   );
                 }
 
                 await handleVisualEffectChange(
                   "hideBackground",
                   false,
-                  effectsStyles.style
+                  effectsStyles.style,
                 );
               }}
               holdFunctionCallback={async (effectType) => {
@@ -338,8 +338,8 @@ export default function VisualEffectsSection({
                 if (isUser) {
                   userMedia.current[type][
                     visualMediaId
-                  ].babylonScene.babylonRenderLoop.swapHideBackgroundEffectImage(
-                    effectType
+                  ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                    effectType,
                   );
                 }
 
@@ -347,7 +347,7 @@ export default function VisualEffectsSection({
                   "hideBackground",
                   streamEffects,
                   effectType,
-                  undefined
+                  undefined,
                 );
               }}
               acceptColorCallback={async (color) => {
@@ -366,8 +366,8 @@ export default function VisualEffectsSection({
                 if (isUser) {
                   userMedia.current[type][
                     visualMediaId
-                  ].babylonScene.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                    color
+                  ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                    color,
                   );
                 }
 
@@ -379,7 +379,7 @@ export default function VisualEffectsSection({
                     "hideBackground",
                     streamEffects,
                     undefined,
-                    color
+                    color,
                   );
                 }
               }}
@@ -420,7 +420,7 @@ export default function VisualEffectsSection({
               isUser
                 ? userEffects.current[type][visualMediaId].tint
                 : remoteEffects.current[username][instance][type][visualMediaId]
-                    .tint
+                    .tint,
             );
           }}
         />
@@ -472,7 +472,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].glasses
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].glasses
+                      ].glasses,
                 );
               }}
             />
@@ -526,7 +526,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].beards
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].beards
+                      ].beards,
                 );
               }}
             />
@@ -582,7 +582,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].mustaches
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].mustaches
+                      ].mustaches,
                 );
               }}
             />
@@ -635,7 +635,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].masks
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].masks
+                      ].masks,
                 );
               }}
             />
@@ -688,7 +688,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].hats
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].hats
+                      ].hats,
                 );
               }}
             />
@@ -741,7 +741,7 @@ export default function VisualEffectsSection({
                     ? userEffects.current[type][visualMediaId].pets
                     : remoteEffects.current[username][instance][type][
                         visualMediaId
-                      ].pets
+                      ].pets,
                 );
               }}
             />

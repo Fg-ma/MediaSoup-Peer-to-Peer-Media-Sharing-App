@@ -35,8 +35,8 @@ class VideoMediaInstance {
   constructor(
     public videoMedia: VideoMedia,
     public videoInstanceId: string,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     public initPositioning: {
@@ -302,7 +302,11 @@ class VideoMediaInstance {
 
     this.effects = structuredClone(defaultVideoEffects);
 
-    this.deadbanding.update("capture", this.videoInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "capture",
+      this.videoInstanceId,
+      this.effects,
+    );
   };
 
   updateAllEffects = (oldEffectStyles?: VideoEffectStylesType) => {
@@ -524,7 +528,11 @@ class VideoMediaInstance {
 
     this.updateNeed();
 
-    this.deadbanding.update("video", this.videoInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "video",
+      this.videoInstanceId,
+      this.effects,
+    );
   };
 
   changeEffects = (
@@ -561,7 +569,11 @@ class VideoMediaInstance {
         }
       }
     }
-    this.deadbanding.update("video", this.videoInstanceId, this.effects);
+    this.deadbanding.current.update(
+      "video",
+      this.videoInstanceId,
+      this.effects,
+    );
 
     if (tintColor) {
       this.setTintColor(tintColor);

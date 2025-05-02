@@ -76,7 +76,7 @@ export default function SettingsPanel({
     textColor: React.RefObject<HTMLDivElement>;
     indexColor: React.RefObject<HTMLDivElement>;
   };
-  lowerTextController: LowerTextController;
+  lowerTextController: React.MutableRefObject<LowerTextController>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -194,7 +194,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="z-settings-panel pointer-events-auto absolute flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -236,7 +236,7 @@ export default function SettingsPanel({
                   {settings.synced.value ? "Desync" : "Sync"}
                 </div>
               )}
-              clickFunction={lowerTextController.handleSync}
+              clickFunction={lowerTextController.current.handleSync}
               hoverContent={
                 <FgHoverContentStandard
                   content={settings.synced.value ? "Desync (h)" : "Sync (h)"}
@@ -270,7 +270,7 @@ export default function SettingsPanel({
                   Set as background
                 </div>
               )}
-              clickFunction={lowerTextController.handleSetAsBackground}
+              clickFunction={lowerTextController.current.handleSetAsBackground}
               hoverContent={
                 <FgHoverContentStandard
                   content="Set as background (b)"
@@ -298,7 +298,7 @@ export default function SettingsPanel({
                   Edit
                 </div>
               )}
-              clickFunction={lowerTextController.handleEdit}
+              clickFunction={lowerTextController.current.handleEdit}
               hoverContent={
                 <FgHoverContentStandard content="Edit (q)" style="light" />
               }

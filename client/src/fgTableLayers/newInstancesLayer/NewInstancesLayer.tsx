@@ -36,16 +36,18 @@ export default function NewInstancesLayer({
 
   const [_, setRerender] = useState(false);
 
-  const newInstancesLayerController = new NewInstancesLayerController(
-    newInstanceLayerRef,
-    tableRef,
-    newInstances,
-    hideInstances,
-    mousePosition,
-    setMousePosition,
-    tableStaticContentSocket,
-    setRerender,
-    mode,
+  const newInstancesLayerController = useRef(
+    new NewInstancesLayerController(
+      newInstanceLayerRef,
+      tableRef,
+      newInstances,
+      hideInstances,
+      mousePosition,
+      setMousePosition,
+      tableStaticContentSocket,
+      setRerender,
+      mode,
+    ),
   );
 
   const instanceStructureKey = useMemo(() => {
@@ -55,11 +57,13 @@ export default function NewInstancesLayer({
   }, [newInstances.current]);
 
   useEffect(() => {
-    addNewInstanceSignalListener(newInstancesLayerController.handleSignals);
+    addNewInstanceSignalListener(
+      newInstancesLayerController.current.handleSignals,
+    );
 
     return () => {
       removeNewInstanceSignalListener(
-        newInstancesLayerController.handleSignals,
+        newInstancesLayerController.current.handleSignals,
       );
     };
   }, []);
@@ -69,30 +73,30 @@ export default function NewInstancesLayer({
 
     document.addEventListener(
       "mousemove",
-      newInstancesLayerController.handleMouseMove,
+      newInstancesLayerController.current.handleMouseMove,
     );
     document.addEventListener(
       "wheel",
-      newInstancesLayerController.handleScroll,
+      newInstancesLayerController.current.handleScroll,
     );
     document.addEventListener(
       "keydown",
-      newInstancesLayerController.handleKeyDown,
+      newInstancesLayerController.current.handleKeyDown,
       { capture: true },
     );
 
     return () => {
       document.removeEventListener(
         "mousemove",
-        newInstancesLayerController.handleMouseMove,
+        newInstancesLayerController.current.handleMouseMove,
       );
       document.removeEventListener(
         "wheel",
-        newInstancesLayerController.handleScroll,
+        newInstancesLayerController.current.handleScroll,
       );
       document.removeEventListener(
         "keydown",
-        newInstancesLayerController.handleKeyDown,
+        newInstancesLayerController.current.handleKeyDown,
         { capture: true },
       );
     };
@@ -100,7 +104,7 @@ export default function NewInstancesLayer({
 
   useEffect(() => {
     if (newInstances.current.length > 0) {
-      newInstancesLayerController.placeInstances();
+      newInstancesLayerController.current.placeInstances();
     }
   }, [mousePosition, instanceStructureKey]);
 
@@ -108,7 +112,7 @@ export default function NewInstancesLayer({
     if (mode.current === "paint") {
       document.addEventListener(
         "pointerdown",
-        newInstancesLayerController.onStopInstancesDrag,
+        newInstancesLayerController.current.onStopInstancesDrag,
       );
     }
 
@@ -116,7 +120,7 @@ export default function NewInstancesLayer({
       if (mode.current === "paint") {
         document.removeEventListener(
           "pointerdown",
-          newInstancesLayerController.onStopInstancesDrag,
+          newInstancesLayerController.current.onStopInstancesDrag,
         );
       }
     };
@@ -125,7 +129,7 @@ export default function NewInstancesLayer({
   return (
     <div
       ref={newInstanceLayerRef}
-      className="z-new-instances-layer pointer-events-none absolute left-0 top-0 h-full w-full bg-transparent"
+      className="pointer-events-none absolute left-0 top-0 z-new-instances-layer h-full w-full bg-transparent"
     >
       {!hideInstances.current &&
         newInstances.current.map((instance) => {

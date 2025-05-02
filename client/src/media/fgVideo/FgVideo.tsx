@@ -97,45 +97,49 @@ export default function FgVideo({
   const isScrubbing = useRef(false);
   const wasPaused = useRef(false);
 
-  const lowerVideoController = new LowerVideoController(
-    videoInstanceId,
-    videoMediaInstance,
-    videoContainerRef,
-    setPausedState,
-    paused,
-    setCaptionsActive,
-    settings,
-    currentTimeRef,
-    setVideoEffectsActive,
-    setAudioEffectsActive,
-    tintColor,
-    userEffects,
-    userEffectsStyles,
-    setSettingsActive,
-    recording,
-    downloadRecordingReady,
-    setRerender,
-    timelineContainerRef,
-    isScrubbing,
-    wasPaused,
-    tableStaticContentSocket,
-    setSettings,
+  const lowerVideoController = useRef(
+    new LowerVideoController(
+      videoInstanceId,
+      videoMediaInstance,
+      videoContainerRef,
+      setPausedState,
+      paused,
+      setCaptionsActive,
+      settings,
+      currentTimeRef,
+      setVideoEffectsActive,
+      setAudioEffectsActive,
+      tintColor,
+      userEffects,
+      userEffectsStyles,
+      setSettingsActive,
+      recording,
+      downloadRecordingReady,
+      setRerender,
+      timelineContainerRef,
+      isScrubbing,
+      wasPaused,
+      tableStaticContentSocket,
+      setSettings,
+    ),
   );
 
-  const videoController = new VideoController(
-    videoInstanceId,
-    videoMediaInstance,
-    videoContainerRef,
-    videoOptions,
-    userEffects,
-    userEffectsStyles,
-    tintColor,
-    paused,
-    setPausedState,
-    lowerVideoController,
-    setRerender,
-    subContainerRef,
-    positioning,
+  const videoController = useRef(
+    new VideoController(
+      videoInstanceId,
+      videoMediaInstance,
+      videoContainerRef,
+      videoOptions,
+      userEffects,
+      userEffectsStyles,
+      tintColor,
+      paused,
+      setPausedState,
+      lowerVideoController,
+      setRerender,
+      subContainerRef,
+      positioning,
+    ),
   );
 
   useEffect(() => {
@@ -150,33 +154,36 @@ export default function FgVideo({
       };
 
       // Keep video time
-      lowerVideoController.timeUpdate();
+      lowerVideoController.current.timeUpdate();
       videoMediaInstance.instanceVideo?.addEventListener(
         "timeupdate",
-        lowerVideoController.timeUpdate,
+        lowerVideoController.current.timeUpdate,
       );
 
       videoMediaInstance.instanceVideo?.addEventListener(
         "enterpictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("enter"),
+        () => lowerVideoController.current.handlePictureInPicture("enter"),
       );
 
       videoMediaInstance.instanceVideo?.addEventListener(
         "leavepictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("leave"),
+        () => lowerVideoController.current.handlePictureInPicture("leave"),
       );
 
       setRerender((prev) => !prev);
     }
 
     // Set up initial conditions
-    videoController.init();
+    videoController.current.init();
 
     videoMediaInstance.videoMedia.addVideoListener(
-      videoController.handleVideoMessages,
+      videoController.current.handleVideoMessages,
     );
 
-    document.addEventListener("keydown", lowerVideoController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      lowerVideoController.current.handleKeyDown,
+    );
 
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
@@ -186,35 +193,35 @@ export default function FgVideo({
       );
       positioningListeners.current = {};
       videoMediaInstance.videoMedia.removeVideoListener(
-        videoController.handleVideoMessages,
+        videoController.current.handleVideoMessages,
       );
       document.removeEventListener(
         "keydown",
-        lowerVideoController.handleKeyDown,
+        lowerVideoController.current.handleKeyDown,
       );
       videoMediaInstance.instanceVideo?.removeEventListener(
         "enterpictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("enter"),
+        () => lowerVideoController.current.handlePictureInPicture("enter"),
       );
       videoMediaInstance.instanceVideo?.removeEventListener(
         "leavepictureinpicture",
-        () => lowerVideoController.handlePictureInPicture("leave"),
+        () => lowerVideoController.current.handlePictureInPicture("leave"),
       );
     };
   }, []);
 
   useEffect(() => {
-    lowerVideoController.updateCaptionsStyles();
+    lowerVideoController.current.updateCaptionsStyles();
   }, [settings]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      videoController.handleTableStaticContentMessage,
+      videoController.current.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        videoController.handleTableStaticContentMessage,
+        videoController.current.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -253,8 +260,8 @@ export default function FgVideo({
         <div
           ref={timelineContainerRef}
           className="timeline-container pointer-events-auto"
-          onPointerDown={lowerVideoController.handleStartScrubbing}
-          onPointerMove={lowerVideoController.handleHoverTimelineUpdate}
+          onPointerDown={lowerVideoController.current.handleStartScrubbing}
+          onPointerMove={lowerVideoController.current.handleHoverTimelineUpdate}
         >
           <div className="timeline">
             <div className="thumb-indicator"></div>

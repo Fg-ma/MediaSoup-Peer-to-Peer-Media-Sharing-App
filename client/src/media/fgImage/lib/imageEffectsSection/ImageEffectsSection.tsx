@@ -65,7 +65,7 @@ export default function ImageEffectsSection({
   imageContainerRef,
 }: {
   imageInstanceId: string;
-  lowerImageController: LowerImageController;
+  lowerImageController: React.MutableRefObject<LowerImageController>;
   tintColor: React.MutableRefObject<string>;
   imageMediaInstance: ImageMediaInstance;
   imageContainerRef: React.RefObject<HTMLDivElement>;
@@ -200,7 +200,7 @@ export default function ImageEffectsSection({
       )}
       <motion.div
         ref={effectsContainerRef}
-        className="flex small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 w-full max-w-full items-center rounded"
+        className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
         style={{
           bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
           height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
@@ -224,7 +224,10 @@ export default function ImageEffectsSection({
             setEffectsDisabled={setEffectsDisabled}
             scrollingContainerRef={effectsContainerRef}
             clickFunctionCallback={async () => {
-              await lowerImageController.handleImageEffect("clearAll", false);
+              await lowerImageController.current.handleImageEffect(
+                "clearAll",
+                false,
+              );
             }}
           />
           <BabylonPostProcessEffectsButton
@@ -243,7 +246,7 @@ export default function ImageEffectsSection({
                   .style,
               );
 
-              await lowerImageController.handleImageEffect(
+              await lowerImageController.current.handleImageEffect(
                 "postProcess",
                 false,
               );
@@ -257,7 +260,7 @@ export default function ImageEffectsSection({
                 effectType,
               );
 
-              await lowerImageController.handleImageEffect(
+              await lowerImageController.current.handleImageEffect(
                 "postProcess",
                 userEffects.current.image[imageInstanceId].postProcess,
               );
@@ -285,7 +288,7 @@ export default function ImageEffectsSection({
                     effectsStyles.style,
                   );
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "hideBackground",
                     false,
                   );
@@ -311,7 +314,7 @@ export default function ImageEffectsSection({
                     );
                   }
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "hideBackground",
                     streamEffects,
                   );
@@ -330,7 +333,7 @@ export default function ImageEffectsSection({
                   effectsStyles.style = "color";
                   effectsStyles.color = color;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "hideBackground",
                     streamEffects,
                   );
@@ -344,7 +347,10 @@ export default function ImageEffectsSection({
             scrollingContainerRef={effectsContainerRef}
             streamEffects={userEffects.current.image[imageInstanceId].blur}
             clickFunctionCallback={async () => {
-              await lowerImageController.handleImageEffect("blur", false);
+              await lowerImageController.current.handleImageEffect(
+                "blur",
+                false,
+              );
             }}
           />
           <TintSection
@@ -357,13 +363,16 @@ export default function ImageEffectsSection({
               userEffectsStyles.current.image[imageInstanceId].tint.color =
                 tintColor.current;
 
-              await lowerImageController.handleImageEffect("tint", false);
+              await lowerImageController.current.handleImageEffect(
+                "tint",
+                false,
+              );
             }}
             acceptColorCallback={async () => {
               userEffectsStyles.current.image[imageInstanceId].tint.color =
                 tintColor.current;
 
-              await lowerImageController.handleImageEffect(
+              await lowerImageController.current.handleImageEffect(
                 "tint",
                 userEffects.current.image[imageInstanceId].tint,
               );
@@ -382,7 +391,7 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].glasses
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "glasses",
                     false,
                   );
@@ -392,7 +401,7 @@ export default function ImageEffectsSection({
                     imageInstanceId
                   ].glasses.style = effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "glasses",
                     userEffects.current.image[imageInstanceId].glasses,
                   );
@@ -413,14 +422,17 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].beards
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect("beards", false);
+                  await lowerImageController.current.handleImageEffect(
+                    "beards",
+                    false,
+                  );
                 }}
                 holdFunctionCallback={async (effectType) => {
                   userEffectsStyles.current.image[
                     imageInstanceId
                   ].beards.style = effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "beards",
                     userEffects.current.image[imageInstanceId].beards,
                   );
@@ -441,7 +453,7 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].mustaches
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "mustaches",
                     false,
                   );
@@ -451,7 +463,7 @@ export default function ImageEffectsSection({
                     imageInstanceId
                   ].mustaches.style = effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "mustaches",
                     userEffects.current.image[imageInstanceId].mustaches,
                   );
@@ -470,13 +482,16 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].masks
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect("masks", false);
+                  await lowerImageController.current.handleImageEffect(
+                    "masks",
+                    false,
+                  );
                 }}
                 holdFunctionCallback={async (effectType) => {
                   userEffectsStyles.current.image[imageInstanceId].masks.style =
                     effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "masks",
                     userEffects.current.image[imageInstanceId].masks,
                   );
@@ -495,13 +510,16 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].hats
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect("hats", false);
+                  await lowerImageController.current.handleImageEffect(
+                    "hats",
+                    false,
+                  );
                 }}
                 holdFunctionCallback={async (effectType) => {
                   userEffectsStyles.current.image[imageInstanceId].hats.style =
                     effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "hats",
                     userEffects.current.image[imageInstanceId].hats,
                   );
@@ -520,13 +538,16 @@ export default function ImageEffectsSection({
                   userEffectsStyles.current.image[imageInstanceId].pets
                 }
                 clickFunctionCallback={async () => {
-                  await lowerImageController.handleImageEffect("pets", false);
+                  await lowerImageController.current.handleImageEffect(
+                    "pets",
+                    false,
+                  );
                 }}
                 holdFunctionCallback={async (effectType) => {
                   userEffectsStyles.current.image[imageInstanceId].pets.style =
                     effectType;
 
-                  await lowerImageController.handleImageEffect(
+                  await lowerImageController.current.handleImageEffect(
                     "pets",
                     userEffects.current.image[imageInstanceId].pets,
                   );

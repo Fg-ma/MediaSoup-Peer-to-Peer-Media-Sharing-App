@@ -14,13 +14,13 @@ export default function DownloadButton({
   scrollingContainerRef,
 }: {
   settingsActive: boolean;
-  lowerTextController: LowerTextController;
+  lowerTextController: React.MutableRefObject<LowerTextController>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerTextController.handleDownload();
+        lowerTextController.current.handleDownload();
       }}
       contentFunction={() => (
         <FgSVGElement
@@ -35,11 +35,11 @@ export default function DownloadButton({
       )}
       hoverContent={
         !settingsActive ? (
-          <FgHoverContentStandard content='Download (d)' style='light' />
+          <FgHoverContentStandard content="Download (d)" style="light" />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

@@ -62,33 +62,37 @@ export default function FgImage({
   const recording = useRef(false);
   const downloadRecordingReady = useRef(false);
 
-  const lowerImageController = new LowerImageController(
-    imageInstanceId,
-    imageMediaInstance,
-    imageContainerRef,
-    setImageEffectsActive,
-    tintColor,
-    userEffects,
-    userEffectsStyles,
-    setSettingsActive,
-    settings,
-    recording,
-    downloadRecordingReady,
-    setRerender,
-    tableStaticContentSocket,
-    setSettings,
+  const lowerImageController = useRef(
+    new LowerImageController(
+      imageInstanceId,
+      imageMediaInstance,
+      imageContainerRef,
+      setImageEffectsActive,
+      tintColor,
+      userEffects,
+      userEffectsStyles,
+      setSettingsActive,
+      settings,
+      recording,
+      downloadRecordingReady,
+      setRerender,
+      tableStaticContentSocket,
+      setSettings,
+    ),
   );
 
-  const imageController = new ImageController(
-    imageInstanceId,
-    imageMediaInstance,
-    setSettingsActive,
-    userEffects,
-    userEffectsStyles,
-    tintColor,
-    setRerender,
-    subContainerRef,
-    positioning,
+  const imageController = useRef(
+    new ImageController(
+      imageInstanceId,
+      imageMediaInstance,
+      setSettingsActive,
+      userEffects,
+      userEffectsStyles,
+      tintColor,
+      setRerender,
+      subContainerRef,
+      positioning,
+    ),
   );
 
   useEffect(() => {
@@ -105,27 +109,30 @@ export default function FgImage({
       setRerender((prev) => !prev);
     }
     imageMediaInstance.imageMedia.addImageListener(
-      imageController.handleImageMessages,
+      imageController.current.handleImageMessages,
     );
 
-    document.addEventListener("keydown", lowerImageController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      lowerImageController.current.handleKeyDown,
+    );
 
     tableRef.current?.addEventListener(
       "scroll",
-      imageController.handleTableScroll,
+      imageController.current.handleTableScroll,
     );
 
     return () => {
       imageMediaInstance.imageMedia.removeImageListener(
-        imageController.handleImageMessages,
+        imageController.current.handleImageMessages,
       );
       document.removeEventListener(
         "keydown",
-        lowerImageController.handleKeyDown,
+        lowerImageController.current.handleKeyDown,
       );
       tableRef.current?.removeEventListener(
         "scroll",
-        imageController.handleTableScroll,
+        imageController.current.handleTableScroll,
       );
     };
   }, []);
@@ -144,12 +151,12 @@ export default function FgImage({
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      imageController.handleTableStaticContentMessage,
+      imageController.current.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        imageController.handleTableStaticContentMessage,
+        imageController.current.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 

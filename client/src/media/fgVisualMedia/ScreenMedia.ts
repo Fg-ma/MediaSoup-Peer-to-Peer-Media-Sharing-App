@@ -39,7 +39,7 @@ class ScreenMedia {
     private screenStream: MediaStream,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userDevice: UserDevice,
+    private userDevice: React.MutableRefObject<UserDevice>,
     private userMedia: React.MutableRefObject<UserMediaType>,
   ) {
     this.effects = {};

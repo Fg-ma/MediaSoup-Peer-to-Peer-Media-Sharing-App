@@ -57,21 +57,20 @@ export default function FgText({
 
   const [_, setRerender] = useState(false);
 
-  const lowerTextController = new LowerTextController(
-    textMediaInstance,
-    textContainerRef,
-    setSettings,
-    setSettingsActive,
-    textAreaRef,
-    setIsEditing,
-    textAreaContainerRef,
+  const lowerTextController = useRef(
+    new LowerTextController(
+      textMediaInstance,
+      textContainerRef,
+      setSettings,
+      setSettingsActive,
+      textAreaRef,
+      setIsEditing,
+      textAreaContainerRef,
+    ),
   );
 
-  const textController = new TextController(
-    setSettingsActive,
-    textMediaInstance,
-    text,
-    setRerender,
+  const textController = useRef(
+    new TextController(setSettingsActive, textMediaInstance, text, setRerender),
   );
 
   useEffect(() => {
@@ -80,24 +79,27 @@ export default function FgText({
       setRerender((prev) => !prev);
     }
     textMediaInstance.textMedia.addTextListener(
-      textController.handleTextMessages,
+      textController.current.handleTextMessages,
     );
 
-    document.addEventListener("keydown", lowerTextController.handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      lowerTextController.current.handleKeyDown,
+    );
 
     tableRef.current?.addEventListener(
       "scroll",
-      textController.handleTableScroll,
+      textController.current.handleTableScroll,
     );
 
     return () => {
       document.removeEventListener(
         "keydown",
-        lowerTextController.handleKeyDown,
+        lowerTextController.current.handleKeyDown,
       );
       tableRef.current?.removeEventListener(
         "scroll",
-        textController.handleTableScroll,
+        textController.current.handleTableScroll,
       );
     };
   }, []);

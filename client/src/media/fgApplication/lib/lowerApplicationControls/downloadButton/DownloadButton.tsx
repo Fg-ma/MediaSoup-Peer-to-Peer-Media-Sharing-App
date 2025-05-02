@@ -21,24 +21,24 @@ export default function DownloadButton({
 }: {
   settings: Settings;
   recording: React.MutableRefObject<boolean>;
-  lowerApplicationController: LowerApplicationController;
+  lowerApplicationController: React.MutableRefObject<LowerApplicationController>;
   applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationController.handleDownload();
+        lowerApplicationController.current.handleDownload();
       }}
       contentFunction={() => {
         const src =
           settings.downloadType.value === "snapShot"
             ? snapShotIcon
             : settings.downloadType.value === "original"
-            ? downloadIcon
-            : recording.current
-            ? recordOffIcon
-            : recordIcon;
+              ? downloadIcon
+              : recording.current
+                ? recordOffIcon
+                : recordIcon;
 
         return (
           <FgSVGElement
@@ -59,17 +59,17 @@ export default function DownloadButton({
               settings.downloadType.value === "snapShot"
                 ? "Take snap shot (d)"
                 : settings.downloadType.value === "original"
-                ? "Download (d)"
-                : recording.current
-                ? "Stop recording (d)"
-                : "Start recording (d)"
+                  ? "Download (d)"
+                  : recording.current
+                    ? "Stop recording (d)"
+                    : "Start recording (d)"
             }
-            style='light'
+            style="light"
           />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

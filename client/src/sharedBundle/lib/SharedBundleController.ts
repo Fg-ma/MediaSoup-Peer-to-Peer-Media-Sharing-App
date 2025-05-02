@@ -39,8 +39,8 @@ import VideoMediaInstance from "../../media/fgVideo/VideoMediaInstance";
 class SharedBundleController extends SharedBundleSocket {
   constructor(
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private userDevice: UserDevice,
-    private deadbanding: Deadbanding,
+    private userDevice: React.MutableRefObject<UserDevice>,
+    private deadbanding: React.MutableRefObject<Deadbanding>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -255,7 +255,6 @@ class SharedBundleController extends SharedBundleSocket {
             this.userEffectsStyles,
             this.userEffects,
             this.userDevice,
-            this.userMedia,
             instance.positioning,
           );
         }
@@ -296,7 +295,6 @@ class SharedBundleController extends SharedBundleSocket {
                   this.userEffectsStyles,
                   this.userEffects,
                   this.userDevice,
-                  this.userMedia,
                   ins.positioning,
                 );
             });

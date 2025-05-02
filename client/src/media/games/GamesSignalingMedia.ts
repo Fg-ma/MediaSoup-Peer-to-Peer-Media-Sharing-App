@@ -79,7 +79,7 @@ class GamesSignalingMedia {
     private instance: string,
     private url: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
-    private bundlesController: BundlesController
+    private bundlesController: React.MutableRefObject<BundlesController>,
   ) {
     this.connect(this.url);
   }
@@ -163,7 +163,7 @@ class GamesSignalingMedia {
           gameId,
           "https://localhost:8042",
           initiator.username === this.username &&
-            initiator.instance === this.instance
+            initiator.instance === this.instance,
         );
         await snakeGameMedia.connect();
 
@@ -196,7 +196,7 @@ class GamesSignalingMedia {
         break;
     }
 
-    this.bundlesController.cleanUpProducerBundle();
+    this.bundlesController.current.cleanUpProducerBundle();
   };
 
   onUserJoinedTable = (event: onUserJoinedTableType) => {
@@ -214,7 +214,7 @@ class GamesSignalingMedia {
             this.instance,
             activeGame.gameId,
             "https://localhost:8042",
-            false
+            false,
           );
           await snakeGameMedia.connect();
 

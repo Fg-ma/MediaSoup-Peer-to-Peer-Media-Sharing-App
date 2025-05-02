@@ -18,9 +18,9 @@ class ScreenSectionController {
 
     private userMedia: React.MutableRefObject<UserMediaType>,
 
-    private producersController: ProducersController,
+    private producersController: React.MutableRefObject<ProducersController>,
 
-    private handleDisableEnableBtns: (disabled: boolean) => void
+    private handleDisableEnableBtns: (disabled: boolean) => void,
   ) {}
 
   shareScreen = () => {
@@ -33,7 +33,7 @@ class ScreenSectionController {
     this.setScreenActive((prev) => !prev);
 
     if (this.isScreen.current) {
-      this.producersController.createNewProducer("screen");
+      this.producersController.current.createNewProducer("screen");
     } else if (!this.isScreen.current) {
       const screenIds = Object.keys(this.userMedia.current.screen);
 
@@ -77,7 +77,7 @@ class ScreenSectionController {
     this.handleDisableEnableBtns(true);
 
     if (this.device.current) {
-      this.producersController.createNewProducer("screen");
+      this.producersController.current.createNewProducer("screen");
     }
   };
 }

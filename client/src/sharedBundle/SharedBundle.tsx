@@ -23,8 +23,8 @@ export default function SharedBundle({
   options,
 }: {
   name?: string;
-  userDevice: UserDevice;
-  deadbanding: Deadbanding;
+  userDevice: React.MutableRefObject<UserDevice>;
+  deadbanding: React.MutableRefObject<Deadbanding>;
   tableRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
 }) {
@@ -45,36 +45,38 @@ export default function SharedBundle({
 
   const [_, setRerender] = useState(false);
 
-  const sharedBundleController = new SharedBundleController(
-    setRerender,
-    userDevice,
-    deadbanding,
-    userEffectsStyles,
-    userEffects,
-    userMedia,
-    tableStaticContentSocket
+  const sharedBundleController = useRef(
+    new SharedBundleController(
+      setRerender,
+      userDevice,
+      deadbanding,
+      userEffectsStyles,
+      userEffects,
+      userMedia,
+      tableStaticContentSocket,
+    ),
   );
 
   useEffect(() => {
     userMedia.current.gamesSignaling?.addMessageListener(
-      sharedBundleController.gameSignalingListener
+      sharedBundleController.current.gameSignalingListener,
     );
 
     return () => {
       userMedia.current.gamesSignaling?.removeMessageListener(
-        sharedBundleController.gameSignalingListener
+        sharedBundleController.current.gameSignalingListener,
       );
     };
   }, [userMedia.current.gamesSignaling]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
-      sharedBundleController.handleTableStaticContentMessage
+      sharedBundleController.current.handleTableStaticContentMessage,
     );
 
     return () =>
       tableStaticContentSocket.current?.removeMessageListener(
-        sharedBundleController.handleTableStaticContentMessage
+        sharedBundleController.current.handleTableStaticContentMessage,
       );
   }, [tableStaticContentSocket.current]);
 
@@ -82,7 +84,7 @@ export default function SharedBundle({
     <div
       ref={sharedBundleRef}
       id={`${username.current}_shared_bundle_container`}
-      className='w-full h-full absolute top-0 left-0 pointer-events-none'
+      className="pointer-events-none absolute left-0 top-0 h-full w-full"
     >
       {userMedia.current.games.snake &&
         Object.keys(userMedia.current.games.snake).length !== 0 &&
@@ -104,7 +106,7 @@ export default function SharedBundle({
                 videoContentMute={videoContentMute}
               />
             </Suspense>
-          )
+          ),
         )}
       {Object.keys(userMedia.current.image.instances).length !== 0 &&
         Object.keys(userMedia.current.image.instances).map(
@@ -116,7 +118,7 @@ export default function SharedBundle({
                 tableRef={tableRef}
               />
             </Suspense>
-          )
+          ),
         )}
       {Object.keys(userMedia.current.svg.instances).length !== 0 &&
         Object.keys(userMedia.current.svg.instances).map((svgInstanceId) => (
@@ -141,7 +143,7 @@ export default function SharedBundle({
                 tableRef={tableRef}
               />
             </Suspense>
-          )
+          ),
         )}
       {Object.keys(userMedia.current.text.instances).length !== 0 &&
         Object.keys(userMedia.current.text.instances).map((textInstanceId) => (

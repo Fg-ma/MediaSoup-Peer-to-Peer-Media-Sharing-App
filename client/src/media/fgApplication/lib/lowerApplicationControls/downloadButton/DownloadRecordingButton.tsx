@@ -13,14 +13,14 @@ export default function DownloadRecordingButton({
   applicationEffectsActive,
   scrollingContainerRef,
 }: {
-  lowerApplicationController: LowerApplicationController;
+  lowerApplicationController: React.MutableRefObject<LowerApplicationController>;
   applicationEffectsActive: boolean;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <FgButton
       clickFunction={() => {
-        lowerApplicationController.handleDownloadRecording();
+        lowerApplicationController.current.handleDownloadRecording();
       }}
       contentFunction={() => (
         <FgSVGElement
@@ -36,13 +36,13 @@ export default function DownloadRecordingButton({
       hoverContent={
         !applicationEffectsActive ? (
           <FgHoverContentStandard
-            content='Download recording (h)'
-            style='light'
+            content="Download recording (h)"
+            style="light"
           />
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className='flex items-center justify-center h-full aspect-square scale-x-[-1] pointer-events-auto'
+      className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
     />
   );
 }

@@ -78,9 +78,9 @@ export default function FgTableFunctions({
       cols: number;
     }>
   >;
-  producersController: ProducersController;
-  userDevice: UserDevice;
-  deadbanding: Deadbanding;
+  producersController: React.MutableRefObject<ProducersController>;
+  userDevice: React.MutableRefObject<UserDevice>;
+  deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { sendGeneralSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
@@ -104,16 +104,18 @@ export default function FgTableFunctions({
 
   const [_, setRerender] = useState(false);
 
-  const tableFunctionsController = new TableFunctionsController(
-    externalBackgroundChange,
-    setTableBackground,
-    setCaptureMediaActive,
-    captureMedia,
-    userDevice,
-    deadbanding,
-    captureEffects,
-    captureEffectsStyles,
-    setRerender,
+  const tableFunctionsController = useRef(
+    new TableFunctionsController(
+      externalBackgroundChange,
+      setTableBackground,
+      setCaptureMediaActive,
+      captureMedia,
+      userDevice,
+      deadbanding,
+      captureEffects,
+      captureEffectsStyles,
+      setRerender,
+    ),
   );
 
   const handleExternalMute = () => {
@@ -137,12 +139,12 @@ export default function FgTableFunctions({
 
   useEffect(() => {
     tableSocket.current?.addMessageListener(
-      tableFunctionsController.handleTableSocketMessage,
+      tableFunctionsController.current.handleTableSocketMessage,
     );
 
     return () => {
       tableSocket.current?.removeMessageListener(
-        tableFunctionsController.handleTableSocketMessage,
+        tableFunctionsController.current.handleTableSocketMessage,
       );
     };
   }, [tableSocket.current]);
@@ -150,7 +152,7 @@ export default function FgTableFunctions({
   useEffect(() => {
     if (!captureMediaActive) return;
 
-    tableFunctionsController.getVideo();
+    tableFunctionsController.current.getVideo();
   }, [captureMediaActive]);
 
   return (

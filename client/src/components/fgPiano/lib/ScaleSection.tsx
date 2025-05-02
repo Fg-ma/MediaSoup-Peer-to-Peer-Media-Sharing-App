@@ -22,7 +22,7 @@ export default function ScaleSection({
   visualizerAnimationFrameRef,
   keyVisualizerNotesStore,
 }: {
-  fgPianoController: FgPianoController;
+  fgPianoController: React.MutableRefObject<FgPianoController>;
   scaleSectionContainerRef: React.RefObject<HTMLDivElement>;
   scaleSectionRef: React.RefObject<HTMLDivElement>;
   visibleOctave: Octaves;
@@ -55,7 +55,7 @@ export default function ScaleSection({
 
   useEffect(() => {
     setTimeout(() => {
-      fgPianoController.resize();
+      fgPianoController.current.resize();
     }, 0);
   }, [keyVisualizerActive]);
 
@@ -77,7 +77,11 @@ export default function ScaleSection({
 
         if (keyElement && keyElement.classList.contains("pressed")) {
           keyElement.classList.remove("pressed");
-          fgPianoController.playNote(childKey, parseInt(childOctave), false);
+          fgPianoController.current.playNote(
+            childKey,
+            parseInt(childOctave),
+            false,
+          );
         }
 
         if (keyVisualizerActive) {
@@ -105,7 +109,7 @@ export default function ScaleSection({
         visibleOctaveRef.current = 6;
         setVisibleOctave(6);
       } else {
-        fgPianoController.getVisibleOctave();
+        fgPianoController.current.getVisibleOctave();
       }
     }
   };
@@ -124,7 +128,7 @@ export default function ScaleSection({
       );
       keyElement?.classList.remove("pressed");
 
-      fgPianoController.playNote(
+      fgPianoController.current.playNote(
         currentPress.current.note,
         parseInt(currentPress.current.octave),
         false,
@@ -183,7 +187,7 @@ export default function ScaleSection({
     ) {
       if (visualizerAnimationFrameRef.current === undefined) {
         visualizerAnimationFrameRef.current = requestAnimationFrame(
-          fgPianoController.updateVisualizerAnimations,
+          fgPianoController.current.updateVisualizerAnimations,
         );
       }
 
@@ -205,7 +209,7 @@ export default function ScaleSection({
 
     if (keyElement && !keyElement.classList.contains("pressed")) {
       keyElement.classList.add("pressed");
-      fgPianoController.playNote(note, parseInt(octave), true);
+      fgPianoController.current.playNote(note, parseInt(octave), true);
     }
   };
 
@@ -236,7 +240,7 @@ export default function ScaleSection({
       if (key && key.classList.contains("pressed")) {
         key?.classList.remove("pressed");
 
-        fgPianoController.playNote(
+        fgPianoController.current.playNote(
           currentPress.current.note.length === 1
             ? currentPress.current.note
             : `${currentPress.current.note[0]}#`,
@@ -287,7 +291,7 @@ export default function ScaleSection({
 
       if (visualizerAnimationFrameRef.current === undefined) {
         visualizerAnimationFrameRef.current = requestAnimationFrame(
-          fgPianoController.updateVisualizerAnimations,
+          fgPianoController.current.updateVisualizerAnimations,
         );
       }
     }
@@ -301,7 +305,7 @@ export default function ScaleSection({
       if (key && !key.classList.contains("pressed")) {
         key.classList.add("pressed");
 
-        fgPianoController.playNote(
+        fgPianoController.current.playNote(
           targetValues.note,
           parseInt(targetValues.octave),
           true,
@@ -313,7 +317,7 @@ export default function ScaleSection({
   };
 
   return (
-    <div className="flex relative w-full grow items-center justify-center overflow-hidden">
+    <div className="relative flex w-full grow items-center justify-center overflow-hidden">
       <div
         ref={scaleSectionContainerRef}
         className="scale-section-container hide-scroll-bar"
@@ -349,7 +353,7 @@ export default function ScaleSection({
               ></div>
             ) : undefined
           }
-          panelSizeChangeCallback={fgPianoController.resize}
+          panelSizeChangeCallback={fgPianoController.current.resize}
           minPaneHeightCallback={() => {
             setKeyVisualizerActive(false);
             keyVisualizerActiveRef.current = false;

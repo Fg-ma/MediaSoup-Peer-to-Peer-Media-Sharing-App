@@ -14,35 +14,34 @@ import {
 } from "../typeConstant";
 
 const PlayPauseButton = React.lazy(
-  () => import("./lib/playPauseButton/PlayPauseButton")
+  () => import("./lib/playPauseButton/PlayPauseButton"),
 );
 const FgVolumeElement = React.lazy(
-  () => import("../../../../fgVolumeElement/FgVolumeElement")
+  () => import("../../../../fgVolumeElement/FgVolumeElement"),
 );
 const FullScreenButton = React.lazy(
-  () => import("./lib/fullScreenButton/FullScreenButton")
+  () => import("./lib/fullScreenButton/FullScreenButton"),
 );
 const PictureInPictureButton = React.lazy(
-  () => import("./lib/pictureInPictureButton/PictureInPictureButton")
+  () => import("./lib/pictureInPictureButton/PictureInPictureButton"),
 );
 const CaptionButton = React.lazy(
-  () => import("./lib/captionsButton/CaptionButton")
+  () => import("./lib/captionsButton/CaptionButton"),
 );
 const FgSettingsButton = React.lazy(
-  () => import("./lib/fgSettingsButton/FgSettingsButton")
+  () => import("./lib/fgSettingsButton/FgSettingsButton"),
 );
 const VisualEffectsButton = React.lazy(
-  () => import("./lib/visualEffectsButton/VisualEffectsButton")
-);
-const VisualEffectsSection = React.lazy(
-  () => import("../visualEffectsSection/VisualEffectsSection")
+  () => import("./lib/visualEffectsButton/VisualEffectsButton"),
 );
 const AudioEffectsButton = React.lazy(
-  () => import("../../../../audioEffectsButton/AudioEffectsButton")
+  () => import("../../../../audioEffectsButton/AudioEffectsButton"),
 );
 const FgHoverContentStandard = React.lazy(
   () =>
-    import("../../../../elements/fgHoverContentStandard/FgHoverContentStandard")
+    import(
+      "../../../../elements/fgHoverContentStandard/FgHoverContentStandard"
+    ),
 );
 
 export type FontFamilies =
@@ -145,7 +144,7 @@ export default function FgLowerVisualMediaControls({
   instance: string;
   type: "camera" | "screen";
   visualMediaId: string;
-  fgLowerVisualMediaController: FgLowerVisualMediaController;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   pausedState: boolean;
   clientMute: React.MutableRefObject<boolean>;
   screenAudioClientMute: React.MutableRefObject<{
@@ -170,27 +169,27 @@ export default function FgLowerVisualMediaControls({
   fgVisualMediaOptions: FgVisualMediaOptions;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
-    blockStateChange?: boolean
+    blockStateChange?: boolean,
   ) => Promise<void>;
   handleAudioEffectChange: (
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
-    effect: AudioEffectTypes
+    effect: AudioEffectTypes,
   ) => void;
   handleMuteCallback:
     | ((
         producerType: "audio" | "screenAudio",
-        producerId: string | undefined
+        producerId: string | undefined,
       ) => void)
     | undefined;
   handleVolumeSliderCallback: (
     event: React.ChangeEvent<HTMLInputElement>,
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
   tracksColorSetterCallback: (
     producerType: "audio" | "screenAudio",
-    producerId: string | undefined
+    producerId: string | undefined,
   ) => void;
 }) {
   const { mediasoupSocket } = useSocketContext();
@@ -243,15 +242,15 @@ export default function FgLowerVisualMediaControls({
       mediasoupSocket.current?.removeMessageListener(handleMessage);
       rightVisualMediaControlsRef.current?.removeEventListener(
         "wheel",
-        handleWheel
+        handleWheel,
       );
     };
   }, []);
 
   return (
-    <div className='flex visual-media-lower-controls absolute bottom-[1%] left-0 w-full h-[12%] max-h-12 min-h-6 justify-between z-20 pointer-events-none px-3'>
+    <div className="visual-media-lower-controls pointer-events-none absolute bottom-[1%] left-0 z-20 flex h-[12%] max-h-12 min-h-6 w-full justify-between px-3">
       <div
-        className='flex w-max h-full z-20 items-center space-x-2'
+        className="flex z-20 h-full w-max items-center space-x-2"
         style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
       >
         {fgVisualMediaOptions.isPlayPause && (
@@ -297,7 +296,7 @@ export default function FgLowerVisualMediaControls({
                 if (handleMuteCallback !== undefined) {
                   handleMuteCallback(
                     screenAudioStream ? "screenAudio" : "audio",
-                    screenAudioStream ? `${visualMediaId}_audio` : undefined
+                    screenAudioStream ? `${visualMediaId}_audio` : undefined,
                   );
                 }
 
@@ -309,14 +308,14 @@ export default function FgLowerVisualMediaControls({
           </Suspense>
         )}
         {fgVisualMediaOptions.isCurrentTime && (
-          <div className='flex items-center gap-1 px-1 select-none'>
-            <div ref={currentTimeRef} className='font-K2D text-lg'></div>
+          <div className="flex select-none items-center gap-1 px-1">
+            <div ref={currentTimeRef} className="font-K2D text-lg"></div>
           </div>
         )}
       </div>
       <div
         ref={rightVisualMediaControlsRef}
-        className='hide-scroll-bar w-max h-full overflow-x-auto z-10 flex items-center space-x-2 scale-x-[-1] pr-2'
+        className="hide-scroll-bar z-10 flex h-full w-max scale-x-[-1] items-center space-x-2 overflow-x-auto pr-2"
       >
         {fgVisualMediaOptions.isFullScreen && (
           <Suspense fallback={<div>Loading...</div>}>
@@ -435,7 +434,7 @@ export default function FgLowerVisualMediaControls({
                     !screenAudioLocalMute.current[`${visualMediaId}_audio`];
 
                   const audioElement = document.getElementById(
-                    `${visualMediaId}_audio`
+                    `${visualMediaId}_audio`,
                   ) as HTMLAudioElement | null;
 
                   if (!audioElement) {
@@ -451,7 +450,7 @@ export default function FgLowerVisualMediaControls({
                 if (handleMuteCallback !== undefined) {
                   handleMuteCallback(
                     screenAudioStream ? "screenAudio" : "audio",
-                    screenAudioStream ? `${visualMediaId}_audio` : undefined
+                    screenAudioStream ? `${visualMediaId}_audio` : undefined,
                   );
                 }
 
@@ -463,12 +462,12 @@ export default function FgLowerVisualMediaControls({
               screenAudioLocalMute={screenAudioLocalMute}
               visualMediaContainerRef={visualMediaContainerRef}
               closeLabelElement={
-                <FgHoverContentStandard content='Close (x)' style='dark' />
+                <FgHoverContentStandard content="Close (x)" style="dark" />
               }
               hoverLabelElement={
                 <FgHoverContentStandard
-                  content='Audio effects (a)'
-                  style='dark'
+                  content="Audio effects (a)"
+                  style="dark"
                 />
               }
               scrollingContainerRef={rightVisualMediaControlsRef}

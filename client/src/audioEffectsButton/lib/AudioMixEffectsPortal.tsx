@@ -338,30 +338,32 @@ export default function AudioMixEffectsPortal({
     },
   });
 
-  const audioMixEffectsPortalController = new AudioMixEffectsPortalController(
-    mediasoupSocket,
-    table_id,
-    username,
-    instance,
-    producerType,
-    producerId,
-    isUser,
-    permissions,
-    userMedia,
-    setRerender,
-    dynamicMixEffects,
-    portalRef,
-    setSliderValues,
+  const audioMixEffectsPortalController = useRef(
+    new AudioMixEffectsPortalController(
+      mediasoupSocket,
+      table_id,
+      username,
+      instance,
+      producerType,
+      producerId,
+      isUser,
+      permissions,
+      userMedia,
+      setRerender,
+      dynamicMixEffects,
+      portalRef,
+      setSliderValues,
+    ),
   );
 
   useEffect(() => {
     mediasoupSocket.current?.addMessageListener(
-      audioMixEffectsPortalController.handleMessage,
+      audioMixEffectsPortalController.current.handleMessage,
     );
 
     return () => {
       mediasoupSocket.current?.removeMessageListener(
-        audioMixEffectsPortalController.handleMessage,
+        audioMixEffectsPortalController.current.handleMessage,
       );
     };
   }, [mediasoupSocket.current]);
@@ -386,7 +388,7 @@ export default function AudioMixEffectsPortal({
                           id={effect}
                           callbackFunction={(active, id) => {
                             if (id) {
-                              audioMixEffectsPortalController.mixEffectChange(
+                              audioMixEffectsPortalController.current.mixEffectChange(
                                 active,
                                 id as AudioMixEffectsType,
                               );
@@ -425,7 +427,8 @@ export default function AudioMixEffectsPortal({
                       }
                       sliderValues={sliderValues}
                       mixEffectValueChange={
-                        audioMixEffectsPortalController.mixEffectValueChange
+                        audioMixEffectsPortalController.current
+                          .mixEffectValueChange
                       }
                     />
                   );
@@ -453,7 +456,7 @@ export default function AudioMixEffectsPortal({
           const previous = JSON.parse(
             JSON.stringify(dynamicMixEffects.current),
           );
-          audioMixEffectsPortalController.getPackedPositions(
+          audioMixEffectsPortalController.current.getPackedPositions(
             portalRef.current.getBoundingClientRect().width - 28,
             28,
           );

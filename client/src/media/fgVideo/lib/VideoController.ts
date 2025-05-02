@@ -25,7 +25,7 @@ class VideoController {
     private tintColor: React.MutableRefObject<string>,
     private paused: React.MutableRefObject<boolean>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private lowerVideoController: LowerVideoController,
+    private lowerVideoController: React.MutableRefObject<LowerVideoController>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private positioning: React.MutableRefObject<{
@@ -110,7 +110,7 @@ class VideoController {
     ) {
       this.videoMediaInstance.updateVideoPosition(event.data.videoPosition);
 
-      this.lowerVideoController.timeUpdate();
+      this.lowerVideoController.current.timeUpdate();
     }
   };
 
@@ -153,20 +153,20 @@ class VideoController {
       };
 
       // Keep video time
-      this.lowerVideoController.timeUpdate();
+      this.lowerVideoController.current.timeUpdate();
       this.videoMediaInstance.instanceVideo?.addEventListener(
         "timeupdate",
-        this.lowerVideoController.timeUpdate,
+        this.lowerVideoController.current.timeUpdate,
       );
 
       this.videoMediaInstance.instanceVideo?.addEventListener(
         "enterpictureinpicture",
-        () => this.lowerVideoController.handlePictureInPicture("enter"),
+        () => this.lowerVideoController.current.handlePictureInPicture("enter"),
       );
 
       this.videoMediaInstance.instanceVideo?.addEventListener(
         "leavepictureinpicture",
-        () => this.lowerVideoController.handlePictureInPicture("leave"),
+        () => this.lowerVideoController.current.handlePictureInPicture("leave"),
       );
 
       this.setRerender((prev) => !prev);
