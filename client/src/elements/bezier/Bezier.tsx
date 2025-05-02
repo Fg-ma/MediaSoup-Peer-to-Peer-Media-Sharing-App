@@ -122,50 +122,41 @@ export default function Bezier({
   const name = useRef<string | undefined>(undefined);
   const [getNamePopupActive, setGetNamePopupActive] = useState(false);
 
-  const bezierController = useRef(
-    new BezierController(
-      points,
-      setPoints,
-      bezierContainerRef,
-      bezierBackgroundContainerRef,
-      svgRef,
-      setInBezier,
-      setLargestDim,
-      setAspectSquarish,
-      leaveTimer,
-      movementTimeout,
-      leavePathTimeout,
-      settings,
-      setSettings,
-      setSettingsActive,
-      copiedTimeout,
-      setCopied,
-      confirmBezierCurveFunction,
-      selectionBox,
-      setSelectionBox,
-      name,
-      handles,
-    ),
+  const bezierController = new BezierController(
+    points,
+    setPoints,
+    bezierContainerRef,
+    bezierBackgroundContainerRef,
+    svgRef,
+    setInBezier,
+    setLargestDim,
+    setAspectSquarish,
+    leaveTimer,
+    movementTimeout,
+    leavePathTimeout,
+    settings,
+    setSettings,
+    setSettingsActive,
+    copiedTimeout,
+    setCopied,
+    confirmBezierCurveFunction,
+    selectionBox,
+    setSelectionBox,
+    name,
+    handles,
   );
 
   useEffect(() => {
-    document.addEventListener(
-      "keydown",
-      bezierController.current.handleKeyDown,
-      true,
-    );
-    document.addEventListener("wheel", bezierController.current.handleWheel);
+    document.addEventListener("keydown", bezierController.handleKeyDown, true);
+    document.addEventListener("wheel", bezierController.handleWheel);
 
     return () => {
       document.removeEventListener(
         "keydown",
-        bezierController.current.handleKeyDown,
+        bezierController.handleKeyDown,
         true,
       );
-      document.removeEventListener(
-        "wheel",
-        bezierController.current.handleWheel,
-      );
+      document.removeEventListener("wheel", bezierController.handleWheel);
     };
   }, []);
 
@@ -174,7 +165,7 @@ export default function Bezier({
       return;
     }
 
-    const observer = new ResizeObserver(bezierController.current.handleResize);
+    const observer = new ResizeObserver(bezierController.handleResize);
 
     observer.observe(bezierBackgroundContainerRef.current);
 
@@ -183,8 +174,8 @@ export default function Bezier({
 
   useEffect(() => {
     if (
-      bezierController.current.isOneDragging(points) ||
-      bezierController.current.isOneHovered(points)
+      bezierController.isOneDragging(points) ||
+      bezierController.isOneHovered(points)
     ) {
       if (leavePathTimeout.current) {
         clearTimeout(leavePathTimeout.current);
@@ -192,8 +183,8 @@ export default function Bezier({
       }
     }
   }, [
-    bezierController.current.isOneDragging(points),
-    bezierController.current.isOneHovered(points),
+    bezierController.isOneDragging(points),
+    bezierController.isOneHovered(points),
   ]);
 
   return (
@@ -201,11 +192,12 @@ export default function Bezier({
       type="staticTopDomain"
       top={0}
       left={0}
-      className="h-screen w-screen"
+      className="pointer-events-auto h-screen w-screen"
+      zValue={490000}
       content={
         <div
           ref={bezierBackgroundContainerRef}
-          className="pointer-events-none flex h-full w-full items-center justify-center bg-fg-tone-black-4 bg-opacity-45"
+          className="pointer-events-auto flex h-full w-full items-center justify-center bg-fg-tone-black-4 bg-opacity-45"
         >
           <div
             ref={bezierContainerRef}
@@ -220,14 +212,14 @@ export default function Bezier({
             } ${
               !inBezier &&
               !settingsActive &&
-              !bezierController.current.isOneSelected(points) &&
-              !bezierController.current.isOneHovered(points) &&
-              !bezierController.current.isOneInSelectionBox(points)
+              !bezierController.isOneSelected(points) &&
+              !bezierController.isOneHovered(points) &&
+              !bezierController.isOneInSelectionBox(points)
                 ? "cursor-none"
                 : ""
             } relative aspect-square rounded border-2`}
-            onPointerEnter={bezierController.current.handlePointerEnterBezier}
-            onPointerLeave={bezierController.current.handlePointerLeaveBezier}
+            onPointerEnter={bezierController.handlePointerEnterBezier}
+            onPointerLeave={bezierController.handlePointerLeaveBezier}
             style={{
               backgroundImage: `
                 linear-gradient(45deg, #3e3e3e 25%, transparent 25%, transparent 75%, #3e3e3e 75%, #3e3e3e),
@@ -241,10 +233,10 @@ export default function Bezier({
               ref={svgRef}
               viewBox="0 0 100 100"
               className="pointer-events-auto h-full w-full overflow-hidden rounded"
-              onDoubleClick={bezierController.current.handleDoubleClick}
-              onPointerDown={bezierController.current.handleSVGPointerDown}
-              onPointerUp={bezierController.current.handleSVGPointerUp}
-              onPointerMove={bezierController.current.handleSVGPointerMove}
+              onDoubleClick={bezierController.handleDoubleClick}
+              onPointerDown={bezierController.handleSVGPointerDown}
+              onPointerUp={bezierController.handleSVGPointerUp}
+              onPointerMove={bezierController.handleSVGPointerMove}
               style={{ backgroundColor: settings.backgroundColor.value }}
             >
               <defs>
@@ -433,13 +425,13 @@ export default function Bezier({
 
               <g
                 filter={
-                  bezierController.current.isFilter()
-                    ? bezierController.current.getFilterURLs()
+                  bezierController.isFilter()
+                    ? bezierController.getFilterURLs()
                     : undefined
                 }
               >
                 <path
-                  d={bezierController.current.getPathData()}
+                  d={bezierController.getPathData()}
                   stroke={settings.color.value}
                   fill="none"
                   strokeWidth="2"
@@ -447,7 +439,7 @@ export default function Bezier({
                   strokeLinejoin="round"
                   onPointerEnter={() => setPathHovered(true)}
                   onPointerLeave={() => {
-                    if (bezierController.current.isOneSelected(points)) return;
+                    if (bezierController.isOneSelected(points)) return;
 
                     if (leavePathTimeout.current) {
                       clearTimeout(leavePathTimeout.current);
@@ -533,21 +525,16 @@ export default function Bezier({
                           onDoubleClick={(event) => {
                             event.stopPropagation();
                             if (point.type !== "endPoint") {
-                              bezierController.current.cycleControlType(index);
+                              bezierController.cycleControlType(index);
                             }
                           }}
                           onPointerDown={(event) =>
-                            bezierController.current.handlePointerDown(
-                              event,
-                              index,
-                            )
+                            bezierController.handlePointerDown(event, index)
                           }
                           onPointerEnter={() =>
-                            bezierController.current.handlePointerEnter(index)
+                            bezierController.handlePointerEnter(index)
                           }
-                          onPointerLeave={
-                            bezierController.current.handlePointerLeave
-                          }
+                          onPointerLeave={bezierController.handlePointerLeave}
                           {...fadeIn}
                         />
                       )}
@@ -573,20 +560,15 @@ export default function Bezier({
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
-                              bezierController.current.cycleControlType(index);
+                              bezierController.cycleControlType(index);
                             }}
                             onPointerDown={(event) =>
-                              bezierController.current.handlePointerDown(
-                                event,
-                                index,
-                              )
+                              bezierController.handlePointerDown(event, index)
                             }
                             onPointerEnter={() =>
-                              bezierController.current.handlePointerEnter(index)
+                              bezierController.handlePointerEnter(index)
                             }
-                            onPointerLeave={
-                              bezierController.current.handlePointerLeave
-                            }
+                            onPointerLeave={bezierController.handlePointerLeave}
                             {...fadeIn}
                           />
                         )}
@@ -612,20 +594,15 @@ export default function Bezier({
                             }
                             onDoubleClick={(event) => {
                               event.stopPropagation();
-                              bezierController.current.cycleControlType(index);
+                              bezierController.cycleControlType(index);
                             }}
                             onPointerDown={(event) =>
-                              bezierController.current.handlePointerDown(
-                                event,
-                                index,
-                              )
+                              bezierController.handlePointerDown(event, index)
                             }
                             onPointerEnter={() =>
-                              bezierController.current.handlePointerEnter(index)
+                              bezierController.handlePointerEnter(index)
                             }
-                            onPointerLeave={
-                              bezierController.current.handlePointerLeave
-                            }
+                            onPointerLeave={bezierController.handlePointerLeave}
                             {...fadeIn}
                           />
                         )}
@@ -643,7 +620,7 @@ export default function Bezier({
                                 basePoint.dragging ? "dragging" : ""
                               }`}
                               onPointerDown={(event) =>
-                                bezierController.current.handlePointerDown(
+                                bezierController.handlePointerDown(
                                   event,
                                   index,
                                   controlType as "controlOne" | "controlTwo",
@@ -661,9 +638,9 @@ export default function Bezier({
             {!getNamePopupActive &&
               (inBezier ||
                 settingsActive ||
-                bezierController.current.isOneSelected(points) ||
-                bezierController.current.isOneInSelectionBox(points) ||
-                bezierController.current.isOneHovered(points)) && (
+                bezierController.isOneSelected(points) ||
+                bezierController.isOneInSelectionBox(points) ||
+                bezierController.isOneHovered(points)) && (
                 <motion.div
                   variants={BezierVar}
                   initial="init"
@@ -709,12 +686,8 @@ export default function Bezier({
                       </>
                     )}
                   </div>
-                  {(bezierController.current.isOneSelectedExcludeEndPoints(
-                    points,
-                  ) ||
-                    bezierController.current.isOneHoveredExcludeEndPoints(
-                      points,
-                    )) && (
+                  {(bezierController.isOneSelectedExcludeEndPoints(points) ||
+                    bezierController.isOneHoveredExcludeEndPoints(points)) && (
                     <PointControlsSection
                       bezierController={bezierController}
                       largestDim={largestDim}
@@ -777,7 +750,7 @@ export default function Bezier({
                     <FgButton
                       className="flex h-10 w-10 items-center justify-center rounded-full bg-fg-red"
                       clickFunction={() => {
-                        bezierController.current.confirmBezierCurve();
+                        bezierController.confirmBezierCurve();
                         setGetNamePopupActive(false);
                       }}
                       contentFunction={() => (

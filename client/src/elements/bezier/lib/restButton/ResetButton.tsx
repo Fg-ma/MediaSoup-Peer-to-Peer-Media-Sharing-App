@@ -12,7 +12,7 @@ export default function ResetButton({
   bezierController,
   largestDim,
 }: {
-  bezierController: React.MutableRefObject<BezierController>;
+  bezierController: BezierController;
   largestDim: "width" | "height";
 }) {
   return (
@@ -22,7 +22,7 @@ export default function ResetButton({
       } pointer-events-auto flex aspect-square items-center justify-center`}
       clickFunction={(event) => {
         event.stopPropagation();
-        bezierController.current.handleReset();
+        bezierController.handleReset();
       }}
       contentFunction={() => (
         <FgSVGElement

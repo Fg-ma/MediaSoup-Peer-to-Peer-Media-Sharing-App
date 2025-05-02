@@ -49,10 +49,10 @@ export default function MuteStylePage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
-      <div className='flex h-6 w-full justify-start space-x-1'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+      <div className="flex h-6 w-full justify-start space-x-1">
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -67,63 +67,64 @@ export default function MuteStylePage({
           clickFunction={handleCloseMuteStylePage}
         />
         <div
-          className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
           onClick={handleCloseMuteStylePage}
         >
           Mute style
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
       <div
         ref={scrollingContainerRef}
-        className='w-full overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className="small-vertical-scroll-bar h-max max-h-[11.375rem] w-full overflow-y-auto px-2"
       >
-        <div className='flex w-full flex-col space-y-1 h-max'>
+        <div className="flex h-max w-full flex-col space-y-1">
           <FgButton
-            className='flex w-full text-nowrap bg-opacity-75 rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1'
+            className="flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1"
             contentFunction={() => (
-              <div className='flex justify-start w-full bg-opacity-75 px-2 items-center text-lg'>
+              <div className="flex w-full items-center justify-start bg-opacity-75 px-2 text-lg">
                 Make your own
               </div>
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
           {Object.entries(userMedia.current.svg.all).map(
-            ([svgId, svgMedia]) => (
-              <FgButton
-                key={svgId}
-                className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                  svgId === settings.muteStyle.value
-                    ? "bg-fg-white text-fg-tone-black-1"
-                    : ""
-                }`}
-                contentFunction={() => (
-                  <div
-                    className={`${
-                      svgMedia.filename ? "justify-between" : "justify-start"
-                    } flex w-full bg-opacity-75 px-2 items-center text-lg`}
-                  >
-                    <>{svgMedia.filename}</>
-                    <FgSVGElement
-                      src={svgMedia.blobURL ?? ""}
-                      className='h-6 aspect-square'
-                      attributes={[
-                        { key: "height", value: "100%" },
-                        { key: "width", value: "100%" },
-                      ]}
-                    />
-                  </div>
-                )}
-                clickFunction={() => {
-                  setMuteStyle(svgId);
-                }}
-              />
-            )
+            ([svgId, svgMedia]) =>
+              svgMedia.state.includes("muteStyle") && (
+                <FgButton
+                  key={svgId}
+                  className={`flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                    svgId === settings.muteStyle.value
+                      ? "bg-fg-white text-fg-tone-black-1"
+                      : ""
+                  }`}
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        svgMedia.filename ? "justify-between" : "justify-start"
+                      } flex w-full items-center bg-opacity-75 px-2 text-lg`}
+                    >
+                      <>{svgMedia.filename}</>
+                      <FgSVGElement
+                        src={svgMedia.blobURL ?? ""}
+                        className="aspect-square h-6"
+                        attributes={[
+                          { key: "height", value: "100%" },
+                          { key: "width", value: "100%" },
+                        ]}
+                      />
+                    </div>
+                  )}
+                  clickFunction={() => {
+                    setMuteStyle(svgId);
+                  }}
+                />
+              ),
           )}
           {Object.entries(muteStylesMeta).map(([key, meta]) => (
             <FgButton
               key={key}
-              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 key === settings.muteStyle.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
@@ -132,13 +133,13 @@ export default function MuteStylePage({
                 <div
                   className={`${
                     meta.url ? "justify-between" : "justify-start"
-                  } flex w-full bg-opacity-75 px-2 items-center text-lg`}
+                  } flex w-full items-center bg-opacity-75 px-2 text-lg`}
                 >
                   <>{meta.title}</>
                   {meta.url && (
                     <FgSVGElement
                       src={meta.url}
-                      className='stroke-fg-white h-6 aspect-square'
+                      className="aspect-square h-6 stroke-fg-white"
                       attributes={[
                         { key: "height", value: "100%" },
                         { key: "width", value: "100%" },

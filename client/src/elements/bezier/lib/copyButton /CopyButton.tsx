@@ -14,7 +14,7 @@ export default function CopyButton({
   copied,
   largestDim,
 }: {
-  bezierController: React.MutableRefObject<BezierController>;
+  bezierController: BezierController;
   copied: boolean;
   largestDim: "width" | "height";
 }) {
@@ -29,7 +29,7 @@ export default function CopyButton({
         } pointer-events-auto flex aspect-square items-center justify-center`}
         clickFunction={(event) => {
           event.stopPropagation();
-          bezierController.current.copyToClipBoardBezierCurve();
+          bezierController.copyToClipBoardBezierCurve();
         }}
         contentFunction={() => (
           <FgSVGElement

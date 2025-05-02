@@ -12,7 +12,7 @@ export default function DownloadButton({
   bezierController,
   largestDim,
 }: {
-  bezierController: React.MutableRefObject<BezierController>;
+  bezierController: BezierController;
   largestDim: "width" | "height";
 }) {
   return (
@@ -22,7 +22,7 @@ export default function DownloadButton({
       } pointer-events-auto flex aspect-square items-center justify-center`}
       clickFunction={(event) => {
         event.stopPropagation();
-        bezierController.current.downloadBezierCurve();
+        bezierController.downloadBezierCurve();
       }}
       contentFunction={() => (
         <FgSVGElement

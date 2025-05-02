@@ -280,6 +280,31 @@ class BezierController {
     this.setSelectionBox({ x: 0, y: 0, width: 0, height: 0, active: false });
   };
 
+  handlePointerUp = (
+    index: number,
+    controlType?: "controlOne" | "controlTwo",
+  ) => {
+    document.removeEventListener("pointermove", (e) =>
+      this.handleDrag(index, e, controlType),
+    );
+    document.removeEventListener("pointerup", () =>
+      this.handlePointerUp(index, controlType),
+    );
+
+    this.setPoints((prev) => {
+      const newPoints = [...prev];
+
+      if (controlType !== undefined) {
+        if (newPoints[index].controls[controlType])
+          newPoints[index].controls[controlType].dragging = false;
+      } else {
+        newPoints[index].dragging = false;
+      }
+
+      return newPoints;
+    });
+  };
+
   handlePointerDown = (
     event: React.PointerEvent,
     index: number,
