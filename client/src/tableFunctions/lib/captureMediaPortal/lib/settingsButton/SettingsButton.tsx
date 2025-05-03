@@ -23,7 +23,7 @@ export default function SettingsButton({
   finalizeCapture,
   mediaType,
 }: {
-  captureMediaController: React.MutableRefObject<CaptureMediaController>;
+  captureMediaController: CaptureMediaController;
   captureMediaEffectsActive: boolean;
   captureMediaTypeActive: boolean;
   settingsActive: boolean;

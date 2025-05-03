@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
-import FgTableController from "./lib/FgTableController";
+import TableController from "./lib/TableController";
 import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
@@ -57,20 +57,14 @@ export default function Table({
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
+  const tablePanelRef = useRef<HTMLDivElement>(null);
 
-  const fgTableController = useRef(
-    new FgTableController(
-      username,
-      instance,
-      tableRef,
-      setUserData,
-      aspectDir,
-      setRerender,
-    ),
+  const tableController = useRef(
+    new TableController(tableRef, setUserData, aspectDir, setRerender),
   );
 
   useEffect(() => {
-    fgTableController.current.getAspectDir();
+    tableController.current.getAspectDir();
 
     setTimeout(() => {
       if (tableRef.current) {
@@ -91,31 +85,34 @@ export default function Table({
       }
     }, 100);
 
-    window.addEventListener("resize", fgTableController.current.getAspectDir);
+    window.addEventListener("resize", tableController.current.getAspectDir);
 
     return () => {
       window.removeEventListener(
         "resize",
-        fgTableController.current.getAspectDir,
+        tableController.current.getAspectDir,
       );
     };
   }, []);
 
   useEffect(() => {
     tableSocket.current?.addMessageListener(
-      fgTableController.current.handleTableMessage,
+      tableController.current.handleTableMessage,
     );
 
     return () => {
       tableSocket.current?.removeMessageListener(
-        fgTableController.current.handleTableMessage,
+        tableController.current.handleTableMessage,
       );
     };
   }, [tableSocket.current]);
 
   return (
     <div className="flex w-full grow items-center justify-center">
-      <TableSidePanel activePanel={activePanel} />
+      <TableSidePanel
+        activePanel={activePanel}
+        tableController={tableController}
+      />
       <div ref={tableContainerRef} className="flex h-full grow flex-col">
         <TopTableSection
           userData={userData}

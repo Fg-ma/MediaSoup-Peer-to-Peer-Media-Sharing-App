@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
+import { useUploadContext } from "../../../../context/uploadContext/UploadContext";
+import { UploadSignals } from "src/context/uploadContext/lib/typeConstant";
 
 export default function LoadingElement() {
+  const { addUploadSignalListener, removeUploadSignalListener } =
+    useUploadContext();
+
+  const [progress, setProgress] = useState(0);
+
   const polarToCartesian = (angleInDegrees: number) => {
     const angleInRadians = ((angleInDegrees + 90) * Math.PI) / 180.0;
     return {
@@ -36,12 +43,36 @@ export default function LoadingElement() {
     ].join(" ");
   };
 
+  const handleUploadListener = (signal: UploadSignals) => {
+    switch (signal.type) {
+      case "uploadStart":
+        break;
+      case "uploadProgress":
+        setProgress(signal.data.progress * 359.99);
+        break;
+      case "uploadFinish":
+        break;
+      case "uploadError":
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    addUploadSignalListener(handleUploadListener);
+
+    return () => {
+      removeUploadSignalListener(handleUploadListener);
+    };
+  }, []);
+
   return (
     <HoverElement
       className="h-8 rounded-full bg-fg-off-white"
       content={
         <svg className="h-full w-full fill-fg-red" viewBox="0 0 100 100">
-          <path d={describeArc(60)} fill="red" />
+          <path d={describeArc(progress)} fill="#d40213" />
         </svg>
       }
       hoverContent={

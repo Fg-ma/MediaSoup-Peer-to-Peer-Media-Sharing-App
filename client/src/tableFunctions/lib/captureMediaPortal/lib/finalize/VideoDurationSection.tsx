@@ -6,7 +6,7 @@ export default function VideoDurationSection({
   captureMediaController,
 }: {
   videoRef: React.RefObject<HTMLVideoElement>;
-  captureMediaController: React.MutableRefObject<CaptureMediaController>;
+  captureMediaController: CaptureMediaController;
 }) {
   const [fontSize, setFontSize] = useState("16px");
   const [paddingTop, setPaddingTop] = useState("2px");
@@ -33,7 +33,7 @@ export default function VideoDurationSection({
   const handleTimeUpdate = () => {
     if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
 
-    captureMediaController.current.timeUpdate();
+    captureMediaController.timeUpdate();
   };
 
   useEffect(() => {

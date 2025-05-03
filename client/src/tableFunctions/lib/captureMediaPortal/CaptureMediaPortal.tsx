@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
+import { useUploadContext } from "../../../context/uploadContext/UploadContext";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import CloseButton from "./lib/CloseButton";
 import CaptureButton from "./lib/capture/CaptureButton";
@@ -56,13 +57,15 @@ export default function CaptureMediaPortal({
 }) {
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
   const { tableId, preferences } = useUserInfoContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const [inCaptureMedia, setInCaptureMedia] = useState(false);
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
     useState(false);
   const [captureMediaTypeActive, setCaptureMediaTypeActive] = useState(false);
 
-  const [mediaType, setMediaType] = useState<CaptureMediaTypes>("camera");
+  const mediaType = useRef<CaptureMediaTypes>("camera");
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");
   const [controlsHeight, setControlsHeight] = useState(0);
@@ -107,42 +110,43 @@ export default function CaptureMediaPortal({
   const delayTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const delayCountDownInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const captureMediaController = useRef(
-    new CaptureMediaController(
-      tableId,
-      captureEffects,
-      captureMedia,
-      captureContainerRef,
-      setCaptureMediaEffectsActive,
-      setCaptureMediaTypeActive,
-      setInCaptureMedia,
-      leaveTimer,
-      movementTimeout,
-      tintColor,
-      mediaType,
-      setRecordingCount,
-      recording,
-      setRecording,
-      setFinalizeCapture,
-      countDownTimeout,
-      countDownInterval,
-      captureMediaPortalRef,
-      tableFunctionsController,
-      finalizingCapture,
-      finalizedCaptureType,
-      videoRef,
-      imageRef,
-      settings,
-      timelineContainerRef,
-      isScrubbing,
-      wasPaused,
-      setCaptureMediaActive,
-      setRerender,
-      setDelayCountDown,
-      delayTimeout,
-      delayCountDownInterval,
-      delaying,
-    ),
+  const captureMediaController = new CaptureMediaController(
+    tableId,
+    captureEffects,
+    captureMedia,
+    captureContainerRef,
+    setCaptureMediaEffectsActive,
+    setCaptureMediaTypeActive,
+    setInCaptureMedia,
+    leaveTimer,
+    movementTimeout,
+    tintColor,
+    mediaType,
+    setRecordingCount,
+    recording,
+    setRecording,
+    setFinalizeCapture,
+    countDownTimeout,
+    countDownInterval,
+    captureMediaPortalRef,
+    tableFunctionsController,
+    finalizingCapture,
+    finalizedCaptureType,
+    videoRef,
+    imageRef,
+    settings,
+    timelineContainerRef,
+    isScrubbing,
+    wasPaused,
+    setCaptureMediaActive,
+    setRerender,
+    setDelayCountDown,
+    delayTimeout,
+    delayCountDownInterval,
+    delaying,
+    sendUploadSignal,
+    addCurrentUpload,
+    removeCurrentUpload,
   );
 
   const handleResize = () => {
@@ -208,10 +212,7 @@ export default function CaptureMediaPortal({
   ]);
 
   useEffect(() => {
-    document.addEventListener(
-      "keydown",
-      captureMediaController.current.handleKeyDown,
-    );
+    document.addEventListener("keydown", captureMediaController.handleKeyDown);
     if (captureMedia.current)
       captureMedia.current.video.addEventListener(
         "loadedmetadata",
@@ -221,7 +222,7 @@ export default function CaptureMediaPortal({
     return () => {
       document.removeEventListener(
         "keydown",
-        captureMediaController.current.handleKeyDown,
+        captureMediaController.handleKeyDown,
       );
       if (captureMedia.current)
         captureMedia.current.video.removeEventListener(
@@ -262,8 +263,8 @@ export default function CaptureMediaPortal({
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
-              onPointerEnter={captureMediaController.current.handlePointerEnter}
-              onPointerLeave={captureMediaController.current.handlePointerLeave}
+              onPointerEnter={captureMediaController.handlePointerEnter}
+              onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
               initial="init"
               animate="animate"
@@ -368,8 +369,8 @@ export default function CaptureMediaPortal({
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
-              onPointerEnter={captureMediaController.current.handlePointerEnter}
-              onPointerLeave={captureMediaController.current.handlePointerLeave}
+              onPointerEnter={captureMediaController.handlePointerEnter}
+              onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
               initial="init"
               animate="animate"
@@ -418,8 +419,8 @@ export default function CaptureMediaPortal({
               style={{
                 aspectRatio: `${captureMedia.current?.video.videoWidth} / ${captureMedia.current?.video.videoHeight}`,
               }}
-              onPointerEnter={captureMediaController.current.handlePointerEnter}
-              onPointerLeave={captureMediaController.current.handlePointerLeave}
+              onPointerEnter={captureMediaController.handlePointerEnter}
+              onPointerLeave={captureMediaController.handlePointerLeave}
               variants={CaptureMediaVar}
               initial="init"
               animate="animate"
@@ -441,7 +442,7 @@ export default function CaptureMediaPortal({
                   className="pointer-events-auto absolute left-0 top-0 z-10 h-full w-full"
                   src={captureMedia.current?.babylonScene?.downloadRecordingLink()}
                   autoPlay
-                  onClick={captureMediaController.current.handlePausePlay}
+                  onClick={captureMediaController.handlePausePlay}
                 />
               ) : null}
               <div className="capture-media-overlay-container pointer-events-none absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center">
@@ -451,15 +452,11 @@ export default function CaptureMediaPortal({
                     className="timeline-container z-[100]"
                     onPointerDown={(event) => {
                       event.stopPropagation();
-                      captureMediaController.current.handleStartScrubbing(
-                        event,
-                      );
+                      captureMediaController.handleStartScrubbing(event);
                     }}
                     onPointerMove={(event) => {
                       event.stopPropagation();
-                      captureMediaController.current.handleHoverTimelineUpdate(
-                        event,
-                      );
+                      captureMediaController.handleHoverTimelineUpdate(event);
                     }}
                   >
                     <div className="timeline">

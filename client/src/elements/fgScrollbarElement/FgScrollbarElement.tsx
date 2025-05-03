@@ -93,7 +93,7 @@ export default function FgScrollbarElement({
     >
       <div
         ref={scrollbarRef}
-        className={`fg-scrollbar ${
+        className={`fg-scrollbar z-popup-labels ${
           direction === "vertical"
             ? "fg-vertical-scrollbar"
             : "fg-horizontal-scrollbar"

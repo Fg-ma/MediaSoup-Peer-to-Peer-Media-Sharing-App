@@ -12,6 +12,10 @@ import {
   downloadRecordingMimeMap,
   Settings,
 } from "./typeConstant";
+import {
+  TableUpload,
+  UploadSignals,
+} from "../../../../context/uploadContext/lib/typeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -67,6 +71,9 @@ class CaptureMediaController {
       NodeJS.Timeout | undefined
     >,
     private delaying: React.MutableRefObject<boolean>,
+    private sendUploadSignal: (signal: UploadSignals) => void,
+    private addCurrentUpload: (id: string, upload: TableUpload) => void,
+    private removeCurrentUpload: (id: string) => void,
   ) {}
 
   handleEffects = () => {
@@ -291,7 +298,7 @@ class CaptureMediaController {
 
   handleCapture = () => {
     this.setCaptureMediaTypeActive(false);
-
+    console.log(this.mediaType);
     if (
       this.mediaType === "10s" ||
       this.mediaType === "15s" ||
@@ -358,9 +365,10 @@ class CaptureMediaController {
 
   confirmCapture = async () => {
     if (this.videoRef.current && this.videoRef.current.src) {
+      const contentId = uuidv4();
       const metadata = {
         tableId: this.tableId.current,
-        contentId: uuidv4(),
+        contentId,
         instanceId: uuidv4(),
         direction: "toTable",
         state: [],
@@ -383,17 +391,53 @@ class CaptureMediaController {
         const formData = new FormData();
         const response = await fetch(this.videoRef.current.src);
         const blob = await response.blob();
-        formData.append(
-          "file",
-          blob,
-          `video.${
-            downloadRecordingExtensionsMap[
-              this.settings.downloadVideoOptions.mimeType.value
-            ]
-          }`,
-        );
+        const filename = `video.${
+          downloadRecordingExtensionsMap[
+            this.settings.downloadVideoOptions.mimeType.value
+          ]
+        }`;
+        formData.append("file", blob, filename);
 
         const xhr = new XMLHttpRequest();
+
+        this.addCurrentUpload(contentId, {
+          uploadUrl: URL.createObjectURL(blob),
+          mimeType: this.settings.downloadVideoOptions.mimeType.value,
+          size: blob.size,
+          filename,
+        });
+
+        this.sendUploadSignal({
+          type: "uploadStart",
+          header: { filename },
+        });
+
+        xhr.upload.onprogress = (event) => {
+          this.sendUploadSignal({
+            type: "uploadProgress",
+            header: { filename },
+            data: { progress: event.loaded / event.total },
+          });
+        };
+
+        xhr.onload = () => {
+          this.removeCurrentUpload(contentId);
+
+          this.sendUploadSignal({
+            type: "uploadFinish",
+            header: { filename },
+          });
+        };
+
+        xhr.onerror = () => {
+          this.removeCurrentUpload(contentId);
+
+          this.sendUploadSignal({
+            type: "uploadError",
+            header: { filename },
+          });
+        };
+
         xhr.open(
           "POST",
           tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
@@ -405,9 +449,10 @@ class CaptureMediaController {
         console.error("Error sending metadata:", error);
       }
     } else if (this.imageRef.current && this.imageRef.current.src) {
+      const contentId = uuidv4();
       const metadata = {
         tableId: this.tableId.current,
-        contentId: uuidv4(),
+        contentId,
         instanceId: uuidv4(),
         direction: "toTable",
         state: [],
@@ -430,13 +475,49 @@ class CaptureMediaController {
         const formData = new FormData();
         const response = await fetch(this.imageRef.current.src);
         const blob = await response.blob();
-        formData.append(
-          "file",
-          blob,
-          `image.${this.settings.downloadImageOptions.mimeType.value}`,
-        );
+        const filename = `image.${this.settings.downloadImageOptions.mimeType.value}`;
+        formData.append("file", blob, filename);
 
         const xhr = new XMLHttpRequest();
+
+        this.addCurrentUpload(contentId, {
+          uploadUrl: URL.createObjectURL(blob),
+          mimeType: this.settings.downloadImageOptions.mimeType.value,
+          size: blob.size,
+          filename,
+        });
+
+        this.sendUploadSignal({
+          type: "uploadStart",
+          header: { filename },
+        });
+
+        xhr.upload.onprogress = (event) => {
+          this.sendUploadSignal({
+            type: "uploadProgress",
+            header: { filename },
+            data: { progress: event.loaded / event.total },
+          });
+        };
+
+        xhr.onload = () => {
+          this.removeCurrentUpload(contentId);
+
+          this.sendUploadSignal({
+            type: "uploadFinish",
+            header: { filename },
+          });
+        };
+
+        xhr.onerror = () => {
+          this.removeCurrentUpload(contentId);
+
+          this.sendUploadSignal({
+            type: "uploadError",
+            header: { filename },
+          });
+        };
+
         xhr.open(
           "POST",
           tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,

@@ -73,7 +73,7 @@ export default function SettingsPanel({
   finalizeCapture,
   mediaType,
 }: {
-  captureMediaController: React.MutableRefObject<CaptureMediaController>;
+  captureMediaController: CaptureMediaController;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;

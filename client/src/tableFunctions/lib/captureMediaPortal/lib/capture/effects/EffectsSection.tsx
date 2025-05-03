@@ -41,7 +41,7 @@ export default function EffectsSection({
 }: {
   tintColor: React.MutableRefObject<string>;
   captureMedia: React.RefObject<CaptureMedia | undefined>;
-  captureMediaController: React.MutableRefObject<CaptureMediaController>;
+  captureMediaController: CaptureMediaController;
   captureContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
@@ -134,10 +134,7 @@ export default function EffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "clearAll",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("clearAll", false);
           }}
         />
         <BabylonPostProcessEffectsButton
@@ -151,7 +148,7 @@ export default function EffectsSection({
               captureEffectsStyles.current.postProcess.style,
             );
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "postProcess",
               false,
             );
@@ -163,7 +160,7 @@ export default function EffectsSection({
               effectType,
             );
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "postProcess",
               captureEffects.current.postProcess,
             );
@@ -180,7 +177,7 @@ export default function EffectsSection({
               captureEffectsStyles.current.hideBackground.style,
             );
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "hideBackground",
               false,
             );
@@ -192,7 +189,7 @@ export default function EffectsSection({
               effectType,
             );
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "hideBackground",
               captureEffects.current.hideBackground,
             );
@@ -209,7 +206,7 @@ export default function EffectsSection({
               styles.style = "color";
               styles.color = color;
 
-              await captureMediaController.current.handleCaptureEffect(
+              await captureMediaController.handleCaptureEffect(
                 "hideBackground",
                 effects,
               );
@@ -222,10 +219,7 @@ export default function EffectsSection({
           scrollingContainerRef={effectsContainerRef}
           streamEffects={captureEffects.current.blur}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "blur",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("blur", false);
           }}
         />
         <TintSection
@@ -237,15 +231,12 @@ export default function EffectsSection({
           clickFunctionCallback={async () => {
             captureEffectsStyles.current.tint.color = tintColor.current;
 
-            await captureMediaController.current.handleCaptureEffect(
-              "tint",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("tint", false);
           }}
           acceptColorCallback={async () => {
             captureEffectsStyles.current.tint.color = tintColor.current;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "tint",
               captureEffects.current.tint,
             );
@@ -258,15 +249,12 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.glasses}
           effectsStyles={captureEffectsStyles.current.glasses}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "glasses",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("glasses", false);
           }}
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.glasses.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "glasses",
               captureEffects.current.glasses,
             );
@@ -279,15 +267,12 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.beards}
           effectsStyles={captureEffectsStyles.current.beards}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "beards",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("beards", false);
           }}
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.beards.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "beards",
               captureEffects.current.beards,
             );
@@ -300,7 +285,7 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.mustaches}
           effectsStyles={captureEffectsStyles.current.mustaches}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "mustaches",
               false,
             );
@@ -308,7 +293,7 @@ export default function EffectsSection({
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.mustaches.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "mustaches",
               captureEffects.current.mustaches,
             );
@@ -321,15 +306,12 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.masks}
           effectsStyles={captureEffectsStyles.current.masks}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "masks",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("masks", false);
           }}
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.masks.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "masks",
               captureEffects.current.masks,
             );
@@ -342,15 +324,12 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.hats}
           effectsStyles={captureEffectsStyles.current.hats}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "hats",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("hats", false);
           }}
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.hats.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "hats",
               captureEffects.current.hats,
             );
@@ -363,15 +342,12 @@ export default function EffectsSection({
           streamEffects={captureEffects.current.pets}
           effectsStyles={captureEffectsStyles.current.pets}
           clickFunctionCallback={async () => {
-            await captureMediaController.current.handleCaptureEffect(
-              "pets",
-              false,
-            );
+            await captureMediaController.handleCaptureEffect("pets", false);
           }}
           holdFunctionCallback={async (effectType) => {
             captureEffectsStyles.current.pets.style = effectType;
 
-            await captureMediaController.current.handleCaptureEffect(
+            await captureMediaController.handleCaptureEffect(
               "pets",
               captureEffects.current.pets,
             );

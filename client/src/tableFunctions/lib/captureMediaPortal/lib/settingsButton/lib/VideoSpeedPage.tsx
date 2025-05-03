@@ -25,7 +25,7 @@ export default function VideoSpeedPage({
   settings,
   setSettings,
 }: {
-  captureMediaController: React.MutableRefObject<CaptureMediaController>;
+  captureMediaController: CaptureMediaController;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
@@ -41,7 +41,7 @@ export default function VideoSpeedPage({
       return newSettings;
     });
 
-    captureMediaController.current.handlePlaybackSpeed(videoSpeed);
+    captureMediaController.handlePlaybackSpeed(videoSpeed);
   };
 
   const handleCloseVideoSpeedPage = () => {

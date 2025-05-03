@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { MediaContextProvider } from "./src/context/mediaContext/MediaContext";
 import { SignalContextProvider } from "./src/context/signalContext/SignalContext";
+import { UploadContextProvider } from "./src/context/uploadContext/UploadContext";
 import { EffectsContextProvider } from "./src/context/effectsContext/EffectsContext";
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 import { SocketContextProvider } from "./src/context/socketContext/SocketContext";
@@ -22,7 +23,9 @@ function App() {
           <PermissionsContextProvider>
             <SocketContextProvider>
               <UserInfoContextProvider>
-                <Main />
+                <UploadContextProvider>
+                  <Main />
+                </UploadContextProvider>
               </UserInfoContextProvider>
             </SocketContextProvider>
           </PermissionsContextProvider>

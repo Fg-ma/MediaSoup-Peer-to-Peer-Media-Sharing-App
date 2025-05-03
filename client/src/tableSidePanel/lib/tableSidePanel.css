@@ -1,0 +1,3 @@
+.table-side-panel {
+  width: var(--dynamic-width) !important;
+}

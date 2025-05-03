@@ -8,10 +8,8 @@ import {
   TableColors,
 } from "../../serverControllers/tableServer/lib/typeConstant";
 
-class FgTableController {
+class TableController {
   constructor(
-    private username: React.MutableRefObject<string>,
-    private instance: React.MutableRefObject<string>,
     private tableRef: React.RefObject<HTMLDivElement>,
     private setUserData: React.Dispatch<
       React.SetStateAction<{
@@ -23,7 +21,7 @@ class FgTableController {
       }>
     >,
     private aspectDir: React.MutableRefObject<"width" | "height">,
-    private setRerender: React.Dispatch<React.SetStateAction<boolean>>
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   getAspectDir = () => {
@@ -99,4 +97,4 @@ class FgTableController {
   };
 }
 
-export default FgTableController;
+export default TableController;
