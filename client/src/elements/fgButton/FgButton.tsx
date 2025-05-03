@@ -127,7 +127,7 @@ export default function FgButton({
     ...options,
   };
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = externalRef ? externalRef : useRef<HTMLButtonElement>(null);
 
   const isClicked = useRef(false);
 
@@ -172,11 +172,7 @@ export default function FgButton({
         !toggleClickContentRef.current ||
         !toggleClickContentRef.current.contains(event.target as Node)
       ) {
-        if (
-          !(externalRef ? externalRef : buttonRef).current?.contains(
-            event.target as Node,
-          )
-        ) {
+        if (!buttonRef.current?.contains(event.target as Node)) {
           setIsClickToggle(false);
           if (setExternalClickToggleState) setExternalClickToggleState(false);
         }
@@ -212,7 +208,6 @@ export default function FgButton({
       setIsHover,
       startDragPosition,
       buttonRef,
-      externalRef,
       referenceDragElement,
     ),
   );
@@ -266,7 +261,7 @@ export default function FgButton({
   return (
     <>
       <ButtonComponent
-        ref={externalRef ? externalRef : buttonRef}
+        ref={buttonRef}
         id={externalId}
         className={className}
         style={style}
@@ -330,7 +325,7 @@ export default function FgButton({
                 type={fgButtonOptions.hoverType}
                 spacing={fgButtonOptions.hoverSpacing}
                 content={hoverContent}
-                externalRef={externalRef ? externalRef : buttonRef}
+                externalRef={buttonRef}
                 zValue={fgButtonOptions.hoverZValue}
               />
             </Suspense>
@@ -345,7 +340,7 @@ export default function FgButton({
                 type={fgButtonOptions.hoverType}
                 spacing={fgButtonOptions.holdSpacing}
                 content={toggleClickContent}
-                externalRef={externalRef ? externalRef : buttonRef}
+                externalRef={buttonRef}
                 externalPortalRef={toggleClickContentRef}
                 zValue={fgButtonOptions.hoverZValue}
               />
@@ -360,7 +355,7 @@ export default function FgButton({
               <FgPortal
                 type={fgButtonOptions.holdType}
                 content={holdContent}
-                externalRef={externalRef ? externalRef : buttonRef}
+                externalRef={buttonRef}
                 externalPortalRef={holdContentRef}
                 zValue={499900}
                 spacing={fgButtonOptions.holdSpacing}

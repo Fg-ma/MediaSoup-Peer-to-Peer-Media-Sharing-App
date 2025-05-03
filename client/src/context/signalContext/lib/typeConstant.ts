@@ -1,5 +1,5 @@
 import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
-import { InstanceLayerModes } from "../../../fgTableLayers/newInstancesLayer/lib/typeConstant";
+import { InstanceLayerModes } from "../../../tableLayers/newInstancesLayer/lib/typeConstant";
 
 export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
 

@@ -18,7 +18,7 @@ import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import TabledPortal from "./lib/tabledSection/TabledPortal";
 
-export default function FgTableFunctions({
+export default function TableFunctions({
   tableTopRef,
   isCamera,
   cameraActive,

@@ -19,8 +19,8 @@ import BrowserMedia from "./media/BrowserMedia";
 import BundlesController from "./lib/BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
 import Metadata from "./lib/Metadata";
-import FgTable from "./fgTable/FgTable";
-import FgTableFunctions from "./fgTableFunctions/FgTableFunctions";
+import Table from "./table/Table";
+import TableFunctions from "./tableFunctions/TableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
@@ -346,7 +346,7 @@ export default function Main() {
   return (
     // <CreditPage />
     <div className="flex h-screen w-screen flex-col space-y-[1.5%] overflow-hidden bg-fg-tone-black-1 p-[1.5%]">
-      <FgTable
+      <Table
         tableRef={tableRef}
         tableTopRef={tableTopRef}
         bundles={bundles}
@@ -355,7 +355,7 @@ export default function Main() {
         userDevice={userDevice}
         deadbanding={deadbanding}
       />
-      <FgTableFunctions
+      <TableFunctions
         tableTopRef={tableTopRef}
         isCamera={isCamera}
         cameraActive={cameraActive}

@@ -46,7 +46,6 @@ class FgButtonController {
       | undefined
     >,
     private buttonRef: React.RefObject<HTMLButtonElement>,
-    private externalRef: React.RefObject<HTMLButtonElement> | undefined,
     private referenceDragElement: React.RefObject<HTMLElement> | undefined,
   ) {}
 
@@ -153,7 +152,7 @@ class FgButtonController {
   };
 
   handlePointerMove = (event: PointerEvent) => {
-    const buttonElement = this.externalRef?.current || this.buttonRef.current;
+    const buttonElement = this.buttonRef.current;
 
     if (buttonElement && !buttonElement.contains(event.target as Node)) {
       this.setIsHover(false);
@@ -198,7 +197,10 @@ class FgButtonController {
   };
 
   handleVisibilityChange = () => {
-    clearTimeout(this.hoverTimeout.current);
+    if (this.hoverTimeout.current) {
+      this.hoverTimeout.current = undefined;
+      clearTimeout(this.hoverTimeout.current);
+    }
     this.setIsHover(false);
   };
 
