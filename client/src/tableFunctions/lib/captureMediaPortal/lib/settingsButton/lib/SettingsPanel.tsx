@@ -9,7 +9,6 @@ import {
   downloadImageOptions,
   downloadImageOptionsArrays,
   downloadImageOptionsTitles,
-  DownloadImageOptionsTypes,
   downloadVideoOptions,
   downloadVideoOptionsArrays,
   downloadVideoOptionsTitles,
@@ -81,7 +80,7 @@ export default function SettingsPanel({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   finalizeCapture: boolean;
-  mediaType: CaptureMediaTypes;
+  mediaType: React.MutableRefObject<CaptureMediaTypes>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -243,7 +242,7 @@ export default function SettingsPanel({
                   </div>
                 )}
                 clickFunction={
-                  mediaType !== "camera"
+                  mediaType.current !== "camera"
                     ? handleDownloadVideoOptionsActive
                     : handleDownloadImageOptionsActive
                 }

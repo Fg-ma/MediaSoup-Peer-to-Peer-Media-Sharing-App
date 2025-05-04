@@ -29,6 +29,7 @@ export default function HoverElement({
   style,
   hoverContent,
   content,
+  scrollingContainer,
   options,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
@@ -36,6 +37,7 @@ export default function HoverElement({
   style?: React.CSSProperties;
   hoverContent?: React.ReactElement;
   content?: React.ReactElement;
+  scrollingContainer?: React.RefObject<HTMLDivElement>;
   options?: HoverElementOptions;
 }) {
   const hoverElementOptions = {
@@ -76,6 +78,22 @@ export default function HoverElement({
     };
   }, [isHover]);
 
+  useEffect(() => {
+    if (!scrollingContainer || !scrollingContainer.current) return;
+
+    scrollingContainer.current.addEventListener(
+      "scroll",
+      hoverElementController.current.handleScroll,
+    );
+
+    return () => {
+      scrollingContainer.current?.removeEventListener(
+        "scroll",
+        hoverElementController.current.handleScroll,
+      );
+    };
+  }, [scrollingContainer?.current]);
+
   return (
     <>
       <div
@@ -83,6 +101,7 @@ export default function HoverElement({
         className={className}
         style={style}
         onPointerEnter={hoverElementController.current.handlePointerEnter}
+        onPointerLeave={hoverElementController.current.handlePointerLeave}
       >
         {content}
       </div>

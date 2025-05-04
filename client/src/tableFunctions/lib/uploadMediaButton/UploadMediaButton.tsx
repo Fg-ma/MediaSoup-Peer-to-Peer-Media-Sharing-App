@@ -4,6 +4,7 @@ import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoCon
 import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import { useUploadContext } from "../../../context/uploadContext/UploadContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const tableStaticContentServerBaseUrl =
@@ -13,6 +14,8 @@ const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
 export default function UploadMediaButton() {
   const { tableId } = useUserInfoContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const file = useRef<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,9 +37,10 @@ export default function UploadMediaButton() {
       return;
     }
 
+    const contentId = uuidv4();
     const metadata = {
       tableId: tableId.current,
-      contentId: uuidv4(),
+      contentId,
       instanceId: uuidv4(),
       direction: "toTable",
       state: [],
@@ -57,9 +61,65 @@ export default function UploadMediaButton() {
       const { uploadId } = await metaRes.json();
 
       const formData = new FormData();
-      formData.append("file", file.current);
+      const filename = file.current.name;
+      formData.append("file", file.current, filename);
 
       const xhr = new XMLHttpRequest();
+
+      addCurrentUpload(contentId, {
+        uploadUrl: URL.createObjectURL(file.current),
+        filename,
+        mimeType: "svg",
+        size: file.current.size,
+        progress: 0,
+        paused: false,
+      });
+
+      setTimeout(
+        () =>
+          sendUploadSignal({
+            type: "uploadStart",
+            header: {
+              contentId,
+            },
+          }),
+        250,
+      );
+
+      xhr.onload = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadFinish",
+          header: {
+            contentId,
+          },
+        });
+      };
+
+      xhr.upload.onprogress = (event) => {
+        sendUploadSignal({
+          type: "uploadProgress",
+          header: {
+            contentId,
+          },
+          data: {
+            progress: event.loaded / event.total,
+          },
+        });
+      };
+
+      xhr.onerror = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadError",
+          header: {
+            contentId,
+          },
+        });
+      };
+
       xhr.open(
         "POST",
         tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,

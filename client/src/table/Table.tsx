@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../context/socketContext/SocketContext";
-import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import TableController from "./lib/TableController";
 import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
@@ -15,12 +14,13 @@ import RightTableSection from "./lib/sideSections/RightTableSection";
 import TopTableSection from "./lib/sideSections/TopTableSection";
 import BottomTableSection from "./lib/sideSections/BottomTableSection";
 import { TableColors } from "../serverControllers/tableServer/lib/typeConstant";
-import "./lib/fgTable.css";
 import TableInfoPopup from "./lib/tableInfoPopup/TableInfoPopup";
 import LoadingTab from "./lib/loadingTab/LoadingTab";
 import TableSidePanel, { TablePanels } from "../tableSidePanel/TableSidePanel";
+import "./lib/fgTable.css";
 
 export default function Table({
+  tableFunctionsRef,
   tableRef,
   tableTopRef,
   bundles,
@@ -29,6 +29,7 @@ export default function Table({
   userDevice,
   deadbanding,
 }: {
+  tableFunctionsRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   bundles: {
@@ -45,19 +46,17 @@ export default function Table({
   deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { tableSocket } = useSocketContext();
-  const { username, instance } = useUserInfoContext();
 
   const [userData, setUserData] = useState<{
     [username: string]: { color: TableColors; seat: number; online: boolean };
   }>({});
   const [activePanel, setActivePanel] = useState<TablePanels | undefined>(
-    "loading",
+    undefined,
   );
   const [_, setRerender] = useState(false);
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
-  const tablePanelRef = useRef<HTMLDivElement>(null);
 
   const tableController = useRef(
     new TableController(tableRef, setUserData, aspectDir, setRerender),
@@ -108,9 +107,15 @@ export default function Table({
   }, [tableSocket.current]);
 
   return (
-    <div className="flex w-full grow items-center justify-center">
+    <div
+      className="flex w-full items-center justify-center"
+      style={{
+        height: `calc(100% - ${tableFunctionsRef.current?.clientHeight ?? 0}px - 6.125rem)`,
+      }}
+    >
       <TableSidePanel
         activePanel={activePanel}
+        setActivePanel={setActivePanel}
         tableController={tableController}
       />
       <div ref={tableContainerRef} className="flex h-full grow flex-col">
@@ -135,7 +140,10 @@ export default function Table({
             content={
               <>
                 <TableInfoPopup />
-                <LoadingTab />
+                <LoadingTab
+                  activePanel={activePanel}
+                  setActivePanel={setActivePanel}
+                />
                 <div
                   ref={tableRef}
                   className={`fg-table relative h-full w-full rounded-md border-2 border-fg-off-white ${

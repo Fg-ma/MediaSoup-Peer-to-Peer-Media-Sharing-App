@@ -130,6 +130,7 @@ export default {
         /* table layers after content (200001 - 201000) */
         "new-instances-layer": 200700,
         "upload-layer": 200720,
+        "upload-tab": 200900,
         /* top level content (400000 - 500000) */
         "panel-unfocused": 469800,
         "panel-focused-hover": 469900,

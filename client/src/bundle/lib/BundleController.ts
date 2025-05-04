@@ -242,14 +242,14 @@ class BundleController extends BundleSocket {
     switch (message.type) {
       case "localMuteChange":
         const {
-          tableId: newTable_id,
+          tableId: newtableId,
           username: newUsername,
           instance: newInstance,
           producerType: newProducerType,
           producerId: newProducerId,
         } = message.header;
         if (
-          newTable_id === this.tableId &&
+          newtableId === this.tableId &&
           newUsername === this.username &&
           newInstance === this.instance
         ) {

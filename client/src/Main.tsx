@@ -78,6 +78,8 @@ export default function Main() {
 
   const [_rerender, setRerender] = useState(false);
 
+  const tableFunctionsRef = useRef<HTMLDivElement>(null);
+
   const signIn = (signedInUserId: string) => {
     userId.current = signedInUserId;
 
@@ -347,6 +349,7 @@ export default function Main() {
     // <CreditPage />
     <div className="flex h-screen w-screen flex-col space-y-[1.5%] overflow-hidden bg-fg-tone-black-1 p-[1.5%]">
       <Table
+        tableFunctionsRef={tableFunctionsRef}
         tableRef={tableRef}
         tableTopRef={tableTopRef}
         bundles={bundles}
@@ -356,6 +359,7 @@ export default function Main() {
         deadbanding={deadbanding}
       />
       <TableFunctions
+        tableFunctionsRef={tableFunctionsRef}
         tableTopRef={tableTopRef}
         isCamera={isCamera}
         cameraActive={cameraActive}

@@ -11,6 +11,7 @@ import { Permissions } from "../../context/permissionsContext/typeConstant";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useUploadContext } from "../../context/uploadContext/UploadContext";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import PanButton from "../../elements/fgAdjustmentElements/PanButton";
@@ -107,6 +108,8 @@ export default function FgAudioElementContainer({
     instance: activeInstance,
     userId,
   } = useUserInfoContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
@@ -282,9 +285,10 @@ export default function FgAudioElementContainer({
   }, [positioning.current]);
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
+    const contentId = uuidv4();
     const metadata = {
       userId: userId.current,
-      contentId: uuidv4(),
+      contentId,
       direction: "toMuteStyle",
       state: ["muteStyle"],
     };
@@ -304,9 +308,65 @@ export default function FgAudioElementContainer({
       const { uploadId } = await metaRes.json();
 
       const formData = new FormData();
-      formData.append("file", blob, `${name ? name + ".svg" : "image"}`);
+      const filename = `${name ? name + ".svg" : "image.svg"}`;
+      formData.append("file", blob, filename);
 
       const xhr = new XMLHttpRequest();
+
+      addCurrentUpload(contentId, {
+        uploadUrl: URL.createObjectURL(blob),
+        filename,
+        mimeType: "svg",
+        size: blob.size,
+        progress: 0,
+        paused: false,
+      });
+
+      setTimeout(
+        () =>
+          sendUploadSignal({
+            type: "uploadStart",
+            header: {
+              contentId,
+            },
+          }),
+        250,
+      );
+
+      xhr.onload = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadFinish",
+          header: {
+            contentId,
+          },
+        });
+      };
+
+      xhr.upload.onprogress = (event) => {
+        sendUploadSignal({
+          type: "uploadProgress",
+          header: {
+            contentId,
+          },
+          data: {
+            progress: event.loaded / event.total,
+          },
+        });
+      };
+
+      xhr.onerror = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadError",
+          header: {
+            contentId,
+          },
+        });
+      };
+
       xhr.open(
         "POST",
         userStaticContentServerBaseUrl + `upload-file/${uploadId}`,

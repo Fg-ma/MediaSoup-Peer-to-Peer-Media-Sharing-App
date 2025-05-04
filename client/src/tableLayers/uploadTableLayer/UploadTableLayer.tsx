@@ -1,12 +1,15 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
+import { useUploadContext } from "../../context/uploadContext/UploadContext";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function UploadTableLayer() {
   const { tableId } = useUserInfoContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [draggingFiles, setDraggingFiles] = useState(false);
@@ -18,9 +21,10 @@ export default function UploadTableLayer() {
       return;
     }
 
+    const contentId = uuidv4();
     const metadata = {
       tableId: tableId.current,
-      contentId: uuidv4(),
+      contentId,
       instanceId: uuidv4(),
       direction: "toTable",
       state: [],
@@ -42,8 +46,63 @@ export default function UploadTableLayer() {
 
       const formData = new FormData();
       formData.append("file", file.current);
-
+      const filename = file.current.name;
       const xhr = new XMLHttpRequest();
+
+      addCurrentUpload(contentId, {
+        uploadUrl: URL.createObjectURL(file.current),
+        filename,
+        mimeType: "svg",
+        size: file.current.size,
+        progress: 0,
+        paused: false,
+      });
+
+      setTimeout(
+        () =>
+          sendUploadSignal({
+            type: "uploadStart",
+            header: {
+              contentId,
+            },
+          }),
+        250,
+      );
+
+      xhr.onload = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadFinish",
+          header: {
+            contentId,
+          },
+        });
+      };
+
+      xhr.upload.onprogress = (event) => {
+        sendUploadSignal({
+          type: "uploadProgress",
+          header: {
+            contentId,
+          },
+          data: {
+            progress: event.loaded / event.total,
+          },
+        });
+      };
+
+      xhr.onerror = () => {
+        removeCurrentUpload(contentId);
+
+        sendUploadSignal({
+          type: "uploadError",
+          header: {
+            contentId,
+          },
+        });
+      };
+
       xhr.open(
         "POST",
         tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,

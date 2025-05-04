@@ -1,5 +1,6 @@
 .hide-scroll-bar {
   scrollbar-width: none;
+  scrollbar-height: none;
 }
 
 .hide-scroll-bar::-webkit-scrollbar {

@@ -68,11 +68,11 @@ class Utils {
    */
   sanitizeString = (input: string) => {
     // Normalize and remove unsafe characters
-    let sanitized = input.normalize("NFKC").replace(/[^a-zA-Z0-9._-]/g, "_");
+    let sanitized = input.normalize("NFKC").replace(/[^a-zA-Z0-9._-]/g, "");
 
     // Prevent empty or hidden strings
     if (!sanitized || sanitized.startsWith(".")) {
-      sanitized = "i_heart_table_top";
+      sanitized = "ihearttabletop";
     }
 
     return sanitized;

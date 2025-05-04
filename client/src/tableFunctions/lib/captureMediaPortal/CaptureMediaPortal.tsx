@@ -2,7 +2,6 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
-import { useUploadContext } from "../../../context/uploadContext/UploadContext";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import CloseButton from "./lib/CloseButton";
 import CaptureButton from "./lib/capture/CaptureButton";
@@ -27,6 +26,7 @@ import VideoDurationSection from "./lib/finalize/VideoDurationSection";
 import DelayCountDownButton from "./lib/delay/DelayCountDownButton";
 import ShutterSVG from "../../../elements/shutterSVG/ShutterSVG";
 import "./lib/captureMedia.css";
+import { useUploadContext } from "../../../context/uploadContext/UploadContext";
 
 const CaptureMediaVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -85,7 +85,7 @@ export default function CaptureMediaPortal({
   const countDownTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const countDownInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const [recording, setRecording] = useState(false);
+  const recording = useRef(false);
   const [recordingCount, setRecordingCount] = useState(0);
 
   const [finalizeCapture, setFinalizeCapture] = useState(false);
@@ -124,7 +124,6 @@ export default function CaptureMediaPortal({
     mediaType,
     setRecordingCount,
     recording,
-    setRecording,
     setFinalizeCapture,
     countDownTimeout,
     countDownInterval,
@@ -276,9 +275,10 @@ export default function CaptureMediaPortal({
                   <TypeSection
                     captureMedia={captureMedia}
                     captureContainerRef={captureContainerRef}
-                    setMediaType={setMediaType}
+                    mediaType={mediaType}
                     setRecordingCount={setRecordingCount}
                     recording={recording}
+                    setRerender={setRerender}
                   />
                 )}
                 {captureMediaEffectsActive && (

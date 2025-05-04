@@ -58,7 +58,6 @@ class TableFunctionsController {
   stopVideo = async () => {
     if (this.captureMedia.current) {
       this.captureMedia.current.deconstructor();
-
       this.captureMedia.current = undefined;
     }
 

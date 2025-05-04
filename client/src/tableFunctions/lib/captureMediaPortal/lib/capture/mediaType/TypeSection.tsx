@@ -27,22 +27,22 @@ const CaptureMediaTypeSectionTransition: Transition = {
 export default function TypeSection({
   captureMedia,
   captureContainerRef,
-  setMediaType,
+  mediaType,
   setRecordingCount,
   recording,
+  setRerender,
 }: {
   captureMedia: React.RefObject<CaptureMedia | undefined>;
   captureContainerRef: React.RefObject<HTMLDivElement>;
-  setMediaType: React.Dispatch<React.SetStateAction<CaptureMediaTypes>>;
+  mediaType: React.MutableRefObject<CaptureMediaTypes>;
   setRecordingCount: React.Dispatch<React.SetStateAction<number>>;
-  recording: boolean;
+  recording: React.MutableRefObject<boolean>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const captureMediaTypeContainerRef = useRef<HTMLDivElement>(null);
   const subCaptureMediaTypeContainerRef = useRef<HTMLDivElement>(null);
 
   const overflow = useRef(false);
-
-  const [_, setRerender] = useState(false);
 
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
@@ -138,8 +138,10 @@ export default function TypeSection({
             key={key}
             className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
             clickFunction={() => {
-              setMediaType(key as CaptureMediaTypes);
-              if (!recording) {
+              mediaType.current = key as CaptureMediaTypes;
+              setRerender((prev) => !prev);
+
+              if (!recording.current) {
                 if (key === "10s") {
                   setRecordingCount(10);
                 } else if (key === "15s") {

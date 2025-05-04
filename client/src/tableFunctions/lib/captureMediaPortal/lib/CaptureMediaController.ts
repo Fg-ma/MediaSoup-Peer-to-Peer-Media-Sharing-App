@@ -17,7 +17,7 @@ import {
   UploadSignals,
 } from "../../../../context/uploadContext/lib/typeConstant";
 
-const tableStaticContentServerBaseUrl =
+const staticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 
 class CaptureMediaController {
@@ -38,10 +38,9 @@ class CaptureMediaController {
     private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private tintColor: React.MutableRefObject<string>,
-    private mediaType: CaptureMediaTypes,
+    private mediaType: React.MutableRefObject<CaptureMediaTypes>,
     private setRecordingCount: React.Dispatch<React.SetStateAction<number>>,
-    private recording: boolean,
-    private setRecording: React.Dispatch<React.SetStateAction<boolean>>,
+    private recording: React.MutableRefObject<boolean>,
     private setFinalizeCapture: React.Dispatch<React.SetStateAction<boolean>>,
     private countDownTimeout: React.MutableRefObject<
       NodeJS.Timeout | undefined
@@ -159,9 +158,9 @@ class CaptureMediaController {
     clearTimeout(this.countDownTimeout.current);
     this.countDownTimeout.current = undefined;
 
-    this.setRecordingCount(0);
+    this.recording.current = true;
 
-    this.setRecording(true);
+    this.setRecordingCount(0);
 
     this.captureMedia.current?.babylonScene?.takeSnapShot(
       downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value],
@@ -171,7 +170,7 @@ class CaptureMediaController {
     );
 
     this.countDownTimeout.current = setTimeout(() => {
-      this.setRecording(false);
+      this.recording.current = false;
 
       clearInterval(this.countDownInterval.current);
       this.countDownInterval.current = undefined;
@@ -201,13 +200,13 @@ class CaptureMediaController {
         : this.settings.downloadVideoOptions.bitRate.value,
     );
 
-    if (this.mediaType === "10s") {
+    if (this.mediaType.current === "10s") {
       this.setRecordingCount(10);
-    } else if (this.mediaType === "15s") {
+    } else if (this.mediaType.current === "15s") {
       this.setRecordingCount(15);
-    } else if (this.mediaType === "30s") {
+    } else if (this.mediaType.current === "30s") {
       this.setRecordingCount(30);
-    } else if (this.mediaType === "60s") {
+    } else if (this.mediaType.current === "60s") {
       this.setRecordingCount(60);
     }
 
@@ -218,20 +217,22 @@ class CaptureMediaController {
       () => {
         this.captureMedia.current?.babylonScene?.stopRecording();
 
-        this.setRecording(false);
+        this.recording.current = false;
+
+        this.setRerender((prev) => !prev);
 
         clearInterval(this.countDownInterval.current);
         this.countDownInterval.current = undefined;
         clearTimeout(this.countDownTimeout.current);
         this.countDownTimeout.current = undefined;
 
-        if (this.mediaType === "10s") {
+        if (this.mediaType.current === "10s") {
           this.setRecordingCount(10);
-        } else if (this.mediaType === "15s") {
+        } else if (this.mediaType.current === "15s") {
           this.setRecordingCount(15);
-        } else if (this.mediaType === "30s") {
+        } else if (this.mediaType.current === "30s") {
           this.setRecordingCount(30);
-        } else if (this.mediaType === "60s") {
+        } else if (this.mediaType.current === "60s") {
           this.setRecordingCount(60);
         }
 
@@ -239,13 +240,13 @@ class CaptureMediaController {
           this.addVideoSuccessCallback,
         );
       },
-      this.mediaType === "60s"
+      this.mediaType.current === "60s"
         ? 60000
-        : this.mediaType === "30s"
+        : this.mediaType.current === "30s"
           ? 30000
-          : this.mediaType === "15s"
+          : this.mediaType.current === "15s"
             ? 15000
-            : this.mediaType === "10s"
+            : this.mediaType.current === "10s"
               ? 10000
               : 0,
     );
@@ -292,20 +293,20 @@ class CaptureMediaController {
     clearInterval(this.delayCountDownInterval.current);
     this.delayCountDownInterval.current = undefined;
 
-    this.setRecording(false);
+    this.recording.current = false;
     this.setRerender((prev) => !prev);
   };
 
   handleCapture = () => {
     this.setCaptureMediaTypeActive(false);
-    console.log(this.mediaType);
+
     if (
-      this.mediaType === "10s" ||
-      this.mediaType === "15s" ||
-      this.mediaType === "30s" ||
-      this.mediaType === "60s"
+      this.mediaType.current === "10s" ||
+      this.mediaType.current === "15s" ||
+      this.mediaType.current === "30s" ||
+      this.mediaType.current === "60s"
     ) {
-      if (!this.recording) {
+      if (!this.recording.current) {
         if (this.settings.delay.value !== 0) {
           this.setDelay(this.startTimedVideoCapture);
         } else {
@@ -319,13 +320,13 @@ class CaptureMediaController {
         clearTimeout(this.countDownTimeout.current);
         this.countDownTimeout.current = undefined;
 
-        if (this.mediaType === "10s") {
+        if (this.mediaType.current === "10s") {
           this.setRecordingCount(10);
-        } else if (this.mediaType === "15s") {
+        } else if (this.mediaType.current === "15s") {
           this.setRecordingCount(15);
-        } else if (this.mediaType === "30s") {
+        } else if (this.mediaType.current === "30s") {
           this.setRecordingCount(30);
-        } else if (this.mediaType === "60s") {
+        } else if (this.mediaType.current === "60s") {
           this.setRecordingCount(60);
         }
 
@@ -334,15 +335,16 @@ class CaptureMediaController {
         );
       }
 
-      this.setRecording((prev) => !prev);
-    } else if (this.mediaType === "camera") {
+      this.recording.current = !this.recording.current;
+      this.setRerender((prev) => !prev);
+    } else if (this.mediaType.current === "camera") {
       if (this.settings.delay.value !== 0) {
         this.setDelay(this.cameraCapture);
       } else {
         this.cameraCapture();
       }
-    } else if (this.mediaType === "video") {
-      if (!this.recording) {
+    } else if (this.mediaType.current === "video") {
+      if (!this.recording.current) {
         if (this.settings.delay.value !== 0) {
           this.setDelay(this.startVideoCapture);
         } else {
@@ -359,7 +361,8 @@ class CaptureMediaController {
         );
       }
 
-      this.setRecording((prev) => !prev);
+      this.recording.current = !this.recording.current;
+      this.setRerender((prev) => !prev);
     }
   };
 
@@ -376,7 +379,7 @@ class CaptureMediaController {
 
       try {
         const metaRes = await fetch(
-          tableStaticContentServerBaseUrl + "upload-meta",
+          staticContentServerBaseUrl + "upload-meta",
           {
             method: "POST",
             headers: {
@@ -402,30 +405,44 @@ class CaptureMediaController {
 
         this.addCurrentUpload(contentId, {
           uploadUrl: URL.createObjectURL(blob),
+          filename,
           mimeType: this.settings.downloadVideoOptions.mimeType.value,
           size: blob.size,
-          filename,
+          progress: 0,
+          paused: false,
         });
 
-        this.sendUploadSignal({
-          type: "uploadStart",
-          header: { filename },
-        });
-
-        xhr.upload.onprogress = (event) => {
-          this.sendUploadSignal({
-            type: "uploadProgress",
-            header: { filename },
-            data: { progress: event.loaded / event.total },
-          });
-        };
+        setTimeout(
+          () =>
+            this.sendUploadSignal({
+              type: "uploadStart",
+              header: {
+                contentId,
+              },
+            }),
+          250,
+        );
 
         xhr.onload = () => {
           this.removeCurrentUpload(contentId);
 
           this.sendUploadSignal({
             type: "uploadFinish",
-            header: { filename },
+            header: {
+              contentId,
+            },
+          });
+        };
+
+        xhr.upload.onprogress = (event) => {
+          this.sendUploadSignal({
+            type: "uploadProgress",
+            header: {
+              contentId,
+            },
+            data: {
+              progress: event.loaded / event.total,
+            },
           });
         };
 
@@ -434,13 +451,15 @@ class CaptureMediaController {
 
           this.sendUploadSignal({
             type: "uploadError",
-            header: { filename },
+            header: {
+              contentId,
+            },
           });
         };
 
         xhr.open(
           "POST",
-          tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
+          staticContentServerBaseUrl + `upload-file/${uploadId}`,
           true,
         );
 
@@ -460,7 +479,7 @@ class CaptureMediaController {
 
       try {
         const metaRes = await fetch(
-          tableStaticContentServerBaseUrl + "upload-meta",
+          staticContentServerBaseUrl + "upload-meta",
           {
             method: "POST",
             headers: {
@@ -482,30 +501,44 @@ class CaptureMediaController {
 
         this.addCurrentUpload(contentId, {
           uploadUrl: URL.createObjectURL(blob),
+          filename,
           mimeType: this.settings.downloadImageOptions.mimeType.value,
           size: blob.size,
-          filename,
+          progress: 0,
+          paused: false,
         });
 
-        this.sendUploadSignal({
-          type: "uploadStart",
-          header: { filename },
-        });
-
-        xhr.upload.onprogress = (event) => {
-          this.sendUploadSignal({
-            type: "uploadProgress",
-            header: { filename },
-            data: { progress: event.loaded / event.total },
-          });
-        };
+        setTimeout(
+          () =>
+            this.sendUploadSignal({
+              type: "uploadStart",
+              header: {
+                contentId,
+              },
+            }),
+          250,
+        );
 
         xhr.onload = () => {
           this.removeCurrentUpload(contentId);
 
           this.sendUploadSignal({
             type: "uploadFinish",
-            header: { filename },
+            header: {
+              contentId,
+            },
+          });
+        };
+
+        xhr.upload.onprogress = (event) => {
+          this.sendUploadSignal({
+            type: "uploadProgress",
+            header: {
+              contentId,
+            },
+            data: {
+              progress: event.loaded / event.total,
+            },
           });
         };
 
@@ -514,13 +547,15 @@ class CaptureMediaController {
 
           this.sendUploadSignal({
             type: "uploadError",
-            header: { filename },
+            header: {
+              contentId,
+            },
           });
         };
 
         xhr.open(
           "POST",
-          tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
+          staticContentServerBaseUrl + `upload-file/${uploadId}`,
           true,
         );
 

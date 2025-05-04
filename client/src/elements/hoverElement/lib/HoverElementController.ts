@@ -14,27 +14,29 @@ class HoverElementController {
       this.hoverTimeout.current = setTimeout(() => {
         this.setIsHover(true);
       }, this.hoverElementOptions.hoverTimeoutDuration);
-
-      document.addEventListener("pointermove", this.handlePointerMove);
     }
   };
 
-  handlePointerMove = (event: PointerEvent) => {
-    if (!this.hoverContainerRef.current?.contains(event.target as Node)) {
-      this.setIsHover(false);
-      if (this.hoverTimeout.current !== undefined) {
-        clearTimeout(this.hoverTimeout.current);
-        this.hoverTimeout.current = undefined;
-      }
-
-      document.removeEventListener("pointermove", this.handlePointerMove);
+  handlePointerLeave = () => {
+    this.setIsHover(false);
+    if (this.hoverTimeout.current !== undefined) {
+      clearTimeout(this.hoverTimeout.current);
+      this.hoverTimeout.current = undefined;
     }
   };
 
   handleVisibilityChange = () => {
     if (this.hoverTimeout.current) {
-      this.hoverTimeout.current = undefined;
       clearTimeout(this.hoverTimeout.current);
+      this.hoverTimeout.current = undefined;
+    }
+    this.setIsHover(false);
+  };
+
+  handleScroll = () => {
+    if (this.hoverTimeout.current) {
+      clearTimeout(this.hoverTimeout.current);
+      this.hoverTimeout.current = undefined;
     }
     this.setIsHover(false);
   };

@@ -3,17 +3,23 @@ import FgScrollbarElementController from "./lib/FgScrollbarElementController";
 import "./lib/fgScrollbar.css";
 
 export default function FgScrollbarElement({
-  direction,
+  externalRef,
+  direction = "vertical",
   scrollingContentRef,
   content,
+  className,
   style,
 }: {
-  direction: "vertical" | "horizontal";
+  externalRef?: React.RefObject<HTMLDivElement>;
+  direction?: "vertical" | "horizontal";
   scrollingContentRef: React.RefObject<HTMLDivElement>;
-  content: React.ReactNode;
-  style: CSSProperties;
+  content?: React.ReactNode;
+  className?: string;
+  style?: CSSProperties;
 }) {
-  const scrollbarElementRef = useRef<HTMLDivElement>(null);
+  const scrollbarElementRef = externalRef
+    ? externalRef
+    : useRef<HTMLDivElement>(null);
   const scrollbarRef = useRef<HTMLDivElement>(null);
   const scrollbarTrackRef = useRef<HTMLDivElement>(null);
   const scrollbarThumbRef = useRef<HTMLDivElement>(null);
@@ -86,7 +92,7 @@ export default function FgScrollbarElement({
   return (
     <div
       ref={scrollbarElementRef}
-      className="hide-fg-scrollbar relative"
+      className={`${className} relative`}
       style={style}
       onPointerMove={fgScrollbarElementController.current.hideTableScrollBar}
       onPointerLeave={fgScrollbarElementController.current.pointerLeaveFunction}

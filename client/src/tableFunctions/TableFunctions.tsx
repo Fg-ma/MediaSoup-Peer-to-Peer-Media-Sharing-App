@@ -19,6 +19,7 @@ import Deadbanding from "../babylon/Deadbanding";
 import TabledPortal from "./lib/tabledSection/TabledPortal";
 
 export default function TableFunctions({
+  tableFunctionsRef,
   tableTopRef,
   isCamera,
   cameraActive,
@@ -45,6 +46,7 @@ export default function TableFunctions({
   userDevice,
   deadbanding,
 }: {
+  tableFunctionsRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   isCamera: React.MutableRefObject<boolean>;
   cameraActive: boolean;
@@ -156,7 +158,10 @@ export default function TableFunctions({
   }, [captureMediaActive]);
 
   return (
-    <div className="flex h-16 w-full items-center justify-center space-x-5 px-[5%]">
+    <div
+      ref={tableFunctionsRef}
+      className="flex h-16 w-full items-center justify-center space-x-5 px-[5%]"
+    >
       <div className="flex h-full w-max space-x-3 rounded-xl border-2 border-fg-off-white bg-fg-tone-black-6 px-4 py-2">
         <MoreTableFunctionsButton
           tableTopRef={tableTopRef}

@@ -2,19 +2,33 @@ import React, { useEffect, useState } from "react";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import { useUploadContext } from "../../../../context/uploadContext/UploadContext";
-import { UploadSignals } from "src/context/uploadContext/lib/typeConstant";
+import {
+  TableUpload,
+  UploadSignals,
+} from "../../../../context/uploadContext/lib/typeConstant";
 
-export default function LoadingElement() {
-  const { addUploadSignalListener, removeUploadSignalListener } =
-    useUploadContext();
+export default function LoadingElement({
+  contentId,
+  upload,
+  loadingTabRef,
+}: {
+  contentId: string;
+  upload: TableUpload;
+  loadingTabRef: React.RefObject<HTMLDivElement>;
+}) {
+  const {
+    addUploadSignalListener,
+    removeUploadSignalListener,
+    getCurrentUploads,
+  } = useUploadContext();
 
-  const [progress, setProgress] = useState(0);
+  const [_, setRerender] = useState(false);
 
   const polarToCartesian = (angleInDegrees: number) => {
     const angleInRadians = ((angleInDegrees + 90) * Math.PI) / 180.0;
     return {
-      x: 50 + 50 * Math.cos(angleInRadians),
-      y: 50 + 50 * Math.sin(angleInRadians),
+      x: 50 + 45 * Math.cos(angleInRadians),
+      y: 50 + 45 * Math.sin(angleInRadians),
     };
   };
 
@@ -32,8 +46,8 @@ export default function LoadingElement() {
       start.x,
       start.y,
       "A",
-      50,
-      50,
+      45,
+      45,
       0,
       largeArcFlag,
       0,
@@ -44,15 +58,11 @@ export default function LoadingElement() {
   };
 
   const handleUploadListener = (signal: UploadSignals) => {
+    if (signal.header.contentId !== contentId) return;
+
     switch (signal.type) {
-      case "uploadStart":
-        break;
       case "uploadProgress":
-        setProgress(signal.data.progress * 359.99);
-        break;
-      case "uploadFinish":
-        break;
-      case "uploadError":
+        setRerender((prev) => !prev);
         break;
       default:
         break;
@@ -69,14 +79,58 @@ export default function LoadingElement() {
 
   return (
     <HoverElement
-      className="h-8 rounded-full bg-fg-off-white"
+      className="aspect-square h-12 rounded-full bg-fg-off-white"
+      scrollingContainer={loadingTabRef}
       content={
         <svg className="h-full w-full fill-fg-red" viewBox="0 0 100 100">
-          <path d={describeArc(progress)} fill="#d40213" />
+          <mask id="arcMask1">
+            <circle cx="50" cy="50" r="100" fill="white" />
+            <circle cx="50" cy="50" r="40" fill="black" />
+          </mask>
+
+          <path
+            d={describeArc(
+              (getCurrentUploads()[contentId]?.progress ?? 0) * 359.99,
+            )}
+            fill="#d40213"
+            stroke="#d40213"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            mask="url(#arcMask1)"
+          />
+
+          <mask id="arcMask2">
+            <circle cx="50" cy="50" r="100" fill="black" />
+            <circle cx="50" cy="50" r="40" fill="white" />
+          </mask>
+
+          <path
+            d={describeArc(
+              (getCurrentUploads()[contentId]?.progress ?? 0) * 359.99,
+            )}
+            fill="#e62833"
+            stroke="#e62833"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            mask="url(#arcMask2)"
+          />
         </svg>
       }
       hoverContent={
-        <FgHoverContentStandard content="Filename (60%)" style="light" />
+        <FgHoverContentStandard
+          content={
+            <div>
+              {upload.filename} (
+              <span className="font-B612Mono">
+                {(getCurrentUploads()[contentId]?.progress * 100).toFixed(0)}
+              </span>
+              %)
+            </div>
+          }
+          style="light"
+        />
       }
       options={{
         hoverSpacing: 2,

@@ -7,14 +7,14 @@ import FgHoverContentStandard from "../../../../../../elements/fgHoverContentSta
 
 export default function TypeButton({
   mediaType,
-  recordingCount,
   recording,
+  recordingCount,
   captureMediaController,
   captureMediaEffectsActive,
   captureMediaTypeActive,
 }: {
-  mediaType: CaptureMediaTypes;
-  recording: boolean;
+  mediaType: React.MutableRefObject<CaptureMediaTypes>;
+  recording: React.MutableRefObject<boolean>;
   recordingCount: number;
   captureMediaController: CaptureMediaController;
   captureMediaEffectsActive: boolean;
@@ -38,7 +38,7 @@ export default function TypeButton({
     if (counterRef.current) observer.observe(counterRef.current);
 
     return () => observer.disconnect();
-  }, [mediaType, recording]);
+  }, [mediaType.current, recording.current]);
 
   const formatTime = (time: number) => {
     const hours = Math.floor(time / 3600);
@@ -64,9 +64,10 @@ export default function TypeButton({
         captureMediaController.handleCaptureMediaType();
       }}
       contentFunction={() =>
-        mediaType === "camera" || (mediaType === "video" && !recording) ? (
+        mediaType.current === "camera" ||
+        (mediaType.current === "video" && !recording.current) ? (
           <FgSVGElement
-            src={captureMediaTypeMeta[mediaType].icon}
+            src={captureMediaTypeMeta[mediaType.current].icon}
             className="aspect-square h-full"
             attributes={[
               { key: "fill", value: "#f2f2f2" },
@@ -81,7 +82,7 @@ export default function TypeButton({
             className="flex h-full w-max items-center justify-center font-Josefin text-fg-white"
             style={{ fontSize, lineHeight: "0.8lh", paddingTop }}
           >
-            {recording && mediaType === "video"
+            {recording.current && mediaType.current === "video"
               ? formatTime(recordingCount)
               : recordingCount}
           </div>

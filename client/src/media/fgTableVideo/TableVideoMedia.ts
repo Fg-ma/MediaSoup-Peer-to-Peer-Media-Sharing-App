@@ -308,15 +308,15 @@ class TableVideoMedia {
 
         this.loadingState = "downloaded";
 
-        this.audioStream = (this.video as any).captureStream();
+        // this.audioStream = (this.video as any)?.captureStream();
 
-        if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
-          this.videoAudioMedia = new TableVideoAudioMedia(
-            this.videoId,
-            this.audioStream,
-            this.userEffects,
-          );
-        }
+        // if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
+        //   this.videoAudioMedia = new TableVideoAudioMedia(
+        //     this.videoId,
+        //     this.audioStream,
+        //     this.userEffects,
+        //   );
+        // }
 
         this.videoListeners.forEach((listener) => {
           listener({ type: "downloadComplete" });

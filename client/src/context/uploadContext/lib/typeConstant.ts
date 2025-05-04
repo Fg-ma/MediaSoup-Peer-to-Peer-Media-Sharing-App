@@ -7,14 +7,14 @@ export type UploadSignals =
 export type onUploadStartType = {
   type: "uploadStart";
   header: {
-    filename: string;
+    contentId: string;
   };
 };
 
 export type onUploadProgressType = {
   type: "uploadProgress";
   header: {
-    filename: string;
+    contentId: string;
   };
   data: {
     progress: number;
@@ -24,14 +24,14 @@ export type onUploadProgressType = {
 export type onUploadFinishType = {
   type: "uploadFinish";
   header: {
-    filename: string;
+    contentId: string;
   };
 };
 
 export type onUploadErrorType = {
   type: "uploadError";
   header: {
-    filename: string;
+    contentId: string;
   };
 };
 
@@ -40,4 +40,6 @@ export type TableUpload = {
   mimeType: string;
   size: number;
   filename: string;
+  progress: number;
+  paused: boolean;
 };

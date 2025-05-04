@@ -12,7 +12,7 @@ export default function CaptureButton({
   recording,
   captureMediaController,
 }: {
-  recording: boolean;
+  recording: React.MutableRefObject<boolean>;
   captureMediaController: CaptureMediaController;
 }) {
   return (
@@ -30,7 +30,7 @@ export default function CaptureButton({
             { key: "stroke", value: "#f2f2f2" },
             { key: "width", value: "100%" },
             { key: "height", value: "100%" },
-            recording
+            recording.current
               ? {
                   key: "fill",
                   value: "#d40213",

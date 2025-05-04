@@ -33,7 +33,7 @@ export default function SettingsButton({
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   finalizeCapture: boolean;
-  mediaType: CaptureMediaTypes;
+  mediaType: React.MutableRefObject<CaptureMediaTypes>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);

@@ -28,7 +28,7 @@ export const cleanup = new Cleanup(broadcaster);
 
 // tableTopCeph.emptyBucket("table-svgs");
 // tableTopCeph.emptyBucket("table-images");
-// tableTopCeph.listBucketContents("table-svgs");
+// tableTopCeph.listBucketContents("table-images");
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",

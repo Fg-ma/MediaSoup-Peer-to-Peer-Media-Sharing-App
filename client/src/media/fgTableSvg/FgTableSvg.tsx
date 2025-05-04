@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useUploadContext } from "../../context/uploadContext/UploadContext";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
@@ -35,6 +36,8 @@ export default function FgTableSvg({
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { tableId } = useUserInfoContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const [editing, setEditing] = useState(false);
 
@@ -278,9 +281,65 @@ export default function FgTableSvg({
                   const { uploadId } = await metaRes.json();
 
                   const formData = new FormData();
-                  formData.append("file", file);
+                  const filename = file.name;
+                  formData.append("file", file, filename);
 
                   const xhr = new XMLHttpRequest();
+
+                  addCurrentUpload(svgMediaInstance.svgMedia.svgId, {
+                    uploadUrl: URL.createObjectURL(blob),
+                    filename,
+                    mimeType: "svg",
+                    size: blob.size,
+                    progress: 0,
+                    paused: false,
+                  });
+
+                  setTimeout(
+                    () =>
+                      sendUploadSignal({
+                        type: "uploadStart",
+                        header: {
+                          contentId: svgMediaInstance.svgMedia.svgId,
+                        },
+                      }),
+                    250,
+                  );
+
+                  xhr.onload = () => {
+                    removeCurrentUpload(svgMediaInstance.svgMedia.svgId);
+
+                    sendUploadSignal({
+                      type: "uploadFinish",
+                      header: {
+                        contentId: svgMediaInstance.svgMedia.svgId,
+                      },
+                    });
+                  };
+
+                  xhr.upload.onprogress = (event) => {
+                    sendUploadSignal({
+                      type: "uploadProgress",
+                      header: {
+                        contentId: svgMediaInstance.svgMedia.svgId,
+                      },
+                      data: {
+                        progress: event.loaded / event.total,
+                      },
+                    });
+                  };
+
+                  xhr.onerror = () => {
+                    removeCurrentUpload(svgMediaInstance.svgMedia.svgId);
+
+                    sendUploadSignal({
+                      type: "uploadError",
+                      header: {
+                        contentId: svgMediaInstance.svgMedia.svgId,
+                      },
+                    });
+                  };
+
                   xhr.open(
                     "POST",
                     tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,

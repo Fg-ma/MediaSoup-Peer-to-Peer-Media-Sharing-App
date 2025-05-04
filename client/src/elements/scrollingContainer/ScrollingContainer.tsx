@@ -39,6 +39,7 @@ const scrollButtonsTransition: Transition = {
 export default function ScrollingContainer({
   externalRef,
   className,
+  style,
   content,
   buttonBackgroundColor = "#161616",
   buttonBackgroundColorTransition = {
@@ -51,6 +52,7 @@ export default function ScrollingContainer({
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
   className?: string;
+  style?: React.CSSProperties;
   content: ReactNode;
   buttonBackgroundColor?: string;
   buttonBackgroundColorTransition?: Transition;
@@ -138,6 +140,7 @@ export default function ScrollingContainer({
   return (
     <div
       className={`${className} flex w-full items-center justify-start overflow-hidden`}
+      style={style}
     >
       <AnimatePresence>
         {showLeftScroll && (
