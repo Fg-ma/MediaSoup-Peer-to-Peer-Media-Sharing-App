@@ -141,7 +141,7 @@ export default function FgMediaContainer({
 
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
 
-  const [state, setState] = useState<TableContentStateTypes[]>(initState);
+  const state = useRef<TableContentStateTypes[]>(initState);
 
   const [_, setRerender] = useState(false);
 
@@ -196,7 +196,7 @@ export default function FgMediaContainer({
       frontEffectsContainerRef,
       tableSocket,
       state,
-      setState,
+      setRerender,
     ),
   );
 
@@ -225,7 +225,8 @@ export default function FgMediaContainer({
   );
 
   useEffect(() => {
-    setState(initState);
+    state.current = initState;
+    setRerender((prev) => !prev);
   }, [initState]);
 
   useEffect(() => {

@@ -12,6 +12,8 @@ import {
 } from "../../universal/effectsTypeConstant";
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import { useSocketContext } from "./context/socketContext/SocketContext";
+import { useToolsContext } from "./context/toolsContext/ToolsContext";
+import { useUploadContext } from "./context/uploadContext/UploadContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import UserDevice from "./lib/UserDevice";
@@ -28,8 +30,9 @@ import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 import "./css/scrollbar.css";
 import "./css/fontStyles.css";
 import "./css/tips.css";
-import CreditPage from "./creditPage/CreditPage";
 import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import Uploader from "./uploader/Uploader";
+import CreditPage from "./creditPage/CreditPage";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -44,6 +47,9 @@ export default function Main() {
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
+  const { uploader } = useToolsContext();
+  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
+    useUploadContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -88,6 +94,13 @@ export default function Main() {
       userId.current,
       instance.current,
       userMedia,
+    );
+
+    uploader.current = new Uploader(
+      tableId,
+      sendUploadSignal,
+      addCurrentUpload,
+      removeCurrentUpload,
     );
   };
 

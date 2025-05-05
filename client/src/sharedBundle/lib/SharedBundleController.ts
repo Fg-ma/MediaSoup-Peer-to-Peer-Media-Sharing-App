@@ -367,7 +367,7 @@ class SharedBundleController extends SharedBundleSocket {
       case "videoUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType, state } = message.data;
+          const { filename, mimeType, state, initPositioning } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newVideoMedia = new TableVideoMedia(
@@ -393,17 +393,19 @@ class SharedBundleController extends SharedBundleSocket {
                 this.deadbanding,
                 this.userEffectsStyles,
                 this.userEffects,
-                {
-                  position: {
-                    left: 50,
-                    top: 50,
-                  },
-                  scale: {
-                    x: 25,
-                    y: 25,
-                  },
-                  rotation: 0,
-                },
+                initPositioning
+                  ? initPositioning
+                  : {
+                      position: {
+                        left: 50,
+                        top: 50,
+                      },
+                      scale: {
+                        x: 25,
+                        y: 25,
+                      },
+                      rotation: 0,
+                    },
                 this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
               );
           }
@@ -421,7 +423,7 @@ class SharedBundleController extends SharedBundleSocket {
       case "imageUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType, state } = message.data;
+          const { filename, mimeType, state, initPositioning } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newImageMedia = new TableImageMedia(
@@ -446,17 +448,19 @@ class SharedBundleController extends SharedBundleSocket {
                 this.userEffects,
                 this.userDevice,
                 this.deadbanding,
-                {
-                  position: {
-                    left: 50,
-                    top: 50,
-                  },
-                  scale: {
-                    x: 25,
-                    y: 25,
-                  },
-                  rotation: 0,
-                },
+                initPositioning
+                  ? initPositioning
+                  : {
+                      position: {
+                        left: 50,
+                        top: 50,
+                      },
+                      scale: {
+                        x: 25,
+                        y: 25,
+                      },
+                      rotation: 0,
+                    },
               );
           }
           this.setRerender((prev) => !prev);
@@ -487,7 +491,7 @@ class SharedBundleController extends SharedBundleSocket {
       case "svgUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType, state } = message.data;
+          const { filename, mimeType, state, initPositioning } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newSvgMedia = new TableSvgMedia(
@@ -508,17 +512,19 @@ class SharedBundleController extends SharedBundleSocket {
                 instanceId,
                 this.userEffectsStyles,
                 this.userEffects,
-                {
-                  position: {
-                    left: 50,
-                    top: 50,
-                  },
-                  scale: {
-                    x: 25,
-                    y: 25,
-                  },
-                  rotation: 0,
-                },
+                initPositioning
+                  ? initPositioning
+                  : {
+                      position: {
+                        left: 50,
+                        top: 50,
+                      },
+                      scale: {
+                        x: 25,
+                        y: 25,
+                      },
+                      rotation: 0,
+                    },
               );
           }
 
@@ -557,7 +563,7 @@ class SharedBundleController extends SharedBundleSocket {
       case "textUploadedToTable":
         {
           const { contentId, instanceId } = message.header;
-          const { filename, mimeType, state } = message.data;
+          const { filename, mimeType, state, initPositioning } = message.data;
 
           if (this.tableStaticContentSocket.current) {
             const newTextMedia = new TableTextMedia(
@@ -573,17 +579,23 @@ class SharedBundleController extends SharedBundleSocket {
             this.userMedia.current.text.table[contentId] = newTextMedia;
 
             this.userMedia.current.text.tableInstances[instanceId] =
-              new TableTextMediaInstance(newTextMedia, instanceId, {
-                position: {
-                  left: 50,
-                  top: 50,
-                },
-                scale: {
-                  x: 25,
-                  y: 25,
-                },
-                rotation: 0,
-              });
+              new TableTextMediaInstance(
+                newTextMedia,
+                instanceId,
+                initPositioning
+                  ? initPositioning
+                  : {
+                      position: {
+                        left: 50,
+                        top: 50,
+                      },
+                      scale: {
+                        x: 25,
+                        y: 25,
+                      },
+                      rotation: 0,
+                    },
+              );
           }
           this.setRerender((prev) => !prev);
         }

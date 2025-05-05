@@ -12,8 +12,8 @@ import {
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
-import Deadbanding from "src/babylon/Deadbanding";
-import UserDevice from "src/lib/UserDevice";
+import Deadbanding from "../../babylon/Deadbanding";
+import UserDevice from "../../lib/UserDevice";
 
 export type VideoListenerTypes =
   | { type: "downloadComplete" }

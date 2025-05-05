@@ -166,13 +166,13 @@ export default function Table({
                       tableRef={tableRef}
                       tableTopRef={tableTopRef}
                     />
-                    <UploadTableLayer />
+                    <UploadTableLayer tableTopRef={tableTopRef} />
                     <NewInstancesLayer tableRef={tableRef} />
                     {gridActive && (
                       <TableGridOverlay
                         gridSize={gridSize}
                         tableTopRef={tableTopRef}
-                        gridColor="#fff"
+                        gridColor="#f2f2f2"
                       />
                     )}
                     <SharedBundle

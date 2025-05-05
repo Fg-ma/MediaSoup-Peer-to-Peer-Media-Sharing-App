@@ -113,7 +113,7 @@ export default function PositioningIndicator({
             {instance.instances.map((ins, i) => (
               <div
                 key={instance.contentId + "_" + i}
-                className="pointer-events-none absolute select-none rounded border border-dashed border-fg-red"
+                className="absolute cursor-pointer select-none rounded border border-dashed border-fg-red"
                 style={{
                   width: `${ins.width}%`,
                   height: `${ins.height}%`,

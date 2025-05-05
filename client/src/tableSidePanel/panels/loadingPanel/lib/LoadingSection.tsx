@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  TableUpload,
-  UploadSignals,
-} from "../../../../context/uploadContext/lib/typeConstant";
-import { useUploadContext } from "../../../../context/uploadContext/UploadContext";
 import FgButton from "../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import LoadingBar from "../../../../elements/loadingBar/LoadingBar";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import ChunkedUploader, {
+  ChunkedUploadListenerTypes,
+} from "../../../../uploader/lib/chunkUploader/ChunkUploader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,24 +14,23 @@ const playIcon = nginxAssetServerBaseUrl + "svgs/playIcon.svg";
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 export default function LoadingSection({
-  contentId,
   upload,
   tablePanelRef,
 }: {
-  contentId: string;
-  upload: TableUpload;
+  upload: ChunkedUploader;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { addUploadSignalListener, removeUploadSignalListener } =
-    useUploadContext();
-
   const [_, setRerender] = useState(false);
 
-  const handleUploadListener = (signal: UploadSignals) => {
-    if (signal.header.contentId !== contentId) return;
-
-    switch (signal.type) {
+  const handleUploadListener = (message: ChunkedUploadListenerTypes) => {
+    switch (message.type) {
       case "uploadProgress":
+        setRerender((prev) => !prev);
+        break;
+      case "uploadPaused":
+        setRerender((prev) => !prev);
+        break;
+      case "uploadPlay":
         setRerender((prev) => !prev);
         break;
       default:
@@ -42,10 +39,10 @@ export default function LoadingSection({
   };
 
   useEffect(() => {
-    addUploadSignalListener(handleUploadListener);
+    upload.addChunkedUploadListener(handleUploadListener);
 
     return () => {
-      removeUploadSignalListener(handleUploadListener);
+      upload.removeChunkedUploadListener(handleUploadListener);
     };
   }, []);
 

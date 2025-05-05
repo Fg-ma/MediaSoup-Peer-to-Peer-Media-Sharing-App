@@ -25,7 +25,7 @@ export default function UpperControls({
   mediaContainerOptions: MediaContainerOptions;
   fullscreen: boolean;
   backgroundMedia: boolean;
-  state: TableContentStateTypes[];
+  state: React.MutableRefObject<TableContentStateTypes[]>;
 }) {
   return (
     <div

@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Transition, Variants, motion } from "framer-motion";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useEffectsContext } from "../../../context/effectsContext/EffectsContext";
+import { useToolsContext } from "../../../context/toolsContext/ToolsContext";
 import FgPortal from "../../../elements/fgPortal/FgPortal";
 import CloseButton from "./lib/CloseButton";
 import CaptureButton from "./lib/capture/CaptureButton";
@@ -26,7 +27,6 @@ import VideoDurationSection from "./lib/finalize/VideoDurationSection";
 import DelayCountDownButton from "./lib/delay/DelayCountDownButton";
 import ShutterSVG from "../../../elements/shutterSVG/ShutterSVG";
 import "./lib/captureMedia.css";
-import { useUploadContext } from "../../../context/uploadContext/UploadContext";
 
 const CaptureMediaVar: Variants = {
   init: { opacity: 0, scale: 0.8 },
@@ -56,9 +56,8 @@ export default function CaptureMediaPortal({
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
-  const { tableId, preferences } = useUserInfoContext();
-  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadContext();
+  const { preferences } = useUserInfoContext();
+  const { uploader } = useToolsContext();
 
   const [inCaptureMedia, setInCaptureMedia] = useState(false);
   const [captureMediaEffectsActive, setCaptureMediaEffectsActive] =
@@ -111,7 +110,6 @@ export default function CaptureMediaPortal({
   const delayCountDownInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const captureMediaController = new CaptureMediaController(
-    tableId,
     captureEffects,
     captureMedia,
     captureContainerRef,
@@ -143,9 +141,7 @@ export default function CaptureMediaPortal({
     delayTimeout,
     delayCountDownInterval,
     delaying,
-    sendUploadSignal,
-    addCurrentUpload,
-    removeCurrentUpload,
+    uploader,
   );
 
   const handleResize = () => {

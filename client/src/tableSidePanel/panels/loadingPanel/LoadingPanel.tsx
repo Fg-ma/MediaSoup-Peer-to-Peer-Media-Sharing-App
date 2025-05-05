@@ -31,9 +31,6 @@ export default function LoadingPanel({
       case "uploadFinish":
         setRerender((prev) => !prev);
         break;
-      case "uploadError":
-        setRerender((prev) => !prev);
-        break;
       default:
         break;
     }
@@ -54,7 +51,6 @@ export default function LoadingPanel({
       {Object.entries(getCurrentUploads()).map(([contentId, upload]) => (
         <LoadingSection
           key={contentId}
-          contentId={contentId}
           upload={upload}
           tablePanelRef={tablePanelRef}
         />

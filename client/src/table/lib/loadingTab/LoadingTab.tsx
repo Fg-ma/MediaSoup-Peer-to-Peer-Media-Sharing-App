@@ -28,9 +28,6 @@ export default function LoadingTab({
       case "uploadFinish":
         setRerender((prev) => !prev);
         break;
-      case "uploadError":
-        setRerender((prev) => !prev);
-        break;
       default:
         break;
     }

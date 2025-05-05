@@ -49,10 +49,8 @@ class LowerController {
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
     >,
-    private state: TableContentStateTypes[],
-    private setState: React.Dispatch<
-      React.SetStateAction<TableContentStateTypes[]>
-    >,
+    private state: React.MutableRefObject<TableContentStateTypes[]>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {
     this.reactController = new ReactController(
       this.mediaId,
@@ -283,7 +281,7 @@ class LowerController {
   };
 
   handleTable = () => {
-    const newState = [...this.state];
+    const newState = [...this.state.current];
 
     const index = newState.indexOf("tabled");
     if (index !== -1) {
@@ -292,7 +290,8 @@ class LowerController {
       newState.push("tabled");
     }
 
-    this.setState(newState);
+    this.state.current = newState;
+    this.setRerender((prev) => !prev);
 
     this.tableStaticContentSocket.current?.changeContentState(
       this.kind,

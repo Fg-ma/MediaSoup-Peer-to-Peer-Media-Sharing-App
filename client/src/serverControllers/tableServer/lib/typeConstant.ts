@@ -1,4 +1,4 @@
-import { FgBackground } from "src/elements/fgBackgroundSelector/lib/typeConstant";
+import { FgBackground } from "../../../elements/fgBackgroundSelector/lib/typeConstant";
 import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import {
   TableReactions,

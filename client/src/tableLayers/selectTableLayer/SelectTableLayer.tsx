@@ -45,6 +45,10 @@ export default function SelectTableLayer({
         "keydown",
         selectTableLayerController.current.handleKeyDown,
       );
+      document.addEventListener(
+        "pointerdown",
+        selectTableLayerController.current.handleDocumentPointerDown,
+      );
     }
 
     return () => {
@@ -52,6 +56,10 @@ export default function SelectTableLayer({
         document.removeEventListener(
           "keydown",
           selectTableLayerController.current.handleKeyDown,
+        );
+        document.removeEventListener(
+          "pointerdown",
+          selectTableLayerController.current.handleDocumentPointerDown,
         );
       }
     };
@@ -114,7 +122,7 @@ export default function SelectTableLayer({
     <div
       ref={containerRef}
       onPointerDown={selectTableLayerController.current.handlePointerDown}
-      className="z-select-layer absolute left-0 top-0 h-full w-full bg-transparent"
+      className="absolute left-0 top-0 z-select-layer h-full w-full bg-transparent"
     >
       {dragging && (
         <div

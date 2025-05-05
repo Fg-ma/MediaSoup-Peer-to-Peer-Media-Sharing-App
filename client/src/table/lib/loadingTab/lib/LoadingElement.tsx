@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
-import { useUploadContext } from "../../../../context/uploadContext/UploadContext";
-import {
-  TableUpload,
-  UploadSignals,
-} from "../../../../context/uploadContext/lib/typeConstant";
+import ChunkedUploader, {
+  ChunkedUploadListenerTypes,
+} from "../../../../uploader/lib/chunkUploader/ChunkUploader";
 
 export default function LoadingElement({
   contentId,
@@ -13,15 +11,9 @@ export default function LoadingElement({
   loadingTabRef,
 }: {
   contentId: string;
-  upload: TableUpload;
+  upload: ChunkedUploader;
   loadingTabRef: React.RefObject<HTMLDivElement>;
 }) {
-  const {
-    addUploadSignalListener,
-    removeUploadSignalListener,
-    getCurrentUploads,
-  } = useUploadContext();
-
   const [_, setRerender] = useState(false);
 
   const polarToCartesian = (angleInDegrees: number) => {
@@ -57,10 +49,8 @@ export default function LoadingElement({
     ].join(" ");
   };
 
-  const handleUploadListener = (signal: UploadSignals) => {
-    if (signal.header.contentId !== contentId) return;
-
-    switch (signal.type) {
+  const handleUploadListener = (message: ChunkedUploadListenerTypes) => {
+    switch (message.type) {
       case "uploadProgress":
         setRerender((prev) => !prev);
         break;
@@ -70,10 +60,10 @@ export default function LoadingElement({
   };
 
   useEffect(() => {
-    addUploadSignalListener(handleUploadListener);
+    upload.addChunkedUploadListener(handleUploadListener);
 
     return () => {
-      removeUploadSignalListener(handleUploadListener);
+      upload.removeChunkedUploadListener(handleUploadListener);
     };
   }, []);
 
@@ -89,9 +79,7 @@ export default function LoadingElement({
           </mask>
 
           <path
-            d={describeArc(
-              (getCurrentUploads()[contentId]?.progress ?? 0) * 359.99,
-            )}
+            d={describeArc(upload.progress * 359.99)}
             fill="#d40213"
             stroke="#d40213"
             strokeWidth="10"
@@ -106,9 +94,7 @@ export default function LoadingElement({
           </mask>
 
           <path
-            d={describeArc(
-              (getCurrentUploads()[contentId]?.progress ?? 0) * 359.99,
-            )}
+            d={describeArc(upload.progress * 359.99)}
             fill="#e62833"
             stroke="#e62833"
             strokeWidth="10"
@@ -124,7 +110,7 @@ export default function LoadingElement({
             <div>
               {upload.filename} (
               <span className="font-B612Mono">
-                {(getCurrentUploads()[contentId]?.progress * 100).toFixed(0)}
+                {(upload.progress * 100).toFixed(0)}
               </span>
               %)
             </div>

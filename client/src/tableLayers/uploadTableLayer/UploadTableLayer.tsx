@@ -1,161 +1,97 @@
-import React, { useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import { useUploadContext } from "../../context/uploadContext/UploadContext";
+import React, { useEffect, useRef, useState } from "react";
+import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 
-const tableStaticContentServerBaseUrl =
-  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
+export default function UploadTableLayer({
+  tableTopRef,
+}: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
+}) {
+  const { uploader } = useToolsContext();
 
-export default function UploadTableLayer() {
-  const { tableId } = useUserInfoContext();
-  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadContext();
-
+  const [hovering, setHovering] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [draggingFiles, setDraggingFiles] = useState(false);
   const uploadRef = useRef<HTMLDivElement | null>(null);
-  const file = useRef<File | undefined>(undefined);
 
-  const handleFileUpload = async () => {
-    if (!file.current) {
-      return;
-    }
-
-    const contentId = uuidv4();
-    const metadata = {
-      tableId: tableId.current,
-      contentId,
-      instanceId: uuidv4(),
-      direction: "toTable",
-      state: [],
-    };
-
-    try {
-      const metaRes = await fetch(
-        tableStaticContentServerBaseUrl + "upload-meta",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(metadata),
-        },
-      );
-
-      const { uploadId } = await metaRes.json();
-
-      const formData = new FormData();
-      formData.append("file", file.current);
-      const filename = file.current.name;
-      const xhr = new XMLHttpRequest();
-
-      addCurrentUpload(contentId, {
-        uploadUrl: URL.createObjectURL(file.current),
-        filename,
-        mimeType: "svg",
-        size: file.current.size,
-        progress: 0,
-        paused: false,
-      });
-
-      setTimeout(
-        () =>
-          sendUploadSignal({
-            type: "uploadStart",
-            header: {
-              contentId,
-            },
-          }),
-        250,
-      );
-
-      xhr.onload = () => {
-        removeCurrentUpload(contentId);
-
-        sendUploadSignal({
-          type: "uploadFinish",
-          header: {
-            contentId,
-          },
-        });
-      };
-
-      xhr.upload.onprogress = (event) => {
-        sendUploadSignal({
-          type: "uploadProgress",
-          header: {
-            contentId,
-          },
-          data: {
-            progress: event.loaded / event.total,
-          },
-        });
-      };
-
-      xhr.onerror = () => {
-        removeCurrentUpload(contentId);
-
-        sendUploadSignal({
-          type: "uploadError",
-          header: {
-            contentId,
-          },
-        });
-      };
-
-      xhr.open(
-        "POST",
-        tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
-        true,
-      );
-
-      xhr.send(formData);
-    } catch (error) {
-      console.error("Error sending metadata:", error);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
 
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      const newFile = droppedFiles[0];
-      file.current = newFile;
-      setDraggingFiles(false);
-      handleFileUpload();
+    if (
+      e.dataTransfer?.files?.length &&
+      tableTopRef.current?.contains(e.target as Node)
+    ) {
+      const fileArray = Array.from(e.dataTransfer.files);
+      for (const file of fileArray) {
+        uploader.current?.uploadToTable(file, [], {
+          position: { top: position.y, left: position.x },
+          scale: { x: 25, y: 25 },
+          rotation: 0,
+        });
+      }
+      setHovering(false);
     }
   };
 
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
+  const handleDragOver = (e: DragEvent) => {
+    if (e.dataTransfer?.types.includes("Files")) {
+      e.preventDefault();
+    }
 
     if (uploadRef.current) {
       const rect = uploadRef.current.getBoundingClientRect();
-      const relativeX = event.clientX - rect.left;
-      const relativeY = event.clientY - rect.top;
+      const relativeX = Math.max(
+        0,
+        Math.min(
+          (5 / 6) * 100,
+          ((e.clientX - rect.left) / uploadRef.current.clientWidth) * 100,
+        ),
+      );
+      const relativeY = Math.max(
+        0,
+        Math.min(
+          (5 / 6) * 100,
+          ((e.clientY - rect.top) / uploadRef.current.clientHeight) * 100,
+        ),
+      );
 
       // Save the relative position in the ref
       setPosition({ x: relativeX, y: relativeY });
     }
+
+    if (
+      e.dataTransfer?.types.includes("Files") &&
+      tableTopRef.current?.contains(e.target as Node)
+    ) {
+      if (!hovering) {
+        setHovering(true);
+      }
+    } else {
+      if (hovering) {
+        setHovering(false);
+      }
+    }
   };
+
+  useEffect(() => {
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, [handleDrop]);
 
   return (
     <div
       ref={uploadRef}
-      className="abosulte pointer-events-none left-0 top-0 z-upload-layer h-full w-full bg-transparent"
-      onDragEnter={() => setDraggingFiles(true)}
-      onDragLeave={() => setDraggingFiles(false)}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
+      className="pointer-events-none absolute left-0 top-0 z-upload-layer h-full w-full"
     >
-      {draggingFiles && (
+      {hovering && (
         <div
-          className="absolute aspect-video w-1/6 rounded-md border-4 border-dashed border-fg-primary-desaturated bg-fg-primary-desaturated-2 bg-opacity-75"
+          className="absolute aspect-square w-1/6 rounded-md border-4 border-dashed border-fg-red bg-fg-red-light"
           style={{
-            left: `${position.x}px`,
-            top: `${position.y}px`,
+            left: `${position.x}%`,
+            top: `${position.y}%`,
             pointerEvents: "none",
           }}
         ></div>

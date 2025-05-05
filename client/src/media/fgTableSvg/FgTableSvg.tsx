@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useUploadContext } from "../../context/uploadContext/UploadContext";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
+import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 import SvgController from "./lib/SvgController";
 import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
 import {
@@ -20,9 +19,6 @@ import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
 import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
 
-const tableStaticContentServerBaseUrl =
-  process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
-
 export default function FgTableSvg({
   svgInstanceId,
   bundleRef,
@@ -35,9 +31,7 @@ export default function FgTableSvg({
   const { userMedia } = useMediaContext();
   const { userEffects, userEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { tableId } = useUserInfoContext();
-  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadContext();
+  const { uploader } = useToolsContext();
 
   const [editing, setEditing] = useState(false);
 
@@ -260,96 +254,10 @@ export default function FgTableSvg({
                   },
                 );
 
-                const metadata = {
-                  tableId: tableId.current,
-                  contentId: svgMediaInstance.svgMedia.svgId,
-                  direction: "reupload",
-                };
-
-                try {
-                  const metaRes = await fetch(
-                    tableStaticContentServerBaseUrl + "upload-meta",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify(metadata),
-                    },
-                  );
-
-                  const { uploadId } = await metaRes.json();
-
-                  const formData = new FormData();
-                  const filename = file.name;
-                  formData.append("file", file, filename);
-
-                  const xhr = new XMLHttpRequest();
-
-                  addCurrentUpload(svgMediaInstance.svgMedia.svgId, {
-                    uploadUrl: URL.createObjectURL(blob),
-                    filename,
-                    mimeType: "svg",
-                    size: blob.size,
-                    progress: 0,
-                    paused: false,
-                  });
-
-                  setTimeout(
-                    () =>
-                      sendUploadSignal({
-                        type: "uploadStart",
-                        header: {
-                          contentId: svgMediaInstance.svgMedia.svgId,
-                        },
-                      }),
-                    250,
-                  );
-
-                  xhr.onload = () => {
-                    removeCurrentUpload(svgMediaInstance.svgMedia.svgId);
-
-                    sendUploadSignal({
-                      type: "uploadFinish",
-                      header: {
-                        contentId: svgMediaInstance.svgMedia.svgId,
-                      },
-                    });
-                  };
-
-                  xhr.upload.onprogress = (event) => {
-                    sendUploadSignal({
-                      type: "uploadProgress",
-                      header: {
-                        contentId: svgMediaInstance.svgMedia.svgId,
-                      },
-                      data: {
-                        progress: event.loaded / event.total,
-                      },
-                    });
-                  };
-
-                  xhr.onerror = () => {
-                    removeCurrentUpload(svgMediaInstance.svgMedia.svgId);
-
-                    sendUploadSignal({
-                      type: "uploadError",
-                      header: {
-                        contentId: svgMediaInstance.svgMedia.svgId,
-                      },
-                    });
-                  };
-
-                  xhr.open(
-                    "POST",
-                    tableStaticContentServerBaseUrl + `upload-file/${uploadId}`,
-                    true,
-                  );
-
-                  xhr.send(formData);
-                } catch (error) {
-                  console.error("Error sending metadata:", error);
-                }
+                uploader.current?.reuploadTableContent(
+                  file,
+                  svgMediaInstance.svgMedia.svgId,
+                );
               }}
               cancelCallback={() => {
                 setEditing(false);

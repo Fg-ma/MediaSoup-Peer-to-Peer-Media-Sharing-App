@@ -8,7 +8,7 @@ import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentE
 import { FgVisualMediaOptions, Settings } from "../../typeConstant";
 import MediasoupSocketController from "../../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
-import TableSocketController from "src/serverControllers/tableServer/TableSocketController";
+import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
 
 const fontSizeMap = {
   xsmall: "0.75rem",

@@ -16,7 +16,7 @@ export default function TabledButton({
   state,
   lowerController,
 }: {
-  state: TableContentStateTypes[];
+  state: React.MutableRefObject<TableContentStateTypes[]>;
   lowerController: React.MutableRefObject<LowerController>;
 }) {
   return (
@@ -27,7 +27,7 @@ export default function TabledButton({
         return (
           <FgSVGElement
             src={
-              state.includes("tabled")
+              state.current.includes("tabled")
                 ? tableTopReducedTippedIcon
                 : tableTopReducedIcon
             }
@@ -40,7 +40,9 @@ export default function TabledButton({
       }}
       hoverContent={
         <FgHoverContentStandard
-          content={state.includes("tabled") ? "Untable (t)" : "Table (t)"}
+          content={
+            state.current.includes("tabled") ? "Untable (t)" : "Table (t)"
+          }
           style="light"
         />
       }

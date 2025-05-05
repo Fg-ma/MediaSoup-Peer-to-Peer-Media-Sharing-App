@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgInput from "../../../../../../elements/fgInput/FgInput";
 import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
-import { IncomingTableStaticContentMessages } from "src/serverControllers/tableStaticContentServer/lib/typeConstant";
+import { IncomingTableStaticContentMessages } from "../../../../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { Categories } from "../../../TabledPortal";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;

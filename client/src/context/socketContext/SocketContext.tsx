@@ -2,7 +2,7 @@ import React, { createContext, useContext, useRef } from "react";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import UserStaticContentSocketController from "src/serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;

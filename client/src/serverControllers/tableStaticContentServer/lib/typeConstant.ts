@@ -269,6 +269,19 @@ export type onVideoUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 
@@ -311,6 +324,19 @@ export type onImageUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 
@@ -343,6 +369,19 @@ export type onSvgUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 
@@ -375,6 +414,19 @@ export type onTextUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 
@@ -407,6 +459,19 @@ export type onApplicationUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 
@@ -439,6 +504,19 @@ export type onSoundClipUploadedToTableType = {
     filename: string;
     mimeType: TableTopStaticMimeType;
     state: TableContentStateTypes[];
+    initPositioning:
+      | {
+          position: {
+            top: number;
+            left: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }
+      | undefined;
   };
 };
 

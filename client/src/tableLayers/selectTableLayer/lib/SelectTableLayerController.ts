@@ -33,6 +33,14 @@ class SelectTableLayerController {
     private groupRef: React.RefObject<HTMLDivElement>,
   ) {}
 
+  handleDocumentPointerDown = (e: MouseEvent) => {
+    if (this.groupRef.current?.contains(e.target as Node) || this.dragging)
+      return;
+
+    this.selected.current = [];
+    this.setRerender((prev) => !prev);
+  };
+
   handlePointerDown = (e: React.MouseEvent) => {
     e.preventDefault();
 
