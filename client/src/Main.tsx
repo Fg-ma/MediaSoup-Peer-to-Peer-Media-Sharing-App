@@ -98,6 +98,7 @@ export default function Main() {
 
     uploader.current = new Uploader(
       tableId,
+      userId,
       sendUploadSignal,
       addCurrentUpload,
       removeCurrentUpload,

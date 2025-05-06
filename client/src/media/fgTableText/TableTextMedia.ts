@@ -55,13 +55,9 @@ class TableTextMedia {
 
   private getTextListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "text" ||
-        contentId !== this.textId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "text" || contentId !== this.textId) {
         return;
       }
 
@@ -69,13 +65,9 @@ class TableTextMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "text" ||
-        contentId !== this.textId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "text" || contentId !== this.textId) {
         return;
       }
 

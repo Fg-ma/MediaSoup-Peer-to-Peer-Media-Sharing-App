@@ -9,28 +9,25 @@ class Gets {
 
   getFile = async (event: onGetFileType) => {
     const { userId, instance, contentType, contentId } = event.header;
-    const key = event.data.key;
-
-    if (!key) return;
 
     try {
-      const params = { Bucket: contentTypeBucketMap[contentType], Key: key };
-      const data = await tableTopCeph.s3Client.send(
-        new GetObjectCommand(params)
+      const data = await tableTopCeph.gets.getContent(
+        contentTypeBucketMap[contentType],
+        contentId
       );
 
-      if (data.Body && data.Body instanceof Readable) {
+      if (data && data.Body && data.Body instanceof Readable) {
         data.Body.on("data", (chunk) => {
           this.broadcaster.broadcastToInstance(userId, instance, {
             type: "chunk",
-            header: { contentType, contentId, key },
+            header: { contentType, contentId },
             data: { chunk },
           });
         })
           .on("end", () => {
             this.broadcaster.broadcastToInstance(userId, instance, {
               type: "downloadComplete",
-              header: { contentType, contentId, key },
+              header: { contentType, contentId },
             });
           })
           .on("error", (err) => {

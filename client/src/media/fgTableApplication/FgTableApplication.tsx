@@ -171,7 +171,6 @@ export default function FgTableApplication({
       getAspect={applicationMediaInstance.getAspect}
       mediaId={applicationMediaInstance.applicationMedia.applicationId}
       mediaInstanceId={applicationInstanceId}
-      filename={applicationMediaInstance.applicationMedia.filename}
       kind="application"
       initState={applicationMediaInstance.applicationMedia.state}
       bundleRef={bundleRef}

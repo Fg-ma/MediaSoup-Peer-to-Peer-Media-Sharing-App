@@ -114,20 +114,13 @@ class UserStaticContentSocketController {
     });
   };
 
-  deleteContent = (
-    contentType: StaticContentTypes,
-    contentId: string,
-    filename: string,
-  ) => {
+  deleteContent = (contentType: StaticContentTypes, contentId: string) => {
     this.sendMessage({
       type: "deleteContent",
       header: {
         userId: this.userId,
         contentType,
         contentId,
-      },
-      data: {
-        filename,
       },
     });
   };

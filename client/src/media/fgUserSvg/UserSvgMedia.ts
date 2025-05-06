@@ -69,13 +69,9 @@ class UserSvgMedia {
     message: IncomingUserStaticContentMessages,
   ) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "svg" ||
-        contentId !== this.svgId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "svg" || contentId !== this.svgId) {
         return;
       }
 
@@ -83,13 +79,9 @@ class UserSvgMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "svg" ||
-        contentId !== this.svgId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "svg" || contentId !== this.svgId) {
         return;
       }
 

@@ -42,37 +42,6 @@ export const contentTypeQdrantMap: {
   soundClip: "tableSoundClips",
 };
 
-export const mimeToExtension: {
-  [tableTopStaticMimeType in StaticMimeTypes]: string;
-} = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/gif": ".gif",
-  "image/svg+xml": ".svg",
-  "image/bmp": ".bmp",
-  "image/tiff": ".tiff",
-  "video/mp4": ".mp4",
-  "video/mpeg": ".mpeg",
-  "video/webm": ".webm",
-  "video/ogg": ".ogv",
-  "video/x-msvideo": ".avi",
-  "audio/mpeg": ".mp3",
-  "audio/ogg": ".oga",
-  "audio/wav": ".wav",
-  "audio/webm": ".weba",
-  "application/pdf": ".pdf",
-  "application/vnd.ms-excel": ".xls",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
-  "application/vnd.ms-powerpoint": ".ppt",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-    ".pptx",
-  "application/msword": ".doc",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    ".docx",
-  "text/plain": ".txt",
-};
-
 export interface TableStaticContentWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
   tableId: string;
@@ -149,9 +118,6 @@ export type onDeleteContentType = {
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
-  };
-  data: {
-    filename: string;
   };
 };
 

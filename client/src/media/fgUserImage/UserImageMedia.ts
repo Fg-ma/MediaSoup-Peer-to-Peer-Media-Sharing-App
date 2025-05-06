@@ -59,13 +59,9 @@ class UserImageMedia {
 
   private getImageListener = (message: IncomingUserStaticContentMessages) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "image" ||
-        contentId !== this.imageId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "image" || contentId !== this.imageId) {
         return;
       }
 
@@ -73,13 +69,9 @@ class UserImageMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "image" ||
-        contentId !== this.imageId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "image" || contentId !== this.imageId) {
         return;
       }
 

@@ -177,7 +177,6 @@ export default function FgTableImage({
       getAspect={imageMediaInstance.getAspect}
       mediaId={imageMediaInstance.imageMedia.imageId}
       mediaInstanceId={imageInstanceId}
-      filename={imageMediaInstance.imageMedia.filename}
       kind="image"
       initState={imageMediaInstance.imageMedia.state}
       bundleRef={bundleRef}

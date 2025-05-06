@@ -120,7 +120,6 @@ export default function FgTableText({
       }
       mediaId={textMediaInstance.textMedia.textId}
       mediaInstanceId={textInstanceId}
-      filename={textMediaInstance.textMedia.filename}
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={

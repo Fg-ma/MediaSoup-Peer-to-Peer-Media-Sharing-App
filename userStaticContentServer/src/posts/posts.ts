@@ -3,40 +3,119 @@ import { v4 as uuidv4 } from "uuid";
 import busboy from "busboy";
 import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
+import { contentTypeBucketMap } from "../typeConstant";
 import {
-  contentTypeBucketMap,
   mimeToExtension,
   mimeTypeContentTypeMap,
-  StaticMimeTypes,
-} from "../typeConstant";
-import {
   StaticContentTypes,
+  StaticMimeTypes,
   UserContentStateTypes,
 } from "../../../universal/contentTypeConstant";
 import { getEmbedding } from "./embedding";
 import { uploadEmbeddingToQdrant } from "./qdrant";
+import { ChunkState, UploadSession } from "./lib/typeConstant";
 
 const tableStaticContentUtils = new Utils();
 
-const uploadSessions = new Map<
-  string,
-  | {
-      direction: "toMuteStyle";
-      userId: string;
-      contentId: string;
-      state: UserContentStateTypes[];
-    }
-  | {
-      direction: "toUserContent";
-      userId: string;
-      contentId: string;
-      state: UserContentStateTypes[];
-    }
->();
-
 class Posts {
+  private chunkStates = new Map<string, ChunkState>();
+  private uploadSessions = new Map<string, UploadSession>();
+
   constructor(app: uWS.TemplatedApp) {
-    app.post("/upload-meta", (res, req) => {
+    app.post("/upload-one-shot-file", (res, req) => {
+      res.cork(() => {
+        res.writeHeader(
+          "Access-Control-Allow-Origin",
+          "https://localhost:8080"
+        );
+      });
+
+      const bb = busboy({ headers: this.collectHeaders(req) });
+
+      let metadata: {
+        userId: string;
+        contentId: string;
+        direction: string;
+        state: UserContentStateTypes[];
+      } | null = null;
+
+      bb.on("field", (fieldname, val) => {
+        if (fieldname === "metadata") {
+          try {
+            metadata = JSON.parse(val);
+          } catch (e) {
+            console.error("Invalid JSON in metadata field", e);
+          }
+        }
+      });
+
+      bb.on("file", (_, file, info) => {
+        const { mimeType, filename } = info;
+
+        const sanitizedFilename = tableStaticContentUtils.sanitizeString(
+          filename.slice(0, -4)
+        );
+        const sanitizedMimeType =
+          tableStaticContentUtils.sanitizeMimeType(mimeType);
+        const completeFilename = `${sanitizedFilename}${
+          mimeToExtension[sanitizedMimeType as StaticMimeTypes]
+        }`;
+        const staticContentType =
+          mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
+
+        if (!metadata) return;
+
+        // Save file
+        tableTopCeph.posts
+          .uploadFile(
+            contentTypeBucketMap[staticContentType],
+            metadata.contentId,
+            file
+          )
+          .then(async () => {
+            if (!metadata) return;
+
+            switch (metadata.direction) {
+              case "toMuteStyle":
+                await this.handleToMuteStyle(
+                  metadata.userId,
+                  metadata.contentId,
+                  mimeType as StaticMimeTypes,
+                  completeFilename,
+                  metadata.state
+                );
+                break;
+              case "toUserContent":
+                await this.handleToUserContent(
+                  staticContentType,
+                  metadata.userId,
+                  metadata.contentId,
+                  mimeType as StaticMimeTypes,
+                  completeFilename,
+                  metadata.state
+                );
+                break;
+              default:
+                break;
+            }
+          });
+
+        file.on("error", (err) => {
+          console.error(`Error writing file:`, err);
+        });
+      });
+
+      bb.on("close", () => {
+        res.cork(() => {
+          console.log("Upload complete");
+          res.writeStatus("200 OK").end("That's all folks!");
+        });
+      });
+
+      this.pipeReqToBusboy(res, bb);
+    });
+
+    app.post("/upload-chunk-meta", (res, req) => {
       let buffer = "";
 
       res.cork(() => {
@@ -53,7 +132,7 @@ class Posts {
         console.warn("Request aborted by client");
       });
 
-      res.onData((chunk, isLast) => {
+      res.onData(async (chunk, isLast) => {
         buffer += Buffer.from(chunk).toString();
 
         if (isLast) {
@@ -61,30 +140,29 @@ class Posts {
 
           try {
             const metadata = JSON.parse(buffer);
-            const { userId, contentId, direction, state } = metadata;
+            const { userId, contentId, direction, state, mimeType } = metadata;
 
-            const uploadId = uuidv4();
+            const staticContentType =
+              mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
 
-            switch (direction) {
-              case "toMuteStyle":
-                uploadSessions.set(uploadId, {
-                  direction,
-                  userId,
-                  contentId,
-                  state,
-                });
-                break;
-              case "toUserContent":
-                uploadSessions.set(uploadId, {
-                  direction,
-                  userId,
-                  contentId,
-                  state,
-                });
-                break;
-              default:
-                break;
-            }
+            const uploadId = await tableTopCeph.posts.createMultipartUpload(
+              contentTypeBucketMap[staticContentType as StaticContentTypes],
+              contentId
+            );
+            if (!uploadId) return;
+
+            this.chunkStates.set(uploadId, { uploadId, parts: [] });
+
+            const sessionData = {
+              direction,
+              userId,
+              contentId,
+              staticContentType,
+              mimeType,
+              state,
+            };
+
+            this.uploadSessions.set(uploadId, sessionData);
 
             res.cork(() => {
               res
@@ -107,7 +185,7 @@ class Posts {
       });
     });
 
-    app.post("/upload-file/:uploadId", (res, req) => {
+    app.post("/upload-chunk/:uploadId", (res, req) => {
       res.cork(() => {
         res.writeHeader(
           "Access-Control-Allow-Origin",
@@ -116,106 +194,123 @@ class Posts {
       });
 
       const uploadId = req.getParameter(0);
-
       if (!uploadId) {
         res.cork(() => {
-          res.writeStatus("404 Not Found").end("Upload session not found");
+          res.writeStatus("404").end("No upload id");
         });
         return;
       }
 
-      const session = uploadSessions.get(uploadId);
-
+      const session = this.uploadSessions.get(uploadId);
       if (!session) {
         res.cork(() => {
-          res.writeStatus("404 Not Found").end("Upload session not found");
+          res.writeStatus("404").end("No session");
         });
         return;
       }
 
-      const headers: { [header: string]: string } = {};
-      req.forEach((key, value) => {
-        headers[key] = value;
+      const bb = busboy({ headers: this.collectHeaders(req) });
+      let chunkIndex = -1,
+        totalChunks = -1;
+      let buffer = Buffer.alloc(0);
+
+      bb.on("field", (name, val) => {
+        if (name === "chunkIndex") chunkIndex = parseInt(val, 10);
+        if (name === "totalChunks") totalChunks = parseInt(val, 10);
       });
 
-      const bb = busboy({ headers });
-
-      bb.on("file", (_, file, info) => {
+      bb.on("file", (_fn, stream, info) => {
         const { mimeType, filename } = info;
 
-        const sanitizedFilename = tableStaticContentUtils.sanitizeString(
-          filename.slice(0, -4)
-        );
-        const sanitizedMimeType =
-          tableStaticContentUtils.sanitizeMimeType(mimeType);
-        const completeFilename = `${sanitizedFilename}${
-          mimeToExtension[sanitizedMimeType as StaticMimeTypes]
-        }`;
-        const staticContentType =
-          mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
+        stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
-        // Save file
-        tableTopCeph
-          .uploadFile(
-            contentTypeBucketMap[staticContentType],
-            completeFilename,
-            file
-          )
-          .then(async () => {
-            switch (session.direction) {
-              case "toMuteStyle":
-                if (staticContentType === "svg") {
-                  await this.handleToMuteStyle(
-                    session.userId,
-                    session.contentId,
-                    mimeType as StaticMimeTypes,
-                    completeFilename,
-                    session.state
-                  );
-                }
-                break;
-              case "toUserContent":
-                await this.handleToUserContent(
-                  staticContentType,
-                  session.userId,
-                  session.contentId,
-                  mimeType as StaticMimeTypes,
-                  completeFilename,
-                  session.state
-                );
-                break;
-              default:
-                break;
-            }
+        stream.on("end", async () => {
+          let state = this.chunkStates.get(uploadId);
+          if (!state) return;
 
-            // Cleanup session
-            uploadSessions.delete(uploadId);
+          // upload this part
+          const ETag = await tableTopCeph.posts.uploadPart(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            chunkIndex + 1,
+            uploadId,
+            buffer
+          );
+          if (!ETag) return;
+          state.parts.push({ PartNumber: chunkIndex + 1, ETag });
+
+          res.cork(() => {
+            res.writeStatus("200 OK").end("Chunk received");
           });
 
-        file.on("error", (err) => {
-          console.error(`Error writing file:`, err);
+          // if last chunk, complete
+          if (state.parts.length === totalChunks) {
+            tableTopCeph.posts
+              .completeMultipartUpload(
+                contentTypeBucketMap[session.staticContentType],
+                session.contentId,
+                uploadId,
+                state.parts
+              )
+              .then(async () => {
+                switch (session.direction) {
+                  case "toMuteStyle":
+                    await this.handleToMuteStyle(
+                      session.userId,
+                      session.contentId,
+                      mimeType as StaticMimeTypes,
+                      filename,
+                      session.state
+                    );
+                    break;
+                  case "toUserContent":
+                    this.handleToUserContent(
+                      session.staticContentType,
+                      session.userId,
+                      session.contentId,
+                      mimeType as StaticMimeTypes,
+                      filename,
+                      session.state
+                    );
+                    break;
+                  default:
+                    break;
+                }
+
+                // Cleanup session
+                this.uploadSessions.delete(uploadId);
+                this.chunkStates.delete(uploadId);
+              });
+          }
         });
       });
 
-      bb.on("close", () => {
-        res.cork(() => {
-          console.log("Upload complete");
-          res.writeStatus("200 OK").end("That's all folks!");
-        });
-      });
+      this.pipeReqToBusboy(res, bb, uploadId);
+    });
+  }
 
-      let bodyBuffer = Buffer.alloc(0);
-      res.onData((chunk, isLast) => {
-        bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
-        if (isLast) {
-          bb.end(bodyBuffer);
-        }
-      });
+  private collectHeaders(req: uWS.HttpRequest) {
+    const h: Record<string, string> = {};
+    req.forEach((k, v) => (h[k] = v));
+    return h;
+  }
 
-      res.onAborted(() => {
-        bb.destroy();
-        uploadSessions.delete(uploadId);
-      });
+  private pipeReqToBusboy(
+    res: uWS.HttpResponse,
+    bb: busboy.Busboy,
+    uploadId?: string
+  ) {
+    let buffer = Buffer.alloc(0);
+    res.onData((chunk, isLast) => {
+      buffer = Buffer.concat([buffer, Buffer.from(chunk)]);
+      if (isLast) {
+        bb.end(buffer);
+      }
+    });
+
+    res.onAborted(() => {
+      bb.destroy();
+      if (uploadId) this.uploadSessions.delete(uploadId);
     });
   }
 
@@ -223,21 +318,21 @@ class Posts {
     userId: string,
     contentId: string,
     mimeType: StaticMimeTypes,
-    completeFilename: string,
+    filename: string,
     state: UserContentStateTypes[]
   ) => {
     await this.handleMongoSvgUploads(
       userId,
       contentId,
       mimeType,
-      completeFilename,
+      filename,
       state
     );
 
     broadcaster.broadcastToUser(userId, {
       type: "svgUploadedToUserContent",
       header: { contentId },
-      data: { filename: completeFilename, mimeType, state },
+      data: { filename, mimeType, state },
     });
   };
 
@@ -246,7 +341,7 @@ class Posts {
     userId: string,
     contentId: string,
     mimeType: StaticMimeTypes,
-    completeFilename: string,
+    filename: string,
     state: UserContentStateTypes[]
   ) => {
     switch (staticContentType) {
@@ -255,7 +350,7 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
@@ -265,7 +360,7 @@ class Posts {
             contentId,
           },
           data: {
-            filename: completeFilename,
+            filename,
             mimeType,
             state,
           },
@@ -305,14 +400,14 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
         broadcaster.broadcastToUser(userId, {
           type: "imageUploadedToUserContent",
           header: { contentId },
-          data: { filename: completeFilename, mimeType, state },
+          data: { filename, mimeType, state },
         });
         break;
       case "svg":
@@ -320,14 +415,14 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
         broadcaster.broadcastToUser(userId, {
           type: "svgUploadedToUserContent",
           header: { contentId },
-          data: { filename: completeFilename, mimeType, state },
+          data: { filename, mimeType, state },
         });
         break;
       case "soundClip":
@@ -335,14 +430,14 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
         broadcaster.broadcastToUser(userId, {
           type: "soundClipUploadedToUserContent",
           header: { contentId },
-          data: { filename: completeFilename, mimeType, state },
+          data: { filename, mimeType, state },
         });
         break;
       case "application":
@@ -350,14 +445,14 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
         broadcaster.broadcastToUser(userId, {
           type: "applicationUploadedToUserContent",
           header: { contentId },
-          data: { filename: completeFilename, mimeType },
+          data: { filename, mimeType },
         });
         break;
       case "text":
@@ -365,14 +460,14 @@ class Posts {
           userId,
           contentId,
           mimeType,
-          completeFilename,
+          filename,
           state
         );
 
         broadcaster.broadcastToUser(userId, {
           type: "textUploadedToUserContent",
           header: { contentId },
-          data: { filename: completeFilename, mimeType, state },
+          data: { filename, mimeType, state },
         });
         break;
       default:

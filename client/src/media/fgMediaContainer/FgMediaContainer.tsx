@@ -47,7 +47,6 @@ export default function FgMediaContainer({
   getAspect,
   mediaId,
   mediaInstanceId,
-  filename,
   kind,
   initState,
   bundleRef,
@@ -82,7 +81,6 @@ export default function FgMediaContainer({
   getAspect?: () => number | undefined;
   mediaId: string;
   mediaInstanceId: string;
-  filename: string;
   kind: StaticContentTypes;
   initState: TableContentStateTypes[];
   bundleRef: React.RefObject<HTMLDivElement>;
@@ -181,7 +179,6 @@ export default function FgMediaContainer({
       tableStaticContentSocket,
       mediaId,
       mediaInstanceId,
-      filename,
       kind,
       bundleRef,
       mediaContainerRef,
@@ -412,7 +409,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >

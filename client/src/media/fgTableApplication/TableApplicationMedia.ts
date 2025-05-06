@@ -63,13 +63,9 @@ class TableApplicationMedia {
     message: IncomingTableStaticContentMessages,
   ) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "application" ||
-        contentId !== this.applicationId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "application" || contentId !== this.applicationId) {
         return;
       }
 
@@ -77,13 +73,9 @@ class TableApplicationMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "application" ||
-        contentId !== this.applicationId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "application" || contentId !== this.applicationId) {
         return;
       }
 

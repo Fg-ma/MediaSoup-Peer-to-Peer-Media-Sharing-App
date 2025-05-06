@@ -11,7 +11,6 @@ export type UploadSession =
       contentId: string;
       instanceId: string;
       state: TableContentStateTypes[];
-      filename: string;
       staticContentType: StaticContentTypes;
       mimeType: StaticMimeTypes;
     }
@@ -19,7 +18,6 @@ export type UploadSession =
       direction: "reupload";
       tableId: string;
       contentId: string;
-      filename: string;
       staticContentType: StaticContentTypes;
       mimeType: StaticMimeTypes;
     }
@@ -28,7 +26,6 @@ export type UploadSession =
       tableId: string;
       contentId: string;
       state: TableContentStateTypes[];
-      filename: string;
       staticContentType: StaticContentTypes;
       mimeType: StaticMimeTypes;
     };

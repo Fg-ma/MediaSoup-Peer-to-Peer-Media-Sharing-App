@@ -74,9 +74,6 @@ type onDeleteContentType = {
     contentId: string;
     instanceId: string;
   };
-  data: {
-    filename: string;
-  };
 };
 
 type onGetFileType = {
@@ -544,7 +541,6 @@ export type onChunkType = {
   header: {
     contentType: StaticContentTypes;
     contentId: string;
-    key: string;
   };
   data: {
     chunk: { data: number[] };
@@ -556,7 +552,6 @@ export type onDownloadCompleteType = {
   header: {
     contentType: StaticContentTypes;
     contentId: string;
-    key: string;
   };
 };
 

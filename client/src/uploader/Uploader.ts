@@ -2,10 +2,15 @@ import { v4 as uuidv4 } from "uuid";
 import OneShotUploader from "./lib/oneShotUploader/OneShotUploader";
 import ChunkedUploader from "./lib/chunkUploader/ChunkUploader";
 import { UploadSignals } from "../context/uploadContext/lib/typeConstant";
-import { TableContentStateTypes } from "../../../universal/contentTypeConstant";
+import {
+  TableContentStateTypes,
+  UserContentStateTypes,
+} from "../../../universal/contentTypeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
+const userStaticContentServerBaseUrl =
+  process.env.USER_STATIC_CONTENT_SERVER_BASE_URL;
 
 export type TableUploadDirections = "toTable" | "reupload" | "toTabled";
 
@@ -16,6 +21,7 @@ class Uploader {
 
   constructor(
     private tableId: React.MutableRefObject<string>,
+    private userId: React.MutableRefObject<string>,
     private sendUploadSignal: (signal: UploadSignals) => void,
     private addCurrentUpload: (id: string, upload: ChunkedUploader) => void,
     private removeCurrentUpload: (id: string) => void,
@@ -120,6 +126,73 @@ class Uploader {
       try {
         const metaRes = await fetch(
           tableStaticContentServerBaseUrl + "upload-chunk-meta",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(metadata),
+          },
+        );
+
+        const { uploadId } = await metaRes.json();
+
+        setTimeout(
+          () =>
+            this.sendUploadSignal({
+              type: "uploadStart",
+            }),
+          250,
+        );
+        const uploader = new ChunkedUploader(
+          file,
+          uploadId,
+          contentId,
+          this.removeCurrentUpload,
+          this.sendUploadSignal,
+        );
+        this.addCurrentUpload(contentId, uploader);
+        uploader.start();
+      } catch (error) {
+        console.error("Error sending metadata:", error);
+      }
+    }
+  };
+
+  uploadToMuteStyle = async (
+    file: File,
+    state: UserContentStateTypes[] = [],
+  ) => {
+    if (!userStaticContentServerBaseUrl) return;
+
+    if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
+      this.oneShotUploader.handleOneShotFileUpload(
+        file,
+        {
+          userId: this.userId.current,
+          contentId: uuidv4(),
+          instanceId: uuidv4(),
+          direction: "toMuteStyle",
+          state,
+        },
+        userStaticContentServerBaseUrl,
+      );
+    } else {
+      const contentId = uuidv4();
+
+      const metadata = {
+        userId: this.userId.current,
+        contentId,
+        instanceId: uuidv4(),
+        direction: "toMuteStyle",
+        state,
+        filename: file.name,
+        mimeType: file.type,
+      };
+
+      try {
+        const metaRes = await fetch(
+          userStaticContentServerBaseUrl + "upload-chunk-meta",
           {
             method: "POST",
             headers: {

@@ -1,0 +1,5 @@
+semanticVenv
+
+target
+
+*.onnx

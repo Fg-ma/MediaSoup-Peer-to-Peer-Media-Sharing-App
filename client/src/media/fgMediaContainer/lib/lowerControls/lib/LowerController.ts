@@ -21,7 +21,6 @@ class LowerController {
     >,
     private mediaId: string,
     private mediaInstanceId: string,
-    private filename: string,
     private kind: StaticContentTypes,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private mediaContainerRef: React.RefObject<HTMLDivElement>,
@@ -276,7 +275,6 @@ class LowerController {
       this.kind,
       this.mediaId,
       this.mediaInstanceId,
-      this.filename,
     );
   };
 

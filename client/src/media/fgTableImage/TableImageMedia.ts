@@ -193,13 +193,9 @@ class TableImageMedia {
 
   private getImageListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "image" ||
-        contentId !== this.imageId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "image" || contentId !== this.imageId) {
         return;
       }
 
@@ -207,13 +203,9 @@ class TableImageMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "image" ||
-        contentId !== this.imageId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "image" || contentId !== this.imageId) {
         return;
       }
 

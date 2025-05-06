@@ -242,7 +242,6 @@ export default function FgTableVideo({
       getAspect={videoMediaInstance.getAspect}
       mediaId={videoMediaInstance.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
-      filename={videoMediaInstance.videoMedia.filename}
       kind="video"
       initState={videoMediaInstance.videoMedia.state}
       bundleRef={bundleRef}

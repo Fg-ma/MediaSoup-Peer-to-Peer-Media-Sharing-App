@@ -7,7 +7,6 @@ class Cleanup {
 
   onDeleteContent = async (event: onDeleteContentType) => {
     const { tableId, contentType, contentId, instanceId } = event.header;
-    const { filename } = event.data;
 
     const document = await tableTopMongo.deleteTableDocumentInstance(
       tableId,
@@ -17,9 +16,9 @@ class Cleanup {
     );
 
     if (document && document.i.length === 0 && !document.s.includes(0)) {
-      await tableTopCeph.deleteFile(
+      await tableTopCeph.deletes.deleteFile(
         contentTypeBucketMap[contentType],
-        filename
+        contentId
       );
 
       await tableTopMongo.deleteTableDocument(tableId, contentType, contentId);

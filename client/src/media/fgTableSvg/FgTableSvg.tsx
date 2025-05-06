@@ -161,7 +161,6 @@ export default function FgTableSvg({
         getAspect={svgMediaInstance.getAspect}
         mediaId={svgMediaInstance.svgMedia.svgId}
         mediaInstanceId={svgInstanceId}
-        filename={svgMediaInstance.svgMedia.filename}
         kind="svg"
         initState={svgMediaInstance.svgMedia.state}
         bundleRef={bundleRef}

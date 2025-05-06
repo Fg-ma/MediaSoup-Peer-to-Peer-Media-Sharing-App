@@ -54,13 +54,9 @@ class UserSoundClipMedia {
     message: IncomingUserStaticContentMessages,
   ) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "soundClip" ||
-        contentId !== this.soundClipId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "soundClip" || contentId !== this.soundClipId) {
         return;
       }
 
@@ -68,13 +64,9 @@ class UserSoundClipMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "soundClip" ||
-        contentId !== this.soundClipId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "soundClip" || contentId !== this.soundClipId) {
         return;
       }
 

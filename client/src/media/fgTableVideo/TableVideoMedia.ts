@@ -250,13 +250,9 @@ class TableVideoMedia {
 
   private getVideoListener = (message: IncomingTableStaticContentMessages) => {
     if (message.type === "chunk") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "video" ||
-        contentId !== this.videoId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "video" || contentId !== this.videoId) {
         return;
       }
 
@@ -264,13 +260,9 @@ class TableVideoMedia {
       this.fileChunks.push(chunkData);
       this.totalSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
-      const { contentType, contentId, key } = message.header;
+      const { contentType, contentId } = message.header;
 
-      if (
-        contentType !== "video" ||
-        contentId !== this.videoId ||
-        key !== this.filename
-      ) {
+      if (contentType !== "video" || contentId !== this.videoId) {
         return;
       }
 

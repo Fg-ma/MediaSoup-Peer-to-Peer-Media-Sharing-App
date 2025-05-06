@@ -140,7 +140,6 @@ class TableStaticContentSocketController {
     contentType: StaticContentTypes,
     contentId: string,
     instanceId: string,
-    filename: string,
   ) => {
     this.sendMessage({
       type: "deleteContent",
@@ -149,9 +148,6 @@ class TableStaticContentSocketController {
         contentType,
         contentId,
         instanceId,
-      },
-      data: {
-        filename,
       },
     });
   };

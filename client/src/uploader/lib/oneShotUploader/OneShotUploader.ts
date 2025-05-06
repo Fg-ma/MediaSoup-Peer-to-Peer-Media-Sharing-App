@@ -8,8 +8,8 @@ class OneShotUploader {
   ) => {
     try {
       const formData = new FormData();
-      formData.append("file", file, file.name);
       formData.append("metadata", JSON.stringify(metadata));
+      formData.append("file", file, file.name);
 
       const xhr = new XMLHttpRequest();
 

@@ -1,9 +1,8 @@
 import uWS from "uWebSockets.js";
-import { v4 as uuidv4 } from "uuid";
 import busboy from "busboy";
 import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
-import { contentTypeBucketMap, mimeToExtension } from "../typeConstant";
+import { contentTypeBucketMap } from "../typeConstant";
 import {
   defaultApplicationEffectsStyles,
   defaultApplicationEffects,
@@ -20,6 +19,7 @@ import {
   StaticContentTypes,
   StaticMimeTypes,
   mimeTypeContentTypeMap,
+  mimeToExtension,
 } from "../../../universal/contentTypeConstant";
 import { getEmbedding } from "./embedding";
 import { uploadEmbeddingToQdrant } from "./qdrant";
@@ -40,12 +40,7 @@ class Posts {
         );
       });
 
-      const headers: { [header: string]: string } = {};
-      req.forEach((key, value) => {
-        headers[key] = value;
-      });
-
-      const bb = busboy({ headers });
+      const bb = busboy({ headers: this.collectHeaders(req) });
 
       let metadata: {
         tableId: string;
@@ -84,11 +79,13 @@ class Posts {
         const staticContentType =
           mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
 
+        if (!metadata) return;
+
         // Save file
-        tableTopCeph
+        tableTopCeph.posts
           .uploadFile(
             contentTypeBucketMap[staticContentType],
-            completeFilename,
+            metadata.contentId,
             file
           )
           .then(async () => {
@@ -141,17 +138,7 @@ class Posts {
         });
       });
 
-      let bodyBuffer = Buffer.alloc(0);
-      res.onData((chunk, isLast) => {
-        bodyBuffer = Buffer.concat([bodyBuffer, Buffer.from(chunk)]);
-        if (isLast) {
-          bb.end(bodyBuffer);
-        }
-      });
-
-      res.onAborted(() => {
-        bb.destroy();
-      });
+      this.pipeReqToBusboy(res, bb);
     });
 
     app.post("/upload-chunk-meta", (res, req) => {
@@ -185,25 +172,15 @@ class Posts {
               instanceId,
               direction,
               state,
-              filename,
               mimeType,
             } = metadata;
 
             const staticContentType =
               mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
 
-            const parts = filename.split(".");
-            const baseName = parts.slice(0, -1).join(".");
-            const extension = parts[parts.length - 1];
-            const sanitizedFilename =
-              tableStaticContentUtils.sanitizeString(baseName);
-            const sanitizedExtension =
-              tableStaticContentUtils.sanitizeString(extension);
-            const sanitizedName = `${sanitizedFilename}.${sanitizedExtension}`;
-
-            const uploadId = await tableTopCeph.createMultipartUpload(
+            const uploadId = await tableTopCeph.posts.createMultipartUpload(
               contentTypeBucketMap[staticContentType as StaticContentTypes],
-              sanitizedName
+              contentId
             );
             if (!uploadId) return;
 
@@ -213,7 +190,6 @@ class Posts {
               direction,
               tableId,
               contentId,
-              filename: sanitizedName,
               staticContentType,
               mimeType,
             };
@@ -282,7 +258,7 @@ class Posts {
       });
 
       bb.on("file", (_fn, stream, info) => {
-        const { mimeType } = info;
+        const { mimeType, filename } = info;
 
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
@@ -291,9 +267,9 @@ class Posts {
           if (!state) return;
 
           // upload this part
-          const ETag = await tableTopCeph.uploadPart(
+          const ETag = await tableTopCeph.posts.uploadPart(
             contentTypeBucketMap[session.staticContentType],
-            session.filename,
+            session.contentId,
             chunkIndex + 1,
             uploadId,
             buffer
@@ -307,10 +283,10 @@ class Posts {
 
           // if last chunk, complete
           if (state.parts.length === totalChunks) {
-            tableTopCeph
+            tableTopCeph.posts
               .completeMultipartUpload(
                 contentTypeBucketMap[session.staticContentType],
-                session.filename,
+                session.contentId,
                 uploadId,
                 state.parts
               )
@@ -323,7 +299,7 @@ class Posts {
                       session.contentId,
                       session.instanceId,
                       mimeType as StaticMimeTypes,
-                      session.filename,
+                      filename,
                       session.state
                     );
                     break;
@@ -340,7 +316,7 @@ class Posts {
                       session.tableId,
                       session.contentId,
                       mimeType as StaticMimeTypes,
-                      session.filename,
+                      filename,
                       session.state
                     );
                     break;
@@ -369,7 +345,7 @@ class Posts {
   private pipeReqToBusboy(
     res: uWS.HttpResponse,
     bb: busboy.Busboy,
-    uploadId: string
+    uploadId?: string
   ) {
     let buffer = Buffer.alloc(0);
     res.onData((chunk, isLast) => {
@@ -381,7 +357,7 @@ class Posts {
 
     res.onAborted(() => {
       bb.destroy();
-      this.uploadSessions.delete(uploadId);
+      if (uploadId) this.uploadSessions.delete(uploadId);
     });
   }
 

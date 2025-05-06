@@ -5,13 +5,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import { useUploadContext } from "../../context/uploadContext/UploadContext";
 import FgAudioElement from "./FgAudioElement";
 import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import PanButton from "../../elements/fgAdjustmentElements/PanButton";
@@ -35,9 +34,6 @@ const FgPortal = React.lazy(() => import("../../elements/fgPortal/FgPortal"));
 const AudioEffectsSection = React.lazy(
   () => import("../../audioEffectsButton/lib/AudioEffectsSection"),
 );
-
-const userStaticContentServerBaseUrl =
-  process.env.USER_STATIC_CONTENT_SERVER_BASE_URL;
 
 export default function FgAudioElementContainer({
   tableId,
@@ -103,13 +99,9 @@ export default function FgAudioElementContainer({
 
   const { userDataStreams, remoteDataStreams } = useMediaContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
-  const {
-    username: activeUsername,
-    instance: activeInstance,
-    userId,
-  } = useUserInfoContext();
-  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadContext();
+  const { username: activeUsername, instance: activeInstance } =
+    useUserInfoContext();
+  const { uploader } = useToolsContext();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [audioEffectsSectionVisible, setAudioEffectsSectionVisible] =
@@ -285,98 +277,10 @@ export default function FgAudioElementContainer({
   }, [positioning.current]);
 
   const handleFileUpload = async (blob: Blob, name?: string) => {
-    const contentId = uuidv4();
-    const metadata = {
-      userId: userId.current,
-      contentId,
-      direction: "toMuteStyle",
-      state: ["muteStyle"],
-    };
-
-    try {
-      const metaRes = await fetch(
-        userStaticContentServerBaseUrl + "upload-meta",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(metadata),
-        },
-      );
-
-      const { uploadId } = await metaRes.json();
-
-      const formData = new FormData();
-      const filename = `${name ? name + ".svg" : "image.svg"}`;
-      formData.append("file", blob, filename);
-
-      const xhr = new XMLHttpRequest();
-
-      addCurrentUpload(contentId, {
-        uploadUrl: URL.createObjectURL(blob),
-        filename,
-        mimeType: "svg",
-        size: blob.size,
-        progress: 0,
-        paused: false,
-      });
-
-      setTimeout(
-        () =>
-          sendUploadSignal({
-            type: "uploadStart",
-            header: {
-              contentId,
-            },
-          }),
-        250,
-      );
-
-      xhr.onload = () => {
-        removeCurrentUpload(contentId);
-
-        sendUploadSignal({
-          type: "uploadFinish",
-          header: {
-            contentId,
-          },
-        });
-      };
-
-      xhr.upload.onprogress = (event) => {
-        sendUploadSignal({
-          type: "uploadProgress",
-          header: {
-            contentId,
-          },
-          data: {
-            progress: event.loaded / event.total,
-          },
-        });
-      };
-
-      xhr.onerror = () => {
-        removeCurrentUpload(contentId);
-
-        sendUploadSignal({
-          type: "uploadError",
-          header: {
-            contentId,
-          },
-        });
-      };
-
-      xhr.open(
-        "POST",
-        userStaticContentServerBaseUrl + `upload-file/${uploadId}`,
-        true,
-      );
-
-      xhr.send(formData);
-    } catch (error) {
-      console.error("Error sending metadata:", error);
-    }
+    const file = new File([blob], `${name ? name + ".svg" : "image.svg"}`, {
+      type: "image/svg+xml",
+    });
+    uploader.current?.uploadToMuteStyle(file, ["muteStyle"]);
   };
 
   return (

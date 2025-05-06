@@ -26,9 +26,26 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
-// tableTopCeph.emptyBucket("table-svgs");
-// tableTopCeph.emptyBucket("table-images");
-// tableTopCeph.listBucketContents("table-svgs");
+// tableTopCeph.deletes.emptyBucket("table-svgs");
+// tableTopCeph.deletes.emptyBucket("table-images");
+// tableTopCeph.deletes.emptyBucket("table-videos");
+// tableTopCeph.deletes.emptyBucket("table-applications");
+// tableTopCeph.deletes.emptyBucket("table-text");
+// tableTopCeph.gets.listBucketContents("table-svgs");
+// tableTopCeph.gets.listBucketContents("table-videos");
+// tableTopCeph.gets.listBucketContents("table-images");
+// tableTopCeph.gets.listBucketContents("table-applications");
+// tableTopCeph.gets.listBucketContents("table-text");
+// tableTopCeph.deletes.emptyBucket("user-svgs");
+// tableTopCeph.deletes.emptyBucket("user-images");
+// tableTopCeph.deletes.emptyBucket("user-videos");
+// tableTopCeph.deletes.emptyBucket("user-applications");
+// tableTopCeph.deletes.emptyBucket("user-text");
+// tableTopCeph.gets.listBucketContents("user-svgs");
+// tableTopCeph.gets.listBucketContents("user-videos");
+// tableTopCeph.gets.listBucketContents("user-images");
+// tableTopCeph.gets.listBucketContents("user-applications");
+// tableTopCeph.gets.listBucketContents("user-text");
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
