@@ -1,5 +1,4 @@
 import uWS from "uWebSockets.js";
-import { v4 as uuidv4 } from "uuid";
 import busboy from "busboy";
 import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
 import Utils from "./lib/Utils";
@@ -11,8 +10,6 @@ import {
   StaticMimeTypes,
   UserContentStateTypes,
 } from "../../../universal/contentTypeConstant";
-import { getEmbedding } from "./embedding";
-import { uploadEmbeddingToQdrant } from "./qdrant";
 import { ChunkState, UploadSession } from "./lib/typeConstant";
 
 const tableStaticContentUtils = new Utils();

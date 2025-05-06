@@ -21,8 +21,6 @@ import {
   mimeTypeContentTypeMap,
   mimeToExtension,
 } from "../../../universal/contentTypeConstant";
-import { getEmbedding } from "./embedding";
-import { uploadEmbeddingToQdrant } from "./qdrant";
 import { ChunkState, UploadSession } from "./lib/typeConstant";
 
 const tableStaticContentUtils = new Utils();

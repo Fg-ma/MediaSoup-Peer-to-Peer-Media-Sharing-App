@@ -11,9 +11,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.735.0",
     "@aws-sdk/lib-storage": "^3.741.0",
-    "@grpc/grpc-js": "^1.13.3",
-    "@grpc/proto-loader": "^0.7.13",
-    "@qdrant/js-client-rest": "^1.13.0",
     "busboy": "^1.6.0",
     "dotenv": "^16.4.7",
     "fluent-ffmpeg": "^2.1.3",
