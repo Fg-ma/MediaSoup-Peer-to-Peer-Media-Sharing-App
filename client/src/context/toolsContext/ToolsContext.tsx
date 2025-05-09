@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useRef } from "react";
 import Uploader from "../../uploader/Uploader";
+import UserDevice from "../../lib/UserDevice";
 
 export interface ToolsContextProviderProps {
   children: React.ReactNode;
@@ -7,6 +8,7 @@ export interface ToolsContextProviderProps {
 
 export interface ToolsContextType {
   uploader: React.MutableRefObject<Uploader | undefined>;
+  userDevice: React.MutableRefObject<UserDevice>;
 }
 
 const ToolsContext = createContext<ToolsContextType | undefined>(undefined);
@@ -23,9 +25,10 @@ export const useToolsContext = () => {
 
 export function ToolsContextProvider({ children }: ToolsContextProviderProps) {
   const uploader = useRef<Uploader | undefined>(undefined);
+  const userDevice = useRef(new UserDevice());
 
   return (
-    <ToolsContext.Provider value={{ uploader }}>
+    <ToolsContext.Provider value={{ uploader, userDevice }}>
       {children}
     </ToolsContext.Provider>
   );

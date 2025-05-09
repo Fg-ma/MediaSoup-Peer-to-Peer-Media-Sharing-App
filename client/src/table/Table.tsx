@@ -7,7 +7,6 @@ import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../tableLayers/newInstancesLayer/NewInstancesLayer";
 import SelectTableLayer from "../tableLayers/selectTableLayer/SelectTableLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
-import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import LeftTableSection from "./lib/sideSections/LeftTableSection";
 import RightTableSection from "./lib/sideSections/RightTableSection";
@@ -26,7 +25,6 @@ export default function Table({
   bundles,
   gridActive,
   gridSize,
-  userDevice,
   deadbanding,
 }: {
   tableFunctionsRef: React.RefObject<HTMLDivElement>;
@@ -42,7 +40,6 @@ export default function Table({
     rows: number;
     cols: number;
   };
-  userDevice: React.MutableRefObject<UserDevice>;
   deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { tableSocket } = useSocketContext();
@@ -50,16 +47,21 @@ export default function Table({
   const [userData, setUserData] = useState<{
     [username: string]: { color: TableColors; seat: number; online: boolean };
   }>({});
-  const [activePanel, setActivePanel] = useState<TablePanels | undefined>(
-    undefined,
-  );
+  const [tableSidePanelActive, setTableSidePanelActive] = useState(false);
   const [_, setRerender] = useState(false);
+  const activePanel = useRef<TablePanels>("general");
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
 
   const tableController = useRef(
-    new TableController(tableRef, setUserData, aspectDir, setRerender),
+    new TableController(
+      tableRef,
+      setUserData,
+      aspectDir,
+      setRerender,
+      setTableSidePanelActive,
+    ),
   );
 
   useEffect(() => {
@@ -86,10 +88,16 @@ export default function Table({
 
     window.addEventListener("resize", tableController.current.getAspectDir);
 
+    window.addEventListener("keydown", tableController.current.handleKeyDown);
+
     return () => {
       window.removeEventListener(
         "resize",
         tableController.current.getAspectDir,
+      );
+      window.removeEventListener(
+        "keydown",
+        tableController.current.handleKeyDown,
       );
     };
   }, []);
@@ -115,7 +123,8 @@ export default function Table({
     >
       <TableSidePanel
         activePanel={activePanel}
-        setActivePanel={setActivePanel}
+        tableSidePanelActive={tableSidePanelActive}
+        setTableSidePanelActive={setTableSidePanelActive}
         tableController={tableController}
       />
       <div ref={tableContainerRef} className="flex h-full grow flex-col">
@@ -142,7 +151,7 @@ export default function Table({
                 <TableInfoPopup />
                 <LoadingTab
                   activePanel={activePanel}
-                  setActivePanel={setActivePanel}
+                  setExternalRerender={setRerender}
                 />
                 <div
                   ref={tableRef}
@@ -176,7 +185,6 @@ export default function Table({
                       />
                     )}
                     <SharedBundle
-                      userDevice={userDevice}
                       deadbanding={deadbanding}
                       tableRef={tableRef}
                     />

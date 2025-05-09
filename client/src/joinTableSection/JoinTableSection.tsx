@@ -4,6 +4,7 @@ import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
+import { useToolsContext } from "../context/toolsContext/ToolsContext";
 import JoinTableSectionController from "./lib/JoinTableSectionController";
 import ProducersController from "../lib/ProducersController";
 import BundlesController from "../lib/BundlesController";
@@ -11,7 +12,6 @@ import ConsumersController from "../lib/ConsumersController";
 import PermissionsController from "../lib/PermissionsController";
 import Metadata from "../lib/Metadata";
 import CleanupController from "../lib/CleanupController";
-import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 
 export default function JoinTableSection({
@@ -33,7 +33,6 @@ export default function JoinTableSection({
   consumersController,
   permissionsController,
   metadata,
-  userDevice,
   deadbanding,
   cleanupController,
   setRerender,
@@ -66,7 +65,6 @@ export default function JoinTableSection({
   consumersController: React.MutableRefObject<ConsumersController>;
   permissionsController: React.MutableRefObject<PermissionsController>;
   metadata: React.MutableRefObject<Metadata>;
-  userDevice: React.MutableRefObject<UserDevice>;
   deadbanding: React.MutableRefObject<Deadbanding>;
   cleanupController: React.MutableRefObject<CleanupController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,6 +74,8 @@ export default function JoinTableSection({
   const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
     useSocketContext();
   const { tableId, username, instance, device } = useUserInfoContext();
+  const { userDevice } = useToolsContext();
+
   const [isInTable, setIsInTable] = useState(false);
   const tableIdRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);

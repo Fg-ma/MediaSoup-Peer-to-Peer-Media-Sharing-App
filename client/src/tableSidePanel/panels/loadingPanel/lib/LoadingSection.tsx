@@ -65,6 +65,7 @@ export default function LoadingSection({
                 ]}
               />
             )}
+            clickFunction={upload.paused ? upload.resume : upload.pause}
             scrollingContainerRef={tablePanelRef}
             hoverContent={
               <FgHoverContentStandard

@@ -16,91 +16,88 @@ export default function LoadingElement({
 }) {
   const [_, setRerender] = useState(false);
 
-  const polarToCartesian = (angleInDegrees: number) => {
-    const angleInRadians = ((angleInDegrees + 90) * Math.PI) / 180.0;
-    return {
-      x: 50 + 45 * Math.cos(angleInRadians),
-      y: 50 + 45 * Math.sin(angleInRadians),
-    };
-  };
-
-  const describeArc = (endAngle: number) => {
-    const start = polarToCartesian(endAngle);
-    const end = polarToCartesian(0);
-
-    const largeArcFlag = endAngle <= 180 ? "0" : "1";
-
-    return [
-      "M",
-      50,
-      50,
-      "L",
-      start.x,
-      start.y,
-      "A",
-      45,
-      45,
-      0,
-      largeArcFlag,
-      0,
-      end.x,
-      end.y,
-      "Z",
-    ].join(" ");
-  };
-
-  const handleUploadListener = (message: ChunkedUploadListenerTypes) => {
-    switch (message.type) {
-      case "uploadProgress":
-        setRerender((prev) => !prev);
-        break;
-      default:
-        break;
+  // Touch progress changes so React re‑renders the SVG
+  const handleUploadListener = (msg: ChunkedUploadListenerTypes) => {
+    if (msg.type === "uploadProgress") {
+      setRerender((v) => !v);
     }
   };
 
   useEffect(() => {
     upload.addChunkedUploadListener(handleUploadListener);
-
     return () => {
       upload.removeChunkedUploadListener(handleUploadListener);
     };
   }, []);
+
+  // Parameters for our SVG circles:
+  const radius = 45;
+  const innerRadius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const innerCircumference = 2 * Math.PI * innerRadius;
+
+  // Clamp in [0,1]:
+  const pct = Math.min(Math.max(upload.progress, 0), 1);
 
   return (
     <HoverElement
       className="aspect-square h-12 rounded-full bg-fg-off-white"
       scrollingContainer={loadingTabRef}
       content={
-        <svg className="h-full w-full fill-fg-red" viewBox="0 0 100 100">
-          <mask id="arcMask1">
-            <circle cx="50" cy="50" r="100" fill="white" />
-            <circle cx="50" cy="50" r="40" fill="black" />
-          </mask>
-
+        <svg className="h-full w-full" viewBox="0 0 100 100">
+          {/* 1) Inner wedge (filled pie) */}
           <path
-            d={describeArc(upload.progress * 359.99)}
-            fill="#d40213"
-            stroke="#d40213"
-            strokeWidth="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            mask="url(#arcMask1)"
-          />
+            d={(() => {
+              // Simple wedge generator
+              const startAngle = 0;
+              const endAngle = pct * 360;
+              const toRad = (deg: number) => ((deg - 90) * Math.PI) / 180;
+              const cx = 50,
+                cy = 50,
+                r = innerRadius;
 
-          <mask id="arcMask2">
-            <circle cx="50" cy="50" r="100" fill="black" />
-            <circle cx="50" cy="50" r="40" fill="white" />
-          </mask>
+              const startX = cx + r * Math.cos(toRad(startAngle));
+              const startY = cy + r * Math.sin(toRad(startAngle));
+              const endX = cx + r * Math.cos(toRad(endAngle));
+              const endY = cy + r * Math.sin(toRad(endAngle));
+              const largeArc = endAngle > 180 ? 1 : 0;
 
-          <path
-            d={describeArc(upload.progress * 359.99)}
+              return [
+                `M ${cx} ${cy}`,
+                `L ${startX} ${startY}`,
+                `A ${r} ${r} 0 ${largeArc} 1 ${endX} ${endY}`,
+                "Z",
+              ].join(" ");
+            })()}
             fill="#e62833"
             stroke="#e62833"
-            strokeWidth="10"
-            strokeLinecap="round"
             strokeLinejoin="round"
-            mask="url(#arcMask2)"
+            strokeLinecap="round"
+            strokeWidth="4"
+          />
+
+          {/* 2) Outer ring background */}
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="#f0f0f0"
+            strokeWidth="10"
+          />
+
+          {/* 3) Outer ring progress */}
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="#d40213"
+            strokeWidth="10.5"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - pct)}
+            transform="rotate(-90 50 50)"
           />
         </svg>
       }

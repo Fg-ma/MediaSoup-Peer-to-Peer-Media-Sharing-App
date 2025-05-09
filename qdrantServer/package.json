@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@elastic/elasticsearch": "^9.0.0",
+    "@qdrant/js-client-rest": "^1.14.0",
     "nodemon": "^3.1.9",
     "typescript": "^5.7.2"
   },

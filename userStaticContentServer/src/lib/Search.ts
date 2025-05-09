@@ -4,15 +4,21 @@ import elasticSearch from "../../../elasticSearchServer/src/index";
 
 class Search {
   private indexMap: Record<string, string> = {
-    application: "mongo.tabletopmongo.userapplications",
-    image: "mongo.tabletopmongo.userimages",
-    soundClip: "mongo.tabletopmongo.usersoundclips",
-    svg: "mongo.tabletopmongo.usersvgs",
-    text: "mongo.tabletopmongo.usertext",
-    video: "mongo.tabletopmongo.uservideos",
+    application: "userapplications",
+    image: "userimages",
+    soundClip: "usersoundclips",
+    svg: "usersvgs",
+    text: "usertext",
+    video: "uservideos",
   };
-
-  private searchTabledWhitelist = ["iid", "aid", "sid", "xid", "vid"];
+  private idMap: Record<string, string> = {
+    tableapplications: "aid",
+    tableimages: "iid",
+    tablesoundclips: "sid",
+    tablesvgs: "sid",
+    tabletext: "xid",
+    tablevideos: "vid",
+  };
 
   constructor(private broadcaster: Broadcaster) {}
 
@@ -47,16 +53,12 @@ class Search {
 
     const hits = await elasticSearch.search(indices, boolQuery);
     const transformed = hits.flatMap((hit) => {
-      const source = hit["_source"] as any;
+      const source = hit["_source"] as Record<string, unknown>;
 
       if (source && Array.isArray(source["s"]) && source["s"].includes(0)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const filteredSource: Record<string, any> = {};
-
-        for (const [key, value] of Object.entries(source)) {
-          if (this.searchTabledWhitelist.includes(key)) {
-            filteredSource[key] = value;
-          }
-        }
+        filteredSource[this.idMap[hit._index]] = hit._id;
 
         return {
           score: hit._score,

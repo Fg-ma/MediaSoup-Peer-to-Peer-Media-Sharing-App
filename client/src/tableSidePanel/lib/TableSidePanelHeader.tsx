@@ -10,18 +10,21 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 
 const activePanelTitles: { [tablePanel in TablePanels]: string } = {
-  loading: "Loading",
+  general: "General",
   settings: "Settings",
+  loading: "Loading",
 };
 
 export default function TableSidePanelHeader({
   tableSidePanelRef,
   activePanel,
-  setActivePanel,
+  setTableSidePanelActive,
+  setRerender,
 }: {
   tableSidePanelRef: React.RefObject<HTMLDivElement>;
-  activePanel: TablePanels;
-  setActivePanel: React.Dispatch<React.SetStateAction<TablePanels | undefined>>;
+  activePanel: React.MutableRefObject<TablePanels>;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div
@@ -30,13 +33,24 @@ export default function TableSidePanelHeader({
     >
       <FgDropdownButton
         kind="popup"
-        label={activePanelTitles[activePanel]}
-        className="w-36 py-1 font-Josefin text-xl"
-        elements={[]}
+        label={activePanelTitles[activePanel.current]}
+        className="h-10 w-36 py-1 font-Josefin text-xl"
+        elements={Object.entries(activePanelTitles).map(([key, title]) => (
+          <div
+            key={key}
+            className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] rounded font-K2D hover:bg-fg-tone-black-8`}
+            onClick={() => {
+              activePanel.current = key as TablePanels;
+              setRerender((prev) => !prev);
+            }}
+          >
+            {title}
+          </div>
+        ))}
       />
       <FgButton
         className="flex aspect-square h-[75%] items-center justify-center"
-        clickFunction={() => setActivePanel(undefined)}
+        clickFunction={() => setTableSidePanelActive(false)}
         contentFunction={() => (
           <FgSVGElement
             src={closeIcon}

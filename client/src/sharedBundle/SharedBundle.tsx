@@ -2,10 +2,10 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
+import { useToolsContext } from "../context/toolsContext/ToolsContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
-import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import FgTableVideo from "../media/fgTableVideo/FgTableVideo";
 import FgTableImage from "../media/fgTableImage/FgTableImage";
@@ -17,13 +17,11 @@ const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function SharedBundle({
   name,
-  userDevice,
   deadbanding,
   tableRef,
   options,
 }: {
   name?: string;
-  userDevice: React.MutableRefObject<UserDevice>;
   deadbanding: React.MutableRefObject<Deadbanding>;
   tableRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
@@ -37,6 +35,7 @@ export default function SharedBundle({
   const { tableStaticContentSocket } = useSocketContext();
   const { userEffectsStyles, userEffects } = useEffectsContext();
   const { username } = useUserInfoContext();
+  const { userDevice } = useToolsContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
   const videoContentMute = useRef<{

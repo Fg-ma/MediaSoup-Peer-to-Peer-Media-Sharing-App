@@ -40,7 +40,7 @@ class ChunkedUploader {
     this.listeners.clear();
   };
 
-  async start() {
+  start = async () => {
     this._paused = false;
     setTimeout(
       () =>
@@ -52,24 +52,25 @@ class ChunkedUploader {
       250,
     );
     await this.uploadLoop();
-  }
+  };
 
-  pause() {
+  pause = () => {
     this._paused = true;
-    this.listeners.forEach((listener) => {
+    console.log(this.listeners);
+    this.listeners?.forEach((listener) => {
       listener({
         type: "uploadPaused",
       });
     });
-  }
+  };
 
-  resume() {
+  resume = () => {
     if (this._paused) {
       this.start();
     }
-  }
+  };
 
-  private async uploadLoop() {
+  private uploadLoop = async () => {
     while (this.offset < this.file.size && !this._paused) {
       const chunk = this.file.slice(this.offset, this.offset + this.CHUNK_SIZE);
       const chunkIndex = Math.floor(this.offset / this.CHUNK_SIZE);
@@ -108,7 +109,7 @@ class ChunkedUploader {
     if (this.offset >= this.file.size) {
       this.deconstructor();
     }
-  }
+  };
 
   addChunkedUploadListener = (
     listener: (message: ChunkedUploadListenerTypes) => void,

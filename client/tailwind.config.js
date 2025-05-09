@@ -132,6 +132,7 @@ export default {
         "upload-layer": 200720,
         "upload-tab": 200900,
         /* top level content (400000 - 500000) */
+        scrollbar: 460000,
         "panel-unfocused": 469800,
         "panel-focused-hover": 469900,
         "panel-focused-clicked": 470000,

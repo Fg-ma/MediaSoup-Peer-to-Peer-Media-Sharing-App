@@ -6,10 +6,10 @@ import { TablePanels } from "../../../tableSidePanel/TableSidePanel";
 
 export default function LoadingTab({
   activePanel,
-  setActivePanel,
+  setExternalRerender,
 }: {
-  activePanel: TablePanels | undefined;
-  setActivePanel: React.Dispatch<React.SetStateAction<TablePanels | undefined>>;
+  activePanel: React.MutableRefObject<TablePanels>;
+  setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const {
     getCurrentUploads,
@@ -34,7 +34,8 @@ export default function LoadingTab({
   };
 
   const handleOpenLoadingPanel = () => {
-    setActivePanel("loading");
+    activePanel.current = "loading";
+    setExternalRerender((prev) => !prev);
   };
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function LoadingTab({
   return (
     <>
       {Object.keys(getCurrentUploads()).length !== 0 &&
-        activePanel !== "loading" && (
+        activePanel.current !== "loading" && (
           <div
             ref={loadingTabRef}
             className="hide-scroll-bar absolute bottom-0 left-0 z-upload-tab flex h-16 w-[11.25rem] items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden rounded-bl-md rounded-tr-md border-2 border-fg-off-white bg-fg-tone-black-8 px-2"

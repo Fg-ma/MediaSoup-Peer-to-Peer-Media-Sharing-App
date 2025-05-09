@@ -1,22 +1,14 @@
 use axum::{
-    extract::Extension,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::post,
-    Json, Router,
+    extract::Extension, http::StatusCode, response::IntoResponse, routing::post, Json, Router,
+};
+use ndarray::Array2;
+use ort::{
+    environment::Environment, session::Session, tensor::OrtOwnedTensor, ExecutionProvider, Value,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{net::SocketAddr, sync::Arc};
 use tokenizers::Tokenizer;
-use ort::{
-    environment::Environment,
-    session::Session,
-    ExecutionProvider,
-    Value,
-    tensor::OrtOwnedTensor,
-};
-use ndarray::Array2;
 
 #[derive(Deserialize)]
 struct Payload {
@@ -35,17 +27,16 @@ async fn main() -> anyhow::Result<()> {
     let env = Arc::new(
         builder
             .with_execution_providers([ExecutionProvider::CPU(Default::default())])
-            .build()?
+            .build()?,
     );
 
     // 2) Create the Session from the ONNX model
-    let session = Arc::new(
-      ort::SessionBuilder::new(&env)?
-        .with_model_from_file("all-MiniLM-L6-v2.onnx")?
-    );
+    let session =
+        Arc::new(ort::SessionBuilder::new(&env)?.with_model_from_file("all-MiniLM-L6-v2.onnx")?);
 
     // 3) Load the tokenizer
-    let tokenizer = Arc::new(Tokenizer::from_file("tokenizer.json").map_err(|e| anyhow::anyhow!(e))?);
+    let tokenizer =
+        Arc::new(Tokenizer::from_file("tokenizer.json").map_err(|e| anyhow::anyhow!(e))?);
 
     // 4) Build the Axum router
     let app = Router::new()
@@ -72,7 +63,10 @@ async fn embed(
 
     let embeddings: Vec<Embedding> = tokio::task::spawn_blocking(move || {
         let encs = tokenizer.encode_batch(texts, true).map_err(|e| {
-            (StatusCode::BAD_REQUEST, format!("Tokenization error: {}", e))
+            (
+                StatusCode::BAD_REQUEST,
+                format!("Tokenization error: {}", e),
+            )
         })?;
         let batch = encs.len();
         let max_len = encs.iter().map(|e| e.get_ids().len()).max().unwrap_or(0);
@@ -98,27 +92,32 @@ async fn embed(
         let mask_tensor = mask_dyn.into();
 
         let ids_value = Value::from_array(allocator, &ids_tensor).map_err(|e| {
-          (StatusCode::INTERNAL_SERVER_ERROR, format!("Error creating input tensor: {}", e))
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Error creating input tensor: {}", e),
+            )
         })?;
 
         let mask_value = Value::from_array(allocator, &mask_tensor).map_err(|e| {
-          (StatusCode::INTERNAL_SERVER_ERROR, format!("Error creating attention mask tensor: {}", e))
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Error creating attention mask tensor: {}", e),
+            )
         })?;
 
-        let outputs: Vec<Value> = session
-            .run(vec![
-                ids_value,
-                mask_value,
-            ])
-            .map_err(|e| {
-                (StatusCode::INTERNAL_SERVER_ERROR, format!("Error running the model: {}", e))
-            })?;
+        let outputs: Vec<Value> = session.run(vec![ids_value, mask_value]).map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Error running the model: {}", e),
+            )
+        })?;
 
-        let tensor: OrtOwnedTensor<f32, _> = outputs[0]
-            .try_extract()
-            .map_err(|e| {
-                (StatusCode::INTERNAL_SERVER_ERROR, format!("Error extracting output tensor: {}", e))
-            })?;
+        let tensor: OrtOwnedTensor<f32, _> = outputs[0].try_extract().map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Error extracting output tensor: {}", e),
+            )
+        })?;
 
         let view = tensor.view();
         let shape = view.shape(); // [batch, seq_len, dim]

@@ -3,6 +3,7 @@ import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
+import { useToolsContext } from "../context/toolsContext/ToolsContext";
 import CameraSection from "./lib/cameraSection/CameraSection";
 import AudioSection from "./lib/audioSection/AudioSection";
 import ScreenSection from "./lib/screenSection/ScreenSection";
@@ -14,7 +15,6 @@ import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFu
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
 import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
 import CaptureMedia from "../media/capture/CaptureMedia";
-import UserDevice from "../lib/UserDevice";
 import Deadbanding from "../babylon/Deadbanding";
 import TabledPortal from "./lib/tabledSection/TabledPortal";
 
@@ -43,7 +43,6 @@ export default function TableFunctions({
   gridSize,
   setGridSize,
   producersController,
-  userDevice,
   deadbanding,
 }: {
   tableFunctionsRef: React.RefObject<HTMLDivElement>;
@@ -81,13 +80,13 @@ export default function TableFunctions({
     }>
   >;
   producersController: React.MutableRefObject<ProducersController>;
-  userDevice: React.MutableRefObject<UserDevice>;
   deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { sendGeneralSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
   const { tableId, username, instance } = useUserInfoContext();
   const { captureEffects, captureEffectsStyles } = useEffectsContext();
+  const { userDevice } = useToolsContext();
 
   const externalBackgroundChange = useRef(false);
 

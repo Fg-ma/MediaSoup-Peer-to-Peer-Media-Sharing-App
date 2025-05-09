@@ -11,11 +11,13 @@ export type TablePanels = "loading" | "general" | "settings";
 
 export default function TableSidePanel({
   activePanel,
-  setActivePanel,
+  tableSidePanelActive,
+  setTableSidePanelActive,
   tableController,
 }: {
-  activePanel: TablePanels | undefined;
-  setActivePanel: React.Dispatch<React.SetStateAction<TablePanels | undefined>>;
+  activePanel: React.MutableRefObject<TablePanels>;
+  tableSidePanelActive: boolean;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   tableController: React.MutableRefObject<TableController>;
 }) {
   const [width, setWidth] = useState(256);
@@ -52,7 +54,7 @@ export default function TableSidePanel({
 
   return (
     <>
-      {activePanel && (
+      {tableSidePanelActive && (
         <>
           <div
             className="table-side-panel flex h-full flex-col overflow-hidden rounded-md border-2 border-fg-off-white bg-fg-tone-black-6"
@@ -65,20 +67,27 @@ export default function TableSidePanel({
             <TableSidePanelHeader
               tableSidePanelRef={tableSidePanelRef}
               activePanel={activePanel}
-              setActivePanel={setActivePanel}
+              setTableSidePanelActive={setTableSidePanelActive}
+              setRerender={setRerender}
             />
             <FgScrollbarElement
               direction="vertical"
               style={{
                 height: `calc(100% - ${tableSidePanelRef.current?.clientHeight ?? 0}px)`,
               }}
+              scrollbarVisible={
+                tablePanelRef.current
+                  ? tablePanelRef.current.scrollHeight >
+                    tablePanelRef.current.clientHeight
+                  : true
+              }
               content={
                 <div
                   ref={tablePanelRef}
                   className="hide-scroll-bar h-full w-full overflow-y-auto"
                 >
-                  {activePanel === "general" && <GeneralPanel />}
-                  {activePanel === "loading" && (
+                  {activePanel.current === "general" && <GeneralPanel />}
+                  {activePanel.current === "loading" && (
                     <LoadingPanel
                       tablePanelRef={tablePanelRef}
                       setExternalRerender={setRerender}

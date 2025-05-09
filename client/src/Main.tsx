@@ -16,7 +16,6 @@ import { useToolsContext } from "./context/toolsContext/ToolsContext";
 import { useUploadContext } from "./context/uploadContext/UploadContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
-import UserDevice from "./lib/UserDevice";
 import BrowserMedia from "./media/BrowserMedia";
 import BundlesController from "./lib/BundlesController";
 import Deadbanding from "./babylon/Deadbanding";
@@ -47,7 +46,7 @@ export default function Main() {
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
-  const { uploader } = useToolsContext();
+  const { uploader, userDevice } = useToolsContext();
   const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
     useUploadContext();
 
@@ -267,8 +266,6 @@ export default function Main() {
     ),
   );
 
-  const userDevice = useRef(new UserDevice());
-
   const deadbanding = useRef(
     new Deadbanding(userEffectsStyles, captureEffectsStyles),
   );
@@ -369,7 +366,6 @@ export default function Main() {
         bundles={bundles}
         gridActive={gridActive}
         gridSize={gridSize}
-        userDevice={userDevice}
         deadbanding={deadbanding}
       />
       <TableFunctions
@@ -397,7 +393,6 @@ export default function Main() {
         gridSize={gridSize}
         setGridSize={setGridSize}
         producersController={producersController}
-        userDevice={userDevice}
         deadbanding={deadbanding}
       />
       <JoinTableSection
@@ -419,7 +414,6 @@ export default function Main() {
         consumersController={consumersController}
         permissionsController={permissionsController}
         metadata={metadata}
-        userDevice={userDevice}
         deadbanding={deadbanding}
         cleanupController={cleanupController}
         setRerender={setRerender}

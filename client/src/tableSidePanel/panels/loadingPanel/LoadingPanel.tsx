@@ -57,7 +57,7 @@ export default function LoadingPanel({
       ))}
       {Object.keys(getCurrentUploads()).length === 0 && (
         <div className="flex h-full w-full flex-col items-center justify-center">
-          <span className="text-center font-Josefin text-3xl text-fg-white">
+          <span className="px-2 text-center font-Josefin text-3xl text-fg-white">
             No uploads found
           </span>
           <FgSVGElement

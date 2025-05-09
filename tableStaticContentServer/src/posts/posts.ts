@@ -139,7 +139,7 @@ class Posts {
       this.pipeReqToBusboy(res, bb);
     });
 
-    app.post("/upload-chunk-meta", (res, req) => {
+    app.post("/upload-chunk-meta", (res, _) => {
       let buffer = "";
 
       res.cork(() => {
@@ -261,7 +261,7 @@ class Posts {
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
         stream.on("end", async () => {
-          let state = this.chunkStates.get(uploadId);
+          const state = this.chunkStates.get(uploadId);
           if (!state) return;
 
           // upload this part

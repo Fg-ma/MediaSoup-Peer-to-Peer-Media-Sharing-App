@@ -1,3 +1,4 @@
+import { TablePanels } from "src/tableSidePanel/TableSidePanel";
 import {
   IncomingTableMessages,
   onKickedFromTableType,
@@ -22,6 +23,9 @@ class TableController {
     >,
     private aspectDir: React.MutableRefObject<"width" | "height">,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private setTableSidePanelActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
   ) {}
 
   getAspectDir = () => {
@@ -41,6 +45,21 @@ class TableController {
         this.aspectDir.current = "height";
         this.setRerender((prev) => !prev);
       }
+    }
+  };
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key.toLowerCase()) {
+      case "s":
+        if (event.ctrlKey) {
+          event.preventDefault();
+          event.stopPropagation;
+
+          this.setTableSidePanelActive((prev) => !prev);
+        }
+        break;
+      default:
+        break;
     }
   };
 
