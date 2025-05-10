@@ -1,3 +1,7 @@
 .fg-table::-webkit-scrollbar {
   display: none;
 }
+
+.table-container {
+  width: var(--dynamic-width) !important;
+}

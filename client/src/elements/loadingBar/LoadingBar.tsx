@@ -19,7 +19,10 @@ export default function LoadingBar({
         ></div>
       }
       hoverContent={
-        <FgHoverContentStandard style="light" content={`${progress}%`} />
+        <FgHoverContentStandard
+          style="light"
+          content={`${progress.toFixed(2)}%`}
+        />
       }
       options={{
         hoverSpacing: 4,

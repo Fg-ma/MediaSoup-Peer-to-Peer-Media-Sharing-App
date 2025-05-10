@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocketContext } from "../context/socketContext/SocketContext";
+import { useSignalContext } from "../context/signalContext/SignalContext";
 import TableController from "./lib/TableController";
 import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import TableGridOverlay from "./lib/TableGridOverlay";
@@ -43,11 +44,13 @@ export default function Table({
   deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { tableSocket } = useSocketContext();
+  const { sendGroupSignal } = useSignalContext();
 
   const [userData, setUserData] = useState<{
     [username: string]: { color: TableColors; seat: number; online: boolean };
   }>({});
   const [tableSidePanelActive, setTableSidePanelActive] = useState(false);
+  const [tableSidePanelWidth, setTableSidePanelWidth] = useState(256);
   const [_, setRerender] = useState(false);
   const activePanel = useRef<TablePanels>("general");
   const aspectDir = useRef<"width" | "height">("width");
@@ -61,6 +64,7 @@ export default function Table({
       aspectDir,
       setRerender,
       setTableSidePanelActive,
+      sendGroupSignal,
     ),
   );
 
@@ -126,8 +130,20 @@ export default function Table({
         tableSidePanelActive={tableSidePanelActive}
         setTableSidePanelActive={setTableSidePanelActive}
         tableController={tableController}
+        setExternalRerender={setRerender}
+        tableSidePanelWidth={tableSidePanelWidth}
+        setTableSidePanelWidth={setTableSidePanelWidth}
       />
-      <div ref={tableContainerRef} className="flex h-full grow flex-col">
+      <div
+        ref={tableContainerRef}
+        className="table-container flex h-full flex-col"
+        style={
+          {
+            "--dynamic-width": `calc(100%${tableSidePanelActive ? ` - ${Math.max(200, tableSidePanelWidth)}px - 1.75rem` : ""})`,
+            minWidth: "30%",
+          } as React.CSSProperties
+        }
+      >
         <TopTableSection
           userData={userData}
           tableContainerRef={tableContainerRef}
@@ -151,6 +167,7 @@ export default function Table({
                 <TableInfoPopup />
                 <LoadingTab
                   activePanel={activePanel}
+                  setTableSidePanelActive={setTableSidePanelActive}
                   setExternalRerender={setRerender}
                 />
                 <div

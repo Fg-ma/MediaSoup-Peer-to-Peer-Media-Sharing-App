@@ -332,6 +332,66 @@ class Posts {
 
       this.pipeReqToBusboy(res, bb, uploadId);
     });
+
+    app.post("/cancel-upload/:uploadId", (res, req) => {
+      res.cork(() => {
+        res.writeHeader(
+          "Access-Control-Allow-Origin",
+          "https://localhost:8080"
+        );
+      });
+
+      // Required to prevent crash if the client disconnects early
+      let aborted = false;
+      res.onAborted(() => {
+        aborted = true;
+        console.warn("Cancel request aborted by client");
+      });
+
+      const uploadId = req.getParameter(0);
+
+      if (!uploadId) {
+        res.cork(() => {
+          res.writeStatus("400 Bad Request").end("Missing upload ID");
+        });
+        return;
+      }
+
+      const session = this.uploadSessions.get(uploadId);
+      if (!session) {
+        res.cork(() => {
+          res.writeStatus("404 Not Found").end("No such upload session");
+        });
+        return;
+      }
+
+      // Async work must be done in next tick or promise
+      (async () => {
+        try {
+          await tableTopCeph.posts.abortMultipartUpload(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            uploadId
+          );
+
+          this.uploadSessions.delete(uploadId);
+          this.chunkStates.delete(uploadId);
+
+          if (!aborted) {
+            res.cork(() => {
+              res.writeStatus("200 OK").end("Upload cancelled");
+            });
+          }
+        } catch (err) {
+          console.error("Error cancelling upload:", err);
+          if (!aborted) {
+            res.cork(() => {
+              res.writeStatus("500 Internal Server Error").end("Cancel failed");
+            });
+          }
+        }
+      })();
+    });
   }
 
   private collectHeaders(req: uWS.HttpRequest) {

@@ -4,6 +4,8 @@
 }
 
 .fg-scrollbar {
+  --scrollbar-size: 10px;
+  --gutter-size: 11px;
   position: absolute;
   display: flex;
   align-items: center;
@@ -18,14 +20,14 @@
 
 .fg-scrollbar-track {
   background-color: #d6d6d6;
-  border-radius: 5px;
+  border-radius: calc(var(--scrollbar-size) / 2);
   position: relative;
   pointer-events: auto;
 }
 
 .fg-scrollbar-thumb {
   background-color: #161616;
-  border-radius: 5px;
+  border-radius: calc(var(--scrollbar-size) / 2);
   position: absolute;
   pointer-events: auto;
 }
@@ -45,14 +47,14 @@
 .fg-vertical-scrollbar {
   right: 0%;
   top: 0%;
-  width: 32px;
+  width: calc(var(--scrollbar-size) + (var(--gutter-size) * 2));
   height: 100%;
   pointer-events: none;
 }
 
 .fg-vertical-scrollbar-track {
   height: 95%;
-  width: 10px;
+  width: var(--scrollbar-size);
   pointer-events: auto;
 }
 
@@ -66,12 +68,12 @@
   left: 0%;
   bottom: 0%;
   width: 100%;
-  height: 32px;
+  height: calc(var(--scrollbar-size) + (var(--gutter-size) * 2));
   pointer-events: none;
 }
 
 .fg-horizontal-scrollbar-track {
-  height: 10px;
+  height: var(--scrollbar-size);
   width: 95%;
   pointer-events: auto;
 }

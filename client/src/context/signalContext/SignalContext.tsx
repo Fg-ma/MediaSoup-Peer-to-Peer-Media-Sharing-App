@@ -1,15 +1,23 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useRef } from "react";
 import {
   GeneralSignals,
   GroupSignals,
+  MediaPositioningSignals,
   NewInstanceSignals,
 } from "./lib/typeConstant";
+import { ContentTypes } from "../../../../universal/contentTypeConstant";
 
 export interface SignalContextProviderProps {
   children: React.ReactNode;
 }
 
 export interface SignalContextType {
+  selected: React.MutableRefObject<
+    {
+      type: ContentTypes;
+      id: string;
+    }[]
+  >;
   addGeneralSignalListener: (
     listener: (signal: GeneralSignals) => void,
   ) => void;
@@ -27,6 +35,13 @@ export interface SignalContextType {
   addGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
   removeGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
   sendGroupSignal: (signal: GroupSignals) => void;
+  addMediaPositioningSignalListener: (
+    listener: (signal: MediaPositioningSignals) => void,
+  ) => void;
+  removeMediaPositioningSignalListener: (
+    listener: (signal: MediaPositioningSignals) => void,
+  ) => void;
+  sendMediaPositioningSignal: (signal: MediaPositioningSignals) => void;
 }
 
 const SignalContext = createContext<SignalContextType | undefined>(undefined);
@@ -44,11 +59,21 @@ export const useSignalContext = () => {
 export function SignalContextProvider({
   children,
 }: SignalContextProviderProps) {
+  const selected = useRef<
+    {
+      type: ContentTypes;
+      id: string;
+    }[]
+  >([]);
+
   const generalSignalListeners: Set<(signal: GeneralSignals) => void> =
     new Set();
   const newInstanceSignalListeners: Set<(signal: NewInstanceSignals) => void> =
     new Set();
   const groupSignalListeners: Set<(signal: GroupSignals) => void> = new Set();
+  const mediaPositioningSignalListeners: Set<
+    (signal: MediaPositioningSignals) => void
+  > = new Set();
 
   const addGeneralSignalListener = (
     listener: (signal: GeneralSignals) => void,
@@ -100,6 +125,28 @@ export function SignalContextProvider({
 
   const sendGroupSignal = (signal: GroupSignals) => {
     groupSignalListeners.forEach((listener) => {
+      if (signal.type === "groupChange") {
+        selected.current = signal.data.selected;
+      }
+
+      listener(signal);
+    });
+  };
+
+  const addMediaPositioningSignalListener = (
+    listener: (signal: MediaPositioningSignals) => void,
+  ): void => {
+    mediaPositioningSignalListeners.add(listener);
+  };
+
+  const removeMediaPositioningSignalListener = (
+    listener: (signal: MediaPositioningSignals) => void,
+  ): void => {
+    mediaPositioningSignalListeners.delete(listener);
+  };
+
+  const sendMediaPositioningSignal = (signal: MediaPositioningSignals) => {
+    mediaPositioningSignalListeners.forEach((listener) => {
       listener(signal);
     });
   };
@@ -107,6 +154,7 @@ export function SignalContextProvider({
   return (
     <SignalContext.Provider
       value={{
+        selected,
         addGeneralSignalListener,
         removeGeneralSignalListener,
         sendGeneralSignal,
@@ -116,6 +164,9 @@ export function SignalContextProvider({
         addGroupSignalListener,
         removeGroupSignalListener,
         sendGroupSignal,
+        addMediaPositioningSignalListener,
+        removeMediaPositioningSignalListener,
+        sendMediaPositioningSignal,
       }}
     >
       {children}

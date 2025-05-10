@@ -1,4 +1,3 @@
-import { TablePanels } from "src/tableSidePanel/TableSidePanel";
 import {
   IncomingTableMessages,
   onKickedFromTableType,
@@ -8,6 +7,7 @@ import {
   onUserLeftTableType,
   TableColors,
 } from "../../serverControllers/tableServer/lib/typeConstant";
+import { GroupSignals } from "../../context/signalContext/lib/typeConstant";
 
 class TableController {
   constructor(
@@ -26,6 +26,7 @@ class TableController {
     private setTableSidePanelActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   getAspectDir = () => {
@@ -56,6 +57,7 @@ class TableController {
           event.stopPropagation;
 
           this.setTableSidePanelActive((prev) => !prev);
+          this.sendGroupSignal({ type: "clearGroup" });
         }
         break;
       default:

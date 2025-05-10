@@ -11,7 +11,8 @@ export default function SelectTableLayer({
   tableRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { sendGroupSignal } = useSignalContext();
+  const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef<{ x: number; y: number } | undefined>(undefined);
@@ -64,6 +65,27 @@ export default function SelectTableLayer({
       }
     };
   }, [dragging, selected.current.length]);
+
+  useEffect(() => {
+    document.addEventListener(
+      "resize",
+      selectTableLayerController.current.handleResize,
+    );
+
+    addGroupSignalListener(
+      selectTableLayerController.current.handleGroupSignal,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "resize",
+        selectTableLayerController.current.handleResize,
+      );
+      removeGroupSignalListener(
+        selectTableLayerController.current.handleGroupSignal,
+      );
+    };
+  }, []);
 
   let boxStyle = {};
   if (dragStart.current && dragEnd.current) {

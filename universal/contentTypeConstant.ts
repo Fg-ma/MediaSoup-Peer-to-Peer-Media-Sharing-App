@@ -7,7 +7,7 @@ export type ContentTypes =
   | "text"
   | "soundClip"
   | "audio"
-  | "game"
+  | "games"
   | "svg";
 
 export type StaticContentTypes =

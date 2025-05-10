@@ -14,6 +14,7 @@ import {
   onGroupDragType,
   GroupSignals,
   onGroupDeleteType,
+  MediaPositioningSignals,
 } from "../../../context/signalContext/lib/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
@@ -27,6 +28,19 @@ class MediaContainerController {
     private mediaInstanceId: string,
     private kind: StaticContentTypes,
     private getAspect: (() => number | undefined) | undefined,
+    private setPositioning:
+      | ((positioning: {
+          position: {
+            left: number;
+            top: number;
+          };
+          scale: {
+            x: number;
+            y: number;
+          };
+          rotation: number;
+        }) => void)
+      | undefined,
     private positioningListeners: React.MutableRefObject<{
       [username: string]: {
         [instance: string]: () => void;
@@ -161,6 +175,7 @@ class MediaContainerController {
               data.mediaInstanceId === this.mediaInstanceId
             ) {
               this.positioning.current = data.positioning;
+              if (this.setPositioning) this.setPositioning(data.positioning);
               this.setRerender((prev) => !prev);
             }
           };
@@ -300,7 +315,7 @@ class MediaContainerController {
     this.lowerController.current.handleClose();
   };
 
-  handleSignal = (signal: GroupSignals) => {
+  handleGroupSignal = (signal: GroupSignals) => {
     switch (signal.type) {
       case "groupDelete":
         this.onGroupDelete(signal);
@@ -313,6 +328,105 @@ class MediaContainerController {
         break;
       case "groupDragEnd":
         this.onGroupDragEnd(signal);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleMediaPositioningSignal = (signal: MediaPositioningSignals) => {
+    switch (signal.type) {
+      case "moveTo":
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+          "position",
+          { rotationPointPlacement: "topLeft" },
+        );
+
+        this.fgContentAdjustmentController.current?.movementTo(
+          {
+            x:
+              (signal.data.x / 100) *
+              (this.bundleRef.current?.clientWidth ?? 1),
+            y:
+              (signal.data.y / 100) *
+              (this.bundleRef.current?.clientHeight ?? 1),
+          },
+          {
+            x:
+              (this.positioning.current.position.left / 100) *
+              (this.bundleRef.current?.clientWidth ?? 1),
+            y:
+              (this.positioning.current.position.top / 100) *
+              (this.bundleRef.current?.clientHeight ?? 1),
+          },
+        );
+
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+        this.tableStaticContentSocket.current?.updateContentPositioning(
+          this.kind,
+          this.mediaId,
+          this.mediaInstanceId,
+          { position: this.positioning.current.position },
+        );
+        break;
+      case "rotateTo":
+        if (!this.bundleRef.current) break;
+
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
+
+        const box = this.bundleRef.current.getBoundingClientRect();
+
+        this.fgContentAdjustmentController.current?.rotateTo(
+          signal.data.rotation,
+          {
+            x:
+              (this.positioning.current.position.left / 100) *
+                this.bundleRef.current.clientWidth +
+              box.left,
+            y:
+              (this.positioning.current.position.top / 100) *
+                this.bundleRef.current.clientHeight +
+              box.top,
+          },
+        );
+
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+        this.tableStaticContentSocket.current?.updateContentPositioning(
+          this.kind,
+          this.mediaId,
+          this.mediaInstanceId,
+          { rotation: this.positioning.current.rotation },
+        );
+        break;
+      case "scaleTo":
+        if (!this.bundleRef.current) break;
+
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
+
+        const referencePoint = {
+          x:
+            (this.positioning.current.position.left / 100) *
+            this.bundleRef.current.clientWidth,
+          y:
+            (this.positioning.current.position.top / 100) *
+            this.bundleRef.current.clientHeight,
+        };
+
+        this.fgContentAdjustmentController.current?.scaleTo(
+          this.mediaContainerOptions.resizeType ?? "aspect",
+          signal.data,
+          referencePoint,
+          referencePoint,
+          this.aspectRatio.current,
+        );
+
+        this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+        this.tableStaticContentSocket.current?.updateContentPositioning(
+          this.kind,
+          this.mediaId,
+          this.mediaInstanceId,
+          { scale: this.positioning.current.scale },
+        );
         break;
       default:
         break;

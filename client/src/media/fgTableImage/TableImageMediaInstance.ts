@@ -25,6 +25,18 @@ class TableImageMediaInstance {
     [imageEffect in ImageEffectTypes]?: boolean;
   } = {};
 
+  private positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     public imageMedia: TableImageMedia,
     public imageInstanceId: string,
@@ -44,6 +56,8 @@ class TableImageMediaInstance {
       rotation: number;
     },
   ) {
+    this.positioning = this.initPositioning;
+
     if (!this.userEffects.current.image[this.imageInstanceId]) {
       this.userEffects.current.image[this.imageInstanceId] =
         structuredClone(defaultImageEffects);
@@ -648,6 +662,24 @@ class TableImageMediaInstance {
 
   getAspect = () => {
     return this.imageMedia.aspect;
+  };
+
+  setPositioning = (positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }) => {
+    this.positioning = positioning;
+  };
+
+  getPositioning = () => {
+    return this.positioning;
   };
 }
 

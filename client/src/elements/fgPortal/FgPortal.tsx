@@ -99,7 +99,7 @@ export default function FgPortal({
       };
   }, [content]);
 
-  if (type !== "staticTopDomain" && portalPosition === null) return;
+  if (type === "mouse" && portalPosition === null) return;
 
   return ReactDOM.createPortal(
     <motion.div

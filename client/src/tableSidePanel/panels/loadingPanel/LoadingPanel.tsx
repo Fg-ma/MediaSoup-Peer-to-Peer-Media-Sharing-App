@@ -47,7 +47,9 @@ export default function LoadingPanel({
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-col space-y-4">
+    <div
+      className={`${Object.keys(getCurrentUploads()).length === 0 ? "h-full" : "h-max"} flex w-full flex-col space-y-4`}
+    >
       {Object.entries(getCurrentUploads()).map(([contentId, upload]) => (
         <LoadingSection
           key={contentId}

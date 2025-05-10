@@ -6,7 +6,6 @@ class HoverElementController {
     private hoverContent: React.ReactElement | undefined,
     private hoverTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private setIsHover: React.Dispatch<React.SetStateAction<boolean>>,
-    private hoverContainerRef: React.RefObject<HTMLDivElement>,
   ) {}
 
   handlePointerEnter = () => {

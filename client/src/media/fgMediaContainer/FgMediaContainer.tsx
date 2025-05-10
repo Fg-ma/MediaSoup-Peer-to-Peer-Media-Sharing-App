@@ -45,6 +45,7 @@ export default function FgMediaContainer({
   addDownloadListener,
   removeDownloadListener,
   getAspect,
+  setPositioning,
   mediaId,
   mediaInstanceId,
   kind,
@@ -79,6 +80,17 @@ export default function FgMediaContainer({
     ) => void,
   ) => void;
   getAspect?: () => number | undefined;
+  setPositioning?: (positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }) => void;
   mediaId: string;
   mediaInstanceId: string;
   kind: StaticContentTypes;
@@ -120,8 +132,12 @@ export default function FgMediaContainer({
   const { mediasoupSocket, tableStaticContentSocket, tableSocket } =
     useSocketContext();
   const { tableId } = useUserInfoContext();
-  const { addGroupSignalListener, removeGroupSignalListener } =
-    useSignalContext();
+  const {
+    addGroupSignalListener,
+    removeGroupSignalListener,
+    addMediaPositioningSignalListener,
+    removeMediaPositioningSignalListener,
+  } = useSignalContext();
 
   const mediaContainerRef =
     externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
@@ -204,6 +220,7 @@ export default function FgMediaContainer({
       mediaInstanceId,
       kind,
       getAspect,
+      setPositioning,
       positioningListeners,
       aspectRatio,
       positioning,
@@ -238,7 +255,10 @@ export default function FgMediaContainer({
     tableSocket.current?.addMessageListener(
       mediaContainerController.current.handleTableMessage,
     );
-    addGroupSignalListener(mediaContainerController.current.handleSignal);
+    addGroupSignalListener(mediaContainerController.current.handleGroupSignal);
+    addMediaPositioningSignalListener(
+      mediaContainerController.current.handleMediaPositioningSignal,
+    );
 
     document.addEventListener("keydown", lowerController.current.handleKeyDown);
 
@@ -269,7 +289,12 @@ export default function FgMediaContainer({
       tableSocket.current?.removeMessageListener(
         mediaContainerController.current.handleTableMessage,
       );
-      removeGroupSignalListener(mediaContainerController.current.handleSignal);
+      removeGroupSignalListener(
+        mediaContainerController.current.handleGroupSignal,
+      );
+      removeMediaPositioningSignalListener(
+        mediaContainerController.current.handleMediaPositioningSignal,
+      );
       document.removeEventListener(
         "keydown",
         lowerController.current.handleKeyDown,
@@ -301,6 +326,7 @@ export default function FgMediaContainer({
           positioning: positioning.current,
         }),
       );
+      if (setPositioning) setPositioning(positioning.current);
     }
   }, [positioning.current]);
 
@@ -409,7 +435,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >

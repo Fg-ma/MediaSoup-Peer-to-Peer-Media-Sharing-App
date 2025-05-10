@@ -1,10 +1,11 @@
+import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import { GroupSignals } from "../../../context/signalContext/lib/typeConstant";
 
 class SelectTableLayerController {
   queryInterval: NodeJS.Timeout | undefined;
 
   selectables: NodeListOf<HTMLElement> | undefined;
-  selectedInfo: { type: string; id: string }[] | undefined;
+  selectedInfo: { type: ContentTypes; id: string }[] | undefined;
 
   dragging = false;
 
@@ -33,11 +34,53 @@ class SelectTableLayerController {
     private groupRef: React.RefObject<HTMLDivElement>,
   ) {}
 
+  handleResize = () => {
+    this.selectables =
+      this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
+    this.setRerender((prev) => !prev);
+  };
+
+  handleGroupSignal = (signal: GroupSignals) => {
+    switch (signal.type) {
+      case "clearGroup":
+        this.selected.current = [];
+        this.selectedInfo = [];
+
+        this.sendGroupSignal({
+          type: "groupChange",
+          data: { selected: this.selectedInfo },
+        });
+
+        this.setRerender((prev) => !prev);
+        break;
+      case "groupUpdate":
+        this.selectables =
+          this.tableTopRef.current?.querySelectorAll<HTMLElement>(
+            ".selectable",
+          );
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
   handleDocumentPointerDown = (e: MouseEvent) => {
-    if (this.groupRef.current?.contains(e.target as Node) || this.dragging)
+    if (
+      !this.tableTopRef.current?.contains(e.target as Node) ||
+      this.groupRef.current?.contains(e.target as Node) ||
+      this.dragging
+    )
       return;
 
     this.selected.current = [];
+    this.selectedInfo = [];
+
+    this.sendGroupSignal({
+      type: "groupChange",
+      data: { selected: this.selectedInfo },
+    });
+
     this.setRerender((prev) => !prev);
   };
 
@@ -57,6 +100,12 @@ class SelectTableLayerController {
     this.dragEnd.current = undefined;
 
     this.selected.current = [];
+    this.selectedInfo = [];
+
+    this.sendGroupSignal({
+      type: "groupChange",
+      data: { selected: this.selectedInfo },
+    });
 
     this.setDragging(true);
 
@@ -109,11 +158,16 @@ class SelectTableLayerController {
       this.selectedInfo = [];
 
       for (const sel of this.selected.current) {
-        const type = sel.getAttribute("data-selectable-type");
+        const type = sel.getAttribute("data-selectable-type") as ContentTypes;
         const id = sel.getAttribute("data-selectable-id");
 
         if (type && id) this.selectedInfo.push({ type, id });
       }
+
+      this.sendGroupSignal({
+        type: "groupChange",
+        data: { selected: this.selectedInfo },
+      });
     }
 
     if (this.queryInterval) {

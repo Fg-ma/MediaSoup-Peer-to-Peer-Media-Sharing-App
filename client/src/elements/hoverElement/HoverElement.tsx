@@ -52,14 +52,11 @@ export default function HoverElement({
   const hoverTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const [isHover, setIsHover] = useState(false);
 
-  const hoverElementController = useRef(
-    new HoverElementController(
-      hoverElementOptions,
-      hoverContent,
-      hoverTimeout,
-      setIsHover,
-      hoverContainerRef,
-    ),
+  const hoverElementController = new HoverElementController(
+    hoverElementOptions,
+    hoverContent,
+    hoverTimeout,
+    setIsHover,
   );
 
   useEffect(() => {
@@ -67,13 +64,13 @@ export default function HoverElement({
 
     document.addEventListener(
       "visibilitychange",
-      hoverElementController.current.handleVisibilityChange,
+      hoverElementController.handleVisibilityChange,
     );
 
     return () => {
       document.removeEventListener(
         "visibilitychange",
-        hoverElementController.current.handleVisibilityChange,
+        hoverElementController.handleVisibilityChange,
       );
     };
   }, [isHover]);
@@ -83,13 +80,13 @@ export default function HoverElement({
 
     scrollingContainer.current.addEventListener(
       "scroll",
-      hoverElementController.current.handleScroll,
+      hoverElementController.handleScroll,
     );
 
     return () => {
       scrollingContainer.current?.removeEventListener(
         "scroll",
-        hoverElementController.current.handleScroll,
+        hoverElementController.handleScroll,
       );
     };
   }, [scrollingContainer?.current]);
@@ -100,8 +97,8 @@ export default function HoverElement({
         ref={hoverContainerRef}
         className={className}
         style={style}
-        onPointerEnter={hoverElementController.current.handlePointerEnter}
-        onPointerLeave={hoverElementController.current.handlePointerLeave}
+        onPointerEnter={hoverElementController.handlePointerEnter}
+        onPointerLeave={hoverElementController.handlePointerLeave}
       >
         {content}
       </div>

@@ -34,7 +34,6 @@ export default function LoadingElement({
   const radius = 45;
   const innerRadius = 40;
   const circumference = 2 * Math.PI * radius;
-  const innerCircumference = 2 * Math.PI * innerRadius;
 
   // Clamp in [0,1]:
   const pct = Math.min(Math.max(upload.progress, 0), 1);

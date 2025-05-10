@@ -6,9 +6,11 @@ import { TablePanels } from "../../../tableSidePanel/TableSidePanel";
 
 export default function LoadingTab({
   activePanel,
+  setTableSidePanelActive,
   setExternalRerender,
 }: {
   activePanel: React.MutableRefObject<TablePanels>;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const {
@@ -35,6 +37,7 @@ export default function LoadingTab({
 
   const handleOpenLoadingPanel = () => {
     activePanel.current = "loading";
+    setTableSidePanelActive(true);
     setExternalRerender((prev) => !prev);
   };
 

@@ -9,6 +9,8 @@ export default function FgScrollbarElement({
   scrollbarVisible = true,
   content,
   className,
+  scrollbarSize = 10,
+  gutterSize = 11,
   style,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
@@ -17,6 +19,8 @@ export default function FgScrollbarElement({
   scrollbarVisible?: boolean;
   content?: React.ReactNode;
   className?: string;
+  scrollbarSize?: number;
+  gutterSize?: number;
   style?: CSSProperties;
 }) {
   const scrollbarElementRef = externalRef
@@ -67,10 +71,12 @@ export default function FgScrollbarElement({
       fgScrollbarElementController.current.updateHorizontalScrollbar();
     }
 
-    scrollingContentRef.current?.addEventListener(
-      "scroll",
-      fgScrollbarElementController.current.scrollFunction,
-    );
+    if (direction === "vertical") {
+      scrollingContentRef.current?.addEventListener(
+        "scroll",
+        fgScrollbarElementController.current.scrollFunction,
+      );
+    }
     if (direction === "horizontal") {
       scrollingContentRef.current?.addEventListener(
         "wheel",
@@ -79,10 +85,12 @@ export default function FgScrollbarElement({
     }
 
     return () => {
-      scrollingContentRef.current?.removeEventListener(
-        "scroll",
-        fgScrollbarElementController.current.scrollFunction,
-      );
+      if (direction === "vertical") {
+        scrollingContentRef.current?.removeEventListener(
+          "scroll",
+          fgScrollbarElementController.current.scrollFunction,
+        );
+      }
       if (direction === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
           "wheel",
@@ -94,6 +102,25 @@ export default function FgScrollbarElement({
 
   useEffect(() => {
     if (scrollbarVisible) {
+      if (direction === "vertical") {
+        if (scrollbarThumbRef.current) {
+          scrollbarThumbRef.current.style.width = "100%";
+          scrollbarThumbRef.current.style.left = "0%";
+        }
+        if (scrollbarRef.current) {
+          scrollbarRef.current.style.right = "0%";
+        }
+        fgScrollbarElementController.current.updateVerticalScrollbar();
+      } else {
+        if (scrollbarThumbRef.current) {
+          scrollbarThumbRef.current.style.height = "100%";
+          scrollbarThumbRef.current.style.top = "0%";
+        }
+        if (scrollbarRef.current) {
+          scrollbarRef.current.style.bottom = "0%";
+        }
+        fgScrollbarElementController.current.updateHorizontalScrollbar();
+      }
       setRerender((prev) => !prev);
     } else {
       if (scrollTimeout.current) {
@@ -140,6 +167,10 @@ export default function FgScrollbarElement({
               ? "fg-vertical-scrollbar"
               : "fg-horizontal-scrollbar"
           }`}
+          style={{
+            ["--scrollbar-size" as any]: `${scrollbarSize}px`,
+            ["--gutter-size" as any]: `${gutterSize}px`,
+          }}
         >
           <div
             ref={scrollbarTrackRef}

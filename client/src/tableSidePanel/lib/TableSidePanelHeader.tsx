@@ -16,19 +16,19 @@ const activePanelTitles: { [tablePanel in TablePanels]: string } = {
 };
 
 export default function TableSidePanelHeader({
-  tableSidePanelRef,
+  tableSidePanelHeaderRef,
   activePanel,
   setTableSidePanelActive,
-  setRerender,
+  setExternalRerender,
 }: {
-  tableSidePanelRef: React.RefObject<HTMLDivElement>;
+  tableSidePanelHeaderRef: React.RefObject<HTMLDivElement>;
   activePanel: React.MutableRefObject<TablePanels>;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
+  setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div
-      ref={tableSidePanelRef}
+      ref={tableSidePanelHeaderRef}
       className="flex h-14 w-full items-center justify-between border-b-2 border-fg-tone-black-3 bg-fg-tone-black-5 p-2"
     >
       <FgDropdownButton
@@ -41,7 +41,7 @@ export default function TableSidePanelHeader({
             className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] rounded font-K2D hover:bg-fg-tone-black-8`}
             onClick={() => {
               activePanel.current = key as TablePanels;
-              setRerender((prev) => !prev);
+              setExternalRerender((prev) => !prev);
             }}
           >
             {title}

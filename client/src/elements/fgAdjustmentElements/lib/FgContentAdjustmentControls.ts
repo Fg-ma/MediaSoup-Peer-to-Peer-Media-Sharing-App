@@ -432,6 +432,350 @@ class FgContentAdjustmentController {
     }
   };
 
+  movementTo = (
+    displacement: { x: number; y: number },
+    rotationPoint: { x: number; y: number },
+  ) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const angle =
+      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+
+    const pixelScale = {
+      x:
+        (this.positioning.current.scale.x / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.scale.y / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
+    const isOutside = this.isBoxOutside(
+      displacement.x,
+      displacement.y,
+      angle,
+      pixelScale.x,
+      pixelScale.y,
+      rotationPoint.x,
+      rotationPoint.y,
+    );
+
+    if (!isOutside) {
+      this.positioning.current = {
+        ...this.positioning.current,
+        position: {
+          left: (displacement.x / this.bundleRef.current.clientWidth) * 100,
+          top: (displacement.y / this.bundleRef.current.clientHeight) * 100,
+        },
+      };
+      this.setRerender((prev) => !prev);
+    } else {
+      this.positioning.current = {
+        ...this.positioning.current,
+        position: {
+          left:
+            (displacement.x / this.bundleRef.current.clientWidth) * 100 >
+            this.maxLeft
+              ? this.maxLeft
+              : (displacement.x / this.bundleRef.current.clientWidth) * 100 <
+                  this.minLeft
+                ? this.minLeft
+                : (displacement.x / this.bundleRef.current.clientWidth) * 100,
+          top:
+            (displacement.y / this.bundleRef.current.clientHeight) * 100 >
+            this.maxTop
+              ? this.maxTop
+              : (displacement.y / this.bundleRef.current.clientHeight) * 100 <
+                  this.minTop
+                ? this.minTop
+                : (displacement.y / this.bundleRef.current.clientHeight) * 100,
+        },
+      };
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  rotateTo = (angle: number, referencePoint: { x: number; y: number }) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+
+    const box = this.bundleRef.current.getBoundingClientRect();
+
+    const isOutside = this.isBoxOutside(
+      (this.positioning.current.position.left / 100) *
+        this.bundleRef.current.clientWidth,
+      (this.positioning.current.position.top / 100) *
+        this.bundleRef.current.clientHeight,
+      2 * Math.PI - (angle * Math.PI) / 180,
+      (this.positioning.current.scale.x / 100) *
+        this.bundleRef.current.clientWidth,
+      (this.positioning.current.scale.y / 100) *
+        this.bundleRef.current.clientHeight,
+      referencePoint.x - box.left,
+      referencePoint.y - box.top,
+    );
+
+    if (!isOutside) {
+      this.positioning.current = {
+        ...this.positioning.current,
+        rotation: angle,
+      };
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  scaleTo = (
+    kind: "any" | "square" | "aspect",
+    scale: { x: number; y: number },
+    referencePoint: { x: number; y: number },
+    rotationPoint: { x: number; y: number },
+    aspectRatio?: number,
+  ) => {
+    if (!this.bundleRef.current) {
+      return;
+    }
+    const { x: referenceX, y: referenceY } = referencePoint;
+
+    let theta =
+      2 * Math.PI - this.positioning.current.rotation * (Math.PI / 180);
+    if (theta > 2 * Math.PI - 0.0000001) {
+      theta = 0;
+    }
+
+    let height = Math.max(2, scale.y);
+
+    let width = Math.max(2, scale.x);
+
+    // Apply aspect-ratio constraint when `kind === "aspect"`
+    if (kind === "aspect") {
+      const targetAspect =
+        aspectRatio ??
+        this.positioning.current.scale.x / this.positioning.current.scale.y;
+
+      // Ensure width and height respect the aspect ratio
+      if (width / height > targetAspect) {
+        // Constrain by width
+        height = width / targetAspect;
+      } else {
+        // Constrain by height
+        width = height * targetAspect;
+      }
+    }
+
+    const isOutside = this.isBoxOutside(
+      referenceX,
+      referenceY,
+      theta,
+      kind === "square"
+        ? Math.max(
+            (height * this.bundleRef.current.clientHeight) / 100,
+            (width * this.bundleRef.current.clientWidth) / 100,
+          )
+        : (width * this.bundleRef.current.clientWidth) / 100,
+      kind === "square"
+        ? Math.max(
+            (height * this.bundleRef.current.clientHeight) / 100,
+            (width * this.bundleRef.current.clientWidth) / 100,
+          )
+        : (height * this.bundleRef.current.clientHeight) / 100,
+      rotationPoint.x,
+      rotationPoint.y,
+    );
+
+    if (!isOutside) {
+      this.positioning.current = {
+        ...this.positioning.current,
+        scale:
+          kind === "square"
+            ? { x: Math.max(width, height), y: Math.max(width, height) }
+            : {
+                x: width,
+                y: height,
+              },
+      };
+      this.setRerender((prev) => !prev);
+    } else if (kind === "square") {
+      const maxDims =
+        (this.getMaxSquareAspectDim(
+          referenceX,
+          referenceY,
+          theta,
+          rotationPoint.x,
+          rotationPoint.y,
+          0,
+          0,
+        ) /
+          Math.max(
+            this.bundleRef.current.clientHeight,
+            this.bundleRef.current.clientWidth,
+          )) *
+        100;
+
+      this.positioning.current = {
+        ...this.positioning.current,
+        scale: {
+          x: maxDims,
+          y: maxDims,
+        },
+      };
+      this.setRerender((prev) => !prev);
+    } else if (kind === "aspect") {
+      const isWidthOutside = this.isBoxOutside(
+        referenceX,
+        referenceY,
+        theta,
+        (width * this.bundleRef.current.clientWidth) / 100,
+        (this.positioning.current.scale.y / 100) *
+          this.bundleRef.current.clientHeight,
+        referenceX,
+        referenceY,
+      );
+
+      if (!isWidthOutside) {
+        const maxHeight =
+          (this.getMaxAspectHeight(
+            referenceX,
+            referenceY,
+            theta,
+            rotationPoint.x,
+            rotationPoint.y,
+            (this.positioning.current.scale.y / 100) *
+              this.bundleRef.current.clientHeight,
+            aspectRatio ?? 1,
+          ) /
+            this.bundleRef.current.clientHeight) *
+          100;
+
+        this.positioning.current = {
+          ...this.positioning.current,
+          scale: {
+            x:
+              height > maxHeight
+                ? maxHeight * (aspectRatio ?? 1)
+                : height * (aspectRatio ?? 1),
+            y: height > maxHeight ? maxHeight : height,
+          },
+        };
+        this.setRerender((prev) => !prev);
+      } else {
+        const isHeightOutside = this.isBoxOutside(
+          referenceX,
+          referenceY,
+          theta,
+          (this.positioning.current.scale.x / 100) *
+            this.bundleRef.current.clientWidth,
+          (height * this.bundleRef.current.clientHeight) / 100,
+          referenceX,
+          referenceY,
+        );
+
+        if (!isHeightOutside) {
+          const maxWidth =
+            (this.getMaxAspectWidth(
+              referenceX,
+              referenceY,
+              theta,
+              rotationPoint.x,
+              rotationPoint.y,
+              (this.positioning.current.scale.x / 100) *
+                this.bundleRef.current.clientWidth,
+              aspectRatio ?? 1,
+            ) /
+              this.bundleRef.current.clientWidth) *
+            100;
+
+          this.positioning.current = {
+            ...this.positioning.current,
+            scale: {
+              x: width > maxWidth ? maxWidth : width,
+              y:
+                width > maxWidth
+                  ? maxWidth / (aspectRatio ?? 1)
+                  : width / (aspectRatio ?? 1),
+            },
+          };
+          this.setRerender((prev) => !prev);
+        }
+      }
+    } else {
+      const isWidthOutside = this.isBoxOutside(
+        referenceX,
+        referenceY,
+        theta,
+        (width * this.bundleRef.current.clientWidth) / 100,
+        (this.positioning.current.scale.y / 100) *
+          this.bundleRef.current.clientHeight,
+        referenceX,
+        referenceY,
+      );
+
+      if (!isWidthOutside) {
+        const maxHeight =
+          (this.getMaxHeight(
+            referenceX,
+            referenceY,
+            theta,
+            rotationPoint.x,
+            rotationPoint.y,
+            (width * this.bundleRef.current.clientWidth) / 100,
+            (this.positioning.current.scale.y / 100) *
+              this.bundleRef.current.clientHeight,
+          ) /
+            this.bundleRef.current.clientHeight) *
+          100;
+
+        this.positioning.current = {
+          ...this.positioning.current,
+          scale: {
+            x: width,
+            y:
+              height > maxHeight ? maxHeight : this.positioning.current.scale.y,
+          },
+        };
+        this.setRerender((prev) => !prev);
+      } else {
+        const isHeightOutside = this.isBoxOutside(
+          referenceX,
+          referenceY,
+          theta,
+          (this.positioning.current.scale.x / 100) *
+            this.bundleRef.current.clientWidth,
+          (height * this.bundleRef.current.clientHeight) / 100,
+          referenceX,
+          referenceY,
+        );
+
+        if (!isHeightOutside) {
+          const maxWidth =
+            (this.getMaxWidth(
+              referenceX,
+              referenceY,
+              theta,
+              rotationPoint.x,
+              rotationPoint.y,
+              (this.positioning.current.scale.x / 100) *
+                this.bundleRef.current.clientWidth,
+              (height * this.bundleRef.current.clientHeight) / 100,
+            ) /
+              this.bundleRef.current.clientWidth) *
+            100;
+
+          this.positioning.current = {
+            ...this.positioning.current,
+            scale: {
+              x: width > maxWidth ? maxWidth : this.positioning.current.scale.x,
+              y: height,
+            },
+          };
+          this.setRerender((prev) => !prev);
+        }
+      }
+    }
+  };
+
   getRotatedRectanglePoints = (
     topLeft: { x: number; y: number },
     width: number,

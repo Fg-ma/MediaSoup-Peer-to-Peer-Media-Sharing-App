@@ -1,4 +1,7 @@
-import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
+import {
+  ContentTypes,
+  StaticContentTypes,
+} from "../../../../../universal/contentTypeConstant";
 import { InstanceLayerModes } from "../../../tableLayers/newInstancesLayer/lib/typeConstant";
 
 export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
@@ -12,7 +15,15 @@ export type GroupSignals =
   | onGroupDragStartType
   | onGroupDragType
   | onGroupDragEndType
-  | onGroupDeleteType;
+  | onGroupDeleteType
+  | onGroupChangeType
+  | onClearGroupType
+  | onGroupUpdateType;
+
+export type MediaPositioningSignals =
+  | onMoveToType
+  | onRotateToType
+  | onScaleToType;
 
 export type onLocalMuteChangeType = {
   type: "localMuteChange";
@@ -62,7 +73,7 @@ export type onGroupDragStartType = {
   type: "groupDragStart";
   data: {
     affected: {
-      type: string;
+      type: ContentTypes;
       id: string;
     }[];
     startDragPosition: {
@@ -76,7 +87,7 @@ export type onGroupDragType = {
   type: "groupDrag";
   data: {
     affected: {
-      type: string;
+      type: ContentTypes;
       id: string;
     }[];
     dragPosition: {
@@ -90,7 +101,7 @@ export type onGroupDragEndType = {
   type: "groupDragEnd";
   data: {
     affected: {
-      type: string;
+      type: ContentTypes;
       id: string;
     }[];
   };
@@ -100,8 +111,49 @@ export type onGroupDeleteType = {
   type: "groupDelete";
   data: {
     affected: {
-      type: string;
+      type: ContentTypes;
       id: string;
     }[];
+  };
+};
+
+export type onGroupChangeType = {
+  type: "groupChange";
+  data: {
+    selected: {
+      type: ContentTypes;
+      id: string;
+    }[];
+  };
+};
+
+export type onGroupUpdateType = {
+  type: "groupUpdate";
+};
+
+export type onClearGroupType = {
+  type: "clearGroup";
+};
+
+export type onMoveToType = {
+  type: "moveTo";
+  data: {
+    x: number;
+    y: number;
+  };
+};
+
+export type onRotateToType = {
+  type: "rotateTo";
+  data: {
+    rotation: number;
+  };
+};
+
+export type onScaleToType = {
+  type: "scaleTo";
+  data: {
+    x: number;
+    y: number;
   };
 };

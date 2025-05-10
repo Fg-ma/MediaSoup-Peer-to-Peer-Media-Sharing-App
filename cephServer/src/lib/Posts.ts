@@ -4,6 +4,7 @@ import {
   CreateMultipartUploadCommand,
   UploadPartCommand,
   CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
 } from "@aws-sdk/client-s3";
 import internal from "stream";
 
@@ -87,6 +88,23 @@ class Posts {
       await this.s3Client.send(command);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  abortMultipartUpload = async (
+    bucketName: string,
+    key: string,
+    uploadId: string
+  ) => {
+    try {
+      const command = new AbortMultipartUploadCommand({
+        Bucket: bucketName,
+        Key: key,
+        UploadId: uploadId,
+      });
+      await this.s3Client.send(command);
+    } catch (error) {
+      console.error("Failed to abort multipart upload:", error);
     }
   };
 }

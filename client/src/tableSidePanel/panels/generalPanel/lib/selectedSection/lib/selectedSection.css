@@ -1,0 +1,8 @@
+.selected-section-media-container-download {
+  display: none;
+}
+
+.selected-section-media-container:hover
+  .selected-section-media-container-download {
+  display: flex;
+}
