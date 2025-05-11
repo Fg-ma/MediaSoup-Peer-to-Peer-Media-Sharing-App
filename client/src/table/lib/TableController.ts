@@ -57,7 +57,9 @@ class TableController {
           event.stopPropagation;
 
           this.setTableSidePanelActive((prev) => !prev);
-          this.sendGroupSignal({ type: "clearGroup" });
+          setTimeout(() => {
+            this.sendGroupSignal({ type: "groupUpdate" });
+          }, 0);
         }
         break;
       default:

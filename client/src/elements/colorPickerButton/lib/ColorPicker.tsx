@@ -15,18 +15,17 @@ export default function ColorPicker({
   color,
   setColor,
   tempColor,
-  setTempColor,
   setIsColorPicker,
   colorRef,
   colorPickerBtnRef,
   handleAcceptColorCallback,
   externalColorPickerPanelRef,
   isAlpha = false,
+  setRerender,
 }: {
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
-  tempColor: string;
-  setTempColor: React.Dispatch<React.SetStateAction<string>>;
+  tempColor: React.MutableRefObject<string>;
   setIsColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
   colorRef: React.MutableRefObject<string>;
   colorPickerBtnRef: React.RefObject<HTMLButtonElement>;
@@ -38,6 +37,7 @@ export default function ColorPicker({
   ) => void;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
   isAlpha?: boolean;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [hexValue, setHexValue] = useState(
     color.slice(1) + (isAlpha && color.length !== 9 ? "ff" : ""),
@@ -93,11 +93,13 @@ export default function ColorPicker({
         .toString(16)
         .padStart(2, "0")}`;
 
-      setTempColor(color + hexA);
+      tempColor.current = color + hexA;
+      setRerender((prev) => !prev);
       setHexValue(color.slice(1) + hexA);
       setRgba({ r: `${r}`, g: `${g}`, b: `${b}`, a: `${alpha}` });
     } else {
-      setTempColor(color);
+      tempColor.current = color;
+      setRerender((prev) => !prev);
       setHexValue(color.slice(1));
 
       setRgba((prev) => ({ r: `${r}`, g: `${g}`, b: `${b}`, a: prev.a }));
@@ -105,8 +107,8 @@ export default function ColorPicker({
   };
 
   const handleAcceptColor = () => {
-    setColor(tempColor);
-    colorRef.current = tempColor;
+    setColor(tempColor.current);
+    colorRef.current = tempColor.current;
     setIsColorPicker(false);
     if (handleAcceptColorCallback) {
       handleAcceptColorCallback(
@@ -128,7 +130,8 @@ export default function ColorPicker({
   };
 
   const handleCancelColor = () => {
-    setTempColor(color);
+    tempColor.current = color;
+    setRerender((prev) => !prev);
     setIsColorPicker(false);
   };
 
@@ -138,7 +141,8 @@ export default function ColorPicker({
     setHexValue(event.target.value);
 
     if (isValidHex(event.target.value)) {
-      setTempColor(`#${event.target.value}`);
+      tempColor.current = `#${event.target.value}`;
+      setRerender((prev) => !prev);
       if (isAlpha) {
         const { r, g, b, a } = hexToRgba(`#${event.target.value}`);
         setRgba({ r: `${r}`, g: `${g}`, b: `${b}`, a: `${a}` });
@@ -155,7 +159,7 @@ export default function ColorPicker({
     type: "r" | "g" | "b",
   ) => {
     if (!isAlpha) {
-      const { r, b, g } = hexToRgb(tempColor);
+      const { r, b, g } = hexToRgb(tempColor.current);
 
       setRgba((prev) => {
         const newRgba = { ...prev };
@@ -181,12 +185,13 @@ export default function ColorPicker({
           hexVal = rgbToHex(r, b, value);
         }
         if (hexVal) {
-          setTempColor(hexVal);
+          tempColor.current = hexVal;
+          setRerender((prev) => !prev);
           setHexValue(hexVal.slice(1));
         }
       }
     } else {
-      const { r, b, g, a } = hexToRgba(tempColor);
+      const { r, b, g, a } = hexToRgba(tempColor.current);
 
       setRgba((prev) => {
         const newRgba = { ...prev };
@@ -212,7 +217,8 @@ export default function ColorPicker({
           hexVal = rgbaToHex(r, b, value, a);
         }
         if (hexVal) {
-          setTempColor(hexVal);
+          tempColor.current = hexVal;
+          setRerender((prev) => !prev);
           setHexValue(hexVal.slice(1));
         }
       }
@@ -220,7 +226,7 @@ export default function ColorPicker({
   };
 
   const handleAlphaChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { r, b, g } = hexToRgba(tempColor);
+    const { r, b, g } = hexToRgba(tempColor.current);
 
     setRgba((prev) => {
       const newRgba = { ...prev };
@@ -242,14 +248,15 @@ export default function ColorPicker({
       let hexVal: string | undefined;
       hexVal = rgbaToHex(r, b, g, value);
       if (hexVal) {
-        setTempColor(hexVal);
+        tempColor.current = hexVal;
+        setRerender((prev) => !prev);
         setHexValue(hexVal.slice(1));
       }
     }
   };
 
   const handleAlphaSliderChanges = (value: number) => {
-    const { r, g, b } = hexToRgb(tempColor);
+    const { r, g, b } = hexToRgb(tempColor.current);
     const alphaValue = parseFloat(value.toFixed(2));
 
     setRgba((prev) => {
@@ -266,7 +273,8 @@ export default function ColorPicker({
       let hexVal: string | undefined;
       hexVal = rgbaToHex(r, g, b, alphaValue);
       if (hexVal) {
-        setTempColor(hexVal);
+        tempColor.current = hexVal;
+        setRerender((prev) => !prev);
         setHexValue(hexVal.slice(1));
       }
     }
@@ -321,7 +329,9 @@ export default function ColorPicker({
             }`}
           >
             <HexColorPicker
-              color={isAlpha ? tempColor.slice(0, -2) : tempColor}
+              color={
+                isAlpha ? tempColor.current.slice(0, -2) : tempColor.current
+              }
               onChange={handleChangeComplete}
               style={{
                 height: isAlpha ? "220px" : "200px",

@@ -35,52 +35,33 @@ export default function FgScrollbarElement({
   const startScrollPosition = useRef({ top: 0, left: 0 });
   const [_, setRerender] = useState(false);
 
-  const fgScrollbarElementController = useRef(
-    new FgScrollbarElementController(
-      scrollingContentRef,
-      scrollbarElementRef,
-      scrollbarRef,
-      scrollbarTrackRef,
-      scrollbarThumbRef,
-      scrollTimeout,
-      direction,
-      dragging,
-      scrollStart,
-      startScrollPosition,
-    ),
+  const fgScrollbarElementController = new FgScrollbarElementController(
+    scrollingContentRef,
+    scrollbarElementRef,
+    scrollbarRef,
+    scrollbarTrackRef,
+    scrollbarThumbRef,
+    scrollTimeout,
+    direction,
+    dragging,
+    scrollStart,
+    startScrollPosition,
+    setRerender,
   );
 
   useEffect(() => {
-    if (direction === "vertical") {
-      if (scrollbarThumbRef.current) {
-        scrollbarThumbRef.current.style.width = "100%";
-        scrollbarThumbRef.current.style.left = "0%";
-      }
-      if (scrollbarRef.current) {
-        scrollbarRef.current.style.right = "0%";
-      }
-      fgScrollbarElementController.current.updateVerticalScrollbar();
-    } else {
-      if (scrollbarThumbRef.current) {
-        scrollbarThumbRef.current.style.height = "100%";
-        scrollbarThumbRef.current.style.top = "0%";
-      }
-      if (scrollbarRef.current) {
-        scrollbarRef.current.style.bottom = "0%";
-      }
-      fgScrollbarElementController.current.updateHorizontalScrollbar();
-    }
+    fgScrollbarElementController.updateScrollbar();
 
     if (direction === "vertical") {
       scrollingContentRef.current?.addEventListener(
         "scroll",
-        fgScrollbarElementController.current.scrollFunction,
+        fgScrollbarElementController.scrollFunction,
       );
     }
     if (direction === "horizontal") {
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        fgScrollbarElementController.current.horizontalScrollWheel,
+        fgScrollbarElementController.horizontalScrollWheel,
       );
     }
 
@@ -88,67 +69,27 @@ export default function FgScrollbarElement({
       if (direction === "vertical") {
         scrollingContentRef.current?.removeEventListener(
           "scroll",
-          fgScrollbarElementController.current.scrollFunction,
+          fgScrollbarElementController.scrollFunction,
         );
       }
       if (direction === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          fgScrollbarElementController.current.horizontalScrollWheel,
+          fgScrollbarElementController.horizontalScrollWheel,
         );
       }
     };
   }, [direction]);
 
   useEffect(() => {
-    if (scrollbarVisible) {
-      if (direction === "vertical") {
-        if (scrollbarThumbRef.current) {
-          scrollbarThumbRef.current.style.width = "100%";
-          scrollbarThumbRef.current.style.left = "0%";
-        }
-        if (scrollbarRef.current) {
-          scrollbarRef.current.style.right = "0%";
-        }
-        fgScrollbarElementController.current.updateVerticalScrollbar();
-      } else {
-        if (scrollbarThumbRef.current) {
-          scrollbarThumbRef.current.style.height = "100%";
-          scrollbarThumbRef.current.style.top = "0%";
-        }
-        if (scrollbarRef.current) {
-          scrollbarRef.current.style.bottom = "0%";
-        }
-        fgScrollbarElementController.current.updateHorizontalScrollbar();
-      }
-      setRerender((prev) => !prev);
-    } else {
+    if (!scrollbarVisible) {
       if (scrollTimeout.current) {
         clearTimeout(scrollTimeout.current);
         scrollTimeout.current = undefined;
       }
       dragging.current = false;
-      if (direction === "vertical") {
-        if (scrollbarThumbRef.current) {
-          scrollbarThumbRef.current.style.width = "100%";
-          scrollbarThumbRef.current.style.left = "0%";
-        }
-        if (scrollbarRef.current) {
-          scrollbarRef.current.style.right = "0%";
-        }
-        fgScrollbarElementController.current.updateVerticalScrollbar();
-      } else {
-        if (scrollbarThumbRef.current) {
-          scrollbarThumbRef.current.style.height = "100%";
-          scrollbarThumbRef.current.style.top = "0%";
-        }
-        if (scrollbarRef.current) {
-          scrollbarRef.current.style.bottom = "0%";
-        }
-        fgScrollbarElementController.current.updateHorizontalScrollbar();
-      }
-      setRerender((prev) => !prev);
     }
+    fgScrollbarElementController.updateScrollbar();
   }, [scrollbarVisible]);
 
   return (
@@ -156,8 +97,8 @@ export default function FgScrollbarElement({
       ref={scrollbarElementRef}
       className={`${className} relative`}
       style={style}
-      onPointerMove={fgScrollbarElementController.current.hideTableScrollBar}
-      onPointerLeave={fgScrollbarElementController.current.pointerLeaveFunction}
+      onPointerMove={fgScrollbarElementController.hideTableScrollBar}
+      onPointerLeave={fgScrollbarElementController.pointerLeaveFunction}
     >
       {scrollbarVisible && (
         <div
@@ -179,9 +120,7 @@ export default function FgScrollbarElement({
                 ? "fg-vertical-scrollbar-track"
                 : "fg-horizontal-scrollbar-track"
             }`}
-            onPointerDown={
-              fgScrollbarElementController.current.trackPointerDown
-            }
+            onPointerDown={fgScrollbarElementController.trackPointerDown}
           >
             <div
               ref={scrollbarThumbRef}
@@ -190,9 +129,7 @@ export default function FgScrollbarElement({
                   ? "fg-vertical-scrollbar-thumb"
                   : "fg-horizontal-scrollbar-thumb"
               }`}
-              onPointerDown={
-                fgScrollbarElementController.current.thumbDragStart
-              }
+              onPointerDown={fgScrollbarElementController.thumbDragStart}
             ></div>
           </div>
         </div>

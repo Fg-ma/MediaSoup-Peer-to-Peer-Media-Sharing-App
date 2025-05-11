@@ -137,14 +137,24 @@ export type onClearGroupType = {
 
 export type onMoveToType = {
   type: "moveTo";
+  header: {
+    contentId: string;
+    contentType: ContentTypes;
+  };
   data: {
-    x: number;
-    y: number;
+    position: {
+      x: number;
+      y: number;
+    };
   };
 };
 
 export type onRotateToType = {
   type: "rotateTo";
+  header: {
+    contentId: string;
+    contentType: ContentTypes;
+  };
   data: {
     rotation: number;
   };
@@ -152,8 +162,14 @@ export type onRotateToType = {
 
 export type onScaleToType = {
   type: "scaleTo";
+  header: {
+    contentId: string;
+    contentType: ContentTypes;
+  };
   data: {
-    x: number;
-    y: number;
+    scale: {
+      x: number;
+      y: number;
+    };
   };
 };

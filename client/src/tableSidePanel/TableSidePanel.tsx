@@ -41,14 +41,14 @@ export default function TableSidePanel({
     document.addEventListener("pointerup", handleDividerPointerUp);
     document.addEventListener("pointermove", handleDividerPointerMove);
 
-    sendGroupSignal({ type: "clearGroup" });
-
     setDragging(true);
   };
 
   const handleDividerPointerMove = (event: PointerEvent) => {
     const box = tablePanelRef.current?.getBoundingClientRect();
     setTableSidePanelWidth(event.clientX - (box?.left ?? 0) - 16);
+
+    sendGroupSignal({ type: "groupUpdate" });
   };
 
   const handleDividerPointerUp = () => {

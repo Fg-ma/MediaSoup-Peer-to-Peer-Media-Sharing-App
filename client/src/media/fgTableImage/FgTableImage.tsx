@@ -40,7 +40,7 @@ export default function FgTableImage({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(imageMediaInstance.initPositioning);
+  }>(imageMediaInstance.getPositioning());
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);

@@ -66,12 +66,15 @@ class SelectTableLayerController {
   };
 
   handleDocumentPointerDown = (e: MouseEvent) => {
-    if (
-      !this.tableTopRef.current?.contains(e.target as Node) ||
-      this.groupRef.current?.contains(e.target as Node) ||
-      this.dragging
-    )
-      return;
+    const target = e.target as Node;
+
+    const isInsideTable = this.tableTopRef.current?.contains(target);
+    const isInGroup = this.groupRef.current?.contains(target);
+    const isInSelectables = this.selectables
+      ? Array.from(this.selectables).some((el) => el.contains(target))
+      : false;
+
+    if (!isInsideTable || isInGroup || isInSelectables || this.dragging) return;
 
     this.selected.current = [];
     this.selectedInfo = [];

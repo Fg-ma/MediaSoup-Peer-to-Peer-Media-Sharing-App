@@ -17,7 +17,8 @@ class FgScrollbarController {
     private startScrollPosition: React.MutableRefObject<{
       top: number;
       left: number;
-    }>
+    }>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   updateVerticalScrollbar = () => {
@@ -41,7 +42,7 @@ class FgScrollbarController {
       50,
       contentHeight > containerHeight
         ? (trackHeight / contentHeight) * trackHeight // Proportional thumb height
-        : trackHeight
+        : trackHeight,
     ); // If content is smaller, thumb fills the track height
     this.scrollbarThumbRef.current.style.height = `${thumbHeight}px`;
 
@@ -78,7 +79,7 @@ class FgScrollbarController {
       50,
       contentWidth > containerWidth
         ? (trackWidth / contentWidth) * trackWidth // Proportional thumb width
-        : trackWidth
+        : trackWidth,
     ); // If content is smaller, thumb fills the track width
     this.scrollbarThumbRef.current.style.width = `${thumbWidth}px`;
 
@@ -152,7 +153,7 @@ class FgScrollbarController {
     this.dragging.current = false;
 
     this.scrollbarThumbRef.current?.classList.remove(
-      "fg-scrollbar-thumb-pressed"
+      "fg-scrollbar-thumb-pressed",
     );
 
     // Remove pointermove and pointerup listeners
@@ -161,8 +162,25 @@ class FgScrollbarController {
   };
 
   horizontalScrollWheel = (event: WheelEvent) => {
-    if (this.direction === "vertical" || !this.scrollingContentRef.current) {
+    if (this.direction === "vertical" || !this.scrollingContentRef.current)
       return;
+
+    this.updateHorizontalScrollbar();
+
+    this.scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
+
+    if (this.scrollTimeout.current) {
+      clearTimeout(this.scrollTimeout.current);
+      this.scrollTimeout.current = undefined;
+    }
+
+    if (!this.dragging.current) {
+      this.scrollTimeout.current = setTimeout(() => {
+        this.scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
+
+        clearTimeout(this.scrollTimeout.current);
+        this.scrollTimeout.current = undefined;
+      }, this.scrollTimeoutTime);
     }
 
     this.scrollingContentRef.current.scrollLeft += event.deltaY;
@@ -238,11 +256,7 @@ class FgScrollbarController {
   };
 
   scrollFunction = () => {
-    if (this.direction === "vertical") {
-      this.updateVerticalScrollbar();
-    } else {
-      this.updateHorizontalScrollbar();
-    }
+    this.updateVerticalScrollbar();
 
     this.scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
 
@@ -261,6 +275,29 @@ class FgScrollbarController {
     }
   };
 
+  updateScrollbar = () => {
+    if (this.direction === "vertical") {
+      if (this.scrollbarThumbRef.current) {
+        this.scrollbarThumbRef.current.style.width = "100%";
+        this.scrollbarThumbRef.current.style.left = "0%";
+      }
+      if (this.scrollbarRef.current) {
+        this.scrollbarRef.current.style.right = "0%";
+      }
+      this.updateVerticalScrollbar();
+    } else {
+      if (this.scrollbarThumbRef.current) {
+        this.scrollbarThumbRef.current.style.height = "100%";
+        this.scrollbarThumbRef.current.style.top = "0%";
+      }
+      if (this.scrollbarRef.current) {
+        this.scrollbarRef.current.style.bottom = "0%";
+      }
+      this.updateHorizontalScrollbar();
+    }
+    this.setRerender((prev) => !prev);
+  };
+
   hideTableScrollBar = (event: React.PointerEvent) => {
     if (!this.scrollbarElementRef.current || this.dragging.current) return;
 
@@ -269,17 +306,26 @@ class FgScrollbarController {
     if (this.direction === "vertical") {
       // Check if the pointer is within 40px of the right edge of the container
       if (rect.right - event.clientX <= 40) {
-        this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
+        if (
+          this.scrollbarElementRef.current.classList.contains(
+            "hide-fg-scrollbar",
+          )
+        ) {
+          this.scrollbarElementRef.current.classList.remove(
+            "hide-fg-scrollbar",
+          );
+          this.updateScrollbar();
+        }
       } else {
         if (
           !this.scrollbarElementRef.current.classList.contains(
-            "hide-fg-scrollbar"
+            "hide-fg-scrollbar",
           ) &&
           !this.scrollTimeout.current
         ) {
           this.scrollTimeout.current = setTimeout(() => {
             this.scrollbarElementRef.current?.classList.add(
-              "hide-fg-scrollbar"
+              "hide-fg-scrollbar",
             );
 
             clearTimeout(this.scrollTimeout.current);
@@ -290,17 +336,26 @@ class FgScrollbarController {
     } else {
       // Check if the pointer is within 40px of the right edge of the container
       if (rect.bottom - event.clientY <= 40) {
-        this.scrollbarElementRef.current.classList.remove("hide-fg-scrollbar");
+        if (
+          this.scrollbarElementRef.current.classList.contains(
+            "hide-fg-scrollbar",
+          )
+        ) {
+          this.scrollbarElementRef.current.classList.remove(
+            "hide-fg-scrollbar",
+          );
+          this.updateScrollbar();
+        }
       } else {
         if (
           !this.scrollbarElementRef.current.classList.contains(
-            "hide-fg-scrollbar"
+            "hide-fg-scrollbar",
           ) &&
           !this.scrollTimeout.current
         ) {
           this.scrollTimeout.current = setTimeout(() => {
             this.scrollbarElementRef.current?.classList.add(
-              "hide-fg-scrollbar"
+              "hide-fg-scrollbar",
             );
 
             clearTimeout(this.scrollTimeout.current);

@@ -3,7 +3,7 @@ import {
   SvgEffectStylesType,
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { tableStateDecodingMap, tableStateEncodingMap } from "../typeConstant";
+import { tableStateDecodingMap } from "../typeConstant";
 import { svgEffectEncodingMap } from "./typeConstant";
 
 class Decoder {

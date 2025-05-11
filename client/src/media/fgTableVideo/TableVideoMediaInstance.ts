@@ -29,6 +29,18 @@ class TableVideoMediaInstance {
 
   babylonScene: BabylonScene | undefined;
 
+  private positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     public videoMedia: TableVideoMedia,
     public videoInstanceId: string,
@@ -53,6 +65,8 @@ class TableVideoMediaInstance {
       instanceId: string,
     ) => void,
   ) {
+    this.positioning = this.initPositioning;
+
     if (!this.userEffects.current.video[this.videoInstanceId]) {
       this.userEffects.current.video[this.videoInstanceId] = {
         video: structuredClone(defaultVideoEffects),
@@ -671,6 +685,24 @@ class TableVideoMediaInstance {
 
   getAspect = () => {
     return this.videoMedia.aspect;
+  };
+
+  setPositioning = (positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }) => {
+    this.positioning = positioning;
+  };
+
+  getPositioning = () => {
+    return this.positioning;
   };
 }
 

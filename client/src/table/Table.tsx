@@ -159,6 +159,7 @@ export default function Table({
           />
           <FgScrollbarElement
             direction={
+              // "horizontal"
               aspectDir.current === "width" ? "vertical" : "horizontal"
             }
             scrollingContentRef={tableRef}

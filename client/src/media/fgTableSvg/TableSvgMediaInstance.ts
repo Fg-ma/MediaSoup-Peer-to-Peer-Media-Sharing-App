@@ -12,15 +12,33 @@ import {
   DownloadMimeTypes,
 } from "./lib/typeConstant";
 
+export type SvgInstanceListenerTypes = { type: "effectsChanged" };
+
 class TableSvgMediaInstance {
   instanceSvg: SVGSVGElement | undefined = undefined;
+
+  private positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
+  private svgInstanceListeners: Set<
+    (message: SvgInstanceListenerTypes) => void
+  > = new Set();
 
   constructor(
     public svgMedia: SvgMedia,
     private svgInstanceId: string,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    public initPositioning: {
+    initPositioning: {
       position: {
         left: number;
         top: number;
@@ -32,6 +50,8 @@ class TableSvgMediaInstance {
       rotation: number;
     },
   ) {
+    this.positioning = initPositioning;
+
     if (!this.userEffects.current.svg[this.svgInstanceId]) {
       this.userEffects.current.svg[this.svgInstanceId] =
         structuredClone(defaultSvgEffects);
@@ -65,6 +85,7 @@ class TableSvgMediaInstance {
 
   private onDownloadComplete = () => {
     this.instanceSvg = this.svgMedia.svg?.cloneNode(true) as SVGSVGElement;
+    this.updateAllEffects();
   };
 
   clearAllEffects = () => {
@@ -104,7 +125,7 @@ class TableSvgMediaInstance {
               break;
           }
 
-          this.removeEffect(effectId);
+          if (effectId) this.removeEffect(effectId);
 
           this.userEffects.current.svg[this.svgInstanceId][
             effect as SvgEffectTypes
@@ -112,6 +133,10 @@ class TableSvgMediaInstance {
         }
       },
     );
+
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   updateAllEffects = () => {
@@ -166,14 +191,18 @@ class TableSvgMediaInstance {
         }
       },
     );
+
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
-  applyShadowEffect(
+  applyShadowEffect = (
     shadowColor: string,
     strength: string,
     offsetX: string,
     offsetY: string,
-  ) {
+  ) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -262,9 +291,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyBlurEffect(strength: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyBlurEffect = (strength: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -296,9 +329,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyGrayscaleEffect(scale: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyGrayscaleEffect = (scale: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -330,9 +367,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applySaturateEffect(saturation: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applySaturateEffect = (saturation: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -364,9 +405,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyEdgeDetectionEffect() {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyEdgeDetectionEffect = () => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -401,9 +446,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyColorOverlayEffect(overlayColor: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyColorOverlayEffect = (overlayColor: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -461,9 +510,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyNeonGlowEffect(neonColor: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyNeonGlowEffect = (neonColor: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -529,9 +582,17 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyCrackedGlassEffect(density: string, detail: string, strength: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyCrackedGlassEffect = (
+    density: string,
+    detail: string,
+    strength: string,
+  ) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -597,9 +658,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  applyWaveDistortionEffect(frequency: string, strength: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  applyWaveDistortionEffect = (frequency: string, strength: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(
@@ -648,9 +713,13 @@ class TableSvgMediaInstance {
     } else if (!filterList) {
       this.instanceSvg.style.filter = filterString;
     }
-  }
 
-  removeEffect(id: string) {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
+  };
+
+  removeEffect = (id: string) => {
     if (!this.instanceSvg) return;
 
     let filter = this.instanceSvg.querySelector(id);
@@ -666,41 +735,10 @@ class TableSvgMediaInstance {
         .join(" ")
         .trim();
     }
-  }
 
-  setPathColor = (color: string) => {
-    if (!this.instanceSvg) return;
-    const paths = this.instanceSvg.querySelectorAll("path");
-    paths.forEach((path) => {
-      path.setAttribute("fill", color);
-      path.setAttribute("stroke", color);
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
     });
-  };
-
-  setBackgroundColor = (color: string) => {
-    if (this.instanceSvg) this.instanceSvg.style.backgroundColor = color;
-  };
-
-  getPathColor = () => {
-    if (!this.instanceSvg) return undefined;
-
-    const paths = this.instanceSvg.querySelectorAll("path");
-    for (let path of paths) {
-      const strokeColor = path.getAttribute("stroke");
-      const fillColor = path.getAttribute("fill");
-
-      if (strokeColor) {
-        return strokeColor;
-      }
-      if (fillColor) {
-        return fillColor;
-      }
-    }
-    return undefined;
-  };
-
-  getBackgroundColor = () => {
-    return this.instanceSvg?.style.backgroundColor;
   };
 
   private triggerDownload = (url: string, filename: string) => {
@@ -843,6 +881,36 @@ class TableSvgMediaInstance {
 
   getAspect = () => {
     return this.svgMedia.aspect;
+  };
+
+  setPositioning = (positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }) => {
+    this.positioning = positioning;
+  };
+
+  getPositioning = () => {
+    return this.positioning;
+  };
+
+  addSvgInstanceListener = (
+    listener: (message: SvgInstanceListenerTypes) => void,
+  ): void => {
+    this.svgInstanceListeners.add(listener);
+  };
+
+  removeSvgInstanceListener = (
+    listener: (message: SvgInstanceListenerTypes) => void,
+  ): void => {
+    this.svgInstanceListeners.delete(listener);
   };
 }
 

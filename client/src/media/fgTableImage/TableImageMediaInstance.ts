@@ -15,6 +15,8 @@ import Deadbanding from "../../babylon/Deadbanding";
 import assetMeshes from "../../babylon/meshes";
 import TableImageMedia, { ImageListenerTypes } from "./TableImageMedia";
 
+export type ImageInstanceListenerTypes = { type: "effectsChanged" };
+
 class TableImageMediaInstance {
   instanceCanvas: HTMLCanvasElement;
   instanceImage: HTMLImageElement | undefined;
@@ -37,6 +39,10 @@ class TableImageMediaInstance {
     rotation: number;
   };
 
+  private imageInstanceListeners: Set<
+    (message: ImageInstanceListenerTypes) => void
+  > = new Set();
+
   constructor(
     public imageMedia: TableImageMedia,
     public imageInstanceId: string,
@@ -44,7 +50,7 @@ class TableImageMediaInstance {
     private userEffects: React.MutableRefObject<UserEffectsType>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private deadbanding: React.MutableRefObject<Deadbanding>,
-    public initPositioning: {
+    initPositioning: {
       position: {
         left: number;
         top: number;
@@ -56,7 +62,7 @@ class TableImageMediaInstance {
       rotation: number;
     },
   ) {
-    this.positioning = this.initPositioning;
+    this.positioning = initPositioning;
 
     if (!this.userEffects.current.image[this.imageInstanceId]) {
       this.userEffects.current.image[this.imageInstanceId] =
@@ -301,6 +307,10 @@ class TableImageMediaInstance {
       this.imageInstanceId,
       this.effects,
     );
+
+    this.imageInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
@@ -517,6 +527,10 @@ class TableImageMediaInstance {
     );
 
     this.babylonScene.imageAlreadyProcessed[0] = 1;
+
+    this.imageInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   changeEffects = (
@@ -603,6 +617,10 @@ class TableImageMediaInstance {
     }
 
     this.babylonScene.imageAlreadyProcessed[0] = 1;
+
+    this.imageInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   drawNewEffect = (effect: EffectType) => {
@@ -680,6 +698,18 @@ class TableImageMediaInstance {
 
   getPositioning = () => {
     return this.positioning;
+  };
+
+  addImageInstanceListener = (
+    listener: (message: ImageInstanceListenerTypes) => void,
+  ): void => {
+    this.imageInstanceListeners.add(listener);
+  };
+
+  removeImageInstanceListener = (
+    listener: (message: ImageInstanceListenerTypes) => void,
+  ): void => {
+    this.imageInstanceListeners.delete(listener);
   };
 }
 

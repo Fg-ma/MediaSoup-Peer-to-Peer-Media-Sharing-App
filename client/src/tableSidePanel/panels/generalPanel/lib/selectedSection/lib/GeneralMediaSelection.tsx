@@ -1,35 +1,56 @@
 import React, { useRef, useState } from "react";
-import { useMediaContext } from "../../../../../../context/mediaContext/MediaContext";
 import { useSignalContext } from "../../../../../../context/signalContext/SignalContext";
-import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import FgInput from "../../../../../../elements/fgInput/FgInput";
 import HoverElement from "../../../../../../elements/hoverElement/HoverElement";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../../../elements/fgButton/FgButton";
+import FgInput from "../../../../../../elements/fgInput/FgInput";
+import { ContentTypes } from "../../../../../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
 const infoIcon = nginxAssetServerBaseUrl + "svgs/infoIcon.svg";
 
-export default function ImageSelection({
+export default function GeneralMediaSelection({
   contentId,
+  contentType,
+  selectionContent,
+  effectsSection,
+  downloadFunction,
+  filename = "",
+  mimeType = "",
+  fileSize = "",
   tablePanelRef,
+  positioning,
 }: {
   contentId: string;
-  tablePanelRef: React.RefObject<HTMLDivElement>;
+  contentType: ContentTypes;
+  selectionContent?: React.ReactElement;
+  effectsSection?: React.ReactElement;
+  downloadFunction?: () => void;
+  filename?: string;
+  mimeType?: string;
+  fileSize?: string;
+  tablePanelRef?: React.RefObject<HTMLDivElement>;
+  positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
 }) {
-  const { userMedia } = useMediaContext();
   const { sendMediaPositioningSignal, sendGroupSignal } = useSignalContext();
 
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);
   const [_, setRerender] = useState(false);
-
-  const imageInstanceMedia = userMedia.current.image.tableInstances[contentId];
-  const positioning = imageInstanceMedia.getPositioning();
-
   const filenameRef = useRef<HTMLDivElement>(null);
+
   const originalScale = useRef(positioning.scale);
   const placement = useRef<{
     x: number | "hide";
@@ -45,50 +66,42 @@ export default function ImageSelection({
 
   return (
     <div
-      key={contentId}
-      className="relative mx-6 flex h-max flex-col items-center justify-center space-y-2 rounded-md border-2 border-fg-tone-black-3 bg-fg-tone-black-5 p-2"
+      className="relative mx-6 flex h-max flex-col items-center justify-center space-y-2 rounded-md border-2 border-fg-tone-black-3 bg-fg-tone-black-5 py-4"
       style={{
         width: "calc(100% - 3rem)",
       }}
     >
       <div
-        className="selected-section-media-container relative max-h-[12rem]"
+        className="selected-section-media-container relative mx-2 max-h-[12rem]"
         style={{ height: "calc(100% - 4rem)" }}
       >
-        <FgImageElement
-          className="h-full max-h-[12rem] overflow-hidden rounded-md"
-          imageClassName="object-contain max-h-[12rem] !w-auto"
-          src={imageInstanceMedia.imageMedia.blobURL ?? ""}
-        />
-        <div
-          className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-40"
-          onClick={() => {
-            imageInstanceMedia.babylonScene?.takeSnapShot();
-            imageInstanceMedia.babylonScene?.downloadSnapShot();
-          }}
-        >
-          <FgSVGElement
-            src={downloadIcon}
-            className="aspect-square h-[20%] fill-fg-white stroke-fg-white"
-            attributes={[
-              { key: "height", value: "100%" },
-              { key: "width", value: "100%" },
-            ]}
-          />
-        </div>
+        {selectionContent}
+        {downloadFunction && (
+          <div
+            className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-40"
+            onClick={downloadFunction}
+          >
+            <FgSVGElement
+              src={downloadIcon}
+              className="aspect-square h-[20%] fill-fg-white stroke-fg-white"
+              attributes={[
+                { key: "height", value: "100%" },
+                { key: "width", value: "100%" },
+              ]}
+            />
+          </div>
+        )}
       </div>
-      <div className="flex h-8 w-full items-center justify-between truncate px-1">
+      <div className="flex h-8 w-full items-center justify-between truncate px-3">
         <HoverElement
           externalRef={filenameRef}
           className="h-full grow truncate text-start font-K2D text-lg text-fg-white"
-          content={<>{imageInstanceMedia.imageMedia.filename}</>}
+          content={<>{filename}</>}
           hoverContent={
+            filename &&
             (filenameRef.current?.scrollWidth ?? 0) >
-            (filenameRef.current?.clientWidth ?? 0) ? (
-              <FgHoverContentStandard
-                style="light"
-                content={imageInstanceMedia.imageMedia.filename}
-              />
+              (filenameRef.current?.clientWidth ?? 0) ? (
+              <FgHoverContentStandard style="light" content={filename} />
             ) : undefined
           }
           options={{
@@ -126,17 +139,15 @@ export default function ImageSelection({
       </div>
       {moreInfoSectionActive && (
         <div className="flex w-full flex-col space-y-2">
-          <div className="space-y-1 text-white">
+          <div className="space-y-1 px-3 text-white">
             <p>
-              <strong>MIME type:</strong>{" "}
-              {imageInstanceMedia.imageMedia.mimeType}
+              <strong>MIME type:</strong> {mimeType}
             </p>
             <p>
-              <strong>File size:</strong>{" "}
-              {imageInstanceMedia.imageMedia.getFileSize()}
+              <strong>File size:</strong> {fileSize}
             </p>
           </div>
-          <div className="flex flex-col items-start justify-center space-y-2">
+          <div className="flex flex-col items-start justify-center space-y-2 px-3">
             <div className="flex items-center justify-center space-x-2">
               <div className="text-lg text-white">X:</div>
               <FgInput
@@ -160,9 +171,15 @@ export default function ImageSelection({
                   ) {
                     sendMediaPositioningSignal({
                       type: "moveTo",
+                      header: {
+                        contentId,
+                        contentType,
+                      },
                       data: {
-                        x: placement.current.x,
-                        y: placement.current.y,
+                        position: {
+                          x: placement.current.x,
+                          y: placement.current.y,
+                        },
                       },
                     });
                     setTimeout(() => {
@@ -219,9 +236,15 @@ export default function ImageSelection({
                   ) {
                     sendMediaPositioningSignal({
                       type: "moveTo",
+                      header: {
+                        contentId,
+                        contentType,
+                      },
                       data: {
-                        x: placement.current.x,
-                        y: placement.current.y,
+                        position: {
+                          x: placement.current.x,
+                          y: placement.current.y,
+                        },
                       },
                     });
                     setTimeout(() => {
@@ -275,9 +298,15 @@ export default function ImageSelection({
                   if (placement.current.scale !== "hide") {
                     sendMediaPositioningSignal({
                       type: "scaleTo",
+                      header: {
+                        contentId,
+                        contentType,
+                      },
                       data: {
-                        x: originalScale.current.x * placement.current.scale,
-                        y: originalScale.current.y * placement.current.scale,
+                        scale: {
+                          x: originalScale.current.x * placement.current.scale,
+                          y: originalScale.current.y * placement.current.scale,
+                        },
                       },
                     });
                     setTimeout(() => {
@@ -332,6 +361,10 @@ export default function ImageSelection({
                   if (placement.current.rotation !== "hide") {
                     sendMediaPositioningSignal({
                       type: "rotateTo",
+                      header: {
+                        contentId,
+                        contentType,
+                      },
                       data: {
                         rotation: placement.current.rotation,
                       },
@@ -368,6 +401,7 @@ export default function ImageSelection({
               />
             </div>
           </div>
+          {effectsSection}
         </div>
       )}
     </div>

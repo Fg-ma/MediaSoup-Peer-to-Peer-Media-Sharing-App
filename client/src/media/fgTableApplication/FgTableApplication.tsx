@@ -169,6 +169,7 @@ export default function FgTableApplication({
           : undefined
       }
       getAspect={applicationMediaInstance.getAspect}
+      setPositioning={applicationMediaInstance.setPositioning}
       mediaId={applicationMediaInstance.applicationMedia.applicationId}
       mediaInstanceId={applicationInstanceId}
       kind="application"

@@ -21,6 +21,18 @@ class TableApplicationMediaInstance {
     [applicationEffect in ApplicationEffectTypes]?: boolean;
   } = {};
 
+  private positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  };
+
   constructor(
     public applicationMedia: TableApplicationMedia,
     public applicationInstanceId: string,
@@ -39,6 +51,8 @@ class TableApplicationMediaInstance {
       rotation: number;
     },
   ) {
+    this.positioning = this.initPositioning;
+
     if (!this.userEffects.current.application[this.applicationInstanceId]) {
       this.userEffects.current.application[this.applicationInstanceId] =
         structuredClone(defaultApplicationEffects);
@@ -238,6 +252,24 @@ class TableApplicationMediaInstance {
 
   getAspect = () => {
     return this.applicationMedia.aspect;
+  };
+
+  setPositioning = (positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }) => {
+    this.positioning = positioning;
+  };
+
+  getPositioning = () => {
+    return this.positioning;
   };
 }
 

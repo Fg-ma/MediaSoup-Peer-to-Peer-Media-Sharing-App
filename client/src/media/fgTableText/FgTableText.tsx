@@ -118,6 +118,7 @@ export default function FgTableText({
           ? textMediaInstance.textMedia.removeTextListener
           : undefined
       }
+      setPositioning={textMediaInstance.setPositioning}
       mediaId={textMediaInstance.textMedia.textId}
       mediaInstanceId={textInstanceId}
       kind="text"

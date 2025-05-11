@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
 import { GroupSignals } from "../../../../../context/signalContext/lib/typeConstant";
-import ImageSelection from "./lib/ImageSelection";
+import ImageSelection from "./lib/imageEffectsSelection/ImageSelection";
 import "./lib/selectedSection.css";
+import SvgSelection from "./lib/svgEffectsSelection/SvgSelection";
 
 export default function SelectedSection({
   tablePanelRef,
@@ -29,7 +30,7 @@ export default function SelectedSection({
   }, []);
 
   return (
-    <div className="h-max w-full py-2">
+    <div className="flex h-max w-full flex-col items-center justify-center space-y-2 py-2">
       {selected.current.map((sel) => {
         let media: React.ReactElement;
         switch (sel.type) {
@@ -49,7 +50,13 @@ export default function SelectedSection({
             media = <></>;
             break;
           case "svg":
-            media = <></>;
+            media = (
+              <SvgSelection
+                key={sel.id}
+                contentId={sel.id}
+                tablePanelRef={tablePanelRef}
+              />
+            );
             break;
           case "text":
             media = <></>;

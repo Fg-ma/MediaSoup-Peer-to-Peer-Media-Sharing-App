@@ -666,6 +666,24 @@ class BabylonScene {
     }
   };
 
+  getSnapShotURL = (): Promise<string | undefined> => {
+    return new Promise((resolve) => {
+      if (this.engine && this.camera) {
+        Tools.CreateScreenshotUsingRenderTarget(
+          this.engine,
+          this.camera,
+          { width: this.canvas.width, height: this.canvas.height },
+          (dataUrl) => {
+            resolve(dataUrl);
+          },
+          "image/png",
+        );
+      } else {
+        resolve(undefined);
+      }
+    });
+  };
+
   takeSnapShot = (
     mimeType?: string,
     samples?: number,
@@ -803,6 +821,10 @@ class BabylonScene {
 
   removeForceFaceDetectEndListener = (listener: () => void): void => {
     this.forceFaceDetectEndListeners.delete(listener);
+  };
+
+  getReadPixels = () => {
+    return this.engine.readPixels(0, 0, this.canvas.width, this.canvas.height);
   };
 }
 

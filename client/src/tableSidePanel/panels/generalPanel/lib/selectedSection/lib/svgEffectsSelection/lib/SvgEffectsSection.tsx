@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Transition, Variants, motion } from "framer-motion";
-import LowerSvgController from "../lowerSvgControls/LowerSvgController";
-import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
-import SvgEffectButton from "./lib/SvgEffectButton";
-import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import ColorPickerButton from "../../../../elements/colorPickerButton/ColorPickerButton";
-import TableSvgMediaInstance from "../../TableSvgMediaInstance";
+import React, { useState, useEffect, useRef } from "react";
+import { useSocketContext } from "../../../../../../../../context/socketContext/SocketContext";
+import { useEffectsContext } from "../../../../../../../..//context/effectsContext/EffectsContext";
+import ClearAllButton from "../../../../../../../../elements/effectsButtons/ClearAllButton";
+import FgSVGElement from "../../../../../../../..//elements/fgSVGElement/FgSVGElement";
+import ColorPickerButton from "../../../../../../../.././elements/colorPickerButton/ColorPickerButton";
+import SvgEffectButton from "../../../../../../../../media/fgTableSvg/lib/svgEffectsSection/lib/SvgEffectButton";
+import TableSvgMediaInstance from "../../../../../../../../media/fgTableSvg/TableSvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -33,36 +32,15 @@ const grayscaleOffIcon =
 const edgeDetectionIcon =
   nginxAssetServerBaseUrl + "svgs/svgEffects/edgeDetectionIcon.svg";
 
-const EffectSectionVar: Variants = {
-  init: { opacity: 0, scale: 0.8, translate: "-50%" },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    translate: "-50%",
-    transition: {
-      scale: { type: "spring", stiffness: 80 },
-    },
-  },
-};
-
-const EffectSectionTransition: Transition = {
-  transition: {
-    opacity: { duration: 0.2, delay: 0.0 },
-  },
-};
-
 export default function SvgEffectsSection({
   svgInstanceId,
   svgMediaInstance,
-  lowerSvgController,
-  svgContainerRef,
 }: {
   svgInstanceId: string;
   svgMediaInstance: TableSvgMediaInstance;
-  lowerSvgController: React.MutableRefObject<LowerSvgController>;
-  svgContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(true);
 
@@ -72,8 +50,6 @@ export default function SvgEffectsSection({
   const shadowColorPickerRef = useRef<HTMLDivElement>(null);
   const overlayColorPickerRef = useRef<HTMLDivElement>(null);
   const neonColorPickerRef = useRef<HTMLDivElement>(null);
-
-  const overflow = useRef(false);
 
   const [_, setRerender] = useState(false);
 
@@ -94,49 +70,20 @@ export default function SvgEffectsSection({
     };
   }, []);
 
-  useLayoutEffect(() => {
-    if (!svgContainerRef.current) {
-      return;
-    }
-
-    const observer = new ResizeObserver(() => {
-      if (effectsContainerRef.current && subEffectsContainerRef.current) {
-        overflow.current =
-          effectsContainerRef.current.clientWidth <
-          subEffectsContainerRef.current.clientWidth;
-        setRerender((prev) => !prev);
-      }
-    });
-
-    observer.observe(svgContainerRef.current);
-
-    if (effectsContainerRef.current && subEffectsContainerRef.current) {
-      overflow.current =
-        effectsContainerRef.current.clientWidth <
-        subEffectsContainerRef.current.clientWidth;
-      setRerender((prev) => !prev);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const handleAlertSvgEffect = () => {
+    tableStaticContentSocket.current?.updateContentEffects(
+      "svg",
+      svgMediaInstance.svgMedia.svgId,
+      svgInstanceId,
+      userEffects.current.svg[svgInstanceId],
+      userEffectsStyles.current.svg[svgInstanceId],
+    );
+  };
 
   return (
-    <motion.div
+    <div
       ref={effectsContainerRef}
-      className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
-      style={{
-        bottom: "calc(max(2rem, min(12% + 0.5rem, 3.5rem)))",
-        height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
-        maxHeight: overflow.current ? "6.75rem" : "5rem",
-        minHeight: overflow.current ? "4.75rem" : "3rem",
-        overflowX: overflow.current ? "auto" : "hidden",
-        justifyContent: overflow.current ? "flex-start" : "center",
-      }}
-      variants={EffectSectionVar}
-      initial="init"
-      animate="animate"
-      exit="init"
-      transition={EffectSectionTransition}
+      className="hide-scroll-bar flex h-12 w-full max-w-full items-center justify-start overflow-x-auto rounded"
     >
       <div
         ref={subEffectsContainerRef}
@@ -149,7 +96,7 @@ export default function SvgEffectsSection({
           clickFunctionCallback={async () => {
             svgMediaInstance.clearAllEffects();
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -175,7 +122,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -215,7 +162,7 @@ export default function SvgEffectsSection({
               `${style.offsetY}`,
             );
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
           handleAcceptColor={(_key, hexa) => {
             userEffectsStyles.current.svg[svgInstanceId].shadow.shadowColor =
@@ -233,7 +180,7 @@ export default function SvgEffectsSection({
               `${style.offsetY}`,
             );
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -254,7 +201,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -288,7 +235,7 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyBlurEffect(`${style.strength}`);
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -310,7 +257,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -343,7 +290,7 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyColorOverlayEffect(`${style.overlayColor}`);
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -364,7 +311,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -394,7 +341,7 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applySaturateEffect(`${style.saturation}`);
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -416,7 +363,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -451,7 +398,7 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyGrayscaleEffect(`${style.scale}`);
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -471,7 +418,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -507,7 +454,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -538,7 +485,7 @@ export default function SvgEffectsSection({
 
             svgMediaInstance.applyNeonGlowEffect(`${style.neonColor}`);
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -563,7 +510,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -598,7 +545,7 @@ export default function SvgEffectsSection({
               `${style.strength}`,
             );
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
         <SvgEffectButton
@@ -624,7 +571,7 @@ export default function SvgEffectsSection({
               );
             }
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
 
             setRerender((prev) => !prev);
           }}
@@ -660,10 +607,10 @@ export default function SvgEffectsSection({
               `${style.strength}`,
             );
 
-            lowerSvgController.current.handleAlertSvgEffect();
+            handleAlertSvgEffect();
           }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }

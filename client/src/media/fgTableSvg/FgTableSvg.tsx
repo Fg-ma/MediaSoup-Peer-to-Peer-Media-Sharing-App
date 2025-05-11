@@ -43,7 +43,7 @@ export default function FgTableSvg({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(svgMediaInstance.initPositioning);
+  }>(svgMediaInstance.getPositioning());
 
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +159,7 @@ export default function FgTableSvg({
             : undefined
         }
         getAspect={svgMediaInstance.getAspect}
+        setPositioning={svgMediaInstance.setPositioning}
         mediaId={svgMediaInstance.svgMedia.svgId}
         mediaInstanceId={svgInstanceId}
         kind="svg"

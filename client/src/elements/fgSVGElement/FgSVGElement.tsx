@@ -27,6 +27,7 @@ export default function FgSVGElement({
   src,
   attributes,
   className,
+  svgClassName,
   style,
   hoverContent,
   options,
@@ -40,6 +41,7 @@ export default function FgSVGElement({
     transition?: string;
   }[];
   className?: string;
+  svgClassName?: string;
   style?: CSSProperties;
   hoverContent?: React.ReactElement;
   options?: FgSVGOptions;
@@ -106,6 +108,8 @@ export default function FgSVGElement({
             }
           });
         }
+
+        if (svgClassName) svgElement.setAttribute("class", svgClassName);
 
         if (externalRef)
           externalRef.current = svgElement as unknown as SVGSVGElement;

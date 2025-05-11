@@ -133,6 +133,7 @@ export default function FgMediaContainer({
     useSocketContext();
   const { tableId } = useUserInfoContext();
   const {
+    sendGroupSignal,
     addGroupSignalListener,
     removeGroupSignalListener,
     addMediaPositioningSignalListener,

@@ -240,6 +240,7 @@ export default function FgTableVideo({
           : undefined
       }
       getAspect={videoMediaInstance.getAspect}
+      setPositioning={videoMediaInstance.setPositioning}
       mediaId={videoMediaInstance.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
       kind="video"

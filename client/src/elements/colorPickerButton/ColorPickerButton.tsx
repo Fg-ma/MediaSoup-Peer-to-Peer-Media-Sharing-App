@@ -21,7 +21,7 @@ export default function ColorPickerButton({
     hex: string,
     hexa: string,
     a: number,
-    rgba: { r: number; g: number; a: number }
+    rgba: { r: number; g: number; a: number },
   ) => void;
   externalColorRef?: React.MutableRefObject<string>;
   externalColorPickerPanelRef?: React.RefObject<HTMLDivElement>;
@@ -31,18 +31,21 @@ export default function ColorPickerButton({
   const colorRef = externalColorRef ? externalColorRef : useRef(defaultColor);
   const [color, setColor] = useState(colorRef.current);
   const [isColorPicker, setIsColorPicker] = useState(false);
-  const [tempColor, setTempColor] = useState(color);
+  const tempColor = useRef(colorRef.current);
   const colorPickerBtnRef = useRef<HTMLButtonElement>(null);
 
+  const [_, setRerender] = useState(false);
+
   const handleColorPicker = () => {
-    setTempColor(colorRef.current);
+    tempColor.current = colorRef.current;
     setIsColorPicker((prev) => !prev);
   };
 
   useEffect(() => {
     colorRef.current = defaultColor;
     setColor(colorRef.current);
-    setTempColor(colorRef.current);
+    tempColor.current = colorRef.current;
+    setRerender((prev) => !prev);
   }, [defaultColor]);
 
   useEffect(() => {
@@ -50,21 +53,22 @@ export default function ColorPickerButton({
 
     colorRef.current = externalColorRef.current;
     setColor(colorRef.current);
-    setTempColor(colorRef.current);
+    tempColor.current = colorRef.current;
+    setRerender((prev) => !prev);
   }, [externalColorRef?.current]);
 
   return (
     <div
-      className={`${className} flex items-center justify-center !aspect-square`}
+      className={`${className} flex !aspect-square items-center justify-center`}
     >
       <FgButton
         externalRef={colorPickerBtnRef}
-        clickFunction={() => handleColorPicker()}
-        hoverContent={<FgHoverContentStandard content='Color picker' />}
+        clickFunction={handleColorPicker}
+        hoverContent={<FgHoverContentStandard content="Color picker" />}
         scrollingContainerRef={scrollingContainerRef}
-        className='border-2 border-fg-white border-opacity-90 w-full h-full rounded-full hover:border-fg-red-light'
+        className="h-full w-full rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
         style={{
-          backgroundColor: tempColor,
+          backgroundColor: tempColor.current,
         }}
         options={{
           hoverTimeoutDuration: 750,
@@ -77,7 +81,6 @@ export default function ColorPickerButton({
             color={color}
             setColor={setColor}
             tempColor={tempColor}
-            setTempColor={setTempColor}
             setIsColorPicker={setIsColorPicker}
             colorRef={colorRef}
             colorPickerBtnRef={colorPickerBtnRef}
@@ -87,6 +90,7 @@ export default function ColorPickerButton({
             }}
             externalColorPickerPanelRef={externalColorPickerPanelRef}
             isAlpha={isAlpha}
+            setRerender={setRerender}
           />
         </Suspense>
       )}
