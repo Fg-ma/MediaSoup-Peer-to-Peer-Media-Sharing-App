@@ -1,4 +1,4 @@
-import { Permissions } from "../context/permissionsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/lib/typeConstant";
 import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
 import { onPermissionsRequestedType } from "../serverControllers/mediasoupServer/lib/typeConstant";
 

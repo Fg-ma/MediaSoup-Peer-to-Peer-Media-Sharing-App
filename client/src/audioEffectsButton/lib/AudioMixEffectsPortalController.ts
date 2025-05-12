@@ -1,4 +1,4 @@
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/lib/typeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import { SliderChangeEvent } from "../../elements/fgSlider/FgSlider";
 import {

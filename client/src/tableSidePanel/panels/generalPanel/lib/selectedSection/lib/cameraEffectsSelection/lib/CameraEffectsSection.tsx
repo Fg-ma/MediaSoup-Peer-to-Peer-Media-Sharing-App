@@ -1,74 +1,49 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  Suspense,
-  useLayoutEffect,
-} from "react";
-import { Transition, Variants, motion } from "framer-motion";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import {
   CameraEffectTypes,
-  ScreenEffectTypes,
   HideBackgroundEffectTypes,
   PostProcessEffectTypes,
-} from "../../../../../../universal/effectsTypeConstant";
-import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { useSocketContext } from "../../../../context/socketContext/SocketContext";
-import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
-import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/lib/typeConstant";
-import HideBackgroundButton from "../../../../elements/effectsButtons/HideBackgroundButton";
-import TintSection from "../../../../elements/effectsButtons/TintSection";
-import BlurButtton from "../../../../elements/effectsButtons/BlurButton";
-import ClearAllButton from "../../../../elements/effectsButtons/ClearAllButton";
-import BabylonPostProcessEffectsButton from "../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
+} from "../../../../../../../../../../universal/effectsTypeConstant";
+import { useEffectsContext } from "../../../../../../../../context/effectsContext/EffectsContext";
+import { useSocketContext } from "../../../../../../../../context/socketContext/SocketContext";
+import { useMediaContext } from "../../../../../../../../context/mediaContext/MediaContext";
+import { useUserInfoContext } from "../../../../../../../../context/userInfoContext/UserInfoContext";
+import { IncomingMediasoupMessages } from "../../../../../../../../serverControllers/mediasoupServer/lib/typeConstant";
+import HideBackgroundButton from "../../../../../../../../elements/effectsButtons/HideBackgroundButton";
+import TintSection from "../../../../../../../../elements/effectsButtons/TintSection";
+import BlurButtton from "../../../../../../../../elements/effectsButtons/BlurButton";
+import ClearAllButton from "../../../../../../../../elements/effectsButtons/ClearAllButton";
+import CameraMedia from "../../../../../../../../media/fgVisualMedia/CameraMedia";
+import BabylonPostProcessEffectsButton from "../../../../../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 
 const GlassesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/GlassesButton"),
+  () => import("../../../../../../../../elements/effectsButtons/GlassesButton"),
 );
 const BeardsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/BeardsButton"),
+  () => import("../../../../../../../../elements/effectsButtons/BeardsButton"),
 );
 const MustachesButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MustachesButton"),
+  () =>
+    import("../../../../../../../../elements/effectsButtons/MustachesButton"),
 );
 const MasksButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/MasksButton"),
+  () => import("../../../../../../../../elements/effectsButtons/MasksButton"),
 );
 const HatsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/HatsButton"),
+  () => import("../../../../../../../../elements/effectsButtons/HatsButton"),
 );
 const PetsButton = React.lazy(
-  () => import("../../../../elements/effectsButtons/PetsButton"),
+  () => import("../../../../../../../../elements/effectsButtons/PetsButton"),
 );
 
-const EffectSectionVar: Variants = {
-  init: { opacity: 0, scale: 0.8, translate: "-50%" },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    translate: "-50%",
-    transition: {
-      scale: { type: "spring", stiffness: 80 },
-    },
-  },
-};
-
-const EffectSectionTransition: Transition = {
-  transition: {
-    opacity: { duration: 0.2, delay: 0.0 },
-  },
-};
-
-export default function VisualEffectsSection({
+export default function CameraEffectsSection({
   username,
   instance,
   type,
   visualMediaId,
   isUser,
   acceptsVisualEffects,
-  handleVisualEffectChange,
-  tintColor,
-  visualMediaContainerRef,
+  cameraMedia,
 }: {
   username: string;
   instance: string;
@@ -76,29 +51,27 @@ export default function VisualEffectsSection({
   visualMediaId: string;
   isUser: boolean;
   acceptsVisualEffects: boolean;
-  handleVisualEffectChange: (
-    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
-    blockStateChange?: boolean,
-    hideBackgroundStyle?: HideBackgroundEffectTypes,
-    hideBackgroundColor?: string,
-    postProcessStyle?: PostProcessEffectTypes,
-  ) => Promise<void>;
-  tintColor: React.MutableRefObject<string>;
-  visualMediaContainerRef: React.RefObject<HTMLDivElement>;
+  cameraMedia: CameraMedia | MediaStreamTrack;
 }) {
   const { mediasoupSocket } = useSocketContext();
   const { userMedia } = useMediaContext();
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
+  const { tableId } = useUserInfoContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
   const effectsContainerRef = useRef<HTMLDivElement>(null);
   const subEffectsContainerRef = useRef<HTMLDivElement>(null);
 
-  const overflow = useRef(false);
-
   const [_, setRerender] = useState(false);
+
+  const tintColor = useRef(
+    isUser
+      ? userEffectsStyles.current.camera[visualMediaId].tint.color
+      : remoteEffectsStyles.current[username][instance].camera[visualMediaId]
+          .tint.color,
+  );
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -144,51 +117,141 @@ export default function VisualEffectsSection({
     }
   };
 
-  useLayoutEffect(() => {
-    if (!visualMediaContainerRef.current) {
-      return;
-    }
-
-    const observer = new ResizeObserver(() => {
-      if (effectsContainerRef.current && subEffectsContainerRef.current) {
-        overflow.current =
-          effectsContainerRef.current.clientWidth <
-          subEffectsContainerRef.current.clientWidth;
-        setRerender((prev) => !prev);
+  const handleVisualEffect = async (
+    effect: CameraEffectTypes,
+    blockStateChange: boolean,
+  ) => {
+    if (cameraMedia instanceof CameraMedia) {
+      if (!blockStateChange) {
+        // Fill stream effects if state change isn't blocked
+        userEffects.current.camera[visualMediaId][effect as CameraEffectTypes] =
+          !userEffects.current.camera[visualMediaId][
+            effect as CameraEffectTypes
+          ];
       }
-    });
 
-    observer.observe(visualMediaContainerRef.current);
-
-    if (effectsContainerRef.current && subEffectsContainerRef.current) {
-      overflow.current =
-        effectsContainerRef.current.clientWidth <
-        subEffectsContainerRef.current.clientWidth;
-      setRerender((prev) => !prev);
+      cameraMedia.changeEffects(
+        effect as CameraEffectTypes,
+        tintColor.current,
+        blockStateChange,
+      );
     }
+  };
 
-    return () => observer.disconnect();
-  }, []);
+  const handleVisualEffectChange = async (
+    effect: CameraEffectTypes | "clearAll",
+    blockStateChange: boolean = false,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffectTypes,
+  ) => {
+    if (isUser) {
+      await handleUserVisualEffectChange(effect, blockStateChange);
+    } else {
+      await handleRemoteVisualEffectChange(
+        effect,
+        blockStateChange,
+        hideBackgroundStyle,
+        hideBackgroundColor,
+        postProcessStyle,
+      );
+    }
+  };
+
+  const handleUserVisualEffectChange = async (
+    effect: CameraEffectTypes | "clearAll",
+    blockStateChange: boolean = false,
+  ) => {
+    if (effect !== "clearAll") {
+      handleVisualEffect(effect, blockStateChange);
+
+      if (acceptsVisualEffects) {
+        mediasoupSocket?.current?.sendMessage({
+          type: "clientEffectChange",
+          header: {
+            tableId: tableId.current,
+            username,
+            instance,
+            producerType: "camera",
+            producerId: visualMediaId,
+          },
+          data: {
+            effect: effect,
+            effectStyle:
+              // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
+              userEffectsStyles.current.camera[visualMediaId][effect],
+            blockStateChange: blockStateChange,
+          },
+        });
+      }
+    } else {
+      if (cameraMedia instanceof CameraMedia) {
+        cameraMedia.clearAllEffects();
+
+        mediasoupSocket?.current?.sendMessage({
+          type: "clientClearEffects",
+          header: {
+            tableId: tableId.current,
+            username,
+            instance,
+            producerType: type,
+            producerId: visualMediaId,
+          },
+        });
+      }
+    }
+  };
+
+  const handleRemoteVisualEffectChange = async (
+    effect: CameraEffectTypes | "clearAll",
+    blockStateChange: boolean = false,
+    hideBackgroundStyle?: HideBackgroundEffectTypes,
+    hideBackgroundColor?: string,
+    postProcessStyle?: PostProcessEffectTypes,
+  ) => {
+    if (acceptsVisualEffects) {
+      if (effect !== "clearAll") {
+        mediasoupSocket?.current?.sendMessage({
+          type: "requestEffectChange",
+          header: {
+            tableId: tableId.current,
+            requestedUsername: username,
+            requestedInstance: instance,
+            requestedProducerType: type,
+            requestedProducerId: visualMediaId,
+          },
+          data: {
+            effect: effect,
+            blockStateChange: blockStateChange,
+            style:
+              // @ts-expect-error: ts can't verify username, instance, type, visualMediaId, and effect correlate
+              remoteEffectsStyles.current[username][instance][type][
+                visualMediaId
+              ][effect],
+            hideBackgroundStyle: hideBackgroundStyle,
+            hideBackgroundColor: hideBackgroundColor,
+            postProcessStyle: postProcessStyle,
+          },
+        });
+      } else {
+        mediasoupSocket?.current?.sendMessage({
+          type: "requestClearEffects",
+          header: {
+            tableId: tableId.current,
+            requestedUsername: username,
+            requestedInstance: instance,
+            requestedProducerType: type,
+            requestedProducerId: visualMediaId,
+          },
+        });
+      }
+    }
+  };
 
   return (
-    <motion.div
+    <div
       ref={effectsContainerRef}
-      className="small-horizontal-scroll-bar pointer-events-auto absolute left-1/2 z-30 flex w-full max-w-full items-center rounded"
-      style={{
-        bottom: overflow.current
-          ? "calc(max(1.5rem, min(13% + 1rem, 3rem)))"
-          : "calc(max(2rem, min(13% + 0.5rem, 3.5rem)))",
-        height: overflow.current ? "calc(1.75rem + 10%)" : "10%",
-        maxHeight: overflow.current ? "6.75rem" : "5rem",
-        minHeight: overflow.current ? "4.75rem" : "3rem",
-        overflowX: overflow.current ? "auto" : "hidden",
-        justifyContent: overflow.current ? "flex-start" : "center",
-      }}
-      variants={EffectSectionVar}
-      initial="init"
-      animate="animate"
-      exit="init"
-      transition={EffectSectionTransition}
+      className="hide-scroll-bar flex h-12 w-full max-w-full items-center overflow-x-auto rounded"
     >
       <div
         ref={subEffectsContainerRef}
@@ -742,6 +805,6 @@ export default function VisualEffectsSection({
           </Suspense>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

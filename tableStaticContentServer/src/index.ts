@@ -91,7 +91,7 @@ app
       }
     },
   })
-  .options("/*", (res, req) => {
+  .options("/*", (res, _req) => {
     res.cork(() => {
       res
         .writeHeader("Access-Control-Allow-Origin", "https://localhost:8080")
@@ -100,7 +100,7 @@ app
         .end();
     });
   })
-  .options("/stream/*", (res, req) => {
+  .options("/stream/*", (res, _req) => {
     res.cork(() => {
       res.writeHeader("Access-Control-Allow-Origin", "*");
       res.writeHeader("Access-Control-Allow-Methods", "GET");

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import SelectTableLayerController from "./lib/SelectTableLayerController";
 import { useSignalContext } from "../../context/signalContext/SignalContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 
 export default function SelectTableLayer({
   innerTableContainerRef,
@@ -13,6 +14,7 @@ export default function SelectTableLayer({
 }) {
   const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef<{ x: number; y: number } | undefined>(undefined);
@@ -45,6 +47,7 @@ export default function SelectTableLayer({
       document.addEventListener(
         "keydown",
         selectTableLayerController.current.handleKeyDown,
+        true,
       );
       document.addEventListener(
         "pointerdown",
@@ -57,6 +60,7 @@ export default function SelectTableLayer({
         document.removeEventListener(
           "keydown",
           selectTableLayerController.current.handleKeyDown,
+          true,
         );
         document.removeEventListener(
           "pointerdown",
@@ -86,6 +90,18 @@ export default function SelectTableLayer({
       );
     };
   }, []);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(
+      selectTableLayerController.current.handleTableStaticMessage,
+    );
+
+    return () => {
+      tableStaticContentSocket.current?.removeMessageListener(
+        selectTableLayerController.current.handleTableStaticMessage,
+      );
+    };
+  }, [tableStaticContentSocket.current]);
 
   let boxStyle = {};
   if (dragStart.current && dragEnd.current) {

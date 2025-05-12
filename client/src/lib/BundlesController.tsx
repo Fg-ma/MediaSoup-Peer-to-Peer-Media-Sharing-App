@@ -1,7 +1,7 @@
 import React from "react";
 import Bundle from "../bundle/Bundle";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
-import { Permissions } from "../context/permissionsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/lib/typeConstant";
 import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
 
 class BundlesController {

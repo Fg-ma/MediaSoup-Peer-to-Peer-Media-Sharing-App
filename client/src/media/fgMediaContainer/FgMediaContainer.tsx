@@ -236,6 +236,7 @@ export default function FgMediaContainer({
       lowerController,
       fgContentAdjustmentController,
       bundleRef,
+      sendGroupSignal,
     ),
   );
 

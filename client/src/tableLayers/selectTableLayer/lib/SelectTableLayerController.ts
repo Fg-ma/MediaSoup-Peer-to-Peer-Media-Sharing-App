@@ -1,3 +1,4 @@
+import { IncomingTableStaticContentMessages } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import { GroupSignals } from "../../../context/signalContext/lib/typeConstant";
 
@@ -5,7 +6,15 @@ class SelectTableLayerController {
   queryInterval: NodeJS.Timeout | undefined;
 
   selectables: NodeListOf<HTMLElement> | undefined;
-  selectedInfo: { type: ContentTypes; id: string }[] | undefined;
+  selectedInfo:
+    | {
+        type: ContentTypes;
+        id: string;
+        username?: string;
+        instance?: string;
+        isUser?: boolean;
+      }[]
+    | undefined;
 
   dragging = false;
 
@@ -60,6 +69,23 @@ class SelectTableLayerController {
           );
         this.setRerender((prev) => !prev);
         break;
+      case "groupElementMove":
+        const { contentType, contentId } = signal.data;
+        if (
+          this.selectedInfo?.some(
+            (info) => info.type === contentType && info.id === contentId,
+          )
+        ) {
+          this.selected.current = [];
+          this.selectedInfo = [];
+
+          this.sendGroupSignal({
+            type: "groupChange",
+            data: { selected: this.selectedInfo },
+          });
+
+          this.setRerender((prev) => !prev);
+        }
       default:
         break;
     }
@@ -163,8 +189,18 @@ class SelectTableLayerController {
       for (const sel of this.selected.current) {
         const type = sel.getAttribute("data-selectable-type") as ContentTypes;
         const id = sel.getAttribute("data-selectable-id");
+        const username = sel.getAttribute("data-selectable-username");
+        const instance = sel.getAttribute("data-selectable-instance");
+        const isUser = sel.getAttribute("data-selectable-isuser");
 
-        if (type && id) this.selectedInfo.push({ type, id });
+        if (type && id)
+          this.selectedInfo.push({
+            type,
+            id,
+            username: username ?? undefined,
+            instance: instance ?? undefined,
+            isUser: isUser !== null ? isUser === "true" : undefined,
+          });
       }
 
       this.sendGroupSignal({
@@ -319,6 +355,8 @@ class SelectTableLayerController {
 
     switch (key) {
       case "x":
+        event.stopPropagation();
+        event.preventDefault();
         if (this.selectedInfo) {
           this.sendGroupSignal({
             type: "groupDelete",
@@ -332,6 +370,8 @@ class SelectTableLayerController {
         this.setRerender((prev) => !prev);
         break;
       case "delete":
+        event.stopPropagation();
+        event.preventDefault();
         if (this.selectedInfo) {
           this.sendGroupSignal({
             type: "groupDelete",
@@ -353,6 +393,39 @@ class SelectTableLayerController {
         break;
       default:
         break;
+    }
+  };
+
+  handleTableStaticMessage = (event: IncomingTableStaticContentMessages) => {
+    if (event.type === "contentDeleted") {
+      this.selectables =
+        this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
+
+      this.selectedInfo = [];
+
+      for (const sel of this.selected.current) {
+        const type = sel.getAttribute("data-selectable-type") as ContentTypes;
+        const id = sel.getAttribute("data-selectable-id");
+        const username = sel.getAttribute("data-selectable-username");
+        const instance = sel.getAttribute("data-selectable-instance");
+        const isUser = sel.getAttribute("data-selectable-isuser");
+
+        if (type && id)
+          this.selectedInfo.push({
+            type,
+            id,
+            username: username ?? undefined,
+            instance: instance ?? undefined,
+            isUser: isUser !== null ? isUser === "true" : undefined,
+          });
+      }
+
+      this.sendGroupSignal({
+        type: "groupChange",
+        data: { selected: this.selectedInfo },
+      });
+
+      this.setRerender((prev) => !prev);
     }
   };
 }

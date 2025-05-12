@@ -1,5 +1,5 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
-import { Permissions } from "../../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../../context/permissionsContext/lib/typeConstant";
 import {
   IncomingMediasoupMessages,
   onResponsedCatchUpDataType,

@@ -74,6 +74,7 @@ class MediaContainerController {
     private lowerController: React.MutableRefObject<LowerController>,
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handlePointerMove = () => {
@@ -180,6 +181,13 @@ class MediaContainerController {
               this.positioning.current = data.positioning;
               if (this.setPositioning) this.setPositioning(data.positioning);
               this.setRerender((prev) => !prev);
+              this.sendGroupSignal({
+                type: "groupElementMove",
+                data: {
+                  contentType: this.kind,
+                  contentId: this.mediaInstanceId,
+                },
+              });
             }
           };
 

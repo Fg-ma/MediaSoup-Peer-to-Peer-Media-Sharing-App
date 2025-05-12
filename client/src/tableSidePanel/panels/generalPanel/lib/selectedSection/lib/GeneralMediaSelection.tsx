@@ -12,6 +12,10 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
 const infoIcon = nginxAssetServerBaseUrl + "svgs/infoIcon.svg";
 
+const defaultGeneralMediaSelectionOptions = {
+  downloadType: "cover",
+};
+
 export default function GeneralMediaSelection({
   contentId,
   contentType,
@@ -23,6 +27,8 @@ export default function GeneralMediaSelection({
   fileSize = "",
   tablePanelRef,
   positioning,
+  selectionContentStyle,
+  options,
 }: {
   contentId: string;
   contentType: ContentTypes;
@@ -44,7 +50,16 @@ export default function GeneralMediaSelection({
     };
     rotation: number;
   };
+  selectionContentStyle?: React.CSSProperties;
+  options?: {
+    downloadType?: "button" | "cover";
+  };
 }) {
+  const generalMediaSelectionOptions = {
+    ...defaultGeneralMediaSelectionOptions,
+    ...options,
+  };
+
   const { sendMediaPositioningSignal, sendGroupSignal } = useSignalContext();
 
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);
@@ -73,24 +88,25 @@ export default function GeneralMediaSelection({
     >
       <div
         className="selected-section-media-container relative mx-2 max-h-[12rem]"
-        style={{ height: "calc(100% - 4rem)" }}
+        style={{ height: "calc(100% - 4rem)", ...selectionContentStyle }}
       >
         {selectionContent}
-        {downloadFunction && (
-          <div
-            className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-40"
-            onClick={downloadFunction}
-          >
-            <FgSVGElement
-              src={downloadIcon}
-              className="aspect-square h-[20%] fill-fg-white stroke-fg-white"
-              attributes={[
-                { key: "height", value: "100%" },
-                { key: "width", value: "100%" },
-              ]}
-            />
-          </div>
-        )}
+        {generalMediaSelectionOptions.downloadType === "cover" &&
+          downloadFunction && (
+            <div
+              className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-40"
+              onClick={downloadFunction}
+            >
+              <FgSVGElement
+                src={downloadIcon}
+                className="aspect-square h-[20%] fill-fg-white stroke-fg-white"
+                attributes={[
+                  { key: "height", value: "100%" },
+                  { key: "width", value: "100%" },
+                ]}
+              />
+            </div>
+          )}
       </div>
       <div className="flex h-8 w-full items-center justify-between truncate px-3">
         <HoverElement
@@ -139,14 +155,42 @@ export default function GeneralMediaSelection({
       </div>
       {moreInfoSectionActive && (
         <div className="flex w-full flex-col space-y-2">
-          <div className="space-y-1 px-3 text-white">
-            <p>
-              <strong>MIME type:</strong> {mimeType}
-            </p>
-            <p>
-              <strong>File size:</strong> {fileSize}
-            </p>
-          </div>
+          {generalMediaSelectionOptions.downloadType === "button" &&
+            downloadFunction && (
+              <FgButton
+                className="h-8 w-full"
+                contentFunction={() => (
+                  <div className="flex h-full items-center justify-start space-x-2 px-3">
+                    <FgSVGElement
+                      src={downloadIcon}
+                      className="aspect-square h-[80%] fill-fg-white stroke-fg-white"
+                      attributes={[
+                        { key: "height", value: "100%" },
+                        { key: "width", value: "100%" },
+                      ]}
+                    />
+                    <div className="h-full w-max truncate pt-0.5 text-xl text-fg-white">
+                      Download
+                    </div>
+                  </div>
+                )}
+                clickFunction={downloadFunction}
+              />
+            )}
+          {(mimeType || fileSize) && (
+            <div className="space-y-1 px-3 text-white">
+              {mimeType && (
+                <p>
+                  <strong>MIME type:</strong> {mimeType}
+                </p>
+              )}
+              {fileSize && (
+                <p>
+                  <strong>File size:</strong> {fileSize}
+                </p>
+              )}
+            </div>
+          )}
           <div className="flex flex-col items-start justify-center space-y-2 px-3">
             <div className="flex items-center justify-center space-x-2">
               <div className="text-lg text-white">X:</div>

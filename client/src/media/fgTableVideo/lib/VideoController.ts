@@ -97,6 +97,8 @@ class VideoController {
 
         this.setPausedState(false);
       }
+
+      this.setRerender((prev) => !prev);
     }
   };
 

@@ -1,9 +1,7 @@
 import React from "react";
 import { Settings } from "./typeConstant";
-import LowerTextController from "./lowerTextControls/LowerTextController";
 
 export default function TextArea({
-  lowerTextController,
   text,
   settings,
   textAreaRef,
@@ -11,7 +9,6 @@ export default function TextArea({
   setIsEditing,
   textAreaContainerRef,
 }: {
-  lowerTextController: React.MutableRefObject<LowerTextController>;
   text: React.MutableRefObject<string>;
   settings: Settings;
   textAreaRef: React.RefObject<HTMLPreElement>;
@@ -19,6 +16,13 @@ export default function TextArea({
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
   textAreaContainerRef: React.RefObject<HTMLDivElement>;
 }) {
+  const handlePointerDown = (event: PointerEvent) => {
+    if (!textAreaContainerRef.current?.contains(event.target as Node)) {
+      setIsEditing(false);
+      document.removeEventListener("pointerdown", handlePointerDown);
+    }
+  };
+
   const handleEditingPointerDown = (event: React.PointerEvent) => {
     if (
       isEditing &&
@@ -41,10 +45,7 @@ export default function TextArea({
   const handleDoubleClick = () => {
     setIsEditing(true);
 
-    document.addEventListener(
-      "pointerdown",
-      lowerTextController.current.handlePointerDown,
-    );
+    document.addEventListener("pointerdown", handlePointerDown);
   };
 
   const handleContainerDoubleClick = (event: React.MouseEvent) => {
@@ -55,10 +56,7 @@ export default function TextArea({
     ) {
       setIsEditing(true);
 
-      document.addEventListener(
-        "pointerdown",
-        lowerTextController.current.handlePointerDown,
-      );
+      document.addEventListener("pointerdown", handlePointerDown);
 
       setTimeout(() => {
         const range = document.createRange();

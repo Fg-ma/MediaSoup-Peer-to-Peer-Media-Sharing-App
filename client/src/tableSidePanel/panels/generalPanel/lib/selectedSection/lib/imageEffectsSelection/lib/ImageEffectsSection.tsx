@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../../../../../context/socketContext/SocketContext";
 import BabylonPostProcessEffectsButton from "../../../../../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
@@ -47,6 +46,10 @@ export default function ImageEffectsSection({
 
   const [effectsDisabled, setEffectsDisabled] = useState(true);
 
+  const [_, setRerender] = useState(false);
+
+  const faceDetectedCount = useRef(imageMediaInstance.imageMedia.detectedFaces);
+
   const tintColor = useRef(
     userEffectsStyles.current.image[imageInstanceId].tint.color,
   );
@@ -62,11 +65,23 @@ export default function ImageEffectsSection({
     }
   };
 
+  const handleFaceDetectedCountChange = (facesDetected: number) => {
+    faceDetectedCount.current = facesDetected;
+
+    setRerender((prev) => !prev);
+  };
+
   useEffect(() => {
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
+    imageMediaInstance.imageMedia.addFaceCountChangeListener(
+      handleFaceDetectedCountChange,
+    );
 
     return () => {
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
+      imageMediaInstance.imageMedia.removeFaceCountChangeListener(
+        handleFaceDetectedCountChange,
+      );
     };
   }, []);
 

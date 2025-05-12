@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
 import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
 import GeneralMediaSelection from "../GeneralMediaSelection";
@@ -14,11 +14,12 @@ export default function SvgSelection({
 }) {
   const { userMedia } = useMediaContext();
 
+  const [largestDim, setLargestDim] = useState<"width" | "height">("width");
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const svgMirror = useRef<SVGSVGElement | undefined>(undefined);
 
   const svgInstanceMedia = userMedia.current.svg.tableInstances[contentId];
-  const positioning = svgInstanceMedia.getPositioning();
+  const positioning = svgInstanceMedia?.getPositioning();
 
   const handleInstanceEvents = (event: SvgInstanceListenerTypes) => {
     if (event.type === "effectsChanged") {
@@ -39,47 +40,55 @@ export default function SvgSelection({
   };
 
   useEffect(() => {
-    if (svgInstanceMedia.instanceSvg) {
+    if (svgInstanceMedia?.instanceSvg) {
       svgMirror.current = svgInstanceMedia.instanceSvg.cloneNode(
         true,
       ) as SVGSVGElement;
-      svgMirror.current.setAttribute("height", "100%");
-      svgMirror.current.setAttribute("width", "auto");
-      svgMirror.current.setAttribute("maxHeight", "12rem");
+      if ((svgInstanceMedia.svgMedia.aspect ?? 0) > 1) {
+        svgMirror.current.setAttribute("width", "100%");
+        svgMirror.current.setAttribute("maxWidth", "12rem");
+        setLargestDim("width");
+      } else {
+        svgMirror.current.setAttribute("height", "100%");
+        svgMirror.current.setAttribute("maxHeight", "12rem");
+        setLargestDim("height");
+      }
       svgContainerRef.current?.appendChild(svgMirror.current);
     }
 
-    svgInstanceMedia.addSvgInstanceListener(handleInstanceEvents);
+    svgInstanceMedia?.addSvgInstanceListener(handleInstanceEvents);
 
     return () => {
-      svgInstanceMedia.removeSvgInstanceListener(handleInstanceEvents);
+      svgInstanceMedia?.removeSvgInstanceListener(handleInstanceEvents);
     };
   }, []);
 
   return (
-    <GeneralMediaSelection
-      contentId={contentId}
-      contentType="svg"
-      selectionContent={
-        <div
-          ref={svgContainerRef}
-          className="h-full max-h-[12rem] !w-auto overflow-hidden rounded-md object-contain"
-        ></div>
-      }
-      effectsSection={
-        <SvgEffectsSection
-          svgInstanceId={contentId}
-          svgMediaInstance={svgInstanceMedia}
-        />
-      }
-      downloadFunction={() => {
-        svgInstanceMedia.downloadSvg("svg", 256, 256, "Minified");
-      }}
-      filename={svgInstanceMedia.svgMedia.filename}
-      mimeType={svgInstanceMedia.svgMedia.mimeType}
-      fileSize={svgInstanceMedia.svgMedia.getFileSize()}
-      tablePanelRef={tablePanelRef}
-      positioning={positioning}
-    />
+    svgInstanceMedia && (
+      <GeneralMediaSelection
+        contentId={contentId}
+        contentType="svg"
+        selectionContent={
+          <div
+            ref={svgContainerRef}
+            className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
+          ></div>
+        }
+        effectsSection={
+          <SvgEffectsSection
+            svgInstanceId={contentId}
+            svgMediaInstance={svgInstanceMedia}
+          />
+        }
+        downloadFunction={() => {
+          svgInstanceMedia.downloadSvg("svg", 256, 256, "Minified");
+        }}
+        filename={svgInstanceMedia.svgMedia.filename}
+        mimeType={svgInstanceMedia.svgMedia.mimeType}
+        fileSize={svgInstanceMedia.svgMedia.getFileSize()}
+        tablePanelRef={tablePanelRef}
+        positioning={positioning}
+      />
+    )
   );
 }

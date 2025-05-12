@@ -18,7 +18,8 @@ export type GroupSignals =
   | onGroupDeleteType
   | onGroupChangeType
   | onClearGroupType
-  | onGroupUpdateType;
+  | onGroupUpdateType
+  | onGroupElementMoveType;
 
 export type MediaPositioningSignals =
   | onMoveToType
@@ -133,6 +134,14 @@ export type onGroupUpdateType = {
 
 export type onClearGroupType = {
   type: "clearGroup";
+};
+
+export type onGroupElementMoveType = {
+  type: "groupElementMove";
+  data: {
+    contentType: ContentTypes;
+    contentId: string;
+  };
 };
 
 export type onMoveToType = {

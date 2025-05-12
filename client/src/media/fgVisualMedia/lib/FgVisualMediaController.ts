@@ -7,7 +7,7 @@ import {
   defaultCameraEffects,
   defaultScreenEffects,
 } from "../../../../../universal/effectsTypeConstant";
-import { Permissions } from "../../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../../context/permissionsContext/lib/typeConstant";
 import FgLowerVisualMediaController from "./fgLowerVisualMediaControls/lib/FgLowerVisualMediaController";
 import { FgVisualMediaOptions } from "./typeConstant";
 import {
@@ -93,6 +93,7 @@ class FgVisualMediaController {
     >,
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   init = () => {
@@ -439,6 +440,13 @@ class FgVisualMediaController {
             ) {
               this.positioning.current = data.positioning;
               this.setRerender((prev) => !prev);
+              this.sendGroupSignal({
+                type: "groupElementMove",
+                data: {
+                  contentType: this.type,
+                  contentId: this.visualMediaId,
+                },
+              });
             }
           };
 

@@ -125,7 +125,6 @@ export default function FgTableText({
       initState={textMediaInstance.textMedia.state}
       media={
         <EditableText
-          lowerTextController={lowerTextController}
           text={text}
           settings={settings}
           expandLineNumbersButtonRef={expandLineNumbersButtonRef}

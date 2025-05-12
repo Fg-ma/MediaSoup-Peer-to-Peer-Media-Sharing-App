@@ -22,7 +22,7 @@ import {
   UserEffectsStylesType,
   UserEffectsType,
 } from "../../../../../universal/effectsTypeConstant";
-import { Permissions } from "../../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../../context/permissionsContext/lib/typeConstant";
 
 export type OutGoingMediasoupMessages =
   | onJoinTableType

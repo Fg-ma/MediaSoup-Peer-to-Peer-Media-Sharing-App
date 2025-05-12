@@ -8,7 +8,7 @@ import {
 } from "../../../../universal/effectsTypeConstant";
 import BundleSocket from "./BundleSocket";
 import { BundleOptions } from "./typeConstant";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/lib/typeConstant";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";

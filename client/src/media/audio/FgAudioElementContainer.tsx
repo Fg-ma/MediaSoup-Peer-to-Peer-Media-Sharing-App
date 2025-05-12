@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/lib/typeConstant";
 import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
 import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";

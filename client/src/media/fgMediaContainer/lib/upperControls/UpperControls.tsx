@@ -34,7 +34,7 @@ export default function UpperControls({
         fullscreen ||
         backgroundMedia
           ? "top-0"
-          : "bottom-full"
+          : "bottom-full mb-1"
       } pointer-events-none absolute z-20 h-[10%] max-h-10 min-h-6 w-full items-center justify-between`}
     >
       <div className="flex h-full w-max items-center justify-center">

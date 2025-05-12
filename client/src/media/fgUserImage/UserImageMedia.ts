@@ -15,7 +15,7 @@ class UserImageMedia {
   image: HTMLImageElement | undefined;
 
   private fileChunks: Uint8Array[] = [];
-  private totalSize = 0;
+  private fileSize = 0;
   blobURL: string | undefined;
   loadingState: "downloading" | "downloaded" = "downloading";
   aspect: number | undefined;
@@ -67,7 +67,7 @@ class UserImageMedia {
 
       const chunkData = new Uint8Array(message.data.chunk.data);
       this.fileChunks.push(chunkData);
-      this.totalSize += chunkData.length;
+      this.fileSize += chunkData.length;
     } else if (message.type === "downloadComplete") {
       const { contentType, contentId } = message.header;
 
@@ -75,7 +75,7 @@ class UserImageMedia {
         return;
       }
 
-      const mergedBuffer = new Uint8Array(this.totalSize);
+      const mergedBuffer = new Uint8Array(this.fileSize);
       let offset = 0;
 
       for (const chunk of this.fileChunks) {
@@ -134,6 +134,18 @@ class UserImageMedia {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  getFileSize = () => {
+    return this.formatBytes(this.fileSize);
+  };
+
+  private formatBytes = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 }
 

@@ -76,7 +76,7 @@ class FgGameController {
     this.reactController = new ReactController(
       this.gameId,
       undefined,
-      "game",
+      "games",
       this.behindEffectsContainerRef,
       this.frontEffectsContainerRef,
       this.tableSocket,
@@ -434,7 +434,7 @@ class FgGameController {
     const { contentType, contentId } = event.header;
     const { reaction, reactionStyle } = event.data;
 
-    if (contentType === "game" && contentId === this.gameId) {
+    if (contentType === "games" && contentId === this.gameId) {
       this.reactController.handleReaction(reaction, false, reactionStyle);
     }
   };
@@ -453,7 +453,7 @@ class FgGameController {
     const { affected, startDragPosition } = signal.data;
 
     if (
-      !affected.some((item) => item.id === this.gameId && item.type === "game")
+      !affected.some((item) => item.id === this.gameId && item.type === "games")
     )
       return;
 
@@ -471,7 +471,7 @@ class FgGameController {
 
     if (
       !affected.some(
-        (item) => item.id === this.gameId && item.type === "game",
+        (item) => item.id === this.gameId && item.type === "games",
       ) ||
       !this.groupStartDragPosition ||
       !this.savedMediaPosition ||
@@ -510,7 +510,7 @@ class FgGameController {
     const { affected } = signal.data;
 
     if (
-      !affected.some((item) => item.id === this.gameId && item.type === "game")
+      !affected.some((item) => item.id === this.gameId && item.type === "games")
     )
       return;
 
@@ -524,7 +524,7 @@ class FgGameController {
     const { affected } = signal.data;
 
     if (
-      !affected.some((item) => item.id === this.gameId && item.type === "game")
+      !affected.some((item) => item.id === this.gameId && item.type === "games")
     )
       return;
 

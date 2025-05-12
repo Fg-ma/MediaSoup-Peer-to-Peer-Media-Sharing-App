@@ -1,4 +1,4 @@
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/lib/typeConstant";
 
 export interface BundleOptions {
   primaryVolumeSliderColor?: string;

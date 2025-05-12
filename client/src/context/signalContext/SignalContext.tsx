@@ -16,6 +16,9 @@ export interface SignalContextType {
     {
       type: ContentTypes;
       id: string;
+      username?: string;
+      instance?: string;
+      isUser?: boolean;
     }[]
   >;
   addGeneralSignalListener: (
@@ -63,6 +66,9 @@ export function SignalContextProvider({
     {
       type: ContentTypes;
       id: string;
+      username?: string;
+      instance?: string;
+      isUser?: boolean;
     }[]
   >([]);
 

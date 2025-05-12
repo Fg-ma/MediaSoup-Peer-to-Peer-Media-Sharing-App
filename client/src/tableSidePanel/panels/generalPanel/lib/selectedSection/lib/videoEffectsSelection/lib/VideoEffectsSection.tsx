@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { Transition, Variants, motion } from "framer-motion";
 import { useEffectsContext } from "../../../../../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../../../../../context/socketContext/SocketContext";
 import BabylonPostProcessEffectsButton from "../../../../../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 import BlurButton from "../../../../../../../../elements/effectsButtons/BlurButton";
 import TintSection from "../../../../../../../../elements/effectsButtons/TintSection";
 import ClearAllButton from "../../../../../../../../elements/effectsButtons/ClearAllButton";
-import TableImageMediaInstance from "../../../../../../../../media/fgTableImage/TableImageMediaInstance";
-import { ImageEffectTypes } from "../../../../../../../../../../universal/effectsTypeConstant";
+import { VideoEffectTypes } from "../../../../../../../../../../universal/effectsTypeConstant";
+import TableVideoMediaInstance from "../../../../../../../../media/fgTableVideo/TableVideoMediaInstance";
 
 const HideBackgroundButton = React.lazy(
   () =>
@@ -35,23 +34,29 @@ const PetsButton = React.lazy(
   () => import("../../../../../../../../elements/effectsButtons/PetsButton"),
 );
 
-export default function ImageEffectsSection({
-  imageInstanceId,
-  imageMediaInstance,
+export default function VideoEffectsSection({
+  videoInstanceId,
+  videoMediaInstance,
 }: {
-  imageInstanceId: string;
-  imageMediaInstance: TableImageMediaInstance;
+  videoInstanceId: string;
+  videoMediaInstance: TableVideoMediaInstance;
 }) {
   const { userEffectsStyles, userEffects } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
-  const [effectsDisabled, setEffectsDisabled] = useState(true);
-
-  const tintColor = useRef(
-    userEffectsStyles.current.image[imageInstanceId].tint.color,
-  );
+  const [effectsDisabled, setEffectsDisabled] = useState(false);
 
   const effectsContainerRef = useRef<HTMLDivElement>(null);
+
+  const tintColor = useRef(
+    userEffectsStyles.current.video[videoInstanceId].video.tint.color,
+  );
+
+  const faceDetectedCount = useRef(
+    videoMediaInstance.videoMedia.maxFacesDetected,
+  );
+
+  const [_, setRerender] = useState(false);
 
   const handleWheel = (event: WheelEvent) => {
     event.stopPropagation();
@@ -62,46 +67,64 @@ export default function ImageEffectsSection({
     }
   };
 
+  const handleFaceDetectedCountChange = (facesDetected: number) => {
+    if (facesDetected > faceDetectedCount.current) {
+      faceDetectedCount.current = facesDetected;
+
+      setRerender((prev) => !prev);
+    }
+  };
+
   useEffect(() => {
+    if (faceDetectedCount.current === 0) {
+      videoMediaInstance.videoMedia.addFaceCountChangeListener(
+        handleFaceDetectedCountChange,
+      );
+    }
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
 
     return () => {
+      if (faceDetectedCount.current === 0) {
+        videoMediaInstance.videoMedia.removeFaceCountChangeListener(
+          handleFaceDetectedCountChange,
+        );
+      }
       effectsContainerRef.current?.removeEventListener("wheel", handleWheel);
     };
   }, []);
 
-  const handleImageEffect = async (
-    effect: ImageEffectTypes | "clearAll",
+  const handleVideoEffect = async (
+    effect: VideoEffectTypes | "clearAll",
     blockStateChange: boolean,
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        userEffects.current.image[imageInstanceId][effect] =
-          !userEffects.current.image[imageInstanceId][effect];
+        userEffects.current.video[videoInstanceId].video[effect] =
+          !userEffects.current.video[videoInstanceId].video[effect];
       }
 
-      imageMediaInstance.changeEffects(
+      videoMediaInstance.changeEffects(
         effect,
         tintColor.current,
         blockStateChange,
       );
 
       tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        imageMediaInstance.imageMedia.imageId,
-        imageInstanceId,
-        userEffects.current.image[imageInstanceId],
-        userEffectsStyles.current.image[imageInstanceId],
+        "video",
+        videoMediaInstance.videoMedia.videoId,
+        videoInstanceId,
+        userEffects.current.video[videoInstanceId].video,
+        userEffectsStyles.current.video[videoInstanceId].video,
       );
     } else {
-      imageMediaInstance.clearAllEffects();
+      videoMediaInstance.clearAllEffects();
 
       tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        imageMediaInstance.imageMedia.imageId,
-        imageInstanceId,
-        userEffects.current.image[imageInstanceId],
-        userEffectsStyles.current.image[imageInstanceId],
+        "video",
+        videoMediaInstance.videoMedia.videoId,
+        videoInstanceId,
+        userEffects.current.video[videoInstanceId].video,
+        userEffectsStyles.current.video[videoInstanceId].video,
       );
     }
   };
@@ -109,108 +132,106 @@ export default function ImageEffectsSection({
   return (
     <div
       ref={effectsContainerRef}
-      className="hide-scroll-bar flex h-12 w-full max-w-full items-center justify-start overflow-x-auto rounded"
+      className="hide-scroll-bar z-30 flex h-12 w-full max-w-full items-center overflow-auto rounded"
     >
-      <div className="flex h-full w-max items-center justify-center space-x-2 px-2">
+      <div className="flex h-full w-max items-center justify-center space-x-2 px-4">
         <ClearAllButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           clickFunctionCallback={async () => {
-            await handleImageEffect("clearAll", false);
+            await handleVideoEffect("clearAll", false);
           }}
         />
         <BabylonPostProcessEffectsButton
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.image[imageInstanceId].postProcess}
+          streamEffects={
+            userEffects.current.video[videoInstanceId].video.postProcess
+          }
           effectsStyles={
-            userEffectsStyles.current.image[imageInstanceId].postProcess
+            userEffectsStyles.current.video[videoInstanceId].video.postProcess
           }
           clickFunctionCallback={async () => {
-            imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              userEffectsStyles.current.image[imageInstanceId].postProcess
+            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              userEffectsStyles.current.video[videoInstanceId].video.postProcess
                 .style,
             );
 
-            await handleImageEffect("postProcess", false);
+            await handleVideoEffect("postProcess", false);
           }}
           holdFunctionCallback={async (effectType) => {
-            userEffectsStyles.current.image[imageInstanceId].postProcess.style =
-              effectType;
+            userEffectsStyles.current.video[
+              videoInstanceId
+            ].video.postProcess.style = effectType;
 
-            imageMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              effectType,
+            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
+              userEffectsStyles.current.video[videoInstanceId].video.postProcess
+                .style,
             );
 
-            await handleImageEffect(
+            await handleVideoEffect(
               "postProcess",
-              userEffects.current.image[imageInstanceId].postProcess,
+              userEffects.current.video[videoInstanceId].video.postProcess,
             );
           }}
         />
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HideBackgroundButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
-                userEffects.current.image[imageInstanceId].hideBackground
+                userEffects.current.video[videoInstanceId].video.hideBackground
               }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].hideBackground
+                userEffectsStyles.current.video[videoInstanceId].video
+                  .hideBackground
               }
               clickFunctionCallback={async () => {
                 const effectsStyles =
-                  userEffectsStyles.current.image[imageInstanceId]
+                  userEffectsStyles.current.video[videoInstanceId].video
                     .hideBackground;
 
-                imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectsStyles.style,
                 );
 
-                await handleImageEffect("hideBackground", false);
+                await handleVideoEffect("hideBackground", false);
               }}
               holdFunctionCallback={async (effectType) => {
                 const effectsStyles =
-                  userEffectsStyles.current.image[imageInstanceId]
+                  userEffectsStyles.current.video[videoInstanceId].video
                     .hideBackground;
                 const streamEffects =
-                  userEffects.current.image[imageInstanceId].hideBackground;
+                  userEffects.current.video[videoInstanceId].video
+                    .hideBackground;
 
-                userEffectsStyles.current.image[
-                  imageInstanceId
-                ].hideBackground.style = effectType;
+                effectsStyles.style = effectType;
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                  effectType,
+                );
 
-                if (effectType !== "color") {
-                  imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                    effectType,
-                  );
-                } else {
-                  imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                    effectsStyles.color,
-                  );
-                }
-
-                await handleImageEffect("hideBackground", streamEffects);
+                await handleVideoEffect("hideBackground", streamEffects);
               }}
               acceptColorCallback={async (color) => {
                 const effectsStyles =
-                  userEffectsStyles.current.image[imageInstanceId]
+                  userEffectsStyles.current.video[videoInstanceId].video
                     .hideBackground;
                 const streamEffects =
-                  userEffects.current.image[imageInstanceId].hideBackground;
+                  userEffects.current.video[videoInstanceId].video
+                    .hideBackground;
 
-                imageMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color,
                 );
 
                 effectsStyles.style = "color";
                 effectsStyles.color = color;
 
-                await handleImageEffect("hideBackground", streamEffects);
+                await handleVideoEffect("hideBackground", streamEffects);
               }}
             />
           </Suspense>
@@ -219,9 +240,9 @@ export default function ImageEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.image[imageInstanceId].blur}
+          streamEffects={userEffects.current.video[videoInstanceId].video.blur}
           clickFunctionCallback={async () => {
-            await handleImageEffect("blur", false);
+            await handleVideoEffect("blur", false);
           }}
         />
         <TintSection
@@ -229,171 +250,186 @@ export default function ImageEffectsSection({
           effectsDisabled={effectsDisabled}
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
-          streamEffects={userEffects.current.image[imageInstanceId].tint}
+          streamEffects={userEffects.current.video[videoInstanceId].video.tint}
           clickFunctionCallback={async () => {
-            userEffectsStyles.current.image[imageInstanceId].tint.color =
+            userEffectsStyles.current.video[videoInstanceId].video.tint.color =
               tintColor.current;
 
-            await handleImageEffect("tint", false);
+            await handleVideoEffect("tint", false);
           }}
           acceptColorCallback={async () => {
-            userEffectsStyles.current.image[imageInstanceId].tint.color =
+            userEffectsStyles.current.video[videoInstanceId].video.tint.color =
               tintColor.current;
 
-            await handleImageEffect(
+            await handleVideoEffect(
               "tint",
-              userEffects.current.image[imageInstanceId].tint,
+              userEffects.current.video[videoInstanceId].video.tint,
             );
           }}
         />
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <GlassesButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.image[imageInstanceId].glasses}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.glasses
+              }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].glasses
+                userEffectsStyles.current.video[videoInstanceId].video.glasses
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("glasses", false);
+                await handleVideoEffect("glasses", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[imageInstanceId].glasses.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.glasses.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "glasses",
-                  userEffects.current.image[imageInstanceId].glasses,
+                  userEffects.current.video[videoInstanceId].video.glasses,
                 );
               }}
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <BeardsButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.image[imageInstanceId].beards}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.beards
+              }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].beards
+                userEffectsStyles.current.video[videoInstanceId].video.beards
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("beards", false);
+                await handleVideoEffect("beards", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[imageInstanceId].beards.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.beards.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "beards",
-                  userEffects.current.image[imageInstanceId].beards,
+                  userEffects.current.video[videoInstanceId].video.beards,
                 );
               }}
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MustachesButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
               streamEffects={
-                userEffects.current.image[imageInstanceId].mustaches
+                userEffects.current.video[videoInstanceId].video.mustaches
               }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].mustaches
+                userEffectsStyles.current.video[videoInstanceId].video.mustaches
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("mustaches", false);
+                await handleVideoEffect("mustaches", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[
-                  imageInstanceId
-                ].mustaches.style = effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.mustaches.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "mustaches",
-                  userEffects.current.image[imageInstanceId].mustaches,
+                  userEffects.current.video[videoInstanceId].video.mustaches,
                 );
               }}
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MasksButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.image[imageInstanceId].masks}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.masks
+              }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].masks
+                userEffectsStyles.current.video[videoInstanceId].video.masks
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("masks", false);
+                await handleVideoEffect("masks", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[imageInstanceId].masks.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.masks.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "masks",
-                  userEffects.current.image[imageInstanceId].masks,
+                  userEffects.current.video[videoInstanceId].video.masks,
                 );
               }}
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HatsButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.image[imageInstanceId].hats}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.hats
+              }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].hats
+                userEffectsStyles.current.video[videoInstanceId].video.hats
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("hats", false);
+                await handleVideoEffect("hats", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[imageInstanceId].hats.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.hats.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "hats",
-                  userEffects.current.image[imageInstanceId].hats,
+                  userEffects.current.video[videoInstanceId].video.hats,
                 );
               }}
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <PetsButton
               effectsDisabled={effectsDisabled}
               setEffectsDisabled={setEffectsDisabled}
               scrollingContainerRef={effectsContainerRef}
-              streamEffects={userEffects.current.image[imageInstanceId].pets}
+              streamEffects={
+                userEffects.current.video[videoInstanceId].video.pets
+              }
               effectsStyles={
-                userEffectsStyles.current.image[imageInstanceId].pets
+                userEffectsStyles.current.video[videoInstanceId].video.pets
               }
               clickFunctionCallback={async () => {
-                await handleImageEffect("pets", false);
+                await handleVideoEffect("pets", false);
               }}
               holdFunctionCallback={async (effectType) => {
-                userEffectsStyles.current.image[imageInstanceId].pets.style =
-                  effectType;
+                userEffectsStyles.current.video[
+                  videoInstanceId
+                ].video.pets.style = effectType;
 
-                await handleImageEffect(
+                await handleVideoEffect(
                   "pets",
-                  userEffects.current.image[imageInstanceId].pets,
+                  userEffects.current.video[videoInstanceId].video.pets,
                 );
               }}
             />

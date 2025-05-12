@@ -3,7 +3,7 @@ import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSignalContext } from "../context/signalContext/SignalContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
-import { Permissions } from "../context/permissionsContext/typeConstant";
+import { Permissions } from "../context/permissionsContext/lib/typeConstant";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import BundleController from "./lib/BundleController";
 

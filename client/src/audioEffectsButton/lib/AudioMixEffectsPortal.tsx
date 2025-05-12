@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import isEqual from "lodash/isEqual";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
-import { Permissions } from "../../context/permissionsContext/typeConstant";
+import { Permissions } from "../../context/permissionsContext/lib/typeConstant";
 import AudioMixEffect from "./AudioMixEffect";
 import ScrollingContainer from "../../elements/scrollingContainer/ScrollingContainer";
 import ScrollingContainerButton from "../../elements/scrollingContainer/lib/ScrollingContainerButton";

@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import {
@@ -19,9 +20,8 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
-import "./lib/fgVisualMediaStyles.css";
-import { AnimatePresence } from "framer-motion";
 import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
+import "./lib/fgVisualMediaStyles.css";
 
 const VisualMediaAdjustmentButtons = React.lazy(
   () => import("./lib/VisualMediaAdjustmentButtons"),
@@ -102,7 +102,7 @@ export default function UserVisualMedia({
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
-  const { addGroupSignalListener, removeGroupSignalListener } =
+  const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
@@ -311,6 +311,7 @@ export default function UserVisualMedia({
       mediasoupSocket,
       fgContentAdjustmentController,
       bundleRef,
+      sendGroupSignal,
     ),
   );
 
@@ -545,6 +546,9 @@ export default function UserVisualMedia({
         className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
+        data-selectable-isuser={true}
+        data-selectable-username={username}
+        data-selectable-instance={instance}
       >
         <AnimatePresence>
           {visualEffectsActive && (
