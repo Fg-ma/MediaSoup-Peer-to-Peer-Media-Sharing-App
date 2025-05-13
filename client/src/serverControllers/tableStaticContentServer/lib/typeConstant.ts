@@ -30,6 +30,9 @@ export type OutGoingTableStaticContentMessages =
   | onRequestCatchUpTableDataType
   | onDeleteContentType
   | onGetFileType
+  | onPauseDownloadType
+  | onResumeDownloadType
+  | onCancelDownloadType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
   | onUpdateVideoPositionType
@@ -85,7 +88,21 @@ type onGetFileType = {
     contentType: StaticContentTypes;
     contentId: string;
   };
-  data: { key: string };
+};
+
+export type onPauseDownloadType = {
+  type: "pauseDownload";
+  header: { downloadId: string };
+};
+
+export type onResumeDownloadType = {
+  type: "resumeDownload";
+  header: { downloadId: string };
+};
+
+export type onCancelDownloadType = {
+  type: "cancelDownload";
+  header: { downloadId: string };
 };
 
 type onUpdateContentPositioningType = {
@@ -246,6 +263,8 @@ export type IncomingTableStaticContentMessages =
   | onTextReuploadedType
   | onChunkType
   | onDownloadCompleteType
+  | onDownloadStartedType
+  | onDownloadErrorType
   | onResponsedCatchUpTableDataType
   | onContentDeletedType
   | onContentStateChangedType
@@ -553,6 +572,18 @@ export type onDownloadCompleteType = {
     contentType: StaticContentTypes;
     contentId: string;
   };
+};
+
+export type onDownloadStartedType = {
+  type: "downloadStarted";
+  header: { contentType: StaticContentTypes; contentId: string };
+  data: { downloadId: string; fileSize: number };
+};
+
+export type onDownloadErrorType = {
+  type: "downloadError";
+  header: { contentType: StaticContentTypes; contentId: string };
+  data: { downloadId: string };
 };
 
 export type onResponsedCatchUpTableDataType = {

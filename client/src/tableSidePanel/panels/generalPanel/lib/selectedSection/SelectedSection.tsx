@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
 import { GroupSignals } from "../../../../../context/signalContext/lib/typeConstant";
-import ImageSelection from "./lib/imageEffectsSelection/ImageSelection";
-import SvgSelection from "./lib/svgEffectsSelection/SvgSelection";
-import VideoSelection from "./lib/videoEffectsSelection/VideoSelection";
-import TextSelection from "./lib/textEffectsSelection/TextSelection";
+import ImageSelection from "./lib/imageSelection/ImageSelection";
+import SvgSelection from "./lib/svgSelection/SvgSelection";
+import VideoSelection from "./lib/videoSelection/VideoSelection";
+import TextSelection from "./lib/textSelection/TextSelection";
+import VisualMediaSelection from "./lib/visualMediaSelection/VisualMediaSelection";
 import "./lib/selectedSection.css";
-import CameraSelection from "./lib/cameraEffectsSelection/CameraSelection";
 
 export default function SelectedSection({
   tablePanelRef,
@@ -86,18 +86,34 @@ export default function SelectedSection({
               sel.isUser !== undefined
             )
               media = (
-                <CameraSelection
+                <VisualMediaSelection
                   key={sel.id}
                   username={sel.username}
                   instance={sel.instance}
                   isUser={sel.isUser}
                   contentId={sel.id}
+                  type="camera"
                   tablePanelRef={tablePanelRef}
                 />
               );
             break;
           case "screen":
-            media = <></>;
+            if (
+              sel.username !== undefined &&
+              sel.instance !== undefined &&
+              sel.isUser !== undefined
+            )
+              media = (
+                <VisualMediaSelection
+                  key={sel.id}
+                  username={sel.username}
+                  instance={sel.instance}
+                  isUser={sel.isUser}
+                  contentId={sel.id}
+                  type="screen"
+                  tablePanelRef={tablePanelRef}
+                />
+              );
             break;
           case "audio":
             media = <></>;

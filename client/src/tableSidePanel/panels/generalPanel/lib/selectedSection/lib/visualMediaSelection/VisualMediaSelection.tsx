@@ -2,56 +2,78 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
 import { usePermissionsContext } from "../../../../../../../context/permissionsContext/PermissionsContext";
 import GeneralMediaSelection from "../GeneralMediaSelection";
-import CameraEffectsSection from "./lib/CameraEffectsSection";
+import VisualMediaEffectsSection from "./lib/VisualMediaEffectsSection";
 import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
+import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
+import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
+import { GroupSignals } from "../../../../../../../context/signalContext/lib/typeConstant";
 
-export default function CameraSelection({
+export default function VisualMediaSelection({
   username,
   instance,
   isUser,
   contentId,
+  type,
   tablePanelRef,
 }: {
   username: string;
   instance: string;
   isUser: boolean;
   contentId: string;
+  type: "camera" | "screen";
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia, remoteMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
+  const { selected, addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
   const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
   const mirrorVideoRef = useRef<HTMLVideoElement>(null);
 
   const [_, setRerender] = useState(false);
 
-  const cameraMedia = isUser
-    ? userMedia.current.camera[contentId]
-    : remoteMedia.current[username][instance].camera?.[contentId];
-  const positioning = {
-    position: { top: 50, left: 50 },
-    scale: { x: 25, y: 25 },
-    rotation: 0,
-  }; //cameraMedia?.getPositioning();
+  const visualMedia = isUser
+    ? userMedia.current[type][contentId]
+    : remoteMedia.current[username]?.[instance]?.[type]?.[contentId];
+  const posAttr = document
+    .getElementById(`${contentId}_container`)
+    ?.getAttribute("data-positioning");
+  const positioning = posAttr
+    ? (JSON.parse(posAttr) ?? {
+        position: { top: 50, left: 50 },
+        scale: { x: 25, y: 25 },
+        rotation: 0,
+      })
+    : {
+        position: { top: 50, left: 50 },
+        scale: { x: 25, y: 25 },
+        rotation: 0,
+      };
   const largestDim = useRef<"width" | "height" | undefined>(undefined);
 
   const updateMirrors = () => {
     const canvas = mirrorCanvasRef.current;
     const ctx = canvas?.getContext("2d");
 
-    if (!ctx || !(cameraMedia instanceof CameraMedia)) return;
+    if (
+      !ctx ||
+      !(
+        visualMedia instanceof CameraMedia || visualMedia instanceof ScreenMedia
+      )
+    )
+      return;
 
-    const src = cameraMedia.canvas;
+    const src = visualMedia.canvas;
 
     ctx.clearRect(
       0,
       0,
       largestDim.current === "width"
         ? 184
-        : 192 * (cameraMedia.aspectRatio ?? 1),
+        : 192 * (visualMedia.aspectRatio ?? 1),
       largestDim.current === "width"
-        ? 184 / (cameraMedia.aspectRatio ?? 1)
+        ? 184 / (visualMedia.aspectRatio ?? 1)
         : 192,
     );
     ctx.drawImage(
@@ -60,9 +82,9 @@ export default function CameraSelection({
       0,
       largestDim.current === "width"
         ? 184
-        : 192 * (cameraMedia.aspectRatio ?? 1),
+        : 192 * (visualMedia.aspectRatio ?? 1),
       largestDim.current === "width"
-        ? 184 / (cameraMedia.aspectRatio ?? 1)
+        ? 184 / (visualMedia.aspectRatio ?? 1)
         : 192,
     );
 
@@ -85,12 +107,12 @@ export default function CameraSelection({
   const handleStream = async () => {
     if (
       !mirrorVideoRef.current ||
-      !cameraMedia ||
-      !(cameraMedia instanceof MediaStreamTrack)
+      !visualMedia ||
+      !(visualMedia instanceof MediaStreamTrack)
     )
       return;
 
-    const stream = new MediaStream([cameraMedia]);
+    const stream = new MediaStream([visualMedia]);
     mirrorVideoRef.current.srcObject = stream;
     mirrorVideoRef.current.srcObject = stream;
     mirrorVideoRef.current.playsInline = true;
@@ -100,28 +122,51 @@ export default function CameraSelection({
     mirrorVideoRef.current.addEventListener("loadedmetadata", onMeta);
   };
 
+  const handleGroupSignal = (signal: GroupSignals) => {
+    if (signal.type === "groupElementMove") {
+      const { contentType, contentId } = signal.data;
+      if (
+        selected.current?.some(
+          (info) => info.type === contentType && info.id === contentId,
+        )
+      ) {
+        setRerender((prev) => !prev);
+      }
+    }
+  };
+
   useEffect(() => {
-    if (cameraMedia instanceof CameraMedia) {
+    if (
+      visualMedia instanceof CameraMedia ||
+      visualMedia instanceof ScreenMedia
+    ) {
       largestDim.current =
-        (cameraMedia?.aspectRatio ?? 0) > 1 ? "width" : "height";
+        (visualMedia?.aspectRatio ?? 0) > 1 ? "width" : "height";
       setRerender((prev) => !prev);
       updateMirrors();
     } else {
       handleStream();
     }
+
+    addGroupSignalListener(handleGroupSignal);
+
+    return () => {
+      removeGroupSignalListener(handleGroupSignal);
+    };
   }, []);
 
   return (
-    cameraMedia && (
+    visualMedia && (
       <GeneralMediaSelection
         contentId={contentId}
-        contentType="image"
+        contentType={type}
         selectionContent={
           isUser ? (
-            cameraMedia instanceof CameraMedia ? (
+            visualMedia instanceof CameraMedia ||
+            visualMedia instanceof ScreenMedia ? (
               <div
                 className={`${largestDim.current === "width" ? "h-auto w-full max-w-[12rem]" : "h-full max-h-[12rem] w-auto"} overflow-hidden rounded-md`}
-                style={{ aspectRatio: cameraMedia.aspectRatio }}
+                style={{ aspectRatio: visualMedia.aspectRatio }}
               >
                 <canvas
                   ref={mirrorCanvasRef}
@@ -129,11 +174,11 @@ export default function CameraSelection({
                   width={
                     largestDim.current === "width"
                       ? 184
-                      : 192 * (cameraMedia.aspectRatio ?? 1)
+                      : 192 * (visualMedia.aspectRatio ?? 1)
                   }
                   height={
                     largestDim.current === "width"
-                      ? 184 / (cameraMedia.aspectRatio ?? 1)
+                      ? 184 / (visualMedia.aspectRatio ?? 1)
                       : 192
                   }
                 />
@@ -147,14 +192,18 @@ export default function CameraSelection({
           )
         }
         effectsSection={
-          <CameraEffectsSection
+          <VisualMediaEffectsSection
             username={username}
             instance={instance}
-            type="camera"
             visualMediaId={contentId}
             isUser={isUser}
-            acceptsVisualEffects={permissions.current.acceptsCameraEffects}
-            cameraMedia={cameraMedia}
+            acceptsVisualEffects={
+              type === "camera"
+                ? permissions.current.acceptsCameraEffects
+                : permissions.current.acceptsScreenEffects
+            }
+            type={type}
+            visualMedia={visualMedia}
           />
         }
         filename={username}

@@ -28,6 +28,15 @@ const handleMessage = (
     case "getFile":
       gets.getFile(event);
       break;
+    case "pauseDownload":
+      gets.onPauseDownload(event);
+      break;
+    case "resumeDownload":
+      gets.onResumeDownload(event);
+      break;
+    case "cancelDownload":
+      gets.onCancelDownload(event);
+      break;
     case "updateContentPositioning":
       tableTopMongo.onUpdateContentPositioning(event);
       break;

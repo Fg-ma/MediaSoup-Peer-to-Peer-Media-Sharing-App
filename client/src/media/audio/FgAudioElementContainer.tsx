@@ -188,13 +188,10 @@ export default function FgAudioElementContainer({
   );
 
   useEffect(() => {
-    if (
-      !remoteDataStreams.current ||
-      (isUser && !permissions.acceptsAudioEffects)
-    ) {
-      fgAudioElementContainerController.current.attachListeners();
-    }
+    fgAudioElementContainerController.current.attachPositioningListeners();
+  }, [JSON.stringify(remoteDataStreams.current)]);
 
+  useEffect(() => {
     // Request initial catch up data
     if (!isUser && activeUsername.current && activeInstance.current) {
       mediasoupSocket.current?.sendMessage({

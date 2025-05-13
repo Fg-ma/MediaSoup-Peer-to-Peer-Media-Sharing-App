@@ -214,7 +214,6 @@ export default function SettingsPanel({
             animate="animate"
             exit="exit"
           >
-            {" "}
             <FgButton
               className="h-7 w-full"
               contentFunction={() => (

@@ -13,7 +13,7 @@ import {
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import { useSocketContext } from "./context/socketContext/SocketContext";
 import { useToolsContext } from "./context/toolsContext/ToolsContext";
-import { useUploadContext } from "./context/uploadContext/UploadContext";
+import { useUploadDownloadContext } from "./context/uploadDownloadContext/UploadDownloadContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import BrowserMedia from "./media/BrowserMedia";
@@ -48,7 +48,7 @@ export default function Main() {
   const { userId, tableId, username, instance, device } = useUserInfoContext();
   const { uploader, userDevice } = useToolsContext();
   const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadContext();
+    useUploadDownloadContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };

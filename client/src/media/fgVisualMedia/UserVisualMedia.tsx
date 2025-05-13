@@ -102,8 +102,13 @@ export default function UserVisualMedia({
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
-  const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
-    useSignalContext();
+  const {
+    addMediaPositioningSignalListener,
+    removeMediaPositioningSignalListener,
+    sendGroupSignal,
+    addGroupSignalListener,
+    removeGroupSignalListener,
+  } = useSignalContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -312,6 +317,7 @@ export default function UserVisualMedia({
       fgContentAdjustmentController,
       bundleRef,
       sendGroupSignal,
+      userDataStreams,
     ),
   );
 
@@ -338,6 +344,10 @@ export default function UserVisualMedia({
     );
 
     addGroupSignalListener(fgVisualMediaController.current.handleSignal);
+
+    addMediaPositioningSignalListener(
+      fgVisualMediaController.current.handleMediaPositioningSignal,
+    );
 
     // Keep video time
     fgLowerVisualMediaController.current.timeUpdate();
@@ -396,6 +406,9 @@ export default function UserVisualMedia({
         fgVisualMediaController.current.handleTableMessage,
       );
       removeGroupSignalListener(fgVisualMediaController.current.handleSignal);
+      removeMediaPositioningSignalListener(
+        fgVisualMediaController.current.handleMediaPositioningSignal,
+      );
       if (timeUpdateInterval.current !== undefined) {
         clearInterval(timeUpdateInterval.current);
         timeUpdateInterval.current = undefined;

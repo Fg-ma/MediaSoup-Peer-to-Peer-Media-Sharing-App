@@ -3,7 +3,6 @@ import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import {
   TableContentStateTypes,
   StaticContentTypes,
-  StaticMimeTypes,
 } from "../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
@@ -62,6 +61,9 @@ export type MessageTypes =
   | onRequestCatchUpTableDataType
   | onDeleteContentType
   | onGetFileType
+  | onPauseDownloadType
+  | onResumeDownloadType
+  | onCancelDownloadType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
   | onUpdateVideoPositionType
@@ -129,9 +131,6 @@ export type onGetFileType = {
     instance: string;
     contentType: StaticContentTypes;
     contentId: string;
-  };
-  data: {
-    key: string;
   };
 };
 
@@ -242,6 +241,21 @@ export type onCreateNewInstancesType = {
       }[];
     }[];
   };
+};
+
+export type onPauseDownloadType = {
+  type: "pauseDownload";
+  header: { downloadId: string };
+};
+
+export type onResumeDownloadType = {
+  type: "resumeDownload";
+  header: { downloadId: string };
+};
+
+export type onCancelDownloadType = {
+  type: "cancelDownload";
+  header: { downloadId: string };
 };
 
 export const tables: Tables = {};

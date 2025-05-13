@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import OneShotUploader from "./lib/oneShotUploader/OneShotUploader";
 import ChunkedUploader from "./lib/chunkUploader/ChunkUploader";
-import { UploadSignals } from "../context/uploadContext/lib/typeConstant";
+import { UploadSignals } from "../context/uploadDownloadContext/lib/typeConstant";
 import {
   TableContentStateTypes,
   UserContentStateTypes,

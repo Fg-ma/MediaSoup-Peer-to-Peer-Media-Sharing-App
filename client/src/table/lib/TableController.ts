@@ -59,6 +59,7 @@ class TableController {
           this.setTableSidePanelActive((prev) => !prev);
           setTimeout(() => {
             this.sendGroupSignal({ type: "groupUpdate" });
+            this.getAspectDir();
           }, 0);
         }
         break;

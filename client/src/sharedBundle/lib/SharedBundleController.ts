@@ -35,6 +35,8 @@ import TableImageMediaInstance from "../../media/fgTableImage/TableImageMediaIns
 import TableTextMediaInstance from "../../media/fgTableText/TableTextMediaInstance";
 import TableApplicationMediaInstance from "../../media/fgTableApplication/TableApplicationMediaInstance";
 import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaInstance";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import Downloader from "../../downloader/Downloader";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(
@@ -47,6 +49,9 @@ class SharedBundleController extends SharedBundleSocket {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
     super();
   }
@@ -139,9 +144,10 @@ class SharedBundleController extends SharedBundleSocket {
           image.state,
           this.deadbanding,
           this.userDevice,
-          this.tableStaticContentSocket.current.getFile,
-          this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
         this.userMedia.current.image.table[image.imageId] = newImageMedia;
@@ -433,9 +439,10 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.deadbanding,
               this.userDevice,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
 
             this.userMedia.current.image.table[contentId] = newImageMedia;
@@ -479,9 +486,10 @@ class SharedBundleController extends SharedBundleSocket {
               state,
               this.deadbanding,
               this.userDevice,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
           }
 

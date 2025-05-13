@@ -2,6 +2,7 @@ import {
   S3Client,
   ListObjectsCommand,
   GetObjectCommand,
+  HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 
 class Gets {
@@ -25,6 +26,16 @@ class Gets {
 
     try {
       return await this.s3Client.send(new GetObjectCommand(params));
+    } catch (err) {
+      console.error("Error listing contents:", err);
+    }
+  };
+
+  getHead = async (bucketName: string, key: string) => {
+    const params = { Bucket: bucketName, Key: key };
+
+    try {
+      return await this.s3Client.send(new HeadObjectCommand(params));
     } catch (err) {
       console.error("Error listing contents:", err);
     }

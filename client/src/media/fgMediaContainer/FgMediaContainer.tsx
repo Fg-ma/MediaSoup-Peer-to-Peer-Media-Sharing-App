@@ -237,6 +237,8 @@ export default function FgMediaContainer({
       fgContentAdjustmentController,
       bundleRef,
       sendGroupSignal,
+      adjustingDimensions,
+      userDataStreams,
     ),
   );
 

@@ -3,9 +3,10 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { useToolsContext } from "../context/toolsContext/ToolsContext";
+import { useUploadDownloadContext } from "../context/uploadDownloadContext/UploadDownloadContext";
+import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
-import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import Deadbanding from "../babylon/Deadbanding";
 import FgTableVideo from "../media/fgTableVideo/FgTableVideo";
 import FgTableImage from "../media/fgTableImage/FgTableImage";
@@ -36,6 +37,8 @@ export default function SharedBundle({
   const { userEffectsStyles, userEffects } = useEffectsContext();
   const { username } = useUserInfoContext();
   const { userDevice } = useToolsContext();
+  const { sendDownloadSignal, addCurrentDownload, removeCurrentDownload } =
+    useUploadDownloadContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
   const videoContentMute = useRef<{
@@ -53,6 +56,9 @@ export default function SharedBundle({
       userEffects,
       userMedia,
       tableStaticContentSocket,
+      sendDownloadSignal,
+      addCurrentDownload,
+      removeCurrentDownload,
     ),
   );
 

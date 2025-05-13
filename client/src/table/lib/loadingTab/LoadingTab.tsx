@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import LoadingElement from "./lib/LoadingElement";
-import { useUploadContext } from "../../../context/uploadContext/UploadContext";
-import { UploadSignals } from "../../../context/uploadContext/lib/typeConstant";
+import { useUploadDownloadContext } from "../../../context/uploadDownloadContext/UploadDownloadContext";
+import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
 import { TablePanels } from "../../../tableSidePanel/TableSidePanel";
 
 export default function LoadingTab({
@@ -17,7 +17,7 @@ export default function LoadingTab({
     getCurrentUploads,
     addUploadSignalListener,
     removeUploadSignalListener,
-  } = useUploadContext();
+  } = useUploadDownloadContext();
 
   const [_, setRerender] = useState(false);
   const loadingTabRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ export default function LoadingTab({
   };
 
   const handleOpenLoadingPanel = () => {
-    activePanel.current = "loading";
+    activePanel.current = "upload";
     setTableSidePanelActive(true);
     setExternalRerender((prev) => !prev);
   };
@@ -52,7 +52,7 @@ export default function LoadingTab({
   return (
     <>
       {Object.keys(getCurrentUploads()).length !== 0 &&
-        activePanel.current !== "loading" && (
+        activePanel.current !== "upload" && (
           <div
             ref={loadingTabRef}
             className="hide-scroll-bar absolute bottom-0 left-0 z-upload-tab flex h-16 w-[11.25rem] items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden rounded-bl-md rounded-tr-md border-2 border-fg-off-white bg-fg-tone-black-8 px-2"
@@ -65,7 +65,6 @@ export default function LoadingTab({
             {Object.entries(getCurrentUploads()).map(([contentId, upload]) => (
               <LoadingElement
                 key={contentId}
-                contentId={contentId}
                 upload={upload}
                 loadingTabRef={loadingTabRef}
               />

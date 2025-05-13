@@ -56,7 +56,7 @@ class TableStaticContentSocketController {
         typeof event.data === "string"
           ? (JSON.parse(event.data) as IncomingTableStaticContentMessages)
           : { type: undefined };
-
+      console.log(message.type);
       this.handleMessage(message);
 
       this.messageListeners.forEach((listener) => {
@@ -118,11 +118,7 @@ class TableStaticContentSocketController {
     });
   };
 
-  getFile = (
-    contentType: StaticContentTypes,
-    contentId: string,
-    key: string,
-  ) => {
+  getFile = (contentType: StaticContentTypes, contentId: string) => {
     this.sendMessage({
       type: "getFile",
       header: {
@@ -132,7 +128,6 @@ class TableStaticContentSocketController {
         contentType,
         contentId,
       },
-      data: { key },
     });
   };
 

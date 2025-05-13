@@ -20,6 +20,7 @@ import {
 } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 import {
   RemoteDataStreamsType,
+  UserDataStreamsType,
   UserMediaType,
 } from "../../../context/mediaContext/typeConstant";
 import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
@@ -29,10 +30,14 @@ import {
 } from "../../../serverControllers/tableServer/lib/typeConstant";
 import {
   GroupSignals,
+  MediaPositioningSignals,
   onGroupDeleteType,
   onGroupDragEndType,
   onGroupDragStartType,
   onGroupDragType,
+  onMoveToType,
+  onRotateToType,
+  onScaleToType,
 } from "../../../context/signalContext/lib/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 
@@ -94,6 +99,7 @@ class FgVisualMediaController {
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
   ) {}
 
   init = () => {
@@ -587,6 +593,141 @@ class FgVisualMediaController {
         break;
       case "groupDragEnd":
         this.onGroupDragEnd(signal);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private sendUpdatePosition = () => {
+    if (
+      this.fgVisualMediaOptions.permissions
+        ?.acceptsPositionScaleRotationManipulation &&
+      this.userDataStreams.current.positionScaleRotation?.readyState === "open"
+    ) {
+      this.userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          tableId: this.tableId,
+          username: this.username,
+          instance: this.instance,
+          type: this.type,
+          producerId: this.visualMediaId,
+          positioning: this.positioning.current,
+        }),
+      );
+    }
+  };
+
+  handleMoveTo = (signal: onMoveToType) => {
+    const { contentId, contentType } = signal.header;
+
+    if (contentId !== this.visualMediaId || contentType !== this.type) return;
+
+    const { position } = signal.data;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(
+      "position",
+      { rotationPointPlacement: "topLeft" },
+    );
+
+    this.fgContentAdjustmentController.current?.movementTo(
+      {
+        x: (position.x / 100) * (this.bundleRef.current?.clientWidth ?? 1),
+        y: (position.y / 100) * (this.bundleRef.current?.clientHeight ?? 1),
+      },
+      {
+        x:
+          (this.positioning.current.position.left / 100) *
+          (this.bundleRef.current?.clientWidth ?? 1),
+        y:
+          (this.positioning.current.position.top / 100) *
+          (this.bundleRef.current?.clientHeight ?? 1),
+      },
+    );
+
+    this.sendUpdatePosition();
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+  };
+
+  handleRotateTo = (signal: onRotateToType) => {
+    const { contentId, contentType } = signal.header;
+
+    if (
+      !this.bundleRef.current ||
+      contentId !== this.visualMediaId ||
+      contentType !== this.type
+    )
+      return;
+
+    const { rotation } = signal.data;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
+
+    const box = this.bundleRef.current.getBoundingClientRect();
+
+    this.fgContentAdjustmentController.current?.rotateTo(rotation, {
+      x:
+        (this.positioning.current.position.left / 100) *
+          this.bundleRef.current.clientWidth +
+        box.left,
+      y:
+        (this.positioning.current.position.top / 100) *
+          this.bundleRef.current.clientHeight +
+        box.top,
+    });
+
+    this.sendUpdatePosition();
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+  };
+
+  handleScaleTo = (signal: onScaleToType) => {
+    const { contentId, contentType } = signal.header;
+
+    if (
+      !this.bundleRef.current ||
+      contentId !== this.visualMediaId ||
+      contentType !== this.type
+    )
+      return;
+
+    const { scale } = signal.data;
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction();
+
+    const referencePoint = {
+      x:
+        (this.positioning.current.position.left / 100) *
+        this.bundleRef.current.clientWidth,
+      y:
+        (this.positioning.current.position.top / 100) *
+        this.bundleRef.current.clientHeight,
+    };
+
+    this.fgContentAdjustmentController.current?.scaleTo(
+      "aspect",
+      scale,
+      referencePoint,
+      referencePoint,
+      this.aspectRatio.current,
+    );
+
+    this.sendUpdatePosition();
+
+    this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+  };
+
+  handleMediaPositioningSignal = (signal: MediaPositioningSignals) => {
+    switch (signal.type) {
+      case "moveTo":
+        this.handleMoveTo(signal);
+        break;
+      case "rotateTo":
+        this.handleRotateTo(signal);
+        break;
+      case "scaleTo":
+        this.handleScaleTo(signal);
         break;
       default:
         break;

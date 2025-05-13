@@ -1,15 +1,16 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import {
-  TableContentStateTypes,
-  StaticContentTypes,
-} from "../../../../universal/contentTypeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
+import Downloader from "../../downloader/Downloader";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
 import UserDevice from "../../lib/UserDevice";
 
 export type ImageListenerTypes =
@@ -20,7 +21,6 @@ export type ImageListenerTypes =
 class TableImageMedia {
   image: HTMLImageElement | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
   loadingState: "downloading" | "downloaded" = "downloading";
@@ -50,6 +50,8 @@ class TableImageMedia {
 
   babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
 
+  downloader: undefined | Downloader;
+
   constructor(
     public imageId: string,
     public filename: string,
@@ -57,17 +59,12 @@ class TableImageMedia {
     public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
-    private getImage: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
     this.faceLandmarks = new FaceLandmarks(
       true,
@@ -161,8 +158,18 @@ class TableImageMedia {
       }
     };
 
-    this.getImage("image", this.imageId, this.filename);
-    this.addMessageListener(this.getImageListener);
+    this.downloader = new Downloader(
+      "image",
+      this.imageId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.imageId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor() {
@@ -191,65 +198,111 @@ class TableImageMedia {
     this.faceCountChangeListeners.clear();
   }
 
-  private getImageListener = (message: IncomingTableStaticContentMessages) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = (message: onDownloadFinishType) => {
+    const { buffer, fileSize } = message.data;
 
-      if (contentType !== "image" || contentId !== this.imageId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    const blob = new Blob([buffer], { type: this.mimeType });
+    this.blobURL = URL.createObjectURL(blob);
+    this.image = document.createElement("img");
+    this.image.src = this.blobURL;
 
-      if (contentType !== "image" || contentId !== this.imageId) {
-        return;
-      }
+    this.image.onload = () => {
+      this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
 
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
+      if (this.image)
+        this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
+          false,
+          this.faceLandmarks,
+          this.aspect,
+          this.image,
+          this.faceMeshWorker,
+          this.faceMeshProcessing,
+          this.faceDetectionWorker,
+          this.faceDetectionProcessing,
+          this.selfieSegmentationWorker,
+          this.selfieSegmentationProcessing,
+          this.userDevice,
+        );
 
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
+      this.loadingState = "downloaded";
 
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
-      this.image = document.createElement("img");
-      this.image.src = this.blobURL;
+      this.imageListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
+      });
+    };
+  };
 
-      this.image.onload = () => {
-        this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
-
-        if (this.image)
-          this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
-            false,
-            this.faceLandmarks,
-            this.aspect,
-            this.image,
-            this.faceMeshWorker,
-            this.faceMeshProcessing,
-            this.faceDetectionWorker,
-            this.faceDetectionProcessing,
-            this.selfieSegmentationWorker,
-            this.selfieSegmentationProcessing,
-            this.userDevice,
-          );
-
-        this.loadingState = "downloaded";
-
-        this.imageListeners.forEach((listener) => {
-          listener({ type: "downloadComplete" });
-        });
-      };
-
-      this.removeMessageListener(this.getImageListener);
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      default:
+        break;
     }
   };
+
+  // private getImageListener = (message: IncomingTableStaticContentMessages) => {
+  //   if (message.type === "chunk") {
+  //     const { contentType, contentId } = message.header;
+
+  //     if (contentType !== "image" || contentId !== this.imageId) {
+  //       return;
+  //     }
+
+  //     const chunkData = new Uint8Array(message.data.chunk.data);
+  //     this.fileChunks.push(chunkData);
+  //     this.fileSize += chunkData.length;
+  //   } else if (message.type === "downloadComplete") {
+  //     const { contentType, contentId } = message.header;
+
+  //     if (contentType !== "image" || contentId !== this.imageId) {
+  //       return;
+  //     }
+
+  //     const mergedBuffer = new Uint8Array(this.fileSize);
+  //     let offset = 0;
+
+  //     for (const chunk of this.fileChunks) {
+  //       mergedBuffer.set(chunk, offset);
+  //       offset += chunk.length;
+  //     }
+
+  //     const blob = new Blob([mergedBuffer], { type: this.mimeType });
+  //     this.blobURL = URL.createObjectURL(blob);
+  //     this.image = document.createElement("img");
+  //     this.image.src = this.blobURL;
+
+  //     this.image.onload = () => {
+  //       this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
+
+  //       if (this.image)
+  //         this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
+  //           false,
+  //           this.faceLandmarks,
+  //           this.aspect,
+  //           this.image,
+  //           this.faceMeshWorker,
+  //           this.faceMeshProcessing,
+  //           this.faceDetectionWorker,
+  //           this.faceDetectionProcessing,
+  //           this.selfieSegmentationWorker,
+  //           this.selfieSegmentationProcessing,
+  //           this.userDevice,
+  //         );
+
+  //       this.loadingState = "downloaded";
+
+  //       this.imageListeners.forEach((listener) => {
+  //         listener({ type: "downloadComplete" });
+  //       });
+  //     };
+
+  //     this.removeMessageListener(this.getImageListener);
+  //   }
+  // };
 
   addImageListener = (
     listener: (message: ImageListenerTypes) => void,

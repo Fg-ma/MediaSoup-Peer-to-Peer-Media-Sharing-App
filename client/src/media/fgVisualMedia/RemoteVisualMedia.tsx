@@ -111,8 +111,13 @@ export default function RemoteVisualMedia({
   const { mediasoupSocket, tableSocket } = useSocketContext();
   const { username: activeUsername, instance: activeInstance } =
     useUserInfoContext();
-  const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
-    useSignalContext();
+  const {
+    addMediaPositioningSignalListener,
+    removeMediaPositioningSignalListener,
+    sendGroupSignal,
+    addGroupSignalListener,
+    removeGroupSignalListener,
+  } = useSignalContext();
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -319,6 +324,7 @@ export default function RemoteVisualMedia({
       fgContentAdjustmentController,
       bundleRef,
       sendGroupSignal,
+      userDataStreams,
     ),
   );
 
@@ -336,6 +342,10 @@ export default function RemoteVisualMedia({
     );
 
     addGroupSignalListener(fgVisualMediaController.current.handleSignal);
+
+    addMediaPositioningSignalListener(
+      fgVisualMediaController.current.handleMediaPositioningSignal,
+    );
 
     // Request initial catch up data
     if (activeUsername.current && activeInstance.current) {
@@ -403,6 +413,9 @@ export default function RemoteVisualMedia({
         fgVisualMediaController.current.handleTableMessage,
       );
       removeGroupSignalListener(fgVisualMediaController.current.handleSignal);
+      removeMediaPositioningSignalListener(
+        fgVisualMediaController.current.handleMediaPositioningSignal,
+      );
       if (fgVisualMediaOptions.isFullScreen) {
         document.removeEventListener(
           "fullscreenchange",

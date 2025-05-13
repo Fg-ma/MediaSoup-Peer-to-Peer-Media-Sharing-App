@@ -1,6 +1,9 @@
 import { MediaContainerOptions } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
-import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import {
+  RemoteDataStreamsType,
+  UserDataStreamsType,
+} from "../../../context/mediaContext/typeConstant";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import {
   IncomingTableMessages,
@@ -75,6 +78,8 @@ class MediaContainerController {
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private adjustingDimensions: boolean,
+    private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
   ) {}
 
   handlePointerMove = () => {
@@ -345,6 +350,23 @@ class MediaContainerController {
     }
   };
 
+  private sendUpdatePosition = () => {
+    if (
+      this.userDataStreams.current.positionScaleRotation?.readyState === "open"
+    ) {
+      this.userDataStreams.current.positionScaleRotation?.send(
+        JSON.stringify({
+          tableId: this.tableId.current,
+          kind: this.kind,
+          mediaId: this.mediaId,
+          mediaInstanceId: this.mediaInstanceId,
+          positioning: this.positioning.current,
+        }),
+      );
+      if (this.setPositioning) this.setPositioning(this.positioning.current);
+    }
+  };
+
   handleMoveTo = (signal: onMoveToType) => {
     const { contentId, contentType } = signal.header;
 
@@ -379,6 +401,8 @@ class MediaContainerController {
       this.mediaInstanceId,
       { position: this.positioning.current.position },
     );
+
+    this.sendUpdatePosition();
   };
 
   handleRotateTo = (signal: onRotateToType) => {
@@ -415,6 +439,8 @@ class MediaContainerController {
       this.mediaInstanceId,
       { rotation: this.positioning.current.rotation },
     );
+
+    this.sendUpdatePosition();
   };
 
   handleScaleTo = (signal: onScaleToType) => {
@@ -455,6 +481,8 @@ class MediaContainerController {
       this.mediaInstanceId,
       { scale: this.positioning.current.scale },
     );
+
+    this.sendUpdatePosition();
   };
 
   handleMediaPositioningSignal = (signal: MediaPositioningSignals) => {

@@ -3,6 +3,7 @@ import {
   CameraEffectTypes,
   HideBackgroundEffectTypes,
   PostProcessEffectTypes,
+  ScreenEffectTypes,
 } from "../../../../../../../../../../universal/effectsTypeConstant";
 import { useEffectsContext } from "../../../../../../../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../../../../../../../context/socketContext/SocketContext";
@@ -14,6 +15,7 @@ import TintSection from "../../../../../../../../elements/effectsButtons/TintSec
 import BlurButtton from "../../../../../../../../elements/effectsButtons/BlurButton";
 import ClearAllButton from "../../../../../../../../elements/effectsButtons/ClearAllButton";
 import CameraMedia from "../../../../../../../../media/fgVisualMedia/CameraMedia";
+import ScreenMedia from "../../../../../../../../media/fgVisualMedia/ScreenMedia";
 import BabylonPostProcessEffectsButton from "../../../../../../../../elements/effectsButtons/BabylonPostProcessEffectsButton";
 
 const GlassesButton = React.lazy(
@@ -36,22 +38,22 @@ const PetsButton = React.lazy(
   () => import("../../../../../../../../elements/effectsButtons/PetsButton"),
 );
 
-export default function CameraEffectsSection({
+export default function VisualMediaEffectsSection({
   username,
   instance,
-  type,
   visualMediaId,
   isUser,
   acceptsVisualEffects,
-  cameraMedia,
+  type,
+  visualMedia,
 }: {
   username: string;
   instance: string;
-  type: "camera" | "screen";
   visualMediaId: string;
   isUser: boolean;
   acceptsVisualEffects: boolean;
-  cameraMedia: CameraMedia | MediaStreamTrack;
+  type: "camera" | "screen";
+  visualMedia: CameraMedia | ScreenMedia | MediaStreamTrack;
 }) {
   const { mediasoupSocket } = useSocketContext();
   const { userMedia } = useMediaContext();
@@ -68,8 +70,8 @@ export default function CameraEffectsSection({
 
   const tintColor = useRef(
     isUser
-      ? userEffectsStyles.current.camera[visualMediaId].tint.color
-      : remoteEffectsStyles.current[username][instance].camera[visualMediaId]
+      ? userEffectsStyles.current[type][visualMediaId].tint.color
+      : remoteEffectsStyles.current[username][instance][type][visualMediaId]
           .tint.color,
   );
 
@@ -118,28 +120,24 @@ export default function CameraEffectsSection({
   };
 
   const handleVisualEffect = async (
-    effect: CameraEffectTypes,
+    effect: CameraEffectTypes | ScreenEffectTypes,
     blockStateChange: boolean,
   ) => {
-    if (cameraMedia instanceof CameraMedia) {
+    if (visualMedia instanceof CameraMedia) {
       if (!blockStateChange) {
         // Fill stream effects if state change isn't blocked
-        userEffects.current.camera[visualMediaId][effect as CameraEffectTypes] =
-          !userEffects.current.camera[visualMediaId][
-            effect as CameraEffectTypes
-          ];
+        // @ts-expect-error: effect and type mismatch that will never happen
+        userEffects.current[type][visualMediaId][effect] =
+          // @ts-expect-error: effect and type mismatch that will never happen
+          !userEffects.current[type][visualMediaId][effect];
       }
 
-      cameraMedia.changeEffects(
-        effect as CameraEffectTypes,
-        tintColor.current,
-        blockStateChange,
-      );
+      visualMedia.changeEffects(effect, tintColor.current, blockStateChange);
     }
   };
 
   const handleVisualEffectChange = async (
-    effect: CameraEffectTypes | "clearAll",
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange: boolean = false,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,
@@ -159,7 +157,7 @@ export default function CameraEffectsSection({
   };
 
   const handleUserVisualEffectChange = async (
-    effect: CameraEffectTypes | "clearAll",
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange: boolean = false,
   ) => {
     if (effect !== "clearAll") {
@@ -172,21 +170,24 @@ export default function CameraEffectsSection({
             tableId: tableId.current,
             username,
             instance,
-            producerType: "camera",
+            producerType: type,
             producerId: visualMediaId,
           },
           data: {
             effect: effect,
             effectStyle:
               // @ts-expect-error: ts can't infer type, visualMediaId, and effect are strictly enforces and exist
-              userEffectsStyles.current.camera[visualMediaId][effect],
+              userEffectsStyles.current[type][visualMediaId][effect],
             blockStateChange: blockStateChange,
           },
         });
       }
     } else {
-      if (cameraMedia instanceof CameraMedia) {
-        cameraMedia.clearAllEffects();
+      if (
+        visualMedia instanceof CameraMedia ||
+        visualMedia instanceof ScreenMedia
+      ) {
+        visualMedia.clearAllEffects();
 
         mediasoupSocket?.current?.sendMessage({
           type: "clientClearEffects",
@@ -203,7 +204,7 @@ export default function CameraEffectsSection({
   };
 
   const handleRemoteVisualEffectChange = async (
-    effect: CameraEffectTypes | "clearAll",
+    effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
     blockStateChange: boolean = false,
     hideBackgroundStyle?: HideBackgroundEffectTypes,
     hideBackgroundColor?: string,

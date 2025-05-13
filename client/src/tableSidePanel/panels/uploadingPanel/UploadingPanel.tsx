@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { UploadSignals } from "../../../context/uploadContext/lib/typeConstant";
-import { useUploadContext } from "../../../context/uploadContext/UploadContext";
-import LoadingSection from "./lib/LoadingSection";
+import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
+import { useUploadDownloadContext } from "../../../context/uploadDownloadContext/UploadDownloadContext";
+import UploadingSection from "./lib/UploadingSection";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const relaxedIcon = nginxAssetServerBaseUrl + "svgs/relaxedIcon.svg";
 
-export default function LoadingPanel({
+export default function UploadingPanel({
   tablePanelRef,
   setExternalRerender,
 }: {
@@ -19,7 +19,7 @@ export default function LoadingPanel({
     getCurrentUploads,
     addUploadSignalListener,
     removeUploadSignalListener,
-  } = useUploadContext();
+  } = useUploadDownloadContext();
 
   const [_, setRerender] = useState(false);
 
@@ -51,7 +51,7 @@ export default function LoadingPanel({
       className={`${Object.keys(getCurrentUploads()).length === 0 ? "h-full" : "h-max"} flex w-full flex-col space-y-4`}
     >
       {Object.entries(getCurrentUploads()).map(([contentId, upload]) => (
-        <LoadingSection
+        <UploadingSection
           key={contentId}
           upload={upload}
           tablePanelRef={tablePanelRef}

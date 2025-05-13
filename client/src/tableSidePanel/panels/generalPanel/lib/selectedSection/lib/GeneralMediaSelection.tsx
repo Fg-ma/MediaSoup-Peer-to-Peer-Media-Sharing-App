@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSignalContext } from "../../../../../../context/signalContext/SignalContext";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import HoverElement from "../../../../../../elements/hoverElement/HoverElement";
@@ -78,6 +78,15 @@ export default function GeneralMediaSelection({
     scale: 1,
     rotation: parseFloat(positioning.rotation.toFixed(2)),
   });
+
+  useEffect(() => {
+    placement.current = {
+      x: parseFloat(positioning.position.left.toFixed(2)),
+      y: parseFloat(positioning.position.top.toFixed(2)),
+      scale: positioning.scale.x / originalScale.current.x,
+      rotation: parseFloat(positioning.rotation.toFixed(2)),
+    };
+  }, [positioning]);
 
   return (
     <div

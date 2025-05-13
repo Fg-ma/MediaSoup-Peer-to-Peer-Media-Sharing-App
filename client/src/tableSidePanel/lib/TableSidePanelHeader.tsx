@@ -12,7 +12,8 @@ const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const activePanelTitles: { [tablePanel in TablePanels]: string } = {
   general: "General",
   settings: "Settings",
-  loading: "Loading",
+  upload: "Uploads",
+  download: "Downloads",
 };
 
 export default function TableSidePanelHeader({

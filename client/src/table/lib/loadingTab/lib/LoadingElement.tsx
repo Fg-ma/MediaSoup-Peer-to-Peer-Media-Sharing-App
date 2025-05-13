@@ -6,17 +6,14 @@ import ChunkedUploader, {
 } from "../../../../uploader/lib/chunkUploader/ChunkUploader";
 
 export default function LoadingElement({
-  contentId,
   upload,
   loadingTabRef,
 }: {
-  contentId: string;
   upload: ChunkedUploader;
   loadingTabRef: React.RefObject<HTMLDivElement>;
 }) {
   const [_, setRerender] = useState(false);
 
-  // Touch progress changes so React re‑renders the SVG
   const handleUploadListener = (msg: ChunkedUploadListenerTypes) => {
     if (msg.type === "uploadProgress") {
       setRerender((v) => !v);

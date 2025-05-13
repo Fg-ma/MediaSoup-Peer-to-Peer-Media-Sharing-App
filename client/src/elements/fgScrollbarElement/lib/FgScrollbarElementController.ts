@@ -8,7 +8,7 @@ class FgScrollbarController {
     private scrollbarTrackRef: React.RefObject<HTMLDivElement>,
     private scrollbarThumbRef: React.RefObject<HTMLDivElement>,
     private scrollTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
-    private direction: "vertical" | "horizontal",
+    private directionRef: React.MutableRefObject<"vertical" | "horizontal">,
     private dragging: React.MutableRefObject<boolean>,
     private scrollStart: React.MutableRefObject<{
       x: number;
@@ -117,7 +117,7 @@ class FgScrollbarController {
   thumbDragMove = (event: PointerEvent) => {
     if (!this.scrollingContentRef.current) return;
 
-    if (this.direction === "vertical") {
+    if (this.directionRef.current === "vertical") {
       const deltaY = event.clientY - this.scrollStart.current.y;
       const contentHeight = this.scrollingContentRef.current.scrollHeight;
       const containerHeight = this.scrollingContentRef.current.clientHeight;
@@ -162,7 +162,10 @@ class FgScrollbarController {
   };
 
   horizontalScrollWheel = (event: WheelEvent) => {
-    if (this.direction === "vertical" || !this.scrollingContentRef.current)
+    if (
+      this.directionRef.current === "vertical" ||
+      !this.scrollingContentRef.current
+    )
       return;
 
     this.updateHorizontalScrollbar();
@@ -199,7 +202,7 @@ class FgScrollbarController {
     const container = this.scrollingContentRef.current;
     const thumb = this.scrollbarThumbRef.current;
 
-    if (this.direction === "vertical") {
+    if (this.directionRef.current === "vertical") {
       // Handle vertical scrolling
       const trackRect = track.getBoundingClientRect();
       const thumbHeight = thumb.offsetHeight;
@@ -276,7 +279,7 @@ class FgScrollbarController {
   };
 
   updateScrollbar = () => {
-    if (this.direction === "vertical") {
+    if (this.directionRef.current === "vertical") {
       if (this.scrollbarThumbRef.current) {
         this.scrollbarThumbRef.current.style.width = "100%";
         this.scrollbarThumbRef.current.style.left = "0%";
@@ -298,12 +301,12 @@ class FgScrollbarController {
     this.setRerender((prev) => !prev);
   };
 
-  hideTableScrollBar = (event: React.PointerEvent) => {
+  hideTableScrollBar = (event: PointerEvent) => {
     if (!this.scrollbarElementRef.current || this.dragging.current) return;
 
     const rect = this.scrollbarElementRef.current.getBoundingClientRect();
 
-    if (this.direction === "vertical") {
+    if (this.directionRef.current === "vertical") {
       // Check if the pointer is within 40px of the right edge of the container
       if (rect.right - event.clientX <= 40) {
         if (

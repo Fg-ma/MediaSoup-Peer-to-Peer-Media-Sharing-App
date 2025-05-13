@@ -76,13 +76,38 @@ class SelectTableLayerController {
             (info) => info.type === contentType && info.id === contentId,
           )
         ) {
-          this.selected.current = [];
-          this.selectedInfo = [];
+          this.selectables =
+            this.tableTopRef.current?.querySelectorAll<HTMLElement>(
+              ".selectable",
+            );
 
-          this.sendGroupSignal({
-            type: "groupChange",
-            data: { selected: this.selectedInfo },
-          });
+          if (this.selected.current.length) {
+            this.selectedInfo = [];
+
+            for (const sel of this.selected.current) {
+              const type = sel.getAttribute(
+                "data-selectable-type",
+              ) as ContentTypes;
+              const id = sel.getAttribute("data-selectable-id");
+              const username = sel.getAttribute("data-selectable-username");
+              const instance = sel.getAttribute("data-selectable-instance");
+              const isUser = sel.getAttribute("data-selectable-isuser");
+
+              if (type && id)
+                this.selectedInfo.push({
+                  type,
+                  id,
+                  username: username ?? undefined,
+                  instance: instance ?? undefined,
+                  isUser: isUser !== null ? isUser === "true" : undefined,
+                });
+            }
+
+            this.sendGroupSignal({
+              type: "groupChange",
+              data: { selected: this.selectedInfo },
+            });
+          }
 
           this.setRerender((prev) => !prev);
         }

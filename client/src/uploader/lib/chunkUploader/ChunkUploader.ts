@@ -1,4 +1,4 @@
-import { UploadSignals } from "../../../context/uploadContext/lib/typeConstant";
+import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;

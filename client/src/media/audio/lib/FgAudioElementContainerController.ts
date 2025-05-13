@@ -138,12 +138,21 @@ class FgAudioElementContainerController {
     }
   };
 
-  attachListeners = () => {
+  attachPositioningListeners = () => {
+    Object.values(this.positioningListeners.current).forEach((userListners) =>
+      Object.values(userListners).forEach((removeListener) => removeListener()),
+    );
+    this.positioningListeners.current = {};
+
     for (const remoteUsername in this.remoteDataStreams.current) {
       const remoteUserStreams = this.remoteDataStreams.current[remoteUsername];
       for (const remoteInstance in remoteUserStreams) {
         const stream = remoteUserStreams[remoteInstance].positionScaleRotation;
-        if (stream) {
+        if (
+          stream &&
+          (!this.positioningListeners.current[remoteUsername] ||
+            !this.positioningListeners.current[remoteUsername][remoteInstance])
+        ) {
           const handleMessage = (message: string) => {
             const data = JSON.parse(message);
             if (

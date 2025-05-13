@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { animated, useSprings } from "react-spring";
+import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import AudioAnalyser from "./lib/AudioAnalyzer";
 import PathGenerator from "./lib/PathGenerator";
 import FgButton from "../../elements/fgButton/FgButton";
@@ -9,7 +10,6 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
-import { useMediaContext } from "../../context/mediaContext/MediaContext";
 
 export default function FgAudioElement({
   svgRef,
