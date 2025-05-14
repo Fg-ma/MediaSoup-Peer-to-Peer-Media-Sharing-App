@@ -52,7 +52,7 @@ export default function DownloadingSection({
       download.removeDownloadListener(handleDownloadListener);
     };
   }, []);
-
+  console.log(download);
   return (
     <div className="flex h-max w-full flex-col items-start justify-center space-y-2 border-y-2 border-fg-tone-black-3 bg-fg-tone-black-5 py-4">
       <div className="flex h-8 w-full items-center justify-between pl-[1.875rem] pr-8">

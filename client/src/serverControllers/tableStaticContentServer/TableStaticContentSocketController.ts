@@ -50,13 +50,62 @@ class TableStaticContentSocketController {
 
   private connect = (url: string) => {
     this.ws = new WebSocket(url);
+    this.ws.binaryType = "arraybuffer";
 
     this.ws.onmessage = (event: MessageEvent) => {
-      const message =
-        typeof event.data === "string"
-          ? (JSON.parse(event.data) as IncomingTableStaticContentMessages)
-          : { type: undefined };
-      console.log(message.type);
+      let message: IncomingTableStaticContentMessages;
+
+      if (event.data instanceof ArrayBuffer) {
+        const buf = new Uint8Array(event.data);
+        const view = new DataView(buf.buffer);
+
+        // 1) Read first 4 bytes for JSON length
+        const headerLen = view.getUint32(0);
+
+        // 2) Slice out the JSON header
+        const headerBytes = buf.subarray(4, 4 + headerLen);
+        const headerText = new TextDecoder().decode(headerBytes);
+        const header = JSON.parse(headerText);
+
+        // 3) The rest is your file chunk
+        const fileBuffer = buf.subarray(4 + headerLen);
+
+        switch (header.type) {
+          case "oneShotDownload":
+            message = {
+              type: header.type,
+              header: {
+                contentType: header.header.contentType,
+                contentId: header.header.contentId,
+              },
+              data: {
+                buffer: fileBuffer,
+              },
+            };
+            break;
+          case "chunk":
+            message = {
+              type: header.type,
+              header: {
+                contentType: header.header.contentType,
+                contentId: header.header.contentId,
+                range: header.header.range,
+              },
+              data: {
+                chunk: fileBuffer,
+              },
+            };
+            break;
+          default:
+            return;
+        }
+      } else {
+        message =
+          typeof event.data === "string"
+            ? (JSON.parse(event.data) as IncomingTableStaticContentMessages)
+            : { type: undefined };
+      }
+
       this.handleMessage(message);
 
       this.messageListeners.forEach((listener) => {
@@ -120,7 +169,7 @@ class TableStaticContentSocketController {
 
   getFile = (contentType: StaticContentTypes, contentId: string) => {
     this.sendMessage({
-      type: "getFile",
+      type: "getDownloadMeta",
       header: {
         tableId: this.tableId,
         username: this.username,
@@ -128,6 +177,24 @@ class TableStaticContentSocketController {
         contentType,
         contentId,
       },
+    });
+  };
+
+  getChunk = (
+    contentType: StaticContentTypes,
+    contentId: string,
+    range: string,
+  ) => {
+    this.sendMessage({
+      type: "getFileChunk",
+      header: {
+        tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
+        contentType,
+        contentId,
+      },
+      data: { range },
     });
   };
 

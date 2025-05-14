@@ -130,22 +130,28 @@ class MediaContainerController {
   downloadListener = (
     message: { type: "downloadComplete" } | { type: string },
   ) => {
-    if (message.type === "downloadComplete" && this.getAspect) {
-      this.aspectRatio.current = this.getAspect();
+    switch (message.type) {
+      case "downloadComplete":
+        if (this.getAspect) {
+          this.aspectRatio.current = this.getAspect();
 
-      if (this.aspectRatio.current) {
-        this.positioning.current.scale.y =
-          this.positioning.current.scale.x / this.aspectRatio.current;
+          if (this.aspectRatio.current) {
+            this.positioning.current.scale.y =
+              this.positioning.current.scale.x / this.aspectRatio.current;
 
-        this.setRerender((prev) => !prev);
+            this.setRerender((prev) => !prev);
 
-        this.tableStaticContentSocket.current?.updateContentPositioning(
-          this.kind,
-          this.mediaId,
-          this.mediaInstanceId,
-          { position: this.positioning.current.position },
-        );
-      }
+            this.tableStaticContentSocket.current?.updateContentPositioning(
+              this.kind,
+              this.mediaId,
+              this.mediaInstanceId,
+              { position: this.positioning.current.position },
+            );
+          }
+        }
+        break;
+      default:
+        break;
     }
   };
 

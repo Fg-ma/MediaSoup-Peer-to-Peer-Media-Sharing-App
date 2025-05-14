@@ -1,9 +1,10 @@
 import {
   IncomingTableStaticContentMessages,
+  onChunkErrorType,
   onChunkType,
-  onDownloadCompleteType,
   onDownloadErrorType,
-  onDownloadStartedType,
+  onDownloadMetaType,
+  onOneShotDownloadType,
   TableTopStaticMimeType,
 } from "../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { StaticContentTypes } from "../../../universal/contentTypeConstant";
@@ -12,12 +13,12 @@ import TableStaticContentSocketController from "../serverControllers/tableStatic
 import { DownloadListenerTypes } from "./lib/typeConstant";
 
 class Downloader {
-  private downloadId: string | undefined;
+  private DOWNLOAD_CHUNK_SIZE = 1024 * 1024;
 
   private _paused: boolean = false;
 
   private fileSize = 0;
-  private currentSize = 0;
+  private offset = 0;
   private fileChunks: Uint8Array[] = [];
 
   private _progress: number = 0;
@@ -49,6 +50,27 @@ class Downloader {
     this.listeners.clear();
   };
 
+  private onDownloadMeta = (message: onDownloadMetaType) => {
+    const { contentType, contentId } = message.header;
+
+    if (contentType !== this.contentType || contentId !== this.contentId) {
+      return;
+    }
+
+    this.fileSize = message.data.fileSize;
+
+    this.requestNextChunk();
+  };
+
+  private requestNextChunk = () => {
+    if (this.offset < this.fileSize)
+      this.tableStaticContentSocket.current?.getChunk(
+        this.contentType,
+        this.contentId,
+        `bytes=${this.offset}-${Math.min(this.fileSize, this.offset + 1024 * 1024)}`,
+      );
+  };
+
   private onChunk = (message: onChunkType) => {
     const { contentType, contentId } = message.header;
 
@@ -57,11 +79,11 @@ class Downloader {
     }
 
     const now = Date.now();
-    const chunkData = new Uint8Array(message.data.chunk.data);
+    const chunkData = message.data.chunk;
     const chunkBytes = chunkData.byteLength;
 
-    this.currentSize += chunkBytes;
-    this._progress = this.currentSize / (this.fileSize ?? 1);
+    this.offset += chunkBytes;
+    this._progress = this.offset / (this.fileSize ?? 1);
 
     // 1) Append chunk as before
     this.fileChunks.push(chunkData);
@@ -96,26 +118,63 @@ class Downloader {
         type: "downloadProgress",
       });
     });
+
+    if (!this._paused) {
+      if (this.offset < this.fileSize) {
+        this.requestNextChunk();
+      } else {
+        const buffer = new Uint8Array(this.fileSize);
+
+        let total = 0;
+        for (const chunk of this.fileChunks) {
+          buffer.set(chunk, total);
+          total += chunk.length;
+        }
+
+        const finishMessage = {
+          type: "downloadFinish",
+          data: { buffer, fileSize: this.fileSize },
+        };
+        this.listeners.forEach((listener) => {
+          listener(
+            finishMessage as {
+              type: "downloadFinish";
+              data: { buffer: Uint8Array<ArrayBuffer>; fileSize: number };
+            },
+          );
+        });
+
+        this.removeCurrentDownload(this.contentId);
+
+        this.sendDownloadSignal({ type: "downloadFinish" });
+
+        this.deconstructor();
+      }
+    }
   };
 
-  private onDownloadComplete = (message: onDownloadCompleteType) => {
+  private onChunkError = (message: onChunkErrorType) => {
     const { contentType, contentId } = message.header;
 
     if (contentType !== this.contentType || contentId !== this.contentId) {
       return;
     }
 
-    const mergedBuffer = new Uint8Array(this.currentSize);
-    let offset = 0;
+    this.requestNextChunk();
+  };
 
-    for (const chunk of this.fileChunks) {
-      mergedBuffer.set(chunk, offset);
-      offset += chunk.length;
+  private onOneShotDownloadComplete = (message: onOneShotDownloadType) => {
+    const { contentType, contentId } = message.header;
+
+    if (contentType !== this.contentType || contentId !== this.contentId) {
+      return;
     }
+
+    const { buffer } = message.data;
 
     const finishMessage = {
       type: "downloadFinish",
-      data: { buffer: mergedBuffer, fileSize: this.currentSize },
+      data: { buffer, fileSize: this.fileSize },
     };
     this.listeners.forEach((listener) => {
       listener(
@@ -133,27 +192,18 @@ class Downloader {
     this.deconstructor();
   };
 
-  private onDownloadStarted = (message: onDownloadStartedType) => {
-    const { contentType, contentId } = message.header;
-
-    if (contentType !== this.contentType || contentId !== this.contentId) {
-      return;
-    }
-
-    const { downloadId, fileSize } = message.data;
-
-    this.downloadId = downloadId;
-    this.fileSize = fileSize;
-
-    this.sendDownloadSignal({ type: "downloadStart" });
-  };
-
   private onDownloadError = (message: onDownloadErrorType) => {
     const { contentType, contentId } = message.header;
 
     if (contentType !== this.contentType || contentId !== this.contentId) {
       return;
     }
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "downloadFailed",
+      });
+    });
 
     this.removeCurrentDownload(this.contentId);
 
@@ -164,14 +214,17 @@ class Downloader {
 
   private downloadListener = (message: IncomingTableStaticContentMessages) => {
     switch (message.type) {
+      case "downloadMeta":
+        this.onDownloadMeta(message);
+        break;
       case "chunk":
         this.onChunk(message);
         break;
-      case "downloadComplete":
-        this.onDownloadComplete(message);
+      case "chunkError":
+        this.onChunkError(message);
         break;
-      case "downloadStarted":
-        this.onDownloadStarted(message);
+      case "oneShotDownload":
+        this.onOneShotDownloadComplete(message);
         break;
       case "downloadError":
         this.onDownloadError(message);
@@ -182,22 +235,23 @@ class Downloader {
   };
 
   cancel = () => {
-    if (!this.downloadId) return;
-
-    this.tableStaticContentSocket.current?.sendMessage({
-      type: "cancelDownload",
-      header: { downloadId: this.downloadId },
-    });
-
     this.removeCurrentDownload(this.contentId);
 
     this.sendDownloadSignal({ type: "downloadCancel" });
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "downloadFailed",
+      });
+    });
 
     this.deconstructor();
   };
 
   start = () => {
     this._paused = false;
+
+    this.sendDownloadSignal({ type: "downloadStart" });
 
     this.tableStaticContentSocket.current?.getFile(
       this.contentType,
@@ -206,14 +260,9 @@ class Downloader {
   };
 
   pause = () => {
-    if (!this.downloadId || this._paused) return;
+    if (this._paused) return;
 
     this._paused = true;
-
-    this.tableStaticContentSocket.current?.sendMessage({
-      type: "pauseDownload",
-      header: { downloadId: this.downloadId },
-    });
 
     this.listeners.forEach((listener) => {
       listener({
@@ -223,20 +272,17 @@ class Downloader {
   };
 
   resume = () => {
-    if (!this._paused || !this.downloadId) return;
+    if (!this._paused) return;
 
     this._paused = false;
-
-    this.tableStaticContentSocket.current?.sendMessage({
-      type: "resumeDownload",
-      header: { downloadId: this.downloadId },
-    });
 
     this.listeners.forEach((listener) => {
       listener({
         type: "downloadResumed",
       });
     });
+
+    this.requestNextChunk();
   };
 
   addDownloadListener = (

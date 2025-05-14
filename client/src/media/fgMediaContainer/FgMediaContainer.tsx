@@ -19,6 +19,10 @@ import {
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
 import "./lib/mediaContainerStyles.css";
+import BouncingLoader from "../../elements/bouncingLoader/BouncingLoader";
+import DownloadFailed from "../../elements/downloadFailed/DownloadFailed";
+import AtomLoader from "../../elements/atomLoader/AtomLoader";
+import DownloadPaused from "../../elements/downloadPaused/DownloadPaused";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
@@ -41,6 +45,9 @@ const MediaContainerTransition: Transition = {
 };
 
 export default function FgMediaContainer({
+  pauseDownload,
+  resumeDownload,
+  retryDownload,
   downloadingState,
   addDownloadListener,
   removeDownloadListener,
@@ -68,7 +75,10 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
-  downloadingState: "downloading" | "downloaded";
+  pauseDownload?: () => void;
+  resumeDownload?: () => void;
+  retryDownload?: () => void;
+  downloadingState: "downloading" | "downloaded" | "failed" | "paused";
   addDownloadListener?: (
     listener: (
       message: { type: "downloadComplete" } | { type: string },
@@ -266,7 +276,7 @@ export default function FgMediaContainer({
 
     document.addEventListener("keydown", lowerController.current.handleKeyDown);
 
-    if (downloadingState === "downloading") {
+    if (downloadingState !== "downloaded") {
       if (addDownloadListener)
         addDownloadListener(mediaContainerController.current.downloadListener);
     } else {
@@ -303,7 +313,7 @@ export default function FgMediaContainer({
         "keydown",
         lowerController.current.handleKeyDown,
       );
-      if (downloadingState === "downloading") {
+      if (downloadingState !== "downloaded") {
         if (removeDownloadListener)
           removeDownloadListener(
             mediaContainerController.current.downloadListener,
@@ -443,6 +453,25 @@ export default function FgMediaContainer({
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >
+        {downloadingState === "downloading" && (
+          // <BouncingLoader className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full" onClick={pauseDownload} />
+          <AtomLoader
+            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+            onClick={pauseDownload}
+          />
+        )}
+        {downloadingState === "failed" && (
+          <DownloadFailed
+            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+            onClick={retryDownload}
+          />
+        )}
+        {downloadingState === "paused" && (
+          <DownloadPaused
+            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+            onClick={resumeDownload}
+          />
+        )}
         {media && media}
         <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">
           {popupElements &&

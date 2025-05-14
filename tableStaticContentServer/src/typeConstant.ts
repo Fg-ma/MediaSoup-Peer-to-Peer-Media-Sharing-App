@@ -60,10 +60,8 @@ export type MessageTypes =
   | onLeaveTableType
   | onRequestCatchUpTableDataType
   | onDeleteContentType
-  | onGetFileType
-  | onPauseDownloadType
-  | onResumeDownloadType
-  | onCancelDownloadType
+  | onGetDownloadMetaType
+  | onGetFileChunkType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
   | onUpdateVideoPositionType
@@ -123,14 +121,28 @@ export type onDeleteContentType = {
   };
 };
 
-export type onGetFileType = {
-  type: "getFile";
+export type onGetDownloadMetaType = {
+  type: "getDownloadMeta";
   header: {
     tableId: string;
     username: string;
     instance: string;
     contentType: StaticContentTypes;
     contentId: string;
+  };
+};
+
+export type onGetFileChunkType = {
+  type: "getFileChunk";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    range: string;
   };
 };
 
@@ -241,21 +253,6 @@ export type onCreateNewInstancesType = {
       }[];
     }[];
   };
-};
-
-export type onPauseDownloadType = {
-  type: "pauseDownload";
-  header: { downloadId: string };
-};
-
-export type onResumeDownloadType = {
-  type: "resumeDownload";
-  header: { downloadId: string };
-};
-
-export type onCancelDownloadType = {
-  type: "cancelDownload";
-  header: { downloadId: string };
 };
 
 export const tables: Tables = {};

@@ -25,17 +25,11 @@ const handleMessage = (
     case "deleteContent":
       cleanup.onDeleteContent(event);
       break;
-    case "getFile":
-      gets.getFile(event);
+    case "getDownloadMeta":
+      gets.onGetDownloadMeta(event);
       break;
-    case "pauseDownload":
-      gets.onPauseDownload(event);
-      break;
-    case "resumeDownload":
-      gets.onResumeDownload(event);
-      break;
-    case "cancelDownload":
-      gets.onCancelDownload(event);
+    case "getFileChunk":
+      gets.onGetFileChunk(event);
       break;
     case "updateContentPositioning":
       tableTopMongo.onUpdateContentPositioning(event);

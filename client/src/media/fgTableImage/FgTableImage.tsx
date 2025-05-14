@@ -163,14 +163,17 @@ export default function FgTableImage({
 
   return (
     <FgMediaContainer
+      pauseDownload={imageMediaInstance.imageMedia.downloader?.pause}
+      resumeDownload={imageMediaInstance.imageMedia.downloader?.resume}
+      retryDownload={imageMediaInstance.imageMedia.retryDownload}
       downloadingState={imageMediaInstance.imageMedia.loadingState}
       addDownloadListener={
-        imageMediaInstance.imageMedia.loadingState === "downloading"
+        imageMediaInstance.imageMedia.loadingState !== "downloaded"
           ? imageMediaInstance.imageMedia.addImageListener
           : undefined
       }
       removeDownloadListener={
-        imageMediaInstance.imageMedia.loadingState === "downloading"
+        imageMediaInstance.imageMedia.loadingState !== "downloaded"
           ? imageMediaInstance.imageMedia.removeImageListener
           : undefined
       }

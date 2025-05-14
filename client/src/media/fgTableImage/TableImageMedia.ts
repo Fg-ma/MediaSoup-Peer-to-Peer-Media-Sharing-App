@@ -15,6 +15,10 @@ import UserDevice from "../../lib/UserDevice";
 
 export type ImageListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" }
   | { type: "rectifyEffectMeshCount" };
 
@@ -23,7 +27,8 @@ class TableImageMedia {
 
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: "downloading" | "downloaded" | "failed" | "paused" =
+    "downloading";
   aspect: number | undefined;
 
   private imageListeners: Set<(message: ImageListenerTypes) => void> =
@@ -232,6 +237,8 @@ class TableImageMedia {
         listener({ type: "downloadComplete" });
       });
     };
+
+    this.downloader = undefined;
   };
 
   private handleDownloadMessage = (message: DownloadListenerTypes) => {
@@ -239,70 +246,30 @@ class TableImageMedia {
       case "downloadFinish":
         this.onDownloadFinish(message);
         break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
+
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadFailed" });
+        });
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
       default:
         break;
     }
   };
-
-  // private getImageListener = (message: IncomingTableStaticContentMessages) => {
-  //   if (message.type === "chunk") {
-  //     const { contentType, contentId } = message.header;
-
-  //     if (contentType !== "image" || contentId !== this.imageId) {
-  //       return;
-  //     }
-
-  //     const chunkData = new Uint8Array(message.data.chunk.data);
-  //     this.fileChunks.push(chunkData);
-  //     this.fileSize += chunkData.length;
-  //   } else if (message.type === "downloadComplete") {
-  //     const { contentType, contentId } = message.header;
-
-  //     if (contentType !== "image" || contentId !== this.imageId) {
-  //       return;
-  //     }
-
-  //     const mergedBuffer = new Uint8Array(this.fileSize);
-  //     let offset = 0;
-
-  //     for (const chunk of this.fileChunks) {
-  //       mergedBuffer.set(chunk, offset);
-  //       offset += chunk.length;
-  //     }
-
-  //     const blob = new Blob([mergedBuffer], { type: this.mimeType });
-  //     this.blobURL = URL.createObjectURL(blob);
-  //     this.image = document.createElement("img");
-  //     this.image.src = this.blobURL;
-
-  //     this.image.onload = () => {
-  //       this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
-
-  //       if (this.image)
-  //         this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
-  //           false,
-  //           this.faceLandmarks,
-  //           this.aspect,
-  //           this.image,
-  //           this.faceMeshWorker,
-  //           this.faceMeshProcessing,
-  //           this.faceDetectionWorker,
-  //           this.faceDetectionProcessing,
-  //           this.selfieSegmentationWorker,
-  //           this.selfieSegmentationProcessing,
-  //           this.userDevice,
-  //         );
-
-  //       this.loadingState = "downloaded";
-
-  //       this.imageListeners.forEach((listener) => {
-  //         listener({ type: "downloadComplete" });
-  //       });
-  //     };
-
-  //     this.removeMessageListener(this.getImageListener);
-  //   }
-  // };
 
   addImageListener = (
     listener: (message: ImageListenerTypes) => void,
@@ -360,6 +327,29 @@ class TableImageMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader) return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "image",
+      this.imageId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.imageId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.imageListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

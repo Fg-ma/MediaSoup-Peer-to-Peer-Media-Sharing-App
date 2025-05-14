@@ -143,6 +143,10 @@ export default {
         "hold-content": 499900,
         "popup-labels": 500000,
       },
+      backgroundImage: {
+        "table-top-gradient":
+          "linear-gradient(135deg, #d40213 0%, #F56114 100%)",
+      },
     },
   },
 };

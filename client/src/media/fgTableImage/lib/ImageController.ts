@@ -118,6 +118,18 @@ class ImageController {
       case "stateChanged":
         this.setRerender((prev) => !prev);
         break;
+      case "downloadFailed":
+        this.setRerender((prev) => !prev);
+        break;
+      case "downloadPaused":
+        this.setRerender((prev) => !prev);
+        break;
+      case "downloadResumed":
+        this.setRerender((prev) => !prev);
+        break;
+      case "downloadRetry":
+        this.setRerender((prev) => !prev);
+        break;
       default:
         break;
     }

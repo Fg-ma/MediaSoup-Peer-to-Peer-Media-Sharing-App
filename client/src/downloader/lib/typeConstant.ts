@@ -2,7 +2,8 @@ export type DownloadListenerTypes =
   | onDownloadFinishType
   | onDownloadPausedType
   | onDownloadResumedType
-  | onDownloadProgressType;
+  | onDownloadProgressType
+  | onDownloadFailedrType;
 
 export type onDownloadFinishType = {
   type: "downloadFinish";
@@ -19,4 +20,8 @@ export type onDownloadResumedType = {
 
 export type onDownloadProgressType = {
   type: "downloadProgress";
+};
+
+export type onDownloadFailedrType = {
+  type: "downloadFailed";
 };

@@ -5,11 +5,16 @@ class Broadcaster {
 
   broadcastToTable = (
     tableId: string,
-    message: object,
-    exclude?: { username: string; instance: string }[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    exclude?: { username: string; instance: string }[],
+    binary: boolean = false
   ) => {
     if (tables[tableId]) {
-      const msg = JSON.stringify(message);
+      let msg = message;
+      if (!binary) {
+        msg = JSON.stringify(message);
+      }
 
       Object.entries(tables[tableId]).forEach(([username, user]) => {
         Object.entries(user).forEach(([instance, socket]) => {
@@ -18,7 +23,7 @@ class Broadcaster {
           }
 
           try {
-            socket.send(msg);
+            socket.send(msg, binary);
           } catch (error) {
             console.error("Failed to send message:", error);
           }
@@ -27,13 +32,22 @@ class Broadcaster {
     }
   };
 
-  broadcastToUser = (tableId: string, username: string, message: object) => {
+  broadcastToUser = (
+    tableId: string,
+    username: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    binary: boolean = false
+  ) => {
     if (tables[tableId] && tables[tableId][username]) {
-      const msg = JSON.stringify(message);
+      let msg = message;
+      if (!binary) {
+        msg = JSON.stringify(message);
+      }
 
       Object.values(tables[tableId][username]).forEach((socket) => {
         try {
-          socket.send(msg);
+          socket.send(msg, binary);
         } catch (error) {
           console.error("Failed to send message:", error);
         }
@@ -45,29 +59,42 @@ class Broadcaster {
     tableId: string,
     username: string,
     instance: string,
-    message: object
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    binary: boolean = false
   ) => {
     if (
       tables[tableId] &&
       tables[tableId][username] &&
       tables[tableId][username][instance]
     ) {
-      const msg = JSON.stringify(message);
-
       const socket = tables[tableId][username][instance];
 
-      socket.send(msg);
+      let msg = message;
+      if (!binary) {
+        msg = JSON.stringify(message);
+      }
+
+      socket.send(msg, binary);
     }
   };
 
-  broadcastToFirstFoundInstance = (tableId: string, message: object) => {
+  broadcastToFirstFoundInstance = (
+    tableId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    binary: boolean = false
+  ) => {
     if (tables[tableId]) {
       const user = Object.entries(tables[tableId])[0];
       if (user) {
         const instance = Object.entries(tables[tableId][user[0]])[0];
 
         if (instance) {
-          const msg = JSON.stringify(message);
+          let msg = message;
+          if (!binary) {
+            msg = JSON.stringify(message);
+          }
 
           const socket = tables[tableId][user[0]][instance[0]];
 

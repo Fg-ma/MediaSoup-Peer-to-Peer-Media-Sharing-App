@@ -1,0 +1,21 @@
+.bouncing-loader-ball {
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+}
+
+.bouncing-loader-ball {
+  animation-name: bouncing-loader-ball;
+  animation-timing-function: cubic-bezier(0.42, 0.17, 0.75, 0.83);
+}
+
+@keyframes bouncing-loader-ball {
+  from {
+    stroke-dashoffset: 10;
+  }
+  25% {
+    stroke-dashoffset: 295;
+  }
+  to {
+    stroke-dashoffset: 1165;
+  }
+}

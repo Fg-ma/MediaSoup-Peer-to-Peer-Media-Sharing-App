@@ -21,8 +21,12 @@ class Gets {
     }
   };
 
-  getContent = async (bucketName: string, key: string) => {
-    const params = { Bucket: bucketName, Key: key };
+  getContent = async (bucketName: string, key: string, range?: string) => {
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+      ...(range ? { Range: range } : {}),
+    };
 
     try {
       return await this.s3Client.send(new GetObjectCommand(params));
