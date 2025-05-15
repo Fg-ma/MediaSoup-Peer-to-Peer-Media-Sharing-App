@@ -1,10 +1,13 @@
 import Animation from "./Animation";
 import SpriteSheet from "./SpriteSheet";
 import {
+  AltSpriteAnimationsTypes,
   coreAnimations,
   CoreSpriteAnimationsTypes,
-  OptionalSpriteAnimationsTypes,
+  LittleBuddiesTypes,
   spirteSheetsMeta,
+  SpriteAnimations,
+  SpriteAnimationsTypes,
   SpriteType,
 } from "./typeConstant";
 
@@ -19,9 +22,13 @@ class TableLittleBuddiesController {
     | "leftUp"
     | "leftDown"
     | "rightUp"
-    | "rightDown" = "left";
+    | "rightDown"
+    | undefined = undefined;
+
+  private idleTimeout: undefined | NodeJS.Timeout;
 
   constructor(
+    private littleBuddy: LittleBuddiesTypes,
     private tableLittleBuddiesContainer: React.RefObject<HTMLDivElement>,
     private canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
     private spriteSheet: React.MutableRefObject<SpriteSheet | null>,
@@ -29,97 +36,111 @@ class TableLittleBuddiesController {
     private sprite: React.MutableRefObject<SpriteType | null>,
   ) {}
 
+  private newAnimation = (
+    animations: SpriteAnimations,
+    type: "core" | "alt",
+    name: SpriteAnimationsTypes,
+  ) => {
+    // @ts-expect-error: trust me I know what i'm doing
+    const meta = spirteSheetsMeta[this.littleBuddy].animations[type][name];
+    const newCoreAnimation = new Animation(meta.core, meta.speed);
+
+    const altMeta = meta.alt;
+    const newAltAnimations: { [alt: string]: Animation } = {};
+    if (altMeta) {
+      for (const alt in altMeta) {
+        const newAltAnimation = new Animation(
+          altMeta[alt].animation,
+          altMeta[alt].speed !== undefined ? altMeta[alt].speed : meta.speed,
+          altMeta[alt].loop,
+        );
+        if (!altMeta[alt].loop)
+          newAltAnimation.addAnimationListener(this.idleAltAnimationFinished);
+        newAltAnimations[alt] = newAltAnimation;
+      }
+    }
+
+    // @ts-expect-error: trust me I know what i'm doing
+    animations[type === "core" ? "coreAnimations" : "altAnimations"][name] = {
+      core: newCoreAnimation,
+      ...(altMeta ? { alt: newAltAnimations } : {}),
+    };
+  };
+
   init = async () => {
     if (!this.tableLittleBuddiesContainer.current) return;
+
+    const meta = spirteSheetsMeta[this.littleBuddy];
 
     const positioning = {
       position: { top: 50, left: 50 },
       scale: {
         x:
-          (spirteSheetsMeta["horse"].frameWidth /
+          (meta.frameWidth /
             this.tableLittleBuddiesContainer.current.clientWidth) *
-          100,
+          100 *
+          10,
         y:
-          (spirteSheetsMeta["horse"].frameHeight /
+          (meta.frameHeight /
             this.tableLittleBuddiesContainer.current.clientHeight) *
-          100,
+          100 *
+          10,
       },
       rotation: 0,
       flip: false,
     };
 
-    const img = await this.loadImage(spirteSheetsMeta["horse"].url);
-    const sheet = new SpriteSheet(
-      img,
-      spirteSheetsMeta["horse"].frameWidth,
-      spirteSheetsMeta["horse"].frameHeight,
-    );
+    const img = await this.loadImage(meta.url);
+
+    const sheet = new SpriteSheet(img, meta.frameWidth, meta.frameHeight);
     this.spriteSheet.current = sheet;
 
-    if (
-      spirteSheetsMeta["horse"].animations.core.idle.alt &&
-      spirteSheetsMeta["horse"].animations.alt.run
-    ) {
-      const idleCore = new Animation(
-        spirteSheetsMeta["horse"].animations.core.idle.core,
-        0.2,
-      );
-      const idleAlt1 = new Animation(
-        spirteSheetsMeta["horse"].animations.core.idle.alt.alt1,
-        0.2,
-      );
-      const idleAlt2 = new Animation(
-        spirteSheetsMeta["horse"].animations.core.idle.alt.alt2,
-        0.2,
-      );
-      const walkCore = new Animation(
-        spirteSheetsMeta["horse"].animations.core.walk.core,
-        0.1,
-      );
-      const runCore = new Animation(
-        spirteSheetsMeta["horse"].animations.alt.run.core,
-        0.1,
-      );
+    const animations: SpriteAnimations = {
+      currentAnimation: { core: "idle", alt: undefined },
+      // @ts-expect-error: trust me I know what i'm doing
+      coreAnimations: {},
+      altAnimations: {},
+    };
 
-      this.sprite.current = {
-        positioning,
-        animations: {
-          currentAnimation: "idle",
-          coreAnimations: {
-            walk: { core: walkCore },
-            idle: { core: idleCore, alt: { alt1: idleAlt1, alt2: idleAlt2 } },
-          },
-          optionalAnimations: {
-            run: {
-              core: runCore,
-            },
-          },
-        },
-      };
+    for (const core in meta.animations.core) {
+      this.newAnimation(animations, "core", core as SpriteAnimationsTypes);
+    }
+    for (const alt in meta.animations.alt) {
+      this.newAnimation(animations, "alt", alt as SpriteAnimationsTypes);
     }
 
-    requestAnimationFrame(this.gameLoop);
+    this.sprite.current = {
+      rotatable: meta.rotatable,
+      flipTextures: meta.flipTextures,
+      positioning,
+      animations,
+    };
+
+    if (meta.pixelated && this.canvasRef.current) {
+      this.canvasRef.current.style.imageRendering = "pixelated";
+    }
+
+    requestAnimationFrame(this.animationLoop);
   };
 
   private loadImage = (src: string): Promise<HTMLImageElement> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => console.log("bad");
       img.src = src;
     });
   };
 
-  gameLoop = (timestamp: number) => {
+  animationLoop = (timestamp: number) => {
+    const ctx = this.canvasRef.current?.getContext("2d");
+
     if (
       !this.canvasRef.current ||
       !this.spriteSheet.current ||
-      !this.sprite.current
+      !this.sprite.current ||
+      !ctx
     )
       return;
-
-    const ctx = this.canvasRef.current.getContext("2d");
-    if (!ctx) return;
 
     if (this.lastTimeRef.current === 0) {
       this.lastTimeRef.current = timestamp;
@@ -136,54 +157,82 @@ class TableLittleBuddiesController {
     );
 
     const coreAnimation = coreAnimations.includes(
-      this.sprite.current.animations.currentAnimation,
+      this.sprite.current.animations.currentAnimation.core,
     );
+    const currentAlt = this.sprite.current.animations.currentAnimation.alt;
     const currentAnimation = coreAnimation
-      ? this.sprite.current.animations.coreAnimations[
-          this.sprite.current.animations
-            .currentAnimation as CoreSpriteAnimationsTypes
-        ].core
-      : this.sprite.current.animations.optionalAnimations[
-          this.sprite.current.animations
-            .currentAnimation as OptionalSpriteAnimationsTypes
-        ]?.core;
+      ? currentAlt
+        ? this.sprite.current.animations.coreAnimations[
+            this.sprite.current.animations.currentAnimation
+              .core as CoreSpriteAnimationsTypes
+          ].alt?.[currentAlt]
+        : this.sprite.current.animations.coreAnimations[
+            this.sprite.current.animations.currentAnimation
+              .core as CoreSpriteAnimationsTypes
+          ].core
+      : currentAlt
+        ? this.sprite.current.animations.altAnimations[
+            this.sprite.current.animations.currentAnimation
+              .core as AltSpriteAnimationsTypes
+          ]?.alt?.[currentAlt]
+        : this.sprite.current.animations.altAnimations[
+            this.sprite.current.animations.currentAnimation
+              .core as AltSpriteAnimationsTypes
+          ]?.core;
 
-    if (!currentAnimation) return;
+    if (!currentAnimation) {
+      requestAnimationFrame(this.animationLoop);
+      return;
+    }
 
     currentAnimation.update(dt);
     const frameIndex = currentAnimation.getCurrentFrame();
     this.spriteSheet.current.drawFrame(ctx, frameIndex, 0, 0);
 
     if (
-      this.sprite.current.animations.currentAnimation === "run" ||
-      this.sprite.current.animations.currentAnimation === "walk"
+      this.sprite.current.animations.currentAnimation.core === "run" ||
+      this.sprite.current.animations.currentAnimation.core === "walk"
     ) {
       this.move();
     }
+    if (this.sprite.current.animations.currentAnimation.core === "idle") {
+      this.idle();
+    } else {
+      if (this.idleTimeout) {
+        clearTimeout(this.idleTimeout);
+        this.idleTimeout = undefined;
+      }
+    }
 
-    requestAnimationFrame(this.gameLoop);
+    requestAnimationFrame(this.animationLoop);
   };
 
   private updateMovement() {
     if (!this.sprite.current) return;
 
     if (this.activeDirs.size === 0) {
-      if (this.sprite.current.animations.currentAnimation !== "idle") {
-        this.sprite.current.animations.currentAnimation = "idle";
+      if (this.sprite.current.animations.currentAnimation.core !== "idle") {
+        this.sprite.current.animations.currentAnimation.core = "idle";
+        this.sprite.current.animations.currentAnimation.alt = undefined;
         this.sprite.current.animations.coreAnimations.idle.core.reset();
       }
       return;
     }
 
     // choose run vs walk animation
-    const animationType = this.sprinting ? "run" : "walk";
-    const isCore = animationType === "walk";
     const animations = this.sprite.current.animations;
-    if (animations.currentAnimation !== animationType) {
-      animations.currentAnimation = animationType;
+    const animationType = this.sprinting
+      ? animations.altAnimations.run
+        ? "run"
+        : "walk"
+      : "walk";
+    const isCore = animationType === "walk";
+    if (animations.currentAnimation.core !== animationType) {
+      animations.currentAnimation.core = animationType;
       const animation = isCore
         ? animations.coreAnimations.walk.core
-        : animations.optionalAnimations.run!.core;
+        : animations.altAnimations.run!.core;
+      this.sprite.current.animations.currentAnimation.alt = undefined;
       animation.reset();
     }
   }
@@ -192,7 +241,7 @@ class TableLittleBuddiesController {
     if (!this.canvasRef.current || !this.sprite.current) return;
 
     // movement step
-    const meta = spirteSheetsMeta["horse"];
+    const meta = spirteSheetsMeta[this.littleBuddy];
     const speed = this.sprinting ? meta.runSpeed : meta.walkSpeed;
 
     const moveCount = this.activeDirs.size;
@@ -205,58 +254,81 @@ class TableLittleBuddiesController {
     if (this.activeDirs.has("left")) dx -= speed * norm;
     if (this.activeDirs.has("right")) dx += speed * norm;
 
-    if (dx > 0 && dy > 0) {
-      this.sprite.current.positioning.rotation = 45;
-      this.sprite.current.positioning.flip = true;
-      this.prevDir = "leftDown";
-    } else if (dx > 0 && dy < 0) {
-      this.sprite.current.positioning.rotation = -45;
-      this.sprite.current.positioning.flip = true;
-      this.prevDir = "leftUp";
-    } else if (dx < 0 && dy > 0) {
-      this.sprite.current.positioning.rotation = -45;
-      this.sprite.current.positioning.flip = false;
-      this.prevDir = "rightDown";
-    } else if (dx < 0 && dy < 0) {
-      this.sprite.current.positioning.rotation = 45;
-      this.sprite.current.positioning.flip = false;
-      this.prevDir = "rightUp";
-    } else if (dx === 0 && dy > 0) {
-      if (this.prevDir !== "down") {
-        this.sprite.current.positioning.rotation =
-          this.prevDir === "right" ||
-          this.prevDir === "rightDown" ||
-          this.prevDir === "rightUp"
-            ? 90
-            : -90;
-        this.sprite.current.positioning.flip =
-          this.prevDir === "right" ||
-          this.prevDir === "rightDown" ||
-          this.prevDir === "rightUp";
-        this.prevDir = "down";
+    const currentDir = this.prevDir;
+
+    if (this.sprite.current.rotatable) {
+      if (dx > 0 && dy > 0) {
+        this.sprite.current.positioning.rotation = 45;
+        this.sprite.current.positioning.flip = true;
+        this.prevDir = "leftDown";
+      } else if (dx > 0 && dy < 0) {
+        this.sprite.current.positioning.rotation = -45;
+        this.sprite.current.positioning.flip = true;
+        this.prevDir = "leftUp";
+      } else if (dx < 0 && dy > 0) {
+        this.sprite.current.positioning.rotation = -45;
+        this.sprite.current.positioning.flip = false;
+        this.prevDir = "rightDown";
+      } else if (dx < 0 && dy < 0) {
+        this.sprite.current.positioning.rotation = 45;
+        this.sprite.current.positioning.flip = false;
+        this.prevDir = "rightUp";
+      } else if (dx === 0 && dy > 0) {
+        if (this.prevDir !== "down") {
+          this.sprite.current.positioning.rotation =
+            this.prevDir === "right" ||
+            this.prevDir === "rightDown" ||
+            this.prevDir === "rightUp"
+              ? 90
+              : -90;
+          this.sprite.current.positioning.flip =
+            this.prevDir === "right" ||
+            this.prevDir === "rightDown" ||
+            this.prevDir === "rightUp";
+          this.prevDir = "down";
+        }
+      } else if (dx === 0 && dy < 0) {
+        if (this.prevDir !== "up") {
+          this.sprite.current.positioning.rotation =
+            this.prevDir === "right" ||
+            this.prevDir === "rightDown" ||
+            this.prevDir === "rightUp"
+              ? -90
+              : 90;
+          this.sprite.current.positioning.flip =
+            this.prevDir === "right" ||
+            this.prevDir === "rightDown" ||
+            this.prevDir === "rightUp";
+          this.prevDir = "up";
+        }
+      } else if (dx > 0 && dy === 0) {
+        this.sprite.current.positioning.rotation = 0;
+        this.sprite.current.positioning.flip = true;
+        this.prevDir = "right";
+      } else if (dx < 0 && dy === 0) {
+        this.sprite.current.positioning.rotation = 0;
+        this.sprite.current.positioning.flip = false;
+        this.prevDir = "left";
       }
-    } else if (dx === 0 && dy < 0) {
-      if (this.prevDir !== "up") {
-        this.sprite.current.positioning.rotation =
-          this.prevDir === "right" ||
-          this.prevDir === "rightDown" ||
-          this.prevDir === "rightUp"
-            ? -90
-            : 90;
-        this.sprite.current.positioning.flip =
-          this.prevDir === "right" ||
-          this.prevDir === "rightDown" ||
-          this.prevDir === "rightUp";
-        this.prevDir = "up";
+    } else {
+      if (dx > 0) {
+        if (this.prevDir !== "right") {
+          this.sprite.current.positioning.flip = true;
+          this.prevDir = "right";
+        }
+      } else if (dx < 0) {
+        if (this.prevDir !== "left") {
+          this.sprite.current.positioning.flip = false;
+          this.prevDir = "left";
+        }
       }
-    } else if (dx > 0 && dy === 0) {
-      this.sprite.current.positioning.rotation = 0;
-      this.sprite.current.positioning.flip = true;
-      this.prevDir = "right";
-    } else if (dx < 0 && dy === 0) {
-      this.sprite.current.positioning.rotation = 0;
-      this.sprite.current.positioning.flip = false;
-      this.prevDir = "left";
+    }
+
+    if (currentDir !== this.prevDir) {
+      if (meta.flipTextures) {
+        this.sprite.current.positioning.flip =
+          !this.sprite.current.positioning.flip;
+      }
     }
 
     const pos = this.sprite.current.positioning.position;
@@ -270,6 +342,56 @@ class TableLittleBuddiesController {
     this.canvasRef.current.style.top = `${this.sprite.current.positioning.position.top}%`;
     this.canvasRef.current.style.left = `${this.sprite.current.positioning.position.left}%`;
     this.canvasRef.current.style.transform = `rotate(${this.sprite.current.positioning.rotation}deg) scaleX(${this.sprite.current.positioning.flip ? "-1" : "1"})`;
+  };
+
+  private idle = () => {
+    if (
+      !this.idleTimeout &&
+      this.sprite.current?.animations.coreAnimations.idle.alt
+    ) {
+      this.idleTimeout = setTimeout(
+        () => {
+          const idleAlt =
+            this.sprite.current?.animations.coreAnimations.idle.alt;
+          if (
+            this.sprite.current &&
+            this.sprite.current.animations.currentAnimation.core === "idle" &&
+            idleAlt
+          ) {
+            const idleKeys = Object.keys(idleAlt);
+            const randomKey =
+              idleKeys[Math.round(Math.random() * (idleKeys.length - 1))];
+
+            this.sprite.current.animations.currentAnimation.alt = randomKey;
+            this.sprite.current.animations.coreAnimations.idle.alt?.[
+              randomKey
+            ].reset();
+          }
+
+          if (this.idleTimeout) {
+            clearTimeout(this.idleTimeout);
+            this.idleTimeout = undefined;
+          }
+        },
+        Math.random() * 9000 + 7000,
+      );
+    }
+  };
+
+  private idleAltAnimationFinished = () => {
+    if (
+      this.sprite.current &&
+      this.sprite.current.animations.currentAnimation.core !== "idle"
+    ) {
+      this.sprite.current.animations.currentAnimation.alt = undefined;
+      this.sprite.current.animations.currentAnimation.core = "idle";
+      this.sprite.current.animations.coreAnimations.idle.core.reset();
+
+      if (this.idleTimeout) {
+        clearTimeout(this.idleTimeout);
+        this.idleTimeout = undefined;
+      }
+    }
   };
 
   handleKeyDown = (event: KeyboardEvent) => {

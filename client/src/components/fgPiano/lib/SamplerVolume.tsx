@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import FgButton from "../../../elements/fgButton/FgButton";
-import VolumeSVG from "../../../fgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
+import VolumeSVG from "../../../elements/fgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../../../elements/fgVolumeElement/lib/volumeSVGPaths";
 
 export default function SamplerVolume() {
   const { userMedia } = useMediaContext();
@@ -87,7 +87,7 @@ export default function SamplerVolume() {
   }, []);
 
   return (
-    <div className="flex volume-container h-full w-max items-center justify-center space-x-1">
+    <div className="volume-container flex h-full w-max items-center justify-center space-x-1">
       <FgButton
         clickFunction={handleMute}
         contentFunction={() => (

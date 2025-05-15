@@ -1,9 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import SpriteSheet from "./lib/SpriteSheet";
-import { spirteSheetsMeta, SpriteType } from "./lib/typeConstant";
+import {
+  LittleBuddiesTypes,
+  spirteSheetsMeta,
+  SpriteType,
+} from "./lib/typeConstant";
 import TableLittleBuddiesController from "./lib/TableLittleBuddiesController";
 
-export default function TableLittleBuddies() {
+export default function TableLittleBuddies({
+  littleBuddy = "rainbowBird",
+}: {
+  littleBuddy: LittleBuddiesTypes;
+}) {
   const tableLittleBuddiesContainer = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -14,6 +22,7 @@ export default function TableLittleBuddies() {
 
   const tableLittleBuddiesController = useRef(
     new TableLittleBuddiesController(
+      littleBuddy,
       tableLittleBuddiesContainer,
       canvasRef,
       spriteSheet,
@@ -54,8 +63,8 @@ export default function TableLittleBuddies() {
       <canvas
         className="absolute"
         ref={canvasRef}
-        width={spirteSheetsMeta["horse"].frameWidth}
-        height={spirteSheetsMeta["horse"].frameHeight}
+        width={spirteSheetsMeta[littleBuddy].frameWidth}
+        height={spirteSheetsMeta[littleBuddy].frameHeight}
       />
     </div>
   );

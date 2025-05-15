@@ -5,7 +5,7 @@ import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ProducersController from "../../../lib/ProducersController";
 import AudioSectionController from "./lib/audioSectionController";
-import volumeSVGPaths from "../../../fgVolumeElement/lib/volumeSVGPaths";
+import volumeSVGPaths from "../../../elements/fgVolumeElement/lib/volumeSVGPaths";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,7 +16,7 @@ const FgButton = React.lazy(
   () => import("../../../elements/fgButton/FgButton"),
 );
 const VolumeSVG = React.lazy(
-  () => import("../../../fgVolumeElement/lib/VolumeSVG"),
+  () => import("../../../elements/fgVolumeElement/lib/VolumeSVG"),
 );
 
 export default function AudioSection({
