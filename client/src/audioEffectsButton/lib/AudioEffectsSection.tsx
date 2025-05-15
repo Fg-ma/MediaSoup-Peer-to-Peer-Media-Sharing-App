@@ -7,15 +7,15 @@ import FgButton from "../../elements/fgButton/FgButton";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import AudioEffectButton from "./AudioEffectButton";
-import FgBackgroundMusicPortal from "../../fgBackgroundMusicPortal/FgBackgroundMusicPortal";
+import FgBackgroundMusicPortal from "../../components/fgBackgroundMusicPortal/FgBackgroundMusicPortal";
 import { audioEffectTemplates } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import LazyScrollingContainer from "../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-import VolumeSVG from "../../fgVolumeElement/lib/VolumeSVG";
-import volumeSVGPaths from "../../fgVolumeElement/lib/volumeSVGPaths";
+import VolumeSVG from "../../elements/fgVolumeElement/lib/VolumeSVG";
+import volumeSVGPaths from "../../elements/fgVolumeElement/lib/volumeSVGPaths";
 
 const mixAudioEffectsIcon =
   nginxAssetServerBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";
@@ -262,7 +262,7 @@ export default function AudioEffectsSection({
         content={
           <LazyScrollingContainer
             externalRef={audioSectionRef}
-            className="small-vertical-scroll-bar grid h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
+            className="grid small-vertical-scroll-bar h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
             style={{
               gridTemplateColumns: "repeat(auto-fit, minmax(2rem, 5rem))",
             }}
@@ -349,7 +349,7 @@ export default function AudioEffectsSection({
               <FgButton
                 scrollingContainerRef={audioSectionRef}
                 externalRef={audioMixEffectsButtonRef}
-                className="w-fullitems-center flex aspect-square justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
+                className="flex w-fullitems-center aspect-square justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                 clickFunction={() => {
                   setAudioMixEffectsActive((prev) => !prev);
                 }}

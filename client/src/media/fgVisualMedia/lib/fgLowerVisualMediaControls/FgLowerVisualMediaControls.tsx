@@ -17,7 +17,7 @@ const PlayPauseButton = React.lazy(
   () => import("./lib/playPauseButton/PlayPauseButton"),
 );
 const FgVolumeElement = React.lazy(
-  () => import("../../../../fgVolumeElement/FgVolumeElement"),
+  () => import("../../../../elements/fgVolumeElement/FgVolumeElement"),
 );
 const FullScreenButton = React.lazy(
   () => import("./lib/fullScreenButton/FullScreenButton"),
@@ -250,7 +250,7 @@ export default function FgLowerVisualMediaControls({
   return (
     <div className="visual-media-lower-controls pointer-events-none absolute bottom-[1%] left-0 z-20 flex h-[12%] max-h-12 min-h-6 w-full justify-between px-3">
       <div
-        className="z-20 flex h-full w-max items-center space-x-2"
+        className="flex z-20 h-full w-max items-center space-x-2"
         style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
       >
         {fgVisualMediaOptions.isPlayPause && (

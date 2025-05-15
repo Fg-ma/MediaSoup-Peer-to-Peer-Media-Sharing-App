@@ -32,6 +32,7 @@ import "./css/tips.css";
 import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import Uploader from "./uploader/Uploader";
 import CreditPage from "./creditPage/CreditPage";
+import TableLittleBuddies from "./components/tableLittleBuddies/TableLittleBuddies";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -359,6 +360,7 @@ export default function Main() {
   return (
     // <CreditPage />
     <div className="flex h-screen w-screen flex-col space-y-[1.5%] overflow-hidden bg-fg-tone-black-1 p-[1.5%]">
+      <TableLittleBuddies />
       <Table
         tableFunctionsRef={tableFunctionsRef}
         tableRef={tableRef}

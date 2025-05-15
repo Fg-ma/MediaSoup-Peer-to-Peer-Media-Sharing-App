@@ -6,49 +6,25 @@ https://opengameart.org/content/pink-monster-animation - pinky
 https://opengameart.org/content/dwarves-0 - dwarves
 https://opengameart.org/content/animated-horse - horse
 https://opengameart.org/content/bat-rework - bats
-https://opengameart.org/content/boss-lobster - boss lobster
 https://opengameart.org/content/animated-bird-characters - birds
+https://opengameart.org/content/bad-company-assorted-military-thugs-universal-prototype-2-for-scrolling-beat-em-up-or-mugen - army men
+https://opengameart.org/content/goblin-corps-mv-platformer-set - goblins
+https://opengameart.org/content/dragon-fully-animated - dragon
+https://opengameart.org/content/classic-hero - classic hero
+https://opengameart.org/content/ninja-animated - ninja
+https://opengameart.org/content/free-dino-sprites - dino
+https://opengameart.org/content/opp2017-sprites-characters-objects-effects - open pixel project
+https://opengameart.org/content/lpc-chicken-rework - chicken
+https://opengameart.org/content/pigs-rework - pigs
+https://opengameart.org/content/bunny-rabbit-lpc-style-for-pixelfarm - bunny
+https://opengameart.org/content/angels-vs-demons-character-tilesets - demons and angels
+https://opengameart.org/content/four-characters-my-lpc-entries - magical characters
+https://opengameart.org/content/animated-wild-animals - wild animals
+https://gbzoid.itch.io/poring - poring
+https://zerie.itch.io/tiny-rpg-character-asset-pack - RPG characters
+https://aamatniekss.itch.io/fantasy-knight-free-pixelart-animated-character -  Knight
+
+***https://opengameart.org/content/track-tiles - tracks
 
 *** https://www.kenney.nl/assets/category:2D?sort=update
-
-https://opengameart.org/content/bad-company-assorted-military-thugs-universal-prototype-2-for-scrolling-beat-em-up-or-mugen
-https://opengameart.org/content/complete-komato-devastator-1-for-platformers-or-fighting-games-alt
-https://opengameart.org/content/goblin-corps-mv-platformer-set
-https://opengameart.org/content/dragon-fully-animated
-https://opengameart.org/content/ninja-animated
-https://opengameart.org/content/free-dino-sprites
-https://opengameart.org/content/opp2017-sprites-characters-objects-effects
-https://opengameart.org/content/angels-vs-demons-character-tilesets
-https://opengameart.org/content/four-characters-my-lpc-entries
-https://opengameart.org/content/animated-runner-character
-https://opengameart.org/content/lpc-chicken-rework
-https://opengameart.org/content/animated-wild-animals
-https://opengameart.org/content/pigs-rework
-https://opengameart.org/content/bunny-rabbit-lpc-style-for-pixelfarm
-https://opengameart.org/content/red-car-top-down
-https://opengameart.org/content/car-pixelart
-https://opengameart.org/content/topdowncar2
-https://opengameart.org/content/top-down-f1-cars
-
-
-
-
-
-***https://opengameart.org/content/track-tiles
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
