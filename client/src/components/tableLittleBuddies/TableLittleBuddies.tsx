@@ -8,7 +8,7 @@ import {
 import TableLittleBuddiesController from "./lib/TableLittleBuddiesController";
 
 export default function TableLittleBuddies({
-  littleBuddy = "rainbowBird",
+  littleBuddy = "whiteDemon",
 }: {
   littleBuddy: LittleBuddiesTypes;
 }) {
@@ -58,7 +58,7 @@ export default function TableLittleBuddies({
   return (
     <div
       ref={tableLittleBuddiesContainer}
-      className="absolute left-0 top-0 z-popup-labels flex h-full w-full bg-fg-white"
+      className="flex absolute left-0 top-0 z-popup-labels h-full w-full bg-fg-white"
     >
       <canvas
         className="absolute"

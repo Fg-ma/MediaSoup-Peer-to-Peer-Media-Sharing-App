@@ -26,6 +26,14 @@ const technoBird =
 const redBird = nginxAssetServerBaseUrl + "spriteSheets/birds/redBird.png";
 const rainbowBird =
   nginxAssetServerBaseUrl + "spriteSheets/birds/rainbowBird.png";
+const angel = nginxAssetServerBaseUrl + "spriteSheets/angel/angel.png";
+const redDemon = nginxAssetServerBaseUrl + "spriteSheets/redDemon/redDemon.png";
+const whiteDemon =
+  nginxAssetServerBaseUrl + "spriteSheets/whiteDemon/whiteDemon.png";
+const chicken = nginxAssetServerBaseUrl + "spriteSheets/chicken/chicken.png";
+const pig = nginxAssetServerBaseUrl + "spriteSheets/pig/pig.png";
+const boar = nginxAssetServerBaseUrl + "spriteSheets/boar/boar.png";
+const bunny = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunny.png";
 
 export const coreAnimations = ["walk", "idle"];
 
@@ -79,7 +87,14 @@ export type LittleBuddiesTypes =
   | "flameBird"
   | "technoBird"
   | "redBird"
-  | "rainbowBird";
+  | "rainbowBird"
+  | "angel"
+  | "redDemon"
+  | "whiteDemon"
+  | "chicken"
+  | "pig"
+  | "boar"
+  | "bunny";
 
 export type MetaAnimation = {
   core: number[];
@@ -502,6 +517,173 @@ export const spirteSheetsMeta: {
         walk: { core: [0, 1, 2], speed: 0.2 },
       },
       alt: { jump: { core: [6], speed: 0.2 } },
+    },
+  },
+  angel: {
+    url: angel,
+    frameHeight: 256,
+    frameWidth: 256,
+    walkSpeed: 0.2,
+    runSpeed: 0.35,
+    rotatable: false,
+    flipTextures: true,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [24],
+          speed: null,
+        },
+        walk: {
+          core: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+          speed: 0.075,
+        },
+      },
+      alt: {
+        jump: { core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], speed: 0.075 },
+        run: {
+          core: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+          speed: 0.075,
+        },
+      },
+    },
+  },
+  redDemon: {
+    url: redDemon,
+    frameHeight: 330,
+    frameWidth: 270,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [4],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+          speed: 0.075,
+        },
+      },
+      alt: {},
+    },
+  },
+  whiteDemon: {
+    url: whiteDemon,
+    frameHeight: 330,
+    frameWidth: 270,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [4],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+          speed: 0.075,
+        },
+      },
+      alt: {},
+    },
+  },
+  chicken: {
+    url: chicken,
+    frameHeight: 32,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [10],
+          speed: null,
+        },
+        walk: {
+          core: [9, 10, 11],
+          speed: 0.1375,
+        },
+      },
+      alt: {},
+    },
+  },
+  pig: {
+    url: pig,
+    frameHeight: 64,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [10],
+          speed: null,
+        },
+        walk: {
+          core: [9, 10, 11],
+          speed: 0.1375,
+        },
+      },
+      alt: {},
+    },
+  },
+  boar: {
+    url: boar,
+    frameHeight: 64,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [10],
+          speed: null,
+        },
+        walk: {
+          core: [9, 10, 11],
+          speed: 0.1375,
+        },
+      },
+      alt: {},
+    },
+  },
+  bunny: {
+    url: bunny,
+    frameHeight: 36,
+    frameWidth: 36,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: true,
+    pixelated: false,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6, 7],
+          speed: 0.125,
+        },
+      },
+      alt: {},
     },
   },
 };

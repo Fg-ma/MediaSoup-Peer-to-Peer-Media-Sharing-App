@@ -78,13 +78,11 @@ class TableLittleBuddiesController {
         x:
           (meta.frameWidth /
             this.tableLittleBuddiesContainer.current.clientWidth) *
-          100 *
-          10,
+          100,
         y:
           (meta.frameHeight /
             this.tableLittleBuddiesContainer.current.clientHeight) *
-          100 *
-          10,
+          100,
       },
       rotation: 0,
       flip: false,

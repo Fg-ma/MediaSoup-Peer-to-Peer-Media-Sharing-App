@@ -17,9 +17,12 @@ https://opengameart.org/content/opp2017-sprites-characters-objects-effects - was
 https://opengameart.org/content/opp2017-sprites-characters-objects-effects - leafBug
 https://opengameart.org/content/opp2017-sprites-characters-objects-effects - skeleton
 https://opengameart.org/content/lpc-chicken-rework - chicken
-https://opengameart.org/content/pigs-rework - pigs
+https://opengameart.org/content/pigs-rework - pig
+https://opengameart.org/content/pigs-rework - boar
 https://opengameart.org/content/bunny-rabbit-lpc-style-for-pixelfarm - bunny
-https://opengameart.org/content/angels-vs-demons-character-tilesets - demons and angels
+https://opengameart.org/content/angels-vs-demons-character-tilesets - angel
+https://opengameart.org/content/angels-vs-demons-character-tilesets - red demon
+https://opengameart.org/content/angels-vs-demons-character-tilesets - white demon
 https://opengameart.org/content/four-characters-my-lpc-entries - magical characters
 https://opengameart.org/content/animated-wild-animals - wild animals
 https://gbzoid.itch.io/poring - poring
