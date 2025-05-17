@@ -11,6 +11,7 @@ export type UploadSession =
       contentId: string;
       state: UserContentStateTypes[];
       staticContentType: StaticContentTypes;
+      filename: string;
     }
   | {
       direction: "toUserContent";
@@ -19,6 +20,7 @@ export type UploadSession =
       state: UserContentStateTypes[];
       staticContentType: StaticContentTypes;
       mimeType: StaticMimeTypes;
+      filename: string;
     };
 
 export interface ChunkState {

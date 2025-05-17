@@ -54,7 +54,7 @@ export default function DownloadingPanel({
       removeDownloadSignalListener(handleDownloadListener);
     };
   }, []);
-  console.log(getCurrentDownloads());
+
   return (
     <div
       className={`${Object.keys(getCurrentDownloads()).length === 0 ? "h-full" : "h-max"} flex w-full flex-col space-y-4`}

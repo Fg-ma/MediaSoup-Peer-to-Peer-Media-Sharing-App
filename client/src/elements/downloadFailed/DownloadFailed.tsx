@@ -50,7 +50,7 @@ export default function DownloadFailed({
   return (
     <div
       ref={failedContainerRef}
-      className={`${className} curvy-bg bg-table-top-gradient flex flex-col items-center justify-center`}
+      className={`${className} curvy-bg flex flex-col items-center justify-center bg-table-top-gradient`}
       style={{
         fontSize: `${textSize}rem`,
         lineHeight: `${textSize + 0.5}rem`,
@@ -59,7 +59,7 @@ export default function DownloadFailed({
     >
       <div
         ref={failedRef}
-        className="hyphens-auto whitespace-normal py-4 text-center font-Josefin text-fg-white"
+        className="hyphens-auto whitespace-normal px-2 py-4 text-center font-Josefin text-fg-white"
         style={{
           fontSize: `${textSize}rem`,
           lineHeight: `${textSize + 0.5}rem`,

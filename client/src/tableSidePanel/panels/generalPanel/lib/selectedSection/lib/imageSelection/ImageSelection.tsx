@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
-import { ImageInstanceListenerTypes } from "../../../../../../../media/fgTableImage/TableImageMediaInstance";
 import ImageEffectsSection from "./lib/ImageEffectsSection";
 import GeneralMediaSelection from "../GeneralMediaSelection";
+import LoadingElement from "../../../../../../../elements/loadingElement/LoadingElement";
+import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
+import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
+import ImageSelectionController from "./lib/ImageSelectionController";
+import { LoadingStateTypes } from "../../../../../../../../../universal/contentTypeConstant";
 
 export default function ImageSelection({
   contentId,
@@ -12,63 +16,47 @@ export default function ImageSelection({
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-
-  const [largestDim, setLargestDim] = useState<"width" | "height">("width");
-  const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
-
   const imageInstanceMedia = userMedia.current.image.tableInstances[contentId];
   const positioning = imageInstanceMedia?.getPositioning();
 
-  const drawInstanceCanvas = async () => {
-    const mirrorCanvas = mirrorCanvasRef.current;
-    const sourceCanvas = imageInstanceMedia.instanceCanvas;
-    if (!mirrorCanvas || !sourceCanvas) return;
+  const [largestDim, setLargestDim] = useState<"width" | "height">("width");
+  const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
+    imageInstanceMedia?.imageMedia.loadingState,
+  );
+  const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
 
-    const ctx = mirrorCanvas.getContext("2d");
-    if (!ctx) return;
-
-    // Mirror canvas gets scaled dimensions
-    const aspectRatio = sourceCanvas.width / sourceCanvas.height;
-    let height;
-    let width;
-    if (sourceCanvas.width > sourceCanvas.height) {
-      width = 192;
-      height = width / aspectRatio;
-      setLargestDim("width");
-    } else {
-      height = 192;
-      width = height * aspectRatio;
-      setLargestDim("height");
-    }
-    mirrorCanvas.width = width;
-    mirrorCanvas.height = height;
-
-    const url = await imageInstanceMedia.babylonScene?.getSnapShotURL();
-    if (!url) return;
-
-    const img = new Image();
-    img.onload = () => {
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(img, 0, 0, width, height);
-    };
-    img.src = url;
-  };
-
-  const handleInstanceEvents = (event: ImageInstanceListenerTypes) => {
-    if (event.type === "effectsChanged") {
-      drawInstanceCanvas();
-    }
-  };
+  const imageSelectionController = new ImageSelectionController(
+    imageInstanceMedia,
+    mirrorCanvasRef,
+    setLargestDim,
+    setLoadingState,
+  );
 
   useEffect(() => {
-    drawInstanceCanvas();
+    imageSelectionController.drawInstanceCanvas();
 
-    imageInstanceMedia?.addImageInstanceListener(handleInstanceEvents);
+    imageInstanceMedia?.addImageInstanceListener(
+      imageSelectionController.handleInstanceEvents,
+    );
+    imageInstanceMedia?.imageMedia.addImageListener(
+      imageSelectionController.handleImageMessages,
+    );
 
     return () => {
-      imageInstanceMedia?.removeImageInstanceListener(handleInstanceEvents);
+      imageInstanceMedia?.removeImageInstanceListener(
+        imageSelectionController.handleInstanceEvents,
+      );
+      imageInstanceMedia?.imageMedia.removeImageListener(
+        imageSelectionController.handleImageMessages,
+      );
     };
   }, []);
+
+  useEffect(() => {
+    if (loadingState === "downloaded") {
+      imageSelectionController.drawInstanceCanvas();
+    }
+  }, [loadingState]);
 
   return (
     imageInstanceMedia && (
@@ -76,10 +64,29 @@ export default function ImageSelection({
         contentId={contentId}
         contentType="image"
         selectionContent={
-          <canvas
-            ref={mirrorCanvasRef}
-            className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} overflow-hidden rounded-md`}
-          ></canvas>
+          loadingState === "downloaded" ? (
+            <canvas
+              ref={mirrorCanvasRef}
+              className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} overflow-hidden rounded-md`}
+            ></canvas>
+          ) : loadingState === "downloading" ? (
+            <LoadingElement
+              className="h-[12rem] w-full rounded-md"
+              pauseDownload={imageInstanceMedia.imageMedia.downloader?.pause}
+            />
+          ) : loadingState === "failed" ? (
+            <DownloadFailed
+              className="h-[12rem] w-full rounded-md"
+              onClick={imageInstanceMedia.imageMedia.retryDownload}
+            />
+          ) : loadingState === "paused" ? (
+            <DownloadPaused
+              className="h-[12rem] w-full rounded-md"
+              onClick={imageInstanceMedia.imageMedia.downloader?.resume}
+            />
+          ) : (
+            <></>
+          )
         }
         effectsSection={
           <ImageEffectsSection
@@ -87,10 +94,14 @@ export default function ImageSelection({
             imageMediaInstance={imageInstanceMedia}
           />
         }
-        downloadFunction={() => {
-          imageInstanceMedia.babylonScene?.takeSnapShot();
-          imageInstanceMedia.babylonScene?.downloadSnapShot();
-        }}
+        downloadFunction={
+          loadingState === "downloaded"
+            ? () => {
+                imageInstanceMedia.babylonScene?.takeSnapShot();
+                imageInstanceMedia.babylonScene?.downloadSnapShot();
+              }
+            : undefined
+        }
         filename={imageInstanceMedia.imageMedia.filename}
         mimeType={imageInstanceMedia.imageMedia.mimeType}
         fileSize={imageInstanceMedia.imageMedia.getFileSize()}

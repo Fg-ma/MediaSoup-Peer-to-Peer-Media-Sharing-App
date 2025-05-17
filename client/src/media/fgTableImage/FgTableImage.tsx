@@ -163,6 +163,7 @@ export default function FgTableImage({
 
   return (
     <FgMediaContainer
+      filename={imageMediaInstance.imageMedia.filename}
       pauseDownload={imageMediaInstance.imageMedia.downloader?.pause}
       resumeDownload={imageMediaInstance.imageMedia.downloader?.resume}
       retryDownload={imageMediaInstance.imageMedia.retryDownload}

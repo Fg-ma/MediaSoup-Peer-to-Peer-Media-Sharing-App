@@ -1,3 +1,9 @@
+export type LoadingStateTypes =
+  | "downloading"
+  | "downloaded"
+  | "failed"
+  | "paused";
+
 export type ContentTypes =
   | "video"
   | "image"

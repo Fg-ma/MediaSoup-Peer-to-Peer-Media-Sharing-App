@@ -19,8 +19,11 @@ const handleMessage = (ws: UserStaticContentWebSocket, event: MessageTypes) => {
     case "deleteContent":
       cleanup.onDeleteContent(event);
       break;
-    case "getFile":
-      gets.getFile(event);
+    case "getDownloadMeta":
+      gets.onGetDownloadMeta(event);
+      break;
+    case "getFileChunk":
+      gets.onGetFileChunk(event);
       break;
     case "changeContentState":
       tableTopMongo.onChangeUserContentState(event);

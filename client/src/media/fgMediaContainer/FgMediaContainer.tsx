@@ -18,11 +18,10 @@ import {
   TableContentStateTypes,
   StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
-import "./lib/mediaContainerStyles.css";
-import BouncingLoader from "../../elements/bouncingLoader/BouncingLoader";
 import DownloadFailed from "../../elements/downloadFailed/DownloadFailed";
-import AtomLoader from "../../elements/atomLoader/AtomLoader";
 import DownloadPaused from "../../elements/downloadPaused/DownloadPaused";
+import LoadingElement from "../../elements/loadingElement/LoadingElement";
+import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
@@ -45,6 +44,7 @@ const MediaContainerTransition: Transition = {
 };
 
 export default function FgMediaContainer({
+  filename,
   pauseDownload,
   resumeDownload,
   retryDownload,
@@ -75,6 +75,7 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
+  filename?: string;
   pauseDownload?: () => void;
   resumeDownload?: () => void;
   retryDownload?: () => void;
@@ -413,6 +414,7 @@ export default function FgMediaContainer({
         !backgroundMedia && (
           <>
             <UpperControls
+              filename={filename}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}
@@ -449,15 +451,15 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >
         {downloadingState === "downloading" && (
-          // <BouncingLoader className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full" onClick={pauseDownload} />
-          <AtomLoader
+          <LoadingElement
             className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
-            onClick={pauseDownload}
+            pauseDownload={pauseDownload}
+            aspectRatio={aspectRatio}
           />
         )}
         {downloadingState === "failed" && (
@@ -485,6 +487,7 @@ export default function FgMediaContainer({
           backgroundMedia) && (
           <>
             <UpperControls
+              filename={filename}
               reactionsPanelActive={reactionsPanelActive}
               setReactionsPanelActive={setReactionsPanelActive}
               lowerController={lowerController}

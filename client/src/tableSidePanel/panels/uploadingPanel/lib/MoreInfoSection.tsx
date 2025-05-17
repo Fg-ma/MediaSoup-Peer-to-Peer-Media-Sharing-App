@@ -24,34 +24,54 @@ function niceCeil(value: number) {
   return nice * base;
 }
 
+const UNITS = ["b/s", "B/s", "KB/s", "MB/s", "GB/s", "TB/s"];
+
+function chooseUnit(KB: number) {
+  let idx = 2;
+  let scaleFactor = 1;
+  if (KB > 1000000000) {
+    idx = 5;
+    scaleFactor = 1 / 1000000000;
+  } else if (KB > 1000000) {
+    idx = 4;
+    scaleFactor = 1 / 1000000;
+  } else if (KB > 125) {
+    idx = 3;
+    scaleFactor = 1 / 125;
+  } else if (KB > 0.001) {
+    idx = 1;
+    scaleFactor = 1 * 1000;
+  } else if (KB > 0.000125) {
+    idx = 0;
+    scaleFactor = 1 * 8000;
+  }
+
+  return {
+    unitLabel: UNITS[idx],
+    scaleFactor,
+  };
+}
+
 export default function MoreInfoSection({
   upload,
 }: {
   upload: ChunkedUploader;
 }) {
   const { mimeType, fileSize, uploadSpeed } = upload.getFileInfo();
-  const speedData = uploadSpeed;
-
-  // Apply simple moving average smoothing over last 3 points
-  const SMOOTH_WINDOW = 3;
-  const smoothedData = speedData.map((d, idx, arr) => {
-    const start = Math.max(0, idx - (SMOOTH_WINDOW - 1));
-    const window = arr.slice(start, idx + 1);
-    const avg = window.reduce((sum, w) => sum + w.speedKBps, 0) / window.length;
-    return { time: d.time, speedKBps: avg };
-  });
 
   // Window and tick settings
   const WINDOW_MS = 20_000; // 20 seconds window
   const TICK_MS = 5_000; // ticks every 5 seconds
 
   // Compute X-domain for sliding window based on raw times
-  const lastTime = speedData.length ? speedData[speedData.length - 1].time : 0;
+  const lastTime = uploadSpeed.length
+    ? uploadSpeed[uploadSpeed.length - 1].time
+    : 0;
   const domainEnd = Math.ceil(lastTime / TICK_MS) * TICK_MS;
   const domainStart = Math.max(0, domainEnd - WINDOW_MS);
 
   // Slice points in current window from smoothed data
-  const windowData = smoothedData.filter(
+  const windowData = uploadSpeed.filter(
     (d) => d.time >= domainStart && d.time <= domainEnd,
   );
 
@@ -59,21 +79,13 @@ export default function MoreInfoSection({
   const xTicks = [];
   for (let t = domainStart; t <= domainEnd; t += TICK_MS) xTicks.push(t);
 
-  // Filter valid smoothed speeds for Y-axis calculation
-  const validSpeeds = smoothedData
-    .map((d) => d.speedKBps)
-    .filter((v) => Number.isFinite(v) && v >= 0);
+  const windowSpeeds = windowData.map((d) => d.speedKBps);
+  const maxSpeed = windowSpeeds.length ? Math.max(...windowSpeeds) : 0;
 
-  // Track lifetime maximum of smoothed speeds
-  const maxRef = useRef(0);
-  useEffect(() => {
-    const currentMax = validSpeeds.length ? Math.max(...validSpeeds) : 0;
-    if (currentMax > maxRef.current) maxRef.current = currentMax;
-  }, [validSpeeds]);
+  const { unitLabel, scaleFactor } = chooseUnit(maxSpeed);
 
   // Determine Y-axis top, add 10% headroom and round nicely
-  const rawTop = maxRef.current * 1.1;
-  const yTop = niceCeil(rawTop);
+  const yTop = niceCeil(maxSpeed * 1.1 * scaleFactor);
 
   return (
     <div className="w-full space-y-2 rounded-xl p-4 font-K2D">
@@ -88,7 +100,10 @@ export default function MoreInfoSection({
       <div className="h-44 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={windowData}
+            data={windowData.map((d) => ({
+              time: d.time,
+              speed: d.speedKBps * scaleFactor,
+            }))}
             margin={{ top: 10, right: 20, bottom: 30, left: 40 }}
           >
             <CartesianGrid stroke="#444" strokeDasharray="3 3" />
@@ -119,7 +134,7 @@ export default function MoreInfoSection({
               domain={[0, yTop]}
               allowDecimals={false}
               label={{
-                value: "KB/s",
+                value: unitLabel,
                 angle: -90,
                 position: "insideLeft",
                 dx: -20,
@@ -133,7 +148,9 @@ export default function MoreInfoSection({
             />
 
             <Tooltip
-              formatter={(v) => `${parseFloat(v.toString()).toFixed(1)} KB/s`}
+              formatter={(v) =>
+                `${parseFloat(v.toString()).toFixed(1)} ${unitLabel}`
+              }
               labelFormatter={(l) => `${(l / 1000).toFixed(1)}s`}
             />
 
@@ -146,11 +163,12 @@ export default function MoreInfoSection({
 
             <Area
               type="linear"
-              dataKey="speedKBps"
+              dataKey="speed"
               stroke="#e62833"
               fill="url(#speedGradient)"
               strokeWidth={2}
               dot={false}
+              isAnimationActive={false}
             />
           </AreaChart>
         </ResponsiveContainer>

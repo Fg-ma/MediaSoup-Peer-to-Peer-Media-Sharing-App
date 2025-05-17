@@ -1,6 +1,10 @@
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class FaceDetectionWebWorker {
+  canvas;
+  canvasHeight;
+  canvasWidth;
+  context;
   faceDetector;
   maxFaces = 10;
 
@@ -8,7 +12,7 @@ class FaceDetectionWebWorker {
     this.loadDependencies()
       .then(this.loadModel)
       .catch((error) =>
-        console.error("Error loading dependencies or model:", error)
+        console.error("Error loading dependencies or model:", error),
       );
   }
 
@@ -42,7 +46,7 @@ class FaceDetectionWebWorker {
       {
         maxFaces: this.maxFaces,
         minDetectionConfidence: 0.9,
-      }
+      },
     );
   };
 
@@ -51,19 +55,29 @@ class FaceDetectionWebWorker {
       return;
     }
 
-    // Parse passed ArrayBuffer
-    const buffer = event.data.data;
-    const array = new Uint8ClampedArray(buffer);
-    const imData = new ImageData(array, event.data.width, event.data.height);
+    const bitmap = event.data.bitmap;
+    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.context.drawImage(bitmap, 0, 0);
+    bitmap.close();
 
     const predictions = await this.faceDetector.estimateFaces({
-      input: imData,
+      input: this.canvas,
       returnTensors: false,
       flipHorizontal: false,
     });
 
     // Return the number of detected faces (bounding boxes)
     return predictions.length;
+  };
+
+  setCanvas = (event) => {
+    this.canvas = event.data.canvas;
+    this.canvasHeight = event.data.height;
+    this.canvasWidth = event.data.width;
+    this.context = this.canvas.getContext("2d", {
+      alpha: true,
+      willReadFrequently: true,
+    });
   };
 }
 
@@ -78,6 +92,9 @@ onmessage = (event) => {
           numFacesDetected,
         });
       });
+      break;
+    case "INIT":
+      faceDetectionWebWorker.setCanvas(event);
       break;
     default:
       break;

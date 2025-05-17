@@ -3,6 +3,10 @@ import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class SelfieSegmentationWebWorker {
+  canvas;
+  canvasHeight;
+  canvasWidth;
+  context;
   selfieSegmenter = null;
   isInitialized = false;
   isInitializing = false;
@@ -18,7 +22,7 @@ class SelfieSegmentationWebWorker {
       try {
         // Load the vision tasks WASM files
         const vision = await FilesetResolver.forVisionTasks(
-          nginxAssetServerBaseUrl + "tasks-vision"
+          nginxAssetServerBaseUrl + "tasks-vision",
         );
 
         // Define options for the ImageSegmenter
@@ -37,7 +41,7 @@ class SelfieSegmentationWebWorker {
         // Create the ImageSegmenter
         this.selfieSegmenter = await ImageSegmenter.createFromOptions(
           vision,
-          options
+          options,
         );
         this.isInitialized = true;
       } catch (error) {
@@ -53,15 +57,16 @@ class SelfieSegmentationWebWorker {
       return;
     }
 
-    const buffer = event.data.data;
-    const array = new Uint8ClampedArray(buffer);
-    const imData = new ImageData(array, event.data.width, event.data.height);
+    const bitmap = event.data.bitmap;
+    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.context.drawImage(bitmap, 0, 0);
+    bitmap.close();
 
     // Run the segmentation model on the input frame
-    const segmentationResult = await this.selfieSegmenter.segment(imData);
+    const segmentationResult = await this.selfieSegmenter.segment(this.canvas);
 
     const confidenceMask = segmentationResult.confidenceMasks[0];
-    const maskData = confidenceMask.g[0]; // Extract grayscale mask (Uint8Array)
+    const maskData = confidenceMask.g[0];
     const width = confidenceMask.width;
     const height = confidenceMask.height;
 
@@ -82,6 +87,16 @@ class SelfieSegmentationWebWorker {
 
     return new ImageData(rgbaData, width, height);
   };
+
+  setCanvas = (event) => {
+    this.canvas = event.data.canvas;
+    this.canvasHeight = event.data.height;
+    this.canvasWidth = event.data.width;
+    this.context = this.canvas.getContext("2d", {
+      alpha: true,
+      willReadFrequently: true,
+    });
+  };
 }
 
 // Create an instance of the worker
@@ -99,6 +114,9 @@ onmessage = (event) => {
           results,
         });
       });
+      break;
+    case "INIT":
+      selfieSegmentationWebWorker.setCanvas(event);
       break;
     default:
       break;

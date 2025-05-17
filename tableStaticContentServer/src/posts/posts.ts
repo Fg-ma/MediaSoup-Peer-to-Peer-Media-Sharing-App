@@ -171,6 +171,7 @@ class Posts {
               direction,
               state,
               mimeType,
+              filename,
             } = metadata;
 
             const staticContentType =
@@ -189,13 +190,14 @@ class Posts {
               tableId,
               contentId,
               staticContentType,
+
               mimeType,
             };
 
             if (direction === "toTable") {
-              Object.assign(sessionData, { instanceId, state });
+              Object.assign(sessionData, { instanceId, state, filename });
             } else if (direction === "toTabled") {
-              Object.assign(sessionData, { state });
+              Object.assign(sessionData, { state, filename });
             }
 
             this.uploadSessions.set(uploadId, sessionData);
@@ -256,7 +258,7 @@ class Posts {
       });
 
       bb.on("file", (_fn, stream, info) => {
-        const { mimeType, filename } = info;
+        const { mimeType } = info;
 
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
@@ -297,7 +299,7 @@ class Posts {
                       session.contentId,
                       session.instanceId,
                       mimeType as StaticMimeTypes,
-                      filename,
+                      session.filename,
                       session.state
                     );
                     break;
@@ -314,7 +316,7 @@ class Posts {
                       session.tableId,
                       session.contentId,
                       mimeType as StaticMimeTypes,
-                      filename,
+                      session.filename,
                       session.state
                     );
                     break;

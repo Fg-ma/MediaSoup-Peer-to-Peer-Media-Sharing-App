@@ -111,6 +111,7 @@ class SelectTableLayerController {
 
           this.setRerender((prev) => !prev);
         }
+        break;
       default:
         break;
     }
@@ -132,7 +133,7 @@ class SelectTableLayerController {
 
     this.sendGroupSignal({
       type: "groupChange",
-      data: { selected: this.selectedInfo },
+      data: { selected: [] },
     });
 
     this.setRerender((prev) => !prev);
@@ -158,7 +159,7 @@ class SelectTableLayerController {
 
     this.sendGroupSignal({
       type: "groupChange",
-      data: { selected: this.selectedInfo },
+      data: { selected: [] },
     });
 
     this.setDragging(true);
@@ -289,13 +290,6 @@ class SelectTableLayerController {
     return overlappingElements;
   };
 
-  groupClick = () => {
-    if (!this.dragging) {
-      this.selected.current = [];
-      this.setRerender((prev) => !prev);
-    }
-  };
-
   groupDragStart = (event: React.PointerEvent) => {
     document.addEventListener("pointerup", this.groupDragEnd);
     document.addEventListener("pointermove", this.groupDrag);
@@ -391,6 +385,7 @@ class SelectTableLayerController {
         this.dragStart.current = undefined;
         this.dragEnd.current = undefined;
         this.selected.current = [];
+        this.selectedInfo = [];
         this.setDragging(false);
         this.setRerender((prev) => !prev);
         break;
@@ -406,6 +401,7 @@ class SelectTableLayerController {
         this.dragStart.current = undefined;
         this.dragEnd.current = undefined;
         this.selected.current = [];
+        this.selectedInfo = [];
         this.setDragging(false);
         this.setRerender((prev) => !prev);
         break;

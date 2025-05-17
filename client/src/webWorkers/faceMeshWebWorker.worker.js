@@ -1,6 +1,10 @@
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 class FaceMeshWebWorker {
+  canvas;
+  canvasHeight;
+  canvasWidth;
+  context;
   faceMesh;
   maxFaces = 1;
   smoothingData = []; // Store previous landmarks for smoothing
@@ -11,7 +15,7 @@ class FaceMeshWebWorker {
     this.loadDependencies()
       .then(this.loadModel)
       .catch((error) =>
-        console.error("Error loading dependencies or model:", error)
+        console.error("Error loading dependencies or model:", error),
       );
   }
 
@@ -47,7 +51,7 @@ class FaceMeshWebWorker {
         refineLandmarks: true,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5,
-      }
+      },
     );
   };
 
@@ -55,14 +59,13 @@ class FaceMeshWebWorker {
     if (!this.faceMesh) {
       return;
     }
-
-    // Parse ArrayBuffer
-    const buffer = event.data.data;
-    const array = new Uint8ClampedArray(buffer);
-    const imData = new ImageData(array, event.data.width, event.data.height);
+    const bitmap = event.data.bitmap;
+    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.context.drawImage(bitmap, 0, 0);
+    bitmap.close();
 
     const predictions = await this.faceMesh.estimateFaces({
-      input: imData,
+      input: this.canvas,
       returnTensors: false,
       flipHorizontal: false,
       predictIrises: true,
@@ -87,8 +90,8 @@ class FaceMeshWebWorker {
         face.scaledMesh.map(([x, y, z], landmarkIndex) => {
           // Normalize coordinates
           const normX =
-            ((x / event.data.width) * 2 - 1) * (event.data.flipped ? 1 : -1);
-          const normY = ((y / event.data.height) * 2 - 1) * -1;
+            ((x / this.canvasWidth) * 2 - 1) * (event.data.flipped ? 1 : -1);
+          const normY = ((y / this.canvasHeight) * 2 - 1) * -1;
           const adjustedZ = (z - Math.min(...zValues)) / (zRange || 1);
 
           if (!event.data.smooth) {
@@ -131,7 +134,7 @@ class FaceMeshWebWorker {
             // Return the previous position if within deadband threshold
             return prevLandmark;
           }
-        })
+        }),
       );
     });
 
@@ -144,11 +147,21 @@ class FaceMeshWebWorker {
       await this.loadModel();
     }
   };
+
+  setCanvas = (event) => {
+    this.canvas = event.data.canvas;
+    this.canvasHeight = event.data.height;
+    this.canvasWidth = event.data.width;
+    this.context = this.canvas.getContext("2d", {
+      alpha: true,
+      willReadFrequently: true,
+    });
+  };
 }
 
 const faceMeshWebWorker = new FaceMeshWebWorker();
 
-onmessage = (event) => {
+onmessage = async (event) => {
   switch (event.data.message) {
     case "FRAME":
       faceMeshWebWorker.processFrame(event).then((results) => {
@@ -160,6 +173,9 @@ onmessage = (event) => {
       break;
     case "CHANGE_MAX_FACES":
       faceMeshWebWorker.changeMaxFaces(event.data.newMaxFace);
+      break;
+    case "INIT":
+      faceMeshWebWorker.setCanvas(event);
       break;
     default:
       break;

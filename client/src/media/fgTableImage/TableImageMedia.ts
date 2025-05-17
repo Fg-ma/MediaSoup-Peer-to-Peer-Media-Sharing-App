@@ -1,6 +1,9 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { TableContentStateTypes } from "../../../../universal/contentTypeConstant";
+import {
+  LoadingStateTypes,
+  TableContentStateTypes,
+} from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
@@ -27,8 +30,7 @@ class TableImageMedia {
 
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" | "failed" | "paused" =
-    "downloading";
+  loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
   private imageListeners: Set<(message: ImageListenerTypes) => void> =

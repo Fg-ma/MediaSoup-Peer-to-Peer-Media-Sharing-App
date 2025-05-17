@@ -80,7 +80,8 @@ export type MessageTypes =
   | onConnectType
   | onDisconnectType
   | onDeleteContentType
-  | onGetFileType
+  | onGetDownloadMetaType
+  | onGetFileChunkType
   | onChangeContentStateType
   | onSearchUserContentRequestType
   | onMuteStylesRequestType;
@@ -122,19 +123,6 @@ export type onDeleteContentType = {
   };
 };
 
-export type onGetFileType = {
-  type: "getFile";
-  header: {
-    userId: string;
-    instance: string;
-    contentType: StaticContentTypes;
-    contentId: string;
-  };
-  data: {
-    key: string;
-  };
-};
-
 export type onChangeContentStateType = {
   type: "changeContentState";
   header: {
@@ -152,6 +140,29 @@ export type onMuteStylesRequestType = {
   header: {
     userId: string;
     instance: string;
+  };
+};
+
+export type onGetDownloadMetaType = {
+  type: "getDownloadMeta";
+  header: {
+    userId: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+};
+
+export type onGetFileChunkType = {
+  type: "getFileChunk";
+  header: {
+    userId: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    range: string;
   };
 };
 

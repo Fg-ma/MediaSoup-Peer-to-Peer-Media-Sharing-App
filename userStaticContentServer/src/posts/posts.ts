@@ -112,7 +112,7 @@ class Posts {
       this.pipeReqToBusboy(res, bb);
     });
 
-    app.post("/upload-chunk-meta", (res, req) => {
+    app.post("/upload-chunk-meta", (res, _req) => {
       let buffer = "";
 
       res.cork(() => {
@@ -137,7 +137,8 @@ class Posts {
 
           try {
             const metadata = JSON.parse(buffer);
-            const { userId, contentId, direction, state, mimeType } = metadata;
+            const { userId, contentId, direction, state, mimeType, filename } =
+              metadata;
 
             const staticContentType =
               mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
@@ -157,6 +158,7 @@ class Posts {
               staticContentType,
               mimeType,
               state,
+              filename,
             };
 
             this.uploadSessions.set(uploadId, sessionData);
@@ -217,12 +219,12 @@ class Posts {
       });
 
       bb.on("file", (_fn, stream, info) => {
-        const { mimeType, filename } = info;
+        const { mimeType } = info;
 
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
         stream.on("end", async () => {
-          let state = this.chunkStates.get(uploadId);
+          const state = this.chunkStates.get(uploadId);
           if (!state) return;
 
           // upload this part
@@ -256,7 +258,7 @@ class Posts {
                       session.userId,
                       session.contentId,
                       mimeType as StaticMimeTypes,
-                      filename,
+                      session.filename,
                       session.state
                     );
                     break;
@@ -266,7 +268,7 @@ class Posts {
                       session.userId,
                       session.contentId,
                       mimeType as StaticMimeTypes,
-                      filename,
+                      session.filename,
                       session.state
                     );
                     break;

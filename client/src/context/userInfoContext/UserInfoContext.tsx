@@ -37,7 +37,10 @@ export function UserInfoContextProvider({
   const tableId = useRef("");
   const username = useRef("");
   const instance = useRef(uuidv4());
-  const preferences = useRef({ soundEffects: false });
+  const preferences = useRef<UserPreferences>({
+    soundEffects: false,
+    loadingAnimation: "bounce",
+  });
   const device = useRef<Device>();
 
   return (

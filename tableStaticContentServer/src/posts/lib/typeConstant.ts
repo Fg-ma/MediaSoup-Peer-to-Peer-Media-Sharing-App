@@ -12,6 +12,7 @@ export type UploadSession =
       instanceId: string;
       state: TableContentStateTypes[];
       staticContentType: StaticContentTypes;
+      filename: string;
       mimeType: StaticMimeTypes;
     }
   | {
@@ -27,6 +28,7 @@ export type UploadSession =
       contentId: string;
       state: TableContentStateTypes[];
       staticContentType: StaticContentTypes;
+      filename: string;
       mimeType: StaticMimeTypes;
     };
 

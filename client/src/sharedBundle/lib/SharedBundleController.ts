@@ -37,6 +37,7 @@ import TableApplicationMediaInstance from "../../media/fgTableApplication/TableA
 import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaInstance";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import Downloader from "../../downloader/Downloader";
+import { GroupSignals } from "../../context/signalContext/lib/typeConstant";
 
 class SharedBundleController extends SharedBundleSocket {
   constructor(

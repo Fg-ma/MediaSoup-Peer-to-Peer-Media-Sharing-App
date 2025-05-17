@@ -360,7 +360,7 @@ export default function Main() {
   return (
     // <CreditPage />
     <div className="flex h-screen w-screen flex-col space-y-[1.5%] overflow-hidden bg-fg-tone-black-1 p-[1.5%]">
-      <TableLittleBuddies />
+      {/* <TableLittleBuddies /> */}
       <Table
         tableFunctionsRef={tableFunctionsRef}
         tableRef={tableRef}

@@ -179,7 +179,6 @@ export default function SelectTableLayer({
             className="pointer-events-auto absolute z-[100] rounded"
             draggable
             style={selectedStyle}
-            onClick={selectTableLayerController.current.groupClick}
             onPointerDown={selectTableLayerController.current.groupDragStart}
           />
         </>

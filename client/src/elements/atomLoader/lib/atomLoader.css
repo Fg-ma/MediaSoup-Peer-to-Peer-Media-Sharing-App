@@ -6,6 +6,7 @@
   --primary: hsl(var(--hue), 90%, 50%);
   --trans-dur: 0.3s;
   margin: auto;
+  position: relative;
 }
 .pl__nucleus,
 .pl__nucleus-particle {

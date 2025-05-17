@@ -49,10 +49,9 @@ class BabylonRenderLoop {
   ) {
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.current.getFaceMeshDetectionInterval();
-    this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
-      this.userDevice.current.getSelfieSegmentationDetectionInterval();
-
-    this.hideBackgroundEffectImage = new Image();
+    (this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
+      this.userDevice.current.getSelfieSegmentationDetectionInterval()),
+      (this.hideBackgroundEffectImage = new Image());
     this.hideBackgroundEffectImage.crossOrigin = "anonymous";
 
     this.hideBackgroundCanvas = document.createElement("canvas");

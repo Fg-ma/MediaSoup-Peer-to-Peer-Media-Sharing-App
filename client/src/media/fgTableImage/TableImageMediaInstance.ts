@@ -14,6 +14,7 @@ import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import assetMeshes from "../../babylon/meshes";
 import TableImageMedia, { ImageListenerTypes } from "./TableImageMedia";
+import { GroupSignals } from "../../context/signalContext/lib/typeConstant";
 
 export type ImageInstanceListenerTypes = { type: "effectsChanged" };
 

@@ -23,7 +23,10 @@ class Downloader {
 
   private _progress: number = 0;
 
+  private startTime: number = 0;
   private downloadSpeedHistory: { time: number; speedKBps: number }[] = [];
+  private downloadAbsoluteSpeedHistory: { time: number; speedKBps: number }[] =
+    [];
   private lastTimestamp: number | null = null;
   private bytesSinceLast: number = 0;
 
@@ -104,6 +107,10 @@ class Downloader {
 
       // 5) Store in history
       this.downloadSpeedHistory.push({
+        time: now - this.startTime,
+        speedKBps: instantKBps,
+      });
+      this.downloadAbsoluteSpeedHistory.push({
         time: now,
         speedKBps: instantKBps,
       });
@@ -257,6 +264,8 @@ class Downloader {
       this.contentType,
       this.contentId,
     );
+
+    this.startTime = Date.now();
   };
 
   pause = () => {
@@ -304,6 +313,30 @@ class Downloader {
   public get progress(): number {
     return this._progress;
   }
+
+  getFileInfo = (): {
+    mimeType: string;
+    fileSize: string;
+    downloadSpeed: { time: number; speedKBps: number }[];
+  } => {
+    return {
+      mimeType: this.mimeType,
+      fileSize: this.formatBytes(this.fileSize),
+      downloadSpeed: [...this.downloadSpeedHistory],
+    };
+  };
+
+  getAbsoluteSpeedHistory = (): { time: number; speedKBps: number }[] => {
+    return [...this.downloadAbsoluteSpeedHistory];
+  };
+
+  private formatBytes = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
 }
 
 export default Downloader;

@@ -10,7 +10,7 @@ export default function BouncingLoader({
 }) {
   return (
     <svg
-      className={`${className} bg-table-top-gradient`}
+      className={`${className} bg-fg-tone-black-1`}
       onClick={onClick}
       viewBox="0 0 128 128"
       xmlns="http://www.w3.org/2000/svg"

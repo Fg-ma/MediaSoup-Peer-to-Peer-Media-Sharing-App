@@ -3,9 +3,17 @@ import { userConnections } from "../typeConstant";
 class Broadcaster {
   constructor() {}
 
-  broadcastToUser = (userId: string, message: object) => {
+  broadcastToUser = (
+    userId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    binary: boolean = false
+  ) => {
     if (userConnections[userId]) {
-      const msg = JSON.stringify(message);
+      let msg = message;
+      if (!binary) {
+        msg = JSON.stringify(message);
+      }
 
       Object.values(userConnections[userId]).forEach((socket) => {
         try {
@@ -17,9 +25,18 @@ class Broadcaster {
     }
   };
 
-  broadcastToInstance = (userId: string, instance: string, message: object) => {
+  broadcastToInstance = (
+    userId: string,
+    instance: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    message: any,
+    binary: boolean = false
+  ) => {
     if (userConnections[userId] && userConnections[userId][instance]) {
-      const msg = JSON.stringify(message);
+      let msg = message;
+      if (!binary) {
+        msg = JSON.stringify(message);
+      }
 
       const socket = userConnections[userId][instance];
 

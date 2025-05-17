@@ -15,13 +15,13 @@ class BabylonRenderLoopWorker {
 
   private frameCounter = 0;
 
-  private offscreenCanvas: HTMLCanvasElement;
-  private offscreenContext: CanvasRenderingContext2D | null;
+  private offscreenCanvas: OffscreenCanvas;
+  private faceMeshOffscreenCanvas: OffscreenCanvas;
+  private faceDetectionOffscreenCanvas: OffscreenCanvas;
+  private selfieSegmentationOffscreenCanvas: OffscreenCanvas;
+  private offscreenContext: OffscreenCanvasRenderingContext2D | null;
 
   private lastFaceCountCheck: number;
-
-  private hideBackgroundOffscreenCanvas: HTMLCanvasElement;
-  private hideBackgroundOffscreenContext: CanvasRenderingContext2D | null;
 
   private detectFacesTimeout = 1000;
 
@@ -43,35 +43,56 @@ class BabylonRenderLoopWorker {
     this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
       this.userDevice.current.getSelfieSegmentationDetectionInterval();
 
-    this.offscreenCanvas = document.createElement("canvas");
+    this.offscreenCanvas = new OffscreenCanvas(
+      this.aspect > 1 ? 320 : 320 * this.aspect,
+      this.aspect > 1 ? 320 / this.aspect : 320,
+    );
     this.offscreenContext = this.offscreenCanvas.getContext("2d", {
       alpha: true,
       willReadFrequently: true,
     });
+    this.faceMeshOffscreenCanvas = new OffscreenCanvas(
+      this.aspect > 1 ? 320 : 320 * this.aspect,
+      this.aspect > 1 ? 320 / this.aspect : 320,
+    );
+    this.faceDetectionOffscreenCanvas = new OffscreenCanvas(
+      this.aspect > 1 ? 320 : 320 * this.aspect,
+      this.aspect > 1 ? 320 / this.aspect : 320,
+    );
+    this.selfieSegmentationOffscreenCanvas = new OffscreenCanvas(
+      this.aspect > 1 ? 320 : 320 * this.aspect,
+      this.aspect > 1 ? 320 / this.aspect : 320,
+    );
 
-    if (this.aspect > 1) {
-      this.offscreenCanvas.width = 320;
-      this.offscreenCanvas.height = 320 / this.aspect;
-    } else {
-      this.offscreenCanvas.width = 320 * this.aspect;
-      this.offscreenCanvas.height = 320;
-    }
+    this.faceMeshWorker?.postMessage(
+      {
+        message: "INIT",
+        canvas: this.faceMeshOffscreenCanvas,
+        width: this.faceMeshOffscreenCanvas.width,
+        height: this.faceMeshOffscreenCanvas.height,
+      },
+      [this.faceMeshOffscreenCanvas],
+    );
+    this.faceDetectionWorker?.postMessage(
+      {
+        message: "INIT",
+        canvas: this.faceDetectionOffscreenCanvas,
+        width: this.faceDetectionOffscreenCanvas.width,
+        height: this.faceDetectionOffscreenCanvas.height,
+      },
+      [this.faceDetectionOffscreenCanvas],
+    );
+    this.selfieSegmentationWorker?.postMessage(
+      {
+        message: "INIT",
+        canvas: this.selfieSegmentationOffscreenCanvas,
+        width: this.selfieSegmentationOffscreenCanvas.width,
+        height: this.selfieSegmentationOffscreenCanvas.height,
+      },
+      [this.selfieSegmentationOffscreenCanvas],
+    );
 
     this.lastFaceCountCheck = 0;
-
-    this.hideBackgroundOffscreenCanvas = document.createElement("canvas");
-    this.hideBackgroundOffscreenContext =
-      this.hideBackgroundOffscreenCanvas.getContext("2d", {
-        alpha: true,
-        willReadFrequently: true,
-      });
-    if (this.aspect > 1) {
-      this.hideBackgroundOffscreenCanvas.width = 320;
-      this.hideBackgroundOffscreenCanvas.height = 320 / this.aspect;
-    } else {
-      this.hideBackgroundOffscreenCanvas.width = 320 * this.aspect;
-      this.hideBackgroundOffscreenCanvas.height = 320;
-    }
 
     setTimeout(() => {
       this.detectFaces();
@@ -123,29 +144,20 @@ class BabylonRenderLoopWorker {
         this.offscreenCanvas.height,
       );
 
-      // Get ImageData from the offscreen canvas
-      const imageData = this.offscreenContext.getImageData(
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height,
-      );
-
-      // Create a new ArrayBuffer
-      const buffer = new ArrayBuffer(imageData.data.length);
-      const uint8Array = new Uint8Array(buffer);
-      uint8Array.set(imageData.data);
-
       // Send video frames to the worker for processing
       if (this.faceMeshProcessing && !this.faceMeshProcessing[0]) {
         this.faceMeshProcessing[0] = true;
-        this.faceMeshWorker?.postMessage({
-          message: "FRAME",
-          data: buffer, // Send the ArrayBuffer
-          width: this.offscreenCanvas.width,
-          height: this.offscreenCanvas.height,
-          smooth: this.needs.smoothFaceLandmarks.length !== 0,
-          flipped: this.flip,
+
+        createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+          this.faceMeshWorker!.postMessage(
+            {
+              message: "FRAME",
+              bitmap,
+              smooth: this.needs.smoothFaceLandmarks.length !== 0,
+              flipped: this.flip,
+            },
+            [bitmap],
+          );
         });
       }
       if (
@@ -157,11 +169,14 @@ class BabylonRenderLoopWorker {
         this.faceDetectionProcessing[0] = true;
         this.lastFaceCountCheck = performance.now();
 
-        this.faceDetectionWorker?.postMessage({
-          message: "FRAME",
-          data: buffer,
-          width: this.offscreenCanvas.width,
-          height: this.offscreenCanvas.height,
+        createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+          this.faceDetectionWorker!.postMessage(
+            {
+              message: "FRAME",
+              bitmap,
+            },
+            [bitmap],
+          );
         });
       }
     } catch (error) {
@@ -171,42 +186,26 @@ class BabylonRenderLoopWorker {
   };
 
   private hideBackgroundEffect = async () => {
-    if (
-      !this.hideBackgroundOffscreenContext ||
-      !this.selfieSegmentationWorker
-    ) {
+    if (!this.offscreenContext || !this.selfieSegmentationWorker) {
       return;
     }
 
     // Clear the offscreen canvas before drawing
-    this.hideBackgroundOffscreenContext.clearRect(
+    this.offscreenContext.clearRect(
       0,
       0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height,
+      this.offscreenCanvas.width,
+      this.offscreenCanvas.height,
     );
 
     // Draw the video frame onto the offscreen canvas at the lower resolution
-    this.hideBackgroundOffscreenContext.drawImage(
+    this.offscreenContext.drawImage(
       this.backgroundMedia,
       0,
       0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height,
+      this.offscreenCanvas.width,
+      this.offscreenCanvas.height,
     );
-
-    // Get ImageData from the offscreen canvas
-    const imageData = this.hideBackgroundOffscreenContext.getImageData(
-      0,
-      0,
-      this.hideBackgroundOffscreenCanvas.width,
-      this.hideBackgroundOffscreenCanvas.height,
-    );
-
-    // Create a new ArrayBuffer
-    const buffer = new ArrayBuffer(imageData.data.length);
-    const uint8Array = new Uint8Array(buffer);
-    uint8Array.set(imageData.data);
 
     // Send video frames to the worker for processing
     if (
@@ -214,11 +213,15 @@ class BabylonRenderLoopWorker {
       !this.selfieSegmentationProcessing[0]
     ) {
       this.selfieSegmentationProcessing[0] = true;
-      this.selfieSegmentationWorker.postMessage({
-        message: "FRAME",
-        data: buffer, // Send the ArrayBuffer
-        width: this.hideBackgroundOffscreenCanvas.width,
-        height: this.hideBackgroundOffscreenCanvas.height,
+
+      createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+        this.selfieSegmentationWorker!.postMessage(
+          {
+            message: "FRAME",
+            bitmap,
+          },
+          [bitmap],
+        );
       });
     }
   };

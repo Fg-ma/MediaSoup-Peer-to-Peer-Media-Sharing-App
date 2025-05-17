@@ -17,7 +17,8 @@ export type OutGoingUserStaticContentMessages =
   | onConnectType
   | onDisconnectType
   | onDeleteContentType
-  | onGetFileType
+  | onGetDownloadMetaType
+  | onGetFileChunkType
   | onChangeContentStateType
   | onSearchUserContentRequestType
   | onMuteStylesRequestType;
@@ -47,15 +48,27 @@ type onDeleteContentType = {
   };
 };
 
-type onGetFileType = {
-  type: "getFile";
+type onGetDownloadMetaType = {
+  type: "getDownloadMeta";
   header: {
     userId: string;
     instance: string;
     contentType: StaticContentTypes;
     contentId: string;
   };
-  data: { key: string };
+};
+
+type onGetFileChunkType = {
+  type: "getFileChunk";
+  header: {
+    userId: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    range: string;
+  };
 };
 
 type onChangeContentStateType = {
@@ -99,7 +112,10 @@ export type IncomingUserStaticContentMessages =
   | onSvgUploadedToUserContentType
   | onTextUploadedToUserContentType
   | onChunkType
-  | onDownloadCompleteType
+  | onChunkErrorType
+  | onDownloadMetaType
+  | onOneShotDownloadType
+  | onDownloadErrorType
   | onContentDeletedType
   | onContentStateChangedType
   | onMuteStylesResponseType;
@@ -181,18 +197,46 @@ export type onChunkType = {
   header: {
     contentType: StaticContentTypes;
     contentId: string;
+    range: string;
   };
   data: {
-    chunk: { data: number[] };
+    chunk: Uint8Array<any>;
   };
 };
 
-export type onDownloadCompleteType = {
-  type: "downloadComplete";
+export type onChunkErrorType = {
+  type: "chunkError";
   header: {
     contentType: StaticContentTypes;
     contentId: string;
   };
+};
+
+export type onDownloadMetaType = {
+  type: "downloadMeta";
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    fileSize: number;
+  };
+};
+
+export type onOneShotDownloadType = {
+  type: "oneShotDownload";
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+  data: {
+    buffer: Uint8Array<any>;
+  };
+};
+
+export type onDownloadErrorType = {
+  type: "downloadError";
+  header: { contentType: StaticContentTypes; contentId: string };
 };
 
 export type onContentDeletedType = {

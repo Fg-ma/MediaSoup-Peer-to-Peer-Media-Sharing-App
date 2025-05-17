@@ -52,7 +52,7 @@ export default function DownloadingSection({
       download.removeDownloadListener(handleDownloadListener);
     };
   }, []);
-  console.log(download);
+
   return (
     <div className="flex h-max w-full flex-col items-start justify-center space-y-2 border-y-2 border-fg-tone-black-3 bg-fg-tone-black-5 py-4">
       <div className="flex h-8 w-full items-center justify-between pl-[1.875rem] pr-8">
@@ -62,11 +62,6 @@ export default function DownloadingSection({
             width: `calc(100% - ${rightLoadingInfoRef.current?.clientWidth ?? 0}px)`,
           }}
         >
-          {/* <FgImageElement
-            className="aspect-square h-full"
-            imageClassName="object-contain"
-            src={upload.uploadUrl}
-          /> */}
           <HoverElement
             externalRef={filenameRef}
             className="h-full grow truncate font-K2D text-xl text-fg-white"
@@ -113,7 +108,7 @@ export default function DownloadingSection({
             scrollingContainerRef={tablePanelRef}
             hoverContent={
               <FgHoverContentStandard
-                content={download.paused ? "Resume upload" : "Pause upload"}
+                content={download.paused ? "Resume download" : "Pause download"}
                 style="light"
               />
             }
@@ -138,7 +133,7 @@ export default function DownloadingSection({
             clickFunction={download.cancel}
             scrollingContainerRef={tablePanelRef}
             hoverContent={
-              <FgHoverContentStandard content="Cancel upload" style="light" />
+              <FgHoverContentStandard content="Cancel download" style="light" />
             }
             options={{
               hoverSpacing: 4,
@@ -177,7 +172,7 @@ export default function DownloadingSection({
           }}
         />
       </div>
-      {/* {moreInfoSectionActive && <MoreInfoSection upload={upload} />} */}
+      {moreInfoSectionActive && <MoreInfoSection download={download} />}
     </div>
   );
 }

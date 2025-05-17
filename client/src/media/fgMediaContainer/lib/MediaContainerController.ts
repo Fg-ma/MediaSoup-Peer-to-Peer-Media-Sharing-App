@@ -148,6 +148,10 @@ class MediaContainerController {
               { position: this.positioning.current.position },
             );
           }
+
+          setTimeout(() => {
+            this.sendGroupSignal({ type: "groupUpdate" });
+          }, 0);
         }
         break;
       default:
