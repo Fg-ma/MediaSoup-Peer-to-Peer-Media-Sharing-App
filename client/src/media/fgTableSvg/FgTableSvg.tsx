@@ -147,6 +147,10 @@ export default function FgTableSvg({
   return (
     <>
       <FgMediaContainer
+        filename={svgMediaInstance.svgMedia.filename}
+        pauseDownload={svgMediaInstance.svgMedia.downloader?.pause}
+        resumeDownload={svgMediaInstance.svgMedia.downloader?.resume}
+        retryDownload={svgMediaInstance.svgMedia.retryDownload}
         downloadingState={svgMediaInstance.svgMedia.loadingState}
         addDownloadListener={
           svgMediaInstance.svgMedia.loadingState === "downloading"

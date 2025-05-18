@@ -1,11 +1,15 @@
+import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import {
   UserContentStateTypes,
-  StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import Downloader from "../../downloader/Downloader";
 import {
-  IncomingUserStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/userStaticContentServer/lib/typeConstant";
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
 
 export type TextMediaEvents = onTextFinishedLoadingType;
 
@@ -15,78 +19,101 @@ export type onTextFinishedLoadingType = {
 
 export type TextListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" };
 
 class UserTextMedia {
   text: string | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: LoadingStateTypes = "downloading";
 
   private textListeners: Set<(message: TextListenerTypes) => void> = new Set();
+
+  downloader: undefined | Downloader;
 
   constructor(
     public textId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: UserContentStateTypes[],
-    private getText: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
+    private userStaticContentSocket: React.MutableRefObject<
+      UserStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
-    this.getText("text", this.textId, this.filename);
-    this.addMessageListener(this.getTextListener);
+    this.downloader = new Downloader(
+      "text",
+      this.textId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.textId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor = () => {
-    this.removeMessageListener(this.getTextListener);
-
     this.textListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.textId);
+      this.downloader = undefined;
+    }
   };
 
-  private getTextListener = (message: IncomingUserStaticContentMessages) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
-      if (contentType !== "text" || contentId !== this.textId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    blob.arrayBuffer().then((arrayBuffer) => {
+      this.text = new TextDecoder("utf-8").decode(arrayBuffer);
 
-      if (contentType !== "text" || contentId !== this.textId) {
-        return;
-      }
-
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
-
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      this.text = new TextDecoder("utf-8").decode(mergedBuffer);
       this.loadingState = "downloaded";
 
       this.textListeners.forEach((listener) => {
         listener({ type: "downloadComplete" });
       });
+    });
 
-      this.removeMessageListener(this.getTextListener);
+    this.downloader = undefined;
+  };
+
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
+        this.textListeners.forEach((listener) => {
+          listener({ type: "downloadFailed" });
+        });
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.textListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.textListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -141,6 +168,29 @@ class UserTextMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "text",
+      this.textId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.textId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.textListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

@@ -48,8 +48,14 @@ export default function Main() {
   const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
   const { uploader, userDevice } = useToolsContext();
-  const { sendUploadSignal, addCurrentUpload, removeCurrentUpload } =
-    useUploadDownloadContext();
+  const {
+    sendUploadSignal,
+    addCurrentUpload,
+    removeCurrentUpload,
+    sendDownloadSignal,
+    addCurrentDownload,
+    removeCurrentDownload,
+  } = useUploadDownloadContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -82,7 +88,7 @@ export default function Main() {
   const [gridActive, setGridActive] = useState(false);
   const [gridSize, setGridSize] = useState({ rows: 4, cols: 4 });
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const tableFunctionsRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +100,10 @@ export default function Main() {
       userId.current,
       instance.current,
       userMedia,
+      userStaticContentSocket,
+      sendDownloadSignal,
+      addCurrentDownload,
+      removeCurrentDownload,
     );
 
     uploader.current = new Uploader(

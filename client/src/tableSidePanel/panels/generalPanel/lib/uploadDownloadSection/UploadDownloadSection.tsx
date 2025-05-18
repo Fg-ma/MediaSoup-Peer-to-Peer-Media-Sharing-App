@@ -8,8 +8,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { useUploadDownloadContext } from "../../../../context/uploadDownloadContext/UploadDownloadContext";
-import { DownloadListenerTypes } from "../../../../downloader/lib/typeConstant";
+import { useUploadDownloadContext } from "../../../../../context/uploadDownloadContext/UploadDownloadContext";
+import Downloader from "../../../../../downloader/Downloader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -25,14 +25,26 @@ function niceCeil(value: number) {
   return nice * base;
 }
 
-const COLORS = [
-  "#e62833",
-  "#33a1fd",
-  "#2ecc71",
-  "#f1c40f",
-  "#9b59b6",
-  "#ff7f50",
-];
+function getLineColor(idx: number, type: "download" | "upload") {
+  if (type === "download") {
+    // first download always your brand color
+    if (idx === 0) return "#d40213";
+
+    // warm hues from 0° (red) → 60° (yellow)
+    const hueStart = 0;
+    const hueRange = 60;
+    // skip first slot, then spread the rest evenly
+    const hue = hueStart + (((idx - 1) * 17) % hueRange);
+    return `hsl(${hue}, 75%, 50%)`;
+  } else {
+    // cool hues from 180° (cyan) → 260° (blue‑violet)
+    const hueStart = 180;
+    const hueRange = 80;
+    const hue = hueStart + ((idx * 17) % hueRange);
+    return `hsl(${hue}, 75%, 50%)`;
+  }
+}
+
 const WINDOW_MS = 20_000;
 
 const UNITS = ["b/s", "B/s", "KB/s", "MB/s", "GB/s", "TB/s"];
@@ -64,8 +76,11 @@ function chooseUnit(KB: number) {
 }
 
 export default function MultiDownloadChart() {
-  const { getCurrentDownloads } = useUploadDownloadContext();
-  const downloads = Object.values(getCurrentDownloads());
+  const { getCurrentDownloads, getCurrentUploads } = useUploadDownloadContext();
+  const traffic = [
+    ...Object.values(getCurrentDownloads()),
+    ...Object.values(getCurrentUploads()),
+  ];
 
   const [now, setNow] = useState(Date.now());
   const [_, setRerender] = useState(false);
@@ -77,17 +92,25 @@ export default function MultiDownloadChart() {
   }, []);
 
   // Process each download series
-  const seriesData = downloads.map((dl) => {
-    const downloadSpeed = dl.getAbsoluteSpeedHistory();
+  const seriesData: {
+    filename: string;
+    data: {
+      time: number;
+      speed: number;
+    }[];
+    type: "download" | "upload";
+  }[] = traffic.map((t) => {
+    const absoluteSpeed = t.getAbsoluteSpeedHistory();
 
-    const data = downloadSpeed.map((d) => ({
-      time: d.time,
-      speed: d.speedKBps,
+    const data = absoluteSpeed.map((s) => ({
+      time: s.time,
+      speed: s.speedKBps,
     }));
 
     return {
-      filename: dl.filename,
+      filename: t.filename,
       data,
+      type: t instanceof Downloader ? "download" : "upload",
     };
   });
 
@@ -116,7 +139,13 @@ export default function MultiDownloadChart() {
     domainEnd,
   ];
 
-  const handleDownloadListener = (message: DownloadListenerTypes) => {
+  const handleDownloadListener = (
+    message:
+      | { type: "downloadProgress" }
+      | { type: "downloadPaused" }
+      | { type: "downloadResumed" }
+      | Record<string, any>,
+  ) => {
     switch (message.type) {
       case "downloadProgress":
         setRerender((prev) => !prev);
@@ -133,18 +162,28 @@ export default function MultiDownloadChart() {
   };
 
   useEffect(() => {
-    downloads.forEach((d) => d.addDownloadListener(handleDownloadListener));
+    traffic.forEach((t) => {
+      if (t instanceof Downloader) {
+        t.addDownloadListener(handleDownloadListener);
+      } else {
+        t.addChunkedUploadListener(handleDownloadListener);
+      }
+    });
 
     return () => {
-      downloads.forEach((d) =>
-        d.removeDownloadListener(handleDownloadListener),
-      );
+      traffic.forEach((t) => {
+        if (t instanceof Downloader) {
+          t.removeDownloadListener(handleDownloadListener);
+        } else {
+          t.removeChunkedUploadListener(handleDownloadListener);
+        }
+      });
     };
   }, []);
 
   return (
     <>
-      {downloads.length !== 0 && (
+      {traffic.length !== 0 && (
         <>
           <div className="mx-6 font-Josefin text-xl text-fg-white-95">
             Uploads and downloads
@@ -233,11 +272,11 @@ export default function MultiDownloadChart() {
                   }}
                 />
 
-                {seriesData.map((s, idx) => {
-                  // filter each series individually down to [domainStart, domainEnd]
+                {seriesData.map((s, i) => {
                   const data = s.data.filter(
                     (d) => d.time >= domainStart && d.time <= domainEnd,
                   );
+
                   return (
                     <Line
                       key={s.filename}
@@ -248,7 +287,7 @@ export default function MultiDownloadChart() {
                       dataKey="speed"
                       name={s.filename}
                       type="linear"
-                      stroke={COLORS[idx % COLORS.length]}
+                      stroke={getLineColor(i, s.type)}
                       dot={false}
                       strokeWidth={2}
                       isAnimationActive={false}

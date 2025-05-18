@@ -1,58 +1,132 @@
+import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import {
+  LoadingStateTypes,
   TableContentStateTypes,
-  StaticContentTypes,
 } from "../../../../universal/contentTypeConstant";
+import Downloader from "../../downloader/Downloader";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
 
 export type SvgListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" };
 
 class TableSvgMedia {
   svg: SVGSVGElement | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
   private svgListeners: Set<(message: SvgListenerTypes) => void> = new Set();
+
+  downloader: undefined | Downloader;
 
   constructor(
     public svgId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: TableContentStateTypes[],
-    private getSVG: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
-    this.getSVG("svg", this.svgId, this.filename);
-    this.addMessageListener(this.getSvgListener);
+    this.downloader = new Downloader(
+      "svg",
+      this.svgId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.svgId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor = () => {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
-    this.removeMessageListener(this.getSvgListener);
-
     this.svgListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.svgId);
+      this.downloader = undefined;
+    }
+  };
+
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
+
+    this.fileSize = fileSize;
+
+    this.blobURL = URL.createObjectURL(blob);
+
+    const response = await fetch(this.blobURL);
+    const svgText = await response.text();
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+
+    this.svg = svgDoc.documentElement as unknown as SVGSVGElement;
+
+    this.svg.setAttribute("height", "100%");
+    this.svg.setAttribute("width", "auto");
+
+    this.aspect = this.getSvgAspectRatio();
+
+    this.loadingState = "downloaded";
+
+    this.svgListeners.forEach((listener) => {
+      listener({ type: "downloadComplete" });
+    });
+
+    this.downloader = undefined;
+  };
+
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
+
+        this.svgListeners.forEach((listener) => {
+          listener({ type: "downloadFailed" });
+        });
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.svgListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.svgListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   reloadContent = () => {
-    this.fileChunks = [];
     this.fileSize = 0;
     this.blobURL && URL.revokeObjectURL(this.blobURL);
     this.blobURL = undefined;
@@ -61,61 +135,18 @@ class TableSvgMedia {
 
     this.aspect = undefined;
 
-    this.getSVG("svg", this.svgId, this.filename);
-    this.addMessageListener(this.getSvgListener);
-  };
-
-  private getSvgListener = async (
-    message: IncomingTableStaticContentMessages,
-  ) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
-
-      if (contentType !== "svg" || contentId !== this.svgId) {
-        return;
-      }
-
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
-
-      if (contentType !== "svg" || contentId !== this.svgId) {
-        return;
-      }
-
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
-
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
-
-      const response = await fetch(this.blobURL);
-      const svgText = await response.text();
-      const parser = new DOMParser();
-      const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
-
-      this.svg = svgDoc.documentElement as unknown as SVGSVGElement;
-
-      this.svg.setAttribute("height", "100%");
-      this.svg.setAttribute("width", "auto");
-
-      this.aspect = this.getSvgAspectRatio();
-
-      this.loadingState = "downloaded";
-
-      this.svgListeners.forEach((listener) => {
-        listener({ type: "downloadComplete" });
-      });
-
-      this.removeMessageListener(this.getSvgListener);
-    }
+    this.downloader = new Downloader(
+      "svg",
+      this.svgId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.svgId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   };
 
   addSvgListener = (listener: (message: SvgListenerTypes) => void): void => {
@@ -173,6 +204,29 @@ class TableSvgMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "svg",
+      this.svgId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.svgId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.svgListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

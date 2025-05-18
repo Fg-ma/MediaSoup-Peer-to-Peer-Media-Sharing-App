@@ -108,7 +108,7 @@ export default function FgAudioElementContainer({
     useState(false);
   const audioElementSVGRef = useRef<SVGSVGElement | null>(null);
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
   const [adjustingDimensions, setAdjustingDimensions] = useState(false);
   const [inAudioContainer, setInAudioContainer] = useState(false);
 

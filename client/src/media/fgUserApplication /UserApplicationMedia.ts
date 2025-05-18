@@ -1,49 +1,63 @@
-import {
-  IncomingUserStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/userStaticContentServer/lib/typeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import {
   UserContentStateTypes,
-  StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
+import Downloader from "../../downloader/Downloader";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
+import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 
 export type ApplicationListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" }
   | { type: "rectifyEffectMeshCount" };
 
 class UserApplicationMedia {
   application: HTMLImageElement | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
   private applicationListeners: Set<
     (message: ApplicationListenerTypes) => void
   > = new Set();
 
+  downloader: undefined | Downloader;
+
   constructor(
     public applicationId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: UserContentStateTypes[],
-    private getApplication: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
+    private userStaticContentSocket: React.MutableRefObject<
+      UserStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
-    this.getApplication("application", this.applicationId, this.filename);
-    this.addMessageListener(this.getApplicationListener);
+    this.downloader = new Downloader(
+      "application",
+      this.applicationId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.applicationId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor() {
@@ -57,53 +71,83 @@ class UserApplicationMedia {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.applicationListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.applicationId);
+      this.downloader = undefined;
+    }
   }
 
-  private getApplicationListener = (
-    message: IncomingUserStaticContentMessages,
-  ) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
-      if (contentType !== "application" || contentId !== this.applicationId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    const bitmap = await createImageBitmap(blob);
 
-      if (contentType !== "application" || contentId !== this.applicationId) {
-        return;
-      }
+    // replace your createImageBitmap + canvas block with:
+    const MAX_DIM = 1024;
+    const { width: origW, height: origH } = bitmap;
+    const scale = Math.min(1, MAX_DIM / origW, MAX_DIM / origH);
+    const targetW = Math.round(origW * scale);
+    const targetH = Math.round(origH * scale);
 
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
+    const resizedBitmap = await createImageBitmap(bitmap, {
+      resizeWidth: targetW,
+      resizeHeight: targetH,
+      resizeQuality: "high",
+    });
 
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
+    const canvas = new OffscreenCanvas(targetW, targetH);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(resizedBitmap, 0, 0);
+    const blobOut = await canvas.convertToBlob();
 
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
-      this.application = document.createElement("img");
-      this.application.src = this.blobURL;
+    this.blobURL = URL.createObjectURL(blobOut);
+    this.application = document.createElement("img");
+    this.application.src = this.blobURL;
 
-      this.application.onload = () => {
-        this.aspect =
-          (this.application?.width ?? 1) / (this.application?.height ?? 1);
+    this.application.onload = () => {
+      this.aspect =
+        (this.application?.width ?? 1) / (this.application?.height ?? 1);
 
-        this.loadingState = "downloading";
+      this.loadingState = "downloaded";
+
+      this.applicationListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
+      });
+    };
+
+    this.downloader = undefined;
+  };
+
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
 
         this.applicationListeners.forEach((listener) => {
-          listener({ type: "downloadComplete" });
+          listener({ type: "downloadFailed" });
         });
-      };
-
-      this.removeMessageListener(this.getApplicationListener);
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.applicationListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.applicationListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -151,6 +195,29 @@ class UserApplicationMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "application",
+      this.applicationId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.applicationId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.applicationListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

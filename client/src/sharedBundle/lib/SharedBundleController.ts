@@ -94,9 +94,10 @@ class SharedBundleController extends SharedBundleSocket {
           this.deadbanding,
           this.userDevice,
           this.userEffects,
-          this.tableStaticContentSocket.current.getFile,
-          this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
         this.userMedia.current.video.table[video.videoId] = newVideoMedia;
@@ -182,9 +183,10 @@ class SharedBundleController extends SharedBundleSocket {
           svg.filename,
           svg.mimeType as TableTopStaticMimeType,
           svg.state,
-          this.tableStaticContentSocket.current.getFile,
-          this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
         this.userMedia.current.svg.table[svg.svgId] = newSvgMedia;
@@ -215,9 +217,10 @@ class SharedBundleController extends SharedBundleSocket {
           textItem.filename,
           textItem.mimeType as TableTopStaticMimeType,
           textItem.state,
-          this.tableStaticContentSocket.current.getFile,
-          this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
         this.userMedia.current.text.table[textItem.textId] = newTextMedia;
@@ -239,9 +242,10 @@ class SharedBundleController extends SharedBundleSocket {
           application.filename,
           application.mimeType as TableTopStaticMimeType,
           application.state,
-          this.tableStaticContentSocket.current.getFile,
-          this.tableStaticContentSocket.current.addMessageListener,
-          this.tableStaticContentSocket.current.removeMessageListener,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
         this.userMedia.current.application.table[application.applicationId] =
@@ -385,9 +389,10 @@ class SharedBundleController extends SharedBundleSocket {
               this.deadbanding,
               this.userDevice,
               this.userEffects,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
 
             this.userMedia.current.video.table[contentId] = newVideoMedia;
@@ -508,9 +513,10 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
 
             this.userMedia.current.svg.table[contentId] = newSvgMedia;
@@ -551,9 +557,10 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
           }
 
@@ -580,9 +587,10 @@ class SharedBundleController extends SharedBundleSocket {
               filename,
               mimeType,
               state,
-              this.tableStaticContentSocket.current.getFile,
-              this.tableStaticContentSocket.current.addMessageListener,
-              this.tableStaticContentSocket.current.removeMessageListener,
+              this.tableStaticContentSocket,
+              this.sendDownloadSignal,
+              this.addCurrentDownload,
+              this.removeCurrentDownload,
             );
 
             this.userMedia.current.text.table[contentId] = newTextMedia;

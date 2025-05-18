@@ -7,7 +7,7 @@ export type DownloadListenerTypes =
 
 export type onDownloadFinishType = {
   type: "downloadFinish";
-  data: { buffer: Uint8Array<ArrayBuffer>; fileSize: number };
+  data: { blob: Blob; fileSize: number };
 };
 
 export type onDownloadPausedType = {

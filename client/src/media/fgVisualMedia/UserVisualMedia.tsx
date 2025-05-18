@@ -138,7 +138,7 @@ export default function UserVisualMedia({
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [_, setCaptionsActive] = useState(false);
+  const [captionsActive, setCaptionsActive] = useState(false);
 
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -160,7 +160,7 @@ export default function UserVisualMedia({
 
   const initTimeOffset = useRef(0);
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const positioningListeners = useRef<{
     [username: string]: {

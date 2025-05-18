@@ -31,6 +31,9 @@ class BabylonRenderLoop {
 
   private hidebackgroundType: "image" | "color" = "image";
 
+  private _tempNosePos = { x: 0, y: 0 };
+  private _tempShift = { x: 0, y: 0 };
+
   constructor(
     private scene: Scene,
     private camera: UniversalCamera,
@@ -304,20 +307,21 @@ class BabylonRenderLoop {
     return scale * Math.max(verticalExtent, horizontalExtent);
   };
 
-  private directionalShift = (
+  private directionalShift(
     shiftParallel: number,
     shiftPerpendicular: number,
     headAngle: number,
-  ): { x: number; y: number } => {
-    let x = Math.cos(headAngle) * shiftParallel;
-    let y = Math.sin(headAngle) * shiftParallel;
+  ): { x: number; y: number } {
+    const out = this._tempShift;
+    out.x = Math.cos(headAngle) * shiftParallel;
+    out.y = Math.sin(headAngle) * shiftParallel;
 
-    const perpendicularAngle = headAngle + Math.PI / 2;
-    x += Math.cos(perpendicularAngle) * shiftPerpendicular;
-    y += Math.sin(perpendicularAngle) * shiftPerpendicular;
+    const perp = headAngle + Math.PI / 2;
+    out.x += Math.cos(perp) * shiftPerpendicular;
+    out.y += Math.sin(perp) * shiftPerpendicular;
 
-    return { x, y };
-  };
+    return out;
+  }
 
   private updateMeshPositionsScaleRotation = () => {
     if (!this.faceLandmarks) {
@@ -361,11 +365,12 @@ class BabylonRenderLoop {
         faceId,
         landmarks,
       } of this.faceLandmarks.getFaceIdLandmarksPairs()) {
-        const nosePosition = { x: landmarks[1].x, y: landmarks[1].y };
+        this._tempNosePos.x = landmarks[1].x;
+        this._tempNosePos.y = landmarks[1].y;
 
-        const distance = Math.sqrt(
-          Math.pow(nosePosition.x - meshPosition[0], 2) +
-            Math.pow(nosePosition.y - meshPosition[1], 2),
+        const distance = Math.hypot(
+          this._tempNosePos.x - meshPosition[0],
+          this._tempNosePos.y - meshPosition[1],
         );
         if (
           // @ts-expect-error: no types enforce in mesh metadata

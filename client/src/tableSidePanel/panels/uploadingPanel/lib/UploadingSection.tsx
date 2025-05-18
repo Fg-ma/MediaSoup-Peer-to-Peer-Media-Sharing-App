@@ -62,11 +62,26 @@ export default function UploadingSection({
             width: `calc(100% - ${rightLoadingInfoRef.current?.clientWidth ?? 0}px)`,
           }}
         >
-          <FgImageElement
-            className="aspect-square h-full"
-            imageClassName="object-contain"
-            src={upload.uploadUrl}
-          />
+          {upload.file.type === "image/svg+xml"
+            ? upload.uploadUrl && (
+                <FgSVGElement
+                  className="aspect-square h-full"
+                  src={upload.uploadUrl}
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                  ]}
+                />
+              )
+            : (upload.file.type.startsWith("image/") ||
+                upload.file.type.startsWith("video/")) &&
+              upload.uploadUrl && (
+                <FgImageElement
+                  className="aspect-square h-full"
+                  imageClassName="object-contain"
+                  src={upload.uploadUrl}
+                />
+              )}
           <HoverElement
             externalRef={filenameRef}
             className="h-full grow truncate font-K2D text-xl text-fg-white"

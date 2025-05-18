@@ -57,9 +57,7 @@ export default function MoreInfoSection({
 }: {
   download: Downloader;
 }) {
-  const { mimeType, fileSize, downloadSpeed } = download.getFileInfo();
-
-  // Apply simple moving average smoothing over last 3 points
+  const { mimeType, fileSize, downloadSpeed, ETA } = download.getFileInfo();
 
   // Window and tick settings
   const WINDOW_MS = 20_000; // 20 seconds window
@@ -92,6 +90,9 @@ export default function MoreInfoSection({
   return (
     <div className="w-full space-y-2 rounded-xl p-4 font-K2D">
       <div className="space-y-1 text-white">
+        <p>
+          <strong>ETA:</strong> {ETA}
+        </p>
         <p>
           <strong>MIME type:</strong> {mimeType}
         </p>

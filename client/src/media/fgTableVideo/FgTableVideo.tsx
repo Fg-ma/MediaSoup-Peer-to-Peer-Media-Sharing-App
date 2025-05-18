@@ -68,7 +68,7 @@ export default function FgTableVideo({
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [_, setCaptionsActive] = useState(false);
+  const [captionsActive, setCaptionsActive] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
@@ -80,7 +80,7 @@ export default function FgTableVideo({
   const recording = useRef(false);
   const downloadRecordingReady = useRef(false);
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const positioningListeners = useRef<{
     [username: string]: {
@@ -228,6 +228,10 @@ export default function FgTableVideo({
 
   return (
     <FgMediaContainer
+      filename={videoMediaInstance.videoMedia.filename}
+      pauseDownload={videoMediaInstance.videoMedia.downloader?.pause}
+      resumeDownload={videoMediaInstance.videoMedia.downloader?.resume}
+      retryDownload={videoMediaInstance.videoMedia.retryDownload}
       downloadingState={videoMediaInstance.videoMedia.loadingState}
       addDownloadListener={
         videoMediaInstance.videoMedia.loadingState === "downloading"

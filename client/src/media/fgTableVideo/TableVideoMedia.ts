@@ -1,22 +1,30 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import shaka from "shaka-player";
 import { UserEffectsType } from "../../../../universal/effectsTypeConstant";
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import TableVideoAudioMedia from "./TableVideoAudioMedia";
 import {
   TableContentStateTypes,
-  StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../lib/UserDevice";
+import Downloader from "../../downloader/Downloader";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
 
 export type VideoListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" }
   | { type: "rectifyEffectMeshCount" };
 
@@ -28,10 +36,9 @@ class TableVideoMedia {
 
   dashUrl: string | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
   private videoListeners: Set<(message: VideoListenerTypes) => void> =
@@ -61,6 +68,8 @@ class TableVideoMedia {
 
   babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
 
+  downloader: undefined | Downloader;
+
   constructor(
     public videoId: string,
     public filename: string,
@@ -69,17 +78,12 @@ class TableVideoMedia {
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private userEffects: React.MutableRefObject<UserEffectsType>,
-    private getVideo: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
     // this.shakaPlayer = new shaka.Player(this.video);
 
@@ -201,8 +205,18 @@ class TableVideoMedia {
       }
     };
 
-    this.getVideo("video", this.videoId, this.filename);
-    this.addMessageListener(this.getVideoListener);
+    this.downloader = new Downloader(
+      "video",
+      this.videoId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.videoId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor() {
@@ -246,76 +260,88 @@ class TableVideoMedia {
     }
 
     this.faceCountChangeListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.videoId);
+      this.downloader = undefined;
+    }
   }
 
-  private getVideoListener = (message: IncomingTableStaticContentMessages) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
-      if (contentType !== "video" || contentId !== this.videoId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    this.blobURL = URL.createObjectURL(blob);
+    this.video = document.createElement("video");
+    this.video.src = this.blobURL;
 
-      if (contentType !== "video" || contentId !== this.videoId) {
-        return;
-      }
+    this.video.addEventListener("loadeddata", () => {
+      this.aspect =
+        (this.video?.videoWidth ?? 1) / (this.video?.videoHeight ?? 1);
 
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
+      if (this.video)
+        this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
+          false,
+          this.faceLandmarks,
+          this.aspect,
+          this.video,
+          this.faceMeshWorker,
+          this.faceMeshProcessing,
+          this.faceDetectionWorker,
+          this.faceDetectionProcessing,
+          this.selfieSegmentationWorker,
+          this.selfieSegmentationProcessing,
+          this.userDevice,
+        );
 
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
+      this.loadingState = "downloaded";
 
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
-      this.video = document.createElement("video");
-      this.video.src = this.blobURL;
+      // this.audioStream = (this.video as any)?.captureStream();
 
-      this.video.addEventListener("loadeddata", () => {
-        this.aspect =
-          (this.video?.videoWidth ?? 1) / (this.video?.videoHeight ?? 1);
+      // if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
+      //   this.videoAudioMedia = new TableVideoAudioMedia(
+      //     this.videoId,
+      //     this.audioStream,
+      //     this.userEffects,
+      //   );
+      // }
 
-        if (this.video)
-          this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
-            false,
-            this.faceLandmarks,
-            this.aspect,
-            this.video,
-            this.faceMeshWorker,
-            this.faceMeshProcessing,
-            this.faceDetectionWorker,
-            this.faceDetectionProcessing,
-            this.selfieSegmentationWorker,
-            this.selfieSegmentationProcessing,
-            this.userDevice,
-          );
+      this.videoListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
+      });
+    });
 
-        this.loadingState = "downloaded";
+    this.downloader = undefined;
+  };
 
-        // this.audioStream = (this.video as any)?.captureStream();
-
-        // if (this.audioStream && this.audioStream.getAudioTracks().length > 0) {
-        //   this.videoAudioMedia = new TableVideoAudioMedia(
-        //     this.videoId,
-        //     this.audioStream,
-        //     this.userEffects,
-        //   );
-        // }
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
 
         this.videoListeners.forEach((listener) => {
-          listener({ type: "downloadComplete" });
+          listener({ type: "downloadFailed" });
         });
-      });
-
-      this.removeMessageListener(this.getVideoListener);
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.videoListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.videoListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -445,6 +471,29 @@ class TableVideoMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "video",
+      this.videoId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.videoId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.videoListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

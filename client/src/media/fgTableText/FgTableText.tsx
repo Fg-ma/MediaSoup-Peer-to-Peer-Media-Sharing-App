@@ -107,6 +107,10 @@ export default function FgTableText({
 
   return (
     <FgMediaContainer
+      filename={textMediaInstance.textMedia.filename}
+      pauseDownload={textMediaInstance.textMedia.downloader?.pause}
+      resumeDownload={textMediaInstance.textMedia.downloader?.resume}
+      retryDownload={textMediaInstance.textMedia.retryDownload}
       downloadingState={textMediaInstance.textMedia.loadingState}
       addDownloadListener={
         textMediaInstance.textMedia.loadingState === "downloading"

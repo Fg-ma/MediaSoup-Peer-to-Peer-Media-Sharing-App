@@ -22,6 +22,8 @@ import UserSoundClipMedia from "../../media/fgUserSoundClip/UserSoundClipMedia";
 import UserSvgMedia from "../../media/fgUserSvg/UserSvgMedia";
 import UserTextMedia from "../../media/fgUserText/UserTextMedia";
 import UserVideoMedia from "../../media/fgUserVideo/UserVideoMedia";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import Downloader from "../../downloader/Downloader";
 
 class UserStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -34,6 +36,12 @@ class UserStaticContentSocketController {
     private userId: string,
     private instance: string,
     private userMedia: React.MutableRefObject<UserMediaType>,
+    private userStaticContentSocket: React.MutableRefObject<
+      UserStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
     this.connect(this.url);
   }
@@ -54,6 +62,7 @@ class UserStaticContentSocketController {
 
   private connect = (url: string) => {
     this.ws = new WebSocket(url);
+    this.ws.binaryType = "arraybuffer";
 
     this.ws.onmessage = (event: MessageEvent) => {
       let message: IncomingUserStaticContentMessages;
@@ -278,9 +287,10 @@ class UserStaticContentSocketController {
         filename,
         mimeType,
         state,
-        this.getFile,
-        this.addMessageListener,
-        this.removeMessageListener,
+        this.userStaticContentSocket,
+        this.sendDownloadSignal,
+        this.addCurrentDownload,
+        this.removeCurrentDownload,
       );
   };
 
@@ -295,9 +305,10 @@ class UserStaticContentSocketController {
       filename,
       mimeType,
       state,
-      this.getFile,
-      this.addMessageListener,
-      this.removeMessageListener,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
     );
   };
 
@@ -312,9 +323,10 @@ class UserStaticContentSocketController {
       filename,
       mimeType,
       state,
-      this.getFile,
-      this.addMessageListener,
-      this.removeMessageListener,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
     );
   };
 
@@ -329,9 +341,10 @@ class UserStaticContentSocketController {
       filename,
       mimeType,
       state,
-      this.getFile,
-      this.addMessageListener,
-      this.removeMessageListener,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
     );
   };
 
@@ -346,9 +359,10 @@ class UserStaticContentSocketController {
       filename,
       mimeType,
       state,
-      this.getFile,
-      this.addMessageListener,
-      this.removeMessageListener,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
     );
   };
 
@@ -363,9 +377,10 @@ class UserStaticContentSocketController {
       filename,
       mimeType,
       state,
-      this.getFile,
-      this.addMessageListener,
-      this.removeMessageListener,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
     );
   };
 
@@ -396,9 +411,10 @@ class UserStaticContentSocketController {
         svg.filename,
         svg.mimeType,
         svg.state,
-        this.getFile,
-        this.addMessageListener,
-        this.removeMessageListener,
+        this.userStaticContentSocket,
+        this.sendDownloadSignal,
+        this.addCurrentDownload,
+        this.removeCurrentDownload,
       );
     }
   };

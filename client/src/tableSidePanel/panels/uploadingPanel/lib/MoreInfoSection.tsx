@@ -57,7 +57,7 @@ export default function MoreInfoSection({
 }: {
   upload: ChunkedUploader;
 }) {
-  const { mimeType, fileSize, uploadSpeed } = upload.getFileInfo();
+  const { mimeType, fileSize, uploadSpeed, ETA } = upload.getFileInfo();
 
   // Window and tick settings
   const WINDOW_MS = 20_000; // 20 seconds window
@@ -90,6 +90,9 @@ export default function MoreInfoSection({
   return (
     <div className="w-full space-y-2 rounded-xl p-4 font-K2D">
       <div className="space-y-1 text-white">
+        <p>
+          <strong>ETA:</strong> {ETA}
+        </p>
         <p>
           <strong>MIME type:</strong> {mimeType}
         </p>

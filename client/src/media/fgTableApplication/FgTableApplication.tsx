@@ -60,7 +60,7 @@ export default function FgTableApplication({
     userEffectsStyles.current.application[applicationInstanceId].tint.color,
   );
 
-  const [_rerender, setRerender] = useState(false);
+  const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
@@ -109,6 +109,16 @@ export default function FgTableApplication({
       subContainerRef.current?.appendChild(
         applicationMediaInstance.instanceCanvas,
       );
+
+      positioning.current.scale = {
+        x: applicationMediaInstance.applicationMedia.aspect
+          ? positioning.current.scale.y *
+            applicationMediaInstance.applicationMedia.aspect
+          : positioning.current.scale.x,
+        y: positioning.current.scale.y,
+      };
+
+      setRerender((prev) => !prev);
     }
 
     // Set up initial conditions
@@ -157,6 +167,14 @@ export default function FgTableApplication({
 
   return (
     <FgMediaContainer
+      filename={applicationMediaInstance.applicationMedia.filename}
+      pauseDownload={
+        applicationMediaInstance.applicationMedia.downloader?.pause
+      }
+      resumeDownload={
+        applicationMediaInstance.applicationMedia.downloader?.resume
+      }
+      retryDownload={applicationMediaInstance.applicationMedia.retryDownload}
       downloadingState={applicationMediaInstance.applicationMedia.loadingState}
       addDownloadListener={
         applicationMediaInstance.applicationMedia.loadingState === "downloading"

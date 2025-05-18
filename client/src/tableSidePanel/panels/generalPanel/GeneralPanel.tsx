@@ -1,6 +1,6 @@
 import React from "react";
 import SelectedSection from "./lib/selectedSection/SelectedSection";
-import UploadDownloadSection from "./lib/UploadDownloadSection";
+import UploadDownloadSection from "./lib/uploadDownloadSection/UploadDownloadSection";
 
 export default function GeneralPanel({
   tablePanelRef,

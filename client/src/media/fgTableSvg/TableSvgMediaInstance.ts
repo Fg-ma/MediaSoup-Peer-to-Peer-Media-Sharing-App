@@ -84,7 +84,7 @@ class TableSvgMediaInstance {
   };
 
   private onDownloadComplete = () => {
-    this.instanceSvg = this.svgMedia.svg?.cloneNode(true) as SVGSVGElement;
+    this.instanceSvg = this.svgMedia.svg!.cloneNode(true) as SVGSVGElement;
     this.updateAllEffects();
   };
 

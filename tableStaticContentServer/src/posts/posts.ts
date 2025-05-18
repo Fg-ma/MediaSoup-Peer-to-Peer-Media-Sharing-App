@@ -40,6 +40,12 @@ class Posts {
 
       const bb = busboy({ headers: this.collectHeaders(req) });
 
+      let aborted = false;
+      res.onAborted(() => {
+        aborted = true;
+        bb.destroy();
+      });
+
       let metadata: {
         tableId: string;
         contentId: string;
@@ -130,10 +136,12 @@ class Posts {
       });
 
       bb.on("close", () => {
-        res.cork(() => {
-          console.log("Upload complete");
-          res.writeStatus("200 OK").end("That's all folks!");
-        });
+        if (!aborted) {
+          res.cork(() => {
+            console.log("Upload complete");
+            res.writeStatus("200 OK").end("That's all folks!");
+          });
+        }
       });
 
       this.pipeReqToBusboy(res, bb);
@@ -153,7 +161,6 @@ class Posts {
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
-        console.warn("Request aborted by client");
       });
 
       res.onData(async (chunk, isLast) => {
@@ -202,22 +209,25 @@ class Posts {
 
             this.uploadSessions.set(uploadId, sessionData);
 
-            res.cork(() => {
-              res
-                .writeStatus("200 OK")
-                .writeHeader("Content-Type", "application/json")
-                .end(JSON.stringify({ uploadId }));
-            });
-          } catch (err) {
-            console.error("Error in /upload-meta:", err);
-            res.cork(() => {
-              res
-                .writeStatus("400 Bad Request")
-                .writeHeader("Content-Type", "application/json")
-                .end(
-                  JSON.stringify({ error: "Invalid JSON or missing fields" })
-                );
-            });
+            if (!aborted) {
+              res.cork(() => {
+                res
+                  .writeStatus("200 OK")
+                  .writeHeader("Content-Type", "application/json")
+                  .end(JSON.stringify({ uploadId }));
+              });
+            }
+          } catch (_) {
+            if (!aborted) {
+              res.cork(() => {
+                res
+                  .writeStatus("400 Bad Request")
+                  .writeHeader("Content-Type", "application/json")
+                  .end(
+                    JSON.stringify({ error: "Invalid JSON or missing fields" })
+                  );
+              });
+            }
           }
         }
       });
@@ -252,6 +262,25 @@ class Posts {
         totalChunks = -1;
       let buffer = Buffer.alloc(0);
 
+      let aborted = false;
+      res.onAborted(() => {
+        aborted = true;
+        bb.destroy();
+
+        tableTopCeph.posts
+          .abortMultipartUpload(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            uploadId
+          )
+          .catch((err) => {
+            console.error("Failed to abort multipart in Ceph:", err);
+          });
+
+        this.uploadSessions.delete(uploadId);
+        this.chunkStates.delete(uploadId);
+      });
+
       bb.on("field", (name, val) => {
         if (name === "chunkIndex") chunkIndex = parseInt(val, 10);
         if (name === "totalChunks") totalChunks = parseInt(val, 10);
@@ -263,6 +292,8 @@ class Posts {
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
         stream.on("end", async () => {
+          if (aborted) return;
+
           const state = this.chunkStates.get(uploadId);
           if (!state) return;
 
@@ -277,6 +308,7 @@ class Posts {
           if (!ETag) return;
           state.parts.push({ PartNumber: chunkIndex + 1, ETag });
 
+          if (!aborted) return;
           res.cork(() => {
             res.writeStatus("200 OK").end("Chunk received");
           });
@@ -332,7 +364,7 @@ class Posts {
         });
       });
 
-      this.pipeReqToBusboy(res, bb, uploadId);
+      this.pipeReqToBusboy(res, bb);
     });
 
     app.post("/cancel-upload/:uploadId", (res, req) => {
@@ -347,7 +379,6 @@ class Posts {
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
-        console.warn("Cancel request aborted by client");
       });
 
       const uploadId = req.getParameter(0);
@@ -384,8 +415,7 @@ class Posts {
               res.writeStatus("200 OK").end("Upload cancelled");
             });
           }
-        } catch (err) {
-          console.error("Error cancelling upload:", err);
+        } catch (_) {
           if (!aborted) {
             res.cork(() => {
               res.writeStatus("500 Internal Server Error").end("Cancel failed");
@@ -402,22 +432,13 @@ class Posts {
     return h;
   }
 
-  private pipeReqToBusboy(
-    res: uWS.HttpResponse,
-    bb: busboy.Busboy,
-    uploadId?: string
-  ) {
+  private pipeReqToBusboy(res: uWS.HttpResponse, bb: busboy.Busboy) {
     let buffer = Buffer.alloc(0);
     res.onData((chunk, isLast) => {
       buffer = Buffer.concat([buffer, Buffer.from(chunk)]);
       if (isLast) {
         bb.end(buffer);
       }
-    });
-
-    res.onAborted(() => {
-      bb.destroy();
-      if (uploadId) this.uploadSessions.delete(uploadId);
     });
   }
 

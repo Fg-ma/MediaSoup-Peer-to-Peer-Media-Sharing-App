@@ -370,8 +370,8 @@ class BabylonScene {
       this.scene,
     );
 
-    this.hideBackgroundMaterial.useAlphaFromDiffuseTexture = true; // Use the alpha channel from the diffuse texture
-    this.hideBackgroundMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND; // Set transparency mode to alpha test
+    this.hideBackgroundMaterial.useAlphaFromDiffuseTexture = true;
+    this.hideBackgroundMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
 
     this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
   };

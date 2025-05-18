@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, Transition, Variants } from "framer-motion";
+import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
@@ -451,17 +451,27 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable sub-media-container pointer-events-none absolute h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >
-        {downloadingState === "downloading" && (
-          <LoadingElement
-            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
-            pauseDownload={pauseDownload}
-            aspectRatio={aspectRatio}
-          />
-        )}
+        <AnimatePresence>
+          {downloadingState === "downloading" && (
+            <motion.div
+              key="loading-element"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+            >
+              <LoadingElement
+                className="h-full w-full"
+                pauseDownload={pauseDownload}
+                aspectRatio={aspectRatio}
+              />{" "}
+            </motion.div>
+          )}
+        </AnimatePresence>
         {downloadingState === "failed" && (
           <DownloadFailed
             className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"

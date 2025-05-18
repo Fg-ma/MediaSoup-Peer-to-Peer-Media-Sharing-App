@@ -11,10 +11,10 @@ import { StaticContentTypes } from "../../../universal/contentTypeConstant";
 import { DownloadSignals } from "../context/uploadDownloadContext/lib/typeConstant";
 import TableStaticContentSocketController from "../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadListenerTypes } from "./lib/typeConstant";
+import UserStaticContentSocketController from "src/serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import { IncomingUserStaticContentMessages } from "src/serverControllers/userStaticContentServer/lib/typeConstant";
 
 class Downloader {
-  private DOWNLOAD_CHUNK_SIZE = 1024 * 1024;
-
   private _paused: boolean = false;
 
   private fileSize = 0;
@@ -37,17 +37,19 @@ class Downloader {
     private contentId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    private tableStaticContentSocket: React.MutableRefObject<
-      TableStaticContentSocketController | undefined
+    private staticContentSocket: React.MutableRefObject<
+      | TableStaticContentSocketController
+      | UserStaticContentSocketController
+      | undefined
     >,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
-    tableStaticContentSocket.current?.addMessageListener(this.downloadListener);
+    staticContentSocket.current?.addMessageListener(this.downloadListener);
   }
 
   deconstructor = () => {
-    this.tableStaticContentSocket.current?.removeMessageListener(
+    this.staticContentSocket.current?.removeMessageListener(
       this.downloadListener,
     );
     this.listeners.clear();
@@ -67,7 +69,7 @@ class Downloader {
 
   private requestNextChunk = () => {
     if (this.offset < this.fileSize)
-      this.tableStaticContentSocket.current?.getChunk(
+      this.staticContentSocket.current?.getChunk(
         this.contentType,
         this.contentId,
         `bytes=${this.offset}-${Math.min(this.fileSize, this.offset + 1024 * 1024)}`,
@@ -130,23 +132,19 @@ class Downloader {
       if (this.offset < this.fileSize) {
         this.requestNextChunk();
       } else {
-        const buffer = new Uint8Array(this.fileSize);
-
-        let total = 0;
-        for (const chunk of this.fileChunks) {
-          buffer.set(chunk, total);
-          total += chunk.length;
-        }
+        const blob = new Blob(this.fileChunks, {
+          type: this.mimeType,
+        });
 
         const finishMessage = {
           type: "downloadFinish",
-          data: { buffer, fileSize: this.fileSize },
+          data: { blob, fileSize: this.fileSize },
         };
         this.listeners.forEach((listener) => {
           listener(
             finishMessage as {
               type: "downloadFinish";
-              data: { buffer: Uint8Array<ArrayBuffer>; fileSize: number };
+              data: { blob: Blob; fileSize: number };
             },
           );
         });
@@ -179,15 +177,19 @@ class Downloader {
 
     const { buffer } = message.data;
 
+    const blob = new Blob([buffer], {
+      type: this.mimeType,
+    });
+
     const finishMessage = {
       type: "downloadFinish",
-      data: { buffer, fileSize: this.fileSize },
+      data: { blob, fileSize: this.fileSize },
     };
     this.listeners.forEach((listener) => {
       listener(
         finishMessage as {
           type: "downloadFinish";
-          data: { buffer: Uint8Array<ArrayBuffer>; fileSize: number };
+          data: { blob: Blob; fileSize: number };
         },
       );
     });
@@ -219,7 +221,11 @@ class Downloader {
     this.deconstructor();
   };
 
-  private downloadListener = (message: IncomingTableStaticContentMessages) => {
+  private downloadListener = (
+    message:
+      | IncomingTableStaticContentMessages
+      | IncomingUserStaticContentMessages,
+  ) => {
     switch (message.type) {
       case "downloadMeta":
         this.onDownloadMeta(message);
@@ -260,10 +266,7 @@ class Downloader {
 
     this.sendDownloadSignal({ type: "downloadStart" });
 
-    this.tableStaticContentSocket.current?.getFile(
-      this.contentType,
-      this.contentId,
-    );
+    this.staticContentSocket.current?.getFile(this.contentType, this.contentId);
 
     this.startTime = Date.now();
   };
@@ -318,11 +321,43 @@ class Downloader {
     mimeType: string;
     fileSize: string;
     downloadSpeed: { time: number; speedKBps: number }[];
+    ETA: string;
   } => {
+    let ETA = "";
+
+    if (
+      !this._paused &&
+      this.downloadSpeedHistory.length > 0 &&
+      this._progress > 0
+    ) {
+      const totalSpeed = this.downloadSpeedHistory.reduce(
+        (sum, entry) => sum + entry.speedKBps,
+        0,
+      );
+      const avgSpeed = totalSpeed / this.downloadSpeedHistory.length;
+
+      if (avgSpeed > 0) {
+        const remainingBytes = this.fileSize - this.offset;
+        const remainingSeconds = remainingBytes / 1024 / avgSpeed;
+
+        const hours = Math.floor(remainingSeconds / 3600);
+        const minutes = Math.floor((remainingSeconds % 3600) / 60);
+        const seconds = Math.floor(remainingSeconds % 60);
+
+        const parts = [];
+        if (hours > 0) parts.push(`${hours}h`);
+        if (minutes > 0) parts.push(`${minutes}m`);
+        if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+
+        ETA = parts.join(" ");
+      }
+    }
+
     return {
       mimeType: this.mimeType,
       fileSize: this.formatBytes(this.fileSize),
       downloadSpeed: [...this.downloadSpeedHistory],
+      ETA,
     };
   };
 

@@ -203,15 +203,39 @@ class TableImageMedia {
     }
 
     this.faceCountChangeListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.imageId);
+      this.downloader = undefined;
+    }
   }
 
-  private onDownloadFinish = (message: onDownloadFinishType) => {
-    const { buffer, fileSize } = message.data;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
     this.fileSize = fileSize;
 
-    const blob = new Blob([buffer], { type: this.mimeType });
-    this.blobURL = URL.createObjectURL(blob);
+    const bitmap = await createImageBitmap(blob);
+
+    // replace your createImageBitmap + canvas block with:
+    const MAX_DIM = 1024;
+    const { width: origW, height: origH } = bitmap;
+    const scale = Math.min(1, MAX_DIM / origW, MAX_DIM / origH);
+    const targetW = Math.round(origW * scale);
+    const targetH = Math.round(origH * scale);
+
+    const resizedBitmap = await createImageBitmap(bitmap, {
+      resizeWidth: targetW,
+      resizeHeight: targetH,
+      resizeQuality: "high",
+    });
+
+    const canvas = new OffscreenCanvas(targetW, targetH);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(resizedBitmap, 0, 0);
+    const blobOut = await canvas.convertToBlob();
+
+    this.blobURL = URL.createObjectURL(blobOut);
     this.image = document.createElement("img");
     this.image.src = this.blobURL;
 
@@ -332,7 +356,7 @@ class TableImageMedia {
   };
 
   retryDownload = () => {
-    if (this.downloader) return;
+    if (this.downloader || this.loadingState === "downloaded") return;
 
     this.loadingState = "downloading";
 

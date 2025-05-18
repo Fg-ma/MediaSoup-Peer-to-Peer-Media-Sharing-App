@@ -1,47 +1,61 @@
-import {
-  IncomingUserStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/userStaticContentServer/lib/typeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import {
   UserContentStateTypes,
-  StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
+import Downloader from "../../downloader/Downloader";
+import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "../../downloader/lib/typeConstant";
 
 export type ImageListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" };
 
 class UserImageMedia {
   image: HTMLImageElement | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
-  loadingState: "downloading" | "downloaded" = "downloading";
+  loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
   private imageListeners: Set<(message: ImageListenerTypes) => void> =
     new Set();
+
+  downloader: undefined | Downloader;
 
   constructor(
     public imageId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: UserContentStateTypes[],
-    private getImage: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingUserStaticContentMessages) => void,
-    ) => void,
+    private userStaticContentSocket: React.MutableRefObject<
+      UserStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
-    this.getImage("image", this.imageId, this.filename);
-    this.addMessageListener(this.getImageListener);
+    this.downloader = new Downloader(
+      "image",
+      this.imageId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.imageId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor() {
@@ -55,50 +69,81 @@ class UserImageMedia {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.imageListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.imageId);
+      this.downloader = undefined;
+    }
   }
 
-  private getImageListener = (message: IncomingUserStaticContentMessages) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
-      if (contentType !== "image" || contentId !== this.imageId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    const bitmap = await createImageBitmap(blob);
 
-      if (contentType !== "image" || contentId !== this.imageId) {
-        return;
-      }
+    // replace your createImageBitmap + canvas block with:
+    const MAX_DIM = 1024;
+    const { width: origW, height: origH } = bitmap;
+    const scale = Math.min(1, MAX_DIM / origW, MAX_DIM / origH);
+    const targetW = Math.round(origW * scale);
+    const targetH = Math.round(origH * scale);
 
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
+    const resizedBitmap = await createImageBitmap(bitmap, {
+      resizeWidth: targetW,
+      resizeHeight: targetH,
+      resizeQuality: "high",
+    });
 
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
+    const canvas = new OffscreenCanvas(targetW, targetH);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(resizedBitmap, 0, 0);
+    const blobOut = await canvas.convertToBlob();
 
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
-      this.image = document.createElement("img");
-      this.image.src = this.blobURL;
+    this.blobURL = URL.createObjectURL(blobOut);
+    this.image = document.createElement("img");
+    this.image.src = this.blobURL;
 
-      this.image.onload = () => {
-        this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
+    this.image.onload = () => {
+      this.aspect = (this.image?.width ?? 1) / (this.image?.height ?? 1);
 
-        this.loadingState = "downloaded";
+      this.loadingState = "downloaded";
 
+      this.imageListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
+      });
+    };
+
+    this.downloader = undefined;
+  };
+
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
         this.imageListeners.forEach((listener) => {
-          listener({ type: "downloadComplete" });
+          listener({ type: "downloadFailed" });
         });
-      };
-
-      this.removeMessageListener(this.getImageListener);
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.imageListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -146,6 +191,29 @@ class UserImageMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "image",
+      this.imageId,
+      this.filename,
+      this.mimeType,
+      this.userStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.imageId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.imageListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 

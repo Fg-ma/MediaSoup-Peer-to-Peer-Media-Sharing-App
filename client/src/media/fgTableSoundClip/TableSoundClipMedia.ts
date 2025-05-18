@@ -5,91 +5,120 @@ import {
 import {
   TableContentStateTypes,
   StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
+import Downloader from "src/downloader/Downloader";
+import TableStaticContentSocketController from "src/serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { DownloadSignals } from "src/context/uploadDownloadContext/lib/typeConstant";
+import {
+  DownloadListenerTypes,
+  onDownloadFinishType,
+} from "src/downloader/lib/typeConstant";
 
 export type SoundClipListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "downloadPaused" }
+  | { type: "downloadResumed" }
+  | { type: "downloadFailed" }
+  | { type: "downloadRetry" }
   | { type: "stateChanged" };
 
 class TableSoundClipMedia {
   soundClip: HTMLAudioElement | undefined;
 
-  private fileChunks: Uint8Array[] = [];
   private fileSize = 0;
   blobURL: string | undefined;
+  loadingState: LoadingStateTypes = "downloading";
 
   private soundClipListeners: Set<(message: SoundClipListenerTypes) => void> =
     new Set();
+
+  downloader: undefined | Downloader;
 
   constructor(
     public soundClipId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: TableContentStateTypes[],
-    private getSoundClip: (
-      contentType: StaticContentTypes,
-      contentId: string,
-      key: string,
-    ) => void,
-    private addMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
-    private removeMessageListener: (
-      listener: (message: IncomingTableStaticContentMessages) => void,
-    ) => void,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
-    this.getSoundClip("soundClip", this.soundClipId, this.filename);
-    this.addMessageListener(this.getSoundClipListener);
+    this.downloader = new Downloader(
+      "soundClip",
+      this.soundClipId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.soundClipId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   }
 
   deconstructor = () => {
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
-    this.removeMessageListener(this.getSoundClipListener);
-
     this.soundClipListeners.clear();
+
+    if (this.downloader) {
+      this.removeCurrentDownload(this.soundClipId);
+      this.downloader = undefined;
+    }
   };
 
-  private getSoundClipListener = async (
-    message: IncomingTableStaticContentMessages,
-  ) => {
-    if (message.type === "chunk") {
-      const { contentType, contentId } = message.header;
+  private onDownloadFinish = async (message: onDownloadFinishType) => {
+    const { blob, fileSize } = message.data;
 
-      if (contentType !== "soundClip" || contentId !== this.soundClipId) {
-        return;
-      }
+    this.fileSize = fileSize;
 
-      const chunkData = new Uint8Array(message.data.chunk.data);
-      this.fileChunks.push(chunkData);
-      this.fileSize += chunkData.length;
-    } else if (message.type === "downloadComplete") {
-      const { contentType, contentId } = message.header;
+    this.blobURL = URL.createObjectURL(blob);
 
-      if (contentType !== "soundClip" || contentId !== this.soundClipId) {
-        return;
-      }
+    this.soundClip = new Audio(this.blobURL);
 
-      const mergedBuffer = new Uint8Array(this.fileSize);
-      let offset = 0;
+    this.loadingState = "downloaded";
 
-      for (const chunk of this.fileChunks) {
-        mergedBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
+    this.soundClip.onload = () => {
+      this.soundClipListeners.forEach((listener) => {
+        listener({ type: "downloadComplete" });
+      });
+    };
 
-      const blob = new Blob([mergedBuffer], { type: this.mimeType });
-      this.blobURL = URL.createObjectURL(blob);
+    this.downloader = undefined;
+  };
 
-      this.soundClip = new Audio(this.blobURL);
+  private handleDownloadMessage = (message: DownloadListenerTypes) => {
+    switch (message.type) {
+      case "downloadFinish":
+        this.onDownloadFinish(message);
+        break;
+      case "downloadFailed":
+        this.loadingState = "failed";
+        this.downloader = undefined;
 
-      this.soundClip.onload = () => {
         this.soundClipListeners.forEach((listener) => {
-          listener({ type: "downloadComplete" });
+          listener({ type: "downloadFailed" });
         });
-      };
-
-      this.removeMessageListener(this.getSoundClipListener);
+        break;
+      case "downloadPaused":
+        this.loadingState = "paused";
+        this.soundClipListeners.forEach((listener) => {
+          listener({ type: "downloadPaused" });
+        });
+        break;
+      case "downloadResumed":
+        this.loadingState = "downloading";
+        this.soundClipListeners.forEach((listener) => {
+          listener({ type: "downloadResumed" });
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -123,6 +152,29 @@ class TableSoundClipMedia {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  retryDownload = () => {
+    if (this.downloader || this.loadingState === "downloaded") return;
+
+    this.loadingState = "downloading";
+
+    this.downloader = new Downloader(
+      "soundClip",
+      this.soundClipId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.soundClipId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
+
+    this.soundClipListeners.forEach((listener) => {
+      listener({ type: "downloadRetry" });
+    });
   };
 }
 
