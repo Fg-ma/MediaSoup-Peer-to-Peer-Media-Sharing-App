@@ -237,6 +237,15 @@ class FgLowerVisualMediaController {
         .exitFullscreen()
         .then(() => {
           this.visualMediaContainerRef.current?.classList.remove("full-screen");
+
+          if (this.fgVisualMediaOptions.isUser) {
+            this.userMedia.current[this.type][
+              this.visualMediaId
+            ].canvas.style.width = "100%";
+            this.userMedia.current[this.type][
+              this.visualMediaId
+            ].canvas.style.height = "100%";
+          }
         })
         .catch((error) => {
           console.error("Failed to exit full screen:", error);
@@ -246,6 +255,31 @@ class FgLowerVisualMediaController {
         ?.requestFullscreen()
         .then(() => {
           this.visualMediaContainerRef.current?.classList.add("full-screen");
+
+          if (this.fgVisualMediaOptions.isUser) {
+            if (
+              this.userMedia.current[this.type][this.visualMediaId].canvas
+                .width /
+                document.body.clientWidth >
+              this.userMedia.current[this.type][this.visualMediaId].canvas
+                .height /
+                document.body.clientHeight
+            ) {
+              this.userMedia.current[this.type][
+                this.visualMediaId
+              ].canvas.style.width = "100%";
+              this.userMedia.current[this.type][
+                this.visualMediaId
+              ].canvas.style.height = "auto";
+            } else {
+              this.userMedia.current[this.type][
+                this.visualMediaId
+              ].canvas.style.width = "auto";
+              this.userMedia.current[this.type][
+                this.visualMediaId
+              ].canvas.style.height = "100%";
+            }
+          }
         })
         .catch((error) => {
           console.error("Failed to request full screen:", error);
@@ -256,6 +290,15 @@ class FgLowerVisualMediaController {
   handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
       this.visualMediaContainerRef.current?.classList.remove("full-screen");
+
+      if (this.fgVisualMediaOptions.isUser) {
+        this.userMedia.current[this.type][
+          this.visualMediaId
+        ].canvas.style.width = "100%";
+        this.userMedia.current[this.type][
+          this.visualMediaId
+        ].canvas.style.height = "100%";
+      }
     }
   };
 

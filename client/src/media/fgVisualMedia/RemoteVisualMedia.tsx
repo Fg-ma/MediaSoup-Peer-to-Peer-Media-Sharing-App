@@ -587,10 +587,10 @@ export default function RemoteVisualMedia({
           ref={videoRef}
           id={visualMediaId}
           onTimeUpdate={() => fgLowerVisualMediaController.current.timeUpdate()}
-          className="main-video absolute left-0 top-0 h-full w-full"
+          className="main-video h-full w-full"
           controls={false}
           autoPlay={fgVisualMediaOptions.autoPlay}
-          style={{ ...videoStyles, objectFit: "fill" }}
+          style={{ ...videoStyles, objectFit: "contain" }}
         ></video>
         <FgUpperVisualMediaControls
           name={name}

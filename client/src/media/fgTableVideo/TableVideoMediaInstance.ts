@@ -87,8 +87,6 @@ class TableVideoMediaInstance {
 
     this.instanceCanvas = document.createElement("canvas");
     this.instanceCanvas.classList.add("babylonJS-canvas");
-    this.instanceCanvas.style.height = "100%";
-    this.instanceCanvas.style.width = "100%";
 
     if (this.videoMedia.video) this.setVideo();
     this.videoMedia.addVideoListener(this.handleVideoMessages);
@@ -137,6 +135,14 @@ class TableVideoMediaInstance {
       if (this.instanceVideo) {
         this.instanceCanvas.width = this.instanceVideo.videoWidth;
         this.instanceCanvas.height = this.instanceVideo.videoHeight;
+
+        if (this.instanceVideo.videoWidth > this.instanceVideo.videoHeight) {
+          this.instanceCanvas.style.height = "auto";
+          this.instanceCanvas.style.width = "100%";
+        } else {
+          this.instanceCanvas.style.height = "100%";
+          this.instanceCanvas.style.width = "auto";
+        }
       }
     };
 
@@ -245,10 +251,16 @@ class TableVideoMediaInstance {
       this.videoInstanceId,
     );
 
-    this.videoMedia.babylonRenderLoopWorker?.addNeed(
-      "faceDetection",
-      this.videoInstanceId,
-    );
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && key !== "hideBackground",
+      )
+    ) {
+      this.videoMedia.babylonRenderLoopWorker?.addNeed(
+        "faceDetection",
+        this.videoInstanceId,
+      );
+    }
     if (this.effects.hideBackground) {
       this.videoMedia.babylonRenderLoopWorker?.addNeed(
         "selfieSegmentation",

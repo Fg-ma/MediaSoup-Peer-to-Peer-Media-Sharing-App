@@ -67,8 +67,6 @@ class TableApplicationMediaInstance {
 
     this.instanceCanvas = document.createElement("canvas");
     this.instanceCanvas.classList.add("babylonJS-canvas");
-    this.instanceCanvas.style.width = "100%";
-    this.instanceCanvas.style.height = "100%";
     this.instanceCanvas.style.objectFit = "contain";
 
     if (applicationMedia.application) {
@@ -80,6 +78,16 @@ class TableApplicationMediaInstance {
         if (this.instanceApplication) {
           this.instanceCanvas.width = this.instanceApplication.width;
           this.instanceCanvas.height = this.instanceApplication.height;
+
+          if (
+            this.instanceApplication.width > this.instanceApplication.height
+          ) {
+            this.instanceCanvas.style.height = "auto";
+            this.instanceCanvas.style.width = "100%";
+          } else {
+            this.instanceCanvas.style.height = "100%";
+            this.instanceCanvas.style.width = "auto";
+          }
         }
       };
 
@@ -140,6 +148,14 @@ class TableApplicationMediaInstance {
       if (this.instanceApplication) {
         this.instanceCanvas.width = this.instanceApplication.width;
         this.instanceCanvas.height = this.instanceApplication.height;
+
+        if (this.instanceApplication.width > this.instanceApplication.height) {
+          this.instanceCanvas.style.height = "auto";
+          this.instanceCanvas.style.width = "100%";
+        } else {
+          this.instanceCanvas.style.height = "100%";
+          this.instanceCanvas.style.width = "auto";
+        }
       }
     };
 

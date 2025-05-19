@@ -14,7 +14,6 @@ import UserDevice from "../../lib/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import assetMeshes from "../../babylon/meshes";
 import TableImageMedia, { ImageListenerTypes } from "./TableImageMedia";
-import { GroupSignals } from "../../context/signalContext/lib/typeConstant";
 
 export type ImageInstanceListenerTypes = { type: "effectsChanged" };
 
@@ -77,8 +76,6 @@ class TableImageMediaInstance {
 
     this.instanceCanvas = document.createElement("canvas");
     this.instanceCanvas.classList.add("babylonJS-canvas");
-    this.instanceCanvas.style.height = "100%";
-    this.instanceCanvas.style.width = "auto";
     this.instanceCanvas.style.objectFit = "contain";
 
     if (this.imageMedia.image) {
@@ -90,10 +87,18 @@ class TableImageMediaInstance {
         if (this.instanceImage) {
           this.instanceCanvas.width = this.instanceImage.width;
           this.instanceCanvas.height = this.instanceImage.height;
+
+          if (this.instanceImage.width > this.instanceImage.height) {
+            this.instanceCanvas.style.height = "auto";
+            this.instanceCanvas.style.width = "100%";
+          } else {
+            this.instanceCanvas.style.height = "100%";
+            this.instanceCanvas.style.width = "auto";
+          }
         }
       };
 
-      if (!this.babylonScene && this.instanceImage)
+      if (!this.babylonScene && this.instanceImage) {
         this.babylonScene = new BabylonScene(
           this.imageMedia.babylonRenderLoopWorker,
           "image",
@@ -107,6 +112,10 @@ class TableImageMediaInstance {
           this.userDevice,
           this.imageMedia.maxFaces,
         );
+
+        if (this.imageMedia.detectedFaces[0] === 0)
+          setTimeout(() => this.forceRedetectFaces(), 100);
+      }
     }
 
     this.imageMedia.addImageListener(this.handleImageMessages);
@@ -149,6 +158,14 @@ class TableImageMediaInstance {
       if (this.instanceImage) {
         this.instanceCanvas.width = this.instanceImage.width;
         this.instanceCanvas.height = this.instanceImage.height;
+
+        if (this.instanceImage.width > this.instanceImage.height) {
+          this.instanceCanvas.style.height = "auto";
+          this.instanceCanvas.style.width = "100%";
+        } else {
+          this.instanceCanvas.style.height = "100%";
+          this.instanceCanvas.style.width = "auto";
+        }
       }
     };
 
@@ -166,6 +183,9 @@ class TableImageMediaInstance {
         this.userDevice,
         this.imageMedia.maxFaces,
       );
+
+      if (this.imageMedia.detectedFaces[0] === 0)
+        setTimeout(() => this.forceRedetectFaces(), 100);
     }
 
     this.updateAllEffects();
@@ -248,10 +268,16 @@ class TableImageMediaInstance {
       this.imageInstanceId,
     );
 
-    this.imageMedia.babylonRenderLoopWorker?.addNeed(
-      "faceDetection",
-      this.imageInstanceId,
-    );
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && key !== "hideBackground",
+      )
+    ) {
+      this.imageMedia.babylonRenderLoopWorker?.addNeed(
+        "faceDetection",
+        this.imageInstanceId,
+      );
+    }
     if (this.effects.hideBackground) {
       this.imageMedia.babylonRenderLoopWorker?.addNeed(
         "selfieSegmentation",
@@ -676,7 +702,13 @@ class TableImageMediaInstance {
   };
 
   forceRedetectFaces = () => {
-    if (this.babylonScene) this.babylonScene.imageAlreadyProcessed[0] = 1;
+    if (this.babylonScene) {
+      this.babylonScene.imageAlreadyProcessed[0] = 1;
+      this.imageMedia.babylonRenderLoopWorker?.addNeed(
+        "faceDetection",
+        "force",
+      );
+    }
   };
 
   getAspect = () => {

@@ -75,9 +75,6 @@ class CaptureMedia {
         case "PROCESSED_FRAME":
           this.faceMeshProcessing[0] = false;
           if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
             this.faceMeshResults[0] = event.data.results;
           }
           break;
@@ -316,8 +313,13 @@ class CaptureMedia {
 
   private updateNeed = () => {
     this.babylonRenderLoopWorker?.removeAllNeed(this.captureId);
-
-    this.babylonRenderLoopWorker?.addNeed("faceDetection", this.captureId);
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && key !== "hideBackground",
+      )
+    ) {
+      this.babylonRenderLoopWorker?.addNeed("faceDetection", this.captureId);
+    }
     if (this.effects.hideBackground) {
       this.babylonRenderLoopWorker?.addNeed(
         "selfieSegmentation",

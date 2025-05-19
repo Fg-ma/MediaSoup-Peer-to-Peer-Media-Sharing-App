@@ -308,7 +308,7 @@ class Posts {
           if (!ETag) return;
           state.parts.push({ PartNumber: chunkIndex + 1, ETag });
 
-          if (!aborted) return;
+          if (aborted) return;
           res.cork(() => {
             res.writeStatus("200 OK").end("Chunk received");
           });

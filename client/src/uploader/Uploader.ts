@@ -6,6 +6,7 @@ import {
   TableContentStateTypes,
   UserContentStateTypes,
 } from "../../../universal/contentTypeConstant";
+import IndexedDB from "../db/indexedDB/IndexedDB";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -25,6 +26,7 @@ class Uploader {
     private sendUploadSignal: (signal: UploadSignals) => void,
     private addCurrentUpload: (id: string, upload: ChunkedUploader) => void,
     private removeCurrentUpload: (id: string) => void,
+    private indexedDBController: React.MutableRefObject<IndexedDB>,
   ) {}
 
   uploadToTable = async (
@@ -35,6 +37,7 @@ class Uploader {
       scale: { x: number; y: number };
       rotation: number;
     },
+    handle?: FileSystemFileHandle,
   ) => {
     if (!tableStaticContentServerBaseUrl) return;
 
@@ -65,6 +68,12 @@ class Uploader {
         initPositioning,
       };
 
+      if (handle)
+        await this.indexedDBController.current.saveFileHandle(
+          contentId,
+          handle,
+        );
+
       try {
         const metaRes = await fetch(
           tableStaticContentServerBaseUrl + "upload-chunk-meta",
@@ -92,6 +101,8 @@ class Uploader {
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          this.indexedDBController,
+          handle,
         );
         this.addCurrentUpload(contentId, uploader);
         uploader.start();
@@ -150,6 +161,8 @@ class Uploader {
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          undefined,
+          undefined,
         );
         this.addCurrentUpload(contentId, uploader);
         uploader.start();
@@ -217,6 +230,8 @@ class Uploader {
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          undefined,
+          undefined,
         );
         this.addCurrentUpload(contentId, uploader);
         uploader.start();

@@ -47,7 +47,7 @@ export default function Main() {
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
-  const { uploader, userDevice } = useToolsContext();
+  const { uploader, userDevice, indexedDBController } = useToolsContext();
   const {
     sendUploadSignal,
     addCurrentUpload,
@@ -112,6 +112,7 @@ export default function Main() {
       sendUploadSignal,
       addCurrentUpload,
       removeCurrentUpload,
+      indexedDBController,
     );
   };
 

@@ -67,19 +67,14 @@ class BabylonScene {
   scene: Scene;
   private camera: UniversalCamera;
 
-  private resizeObserver: ResizeObserver;
-
   private backgroundLight: HemisphericLight | undefined;
   private ambientLightThreeDimMeshes: HemisphericLight | undefined;
   private ambientLightTwoDimMeshes: HemisphericLight | undefined;
 
-  private backgroundMediaPlane: Mesh | undefined;
+  private backgroundMediaLayer: Layer | undefined;
   private backgroundMediaTexture: VideoTexture | Texture | undefined;
-  private backgroundMediaMaterial: StandardMaterial | undefined;
 
-  private hideBackgroundPlane: Mesh | undefined;
   private hideBackgroundTexture: DynamicTexture | undefined;
-  private hideBackgroundMaterial: StandardMaterial | undefined;
 
   private tintPlane: Mesh | undefined;
   private tintMaterial: StandardMaterial | undefined;
@@ -168,6 +163,7 @@ class BabylonScene {
     );
 
     this.babylonRenderLoop = new BabylonRenderLoop(
+      this.flip,
       this.scene,
       this.camera,
       this.faceLandmarks,
@@ -178,7 +174,7 @@ class BabylonScene {
       this.selfieSegmentationResults,
       this.userDevice,
       this.hideBackgroundTexture,
-      this.hideBackgroundMaterial,
+      this.backgroundMedia,
       this.babylonMeshes,
     );
 
@@ -190,20 +186,6 @@ class BabylonScene {
 
     // Render loop
     this.engine.runRenderLoop(this.engineRenderLoop);
-
-    window.addEventListener("resize", this.canvasSizeChange);
-    window.addEventListener("fullscreenchange", this.canvasSizeChange);
-
-    this.resizeObserver = new ResizeObserver(() => {
-      requestAnimationFrame(() => {
-        this.canvasSizeChange();
-      });
-    });
-    this.resizeObserver.observe(this.canvas);
-
-    setTimeout(() => {
-      this.canvasSizeChange();
-    }, 1000);
   }
 
   deconstructor = () => {
@@ -215,11 +197,6 @@ class BabylonScene {
 
     this.engine.stopRenderLoop();
     this.engine.dispose();
-
-    window.removeEventListener("resize", this.canvasSizeChange);
-    window.removeEventListener("fullscreenchange", this.canvasSizeChange);
-
-    this.resizeObserver.disconnect();
 
     this.forceFaceDetectEndListeners.clear();
   };
@@ -239,6 +216,8 @@ class BabylonScene {
       this.forceFaceDetectEndListeners.forEach((listener) => {
         listener();
       });
+
+      this.babylonRenderLoopWorker?.removeNeed("faceDetection", "force");
     }
 
     this.babylonShaderController.renderLoop();
@@ -286,44 +265,6 @@ class BabylonScene {
     this.ambientLightTwoDimMeshes.includedOnlyMeshes.push(dummyMesh3D);
   };
 
-  private updateBackgroundPlaneSize = (plane: Mesh, zOffset?: number) => {
-    const backgroundDistance = this.camera.maxZ - (zOffset ?? 0);
-
-    const verticalFOV = this.camera.fov;
-    const planeHeight = 2 * Math.tan(verticalFOV / 2) * backgroundDistance;
-
-    const canvas = this.engine.getRenderingCanvas();
-    if (!canvas) return;
-
-    const canvasAspect = canvas.width / canvas.height;
-    const mediaAspect =
-      this.backgroundMedia instanceof HTMLVideoElement
-        ? this.backgroundMedia.videoWidth / this.backgroundMedia.videoHeight
-        : this.backgroundMedia.width / this.backgroundMedia.height;
-
-    let planeWidth: number;
-    let planeScaledHeight: number;
-
-    // Compute dimensions based on `object-fit: contain`
-    if (canvasAspect > mediaAspect) {
-      // Fit by height
-      planeScaledHeight = planeHeight;
-      planeWidth = planeHeight * mediaAspect;
-    } else {
-      // Fit by width
-      planeWidth = planeHeight * canvasAspect;
-      planeScaledHeight = planeWidth / mediaAspect;
-    }
-
-    // Update the plane scaling
-    plane.scaling = new Vector3(
-      (this.flip ? -1 : 1) * planeWidth,
-      planeScaledHeight,
-      1,
-    );
-    plane.position = new Vector3(0, 0, backgroundDistance);
-  };
-
   private initBackgroundMediaPlane = () => {
     this.backgroundMediaTexture =
       this.backgroundMedia instanceof HTMLVideoElement
@@ -334,23 +275,11 @@ class BabylonScene {
           )
         : new Texture(this.backgroundMedia.src, this.scene);
 
-    this.backgroundMediaPlane = MeshBuilder.CreatePlane(
-      "backgroundMediaPlane",
-      { width: 1, height: 1 },
-      this.scene,
-    );
-    this.backgroundMediaMaterial = new StandardMaterial(
-      "backgroundMediaMaterial",
-      this.scene,
-    );
-    this.backgroundMediaMaterial.diffuseTexture = this.backgroundMediaTexture;
-    this.backgroundMediaPlane.material = this.backgroundMediaMaterial;
+    if (this.flip) this.backgroundMediaTexture.uScale = -1;
 
-    this.updateBackgroundPlaneSize(this.backgroundMediaPlane);
+    this.backgroundMediaLayer = new Layer("background", null, this.scene, true);
 
-    if (this.backgroundLight) {
-      this.backgroundLight.includedOnlyMeshes.push(this.backgroundMediaPlane);
-    }
+    this.backgroundMediaLayer.texture = this.backgroundMediaTexture;
   };
 
   private initHideBackgroundPlane = () => {
@@ -364,39 +293,15 @@ class BabylonScene {
     );
 
     this.hideBackgroundTexture.hasAlpha = true;
-
-    this.hideBackgroundMaterial = new StandardMaterial(
-      "hideBackgroundMaterial",
-      this.scene,
-    );
-
-    this.hideBackgroundMaterial.useAlphaFromDiffuseTexture = true;
-    this.hideBackgroundMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
-
-    this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
   };
 
-  private createHideBackgroundPlane = () => {
-    if (!this.hideBackgroundMaterial) {
-      return;
-    }
-
-    this.hideBackgroundPlane = MeshBuilder.CreatePlane(
-      "hideBackgroundPlane",
-      { width: 1, height: 1 },
-      this.scene,
-    );
-    this.backgroundLight?.includedOnlyMeshes.push(this.hideBackgroundPlane);
-
-    this.hideBackgroundPlane.material = this.hideBackgroundMaterial;
-
-    this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.00000001);
-  };
-
-  private deleteHideBackgroundPlane = () => {
-    if (this.hideBackgroundPlane) {
-      this.hideBackgroundPlane.dispose();
-      this.hideBackgroundPlane = undefined;
+  private setBackgroundLayer = (type: "backgroundMedia" | "hideBackground") => {
+    if (type === "backgroundMedia") {
+      if (this.backgroundMediaLayer && this.backgroundMediaTexture)
+        this.backgroundMediaLayer.texture = this.backgroundMediaTexture;
+    } else {
+      if (this.backgroundMediaLayer && this.hideBackgroundTexture)
+        this.backgroundMediaLayer.texture = this.hideBackgroundTexture;
     }
   };
 
@@ -426,18 +331,6 @@ class BabylonScene {
 
     if (this.backgroundLight) {
       this.backgroundLight.includedOnlyMeshes.push(this.tintPlane);
-    }
-  };
-
-  private canvasSizeChange = () => {
-    this.engine.resize();
-    this.scene.render();
-
-    if (this.backgroundMediaPlane) {
-      this.updateBackgroundPlaneSize(this.backgroundMediaPlane);
-    }
-    if (this.hideBackgroundPlane) {
-      this.updateBackgroundPlaneSize(this.hideBackgroundPlane, 0.000001);
     }
   };
 
@@ -549,11 +442,7 @@ class BabylonScene {
   };
 
   toggleHideBackgroundPlane = (active: boolean) => {
-    if (active && !this.hideBackgroundPlane) {
-      this.createHideBackgroundPlane();
-    } else if (!active && this.hideBackgroundPlane) {
-      this.deleteHideBackgroundPlane();
-    }
+    this.setBackgroundLayer(active ? "hideBackground" : "backgroundMedia");
   };
 
   toggleTintPlane = (active: boolean, tintColor?: [number, number, number]) => {

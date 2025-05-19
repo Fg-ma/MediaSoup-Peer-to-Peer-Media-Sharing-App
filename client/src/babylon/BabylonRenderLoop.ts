@@ -33,8 +33,11 @@ class BabylonRenderLoop {
 
   private _tempNosePos = { x: 0, y: 0 };
   private _tempShift = { x: 0, y: 0 };
+  private canvasAspectRatio: number;
+  private tan: number;
 
   constructor(
+    private flip: boolean,
     private scene: Scene,
     private camera: UniversalCamera,
     private faceLandmarks: FaceLandmarks | undefined,
@@ -47,9 +50,12 @@ class BabylonRenderLoop {
     private selfieSegmentationResults: ImageData[] | undefined,
     private userDevice: React.MutableRefObject<UserDevice>,
     private hideBackgroundTexture: DynamicTexture | undefined,
-    private hideBackgroundMaterial: StandardMaterial | undefined,
+    private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private babylonMeshes: BabylonMeshes,
   ) {
+    this.canvasAspectRatio = this.canvas.width / this.canvas.height;
+    this.tan = Math.tan(this.camera.fov / 2);
+
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.current.getFaceMeshDetectionInterval();
     (this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
@@ -142,34 +148,32 @@ class BabylonRenderLoop {
       !this.hideBackgroundCtx ||
       !this.tempHideBackgroundCtx ||
       !this.selfieSegmentationResults ||
-      !this.selfieSegmentationResults[0]
+      !this.selfieSegmentationResults[0] ||
+      !this.backgroundMedia
     ) {
       return;
     }
 
-    this.hideBackgroundCtx.clearRect(
-      0,
-      0,
-      this.hideBackgroundCanvas.width,
-      this.hideBackgroundCanvas.height,
-    );
+    const width = this.hideBackgroundCanvas.width;
+    const height = this.hideBackgroundCanvas.height;
 
-    this.tempHideBackgroundCtx.clearRect(
-      0,
-      0,
-      this.tempHideBackgroundCanvas.width,
-      this.tempHideBackgroundCanvas.height,
-    );
+    // Clear both canvases
+    this.hideBackgroundCtx.clearRect(0, 0, width, height);
+    this.tempHideBackgroundCtx.clearRect(0, 0, width, height);
 
-    // Step 1: Draw the ImageData onto the canvas at its original size (at 0,0)
+    // Step 1: Draw the original video/image feed (foreground + background)
     this.hideBackgroundCtx.globalCompositeOperation = "source-over";
+    this.hideBackgroundCtx.drawImage(this.backgroundMedia, 0, 0, width, height);
+
+    // Step 2: Apply the segmentation mask to keep only the person
     this.tempHideBackgroundCtx.putImageData(
       this.selfieSegmentationResults[0],
       0,
       0,
     );
 
-    // Step 2: Scale the canvas content to fit the full canvas using drawImage
+    // Save person shape into alpha channel
+    this.hideBackgroundCtx.globalCompositeOperation = "destination-out";
     this.hideBackgroundCtx.drawImage(
       this.tempHideBackgroundCanvas,
       0,
@@ -178,19 +182,19 @@ class BabylonRenderLoop {
       this.tempHideBackgroundCanvas.height,
       0,
       0,
-      this.hideBackgroundCanvas.width,
-      this.hideBackgroundCanvas.height,
+      width,
+      height,
     );
 
-    this.hideBackgroundCtx.globalCompositeOperation = "source-atop";
-
+    // Step 3: Draw background media/image behind the person
+    this.hideBackgroundCtx.globalCompositeOperation = "destination-over";
     if (this.hidebackgroundType === "image") {
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,
         0,
         0,
-        this.hideBackgroundCanvas.width,
-        this.hideBackgroundCanvas.height,
+        width,
+        height,
       );
     } else {
       if (
@@ -198,41 +202,27 @@ class BabylonRenderLoop {
       ) {
         this.hideBackgroundCtx.fillStyle = this.hideBackgroundCtxFillStyle;
       }
-
-      this.hideBackgroundCtx.fillRect(
-        0,
-        0,
-        this.hideBackgroundCanvas.width,
-        this.hideBackgroundCanvas.height,
-      );
+      this.hideBackgroundCtx.fillRect(0, 0, width, height);
     }
 
-    // Step 3: Update the texture of the background plane material
-    if (this.hideBackgroundTexture && this.hideBackgroundMaterial) {
+    // Step 4: Update texture
+    if (this.hideBackgroundTexture) {
       const textureCtx = this.hideBackgroundTexture.getContext();
       if (textureCtx) {
-        textureCtx.clearRect(
-          0,
-          0,
-          this.hideBackgroundCanvas.width,
-          this.hideBackgroundCanvas.height,
-        );
+        textureCtx.clearRect(0, 0, width, height);
 
-        // Transfer the content of the canvas to the texture
-        textureCtx.drawImage(
-          this.hideBackgroundCanvas,
-          0,
-          0,
-          this.hideBackgroundCanvas.width,
-          this.hideBackgroundCanvas.height,
-        );
+        if (this.flip) {
+          textureCtx.save();
+          textureCtx.translate(width, 0);
+          textureCtx.scale(-1, 1);
+          textureCtx.drawImage(this.hideBackgroundCanvas, 0, 0, width, height);
+          textureCtx.restore();
+        } else {
+          textureCtx.drawImage(this.hideBackgroundCanvas, 0, 0, width, height);
+        }
 
-        // Mark texture as dirty to trigger an update in the rendering engine
         this.hideBackgroundTexture.update();
       }
-
-      // Assign the updated texture to the material
-      this.hideBackgroundMaterial.diffuseTexture = this.hideBackgroundTexture;
     }
   };
 
@@ -257,13 +247,11 @@ class BabylonRenderLoop {
     mesh: AbstractMesh,
     position: [number, number],
   ): [number, number, number] => {
-    const zPosition = mesh.position.z; // distance from camera
-    const cameraFOV = this.camera.fov; // FOV in radians
-    const aspectRatio = this.canvas.width / this.canvas.height;
+    const zPosition = mesh.position.z;
 
     // Calculate the vertical and horizontal extents at the current zPosition
-    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * aspectRatio;
+    const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
+    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
 
     // Convert normalized screen coordinates to world coordinates
     return [
@@ -277,12 +265,10 @@ class BabylonRenderLoop {
     mesh: AbstractMesh,
   ): [number, number] => {
     const zPosition = mesh.position.z;
-    const cameraFOV = this.camera.fov;
-    const aspectRatio = this.canvas.width / this.canvas.height;
 
     // Calculate the vertical and horizontal extents at the current zPosition
-    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * aspectRatio;
+    const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
+    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
 
     // Reverse the conversion from world coordinates to normalized screen coordinates
     const screenX = (mesh.position.x / horizontalExtent) * -1;
@@ -296,12 +282,10 @@ class BabylonRenderLoop {
     scale: number,
   ) => {
     const zPosition = mesh.position.z; // distance from camera
-    const cameraFOV = this.camera.fov; // FOV in radians
-    const aspectRatio = this.canvas.width / this.canvas.height;
 
     // Calculate the vertical and horizontal extents at the current zPosition
-    const verticalExtent = Math.tan(cameraFOV / 2) * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * aspectRatio;
+    const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
+    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
 
     // Convert normalized screen coordinates to world coordinates
     return scale * Math.max(verticalExtent, horizontalExtent);

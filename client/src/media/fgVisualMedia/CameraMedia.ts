@@ -85,9 +85,6 @@ class CameraMedia {
         case "PROCESSED_FRAME":
           this.faceMeshProcessing[0] = false;
           if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
             this.faceMeshResults[0] = event.data.results;
           }
           break;
@@ -110,7 +107,11 @@ class CameraMedia {
       switch (event.data.message) {
         case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
-          const detectedFaces = event.data.numFacesDetected;
+          const detectedFaces =
+            event.data.numFacesDetected === undefined
+              ? 0
+              : event.data.numFacesDetected;
+
           if (detectedFaces !== this.maxFaces[0]) {
             this.maxFaces[0] = detectedFaces;
 
@@ -290,7 +291,13 @@ class CameraMedia {
   private updateNeed = () => {
     this.babylonRenderLoopWorker?.removeAllNeed(this.cameraId);
 
-    this.babylonRenderLoopWorker?.addNeed("faceDetection", this.cameraId);
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && key !== "hideBackground",
+      )
+    ) {
+      this.babylonRenderLoopWorker?.addNeed("faceDetection", this.cameraId);
+    }
     if (this.effects.hideBackground) {
       this.babylonRenderLoopWorker?.addNeed(
         "selfieSegmentation",

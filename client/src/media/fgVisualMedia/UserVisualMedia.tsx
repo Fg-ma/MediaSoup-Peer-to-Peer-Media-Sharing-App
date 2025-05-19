@@ -454,9 +454,6 @@ export default function UserVisualMedia({
       subContainerRef.current &&
       userMedia.current[type][visualMediaId]?.canvas
     ) {
-      userMedia.current[type][visualMediaId].canvas.style.position = "absolute";
-      userMedia.current[type][visualMediaId].canvas.style.top = "0%";
-      userMedia.current[type][visualMediaId].canvas.style.left = "0%";
       userMedia.current[type][visualMediaId].canvas.style.width = "100%";
       userMedia.current[type][visualMediaId].canvas.style.height = "100%";
       subContainerRef.current.appendChild(

@@ -48,7 +48,7 @@ class TableVideoMedia {
   private videoAudioMedia?: TableVideoAudioMedia;
 
   maxFaces: [number] = [1];
-  detectedFaces: number = 0;
+  detectedFaces: [number] = [0];
   maxFacesDetected = 0;
 
   faceLandmarks: FaceLandmarks;
@@ -128,9 +128,6 @@ class TableVideoMedia {
         case "PROCESSED_FRAME":
           this.faceMeshProcessing[0] = false;
           if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
             this.faceMeshResults[0] = event.data.results;
           }
           break;
@@ -154,25 +151,26 @@ class TableVideoMedia {
         case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
-          this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
+          this.detectedFaces[0] =
+            detectedFaces === undefined ? 0 : detectedFaces;
 
-          if (detectedFaces > this.maxFacesDetected) {
-            this.maxFacesDetected = detectedFaces;
+          if (this.detectedFaces[0] > this.maxFacesDetected) {
+            this.maxFacesDetected = this.detectedFaces[0];
           }
 
-          if (detectedFaces !== this.maxFaces[0]) {
-            this.maxFaces[0] = detectedFaces;
+          if (this.detectedFaces[0] !== this.maxFaces[0]) {
+            this.maxFaces[0] = this.detectedFaces[0];
 
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
-              newMaxFace: detectedFaces,
+              newMaxFace: this.detectedFaces[0],
             });
             this.videoListeners.forEach((listener) => {
               listener({ type: "rectifyEffectMeshCount" });
             });
 
             this.faceCountChangeListeners.forEach((listener) => {
-              listener(detectedFaces);
+              listener(this.detectedFaces[0]);
             });
           }
           break;

@@ -9,12 +9,23 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
 export default function UploadMediaButton() {
-  const { uploader } = useToolsContext();
+  const { uploader, indexedDBController } = useToolsContext();
 
   const file = useRef<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const clickFunction = () => {
+  const clickFunction = async () => {
+    if ("showOpenFilePicker" in window) {
+      try {
+        const [handle] = await (window as any).showOpenFilePicker();
+        const file = (await handle.getFile()) as File;
+
+        uploader.current?.uploadToTable(file, undefined, undefined, handle);
+        return;
+      } catch (_) {}
+    }
+
+    // Fallback to classic input
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }

@@ -1,0 +1,186 @@
+import React, { useEffect, useRef, useState } from "react";
+import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import HoverElement from "../../../../elements/hoverElement/HoverElement";
+import { useToolsContext } from "../../../../context/toolsContext/ToolsContext";
+import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
+import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
+
+export default function FailedUploadingSection({
+  contentId,
+  failed,
+}: {
+  contentId: string;
+  failed: FileSystemFileHandle;
+}) {
+  const { uploader, indexedDBController } = useToolsContext();
+
+  const [_, setRerender] = useState(false);
+  const filenameRef = useRef<HTMLDivElement>(null);
+  const file = useRef<File | undefined>(undefined);
+  const fileUrl = useRef<string | undefined>(undefined);
+
+  const clickFunction = async () => {
+    const perm = await (failed as any).queryPermission({ mode: "read" });
+    if (perm !== "granted") {
+      const request = await (failed as any).requestPermission({ mode: "read" });
+      if (request !== "granted") {
+        return;
+      }
+    }
+
+    const file = (await failed.getFile()) as File;
+
+    uploader.current?.uploadToTable(file, undefined, undefined, failed);
+
+    indexedDBController.current.deleteFileHandle(contentId);
+  };
+
+  useEffect(() => {
+    const extractFirstVideoFrame = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.src = URL.createObjectURL(file);
+        video.muted = true;
+        video.playsInline = true;
+
+        // 1. once metadata is loaded, we know dimensions
+        video.addEventListener(
+          "loadedmetadata",
+          () => {
+            // ensure there's a video duration and size
+            if (!video.videoWidth || !video.videoHeight) {
+              return reject(new Error("video metadata missing dimensions"));
+            }
+
+            // set the canvas to those dimensions
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              return reject(new Error("2D context not available"));
+            }
+
+            // 2. seek to the very first frame
+            video.currentTime = 0;
+            video.addEventListener(
+              "seeked",
+              () => {
+                // 3. draw it
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // export to PNG blob → object URL
+                canvas.toBlob((blob) => {
+                  if (blob) {
+                    const imgUrl = URL.createObjectURL(blob);
+
+                    // clean up the video URL, element, and canvas
+                    URL.revokeObjectURL(video.src);
+                    video.remove();
+                    canvas.remove();
+
+                    resolve(imgUrl);
+                  } else {
+                    reject(new Error("canvas.toBlob() produced no blob"));
+                  }
+                }, "image/png");
+              },
+              { once: true },
+            );
+          },
+          { once: true },
+        );
+
+        video.addEventListener(
+          "error",
+          (e) => {
+            URL.revokeObjectURL(video.src);
+            reject(new Error("video load error"));
+          },
+          { once: true },
+        );
+      });
+    };
+
+    const loadFile = async () => {
+      const perm = await (failed as any).queryPermission({ mode: "read" });
+      if (perm !== "granted") {
+        const request = await (failed as any).requestPermission({
+          mode: "read",
+        });
+        if (request !== "granted") {
+          return;
+        }
+      }
+
+      file.current = (await failed.getFile()) as File;
+
+      if (file.current.type.startsWith("video/")) {
+        extractFirstVideoFrame(file.current)
+          .then((url) => (fileUrl.current = url))
+          .catch(() => {
+            if (file.current)
+              fileUrl.current = URL.createObjectURL(file.current);
+          });
+      } else {
+        fileUrl.current = URL.createObjectURL(file.current);
+      }
+
+      setRerender((prev) => !prev);
+    };
+
+    loadFile();
+
+    return () => {
+      if (fileUrl.current) URL.revokeObjectURL(fileUrl.current);
+    };
+  }, []);
+
+  return (
+    <div
+      className="flex h-[6rem] w-full cursor-pointer items-center justify-center space-x-2 border-y-2 border-fg-tone-black-3 bg-fg-tone-black-5 px-8 py-4"
+      onClick={clickFunction}
+    >
+      {file.current && fileUrl.current && (
+        <div className="h-16">
+          {file.current.type === "image/svg+xml" ? (
+            <FgSVGElement
+              className="aspect-square h-full"
+              src={fileUrl.current}
+              attributes={[
+                { key: "width", value: "100%" },
+                { key: "height", value: "100%" },
+              ]}
+            />
+          ) : (
+            (file.current.type.startsWith("image/") ||
+              file.current.type.startsWith("video/")) && (
+              <FgImageElement
+                className="aspect-square h-full"
+                imageClassName="object-contain"
+                src={fileUrl.current}
+              />
+            )
+          )}
+        </div>
+      )}
+      <HoverElement
+        externalRef={filenameRef}
+        className="h-max grow truncate font-K2D text-xl text-fg-white"
+        content={<>{failed.name}</>}
+        hoverContent={
+          (filenameRef.current?.scrollWidth ?? 0) >
+          (filenameRef.current?.clientWidth ?? 0) ? (
+            <FgHoverContentStandard style="light" content={failed.name} />
+          ) : undefined
+        }
+        options={{
+          hoverSpacing: 4,
+          hoverType: "above",
+          hoverTimeoutDuration: 500,
+        }}
+      />
+    </div>
+  );
+}

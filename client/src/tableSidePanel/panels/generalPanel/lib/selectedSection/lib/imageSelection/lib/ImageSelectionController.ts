@@ -53,7 +53,9 @@ class ImageSelectionController {
 
   handleInstanceEvents = (event: ImageInstanceListenerTypes) => {
     if (event.type === "effectsChanged") {
-      this.drawInstanceCanvas();
+      setTimeout(() => {
+        this.drawInstanceCanvas();
+      }, 100);
     }
   };
 

@@ -36,8 +36,8 @@ class TableImageMedia {
   private imageListeners: Set<(message: ImageListenerTypes) => void> =
     new Set();
 
-  maxFaces: [number] = [1];
-  detectedFaces: number = 0;
+  maxFaces: [number] = [0];
+  detectedFaces: [number] = [0];
 
   faceLandmarks: FaceLandmarks;
 
@@ -52,8 +52,6 @@ class TableImageMedia {
 
   private faceCountChangeListeners: Set<(facesDetected: number) => void> =
     new Set();
-
-  forcingFaces = false;
 
   babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
 
@@ -92,9 +90,6 @@ class TableImageMedia {
         case "PROCESSED_FRAME":
           this.faceMeshProcessing[0] = false;
           if (event.data.results) {
-            if (!this.faceMeshResults) {
-              this.faceMeshResults = [];
-            }
             this.faceMeshResults[0] = event.data.results;
           }
           break;
@@ -118,21 +113,22 @@ class TableImageMedia {
         case "FACES_DETECTED": {
           this.faceDetectionProcessing[0] = false;
           const detectedFaces = event.data.numFacesDetected;
-          this.detectedFaces = detectedFaces === undefined ? 0 : detectedFaces;
+          this.detectedFaces[0] =
+            detectedFaces === undefined ? 0 : detectedFaces;
 
-          if (detectedFaces !== this.maxFaces[0]) {
-            this.maxFaces[0] = detectedFaces;
+          if (this.detectedFaces[0] !== this.maxFaces[0]) {
+            this.maxFaces[0] = this.detectedFaces[0];
 
             this.faceMeshWorker.postMessage({
               message: "CHANGE_MAX_FACES",
-              newMaxFace: detectedFaces,
+              newMaxFace: this.detectedFaces[0],
             });
             this.imageListeners.forEach((listener) => {
               listener({ type: "rectifyEffectMeshCount" });
             });
 
             this.faceCountChangeListeners.forEach((listener) => {
-              listener(detectedFaces);
+              listener(this.detectedFaces[0]);
             });
           }
           break;

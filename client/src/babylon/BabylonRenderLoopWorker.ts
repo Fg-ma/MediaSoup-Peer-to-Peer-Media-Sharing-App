@@ -49,7 +49,6 @@ class BabylonRenderLoopWorker {
     );
     this.offscreenContext = this.offscreenCanvas.getContext("2d", {
       alpha: true,
-      willReadFrequently: true,
     });
     this.faceMeshOffscreenCanvas = new OffscreenCanvas(
       this.aspect > 1 ? 320 : 320 * this.aspect,
@@ -93,102 +92,19 @@ class BabylonRenderLoopWorker {
     );
 
     this.lastFaceCountCheck = 0;
-
-    setTimeout(() => {
-      this.detectFaces();
-    }, 1000);
   }
 
   renderLoop = () => {
     this.frameCounter++;
 
-    if (
+    const doHide =
       this.needs.selfieSegmentation.length !== 0 &&
-      this.frameCounter % this.SELFIE_SEGMENTATION_DETECTION_INTERVAL === 0
-    ) {
-      this.hideBackgroundEffect();
-    }
-
-    if (
+      this.frameCounter % this.SELFIE_SEGMENTATION_DETECTION_INTERVAL === 0;
+    const doDetect =
       this.needs.faceDetection.length !== 0 &&
-      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0
-    ) {
-      this.detectFaces();
-    }
-  };
+      this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0;
 
-  private detectFaces = () => {
-    if (
-      !this.faceLandmarks ||
-      !this.backgroundMedia ||
-      !this.offscreenContext
-    ) {
-      return;
-    }
-
-    try {
-      // Clear the offscreen canvas before drawing
-      this.offscreenContext?.clearRect(
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height,
-      );
-
-      // Draw the video frame onto the offscreen canvas at the lower resolution
-      this.offscreenContext?.drawImage(
-        this.backgroundMedia,
-        0,
-        0,
-        this.offscreenCanvas.width,
-        this.offscreenCanvas.height,
-      );
-
-      // Send video frames to the worker for processing
-      if (this.faceMeshProcessing && !this.faceMeshProcessing[0]) {
-        this.faceMeshProcessing[0] = true;
-
-        createImageBitmap(this.offscreenCanvas).then((bitmap) => {
-          this.faceMeshWorker!.postMessage(
-            {
-              message: "FRAME",
-              bitmap,
-              smooth: this.needs.smoothFaceLandmarks.length !== 0,
-              flipped: this.flip,
-            },
-            [bitmap],
-          );
-        });
-      }
-      if (
-        performance.now() - this.lastFaceCountCheck > this.detectFacesTimeout &&
-        this.faceDetectionProcessing &&
-        !this.faceDetectionProcessing[0] &&
-        this.faceDetectionWorker
-      ) {
-        this.faceDetectionProcessing[0] = true;
-        this.lastFaceCountCheck = performance.now();
-
-        createImageBitmap(this.offscreenCanvas).then((bitmap) => {
-          this.faceDetectionWorker!.postMessage(
-            {
-              message: "FRAME",
-              bitmap,
-            },
-            [bitmap],
-          );
-        });
-      }
-    } catch (error) {
-      console.error("Error sending video frame to faceMesh:", error);
-      return;
-    }
-  };
-
-  private hideBackgroundEffect = async () => {
-    if (!this.offscreenContext || !this.selfieSegmentationWorker) {
-      return;
-    }
+    if ((!doHide && !doDetect) || !this.offscreenContext) return;
 
     // Clear the offscreen canvas before drawing
     this.offscreenContext.clearRect(
@@ -207,23 +123,68 @@ class BabylonRenderLoopWorker {
       this.offscreenCanvas.height,
     );
 
-    // Send video frames to the worker for processing
-    if (
-      this.selfieSegmentationProcessing &&
-      !this.selfieSegmentationProcessing[0]
-    ) {
-      this.selfieSegmentationProcessing[0] = true;
+    const jobs: Promise<void>[] = [];
 
-      createImageBitmap(this.offscreenCanvas).then((bitmap) => {
-        this.selfieSegmentationWorker!.postMessage(
-          {
-            message: "FRAME",
-            bitmap,
-          },
-          [bitmap],
+    if (doHide) {
+      const doSelfie =
+        this.selfieSegmentationWorker &&
+        this.selfieSegmentationProcessing &&
+        !this.selfieSegmentationProcessing[0];
+
+      if (doSelfie) {
+        this.selfieSegmentationProcessing![0] = true;
+        jobs.push(
+          createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+            this.selfieSegmentationWorker!.postMessage(
+              { message: "FRAME", bitmap },
+              [bitmap],
+            );
+          }),
         );
-      });
+      }
     }
+
+    if (doDetect) {
+      const canMesh = this.faceMeshProcessing && !this.faceMeshProcessing[0];
+
+      if (canMesh) {
+        this.faceMeshProcessing![0] = true;
+        jobs.push(
+          createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+            this.faceMeshWorker!.postMessage(
+              {
+                message: "FRAME",
+                bitmap,
+                smooth: this.needs.smoothFaceLandmarks.length !== 0,
+                flipped: this.flip,
+              },
+              [bitmap],
+            );
+          }),
+        );
+      }
+
+      const canDetect =
+        performance.now() - this.lastFaceCountCheck > this.detectFacesTimeout &&
+        this.faceDetectionProcessing &&
+        !this.faceDetectionProcessing[0] &&
+        this.faceDetectionWorker;
+
+      if (canDetect) {
+        this.faceDetectionProcessing![0] = true;
+        this.lastFaceCountCheck = performance.now();
+        jobs.push(
+          createImageBitmap(this.offscreenCanvas).then((bitmap) => {
+            this.faceDetectionWorker!.postMessage(
+              { message: "FRAME", bitmap },
+              [bitmap],
+            );
+          }),
+        );
+      }
+    }
+
+    Promise.all(jobs);
   };
 
   addNeed = (need: Needs, instanceId: string) => {

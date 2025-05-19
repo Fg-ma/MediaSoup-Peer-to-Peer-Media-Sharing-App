@@ -1,3 +1,4 @@
+import IndexedDB from "../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
 
 const tableStaticContentServerBaseUrl =
@@ -37,6 +38,8 @@ class ChunkedUploader {
     private contentId: string,
     private removeCurrentUpload: (id: string) => void,
     private sendUploadSignal: (signal: UploadSignals) => void,
+    private indexedDBController: React.MutableRefObject<IndexedDB> | undefined,
+    private handle: FileSystemFileHandle | undefined,
   ) {
     this.filename = this.file.name;
     if (file.type.startsWith("video/")) {
@@ -51,13 +54,15 @@ class ChunkedUploader {
   }
 
   deconstructor = () => {
+    if (this.handle)
+      this.indexedDBController?.current.deleteFileHandle(this.contentId);
     if (this.uploadUrl) URL.revokeObjectURL(this.uploadUrl);
     this.removeCurrentUpload(this.contentId);
     this.sendUploadSignal({ type: "uploadFinish" });
     this.listeners.clear();
   };
 
-  private extractFirstVideoFrame(file: File): Promise<string> {
+  private extractFirstVideoFrame = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const video = document.createElement("video");
       video.preload = "metadata";
@@ -122,7 +127,7 @@ class ChunkedUploader {
         { once: true },
       );
     });
-  }
+  };
 
   cancel = async () => {
     this.cancelled = true;

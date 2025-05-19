@@ -81,7 +81,9 @@ export default function ImageEffectsSection({
 
   const [_, setRerender] = useState(false);
 
-  const faceDetectedCount = useRef(imageMediaInstance.imageMedia.detectedFaces);
+  const faceDetectedCount = useRef(
+    imageMediaInstance.imageMedia.detectedFaces[0],
+  );
   const [noFacesDetectedWarning, setNoFacesDetectedWarning] = useState(false);
   const forceDetectingFaces = useRef(false);
   const noFacesDetectedTimeout = useRef<NodeJS.Timeout>(undefined);
@@ -120,6 +122,9 @@ export default function ImageEffectsSection({
   };
 
   useEffect(() => {
+    if (faceDetectedCount.current === 0)
+      imageMediaInstance.forceRedetectFaces();
+
     imageMediaInstance.imageMedia.addFaceCountChangeListener(
       handleFaceDetectedCountChange,
     );

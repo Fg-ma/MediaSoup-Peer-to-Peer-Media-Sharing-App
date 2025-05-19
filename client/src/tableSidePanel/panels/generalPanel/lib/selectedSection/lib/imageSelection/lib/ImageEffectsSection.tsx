@@ -48,7 +48,9 @@ export default function ImageEffectsSection({
 
   const [_, setRerender] = useState(false);
 
-  const faceDetectedCount = useRef(imageMediaInstance.imageMedia.detectedFaces);
+  const faceDetectedCount = useRef(
+    imageMediaInstance.imageMedia.detectedFaces[0],
+  );
 
   const tintColor = useRef(
     userEffectsStyles.current.image[imageInstanceId].tint.color,
@@ -72,6 +74,9 @@ export default function ImageEffectsSection({
   };
 
   useEffect(() => {
+    if (faceDetectedCount.current === 0)
+      imageMediaInstance.forceRedetectFaces();
+
     effectsContainerRef.current?.addEventListener("wheel", handleWheel);
     imageMediaInstance.imageMedia.addFaceCountChangeListener(
       handleFaceDetectedCountChange,
@@ -165,7 +170,7 @@ export default function ImageEffectsSection({
             );
           }}
         />
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HideBackgroundButton
               effectsDisabled={effectsDisabled}
@@ -261,7 +266,7 @@ export default function ImageEffectsSection({
             );
           }}
         />
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <GlassesButton
               effectsDisabled={effectsDisabled}
@@ -286,7 +291,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <BeardsButton
               effectsDisabled={effectsDisabled}
@@ -311,7 +316,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MustachesButton
               effectsDisabled={effectsDisabled}
@@ -339,7 +344,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <MasksButton
               effectsDisabled={effectsDisabled}
@@ -364,7 +369,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <HatsButton
               effectsDisabled={effectsDisabled}
@@ -389,7 +394,7 @@ export default function ImageEffectsSection({
             />
           </Suspense>
         )}
-        {imageMediaInstance.imageMedia.detectedFaces > 0 && (
+        {faceDetectedCount.current > 0 && (
           <Suspense fallback={<div>Loading...</div>}>
             <PetsButton
               effectsDisabled={effectsDisabled}

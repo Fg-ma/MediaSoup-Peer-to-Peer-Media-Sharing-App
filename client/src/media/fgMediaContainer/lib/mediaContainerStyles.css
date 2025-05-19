@@ -106,6 +106,10 @@
   padding-inline: 2.25rem;
 }
 
+.media-container.full-screen .timeline-container {
+  width: calc(100% - 4.5rem);
+}
+
 .media-container.full-screen .media-upper-controls {
   padding-left: 1.75rem;
   padding-right: 1.5rem;
