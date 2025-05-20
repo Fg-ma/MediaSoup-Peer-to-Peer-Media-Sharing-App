@@ -16,6 +16,7 @@ import Search from "./lib/Search";
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
+export const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();
@@ -66,21 +67,22 @@ app
       }
     },
   })
-  .options("/*", (res, req) => {
-    res.cork(() => {
-      res
-        .writeHeader("Access-Control-Allow-Origin", "https://localhost:8080")
-        .writeHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        .writeHeader("Access-Control-Allow-Headers", "Content-Type")
-        .end();
-    });
-  })
-  .options("/stream/*", (res, req) => {
-    res.cork(() => {
-      res.writeHeader("Access-Control-Allow-Origin", "*");
-      res.writeHeader("Access-Control-Allow-Methods", "GET");
-      res.writeHeader("Access-Control-Allow-Headers", "Content-Type");
-    });
+  .options("/*", (res, _req) => {
+    if (!clientBaseUrl) {
+      res.cork(() => {
+        res.writeStatus("403 Forbidden");
+        res.writeHeader("Content-Type", "text/plain");
+        res.end("Origin header missing - request blocked");
+      });
+    } else {
+      res.cork(() => {
+        res
+          .writeHeader("Access-Control-Allow-Origin", clientBaseUrl)
+          .writeHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+          .writeHeader("Access-Control-Allow-Headers", "Content-Type")
+          .end();
+      });
+    }
   })
   .listen(8049, (token) => {
     if (token) {

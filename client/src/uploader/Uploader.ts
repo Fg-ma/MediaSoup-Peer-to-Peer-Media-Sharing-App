@@ -38,15 +38,18 @@ class Uploader {
       rotation: number;
     },
     handle?: FileSystemFileHandle,
+    uploadId?: string,
+    contentId?: string,
+    offset = 0,
   ) => {
-    if (!tableStaticContentServerBaseUrl) return;
+    if (!tableStaticContentServerBaseUrl || !this.tableId.current) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
       this.oneShotUploader.handleOneShotFileUpload(
         file,
         {
           tableId: this.tableId.current,
-          contentId: uuidv4(),
+          contentId: contentId !== undefined ? contentId : uuidv4(),
           instanceId: uuidv4(),
           direction: "toTable",
           state,
@@ -55,11 +58,11 @@ class Uploader {
         tableStaticContentServerBaseUrl,
       );
     } else {
-      const contentId = uuidv4();
+      const finalContentId = contentId !== undefined ? contentId : uuidv4();
 
       const metadata = {
         tableId: this.tableId.current,
-        contentId,
+        contentId: finalContentId,
         instanceId: uuidv4(),
         direction: "toTable",
         state,
@@ -68,25 +71,40 @@ class Uploader {
         initPositioning,
       };
 
-      if (handle)
-        await this.indexedDBController.current.saveFileHandle(
-          contentId,
-          handle,
-        );
-
       try {
-        const metaRes = await fetch(
-          tableStaticContentServerBaseUrl + "upload-chunk-meta",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(metadata),
-          },
-        );
+        let finalUploadId = uploadId;
 
-        const { uploadId } = await metaRes.json();
+        if (uploadId === undefined) {
+          const metaRes = await fetch(
+            tableStaticContentServerBaseUrl + "upload-chunk-meta",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(metadata),
+            },
+          );
+
+          if (!metaRes.ok) return;
+
+          const { uploadId: newUploadId } = await metaRes.json();
+
+          finalUploadId = newUploadId;
+        }
+
+        if (!finalUploadId) return;
+
+        if (handle) {
+          await this.indexedDBController.current.uploadPosts?.saveFileHandle(
+            finalContentId,
+            this.tableId.current,
+            finalUploadId,
+            handle,
+            offset,
+            file.size,
+          );
+        }
 
         setTimeout(
           () =>
@@ -96,15 +114,20 @@ class Uploader {
           250,
         );
         const uploader = new ChunkedUploader(
+          this.tableId,
           file,
-          uploadId,
-          contentId,
+          finalUploadId,
+          finalContentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
           this.indexedDBController,
+          "toTable",
           handle,
+          offset,
+          initPositioning,
+          state,
         );
-        this.addCurrentUpload(contentId, uploader);
+        this.addCurrentUpload(finalContentId, uploader);
         uploader.start();
       } catch (error) {
         console.error("Error sending metadata:", error);
@@ -146,7 +169,11 @@ class Uploader {
           },
         );
 
+        if (!metaRes.ok) return;
+
         const { uploadId } = await metaRes.json();
+
+        if (!uploadId) return;
 
         setTimeout(
           () =>
@@ -156,11 +183,16 @@ class Uploader {
           250,
         );
         const uploader = new ChunkedUploader(
+          this.tableId,
           file,
           uploadId,
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          undefined,
+          "reupload",
+          undefined,
+          undefined,
           undefined,
           undefined,
         );
@@ -196,7 +228,6 @@ class Uploader {
       const metadata = {
         userId: this.userId.current,
         contentId,
-        instanceId: uuidv4(),
         direction: "toMuteStyle",
         state,
         filename: file.name,
@@ -215,7 +246,11 @@ class Uploader {
           },
         );
 
+        if (!metaRes.ok) return;
+
         const { uploadId } = await metaRes.json();
+
+        if (!uploadId) return;
 
         setTimeout(
           () =>
@@ -225,11 +260,16 @@ class Uploader {
           250,
         );
         const uploader = new ChunkedUploader(
+          this.tableId,
           file,
           uploadId,
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          undefined,
+          "toMuteStyle",
+          undefined,
+          undefined,
           undefined,
           undefined,
         );

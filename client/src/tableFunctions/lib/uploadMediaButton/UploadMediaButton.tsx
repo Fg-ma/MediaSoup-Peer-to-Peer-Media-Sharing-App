@@ -9,7 +9,7 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const uploadIcon = nginxAssetServerBaseUrl + "svgs/uploadIcon.svg";
 
 export default function UploadMediaButton() {
-  const { uploader, indexedDBController } = useToolsContext();
+  const { uploader } = useToolsContext();
 
   const file = useRef<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +46,7 @@ export default function UploadMediaButton() {
         onChange={handleFileChange}
       />
       <FgButton
-        className="relative flex aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white"
+        className="flex relative aspect-square h-full items-center justify-center rounded-full hover:border-2 hover:border-fg-off-white"
         clickFunction={clickFunction}
         contentFunction={() => (
           <FgSVGElement

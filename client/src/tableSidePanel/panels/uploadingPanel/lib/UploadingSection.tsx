@@ -62,7 +62,7 @@ export default function UploadingSection({
             width: `calc(100% - ${rightLoadingInfoRef.current?.clientWidth ?? 0}px)`,
           }}
         >
-          {upload.file.type === "image/svg+xml"
+          {/* {upload.file.type === "image/svg+xml"
             ? upload.uploadUrl && (
                 <FgSVGElement
                   className="aspect-square h-full"
@@ -81,7 +81,7 @@ export default function UploadingSection({
                   imageClassName="object-contain"
                   src={upload.uploadUrl}
                 />
-              )}
+              )} */}
           <HoverElement
             externalRef={filenameRef}
             className="h-full grow truncate font-K2D text-xl text-fg-white"

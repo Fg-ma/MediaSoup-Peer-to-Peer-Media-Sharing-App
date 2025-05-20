@@ -12,20 +12,51 @@ export default function UploadTableLayer({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const uploadRef = useRef<HTMLDivElement | null>(null);
 
-  const handleDrop = (e: DragEvent) => {
+  const handleDrop = async (e: DragEvent) => {
     e.preventDefault();
 
     if (
-      e.dataTransfer?.files?.length &&
+      e.dataTransfer?.items?.length &&
       tableTopRef.current?.contains(e.target as Node)
     ) {
-      const fileArray = Array.from(e.dataTransfer.files);
-      for (const file of fileArray) {
-        uploader.current?.uploadToTable(file, [], {
-          position: { top: position.y, left: position.x },
-          scale: { x: 25, y: 25 },
-          rotation: 0,
-        });
+      const items = Array.from(e.dataTransfer.items);
+      for (const item of items) {
+        if (item.kind !== "file") continue;
+
+        let file: File | null = null;
+        let handle: FileSystemFileHandle | undefined;
+
+        if ("getAsFileSystemHandle" in item) {
+          try {
+            handle = await (item as any).getAsFileSystemHandle();
+          } catch {
+            handle = undefined;
+          }
+        }
+
+        if (handle) {
+          try {
+            file = await handle.getFile();
+          } catch {}
+        }
+
+        if (!file) {
+          file = item.getAsFile();
+        }
+        if (!file) {
+          continue;
+        }
+
+        uploader.current?.uploadToTable(
+          file,
+          undefined,
+          {
+            position: { top: position.y, left: position.x },
+            scale: { x: 25, y: 25 },
+            rotation: 0,
+          },
+          handle,
+        );
       }
       setHovering(false);
     }

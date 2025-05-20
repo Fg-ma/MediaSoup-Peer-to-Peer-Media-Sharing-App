@@ -26,4 +26,5 @@ export type UploadSession =
 export interface ChunkState {
   uploadId: string;
   parts: { PartNumber: number; ETag: string }[];
+  lastUsed: number;
 }

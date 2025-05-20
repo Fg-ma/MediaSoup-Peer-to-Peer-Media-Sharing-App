@@ -5,6 +5,8 @@ import UploadingSection from "./lib/UploadingSection";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import { useToolsContext } from "../../../context/toolsContext/ToolsContext";
 import FailedUploadingSection from "./lib/FailedUploadingSection";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
+import { HandleListenerTypes } from "../../../db/indexedDB/lib/uploads/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -23,10 +25,15 @@ export default function UploadingPanel({
     removeUploadSignalListener,
   } = useUploadDownloadContext();
   const { indexedDBController } = useToolsContext();
+  const { tableId } = useUserInfoContext();
 
   const [handles, setHandles] = useState<
     {
       key: string;
+      tableId: string;
+      uploadId: string;
+      offset: number;
+      totalSize: number;
       handle: FileSystemFileHandle;
     }[]
   >([]);
@@ -45,11 +52,30 @@ export default function UploadingPanel({
     }
   };
 
+  const handleHandleListener = (message: HandleListenerTypes) => {
+    switch (message.type) {
+      case "handleAdded":
+        if (message.header.tableId !== tableId.current)
+          setHandles((prev) => [
+            ...prev,
+            { ...message.header, ...message.data },
+          ]);
+        break;
+      case "handleDeleted":
+        setHandles((prev) =>
+          prev.filter((val) => val.key !== message.header.key),
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     const fetchHandles = async () => {
       if (indexedDBController.current) {
         const allHandles =
-          await indexedDBController.current.getAllFileHandles();
+          await indexedDBController.current.uploadGets?.getAllFileHandles();
         if (allHandles) setHandles(allHandles);
       }
     };
@@ -58,9 +84,14 @@ export default function UploadingPanel({
 
     setExternalRerender((prev) => !prev);
 
+    indexedDBController.current.addHandleObjStoreListener(handleHandleListener);
+
     addUploadSignalListener(handleUploadListener);
 
     return () => {
+      indexedDBController.current.removeHandleObjStoreListener(
+        handleHandleListener,
+      );
       removeUploadSignalListener(handleUploadListener);
     };
   }, []);
@@ -73,13 +104,16 @@ export default function UploadingPanel({
     >
       {handles.map(
         (handle) =>
-          !currentUploads.some(
-            ([contentId, _]) => contentId === handle.key,
-          ) && (
+          !currentUploads.some(([contentId, _]) => contentId === handle.key) &&
+          handle.tableId === tableId.current && (
             <FailedUploadingSection
               key={handle.key}
-              failed={handle.handle}
+              savedTableId={handle.tableId}
+              uploadId={handle.uploadId}
               contentId={handle.key}
+              offset={handle.offset}
+              totalSize={handle.totalSize}
+              failed={handle.handle}
             />
           ),
       )}

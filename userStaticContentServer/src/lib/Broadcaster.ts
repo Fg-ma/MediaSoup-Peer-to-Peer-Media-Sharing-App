@@ -17,7 +17,7 @@ class Broadcaster {
 
       Object.values(userConnections[userId]).forEach((socket) => {
         try {
-          socket.send(msg);
+          socket.send(msg, binary);
         } catch (error) {
           console.error("Failed to send message:", error);
         }
@@ -40,7 +40,7 @@ class Broadcaster {
 
       const socket = userConnections[userId][instance];
 
-      socket.send(msg);
+      socket.send(msg, binary);
     }
   };
 }

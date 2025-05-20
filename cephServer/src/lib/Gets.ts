@@ -16,8 +16,8 @@ class Gets {
     try {
       const result = await this.s3Client.send(new ListObjectsCommand(params));
       console.log("Bucket Contents:", result.Contents);
-    } catch (err) {
-      console.error("Error listing contents:", err);
+    } catch (_) {
+      return;
     }
   };
 
@@ -30,8 +30,8 @@ class Gets {
 
     try {
       return await this.s3Client.send(new GetObjectCommand(params));
-    } catch (err) {
-      console.error("Error listing contents:", err);
+    } catch (_) {
+      return;
     }
   };
 
@@ -40,8 +40,8 @@ class Gets {
 
     try {
       return await this.s3Client.send(new HeadObjectCommand(params));
-    } catch (err) {
-      console.error("Error listing contents:", err);
+    } catch (_) {
+      return;
     }
   };
 }

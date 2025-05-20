@@ -1,5 +1,7 @@
+import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
+import { TableContentStateTypes } from "../../../../../universal/contentTypeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -33,19 +35,33 @@ class ChunkedUploader {
     new Set();
 
   constructor(
+    private tableId: React.MutableRefObject<string>,
     public file: File,
     private uploadId: string,
     private contentId: string,
     private removeCurrentUpload: (id: string) => void,
     private sendUploadSignal: (signal: UploadSignals) => void,
     private indexedDBController: React.MutableRefObject<IndexedDB> | undefined,
+    private direction: string,
     private handle: FileSystemFileHandle | undefined,
+    offset: number | undefined,
+    private initPositioning?: {
+      position: { top: number; left: number };
+      scale: { x: number; y: number };
+      rotation: number;
+    },
+    private state: TableContentStateTypes[] = [],
   ) {
     this.filename = this.file.name;
+    if (offset) {
+      this.offset = offset;
+      this._progress = offset / this.file.size;
+    }
+
     if (file.type.startsWith("video/")) {
       this.extractFirstVideoFrame(file)
         .then((url) => (this.uploadUrl = url))
-        .catch((err) => {
+        .catch((_) => {
           this.uploadUrl = URL.createObjectURL(file);
         });
     } else {
@@ -53,9 +69,10 @@ class ChunkedUploader {
     }
   }
 
-  deconstructor = () => {
-    if (this.handle)
-      this.indexedDBController?.current.deleteFileHandle(this.contentId);
+  deconstructor = async () => {
+    await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
+      this.contentId,
+    );
     if (this.uploadUrl) URL.revokeObjectURL(this.uploadUrl);
     this.removeCurrentUpload(this.contentId);
     this.sendUploadSignal({ type: "uploadFinish" });
@@ -192,7 +209,7 @@ class ChunkedUploader {
       formData.append("totalChunks", totalChunks.toString());
 
       try {
-        await fetch(
+        const response = await fetch(
           `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
           {
             method: "POST",
@@ -200,18 +217,27 @@ class ChunkedUploader {
           },
         );
 
-        const end = Date.now();
-        const durationMs = end - start;
-        const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000); // in KB/s
+        if (!response.ok) {
+          if (response.status !== 409) {
+            this.chunkErrorRetryUpload();
+            break;
+          }
+        }
 
-        this.uploadSpeedHistory.push({
-          time: end - (this.uploadStartTime ?? 0),
-          speedKBps,
-        });
-        this.uploadAbsoluteSpeedHistory.push({
-          time: end,
-          speedKBps,
-        });
+        if (response.status !== 409) {
+          const end = Date.now();
+          const durationMs = end - start;
+          const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
+
+          this.uploadSpeedHistory.push({
+            time: end - (this.uploadStartTime ?? 0),
+            speedKBps,
+          });
+          this.uploadAbsoluteSpeedHistory.push({
+            time: end,
+            speedKBps,
+          });
+        }
 
         this.offset += this.CHUNK_SIZE;
 
@@ -220,9 +246,14 @@ class ChunkedUploader {
         this.listeners.forEach((listener) => {
           listener({
             type: "uploadProgress",
-            data: { progress: this.offset / this.file.size },
+            data: { progress: this._progress },
           });
         });
+        if (this.handle)
+          this.indexedDBController?.current.uploadPosts?.updateProgress(
+            this.contentId,
+            this.offset,
+          );
       } catch (error) {
         console.error("Chunk upload failed:", error);
         break;
@@ -232,6 +263,86 @@ class ChunkedUploader {
     if (this.offset >= this.file.size) {
       this.deconstructor();
     }
+  };
+
+  private chunkErrorRetryUpload = async () => {
+    this._progress = 0;
+    this.offset = 0;
+    this.uploadSpeedHistory = [];
+    this.uploadAbsoluteSpeedHistory = [];
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "uploadProgress",
+        data: { progress: this._progress },
+      });
+    });
+
+    if (this.handle)
+      await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
+        this.contentId,
+      );
+
+    if (!tableStaticContentServerBaseUrl) return;
+
+    const metadata = {
+      tableId: this.tableId.current,
+      contentId: this.contentId,
+      instanceId: uuidv4(),
+      direction: this.direction,
+      state: this.state,
+      filename: this.file.name,
+      mimeType: this.file.type,
+      initPositioning: this.initPositioning,
+    };
+
+    try {
+      const metaRes = await fetch(
+        tableStaticContentServerBaseUrl + "upload-chunk-meta",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metadata),
+        },
+      );
+
+      if (!metaRes.ok) {
+        this.deconstructor();
+        return;
+      }
+
+      const { uploadId } = await metaRes.json();
+
+      if (!uploadId) {
+        this.deconstructor();
+        return;
+      }
+
+      this.uploadId = uploadId;
+
+      if (this.handle) {
+        await this.indexedDBController?.current.uploadPosts?.saveFileHandle(
+          this.contentId,
+          this.tableId.current,
+          this.uploadId,
+          this.handle,
+          0,
+          this.file.size,
+        );
+      }
+
+      setTimeout(
+        () =>
+          this.sendUploadSignal({
+            type: "uploadStart",
+          }),
+        250,
+      );
+    } catch (_) {}
+
+    this.uploadLoop();
   };
 
   addChunkedUploadListener = (

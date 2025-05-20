@@ -155,6 +155,33 @@ export default function MoreInfoSection({
                 `${parseFloat(v.toString()).toFixed(1)} ${unitLabel}`
               }
               labelFormatter={(l) => `${(l / 1000).toFixed(1)}s`}
+              wrapperStyle={{
+                padding: 0,
+                margin: 0,
+                pointerEvents: "none",
+                maxWidth: "12rem",
+                overflow: "hidden",
+              }}
+              contentStyle={{
+                padding: 4,
+                fontSize: 12,
+                backgroundColor: "rgba(9,9,9,0.7)",
+                borderRadius: 4,
+              }}
+              itemStyle={{
+                padding: 2,
+                margin: 0,
+                fontFamily: "K2D, sans",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+              labelStyle={{
+                fontSize: 16,
+                marginBottom: 2,
+                color: "rgb(242,242,242)",
+                fontFamily: "K2D, sans",
+              }}
             />
 
             <defs>

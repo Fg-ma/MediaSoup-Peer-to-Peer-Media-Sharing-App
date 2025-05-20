@@ -16,7 +16,9 @@ class Deletes {
 
     try {
       await this.s3Client.send(new DeleteObjectCommand(params));
-    } catch (err) {}
+    } catch (_) {
+      return;
+    }
   };
 
   emptyBucket = async (bucketName: string) => {

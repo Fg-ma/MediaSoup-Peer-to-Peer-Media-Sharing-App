@@ -1,6 +1,11 @@
 import uWS from "uWebSockets.js";
 import busboy from "busboy";
-import { broadcaster, tableTopCeph, tableTopMongo } from "../index";
+import {
+  broadcaster,
+  clientBaseUrl,
+  tableTopCeph,
+  tableTopMongo,
+} from "../index";
 import Utils from "./lib/Utils";
 import { contentTypeBucketMap } from "../typeConstant";
 import {
@@ -15,24 +20,19 @@ import { ChunkState, UploadSession } from "./lib/typeConstant";
 const tableStaticContentUtils = new Utils();
 
 class Posts {
+  private readonly STALE_UPLOAD = 1000 * 60 * 30;
+  private readonly CHECK_STALE_UPLOAD = 1000 * 60 * 10;
+
   private chunkStates = new Map<string, ChunkState>();
   private uploadSessions = new Map<string, UploadSession>();
 
   constructor(app: uWS.TemplatedApp) {
     app.post("/upload-one-shot-file", (res, req) => {
-      res.cork(() => {
-        res.writeHeader(
-          "Access-Control-Allow-Origin",
-          "https://localhost:8080"
-        );
-      });
-
       const bb = busboy({ headers: this.collectHeaders(req) });
 
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
-        bb.destroy();
       });
 
       let metadata: {
@@ -110,10 +110,7 @@ class Posts {
 
       bb.on("close", () => {
         if (!aborted) {
-          res.cork(() => {
-            console.log("Upload complete");
-            res.writeStatus("200 OK").end("That's all folks!");
-          });
+          this.sendResponse(res, "200 OK", "text/plain", "That's all folks!");
         }
       });
 
@@ -122,13 +119,6 @@ class Posts {
 
     app.post("/upload-chunk-meta", (res, _req) => {
       let buffer = "";
-
-      res.cork(() => {
-        res.writeHeader(
-          "Access-Control-Allow-Origin",
-          "https://localhost:8080"
-        );
-      });
 
       let aborted = false;
       res.onAborted(() => {
@@ -146,6 +136,20 @@ class Posts {
             const { userId, contentId, direction, state, mimeType, filename } =
               metadata;
 
+            if (
+              userId === undefined ||
+              contentId === undefined ||
+              mimeType === undefined
+            ) {
+              this.sendResponse(
+                res,
+                "400 Bad Request",
+                "text/plain",
+                "Missing fields"
+              );
+              return;
+            }
+
             const staticContentType =
               mimeTypeContentTypeMap[mimeType as StaticMimeTypes];
 
@@ -153,9 +157,21 @@ class Posts {
               contentTypeBucketMap[staticContentType as StaticContentTypes],
               contentId
             );
-            if (!uploadId) return;
+            if (!uploadId) {
+              this.sendResponse(
+                res,
+                "400 Bad Request",
+                "text/plain",
+                "Missing upload id"
+              );
+              return;
+            }
 
-            this.chunkStates.set(uploadId, { uploadId, parts: [] });
+            this.chunkStates.set(uploadId, {
+              uploadId,
+              parts: [],
+              lastUsed: Date.now(),
+            });
 
             const sessionData = {
               direction,
@@ -170,23 +186,21 @@ class Posts {
             this.uploadSessions.set(uploadId, sessionData);
 
             if (!aborted) {
-              res.cork(() => {
-                res
-                  .writeStatus("200 OK")
-                  .writeHeader("Content-Type", "application/json")
-                  .end(JSON.stringify({ uploadId }));
-              });
+              this.sendResponse(
+                res,
+                "200 OK",
+                "application/json",
+                JSON.stringify({ uploadId })
+              );
             }
           } catch (_) {
             if (!aborted) {
-              res.cork(() => {
-                res
-                  .writeStatus("400 Bad Request")
-                  .writeHeader("Content-Type", "application/json")
-                  .end(
-                    JSON.stringify({ error: "Invalid JSON or missing fields" })
-                  );
-              });
+              this.sendResponse(
+                res,
+                "400 Bad Request",
+                "text/plain",
+                "Invalid JSON or missing fields"
+              );
             }
           }
         }
@@ -194,29 +208,6 @@ class Posts {
     });
 
     app.post("/upload-chunk/:uploadId", (res, req) => {
-      res.cork(() => {
-        res.writeHeader(
-          "Access-Control-Allow-Origin",
-          "https://localhost:8080"
-        );
-      });
-
-      const uploadId = req.getParameter(0);
-      if (!uploadId) {
-        res.cork(() => {
-          res.writeStatus("404").end("No upload id");
-        });
-        return;
-      }
-
-      const session = this.uploadSessions.get(uploadId);
-      if (!session) {
-        res.cork(() => {
-          res.writeStatus("404").end("No session");
-        });
-        return;
-      }
-
       const bb = busboy({ headers: this.collectHeaders(req) });
       let chunkIndex = -1,
         totalChunks = -1;
@@ -225,25 +216,47 @@ class Posts {
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
-        bb.destroy();
-
-        tableTopCeph.posts
-          .abortMultipartUpload(
-            contentTypeBucketMap[session.staticContentType],
-            session.contentId,
-            uploadId
-          )
-          .catch((err) => {
-            console.error("Failed to abort multipart in Ceph:", err);
-          });
-
-        this.uploadSessions.delete(uploadId);
-        this.chunkStates.delete(uploadId);
       });
 
+      const uploadId = req.getParameter(0);
+      if (!uploadId) {
+        this.sendResponse(res, "404 Not Found", "text/plain", "No upload id");
+        return;
+      }
+
+      const session = this.uploadSessions.get(uploadId);
+      if (!session) {
+        this.sendResponse(res, "404 Not Found", "text/plain", "No session");
+        aborted = true;
+        return;
+      }
+
+      const state = this.chunkStates.get(uploadId);
+      if (!state) {
+        this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+        aborted = true;
+        return;
+      }
+      state.lastUsed = Date.now();
+
       bb.on("field", (name, val) => {
-        if (name === "chunkIndex") chunkIndex = parseInt(val, 10);
         if (name === "totalChunks") totalChunks = parseInt(val, 10);
+        if (name === "chunkIndex") {
+          chunkIndex = parseInt(val, 10);
+
+          const alreadyUploaded = state.parts.some(
+            (part) => part.PartNumber === chunkIndex + 1
+          );
+          if (alreadyUploaded) {
+            this.sendResponse(
+              res,
+              "409 Conflict",
+              "text/plain",
+              "Chunk already exists"
+            );
+            aborted = true;
+          }
+        }
       });
 
       bb.on("file", (_fn, stream, info) => {
@@ -252,8 +265,7 @@ class Posts {
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
         stream.on("end", async () => {
-          const state = this.chunkStates.get(uploadId);
-          if (!state) return;
+          if (aborted) return;
 
           // upload this part
           const ETag = await tableTopCeph.posts.uploadPart(
@@ -267,11 +279,8 @@ class Posts {
           state.parts.push({ PartNumber: chunkIndex + 1, ETag });
 
           if (aborted) return;
-          res.cork(() => {
-            res.writeStatus("200 OK").end("Chunk received");
-          });
 
-          // if last chunk, complete
+          // If last chunk
           if (state.parts.length === totalChunks) {
             tableTopCeph.posts
               .completeMultipartUpload(
@@ -310,10 +319,123 @@ class Posts {
                 this.chunkStates.delete(uploadId);
               });
           }
+
+          if (aborted) return;
+
+          this.sendResponse(res, "200 OK", "text/plain", "Chunk received");
         });
       });
+
+      if (!aborted) {
+        this.pipeReqToBusboy(res, bb);
+      }
     });
+
+    app.post("/cancel-upload/:uploadId", (res, req) => {
+      let aborted = false;
+      res.onAborted(() => {
+        aborted = true;
+      });
+
+      const uploadId = req.getParameter(0);
+
+      if (!uploadId) {
+        this.sendResponse(
+          res,
+          "400 Bad Request",
+          "text/plain",
+          "Missing upload ID"
+        );
+        return;
+      }
+
+      const session = this.uploadSessions.get(uploadId);
+      if (!session) {
+        this.sendResponse(
+          res,
+          "404 Not Found",
+          "text/plain",
+          "Missing session"
+        );
+        return;
+      }
+
+      // Async work must be done in next tick or promise
+      (async () => {
+        try {
+          await tableTopCeph.posts.abortMultipartUpload(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            uploadId
+          );
+
+          this.uploadSessions.delete(uploadId);
+          this.chunkStates.delete(uploadId);
+
+          if (!aborted) {
+            this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
+          }
+        } catch (_) {
+          if (!aborted) {
+            this.sendResponse(
+              res,
+              "500 Internal Server Error",
+              "text/plain",
+              "Cancel failed"
+            );
+          }
+        }
+      })();
+    });
+
+    setInterval(() => {
+      this.cleanupStaleSessions();
+    }, this.CHECK_STALE_UPLOAD);
   }
+
+  private sendResponse = (
+    res: uWS.HttpResponse,
+    status: string,
+    contentType: string,
+    end: string
+  ) => {
+    if (!clientBaseUrl) {
+      res.cork(() => {
+        res.writeStatus("403 Forbidden");
+        res.writeHeader("Content-Type", "text/plain");
+        res.end("Origin header missing - request blocked");
+      });
+    } else {
+      res.cork(() => {
+        res
+          .writeStatus(status)
+          .writeHeader("Content-Type", contentType)
+          .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+          .end(end);
+      });
+    }
+  };
+
+  private cleanupStaleSessions = async () => {
+    const now = Date.now();
+
+    for (const [uploadId, chunkState] of this.chunkStates.entries()) {
+      if (now - chunkState.lastUsed > this.STALE_UPLOAD) {
+        const session = this.uploadSessions.get(uploadId);
+
+        if (session) {
+          await tableTopCeph.posts.abortMultipartUpload(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            uploadId
+          );
+        }
+
+        this.chunkStates.delete(uploadId);
+        this.uploadSessions.delete(uploadId);
+      }
+    }
+  };
 
   private collectHeaders(req: uWS.HttpRequest) {
     const h: Record<string, string> = {};

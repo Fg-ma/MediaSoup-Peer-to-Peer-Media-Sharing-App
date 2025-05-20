@@ -1,14 +1,19 @@
-import { openDB, IDBPDatabase, DBSchema } from "idb";
-
-interface UploadDBSchema extends DBSchema {
-  handles: {
-    key: string;
-    value: { tableId: string; handle: FileSystemFileHandle };
-  };
-}
+import { openDB, IDBPDatabase } from "idb";
+import {
+  HandleListenerTypes,
+  UploadDBSchema,
+} from "./lib/uploads/typeConstant";
+import Gets from "./lib/uploads/Gets";
+import Posts from "./lib/uploads/Posts";
+import Deletes from "./lib/uploads/Deletes";
 
 class IndexedDB {
   uploadDB: undefined | IDBPDatabase<UploadDBSchema>;
+  uploadGets: Gets | undefined;
+  uploadPosts: Posts | undefined;
+  uploadDeletes: Deletes | undefined;
+
+  handleListeners: Set<(message: HandleListenerTypes) => void> = new Set();
 
   constructor() {
     void this.init();
@@ -20,41 +25,23 @@ class IndexedDB {
         db.createObjectStore("handles");
       },
     });
+
+    this.uploadGets = new Gets(this.uploadDB);
+    this.uploadPosts = new Posts(this.uploadDB, this.handleListeners);
+    this.uploadDeletes = new Deletes(this.uploadDB, this.handleListeners);
   };
 
-  saveFileHandle = async (key: string, handle: FileSystemFileHandle) => {
-    await this.uploadDB?.put("handles", handle, key);
+  addHandleObjStoreListener = (
+    listener: (message: HandleListenerTypes) => void,
+  ): void => {
+    this.handleListeners.add(listener);
   };
 
-  getFileHandle = async (
-    key: string,
-  ): Promise<FileSystemFileHandle | undefined> => {
-    return await this.uploadDB?.get("handles", key);
+  removeHandleObjStoreListener = (
+    listener: (message: HandleListenerTypes) => void,
+  ): void => {
+    this.handleListeners.delete(listener);
   };
-
-  deleteFileHandle = async (key: string) => {
-    await this.uploadDB?.delete("handles", key);
-  };
-
-  getAllFileHandles = async (): Promise<
-    { key: string; handle: FileSystemFileHandle }[]
-  > => {
-    if (!this.uploadDB) throw new Error("IndexedDB not initialized");
-
-    const keys = await this.uploadDB.getAllKeys("handles");
-    const entries: { key: string; handle: FileSystemFileHandle }[] = [];
-
-    for (const key of keys) {
-      const handle = await this.uploadDB.get("handles", key as string);
-      if (handle) {
-        entries.push({ key: key as string, handle });
-      }
-    }
-
-    return entries;
-  };
-
-  addHandleObjStoreListener;
 }
 
 export default IndexedDB;
