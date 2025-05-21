@@ -15,11 +15,10 @@ class Posts {
     uploadId: string,
     handle: FileSystemFileHandle,
     offset: number,
-    totalSize: number,
   ) => {
     await this.uploadDB?.put(
       "handles",
-      { tableId, uploadId, handle, offset, totalSize },
+      { tableId, uploadId, handle, offset },
       key,
     );
     this.handleListeners.forEach((listener) => {
@@ -30,7 +29,6 @@ class Posts {
           uploadId,
           key,
           offset,
-          totalSize,
         },
         data: {
           handle,

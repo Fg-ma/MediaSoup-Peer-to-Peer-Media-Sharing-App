@@ -69,7 +69,8 @@ export type MessageTypes =
   | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
   | onCreateNewInstancesType
-  | onSearchTabledContentRequestType;
+  | onSearchTabledContentRequestType
+  | onDeleteUploadSessionType;
 
 export type onSearchTabledContentRequestType = {
   type: "searchTabledContentRequest";
@@ -253,6 +254,11 @@ export type onCreateNewInstancesType = {
       }[];
     }[];
   };
+};
+
+export type onDeleteUploadSessionType = {
+  type: "deleteUploadSession";
+  header: { uploadId: string };
 };
 
 export const tables: Tables = {};

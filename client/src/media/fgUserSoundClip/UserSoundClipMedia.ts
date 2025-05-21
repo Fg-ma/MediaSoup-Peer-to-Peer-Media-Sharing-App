@@ -5,11 +5,11 @@ import {
 } from "../../../../universal/contentTypeConstant";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 
 export type SoundClipListenerTypes =
   | { type: "downloadComplete" }

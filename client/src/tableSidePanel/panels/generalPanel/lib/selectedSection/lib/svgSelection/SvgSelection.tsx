@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
-import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
 import GeneralMediaSelection from "../GeneralMediaSelection";
 import SvgEffectsSection from "./lib/SvgEffectsSection";
-import { SvgInstanceListenerTypes } from "src/media/fgTableSvg/TableSvgMediaInstance";
+import { SvgInstanceListenerTypes } from "../../../../../../../media/fgTableSvg/TableSvgMediaInstance";
+import { LoadingStateTypes } from "../../../../../../../../../universal/contentTypeConstant";
+import LoadingElement from "../../../../../../../elements/loadingElement/LoadingElement";
+import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
+import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
+import SvgSelectionController from "./lib/SvgSelectionController";
 
 export default function SvgSelection({
   contentId,
@@ -13,31 +17,22 @@ export default function SvgSelection({
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-
-  const [largestDim, setLargestDim] = useState<"width" | "height">("width");
-  const svgContainerRef = useRef<HTMLDivElement>(null);
-  const svgMirror = useRef<SVGSVGElement | undefined>(undefined);
-
   const svgInstanceMedia = userMedia.current.svg.tableInstances[contentId];
   const positioning = svgInstanceMedia?.getPositioning();
 
-  const handleInstanceEvents = (event: SvgInstanceListenerTypes) => {
-    if (event.type === "effectsChanged") {
-      if (svgMirror.current && svgMirror.current.parentElement) {
-        svgMirror.current.parentElement.removeChild(svgMirror.current);
-      }
+  const [largestDim, setLargestDim] = useState<"width" | "height">("width");
+  const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
+    svgInstanceMedia?.svgMedia.loadingState,
+  );
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const svgMirror = useRef<SVGSVGElement | undefined>(undefined);
 
-      if (svgInstanceMedia.instanceSvg) {
-        svgMirror.current = svgInstanceMedia.instanceSvg.cloneNode(
-          true,
-        ) as SVGSVGElement;
-        svgMirror.current.setAttribute("height", "100%");
-        svgMirror.current.setAttribute("width", "auto");
-        svgMirror.current.setAttribute("maxHeight", "12rem");
-        svgContainerRef.current?.appendChild(svgMirror.current);
-      }
-    }
-  };
+  const svgSelectionController = new SvgSelectionController(
+    svgInstanceMedia,
+    svgMirror,
+    svgContainerRef,
+    setLoadingState,
+  );
 
   useEffect(() => {
     if (svgInstanceMedia?.instanceSvg) {
@@ -56,10 +51,20 @@ export default function SvgSelection({
       svgContainerRef.current?.appendChild(svgMirror.current);
     }
 
-    svgInstanceMedia?.addSvgInstanceListener(handleInstanceEvents);
+    svgInstanceMedia?.addSvgInstanceListener(
+      svgSelectionController.handleInstanceEvents,
+    );
+    svgInstanceMedia?.svgMedia.addSvgListener(
+      svgSelectionController.handleSvgMessages,
+    );
 
     return () => {
-      svgInstanceMedia?.removeSvgInstanceListener(handleInstanceEvents);
+      svgInstanceMedia?.removeSvgInstanceListener(
+        svgSelectionController.handleInstanceEvents,
+      );
+      svgInstanceMedia.svgMedia.removeSvgListener(
+        svgSelectionController.handleSvgMessages,
+      );
     };
   }, []);
 
@@ -69,10 +74,29 @@ export default function SvgSelection({
         contentId={contentId}
         contentType="svg"
         selectionContent={
-          <div
-            ref={svgContainerRef}
-            className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
-          ></div>
+          loadingState === "downloaded" ? (
+            <div
+              ref={svgContainerRef}
+              className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
+            ></div>
+          ) : loadingState === "downloading" ? (
+            <LoadingElement
+              className="h-[12rem] w-full rounded-md"
+              pauseDownload={svgInstanceMedia.svgMedia.downloader?.pause}
+            />
+          ) : loadingState === "failed" ? (
+            <DownloadFailed
+              className="h-[12rem] w-full rounded-md"
+              onClick={svgInstanceMedia.svgMedia.retryDownload}
+            />
+          ) : loadingState === "paused" ? (
+            <DownloadPaused
+              className="h-[12rem] w-full rounded-md"
+              onClick={svgInstanceMedia.svgMedia.downloader?.resume}
+            />
+          ) : (
+            <></>
+          )
         }
         effectsSection={
           <SvgEffectsSection
@@ -80,9 +104,13 @@ export default function SvgSelection({
             svgMediaInstance={svgInstanceMedia}
           />
         }
-        downloadFunction={() => {
-          svgInstanceMedia.downloadSvg("svg", 256, 256, "Minified");
-        }}
+        downloadFunction={
+          loadingState === "downloaded"
+            ? () => {
+                svgInstanceMedia.downloadSvg("svg", 256, 256, "Minified");
+              }
+            : undefined
+        }
         filename={svgInstanceMedia.svgMedia.filename}
         mimeType={svgInstanceMedia.svgMedia.mimeType}
         fileSize={svgInstanceMedia.svgMedia.getFileSize()}

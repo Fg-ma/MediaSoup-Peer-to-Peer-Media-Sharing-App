@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import {
   AreaChart,
   Area,
@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import Downloader from "../../../../downloader/Downloader";
+import Downloader from "../../../../tools/downloader/Downloader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {

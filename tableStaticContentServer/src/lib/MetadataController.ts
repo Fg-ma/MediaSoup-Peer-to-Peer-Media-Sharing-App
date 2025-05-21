@@ -1,7 +1,8 @@
-import { tableTopMongo } from "src";
+import { tableTopMongo, tableTopRedis } from "src";
 import {
   onChangeContentStateType,
   onCreateNewInstancesType,
+  onDeleteUploadSessionType,
   onRequestCatchUpTableDataType,
   onRequestCatchUpVideoPositionType,
   onResponseCatchUpVideoPositionType,
@@ -122,6 +123,15 @@ class MetadataController {
         newInstances: updates,
       },
     });
+  };
+
+  onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
+    const { uploadId } = event.header;
+
+    await tableTopRedis.delete([
+      { prefix: "uploadSession", id: uploadId },
+      { prefix: "chunkState", id: uploadId },
+    ]);
   };
 }
 

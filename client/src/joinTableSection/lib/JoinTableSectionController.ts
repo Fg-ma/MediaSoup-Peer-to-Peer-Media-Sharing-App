@@ -21,7 +21,9 @@ import PermissionsController from "../../lib/PermissionsController";
 import Metadata from "../../lib/Metadata";
 import CleanupController from "../../lib/CleanupController";
 import Deadbanding from "../../babylon/Deadbanding";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
+import Downloader from "../../tools/downloader/Downloader";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 
 class JoinTableSectionController {
   constructor(
@@ -76,6 +78,9 @@ class JoinTableSectionController {
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private cleanupController: React.MutableRefObject<CleanupController>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {}
 
   joinTable = () => {
@@ -118,6 +123,14 @@ class JoinTableSectionController {
           this.username.current,
           this.instance.current,
           this.userMedia,
+          this.deadbanding,
+          this.userDevice,
+          this.userEffects,
+          this.userEffectsStyles,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
         );
 
       this.userMedia.current.gamesSignaling = new GamesSignalingMedia(

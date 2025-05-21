@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef } from "react";
-import ChunkedUploader from "../../uploader/lib/chunkUploader/ChunkUploader";
+import ChunkedUploader from "../../tools/uploader/lib/chunkUploader/ChunkUploader";
 import { DownloadSignals, UploadSignals } from "./lib/typeConstant";
-import Downloader from "src/downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 
 export interface UploadDownloadContextProviderProps {
   children: React.ReactNode;

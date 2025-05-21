@@ -1,4 +1,4 @@
-import UserDevice from "../lib/UserDevice";
+import UserDevice from "../tools/userDevice/UserDevice";
 import FaceLandmarks from "./FaceLandmarks";
 
 type Needs = "selfieSegmentation" | "faceDetection" | "smoothFaceLandmarks";

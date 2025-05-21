@@ -7,14 +7,14 @@ import {
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
-import UserDevice from "../../lib/UserDevice";
+} from "../../tools/downloader/lib/typeConstant";
+import UserDevice from "../../tools/userDevice/UserDevice";
 
 export type ImageListenerTypes =
   | { type: "downloadComplete" }

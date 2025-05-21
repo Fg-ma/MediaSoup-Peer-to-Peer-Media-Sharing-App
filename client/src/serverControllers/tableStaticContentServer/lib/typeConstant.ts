@@ -38,7 +38,8 @@ export type OutGoingTableStaticContentMessages =
   | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
   | onCreateNewInstancesType
-  | onSearchTabledContentRequestType;
+  | onSearchTabledContentRequestType
+  | onDeleteUploadSessionType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -235,6 +236,11 @@ type onSearchTabledContentRequestType = {
   data: {
     name: string;
   };
+};
+
+type onDeleteUploadSessionType = {
+  type: "deleteUploadSession";
+  header: { uploadId: string };
 };
 
 export type IncomingTableStaticContentMessages =

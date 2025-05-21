@@ -6,10 +6,10 @@ import {
   onDownloadMetaType,
   onOneShotDownloadType,
   TableTopStaticMimeType,
-} from "../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../universal/contentTypeConstant";
-import { DownloadSignals } from "../context/uploadDownloadContext/lib/typeConstant";
-import TableStaticContentSocketController from "../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadListenerTypes } from "./lib/typeConstant";
 import UserStaticContentSocketController from "src/serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import { IncomingUserStaticContentMessages } from "src/serverControllers/userStaticContentServer/lib/typeConstant";

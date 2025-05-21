@@ -55,6 +55,9 @@ const handleMessage = (
     case "searchTabledContentRequest":
       search.onSearchTabledContentRequest(event);
       break;
+    case "deleteUploadSession":
+      metadataController.onDeleteUploadSession(event);
+      break;
     default:
       break;
   }

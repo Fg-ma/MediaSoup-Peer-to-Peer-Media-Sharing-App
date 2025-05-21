@@ -30,9 +30,10 @@ import "./css/scrollbar.css";
 import "./css/fontStyles.css";
 import "./css/tips.css";
 import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
-import Uploader from "./uploader/Uploader";
+import Uploader from "./tools/uploader/Uploader";
 import CreditPage from "./creditPage/CreditPage";
 import TableLittleBuddies from "./components/tableLittleBuddies/TableLittleBuddies";
+import { useSignalContext } from "./context/signalContext/SignalContext";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
@@ -47,7 +48,8 @@ export default function Main() {
   const { permissions } = usePermissionsContext();
   const { mediasoupSocket, userStaticContentSocket } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
-  const { uploader, userDevice, indexedDBController } = useToolsContext();
+  const { uploader, userDevice, indexedDBController, reasonableFileSizer } =
+    useToolsContext();
   const {
     sendUploadSignal,
     addCurrentUpload,
@@ -56,6 +58,7 @@ export default function Main() {
     addCurrentDownload,
     removeCurrentDownload,
   } = useUploadDownloadContext();
+  const { sendGeneralSignal } = useSignalContext();
 
   const [bundles, setBundles] = useState<{
     [username: string]: { [instance: string]: React.JSX.Element };
@@ -112,7 +115,9 @@ export default function Main() {
       sendUploadSignal,
       addCurrentUpload,
       removeCurrentUpload,
+      reasonableFileSizer,
       indexedDBController,
+      sendGeneralSignal,
     );
   };
 

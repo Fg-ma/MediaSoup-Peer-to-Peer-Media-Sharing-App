@@ -3,13 +3,13 @@ import {
   TableContentStateTypes,
   LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 
 export type ApplicationListenerTypes =
   | { type: "downloadComplete" }

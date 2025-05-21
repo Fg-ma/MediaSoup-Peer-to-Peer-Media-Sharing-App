@@ -1,19 +1,15 @@
-import {
-  IncomingTableStaticContentMessages,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   TableContentStateTypes,
-  StaticContentTypes,
   LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
-import Downloader from "src/downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import TableStaticContentSocketController from "src/serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadSignals } from "src/context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "src/downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 
 export type SoundClipListenerTypes =
   | { type: "downloadComplete" }

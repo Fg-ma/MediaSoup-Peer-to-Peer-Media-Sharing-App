@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import ChunkedUploader from "../../../../uploader/lib/chunkUploader/ChunkUploader";
+import ChunkedUploader from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {

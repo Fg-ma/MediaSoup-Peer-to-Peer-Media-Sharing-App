@@ -35,34 +35,23 @@ export default function DownloadImageOptionsPage({
   };
 
   const handleOptionSelect = (
-    option: keyof typeof downloadImageOptionsTitles
+    option: keyof typeof downloadImageOptionsTitles,
   ) => {
-    if (option !== "antialiasing") {
-      setActivePages((prev) => {
-        const newActivePages = { ...prev };
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
 
-        newActivePages.downloadImageOptions[option].active =
-          !newActivePages.downloadImageOptions[option].active;
+      newActivePages.downloadImageOptions[option].active =
+        !newActivePages.downloadImageOptions[option].active;
 
-        return newActivePages;
-      });
-    } else {
-      setSettings((prev) => {
-        const newSettings = { ...prev };
-
-        newSettings.downloadImageOptions[option].value =
-          !newSettings.downloadImageOptions[option].value;
-
-        return newSettings;
-      });
-    }
+      return newActivePages;
+    });
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2 font-K2D'>
-      <div className='flex h-6 w-full space-x-1 justify-start'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2 font-K2D">
+      <div className="flex h-6 w-full justify-start space-x-1">
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -77,36 +66,25 @@ export default function DownloadImageOptionsPage({
           clickFunction={handleDownloadImageOptionsActive}
         />
         <div
-          className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
           onClick={handleDownloadImageOptionsActive}
         >
           Download options
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
+      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
+      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col justify-start space-y-1 overflow-y-auto px-2">
         {Object.keys(downloadImageOptionsArrays).map((option) => (
           <FgButton
             key={option}
-            className='w-full h-8'
+            className="h-8 w-full"
             clickFunction={() =>
               handleOptionSelect(
-                option as keyof typeof downloadImageOptionsArrays
+                option as keyof typeof downloadImageOptionsArrays,
               )
             }
             contentFunction={() => (
-              <div
-                className={`${
-                  option !== "antialiasing"
-                    ? "justify-between"
-                    : "justify-center"
-                } ${
-                  option === "antialiasing" &&
-                  settings.downloadImageOptions.antialiasing.value
-                    ? "bg-fg-white text-fg-tone-black-1"
-                    : ""
-                } flex w-full space-x-4 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap`}
-              >
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                 <div>
                   {
                     downloadImageOptionsTitles[
@@ -114,30 +92,28 @@ export default function DownloadImageOptionsPage({
                     ]
                   }
                 </div>
-                {option !== "antialiasing" && (
-                  <div className='flex space-x-1 items-center justify-center'>
-                    <div>
-                      {option === "quality"
-                        ? parseFloat(
-                            settings.downloadImageOptions[option].value.toFixed(
-                              2
-                            )
-                          )
-                        : settings.downloadImageOptions[
-                            option as keyof typeof downloadImageOptionsArrays
-                          ].value}
-                    </div>
-                    <FgSVGElement
-                      src={navigateForwardIcon}
-                      attributes={[
-                        { key: "width", value: "1.25rem" },
-                        { key: "height", value: "1.25rem" },
-                        { key: "fill", value: "#f2f2f2" },
-                        { key: "stroke", value: "#f2f2f2" },
-                      ]}
-                    />
+                <div className="flex items-center justify-center space-x-1">
+                  <div>
+                    {option === "quality"
+                      ? parseFloat(
+                          settings.downloadImageOptions[option].value.toFixed(
+                            2,
+                          ),
+                        )
+                      : settings.downloadImageOptions[
+                          option as keyof typeof downloadImageOptionsArrays
+                        ].value}
                   </div>
-                )}
+                  <FgSVGElement
+                    src={navigateForwardIcon}
+                    attributes={[
+                      { key: "width", value: "1.25rem" },
+                      { key: "height", value: "1.25rem" },
+                      { key: "fill", value: "#f2f2f2" },
+                      { key: "stroke", value: "#f2f2f2" },
+                    ]}
+                  />
+                </div>
               </div>
             )}
           />

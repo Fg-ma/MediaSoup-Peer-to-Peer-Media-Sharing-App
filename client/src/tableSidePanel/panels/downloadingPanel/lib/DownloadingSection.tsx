@@ -3,12 +3,10 @@ import FgButton from "../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import LoadingBar from "../../../../elements/loadingBar/LoadingBar";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-
-import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import MoreInfoSection from "./MoreInfoSection";
-import Downloader from "../../../../downloader/Downloader";
-import { DownloadListenerTypes } from "../../../../downloader/lib/typeConstant";
+import Downloader from "../../../../tools/downloader/Downloader";
+import { DownloadListenerTypes } from "../../../../tools/downloader/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

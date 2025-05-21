@@ -6,7 +6,7 @@ import {
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import { UserMediaType } from "../../context/mediaContext/typeConstant";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,

@@ -11,7 +11,7 @@ import {
   HideBackgroundEffectTypes,
   CameraEffectTypes,
 } from "../../../universal/effectsTypeConstant";
-import UserDevice from "../lib/UserDevice";
+import UserDevice from "../tools/userDevice/UserDevice";
 import { hideBackgroundEffectImagesMap } from "./meshes";
 import BabylonMeshes from "./BabylonMeshes";
 import FaceLandmarks from "./FaceLandmarks";

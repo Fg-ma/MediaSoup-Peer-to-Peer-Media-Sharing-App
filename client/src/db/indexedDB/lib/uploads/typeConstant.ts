@@ -8,7 +8,6 @@ export interface UploadDBSchema extends DBSchema {
       uploadId: string;
       handle: FileSystemFileHandle;
       offset: number;
-      totalSize: number;
     };
   };
 }
@@ -21,7 +20,6 @@ export type HandleListenerTypes =
         uploadId: string;
         key: string;
         offset: number;
-        totalSize: number;
       };
       data: {
         handle: FileSystemFileHandle;

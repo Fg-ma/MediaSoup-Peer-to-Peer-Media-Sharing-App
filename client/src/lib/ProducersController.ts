@@ -20,7 +20,7 @@ import {
 import CameraMedia from "../media/fgVisualMedia/CameraMedia";
 import ScreenMedia from "../media/fgVisualMedia/ScreenMedia";
 import AudioMedia from "../media/audio/AudioMedia";
-import UserDevice from "./UserDevice";
+import UserDevice from "../tools/userDevice/UserDevice";
 import BrowserMedia from "../media/BrowserMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import ScreenAudioMedia from "../media/screenAudio/ScreenAudioMedia";

@@ -10,7 +10,7 @@ import BabylonScene, {
   EffectType,
   validEffectTypes,
 } from "../../babylon/BabylonScene";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import assetMeshes from "../../babylon/meshes";
 import TableImageMedia, { ImageListenerTypes } from "./TableImageMedia";

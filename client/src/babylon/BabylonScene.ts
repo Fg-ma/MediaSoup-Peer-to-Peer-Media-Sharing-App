@@ -15,7 +15,6 @@ import {
   ImageProcessingPostProcess,
   Layer,
   DynamicTexture,
-  Material,
   Texture,
   Color4,
   Tools,
@@ -24,7 +23,7 @@ import "@babylonjs/inspector";
 import { CameraEffectTypes } from "../../../universal/effectsTypeConstant";
 import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
-import UserDevice from "../lib/UserDevice";
+import UserDevice from "../tools/userDevice/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
 import { MeshTypes } from "./typeContant";
 import FaceLandmarks from "./FaceLandmarks";
@@ -63,6 +62,16 @@ const recordingMimeTypeExtensionMap = {
 };
 
 class BabylonScene {
+  readonly mimeTypeExtensionMap: Record<string, string> = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/webp": ".webp",
+    "image/bmp": ".bmp",
+    "image/tiff": ".tiff",
+    "image/heic": ".heic",
+  };
+
   private engine: Engine;
   scene: Scene;
   private camera: UniversalCamera;
@@ -102,6 +111,7 @@ class BabylonScene {
   recordingMimeType: string | undefined;
 
   snapShotURL: string | undefined;
+  snapShotExtension: string | undefined;
 
   private screenShotSuccessCallbacks: (() => void)[] = [];
   private videoSuccessCallbacks: (() => void)[] = [];
@@ -536,14 +546,18 @@ class BabylonScene {
 
   downloadSnapShot = () => {
     if (this.engine) {
-      Tools.CreateScreenshotUsingRenderTarget(
+      Tools.CreateScreenshot(
         this.engine,
         this.camera,
-        { width: this.canvas.width, height: this.canvas.height },
+        {
+          width: this.canvas.width,
+          height: this.canvas.height,
+        },
         (dataUrl) => {
           // Create a link element for download
           const link = document.createElement("a");
           link.href = dataUrl;
+          console.log(this.snapShotExtension);
           link.download = "scene-snapshot.png";
 
           // Simulate a click to download the image
@@ -551,6 +565,7 @@ class BabylonScene {
           link.click();
           document.body.removeChild(link);
         },
+        "image/png",
       );
     }
   };
@@ -558,14 +573,17 @@ class BabylonScene {
   getSnapShotURL = (): Promise<string | undefined> => {
     return new Promise((resolve) => {
       if (this.engine && this.camera) {
-        Tools.CreateScreenshotUsingRenderTarget(
+        Tools.CreateScreenshot(
           this.engine,
           this.camera,
-          { width: this.canvas.width, height: this.canvas.height },
+          {
+            width: this.canvas.width,
+            height: this.canvas.height,
+            precision: 1,
+          },
           (dataUrl) => {
             resolve(dataUrl);
           },
-          "image/png",
         );
       } else {
         resolve(undefined);
@@ -573,29 +591,21 @@ class BabylonScene {
     });
   };
 
-  takeSnapShot = (
-    mimeType?: string,
-    samples?: number,
-    antialiasing?: boolean,
-    quality?: number,
-  ) => {
+  takeSnapShot = (mimeType?: string, quality?: number) => {
     if (this.engine) {
-      Tools.CreateScreenshotUsingRenderTarget(
+      Tools.CreateScreenshot(
         this.engine,
         this.camera,
-        { width: this.canvas.width, height: this.canvas.height },
+        {
+          width: this.canvas.width,
+          height: this.canvas.height,
+        },
         (dataUrl) => {
           this.snapShotURL = dataUrl;
-          this.screenShotSuccessCallbacks.map((screenShotSuccessCallback) =>
-            screenShotSuccessCallback(),
-          );
+          this.snapShotExtension =
+            this.mimeTypeExtensionMap[mimeType ?? "image/png"] ?? ".png";
         },
         mimeType ?? "image/png",
-        samples,
-        antialiasing,
-        undefined,
-        undefined,
-        undefined,
         undefined,
         quality,
       );

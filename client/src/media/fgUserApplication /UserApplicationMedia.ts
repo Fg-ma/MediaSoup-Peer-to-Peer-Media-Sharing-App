@@ -3,12 +3,12 @@ import {
   UserContentStateTypes,
   LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 
 export type ApplicationListenerTypes =

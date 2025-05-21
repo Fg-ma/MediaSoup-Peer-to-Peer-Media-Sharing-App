@@ -6,7 +6,7 @@ import {
   defaultCameraEffects,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
 import BabylonScene, {
   EffectType,
   validEffectTypes,

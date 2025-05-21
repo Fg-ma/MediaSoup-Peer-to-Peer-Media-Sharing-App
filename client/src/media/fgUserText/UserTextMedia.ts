@@ -5,11 +5,11 @@ import {
 } from "../../../../universal/contentTypeConstant";
 import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 
 export type TextMediaEvents = onTextFinishedLoadingType;
 

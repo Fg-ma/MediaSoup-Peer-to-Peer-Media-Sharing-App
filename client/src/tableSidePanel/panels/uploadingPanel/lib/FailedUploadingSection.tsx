@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useUserInfoContext } from "../../../../context/userInfoContext/UserInfoContext";
+import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import { useToolsContext } from "../../../../context/toolsContext/ToolsContext";
@@ -16,18 +17,18 @@ export default function FailedUploadingSection({
   uploadId,
   contentId,
   offset,
-  totalSize,
   failed,
 }: {
   savedTableId: string;
   uploadId: string;
   contentId: string;
   offset: number;
-  totalSize: number;
   failed: FileSystemFileHandle;
 }) {
-  const { uploader, indexedDBController } = useToolsContext();
+  const { uploader, indexedDBController, reasonableFileSizer } =
+    useToolsContext();
   const { tableId } = useUserInfoContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -40,32 +41,42 @@ export default function FailedUploadingSection({
   const clickFunction = async () => {
     if (savedTableId !== tableId.current) return;
 
-    const perm = await (failed as any).queryPermission({ mode: "read" });
-    if (perm !== "granted") {
-      const request = await (failed as any).requestPermission({ mode: "read" });
-      if (request !== "granted") {
-        await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-          contentId,
-        );
-        return;
+    if (clickState.current === "start") {
+      const perm = await (failed as any).queryPermission({ mode: "read" });
+      if (perm !== "granted") {
+        const request = await (failed as any).requestPermission({
+          mode: "read",
+        });
+        if (request !== "granted") {
+          await indexedDBController.current.uploadDeletes?.deleteFileHandle(
+            contentId,
+          );
+          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
+          return;
+        }
       }
+
+      const file = (await failed.getFile()) as File;
+
+      await indexedDBController.current.uploadDeletes?.deleteFileHandle(
+        contentId,
+      );
+
+      await uploader.current?.uploadToTable(
+        file,
+        undefined,
+        undefined,
+        failed,
+        uploadId,
+        contentId,
+        offset,
+      );
+    } else {
+      await indexedDBController.current.uploadDeletes?.deleteFileHandle(
+        contentId,
+      );
+      tableStaticContentSocket.current?.deleteUploadSession(uploadId);
     }
-
-    const file = (await failed.getFile()) as File;
-
-    await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-      contentId,
-    );
-
-    await uploader.current?.uploadToTable(
-      file,
-      undefined,
-      undefined,
-      failed,
-      uploadId,
-      contentId,
-      offset,
-    );
   };
 
   const onPointerEnter = () => {
@@ -96,73 +107,6 @@ export default function FailedUploadingSection({
   };
 
   useEffect(() => {
-    const extractFirstVideoFrame = (file: File): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const video = document.createElement("video");
-        video.preload = "metadata";
-        video.src = URL.createObjectURL(file);
-        video.muted = true;
-        video.playsInline = true;
-
-        // 1. once metadata is loaded, we know dimensions
-        video.addEventListener(
-          "loadedmetadata",
-          () => {
-            // ensure there's a video duration and size
-            if (!video.videoWidth || !video.videoHeight) {
-              return reject(new Error("video metadata missing dimensions"));
-            }
-
-            // set the canvas to those dimensions
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) {
-              return reject(new Error("2D context not available"));
-            }
-
-            // 2. seek to the very first frame
-            video.currentTime = 0;
-            video.addEventListener(
-              "seeked",
-              () => {
-                // 3. draw it
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // export to PNG blob → object URL
-                canvas.toBlob((blob) => {
-                  if (blob) {
-                    const imgUrl = URL.createObjectURL(blob);
-
-                    // clean up the video URL, element, and canvas
-                    URL.revokeObjectURL(video.src);
-                    video.remove();
-                    canvas.remove();
-
-                    resolve(imgUrl);
-                  } else {
-                    reject(new Error("canvas.toBlob() produced no blob"));
-                  }
-                }, "image/png");
-              },
-              { once: true },
-            );
-          },
-          { once: true },
-        );
-
-        video.addEventListener(
-          "error",
-          (e) => {
-            URL.revokeObjectURL(video.src);
-            reject(new Error("video load error"));
-          },
-          { once: true },
-        );
-      });
-    };
-
     const loadFile = async () => {
       const perm = await (failed as any).queryPermission({ mode: "read" });
       if (perm !== "granted") {
@@ -173,24 +117,17 @@ export default function FailedUploadingSection({
           await indexedDBController.current.uploadDeletes?.deleteFileHandle(
             contentId,
           );
+          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
           return;
         }
       }
 
       file.current = (await failed.getFile()) as File;
 
-      if (file.current.type.startsWith("video/")) {
-        extractFirstVideoFrame(file.current)
-          .then((url) => (fileUrl.current = url))
-          .catch(() => {
-            if (file.current)
-              fileUrl.current = URL.createObjectURL(file.current);
-          });
-      } else {
-        fileUrl.current = URL.createObjectURL(file.current);
-      }
-
-      setRerender((prev) => !prev);
+      reasonableFileSizer.current.getUrl(file.current).then((url) => {
+        fileUrl.current = url;
+        setRerender((prev) => !prev);
+      });
     };
 
     loadFile();
@@ -246,7 +183,7 @@ export default function FailedUploadingSection({
         } relative flex h-[6rem] w-full cursor-pointer items-center justify-center space-x-2 bg-fg-tone-black-5 px-8 py-4 transition-all`}
         onClick={clickFunction}
       >
-        {/* {fileUrl.current && (
+        {fileUrl.current && (
           <div className="h-16">
             {file.current.type === "image/svg+xml" ? (
               <FgSVGElement
@@ -268,7 +205,7 @@ export default function FailedUploadingSection({
               )
             )}
           </div>
-        )} */}
+        )}
         <HoverElement
           externalRef={filenameRef}
           className={`${

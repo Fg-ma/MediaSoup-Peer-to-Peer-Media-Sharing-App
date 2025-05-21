@@ -11,7 +11,7 @@ import {
   downloadRecordingMimeMap,
   Settings,
 } from "./typeConstant";
-import Uploader from "../../../../uploader/Uploader";
+import Uploader from "../../../../tools/uploader/Uploader";
 
 class CaptureMediaController {
   constructor(
@@ -154,8 +154,6 @@ class CaptureMediaController {
 
     this.captureMedia.current?.babylonScene?.takeSnapShot(
       downloadImageMimeMap[this.settings.downloadImageOptions.mimeType.value],
-      this.settings.downloadImageOptions.samples.value,
-      this.settings.downloadImageOptions.antialiasing.value,
       this.settings.downloadImageOptions.quality.value,
     );
 

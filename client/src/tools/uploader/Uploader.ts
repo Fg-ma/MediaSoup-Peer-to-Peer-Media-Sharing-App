@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
+import { UploadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import OneShotUploader from "./lib/oneShotUploader/OneShotUploader";
 import ChunkedUploader from "./lib/chunkUploader/ChunkUploader";
-import { UploadSignals } from "../context/uploadDownloadContext/lib/typeConstant";
 import {
   TableContentStateTypes,
   UserContentStateTypes,
-} from "../../../universal/contentTypeConstant";
-import IndexedDB from "../db/indexedDB/IndexedDB";
+} from "../../../../universal/contentTypeConstant";
+import IndexedDB from "../../db/indexedDB/IndexedDB";
+import ReasonableFileSizer from "../reasonableFileSizer.ts/ReasonableFileSizer";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -26,7 +28,9 @@ class Uploader {
     private sendUploadSignal: (signal: UploadSignals) => void,
     private addCurrentUpload: (id: string, upload: ChunkedUploader) => void,
     private removeCurrentUpload: (id: string) => void,
+    private reasonableFileSizer: React.MutableRefObject<ReasonableFileSizer>,
     private indexedDBController: React.MutableRefObject<IndexedDB>,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
   ) {}
 
   uploadToTable = async (
@@ -45,6 +49,14 @@ class Uploader {
     if (!tableStaticContentServerBaseUrl || !this.tableId.current) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: `Uploading ${file.name}...`,
+          timeout: 2500,
+        },
+      });
+
       this.oneShotUploader.handleOneShotFileUpload(
         file,
         {
@@ -59,6 +71,24 @@ class Uploader {
       );
     } else {
       const finalContentId = contentId !== undefined ? contentId : uuidv4();
+
+      if (uploadId) {
+        this.sendGeneralSignal({
+          type: "tableInfoSignal",
+          data: {
+            message: `Attempting to resume ${file.name} upload...`,
+            timeout: 2500,
+          },
+        });
+      } else {
+        this.sendGeneralSignal({
+          type: "tableInfoSignal",
+          data: {
+            message: `Uploading ${file.name} this may take a second...`,
+            timeout: 2500,
+          },
+        });
+      }
 
       const metadata = {
         tableId: this.tableId.current,
@@ -92,7 +122,7 @@ class Uploader {
 
           finalUploadId = newUploadId;
         }
-
+        console.log("finalUploadId", finalUploadId);
         if (!finalUploadId) return;
 
         if (handle) {
@@ -102,7 +132,6 @@ class Uploader {
             finalUploadId,
             handle,
             offset,
-            file.size,
           );
         }
 
@@ -120,6 +149,7 @@ class Uploader {
           finalContentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          this.reasonableFileSizer,
           this.indexedDBController,
           "toTable",
           handle,
@@ -189,6 +219,7 @@ class Uploader {
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          this.reasonableFileSizer,
           undefined,
           "reupload",
           undefined,
@@ -266,6 +297,7 @@ class Uploader {
           contentId,
           this.removeCurrentUpload,
           this.sendUploadSignal,
+          this.reasonableFileSizer,
           undefined,
           "toMuteStyle",
           undefined,

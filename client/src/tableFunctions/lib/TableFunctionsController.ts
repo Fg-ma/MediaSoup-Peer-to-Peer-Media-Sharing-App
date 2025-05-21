@@ -1,7 +1,7 @@
 import CaptureMedia from "../../media/capture/CaptureMedia";
 import { FgBackground } from "../../elements/fgBackgroundSelector/lib/typeConstant";
 import { IncomingTableMessages } from "../../serverControllers/tableServer/lib/typeConstant";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import {
   CaptureEffectStylesType,

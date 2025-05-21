@@ -11,7 +11,6 @@ class Gets {
         tableId: string;
         uploadId: string;
         offset: number;
-        totalSize: number;
         handle: FileSystemFileHandle;
       }
     | undefined
@@ -25,7 +24,6 @@ class Gets {
       tableId: string;
       uploadId: string;
       offset: number;
-      totalSize: number;
       handle: FileSystemFileHandle;
     }[]
   > => {
@@ -37,7 +35,6 @@ class Gets {
       tableId: string;
       uploadId: string;
       offset: number;
-      totalSize: number;
       handle: FileSystemFileHandle;
     }[] = [];
 

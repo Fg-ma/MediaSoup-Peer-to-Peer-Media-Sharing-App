@@ -5,6 +5,7 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { useToolsContext } from "../context/toolsContext/ToolsContext";
+import { useUploadDownloadContext } from "../context/uploadDownloadContext/UploadDownloadContext";
 import JoinTableSectionController from "./lib/JoinTableSectionController";
 import ProducersController from "../lib/ProducersController";
 import BundlesController from "../lib/BundlesController";
@@ -75,6 +76,8 @@ export default function JoinTableSection({
     useSocketContext();
   const { tableId, username, instance, device } = useUserInfoContext();
   const { userDevice } = useToolsContext();
+  const { sendDownloadSignal, addCurrentDownload, removeCurrentDownload } =
+    useUploadDownloadContext();
 
   const [isInTable, setIsInTable] = useState(false);
   const tableIdRef = useRef<HTMLInputElement>(null);
@@ -119,6 +122,9 @@ export default function JoinTableSection({
       deadbanding,
       cleanupController,
       setRerender,
+      sendDownloadSignal,
+      addCurrentDownload,
+      removeCurrentDownload,
     ),
   );
 
@@ -135,19 +141,19 @@ export default function JoinTableSection({
   }, [mediasoupSocket.current]);
 
   return (
-    <div className="mt-5 flex justify-center">
+    <div className="flex mt-5 justify-center">
       <input
         ref={tableIdRef}
         id="tableIdyInputField"
         type="text"
-        className="mr-2 border border-gray-400 px-4 py-2"
+        className="border mr-2 border-gray-400 px-4 py-2"
         placeholder="Enter room name"
       />
       <input
         ref={usernameRef}
         id="usernameInputField"
         type="text"
-        className="mr-2 border border-gray-400 px-4 py-2"
+        className="border mr-2 border-gray-400 px-4 py-2"
         placeholder="Enter username"
       />
       <button

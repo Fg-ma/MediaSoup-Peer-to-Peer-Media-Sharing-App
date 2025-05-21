@@ -10,14 +10,14 @@ import {
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 import Deadbanding from "../../babylon/Deadbanding";
-import UserDevice from "../../lib/UserDevice";
-import Downloader from "../../downloader/Downloader";
+import UserDevice from "../../tools/userDevice/UserDevice";
+import Downloader from "../../tools/downloader/Downloader";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../downloader/lib/typeConstant";
+} from "../../tools/downloader/lib/typeConstant";
 
 export type VideoListenerTypes =
   | { type: "downloadComplete" }

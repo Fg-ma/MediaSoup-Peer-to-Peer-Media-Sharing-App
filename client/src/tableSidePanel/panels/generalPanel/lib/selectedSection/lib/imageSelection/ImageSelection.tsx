@@ -16,6 +16,7 @@ export default function ImageSelection({
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+
   const imageInstanceMedia = userMedia.current.image.tableInstances[contentId];
   const positioning = imageInstanceMedia?.getPositioning();
 
@@ -96,10 +97,7 @@ export default function ImageSelection({
         }
         downloadFunction={
           loadingState === "downloaded"
-            ? () => {
-                imageInstanceMedia.babylonScene?.takeSnapShot();
-                imageInstanceMedia.babylonScene?.downloadSnapShot();
-              }
+            ? imageInstanceMedia.babylonScene?.downloadSnapShot
             : undefined
         }
         filename={imageInstanceMedia.imageMedia.filename}

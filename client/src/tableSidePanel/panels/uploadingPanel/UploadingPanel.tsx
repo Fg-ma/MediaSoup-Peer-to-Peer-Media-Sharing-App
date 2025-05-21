@@ -33,7 +33,6 @@ export default function UploadingPanel({
       tableId: string;
       uploadId: string;
       offset: number;
-      totalSize: number;
       handle: FileSystemFileHandle;
     }[]
   >([]);
@@ -112,7 +111,6 @@ export default function UploadingPanel({
               uploadId={handle.uploadId}
               contentId={handle.key}
               offset={handle.offset}
-              totalSize={handle.totalSize}
               failed={handle.handle}
             />
           ),
@@ -124,7 +122,7 @@ export default function UploadingPanel({
           tablePanelRef={tablePanelRef}
         />
       ))}
-      {currentUploads.length === 0 && (
+      {handles.length === 0 && currentUploads.length === 0 && (
         <div className="flex h-full w-full flex-col items-center justify-center">
           <span className="px-2 text-center font-Josefin text-3xl text-fg-white">
             No uploads found

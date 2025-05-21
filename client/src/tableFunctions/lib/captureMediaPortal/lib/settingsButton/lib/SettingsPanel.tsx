@@ -21,7 +21,6 @@ import CaptureMediaController from "../../CaptureMediaController";
 import DelayPage from "./DelayPage";
 import DownloadImageOptionsPage from "./DownloadImageOptionsPage";
 import QualityPage from "./QualityPage";
-import SamplesPage from "./SamplesPage";
 import BitRatePage from "./BitRatePage";
 
 const SelectionPanelVar: Variants = {
@@ -200,7 +199,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
+      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md bg-fg-tone-black-2 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -406,8 +405,7 @@ export default function SettingsPanel({
       <AnimatePresence>
         {activePages.downloadImageOptions.active &&
           isDescendantActive(activePages.downloadImageOptions) &&
-          !activePages.downloadImageOptions.quality.active &&
-          !activePages.downloadImageOptions.samples.active && (
+          !activePages.downloadImageOptions.quality.active && (
             <motion.div
               className="w-full"
               variants={panelVariants}
@@ -416,10 +414,6 @@ export default function SettingsPanel({
               exit="exit"
             >
               {downloadImageOptions.map((option) => {
-                if (option === "antialiasing") {
-                  return;
-                }
-
                 const activePage = activePages.downloadImageOptions[option];
                 const activeSetting = settings.downloadImageOptions[option];
 
@@ -485,26 +479,6 @@ export default function SettingsPanel({
               exit="exit"
             >
               <QualityPage
-                setActivePages={setActivePages}
-                settings={settings}
-                setSettings={setSettings}
-              />
-            </motion.div>
-          )}
-      </AnimatePresence>
-      {/* Download image options samlples page */}
-      <AnimatePresence>
-        {activePages.downloadImageOptions.active &&
-          isDescendantActive(activePages.downloadImageOptions) &&
-          activePages.downloadImageOptions.samples.active && (
-            <motion.div
-              className="w-full"
-              variants={panelVariants}
-              initial="init"
-              animate="animate"
-              exit="exit"
-            >
-              <SamplesPage
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}

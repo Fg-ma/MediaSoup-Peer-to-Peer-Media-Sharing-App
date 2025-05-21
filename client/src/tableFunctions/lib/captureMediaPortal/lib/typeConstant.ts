@@ -58,8 +58,6 @@ export interface Settings {
     mimeType: {
       value: DownloadImageMimeTypes;
     };
-    samples: { value: number };
-    antialiasing: { value: boolean };
     quality: { value: number };
   };
   videoSpeed: {
@@ -106,8 +104,6 @@ export const downloadVideoOptions: DownloadVideoOptionsTypes[] = [
 
 export const downloadImageOptions: DownloadImageOptionsTypes[] = [
   "mimeType",
-  "samples",
-  "antialiasing",
   "quality",
 ];
 
@@ -118,18 +114,12 @@ export interface DownloadVideoOptions {
 
 export interface DownloadImageOptions {
   mimeType: DownloadRecordingMimeTypes;
-  samples: number;
-  antialiasing: boolean;
   quality: number;
 }
 
 export type DownloadVideoOptionsTypes = "mimeType" | "fps" | "bitRate";
 
-export type DownloadImageOptionsTypes =
-  | "mimeType"
-  | "samples"
-  | "antialiasing"
-  | "quality";
+export type DownloadImageOptionsTypes = "mimeType" | "quality";
 
 export const downloadVideoOptionsTitles = {
   mimeType: "Mime type",
@@ -139,8 +129,6 @@ export const downloadVideoOptionsTitles = {
 
 export const downloadImageOptionsTitles = {
   mimeType: "Mime type",
-  samples: "Samples",
-  antialiasing: "Antialiasing",
   quality: "Quality",
 };
 
@@ -156,13 +144,9 @@ export const downloadVideoOptionsArrays: {
 
 export const downloadImageOptionsArrays: {
   mimeType: DownloadImageMimeTypes[];
-  samples: number[];
-  antialiasing: [];
   quality: number[];
 } = {
   mimeType: ["jpg", "png", "webp", "tiff", "heic"],
-  samples: [1, 4, 8, 16, 32],
-  antialiasing: [],
   quality: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
 };
 
@@ -182,9 +166,6 @@ export interface ActivePages {
   downloadImageOptions: {
     active: boolean;
     mimeType: {
-      active: boolean;
-    };
-    samples: {
       active: boolean;
     };
     quality: {
@@ -217,9 +198,6 @@ export const defaultActivePages: ActivePages = {
     mimeType: {
       active: false,
     },
-    samples: {
-      active: false,
-    },
     quality: {
       active: false,
     },
@@ -250,14 +228,8 @@ export const defaultSettings: Settings = Object.freeze({
     mimeType: Object.freeze({
       value: "jpg",
     }),
-    samples: {
-      value: 8,
-    },
-    antialiasing: {
-      value: true,
-    },
     quality: {
-      value: 0.8,
+      value: 1,
     },
   }),
   videoSpeed: {

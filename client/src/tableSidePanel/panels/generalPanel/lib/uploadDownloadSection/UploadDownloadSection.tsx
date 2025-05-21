@@ -9,7 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { useUploadDownloadContext } from "../../../../../context/uploadDownloadContext/UploadDownloadContext";
-import Downloader from "../../../../../downloader/Downloader";
+import Downloader from "../../../../../tools/downloader/Downloader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {

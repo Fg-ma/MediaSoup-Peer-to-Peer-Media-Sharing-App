@@ -3,7 +3,7 @@ import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import ChunkedUploader, {
   ChunkedUploadListenerTypes,
-} from "../../../../uploader/lib/chunkUploader/ChunkUploader";
+} from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
 
 export default function LoadingElement({
   upload,

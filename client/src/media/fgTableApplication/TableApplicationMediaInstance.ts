@@ -6,7 +6,7 @@ import {
   ApplicationEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
-import UserDevice from "../../lib/UserDevice";
+import UserDevice from "../../tools/userDevice/UserDevice";
 import TableApplicationMedia, {
   ApplicationListenerTypes,
 } from "./TableApplicationMedia";

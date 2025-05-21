@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import IndexedDB from "../../../db/indexedDB/IndexedDB";
-import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
-import { TableContentStateTypes } from "../../../../../universal/contentTypeConstant";
+import IndexedDB from "../../../../db/indexedDB/IndexedDB";
+import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
+import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
+import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -41,6 +42,7 @@ class ChunkedUploader {
     private contentId: string,
     private removeCurrentUpload: (id: string) => void,
     private sendUploadSignal: (signal: UploadSignals) => void,
+    private reasonableFileSizer: React.MutableRefObject<ReasonableFileSizer>,
     private indexedDBController: React.MutableRefObject<IndexedDB> | undefined,
     private direction: string,
     private handle: FileSystemFileHandle | undefined,
@@ -58,16 +60,12 @@ class ChunkedUploader {
       this._progress = offset / this.file.size;
     }
 
-    if (file.type.startsWith("video/")) {
-      this.extractFirstVideoFrame(file)
-        .then((url) => (this.uploadUrl = url))
-        .catch((_) => {
-          this.uploadUrl = URL.createObjectURL(file);
-        });
-    } else {
-      this.uploadUrl = URL.createObjectURL(file);
-    }
+    this.init();
   }
+
+  init = async () => {
+    this.uploadUrl = await this.reasonableFileSizer?.current.getUrl(this.file);
+  };
 
   deconstructor = async () => {
     await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
@@ -98,8 +96,13 @@ class ChunkedUploader {
 
           // set the canvas to those dimensions
           const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+          const scale = Math.min(
+            256 / video.videoWidth,
+            256 / video.videoHeight,
+            1,
+          );
+          canvas.width = video.videoWidth * scale;
+          canvas.height = video.videoHeight * scale;
           const ctx = canvas.getContext("2d");
           if (!ctx) {
             return reject(new Error("2D context not available"));
@@ -329,7 +332,6 @@ class ChunkedUploader {
           this.uploadId,
           this.handle,
           0,
-          this.file.size,
         );
       }
 
