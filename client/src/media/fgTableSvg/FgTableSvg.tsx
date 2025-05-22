@@ -210,67 +210,69 @@ export default function FgTableSvg({
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
         options={{ gradient: false, adjustmentAnimation: false }}
       />
-      {editing && svgMediaInstance.svgMedia.svg && (
-        <FgPortal
-          type="staticTopDomain"
-          top={0}
-          left={0}
-          zValue={490000}
-          className="flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-45"
-          content={
-            <MethodSvgEditor
-              editing={editing}
-              initialSVGString={() => {
-                if (svgMediaInstance.svgMedia.svg) {
-                  // Create a deep clone of the original svg element
-                  const clonedSVG = svgMediaInstance.svgMedia.svg.cloneNode(
-                    true,
-                  ) as HTMLElement;
+      {svgMediaInstance.svgMedia.fileSize < 1 * 1024 * 1024 &&
+        editing &&
+        svgMediaInstance.svgMedia.svg && (
+          <FgPortal
+            type="staticTopDomain"
+            top={0}
+            left={0}
+            zValue={490000}
+            className="flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-45"
+            content={
+              <MethodSvgEditor
+                editing={editing}
+                initialSVGString={() => {
+                  if (svgMediaInstance.svgMedia.svg) {
+                    // Create a deep clone of the original svg element
+                    const clonedSVG = svgMediaInstance.svgMedia.svg.cloneNode(
+                      true,
+                    ) as HTMLElement;
 
-                  // Modify the clone
-                  clonedSVG.setAttribute("width", "100");
-                  clonedSVG.setAttribute("height", "");
+                    // Modify the clone
+                    clonedSVG.setAttribute("width", "100");
+                    clonedSVG.setAttribute("height", "");
 
-                  // Serialize the cloned SVG to a string
-                  return new XMLSerializer().serializeToString(clonedSVG);
-                }
-              }}
-              finishCallback={async (svg) => {
-                setEditing(false);
+                    // Serialize the cloned SVG to a string
+                    return new XMLSerializer().serializeToString(clonedSVG);
+                  }
+                }}
+                finishCallback={async (svg) => {
+                  setEditing(false);
 
-                const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
-                if (!svgMatch) {
-                  console.error("Malformed SVG received:", svg);
-                  return;
-                }
+                  const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/);
+                  if (!svgMatch) {
+                    console.error("Malformed SVG received:", svg);
+                    return;
+                  }
 
-                const cleanSvgText = svgMatch[0];
+                  const cleanSvgText = svgMatch[0];
 
-                const blob = new Blob([cleanSvgText], {
-                  type: "image/svg+xml",
-                });
-
-                const file = new File(
-                  [blob],
-                  svgMediaInstance.svgMedia.filename,
-                  {
+                  const blob = new Blob([cleanSvgText], {
                     type: "image/svg+xml",
-                  },
-                );
+                  });
 
-                uploader.current?.reuploadTableContent(
-                  file,
-                  svgMediaInstance.svgMedia.svgId,
-                );
-              }}
-              cancelCallback={() => {
-                setEditing(false);
-              }}
-            />
-          }
-          options={{ animate: false }}
-        />
-      )}
+                  const file = new File(
+                    [blob],
+                    svgMediaInstance.svgMedia.filename,
+                    {
+                      type: "image/svg+xml",
+                    },
+                  );
+
+                  uploader.current?.reuploadTableContent(
+                    file,
+                    svgMediaInstance.svgMedia.svgId,
+                  );
+                }}
+                cancelCallback={() => {
+                  setEditing(false);
+                }}
+              />
+            }
+            options={{ animate: false }}
+          />
+        )}
     </>
   );
 }

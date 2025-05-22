@@ -6,26 +6,26 @@ import VisualMediaEffectsSection from "./lib/VisualMediaEffectsSection";
 import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
 import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
 import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
-import { GroupSignals } from "../../../../../../../context/signalContext/lib/typeConstant";
+import VisualMediaSelectionController from "./lib/VisualMediaSelectionController";
 
 export default function VisualMediaSelection({
   username,
   instance,
   isUser,
-  contentId,
+  instanceId,
   type,
   tablePanelRef,
 }: {
   username: string;
   instance: string;
   isUser: boolean;
-  contentId: string;
+  instanceId: string;
   type: "camera" | "screen";
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia, remoteMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
-  const { selected, addGroupSignalListener, removeGroupSignalListener } =
+  const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
   const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -34,10 +34,10 @@ export default function VisualMediaSelection({
   const [_, setRerender] = useState(false);
 
   const visualMedia = isUser
-    ? userMedia.current[type][contentId]
-    : remoteMedia.current[username]?.[instance]?.[type]?.[contentId];
+    ? userMedia.current[type][instanceId]
+    : remoteMedia.current[username]?.[instance]?.[type]?.[instanceId];
   const posAttr = document
-    .getElementById(`${contentId}_container`)
+    .getElementById(`${instanceId}_container`)
     ?.getAttribute("data-positioning");
   const positioning = posAttr
     ? (JSON.parse(posAttr) ?? {
@@ -52,88 +52,14 @@ export default function VisualMediaSelection({
       };
   const largestDim = useRef<"width" | "height" | undefined>(undefined);
 
-  const updateMirrors = () => {
-    const canvas = mirrorCanvasRef.current;
-    const ctx = canvas?.getContext("2d");
-
-    if (
-      !ctx ||
-      !(
-        visualMedia instanceof CameraMedia || visualMedia instanceof ScreenMedia
-      )
-    )
-      return;
-
-    const src = visualMedia.canvas;
-
-    ctx.clearRect(
-      0,
-      0,
-      largestDim.current === "width"
-        ? 184
-        : 192 * (visualMedia.aspectRatio ?? 1),
-      largestDim.current === "width"
-        ? 184 / (visualMedia.aspectRatio ?? 1)
-        : 192,
-    );
-    ctx.drawImage(
-      src,
-      0,
-      0,
-      largestDim.current === "width"
-        ? 184
-        : 192 * (visualMedia.aspectRatio ?? 1),
-      largestDim.current === "width"
-        ? 184 / (visualMedia.aspectRatio ?? 1)
-        : 192,
-    );
-
-    requestAnimationFrame(updateMirrors);
-  };
-
-  const onMeta = () => {
-    mirrorVideoRef.current?.removeEventListener("loadedmetadata", onMeta);
-
-    if (!mirrorVideoRef.current) return;
-
-    largestDim.current =
-      mirrorVideoRef.current.videoWidth > mirrorVideoRef.current.videoHeight
-        ? "width"
-        : "height";
-
-    setRerender((prev) => !prev);
-  };
-
-  const handleStream = async () => {
-    if (
-      !mirrorVideoRef.current ||
-      !visualMedia ||
-      !(visualMedia instanceof MediaStreamTrack)
-    )
-      return;
-
-    const stream = new MediaStream([visualMedia]);
-    mirrorVideoRef.current.srcObject = stream;
-    mirrorVideoRef.current.srcObject = stream;
-    mirrorVideoRef.current.playsInline = true;
-    mirrorVideoRef.current.muted = true;
-    mirrorVideoRef.current.autoplay = true;
-
-    mirrorVideoRef.current.addEventListener("loadedmetadata", onMeta);
-  };
-
-  const handleGroupSignal = (signal: GroupSignals) => {
-    if (signal.type === "groupElementMove") {
-      const { contentType, contentId } = signal.data;
-      if (
-        selected.current?.some(
-          (info) => info.type === contentType && info.id === contentId,
-        )
-      ) {
-        setRerender((prev) => !prev);
-      }
-    }
-  };
+  const visualMediaSelectionController = new VisualMediaSelectionController(
+    instanceId,
+    setRerender,
+    visualMedia,
+    mirrorVideoRef,
+    mirrorCanvasRef,
+    largestDim,
+  );
 
   useEffect(() => {
     if (
@@ -143,22 +69,24 @@ export default function VisualMediaSelection({
       largestDim.current =
         (visualMedia?.aspectRatio ?? 0) > 1 ? "width" : "height";
       setRerender((prev) => !prev);
-      updateMirrors();
+      visualMediaSelectionController.updateMirrors();
     } else {
-      handleStream();
+      visualMediaSelectionController.handleStream();
     }
 
-    addGroupSignalListener(handleGroupSignal);
+    addGroupSignalListener(visualMediaSelectionController.handleGroupSignal);
 
     return () => {
-      removeGroupSignalListener(handleGroupSignal);
+      removeGroupSignalListener(
+        visualMediaSelectionController.handleGroupSignal,
+      );
     };
   }, []);
 
   return (
     visualMedia && (
       <GeneralMediaSelection
-        contentId={contentId}
+        instanceId={instanceId}
         contentType={type}
         selectionContent={
           isUser ? (
@@ -195,7 +123,7 @@ export default function VisualMediaSelection({
           <VisualMediaEffectsSection
             username={username}
             instance={instance}
-            visualMediaId={contentId}
+            visualMediaId={instanceId}
             isUser={isUser}
             acceptsVisualEffects={
               type === "camera"

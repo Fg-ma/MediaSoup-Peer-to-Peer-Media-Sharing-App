@@ -22,6 +22,7 @@ class ChunkedUploader {
 
   private _paused: boolean = false;
   private cancelled: boolean = false;
+  private currentChunkAbortController: AbortController | null = null;
 
   readonly filename: string;
   uploadUrl: string | undefined;
@@ -152,6 +153,10 @@ class ChunkedUploader {
   cancel = async () => {
     this.cancelled = true;
 
+    if (this.currentChunkAbortController) {
+      this.currentChunkAbortController.abort();
+    }
+
     try {
       await fetch(
         `${tableStaticContentServerBaseUrl}cancel-upload/${this.uploadId}`,
@@ -212,13 +217,16 @@ class ChunkedUploader {
       formData.append("totalChunks", totalChunks.toString());
 
       try {
+        this.currentChunkAbortController = new AbortController();
         const response = await fetch(
           `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
           {
             method: "POST",
             body: formData,
+            signal: this.currentChunkAbortController.signal,
           },
         );
+        this.currentChunkAbortController = null;
 
         if (!response.ok) {
           if (response.status !== 409) {
@@ -252,11 +260,12 @@ class ChunkedUploader {
             data: { progress: this._progress },
           });
         });
-        if (this.handle)
+        if (this.handle) {
           this.indexedDBController?.current.uploadPosts?.updateProgress(
             this.contentId,
             this.offset,
           );
+        }
       } catch (error) {
         console.error("Chunk upload failed:", error);
         break;

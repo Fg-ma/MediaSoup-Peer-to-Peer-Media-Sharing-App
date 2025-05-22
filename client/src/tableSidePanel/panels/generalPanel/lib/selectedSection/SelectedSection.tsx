@@ -44,7 +44,7 @@ export default function SelectedSection({
             media = (
               <ImageSelection
                 key={sel.id}
-                contentId={sel.id}
+                instanceId={sel.id}
                 tablePanelRef={tablePanelRef}
               />
             );
@@ -56,7 +56,7 @@ export default function SelectedSection({
             media = (
               <SvgSelection
                 key={sel.id}
-                contentId={sel.id}
+                instanceId={sel.id}
                 tablePanelRef={tablePanelRef}
               />
             );
@@ -65,7 +65,7 @@ export default function SelectedSection({
             media = (
               <TextSelection
                 key={sel.id}
-                contentId={sel.id}
+                instanceId={sel.id}
                 tablePanelRef={tablePanelRef}
               />
             );
@@ -74,7 +74,7 @@ export default function SelectedSection({
             media = (
               <VideoSelection
                 key={sel.id}
-                contentId={sel.id}
+                instanceId={sel.id}
                 tablePanelRef={tablePanelRef}
               />
             );
@@ -91,7 +91,7 @@ export default function SelectedSection({
                   username={sel.username}
                   instance={sel.instance}
                   isUser={sel.isUser}
-                  contentId={sel.id}
+                  instanceId={sel.id}
                   type="camera"
                   tablePanelRef={tablePanelRef}
                 />
@@ -109,7 +109,7 @@ export default function SelectedSection({
                   username={sel.username}
                   instance={sel.instance}
                   isUser={sel.isUser}
-                  contentId={sel.id}
+                  instanceId={sel.id}
                   type="screen"
                   tablePanelRef={tablePanelRef}
                 />

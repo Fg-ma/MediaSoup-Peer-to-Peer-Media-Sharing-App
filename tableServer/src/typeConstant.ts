@@ -42,20 +42,6 @@ export const tableColorEncodingMap = {
   tableTop: 15,
 };
 
-export interface Tables {
-  [tableId: string]: {
-    [username: string]: {
-      [instance: string]: TableWebSocket;
-    };
-  };
-}
-
-export interface TablesUserData {
-  [tableId: string]: {
-    [username: string]: { color: TableColors; seat: number; online: boolean };
-  };
-}
-
 export interface TableWebSocket extends uWS.WebSocket<SocketData> {
   id: string;
   tableId: string;
@@ -145,8 +131,6 @@ export type onReactionType = {
   data: { reaction: TableReactions; reactionStyle: TableReactionStyles };
 };
 
-export const tables: Tables = {};
-
 export const tableColorMap: {
   [tableColor in TableColors]: { primary: string; secondary: string };
 } = {
@@ -167,8 +151,6 @@ export const tableColorMap: {
   lightBlue: { primary: "#88c3e7", secondary: "#61b4dd" },
   tableTop: { primary: "#d40213", secondary: "#b10203" },
 };
-
-export const tablesUserData: TablesUserData = {};
 
 export const tableSeatingChart = {
   1: { seats: [1], swaps: [] },
@@ -197,3 +179,26 @@ export const tableSeatingChart = {
     swaps: [],
   },
 };
+
+export interface Tables {
+  [tableId: string]: {
+    [username: string]: {
+      [instance: string]: TableWebSocket;
+    };
+  };
+}
+
+export interface TableUserData {
+  color: string;
+  seat: number;
+  online: boolean;
+}
+
+export interface TablesUserData {
+  [tableId: string]: {
+    [username: string]: TableUserData;
+  };
+}
+
+export const tables: Tables = {};
+export const tablesUserData: TablesUserData = {};

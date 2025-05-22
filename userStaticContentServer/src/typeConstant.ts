@@ -84,7 +84,8 @@ export type MessageTypes =
   | onGetFileChunkType
   | onChangeContentStateType
   | onSearchUserContentRequestType
-  | onMuteStylesRequestType;
+  | onMuteStylesRequestType
+  | onDeleteUploadSessionType;
 
 export type onConnectType = {
   type: "connect";
@@ -164,6 +165,11 @@ export type onGetFileChunkType = {
   data: {
     range: string;
   };
+};
+
+export type onDeleteUploadSessionType = {
+  type: "deleteUploadSession";
+  header: { uploadId: string };
 };
 
 export const userConnections: UserConnections = {};

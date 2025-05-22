@@ -140,14 +140,14 @@ export type onGroupElementMoveType = {
   type: "groupElementMove";
   data: {
     contentType: ContentTypes;
-    contentId: string;
+    instanceId: string;
   };
 };
 
 export type onMoveToType = {
   type: "moveTo";
   header: {
-    contentId: string;
+    instanceId: string;
     contentType: ContentTypes;
   };
   data: {
@@ -161,7 +161,7 @@ export type onMoveToType = {
 export type onRotateToType = {
   type: "rotateTo";
   header: {
-    contentId: string;
+    instanceId: string;
     contentType: ContentTypes;
   };
   data: {
@@ -172,7 +172,7 @@ export type onRotateToType = {
 export type onScaleToType = {
   type: "scaleTo";
   header: {
-    contentId: string;
+    instanceId: string;
     contentType: ContentTypes;
   };
   data: {

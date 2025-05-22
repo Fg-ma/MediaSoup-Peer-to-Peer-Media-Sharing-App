@@ -252,31 +252,33 @@ export default function SettingsPanel({
                 hoverType: "above",
               }}
             />
-            <FgButton
-              className="h-7 w-full"
-              contentFunction={() => (
-                <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
-                  <FgSVGElement
-                    src={editIcon}
-                    className="mr-2 flex aspect-square h-full items-center justify-center"
-                    attributes={[
-                      { key: "width", value: "80%" },
-                      { key: "height", value: "80%" },
-                    ]}
-                  />
-                  Edit
-                </div>
-              )}
-              clickFunction={lowerSvgController.current.handleEdit}
-              hoverContent={
-                <FgHoverContentStandard content="Edit (q)" style="light" />
-              }
-              options={{
-                hoverSpacing: 4,
-                hoverTimeoutDuration: 3500,
-                hoverType: "above",
-              }}
-            />
+            {svgMediaInstance.svgMedia.fileSize < 1 * 1024 * 1024 && (
+              <FgButton
+                className="h-7 w-full"
+                contentFunction={() => (
+                  <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+                    <FgSVGElement
+                      src={editIcon}
+                      className="mr-2 flex aspect-square h-full items-center justify-center"
+                      attributes={[
+                        { key: "width", value: "80%" },
+                        { key: "height", value: "80%" },
+                      ]}
+                    />
+                    Edit
+                  </div>
+                )}
+                clickFunction={lowerSvgController.current.handleEdit}
+                hoverContent={
+                  <FgHoverContentStandard content="Edit (q)" style="light" />
+                }
+                options={{
+                  hoverSpacing: 4,
+                  hoverTimeoutDuration: 3500,
+                  hoverType: "above",
+                }}
+              />
+            )}
             <FgButton
               className="h-7 w-full"
               contentFunction={() => (

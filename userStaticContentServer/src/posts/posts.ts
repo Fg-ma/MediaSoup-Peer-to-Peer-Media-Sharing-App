@@ -5,6 +5,7 @@ import {
   clientBaseUrl,
   tableTopCeph,
   tableTopMongo,
+  tableTopRedis,
 } from "../index";
 import Utils from "./lib/Utils";
 import { contentTypeBucketMap } from "../typeConstant";
@@ -20,11 +21,7 @@ import { ChunkState, UploadSession } from "./lib/typeConstant";
 const tableStaticContentUtils = new Utils();
 
 class Posts {
-  private readonly STALE_UPLOAD = 1000 * 60 * 30;
-  private readonly CHECK_STALE_UPLOAD = 1000 * 60 * 10;
-
-  private chunkStates = new Map<string, ChunkState>();
-  private uploadSessions = new Map<string, UploadSession>();
+  private readonly REDIS_LIFE_TIME = 1800;
 
   constructor(app: uWS.TemplatedApp) {
     app.post("/upload-one-shot-file", (res, req) => {
@@ -167,11 +164,14 @@ class Posts {
               return;
             }
 
-            this.chunkStates.set(uploadId, {
+            await tableTopRedis.posts.post(
+              "USCCS",
               uploadId,
-              parts: [],
-              lastUsed: Date.now(),
-            });
+              {
+                parts: [],
+              },
+              this.REDIS_LIFE_TIME
+            );
 
             const sessionData = {
               direction,
@@ -183,7 +183,12 @@ class Posts {
               filename,
             };
 
-            this.uploadSessions.set(uploadId, sessionData);
+            await tableTopRedis.posts.post(
+              "USCUS",
+              uploadId,
+              sessionData,
+              this.REDIS_LIFE_TIME
+            );
 
             if (!aborted) {
               this.sendResponse(
@@ -214,6 +219,9 @@ class Posts {
       let buffer = Buffer.alloc(0);
 
       let aborted = false;
+      let state: ChunkState | undefined;
+      let session: UploadSession | undefined;
+
       res.onAborted(() => {
         aborted = true;
       });
@@ -224,25 +232,20 @@ class Posts {
         return;
       }
 
-      const session = this.uploadSessions.get(uploadId);
-      if (!session) {
-        this.sendResponse(res, "404 Not Found", "text/plain", "No session");
-        aborted = true;
-        return;
-      }
-
-      const state = this.chunkStates.get(uploadId);
-      if (!state) {
-        this.sendResponse(res, "404 Not Found", "text/plain", "No state");
-        aborted = true;
-        return;
-      }
-      state.lastUsed = Date.now();
-
-      bb.on("field", (name, val) => {
+      bb.on("field", async (name, val) => {
         if (name === "totalChunks") totalChunks = parseInt(val, 10);
         if (name === "chunkIndex") {
           chunkIndex = parseInt(val, 10);
+
+          state = (await tableTopRedis.gets.get(
+            "USCCS",
+            uploadId
+          )) as ChunkState;
+          if (!state) {
+            this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+            aborted = true;
+            return;
+          }
 
           const alreadyUploaded = state.parts.some(
             (part) => part.PartNumber === chunkIndex + 1
@@ -259,7 +262,29 @@ class Posts {
         }
       });
 
-      bb.on("file", (_fn, stream, info) => {
+      bb.on("file", async (_fn, stream, info) => {
+        session = (await tableTopRedis.gets.get(
+          "USCUS",
+          uploadId
+        )) as UploadSession;
+        if (!session) {
+          this.sendResponse(res, "404 Not Found", "text/plain", "No session");
+          aborted = true;
+          return;
+        }
+
+        if (!state) {
+          state = (await tableTopRedis.gets.get(
+            "USCCS",
+            uploadId
+          )) as ChunkState;
+        }
+        if (!state) {
+          this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+          aborted = true;
+          return;
+        }
+
         const { mimeType } = info;
 
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
@@ -269,45 +294,45 @@ class Posts {
 
           // upload this part
           const ETag = await tableTopCeph.posts.uploadPart(
-            contentTypeBucketMap[session.staticContentType],
-            session.contentId,
+            contentTypeBucketMap[session!.staticContentType],
+            session!.contentId,
             chunkIndex + 1,
             uploadId,
             buffer
           );
           if (!ETag) return;
-          state.parts.push({ PartNumber: chunkIndex + 1, ETag });
+          state!.parts.push({ PartNumber: chunkIndex + 1, ETag });
 
           if (aborted) return;
 
           // If last chunk
-          if (state.parts.length === totalChunks) {
+          if (state!.parts.length === totalChunks) {
             tableTopCeph.posts
               .completeMultipartUpload(
-                contentTypeBucketMap[session.staticContentType],
-                session.contentId,
+                contentTypeBucketMap[session!.staticContentType],
+                session!.contentId,
                 uploadId,
-                state.parts
+                state!.parts
               )
               .then(async () => {
-                switch (session.direction) {
+                switch (session!.direction) {
                   case "toMuteStyle":
                     await this.handleToMuteStyle(
-                      session.userId,
-                      session.contentId,
+                      session!.userId,
+                      session!.contentId,
                       mimeType as StaticMimeTypes,
-                      session.filename,
-                      session.state
+                      session!.filename,
+                      session!.state
                     );
                     break;
                   case "toUserContent":
                     this.handleToUserContent(
-                      session.staticContentType,
-                      session.userId,
-                      session.contentId,
+                      session!.staticContentType,
+                      session!.userId,
+                      session!.contentId,
                       mimeType as StaticMimeTypes,
-                      session.filename,
-                      session.state
+                      session!.filename,
+                      session!.state
                     );
                     break;
                   default:
@@ -315,8 +340,10 @@ class Posts {
                 }
 
                 // Cleanup session
-                this.uploadSessions.delete(uploadId);
-                this.chunkStates.delete(uploadId);
+                await tableTopRedis.deletes.delete([
+                  { prefix: "USCUS", id: uploadId },
+                  { prefix: "USCCS", id: uploadId },
+                ]);
               });
           }
 
@@ -331,7 +358,7 @@ class Posts {
       }
     });
 
-    app.post("/cancel-upload/:uploadId", (res, req) => {
+    app.post("/cancel-upload/:uploadId", async (res, req) => {
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
@@ -349,7 +376,10 @@ class Posts {
         return;
       }
 
-      const session = this.uploadSessions.get(uploadId);
+      const session = (await tableTopRedis.gets.get(
+        "USCUS",
+        uploadId
+      )) as UploadSession;
       if (!session) {
         this.sendResponse(
           res,
@@ -369,8 +399,10 @@ class Posts {
             uploadId
           );
 
-          this.uploadSessions.delete(uploadId);
-          this.chunkStates.delete(uploadId);
+          await tableTopRedis.deletes.delete([
+            { prefix: "USCUS", id: uploadId },
+            { prefix: "USCCS", id: uploadId },
+          ]);
 
           if (!aborted) {
             this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
@@ -387,10 +419,6 @@ class Posts {
         }
       })();
     });
-
-    setInterval(() => {
-      this.cleanupStaleSessions();
-    }, this.CHECK_STALE_UPLOAD);
   }
 
   private sendResponse = (
@@ -413,27 +441,6 @@ class Posts {
           .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
           .end(end);
       });
-    }
-  };
-
-  private cleanupStaleSessions = async () => {
-    const now = Date.now();
-
-    for (const [uploadId, chunkState] of this.chunkStates.entries()) {
-      if (now - chunkState.lastUsed > this.STALE_UPLOAD) {
-        const session = this.uploadSessions.get(uploadId);
-
-        if (session) {
-          await tableTopCeph.posts.abortMultipartUpload(
-            contentTypeBucketMap[session.staticContentType],
-            session.contentId,
-            uploadId
-          );
-        }
-
-        this.chunkStates.delete(uploadId);
-        this.uploadSessions.delete(uploadId);
-      }
     }
   };
 

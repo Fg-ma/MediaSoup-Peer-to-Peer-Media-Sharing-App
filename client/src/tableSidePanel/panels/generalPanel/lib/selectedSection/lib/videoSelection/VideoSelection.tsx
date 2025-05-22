@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
 import VideoEffectsSection from "./lib/VideoEffectsSection";
 import GeneralMediaSelection from "../GeneralMediaSelection";
@@ -7,31 +8,35 @@ import DownloadFailed from "../../../../../../../elements/downloadFailed/Downloa
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
 import { LoadingStateTypes } from "../../../../../../../../../universal/contentTypeConstant";
 import VideoSelectionController from "./lib/VideoSelectionController";
-import { set } from "lodash";
 
 export default function VideoSelection({
-  contentId,
+  instanceId,
   tablePanelRef,
 }: {
-  contentId: string;
+  instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
-  const videoInstanceMedia = userMedia.current.video.tableInstances[contentId];
+  const videoInstanceMedia = userMedia.current.video.tableInstances[instanceId];
   const positioning = videoInstanceMedia?.getPositioning();
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");
   const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
     videoInstanceMedia?.videoMedia.loadingState,
   );
+  const [_, setRerender] = useState(false);
   const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const videoSelectionController = new VideoSelectionController(
+    instanceId,
     videoInstanceMedia,
     setLoadingState,
     setLargestDim,
     mirrorCanvasRef,
+    setRerender,
   );
 
   useEffect(() => {
@@ -41,10 +46,14 @@ export default function VideoSelection({
       videoSelectionController.handleVideoMessages,
     );
 
+    addGroupSignalListener(videoSelectionController.handleGroupSignal);
+
     return () => {
       videoInstanceMedia?.videoMedia.removeVideoListener(
         videoSelectionController.handleVideoMessages,
       );
+
+      removeGroupSignalListener(videoSelectionController.handleGroupSignal);
     };
   }, []);
 
@@ -57,7 +66,8 @@ export default function VideoSelection({
   return (
     videoInstanceMedia && (
       <GeneralMediaSelection
-        contentId={contentId}
+        contentId={videoInstanceMedia.videoMedia.videoId}
+        instanceId={instanceId}
         contentType="video"
         selectionContent={
           loadingState === "downloaded" ? (
@@ -86,7 +96,7 @@ export default function VideoSelection({
         }
         effectsSection={
           <VideoEffectsSection
-            videoInstanceId={contentId}
+            videoInstanceId={instanceId}
             videoMediaInstance={videoInstanceMedia}
           />
         }

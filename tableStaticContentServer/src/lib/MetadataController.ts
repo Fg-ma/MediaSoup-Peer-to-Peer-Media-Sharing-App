@@ -128,9 +128,9 @@ class MetadataController {
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
     const { uploadId } = event.header;
 
-    await tableTopRedis.delete([
-      { prefix: "uploadSession", id: uploadId },
-      { prefix: "chunkState", id: uploadId },
+    await tableTopRedis.deletes.delete([
+      { prefix: "TSCUS", id: uploadId },
+      { prefix: "TSCCS", id: uploadId },
     ]);
   };
 }

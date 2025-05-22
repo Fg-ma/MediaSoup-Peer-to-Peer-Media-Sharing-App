@@ -200,7 +200,7 @@ class MediaContainerController {
                 type: "groupElementMove",
                 data: {
                   contentType: this.kind,
-                  contentId: this.mediaInstanceId,
+                  instanceId: this.mediaInstanceId,
                 },
               });
             }
@@ -378,9 +378,10 @@ class MediaContainerController {
   };
 
   handleMoveTo = (signal: onMoveToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
-    if (contentId !== this.mediaInstanceId || contentType !== this.kind) return;
+    if (instanceId !== this.mediaInstanceId || contentType !== this.kind)
+      return;
 
     const { position } = signal.data;
 
@@ -416,11 +417,11 @@ class MediaContainerController {
   };
 
   handleRotateTo = (signal: onRotateToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
     if (
       !this.bundleRef.current ||
-      contentId !== this.mediaInstanceId ||
+      instanceId !== this.mediaInstanceId ||
       contentType !== this.kind
     )
       return;
@@ -454,11 +455,11 @@ class MediaContainerController {
   };
 
   handleScaleTo = (signal: onScaleToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
     if (
       !this.bundleRef.current ||
-      contentId !== this.mediaInstanceId ||
+      instanceId !== this.mediaInstanceId ||
       contentType !== this.kind
     )
       return;

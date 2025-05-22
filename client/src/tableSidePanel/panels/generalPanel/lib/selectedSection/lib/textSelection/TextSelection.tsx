@@ -11,17 +11,20 @@ import TextSelectionController from "./lib/TextSelectionController";
 import LoadingElement from "../../../../../../../elements/loadingElement/LoadingElement";
 import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
+import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
 
 export default function TextSelection({
-  contentId,
+  instanceId,
   tablePanelRef,
 }: {
-  contentId: string;
+  instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
-  const textInstanceMedia = userMedia.current.text.tableInstances[contentId];
+  const textInstanceMedia = userMedia.current.text.tableInstances[instanceId];
   const positioning = textInstanceMedia?.getPositioning();
 
   const text = useRef(textInstanceMedia.instanceText ?? "");
@@ -33,30 +36,40 @@ export default function TextSelection({
     structuredClone(defaultSettings),
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [_, setRerender] = useState(false);
   const textAreaContainerRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLPreElement>(null);
 
   const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
 
-  const textSelectionController = new TextSelectionController(setLoadingState);
+  const textSelectionController = new TextSelectionController(
+    instanceId,
+    setLoadingState,
+    setRerender,
+  );
 
   useEffect(() => {
     textInstanceMedia?.textMedia.addTextListener(
       textSelectionController.handleTextMessages,
     );
 
+    addGroupSignalListener(textSelectionController.handleGroupSignal);
+
     return () => {
       textInstanceMedia?.textMedia.removeTextListener(
         textSelectionController.handleTextMessages,
       );
+
+      removeGroupSignalListener(textSelectionController.handleGroupSignal);
     };
   }, []);
 
   return (
     textInstanceMedia && (
       <GeneralMediaSelection
-        contentId={contentId}
+        contentId={textInstanceMedia.textMedia.textId}
+        instanceId={instanceId}
         contentType="text"
         selectionContentStyle={{ width: "calc(100% - 1rem)" }}
         selectionContent={

@@ -3,9 +3,11 @@ import TableImageMediaInstance, {
 } from "../../../../../../../../media/fgTableImage/TableImageMediaInstance";
 import { ImageListenerTypes } from "../../../../../../../..//media/fgTableImage/TableImageMedia";
 import { LoadingStateTypes } from "../../../../../../../../../../universal/contentTypeConstant";
+import { GroupSignals } from "../../../../../../../../context/signalContext/lib/typeConstant";
 
 class ImageSelectionController {
   constructor(
+    private instanceId: string,
     private imageInstanceMedia: TableImageMediaInstance,
     private mirrorCanvasRef: React.RefObject<HTMLCanvasElement>,
     private setLargestDim: React.Dispatch<
@@ -14,6 +16,7 @@ class ImageSelectionController {
     private setLoadingState: React.Dispatch<
       React.SetStateAction<LoadingStateTypes>
     >,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   drawInstanceCanvas = async () => {
@@ -78,6 +81,17 @@ class ImageSelectionController {
         break;
       default:
         break;
+    }
+  };
+
+  handleGroupSignal = (signal: GroupSignals) => {
+    if (signal.type === "groupElementMove") {
+      const { instanceId: incomingInstanceId } = signal.data;
+      if (incomingInstanceId === this.instanceId) {
+        this.setRerender((prev) => !prev);
+      }
+    } else if (signal.type === "groupDrag") {
+      this.setRerender((prev) => !prev);
     }
   };
 }

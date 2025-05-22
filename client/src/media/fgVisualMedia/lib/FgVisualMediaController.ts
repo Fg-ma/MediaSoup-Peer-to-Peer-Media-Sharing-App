@@ -450,7 +450,7 @@ class FgVisualMediaController {
                 type: "groupElementMove",
                 data: {
                   contentType: this.type,
-                  contentId: this.visualMediaId,
+                  instanceId: this.visualMediaId,
                 },
               });
             }
@@ -619,9 +619,9 @@ class FgVisualMediaController {
   };
 
   handleMoveTo = (signal: onMoveToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
-    if (contentId !== this.visualMediaId || contentType !== this.type) return;
+    if (instanceId !== this.visualMediaId || contentType !== this.type) return;
 
     const { position } = signal.data;
 
@@ -651,11 +651,11 @@ class FgVisualMediaController {
   };
 
   handleRotateTo = (signal: onRotateToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
     if (
       !this.bundleRef.current ||
-      contentId !== this.visualMediaId ||
+      instanceId !== this.visualMediaId ||
       contentType !== this.type
     )
       return;
@@ -683,11 +683,11 @@ class FgVisualMediaController {
   };
 
   handleScaleTo = (signal: onScaleToType) => {
-    const { contentId, contentType } = signal.header;
+    const { instanceId, contentType } = signal.header;
 
     if (
       !this.bundleRef.current ||
-      contentId !== this.visualMediaId ||
+      instanceId !== this.visualMediaId ||
       contentType !== this.type
     )
       return;

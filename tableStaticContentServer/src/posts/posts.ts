@@ -198,8 +198,8 @@ class Posts {
               return;
             }
 
-            await tableTopRedis.save(
-              "chunkState",
+            await tableTopRedis.posts.post(
+              "TSCCS",
               uploadId,
               {
                 parts: [],
@@ -221,8 +221,8 @@ class Posts {
               Object.assign(sessionData, { state, filename });
             }
 
-            await tableTopRedis.save(
-              "uploadSession",
+            await tableTopRedis.posts.post(
+              "TSCUS",
               uploadId,
               sessionData,
               this.REDIS_LIFE_TIME
@@ -276,8 +276,8 @@ class Posts {
         if (name === "chunkIndex") {
           chunkIndex = parseInt(val, 10);
 
-          state = (await tableTopRedis.get(
-            "chunkState",
+          state = (await tableTopRedis.gets.get(
+            "TSCCS",
             uploadId
           )) as ChunkState;
           if (!state) {
@@ -302,8 +302,8 @@ class Posts {
       });
 
       bb.on("file", async (_fn, stream, info) => {
-        session = (await tableTopRedis.get(
-          "uploadSession",
+        session = (await tableTopRedis.gets.get(
+          "TSCUS",
           uploadId
         )) as UploadSession;
         if (!session) {
@@ -313,8 +313,8 @@ class Posts {
         }
 
         if (!state) {
-          state = (await tableTopRedis.get(
-            "chunkState",
+          state = (await tableTopRedis.gets.get(
+            "TSCCS",
             uploadId
           )) as ChunkState;
         }
@@ -342,14 +342,17 @@ class Posts {
           if (!ETag) return;
 
           state!.parts.push({ PartNumber: chunkIndex + 1, ETag });
-          await tableTopRedis.save(
-            "chunkState",
+
+          if (aborted) return;
+
+          await tableTopRedis.posts.post(
+            "TSCCS",
             uploadId,
             state,
             this.REDIS_LIFE_TIME
           );
-          await tableTopRedis.extendLife(
-            "uploadSession",
+          await tableTopRedis.posts.extendLife(
+            "TSCUS",
             uploadId,
             this.REDIS_LIFE_TIME
           );
@@ -400,9 +403,9 @@ class Posts {
                 }
 
                 // Cleanup session
-                await tableTopRedis.delete([
-                  { prefix: "uploadSession", id: uploadId },
-                  { prefix: "chunkState", id: uploadId },
+                await tableTopRedis.deletes.delete([
+                  { prefix: "TSCUS", id: uploadId },
+                  { prefix: "TSCCS", id: uploadId },
                 ]);
               });
           }
@@ -436,8 +439,8 @@ class Posts {
         return;
       }
 
-      const session = (await tableTopRedis.get(
-        "uploadSession",
+      const session = (await tableTopRedis.gets.get(
+        "TSCUS",
         uploadId
       )) as UploadSession;
       if (!session) {
@@ -459,25 +462,10 @@ class Posts {
             uploadId
           );
 
-          console.log(
-            await tableTopRedis.delete([
-              { prefix: "uploadSession", id: uploadId },
-              { prefix: "chunkState", id: uploadId },
-            ])
-          );
-          const uploadSessionExists = await tableTopRedis.get(
-            "uploadSession",
-            uploadId
-          );
-          const chunkStateExists = await tableTopRedis.get(
-            "chunkState",
-            uploadId
-          );
-          console.log(
-            "After delete - uploadSession exists:",
-            uploadSessionExists
-          );
-          console.log("After delete - chunkState exists:", chunkStateExists);
+          await tableTopRedis.deletes.delete([
+            { prefix: "TSCUS", id: uploadId },
+            { prefix: "TSCCS", id: uploadId },
+          ]);
 
           if (!aborted) {
             this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");

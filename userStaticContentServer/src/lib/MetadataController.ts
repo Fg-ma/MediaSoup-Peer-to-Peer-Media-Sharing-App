@@ -1,5 +1,8 @@
-import { tableTopMongo } from "src";
-import { onMuteStylesRequestType } from "../typeConstant";
+import { tableTopMongo, tableTopRedis } from "src";
+import {
+  onDeleteUploadSessionType,
+  onMuteStylesRequestType,
+} from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 
 class MetadataController {
@@ -19,6 +22,15 @@ class MetadataController {
           ),
         },
       });
+  };
+
+  onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
+    const { uploadId } = event.header;
+
+    await tableTopRedis.deletes.delete([
+      { prefix: "USCUS", id: uploadId },
+      { prefix: "USCCS", id: uploadId },
+    ]);
   };
 }
 

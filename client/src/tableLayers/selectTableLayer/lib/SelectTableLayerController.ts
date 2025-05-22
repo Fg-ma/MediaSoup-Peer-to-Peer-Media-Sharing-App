@@ -70,10 +70,10 @@ class SelectTableLayerController {
         this.setRerender((prev) => !prev);
         break;
       case "groupElementMove":
-        const { contentType, contentId } = signal.data;
+        const { contentType, instanceId } = signal.data;
         if (
           this.selectedInfo?.some(
-            (info) => info.type === contentType && info.id === contentId,
+            (info) => info.type === contentType && info.id === instanceId,
           )
         ) {
           this.selectables =

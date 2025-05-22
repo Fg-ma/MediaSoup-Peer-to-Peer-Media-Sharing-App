@@ -11,6 +11,7 @@ import Gets from "./gets/Gets";
 import Posts from "./posts/posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
+import TableTopRedis from "../../redisServer/src/TableTopRedis";
 import Search from "./lib/Search";
 
 dotenv.config({
@@ -18,6 +19,7 @@ dotenv.config({
 });
 export const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
+export const tableTopRedis = new TableTopRedis();
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();

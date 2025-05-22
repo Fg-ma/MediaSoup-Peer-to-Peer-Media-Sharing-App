@@ -234,7 +234,9 @@ class TablesController {
     // Step 2: Collect colors already in use for the given table
     const colorsAlreadyInUse: TableColors[] = [];
     for (const username in tablesUserData[tableId]) {
-      colorsAlreadyInUse.push(tablesUserData[tableId][username].color);
+      colorsAlreadyInUse.push(
+        tablesUserData[tableId][username].color as TableColors
+      );
     }
 
     // Step 3: Filter out used colors

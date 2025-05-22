@@ -1,9 +1,11 @@
 import { VideoListenerTypes } from "../../../../../../../../media/fgTableVideo/TableVideoMedia";
 import { LoadingStateTypes } from "../../../../../../../../../../universal/contentTypeConstant";
-import TableVideoMediaInstance from "src/media/fgTableVideo/TableVideoMediaInstance";
+import TableVideoMediaInstance from "../../../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import { GroupSignals } from "../../../../../../../../context/signalContext/lib/typeConstant";
 
 class VideoSelectionController {
   constructor(
+    private instanceId: string,
     private videoInstanceMedia: TableVideoMediaInstance,
     private setLoadingState: React.Dispatch<
       React.SetStateAction<LoadingStateTypes>
@@ -12,6 +14,7 @@ class VideoSelectionController {
       React.SetStateAction<"width" | "height">
     >,
     private mirrorCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   drawInstanceCanvas = async () => {
@@ -74,6 +77,17 @@ class VideoSelectionController {
         break;
       default:
         break;
+    }
+  };
+
+  handleGroupSignal = (signal: GroupSignals) => {
+    if (signal.type === "groupElementMove") {
+      const { instanceId: incomingInstanceId } = signal.data;
+      if (incomingInstanceId === this.instanceId) {
+        this.setRerender((prev) => !prev);
+      }
+    } else if (signal.type === "groupDrag") {
+      this.setRerender((prev) => !prev);
     }
   };
 }

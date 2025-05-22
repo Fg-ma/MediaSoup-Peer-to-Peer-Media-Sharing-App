@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
+import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
 import ImageEffectsSection from "./lib/ImageEffectsSection";
 import GeneralMediaSelection from "../GeneralMediaSelection";
 import LoadingElement from "../../../../../../../elements/loadingElement/LoadingElement";
@@ -9,28 +10,33 @@ import ImageSelectionController from "./lib/ImageSelectionController";
 import { LoadingStateTypes } from "../../../../../../../../../universal/contentTypeConstant";
 
 export default function ImageSelection({
-  contentId,
+  instanceId,
   tablePanelRef,
 }: {
-  contentId: string;
+  instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+  const { addGroupSignalListener, removeGroupSignalListener } =
+    useSignalContext();
 
-  const imageInstanceMedia = userMedia.current.image.tableInstances[contentId];
+  const imageInstanceMedia = userMedia.current.image.tableInstances[instanceId];
   const positioning = imageInstanceMedia?.getPositioning();
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");
   const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
     imageInstanceMedia?.imageMedia.loadingState,
   );
+  const [_, setRerender] = useState(false);
   const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const imageSelectionController = new ImageSelectionController(
+    instanceId,
     imageInstanceMedia,
     mirrorCanvasRef,
     setLargestDim,
     setLoadingState,
+    setRerender,
   );
 
   useEffect(() => {
@@ -43,6 +49,8 @@ export default function ImageSelection({
       imageSelectionController.handleImageMessages,
     );
 
+    addGroupSignalListener(imageSelectionController.handleGroupSignal);
+
     return () => {
       imageInstanceMedia?.removeImageInstanceListener(
         imageSelectionController.handleInstanceEvents,
@@ -50,6 +58,7 @@ export default function ImageSelection({
       imageInstanceMedia?.imageMedia.removeImageListener(
         imageSelectionController.handleImageMessages,
       );
+      removeGroupSignalListener(imageSelectionController.handleGroupSignal);
     };
   }, []);
 
@@ -62,7 +71,8 @@ export default function ImageSelection({
   return (
     imageInstanceMedia && (
       <GeneralMediaSelection
-        contentId={contentId}
+        contentId={imageInstanceMedia.imageMedia.imageId}
+        instanceId={instanceId}
         contentType="image"
         selectionContent={
           loadingState === "downloaded" ? (
@@ -91,7 +101,7 @@ export default function ImageSelection({
         }
         effectsSection={
           <ImageEffectsSection
-            imageInstanceId={contentId}
+            imageInstanceId={instanceId}
             imageMediaInstance={imageInstanceMedia}
           />
         }

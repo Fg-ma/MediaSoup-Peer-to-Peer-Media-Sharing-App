@@ -6,6 +6,9 @@ import FgHoverContentStandard from "../../../../../../elements/fgHoverContentSta
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgInput from "../../../../../../elements/fgInput/FgInput";
 import { ContentTypes } from "../../../../../../../../universal/contentTypeConstant";
+import ReactButton from "../../../../../../elements/reactButton/ReactButton";
+import { reactionActions } from "../../../../../../elements/reactButton/lib/ReactController";
+import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -18,6 +21,7 @@ const defaultGeneralMediaSelectionOptions = {
 
 export default function GeneralMediaSelection({
   contentId,
+  instanceId,
   contentType,
   selectionContent,
   effectsSection,
@@ -30,7 +34,8 @@ export default function GeneralMediaSelection({
   selectionContentStyle,
   options,
 }: {
-  contentId: string;
+  contentId?: string;
+  instanceId: string;
   contentType: ContentTypes;
   selectionContent?: React.ReactElement;
   effectsSection?: React.ReactElement;
@@ -61,8 +66,10 @@ export default function GeneralMediaSelection({
   };
 
   const { sendMediaPositioningSignal, sendGroupSignal } = useSignalContext();
+  const { tableSocket } = useSocketContext();
 
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);
+  const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
   const [_, setRerender] = useState(false);
   const filenameRef = useRef<HTMLDivElement>(null);
 
@@ -134,6 +141,22 @@ export default function GeneralMediaSelection({
             hoverType: "above",
             hoverTimeoutDuration: 500,
           }}
+        />
+        <ReactButton
+          reactionsPanelActive={reactionsPanelActive}
+          setReactionsPanelActive={setReactionsPanelActive}
+          clickFunction={() => setReactionsPanelActive((prev) => !prev)}
+          reactionFunction={(reaction) =>
+            tableSocket.current?.reaction(
+              contentType,
+              reaction,
+              reactionActions[
+                Math.floor(Math.random() * reactionActions.length)
+              ],
+              contentId,
+              instanceId,
+            )
+          }
         />
         <FgButton
           className="flex aspect-square h-6 items-center justify-center"
@@ -225,7 +248,7 @@ export default function GeneralMediaSelection({
                     sendMediaPositioningSignal({
                       type: "moveTo",
                       header: {
-                        contentId,
+                        instanceId,
                         contentType,
                       },
                       data: {
@@ -290,7 +313,7 @@ export default function GeneralMediaSelection({
                     sendMediaPositioningSignal({
                       type: "moveTo",
                       header: {
-                        contentId,
+                        instanceId,
                         contentType,
                       },
                       data: {
@@ -352,7 +375,7 @@ export default function GeneralMediaSelection({
                     sendMediaPositioningSignal({
                       type: "scaleTo",
                       header: {
-                        contentId,
+                        instanceId,
                         contentType,
                       },
                       data: {
@@ -415,7 +438,7 @@ export default function GeneralMediaSelection({
                     sendMediaPositioningSignal({
                       type: "rotateTo",
                       header: {
-                        contentId,
+                        instanceId,
                         contentType,
                       },
                       data: {

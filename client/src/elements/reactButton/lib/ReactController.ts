@@ -6,6 +6,14 @@ import {
 } from "../../../../../universal/reactionsTypeConstant";
 import { reactionsMeta } from "./typeConstant";
 
+export const reactionActions: TableReactionStyles[] = [
+  "expand",
+  "expandRotate",
+  "explodeAbove",
+  "explodeBelow",
+  "peakingAroundTheCorner",
+];
+
 class ReactController {
   constructor(
     private contentId: string | undefined,
@@ -15,13 +23,13 @@ class ReactController {
     private frontEffectsContainerRef: React.RefObject<HTMLDivElement>,
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
-    >
+    >,
   ) {}
 
   handleReaction = (
     reaction: TableReactions,
     broadcast: boolean = true,
-    reactionStyle?: TableReactionStyles
+    reactionStyle?: TableReactionStyles,
   ) => {
     const reactionSrc = reactionsMeta[reaction].src;
 
@@ -44,7 +52,7 @@ class ReactController {
           reaction,
           reactionStyle,
           this.contentId,
-          this.instanceId
+          this.instanceId,
         );
       }
     } else {
@@ -60,7 +68,7 @@ class ReactController {
           reaction,
           randomAction[0] as TableReactionStyles,
           this.contentId,
-          this.instanceId
+          this.instanceId,
         );
       }
     }
@@ -79,7 +87,7 @@ class ReactController {
     particle.style.width = `${
       Math.min(
         this.frontEffectsContainerRef.current.clientWidth,
-        this.frontEffectsContainerRef.current.clientHeight
+        this.frontEffectsContainerRef.current.clientHeight,
       ) / 12
     }px`;
     this.frontEffectsContainerRef.current.appendChild(particle);
@@ -103,7 +111,7 @@ class ReactController {
     particle.style.width = `${
       Math.min(
         this.frontEffectsContainerRef.current.clientWidth,
-        this.frontEffectsContainerRef.current.clientHeight
+        this.frontEffectsContainerRef.current.clientHeight,
       ) / 12
     }px`;
     this.frontEffectsContainerRef.current.appendChild(particle);
@@ -129,7 +137,7 @@ class ReactController {
         (Math.random() *
           Math.min(
             this.frontEffectsContainerRef.current.clientWidth,
-            this.frontEffectsContainerRef.current.clientHeight
+            this.frontEffectsContainerRef.current.clientHeight,
           )) /
         1.5;
       const x = Math.cos(angle) * distance;
@@ -170,7 +178,7 @@ class ReactController {
         Math.random() *
         Math.min(
           this.frontEffectsContainerRef.current.clientWidth,
-          this.frontEffectsContainerRef.current.clientHeight
+          this.frontEffectsContainerRef.current.clientHeight,
         );
       const x = Math.cos(angle) * distance;
       const y = Math.sin(angle) * distance;
@@ -201,7 +209,7 @@ class ReactController {
     particle.style.width = `${
       Math.min(
         this.behindEffectsContainerRef.current.clientWidth,
-        this.behindEffectsContainerRef.current.clientHeight
+        this.behindEffectsContainerRef.current.clientHeight,
       ) / 1.5
     }px`;
     this.behindEffectsContainerRef.current.appendChild(particle);
