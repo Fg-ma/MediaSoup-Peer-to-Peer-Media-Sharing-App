@@ -1,11 +1,28 @@
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+interface FaceDetectionInitEventData {
+  message: "INIT";
+  canvas: OffscreenCanvas;
+  width: number;
+  height: number;
+  nginxAssetServerBaseUrl: string;
+}
+
+interface FaceDetectionFrameEventData {
+  message: "FRAME";
+  bitmap: ImageBitmap;
+}
+
+type FaceDetectionWorkerEventData =
+  | FaceDetectionInitEventData
+  | FaceDetectionFrameEventData;
 
 class FaceDetectionWebWorker {
-  canvas;
-  canvasHeight;
-  canvasWidth;
-  context;
-  faceDetector;
+  nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+  canvas: OffscreenCanvas | undefined;
+  context: OffscreenCanvasRenderingContext2D | undefined | null;
+  canvasHeight: number | undefined;
+  canvasWidth: number | undefined;
+  faceDetector: any;
   maxFaces = 10;
 
   constructor() {
@@ -17,7 +34,7 @@ class FaceDetectionWebWorker {
   }
 
   loadDependencies = async () => {
-    const baseUrl = nginxAssetServerBaseUrl + "faceMeshModel/";
+    const baseUrl = this.nginxAssetServerBaseUrl + "faceMeshModel/";
 
     const scripts = [
       "tf-core.js",
@@ -35,7 +52,7 @@ class FaceDetectionWebWorker {
 
   loadModel = async () => {
     // eslint-disable-next-line no-undef
-    tf.wasm.setWasmPaths(nginxAssetServerBaseUrl + "faceMeshModel/");
+    tf.wasm.setWasmPaths(this.nginxAssetServerBaseUrl + "faceMeshModel/");
     // eslint-disable-next-line no-undef
     await tf.ready();
 
@@ -50,8 +67,13 @@ class FaceDetectionWebWorker {
     );
   };
 
-  processFrame = async (event) => {
-    if (!this.faceDetector) {
+  processFrame = async (event: MessageEvent<FaceDetectionFrameEventData>) => {
+    if (
+      !this.faceDetector ||
+      !this.context ||
+      !this.canvasHeight ||
+      !this.canvasWidth
+    ) {
       return;
     }
 
@@ -70,7 +92,7 @@ class FaceDetectionWebWorker {
     return predictions.length;
   };
 
-  setCanvas = (event) => {
+  setCanvas = async (event: MessageEvent<FaceDetectionInitEventData>) => {
     this.canvas = event.data.canvas;
     this.canvasHeight = event.data.height;
     this.canvasWidth = event.data.width;

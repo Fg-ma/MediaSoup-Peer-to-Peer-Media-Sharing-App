@@ -2,16 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import FgScrollbarElementController from "./FgScrollbarElementController";
 
 export default function Scrollbar({
+  contentContainerRef,
   direction = "vertical",
   scrollingContentRef,
-  scrollbarVisible = true,
   scrollbarSize = 10,
   gutterSize = 11,
   scrollbarElementRef,
 }: {
+  contentContainerRef: React.RefObject<HTMLDivElement>;
   direction?: "vertical" | "horizontal";
   scrollingContentRef: React.RefObject<HTMLDivElement>;
-  scrollbarVisible?: boolean;
   scrollbarSize?: number;
   gutterSize?: number;
   scrollbarElementRef: React.RefObject<HTMLDivElement>;
@@ -23,8 +23,9 @@ export default function Scrollbar({
   const dragging = useRef(false);
   const scrollStart = useRef({ x: 0, y: 0 });
   const startScrollPosition = useRef({ top: 0, left: 0 });
-  const [_, setRerender] = useState(false);
   const directionRef = useRef(direction);
+  const scrollbarVisible = useRef(true);
+  const [_, setRerender] = useState(false);
 
   const fgScrollbarElementController = new FgScrollbarElementController(
     scrollingContentRef,
@@ -50,6 +51,10 @@ export default function Scrollbar({
         "scroll",
         fgScrollbarElementController.scrollFunction,
       );
+      scrollingContentRef.current?.addEventListener(
+        "wheel",
+        fgScrollbarElementController.verticalScrollWheel,
+      );
     }
     if (directionRef.current === "horizontal") {
       scrollingContentRef.current?.addEventListener(
@@ -64,6 +69,10 @@ export default function Scrollbar({
           "scroll",
           fgScrollbarElementController.scrollFunction,
         );
+        scrollingContentRef.current?.removeEventListener(
+          "wheel",
+          fgScrollbarElementController.verticalScrollWheel,
+        );
       }
       if (directionRef.current === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
@@ -75,17 +84,32 @@ export default function Scrollbar({
   }, [direction]);
 
   useEffect(() => {
-    if (!scrollbarVisible) {
+    if (!scrollbarVisible.current) {
       if (scrollTimeout.current) {
         clearTimeout(scrollTimeout.current);
         scrollTimeout.current = undefined;
       }
       dragging.current = false;
     }
-    fgScrollbarElementController.updateScrollbar();
-  }, [scrollbarVisible]);
+    setTimeout(() => {
+      fgScrollbarElementController.updateScrollbar();
+    }, 0);
+  }, [scrollbarVisible.current]);
 
   useEffect(() => {
+    // create a resize observer to cause a rerender when the content changes size
+    let resizeObserver: ResizeObserver | undefined;
+    if (contentContainerRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        scrollbarVisible.current = contentContainerRef.current
+          ? contentContainerRef.current.scrollHeight >
+            contentContainerRef.current.clientHeight
+          : true;
+        setRerender((prev) => !prev);
+      });
+      resizeObserver.observe(contentContainerRef.current);
+    }
+
     scrollbarElementRef.current?.addEventListener(
       "pointermove",
       fgScrollbarElementController.hideTableScrollBar,
@@ -96,6 +120,9 @@ export default function Scrollbar({
     );
 
     return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       scrollbarElementRef.current?.removeEventListener(
         "pointermove",
         fgScrollbarElementController.hideTableScrollBar,
@@ -108,7 +135,7 @@ export default function Scrollbar({
   }, []);
 
   return (
-    scrollbarVisible && (
+    scrollbarVisible.current && (
       <div
         ref={scrollbarRef}
         className={`fg-scrollbar z-scrollbar ${

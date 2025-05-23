@@ -189,6 +189,26 @@ class FgScrollbarController {
     this.scrollingContentRef.current.scrollLeft += event.deltaY;
   };
 
+  verticalScrollWheel = () => {
+    if (this.directionRef.current === "horizontal") return;
+
+    this.scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
+
+    if (this.scrollTimeout.current) {
+      clearTimeout(this.scrollTimeout.current);
+      this.scrollTimeout.current = undefined;
+    }
+
+    if (!this.dragging.current) {
+      this.scrollTimeout.current = setTimeout(() => {
+        this.scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
+
+        clearTimeout(this.scrollTimeout.current);
+        this.scrollTimeout.current = undefined;
+      }, this.scrollTimeoutTime);
+    }
+  };
+
   trackPointerDown = (event: React.PointerEvent) => {
     if (
       !this.scrollingContentRef.current ||

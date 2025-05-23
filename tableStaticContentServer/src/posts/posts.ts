@@ -280,7 +280,7 @@ class Posts {
             "TSCCS",
             uploadId
           )) as ChunkState;
-          if (!state) {
+          if (!state && !aborted) {
             this.sendResponse(res, "404 Not Found", "text/plain", "No state");
             aborted = true;
             return;
@@ -289,7 +289,7 @@ class Posts {
           const alreadyUploaded = state.parts.some(
             (part) => part.PartNumber === chunkIndex + 1
           );
-          if (alreadyUploaded) {
+          if (alreadyUploaded && !aborted) {
             this.sendResponse(
               res,
               "409 Conflict",
@@ -301,7 +301,7 @@ class Posts {
         }
       });
 
-      bb.on("file", async (_fn, stream, info) => {
+      bb.on("file", async (_fn, stream) => {
         session = (await tableTopRedis.gets.get(
           "TSCUS",
           uploadId
@@ -323,8 +323,6 @@ class Posts {
           aborted = true;
           return;
         }
-
-        const { mimeType } = info;
 
         stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
 
@@ -376,7 +374,7 @@ class Posts {
                       session!.tableId,
                       session!.contentId,
                       session!.instanceId,
-                      mimeType as StaticMimeTypes,
+                      session!.mimeType,
                       session!.filename,
                       session!.state
                     );
@@ -393,7 +391,7 @@ class Posts {
                       session!.staticContentType,
                       session!.tableId,
                       session!.contentId,
-                      mimeType as StaticMimeTypes,
+                      session!.mimeType,
                       session!.filename,
                       session!.state
                     );

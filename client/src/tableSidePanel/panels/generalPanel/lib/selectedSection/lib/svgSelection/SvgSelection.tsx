@@ -8,7 +8,7 @@ import DownloadFailed from "../../../../../../../elements/downloadFailed/Downloa
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
 import SvgSelectionController from "./lib/SvgSelectionController";
 import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
-import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
+import NoPreviewAvailable from "../../../../../../../elements/noPreviewAvailable/NoPreviewAvailable";
 
 export default function SvgSelection({
   instanceId,
@@ -64,22 +64,19 @@ export default function SvgSelection({
 
   useEffect(() => {
     if (loadingState === "downloaded" && svgInstanceMedia?.instanceSvg) {
-      // svgMirror.current = svgInstanceMedia.instanceSvg.cloneNode(
-      //   true,
-      // ) as SVGSVGElement;
       if ((svgInstanceMedia.svgMedia.aspect ?? 0) > 1) {
-        // svgMirror.current.setAttribute("width", "100%");
-        // svgMirror.current.setAttribute("maxWidth", "12rem");
         setLargestDim("width");
       } else {
-        // svgMirror.current.setAttribute("height", "100%");
-        // svgMirror.current.setAttribute("maxHeight", "12rem");
         setLargestDim("height");
       }
-      // svgContainerRef.current?.appendChild(svgMirror.current);
+
+      if (svgInstanceMedia.svgMedia.fileSize < 1024 * 1024 * 50)
+        svgContainerRef.current?.appendChild(
+          svgInstanceMedia.instanceSvg.cloneNode(true)!,
+        );
     }
   }, [loadingState]);
-  console.log(svgInstanceMedia.svgMedia.blobURL);
+
   return (
     svgInstanceMedia && (
       <GeneralMediaSelection
@@ -92,14 +89,12 @@ export default function SvgSelection({
               ref={svgContainerRef}
               className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
             >
-              {svgInstanceMedia.svgMedia.blobURL && (
-                <img
-                  className={`${largestDim === "height" ? "h-full max-h-[12rem]" : "w-full max-w-[12rem]"}`}
-                  src={svgInstanceMedia.svgMedia.blobURL}
-                  onLoad={() => console.log("SVG loaded")}
-                  onError={(e) => console.warn("SVG failed to load", e)}
-                />
-              )}
+              {svgInstanceMedia.svgMedia.fileSize > 1024 * 1024 * 50 &&
+                svgInstanceMedia.svgMedia.aspect && (
+                  <NoPreviewAvailable
+                    className={`${largestDim === "width" ? "w-[12rem]" : "h-[12rem]"}`}
+                  />
+                )}
             </div>
           ) : loadingState === "downloading" ? (
             <LoadingElement

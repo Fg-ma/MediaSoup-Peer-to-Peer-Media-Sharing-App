@@ -192,7 +192,7 @@ export default function MultiDownloadChart() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={[]}
-                margin={{ top: 10, right: 20, bottom: 30, left: 40 }}
+                margin={{ top: 10, right: 30, bottom: 20, left: 18 }}
               >
                 <CartesianGrid stroke="#444" strokeDasharray="3 3" />
 
@@ -213,7 +213,7 @@ export default function MultiDownloadChart() {
                     style: {
                       fill: "#f2f2f2",
                       fontFamily: "K2D, sans",
-                      fontSize: 14,
+                      fontSize: 18,
                     },
                   }}
                   stroke="#f2f2f2"
@@ -227,7 +227,7 @@ export default function MultiDownloadChart() {
                     value: unitLabel,
                     angle: -90,
                     position: "insideLeft",
-                    dx: -20,
+                    dx: 0,
                     style: {
                       fill: "#f2f2f2",
                       fontFamily: "K2D, sans",

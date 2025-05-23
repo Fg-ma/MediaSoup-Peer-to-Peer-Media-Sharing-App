@@ -65,17 +65,10 @@ export default function TableSidePanel({
             style={{
               height: `calc(100% - ${tableSidePanelHeaderRef.current?.clientHeight ?? 0}px)`,
             }}
-            scrollbarVisible={
-              tablePanelRef.current
-                ? tablePanelRef.current.scrollHeight >
-                  tablePanelRef.current.clientHeight
-                : true
-            }
+            externalContentContainerRef={tablePanelRef}
+            contentContainerClassName="hide-scroll-bar h-full w-full overflow-y-auto"
             content={
-              <div
-                ref={tablePanelRef}
-                className="hide-scroll-bar h-full w-full overflow-y-auto"
-              >
+              <>
                 {activePanel.current === "general" && (
                   <GeneralPanel tablePanelRef={tablePanelRef} />
                 )}
@@ -91,7 +84,7 @@ export default function TableSidePanel({
                     setExternalRerender={setRerender}
                   />
                 )}
-              </div>
+              </>
             }
             scrollingContentRef={tablePanelRef}
           />

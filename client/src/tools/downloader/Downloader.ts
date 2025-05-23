@@ -11,15 +11,14 @@ import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadListenerTypes } from "./lib/typeConstant";
-import UserStaticContentSocketController from "src/serverControllers/userStaticContentServer/UserStaticContentSocketController";
-import { IncomingUserStaticContentMessages } from "src/serverControllers/userStaticContentServer/lib/typeConstant";
-
+import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import { IncomingUserStaticContentMessages } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 class Downloader {
   private _paused: boolean = false;
 
   private fileSize = 0;
   private offset = 0;
-  private fileChunks: Uint8Array[] = [];
+  private totalBuffer: Uint8Array | undefined;
 
   private _progress: number = 0;
 
@@ -31,6 +30,8 @@ class Downloader {
   private bytesSinceLast: number = 0;
 
   private listeners: Set<(message: DownloadListenerTypes) => void> = new Set();
+
+  private downloadWorker: Worker | undefined;
 
   constructor(
     private contentType: StaticContentTypes,
@@ -53,6 +54,11 @@ class Downloader {
       this.downloadListener,
     );
     this.listeners.clear();
+
+    if (this.downloadWorker) {
+      this.downloadWorker.terminate();
+      this.downloadWorker = undefined;
+    }
   };
 
   private onDownloadMeta = (message: onDownloadMetaType) => {
@@ -63,6 +69,7 @@ class Downloader {
     }
 
     this.fileSize = message.data.fileSize;
+    this.totalBuffer = new Uint8Array(this.fileSize);
 
     this.requestNextChunk();
   };
@@ -91,7 +98,7 @@ class Downloader {
     this._progress = this.offset / (this.fileSize ?? 1);
 
     // 1) Append chunk as before
-    this.fileChunks.push(chunkData);
+    this.totalBuffer?.set(chunkData, this.offset - chunkBytes);
 
     // 2) Initialize timing on first chunk
     if (this.lastTimestamp === null) {
@@ -132,28 +139,35 @@ class Downloader {
       if (this.offset < this.fileSize) {
         this.requestNextChunk();
       } else {
-        const blob = new Blob(this.fileChunks, {
-          type: this.mimeType,
-        });
+        this.downloadWorker = new Worker(
+          new URL("../../webWorkers/downloadWorker.worker.ts", import.meta.url),
+        );
 
-        const finishMessage = {
-          type: "downloadFinish",
-          data: { blob, fileSize: this.fileSize },
+        this.downloadWorker.onmessage = (e) => {
+          const blob = e.data.blob;
+
+          this.listeners.forEach((listener) => {
+            listener({
+              type: "downloadFinish",
+              data: { blob, fileSize: this.fileSize },
+            });
+          });
+
+          if (this.downloadWorker) {
+            this.downloadWorker.terminate();
+            this.downloadWorker = undefined;
+          }
+
+          this.removeCurrentDownload(this.contentId);
+          this.sendDownloadSignal({ type: "downloadFinish" });
+          this.deconstructor();
         };
-        this.listeners.forEach((listener) => {
-          listener(
-            finishMessage as {
-              type: "downloadFinish";
-              data: { blob: Blob; fileSize: number };
-            },
-          );
-        });
 
-        this.removeCurrentDownload(this.contentId);
-
-        this.sendDownloadSignal({ type: "downloadFinish" });
-
-        this.deconstructor();
+        const bufferToSend = this.totalBuffer?.buffer;
+        this.downloadWorker.postMessage(
+          { buffer: bufferToSend, mimeType: this.mimeType },
+          [bufferToSend!],
+        );
       }
     }
   };

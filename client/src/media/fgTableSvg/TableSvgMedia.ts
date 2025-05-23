@@ -24,6 +24,7 @@ class TableSvgMedia {
 
   fileSize = 0;
   blobURL: string | undefined;
+  blob: Blob | undefined;
   loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
 
@@ -71,6 +72,7 @@ class TableSvgMedia {
   private onDownloadFinish = async (message: onDownloadFinishType) => {
     const { blob, fileSize } = message.data;
 
+    this.blob = blob;
     this.fileSize = fileSize;
 
     this.blobURL = URL.createObjectURL(blob);

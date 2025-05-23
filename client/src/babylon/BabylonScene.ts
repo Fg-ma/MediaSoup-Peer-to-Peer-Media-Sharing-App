@@ -284,6 +284,8 @@ class BabylonScene {
             this.scene,
           )
         : new Texture(this.backgroundMedia.src, this.scene);
+    this.backgroundMediaTexture.hasAlpha = true;
+    this.scene.clearColor = new Color4(0, 0, 0, 0);
 
     if (this.flip) this.backgroundMediaTexture.uScale = -1;
 
@@ -557,7 +559,6 @@ class BabylonScene {
           // Create a link element for download
           const link = document.createElement("a");
           link.href = dataUrl;
-          console.log(this.snapShotExtension);
           link.download = "scene-snapshot.png";
 
           // Simulate a click to download the image

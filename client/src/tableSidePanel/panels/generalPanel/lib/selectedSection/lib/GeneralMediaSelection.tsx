@@ -103,8 +103,8 @@ export default function GeneralMediaSelection({
       }}
     >
       <div
-        className="selected-section-media-container relative mx-2 max-h-[12rem]"
-        style={{ height: "calc(100% - 4rem)", ...selectionContentStyle }}
+        className="selected-section-media-container relative mx-2 h-[12rem]"
+        style={{ ...selectionContentStyle }}
       >
         {selectionContent}
         {generalMediaSelectionOptions.downloadType === "cover" &&
@@ -142,48 +142,51 @@ export default function GeneralMediaSelection({
             hoverTimeoutDuration: 500,
           }}
         />
-        <ReactButton
-          reactionsPanelActive={reactionsPanelActive}
-          setReactionsPanelActive={setReactionsPanelActive}
-          clickFunction={() => setReactionsPanelActive((prev) => !prev)}
-          reactionFunction={(reaction) =>
-            tableSocket.current?.reaction(
-              contentType,
-              reaction,
-              reactionActions[
-                Math.floor(Math.random() * reactionActions.length)
-              ],
-              contentId,
-              instanceId,
-            )
-          }
-        />
-        <FgButton
-          className="flex aspect-square h-6 items-center justify-center"
-          contentFunction={() => (
-            <FgSVGElement
-              src={infoIcon}
-              className="fill-fg-white stroke-fg-white"
-              attributes={[
-                { key: "height", value: "100%" },
-                { key: "width", value: "100%" },
-              ]}
-            />
-          )}
-          clickFunction={() => setMoreInfoSectionActive((prev) => !prev)}
-          scrollingContainerRef={tablePanelRef}
-          hoverContent={
-            <FgHoverContentStandard
-              content={moreInfoSectionActive ? "More info" : "Less info"}
-              style="light"
-            />
-          }
-          options={{
-            hoverSpacing: 4,
-            hoverTimeoutDuration: 750,
-            hoverType: "above",
-          }}
-        />
+        <div className="flex h-full w-max items-center justify-center space-x-1">
+          <ReactButton
+            className="!h-6 !w-6"
+            reactionsPanelActive={reactionsPanelActive}
+            setReactionsPanelActive={setReactionsPanelActive}
+            clickFunction={() => setReactionsPanelActive((prev) => !prev)}
+            reactionFunction={(reaction) =>
+              tableSocket.current?.reaction(
+                contentType,
+                reaction,
+                reactionActions[
+                  Math.floor(Math.random() * reactionActions.length)
+                ],
+                contentId,
+                instanceId,
+              )
+            }
+          />
+          <FgButton
+            className="flex aspect-square h-6 items-center justify-center"
+            contentFunction={() => (
+              <FgSVGElement
+                src={infoIcon}
+                className="fill-fg-white stroke-fg-white"
+                attributes={[
+                  { key: "height", value: "100%" },
+                  { key: "width", value: "100%" },
+                ]}
+              />
+            )}
+            clickFunction={() => setMoreInfoSectionActive((prev) => !prev)}
+            scrollingContainerRef={tablePanelRef}
+            hoverContent={
+              <FgHoverContentStandard
+                content={moreInfoSectionActive ? "More info" : "Less info"}
+                style="light"
+              />
+            }
+            options={{
+              hoverSpacing: 4,
+              hoverTimeoutDuration: 750,
+              hoverType: "above",
+            }}
+          />
+        </div>
       </div>
       {moreInfoSectionActive && (
         <div className="flex w-full flex-col space-y-2">

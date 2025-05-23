@@ -107,7 +107,7 @@ export default function MoreInfoSection({
               time: d.time,
               speed: d.speedKBps * scaleFactor,
             }))}
-            margin={{ top: 10, right: 20, bottom: 30, left: 40 }}
+            margin={{ top: 10, right: 30, bottom: 20, left: 18 }}
           >
             <CartesianGrid stroke="#444" strokeDasharray="3 3" />
 
@@ -126,7 +126,7 @@ export default function MoreInfoSection({
                 style: {
                   fill: "#f2f2f2",
                   fontFamily: "K2D, sans",
-                  fontSize: 14,
+                  fontSize: 18,
                 },
               }}
               stroke="#f2f2f2"
@@ -140,7 +140,7 @@ export default function MoreInfoSection({
                 value: unitLabel,
                 angle: -90,
                 position: "insideLeft",
-                dx: -20,
+                dx: 0,
                 style: {
                   fill: "#f2f2f2",
                   fontFamily: "K2D, sans",

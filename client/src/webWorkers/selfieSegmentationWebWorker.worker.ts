@@ -1,13 +1,28 @@
 import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+interface SelfieInitEventData {
+  message: "INIT";
+  canvas: OffscreenCanvas;
+  width: number;
+  height: number;
+}
+
+interface SelfieFrameEventData {
+  message: "FRAME";
+  bitmap: ImageBitmap;
+}
+
+type SelfieWorkerEventData = SelfieInitEventData | SelfieFrameEventData;
 
 class SelfieSegmentationWebWorker {
-  canvas;
-  canvasHeight;
-  canvasWidth;
-  context;
-  selfieSegmenter = null;
+  nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+  canvas: OffscreenCanvas | undefined;
+  context: OffscreenCanvasRenderingContext2D | undefined | null;
+  canvasHeight: number | undefined;
+  canvasWidth: number | undefined;
+  faceDetector: any;
+  selfieSegmenter: any = null;
   isInitialized = false;
   isInitializing = false;
 
@@ -22,27 +37,21 @@ class SelfieSegmentationWebWorker {
       try {
         // Load the vision tasks WASM files
         const vision = await FilesetResolver.forVisionTasks(
-          nginxAssetServerBaseUrl + "tasks-vision",
+          this.nginxAssetServerBaseUrl + "tasks-vision",
         );
 
-        // Define options for the ImageSegmenter
-        const options = {
+        // Create the ImageSegmenter
+        this.selfieSegmenter = await ImageSegmenter.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath:
-              nginxAssetServerBaseUrl + "tasks-vision/selfie_segmenter.tflite",
+              this.nginxAssetServerBaseUrl +
+              "tasks-vision/selfie_segmenter.tflite",
             delegate: "CPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: false,
           outputConfidenceMasks: true,
-          outputQualityScores: true,
-        };
-
-        // Create the ImageSegmenter
-        this.selfieSegmenter = await ImageSegmenter.createFromOptions(
-          vision,
-          options,
-        );
+        });
         this.isInitialized = true;
       } catch (error) {
         console.error("Failed to initialize the model:", error);
@@ -52,10 +61,15 @@ class SelfieSegmentationWebWorker {
     }
   };
 
-  processFrame = async (event) => {
-    if (!this.selfieSegmenter || !this.isInitialized) {
+  processFrame = async (event: MessageEvent<SelfieFrameEventData>) => {
+    if (
+      !this.selfieSegmenter ||
+      !this.isInitialized ||
+      !this.context ||
+      !this.canvasWidth ||
+      !this.canvasHeight
+    )
       return;
-    }
 
     const bitmap = event.data.bitmap;
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -88,7 +102,7 @@ class SelfieSegmentationWebWorker {
     return new ImageData(rgbaData, width, height);
   };
 
-  setCanvas = (event) => {
+  setCanvas = (event: MessageEvent<SelfieInitEventData>) => {
     this.canvas = event.data.canvas;
     this.canvasHeight = event.data.height;
     this.canvasWidth = event.data.width;

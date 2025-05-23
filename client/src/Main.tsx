@@ -298,6 +298,7 @@ export default function Main() {
       isAudio,
       setAudioActive,
       handleDisableEnableBtns,
+      sendGeneralSignal,
     ),
   );
 

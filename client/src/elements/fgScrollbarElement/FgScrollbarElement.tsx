@@ -4,27 +4,34 @@ import "./lib/fgScrollbar.css";
 
 export default function FgScrollbarElement({
   externalRef,
+  externalContentContainerRef,
   direction = "vertical",
   scrollingContentRef,
-  scrollbarVisible = true,
   content,
+  outsideContent,
   className,
+  contentContainerClassName,
   scrollbarSize = 10,
   gutterSize = 11,
   style,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
+  externalContentContainerRef?: React.RefObject<HTMLDivElement>;
   direction?: "vertical" | "horizontal";
   scrollingContentRef: React.RefObject<HTMLDivElement>;
-  scrollbarVisible?: boolean;
   content?: React.ReactNode;
+  outsideContent?: React.ReactNode;
   className?: string;
+  contentContainerClassName?: string;
   scrollbarSize?: number;
   gutterSize?: number;
   style?: React.CSSProperties;
 }) {
   const scrollbarElementRef = externalRef
     ? externalRef
+    : useRef<HTMLDivElement>(null);
+  const contentContainerRef = externalContentContainerRef
+    ? externalContentContainerRef
     : useRef<HTMLDivElement>(null);
 
   return (
@@ -34,14 +41,17 @@ export default function FgScrollbarElement({
       style={style}
     >
       <Scrollbar
+        contentContainerRef={contentContainerRef}
         direction={direction}
         scrollingContentRef={scrollingContentRef}
-        scrollbarVisible={scrollbarVisible}
         scrollbarSize={scrollbarSize}
         gutterSize={gutterSize}
         scrollbarElementRef={scrollbarElementRef}
       />
-      {content}
+      {outsideContent}
+      <div className={contentContainerClassName} ref={contentContainerRef}>
+        {content}
+      </div>
     </div>
   );
 }

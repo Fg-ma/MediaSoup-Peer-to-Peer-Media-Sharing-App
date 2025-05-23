@@ -1,13 +1,42 @@
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+declare function importScripts(...urls: string[]): void;
+declare const tf: any;
+declare const faceLandmarksDetection: any;
+
+interface FaceMeshInitEventData {
+  message: "INIT";
+  canvas: OffscreenCanvas;
+  width: number;
+  height: number;
+  nginxAssetServerBaseUrl: string;
+}
+
+interface FaceMeshFrameEventData {
+  message: "FRAME";
+  bitmap: ImageBitmap;
+  flipped: boolean;
+  smooth: boolean;
+}
+
+interface FaceMeshChangeMaxFacesEventData {
+  message: "CHANGE_MAX_FACES";
+  newMaxFace: number;
+}
+
+type FaceMeshWorkerEventData =
+  | FaceMeshInitEventData
+  | FaceMeshFrameEventData
+  | FaceMeshChangeMaxFacesEventData;
 
 class FaceMeshWebWorker {
-  canvas;
-  canvasHeight;
-  canvasWidth;
-  context;
-  faceMesh;
+  nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+  canvas: OffscreenCanvas | undefined;
+  context: OffscreenCanvasRenderingContext2D | undefined | null;
+  canvasHeight: number | undefined;
+  canvasWidth: number | undefined;
+  faceMesh: any;
   maxFaces = 1;
-  smoothingData = []; // Store previous landmarks for smoothing
+  smoothingData: Array<any[]> = []; // Store previous landmarks for smoothing
   smoothingFactor = 0.9; // Smoothing factor for EMA
   deadbandThreshold = 0.001; // Minimum change threshold to register movement
 
@@ -20,7 +49,7 @@ class FaceMeshWebWorker {
   }
 
   loadDependencies = async () => {
-    const baseUrl = nginxAssetServerBaseUrl + "faceMeshModel/";
+    const baseUrl = this.nginxAssetServerBaseUrl + "faceMeshModel/";
 
     const scripts = [
       "tf-core.js",
@@ -38,7 +67,7 @@ class FaceMeshWebWorker {
 
   loadModel = async () => {
     // eslint-disable-next-line no-undef
-    tf.wasm.setWasmPaths(nginxAssetServerBaseUrl + "faceMeshModel/");
+    tf.wasm.setWasmPaths(this.nginxAssetServerBaseUrl + "faceMeshModel/");
     // eslint-disable-next-line no-undef
     await tf.ready();
 
@@ -55,10 +84,15 @@ class FaceMeshWebWorker {
     );
   };
 
-  processFrame = async (event) => {
-    if (!this.faceMesh) {
+  processFrame = async (event: MessageEvent<FaceMeshFrameEventData>) => {
+    if (
+      !this.faceMesh ||
+      !this.context ||
+      !this.canvasHeight ||
+      !this.canvasWidth
+    )
       return;
-    }
+
     const bitmap = event.data.bitmap;
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.context.drawImage(bitmap, 0, 0);
@@ -71,27 +105,29 @@ class FaceMeshWebWorker {
       predictIrises: true,
     });
 
-    const multiFaceLandmarks = [];
+    const multiFaceLandmarks: any[] = [];
 
-    predictions.map((face, faceIndex) => {
-      const zValues = face.scaledMesh.map(([, , z]) => z);
+    predictions.map((face: any, faceIndex: number) => {
+      const zValues = face.scaledMesh.map(([, , z]: number[]) => z);
       const zRange = Math.max(...zValues) - Math.min(...zValues);
 
       // Initialize smoothing data if empty
       if (!this.smoothingData[faceIndex]) {
-        this.smoothingData[faceIndex] = face.scaledMesh.map(([x, y, z]) => ({
-          x,
-          y,
-          z,
-        }));
+        this.smoothingData[faceIndex] = face.scaledMesh.map(
+          ([x, y, z]: number[]) => ({
+            x,
+            y,
+            z,
+          }),
+        );
       }
 
       multiFaceLandmarks.push(
-        face.scaledMesh.map(([x, y, z], landmarkIndex) => {
+        face.scaledMesh.map(([x, y, z]: number[], landmarkIndex: number) => {
           // Normalize coordinates
           const normX =
-            ((x / this.canvasWidth) * 2 - 1) * (event.data.flipped ? 1 : -1);
-          const normY = ((y / this.canvasHeight) * 2 - 1) * -1;
+            ((x / this.canvasWidth!) * 2 - 1) * (event.data.flipped ? 1 : -1);
+          const normY = ((y / this.canvasHeight!) * 2 - 1) * -1;
           const adjustedZ = (z - Math.min(...zValues)) / (zRange || 1);
 
           if (!event.data.smooth) {
@@ -141,14 +177,14 @@ class FaceMeshWebWorker {
     return multiFaceLandmarks;
   };
 
-  changeMaxFaces = async (newMaxFaces) => {
+  changeMaxFaces = async (newMaxFaces: number) => {
     if (this.maxFaces !== newMaxFaces) {
       this.maxFaces = newMaxFaces;
       await this.loadModel();
     }
   };
 
-  setCanvas = (event) => {
+  setCanvas = (event: MessageEvent<FaceMeshInitEventData>) => {
     this.canvas = event.data.canvas;
     this.canvasHeight = event.data.height;
     this.canvasWidth = event.data.width;

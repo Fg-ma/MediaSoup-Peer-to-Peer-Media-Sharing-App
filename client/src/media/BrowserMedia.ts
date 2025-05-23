@@ -1,6 +1,7 @@
 import { types } from "mediasoup-client";
 import { UserMedia } from "tone";
 import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { GeneralSignals } from "../context/signalContext/lib/typeConstant";
 
 class BrowserMedia {
   constructor(
@@ -12,12 +13,19 @@ class BrowserMedia {
     private setScreenActive: React.Dispatch<React.SetStateAction<boolean>>,
     private isAudio: React.MutableRefObject<boolean>,
     private setAudioActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private handleDisableEnableBtns: (disabled: boolean) => void
+    private handleDisableEnableBtns: (disabled: boolean) => void,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
   ) {}
 
   getCameraMedia = async () => {
     if (this.device.current && !this.device.current.canProduce("video")) {
-      console.error("Cannot produce video");
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing camera",
+          timeout: 1750,
+        },
+      });
       return;
     }
 
@@ -37,7 +45,13 @@ class BrowserMedia {
         this.setCameraActive(false);
       }
 
-      console.error("Error accessing camera device:", error);
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing camera",
+          timeout: 1750,
+        },
+      });
       return;
     }
   };
@@ -59,12 +73,45 @@ class BrowserMedia {
         this.setScreenActive(false);
       }
 
-      console.error("Error accessing media devices:", error);
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing screen",
+          timeout: 1750,
+        },
+      });
       return;
     }
   };
 
   getAudioMedia = async () => {
+    if (this.device.current && !this.device.current.canProduce("audio")) {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing microphone",
+          timeout: 1750,
+        },
+      });
+      return;
+    }
+
+    if (navigator.permissions) {
+      const status = await navigator.permissions.query({
+        name: "microphone" as PermissionName,
+      });
+      if (status.state === "denied") {
+        this.sendGeneralSignal({
+          type: "tableInfoSignal",
+          data: {
+            message: "Error accessing microphone",
+            timeout: 1750,
+          },
+        });
+        return;
+      }
+    }
+
     try {
       const mic = new UserMedia();
       return mic;
@@ -74,7 +121,14 @@ class BrowserMedia {
         this.isAudio.current = false;
         this.setAudioActive(false);
       }
-      console.error("Error accessing media devices:", error);
+
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing microphone check permissions",
+          timeout: 1750,
+        },
+      });
       return;
     }
   };

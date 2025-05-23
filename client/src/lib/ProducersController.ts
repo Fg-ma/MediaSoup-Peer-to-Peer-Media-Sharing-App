@@ -458,8 +458,6 @@ class ProducersController {
       if (!audioBrowserMedia) {
         // Reenable buttons
         this.handleDisableEnableBtns(false);
-
-        console.error("Error getting audio data");
         return;
       }
 

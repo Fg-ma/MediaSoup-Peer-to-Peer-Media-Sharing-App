@@ -8,50 +8,35 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function ExpandLineNumbers({
-  expandLineNumbersButtonRef,
-  lineNumbersRef,
+  isLineNums,
+  setIsLineNums,
 }: {
-  expandLineNumbersButtonRef: React.RefObject<HTMLButtonElement>;
-  lineNumbersRef: React.RefObject<HTMLDivElement>;
+  isLineNums: boolean;
+  setIsLineNums: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
-
   const handleClick = (event: React.MouseEvent | PointerEvent) => {
     event.preventDefault();
-    setCollapsed((prev) => !prev);
+    setIsLineNums((prev) => !prev);
   };
 
-  useEffect(() => {
-    if (lineNumbersRef.current) {
-      lineNumbersRef.current.addEventListener("pointerdown", handleClick);
-    }
-
-    return () => {
-      if (lineNumbersRef.current) {
-        lineNumbersRef.current.removeEventListener("pointerdown", handleClick);
-      }
-    };
-  }, [lineNumbersRef.current]);
-
   return (
-    <div className='media-floating-content'>
+    <div className="media-floating-content">
       <AnimatePresence>
-        {collapsed && (
+        {!isLineNums && (
           <motion.div
-            className='absolute top-0 right-full pr-1 w-12 h-10 bg-fg-tone-black-1 z-[5] rounded-l-md'
+            className="absolute right-full top-0 z-[5] h-10 w-12 rounded-l-md bg-fg-tone-black-1 pr-1"
             initial={{ y: 0, x: 50, opacity: 0 }}
             animate={{ y: 0, x: 8, opacity: 1 }}
             exit={{ y: 0, x: 50, opacity: 0 }}
             transition={{ type: "tween", duration: 0.3 }}
           >
             <FgButton
-              externalRef={expandLineNumbersButtonRef}
-              className='flex w-full h-full items-center justify-center'
+              className="flex h-full w-full items-center justify-center"
               style={{ right: "calc(100% - 0.5rem)" }}
               pointerDownFunction={handleClick}
               contentFunction={() => (
                 <FgSVGElement
-                  className='flex items-center justify-center'
+                  className="flex items-center justify-center"
                   src={navigateForward}
                   attributes={[
                     { key: "width", value: "1.5rem" },

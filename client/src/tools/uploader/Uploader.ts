@@ -122,7 +122,7 @@ class Uploader {
 
           finalUploadId = newUploadId;
         }
-        console.log("finalUploadId", finalUploadId);
+
         if (!finalUploadId) return;
 
         if (handle) {

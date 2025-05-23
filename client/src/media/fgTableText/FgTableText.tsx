@@ -56,6 +56,8 @@ export default function FgTableText({
   const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
 
+  const [isLineNums, setIsLineNums] = useState(true);
+
   const [_, setRerender] = useState(false);
 
   const lowerTextController = useRef(
@@ -131,18 +133,16 @@ export default function FgTableText({
         <EditableText
           text={text}
           settings={settings}
-          expandLineNumbersButtonRef={expandLineNumbersButtonRef}
-          lineNumbersRef={lineNumbersRef}
-          textAreaRef={textAreaRef}
+          isLineNums={isLineNums}
+          setIsLineNums={setIsLineNums}
           isEditing={isEditing}
           setIsEditing={setIsEditing}
-          textAreaContainerRef={textAreaContainerRef}
         />
       }
       floatingTagContent={[
         <ExpandLineNumbers
-          expandLineNumbersButtonRef={expandLineNumbersButtonRef}
-          lineNumbersRef={lineNumbersRef}
+          isLineNums={isLineNums}
+          setIsLineNums={setIsLineNums}
         />,
       ]}
       bundleRef={bundleRef}

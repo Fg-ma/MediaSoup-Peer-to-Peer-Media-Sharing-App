@@ -68,7 +68,7 @@ export default function TableInfoPopup() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="max-w-4/5 pointer-events-none absolute left-1/2 z-table-info h-max w-max !-translate-x-1/2 select-none rounded-lg bg-fg-white px-8 py-2 font-K2D text-2xl"
+          className="pointer-events-none absolute left-1/2 z-table-info h-max w-max !max-w-[80%] !-translate-x-1/2 select-none hyphens-auto break-words rounded-lg bg-fg-white px-8 py-2 text-center font-K2D text-2xl"
           variants={TableInfoPopupVar}
           initial={"init"}
           animate={"animate"}
