@@ -61,7 +61,9 @@ class BezierController {
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if ((event.target as HTMLElement).tagName.toLowerCase() === "input") return;
+    const tagName = (event.target as HTMLElement).tagName.toLowerCase();
+
+    if (tagName === "input" || tagName === "textarea") return;
 
     event.stopPropagation();
     event.preventDefault();

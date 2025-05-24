@@ -1,0 +1,15 @@
+.monaco-container {
+  --text-color: #f2f2f2;
+}
+
+.monaco-container.readonly .monaco-editor .cursors-layer .cursor {
+  display: none !important;
+}
+
+.monaco-editor {
+  --vscode-scrollbar-shadow: transparent !important;
+}
+
+.monaco-container .mtk1 {
+  color: var(--text-color) !important;
+}

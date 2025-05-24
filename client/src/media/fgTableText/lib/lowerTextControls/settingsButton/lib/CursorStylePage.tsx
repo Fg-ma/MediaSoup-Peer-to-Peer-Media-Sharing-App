@@ -4,7 +4,8 @@ import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
   Settings,
   ActivePages,
-  fontStylesOptionsMeta,
+  cursorStylesOptionsMeta,
+  CursorStyles,
 } from "../../../typeConstant";
 import LazyFontButton from "./LazyFontButton";
 
@@ -12,7 +13,7 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
-export default function FontStylePage({
+export default function CursorStylePage({
   setActivePages,
   settings,
   setSettings,
@@ -23,21 +24,21 @@ export default function FontStylePage({
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleCloseFontStylePage = () => {
+  const handleCloseCursorStylePage = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.fontStyle.active = !newActivePages.fontStyle.active;
+      newActivePages.cursorStyle.active = !newActivePages.cursorStyle.active;
 
       return newActivePages;
     });
   };
 
-  const handleSelectFontStyle = (fontStyle: string) => {
+  const handleSelectCursorStyle = (cursorStyle: CursorStyles) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
 
-      newSettings.fontStyle.value = fontStyle;
+      newSettings.cursorStyle.value = cursorStyle;
 
       return newSettings;
     });
@@ -59,13 +60,13 @@ export default function FontStylePage({
               ]}
             />
           )}
-          clickFunction={handleCloseFontStylePage}
+          clickFunction={handleCloseCursorStylePage}
         />
         <div
           className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
-          onClick={handleCloseFontStylePage}
+          onClick={handleCloseCursorStylePage}
         >
-          Font styles
+          Cursor
         </div>
       </div>
       <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
@@ -73,22 +74,21 @@ export default function FontStylePage({
         ref={scrollingContainerRef}
         className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
       >
-        {Object.entries(fontStylesOptionsMeta).map(([key, meta]) => (
+        {Object.entries(cursorStylesOptionsMeta).map(([key, title]) => (
           <LazyFontButton
             key={key}
             scrollingContainerRef={scrollingContainerRef}
             item={
               <FgButton
                 className={`${
-                  settings.fontStyle.value === meta.value
+                  settings.fontStyle.value === key
                     ? "bg-fg-white text-fg-tone-black-1"
                     : ""
                 } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
-                style={{
-                  fontFamily: meta.value,
-                }}
-                contentFunction={() => <>{meta.title}</>}
-                clickFunction={() => handleSelectFontStyle(meta.value)}
+                contentFunction={() => <>{title}</>}
+                clickFunction={() =>
+                  handleSelectCursorStyle(key as CursorStyles)
+                }
               />
             }
           />

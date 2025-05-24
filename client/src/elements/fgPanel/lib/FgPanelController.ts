@@ -36,7 +36,7 @@ class FgPanelController {
     private closeCallback: (() => void) | undefined,
     private panelBoundariesRef?: React.RefObject<HTMLDivElement>,
     private panelBoundariesScrollingContainerRef?: React.RefObject<HTMLDivElement>,
-    private panelInsertionPointRef?: React.RefObject<HTMLDivElement>
+    private panelInsertionPointRef?: React.RefObject<HTMLDivElement>,
   ) {}
 
   handlePointerMove = (event: React.PointerEvent | PointerEvent) => {
@@ -107,21 +107,21 @@ class FgPanelController {
         case "se":
           newSize.width = `${Math.min(
             Math.max(this.minWidth, event.clientX - rect.left),
-            maxWidth
+            maxWidth,
           )}px`;
           newSize.height = `${Math.min(
             Math.max(this.minHeight, event.clientY - rect.top),
-            maxHeight
+            maxHeight,
           )}px`;
           break;
         case "sw":
           newSize.width = `${Math.min(
             Math.max(this.minWidth, rect.right - event.clientX),
-            rect.right - minX
+            rect.right - minX,
           )}px`;
           newSize.height = `${Math.min(
             Math.max(this.minHeight, event.clientY - rect.top),
-            maxHeight
+            maxHeight,
           )}px`;
           if (rect.right - event.clientX > this.minWidth) {
             this.setPosition((prev) => ({
@@ -133,11 +133,11 @@ class FgPanelController {
         case "nw":
           newSize.width = `${Math.min(
             Math.max(this.minWidth, rect.right - event.clientX),
-            rect.right - minX
+            rect.right - minX,
           )}px`;
           newSize.height = `${Math.min(
             Math.max(this.minHeight, rect.bottom - event.clientY),
-            rect.bottom - minY
+            rect.bottom - minY,
           )}px`;
           this.setPosition((prev) => {
             const newPosition = { ...prev };
@@ -155,11 +155,11 @@ class FgPanelController {
         case "ne":
           newSize.width = `${Math.min(
             Math.max(this.minWidth, event.clientX - rect.left),
-            maxWidth
+            maxWidth,
           )}px`;
           newSize.height = `${Math.min(
             Math.max(this.minHeight, rect.bottom - event.clientY),
-            rect.bottom - minY
+            rect.bottom - minY,
           )}px`;
           if (rect.bottom - event.clientY > this.minHeight) {
             this.setPosition((prev) => ({
@@ -186,7 +186,7 @@ class FgPanelController {
 
   handleResizePointerDown = (
     event: React.PointerEvent,
-    direction: "se" | "sw" | "ne" | "nw"
+    direction: "se" | "sw" | "ne" | "nw",
   ) => {
     event.preventDefault();
 
@@ -231,7 +231,10 @@ class FgPanelController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (!this.closeCallback || event.target instanceof HTMLInputElement) return;
+    const tagName = (event.target as HTMLElement).tagName.toLowerCase();
+
+    if (!this.closeCallback || tagName === "input" || tagName === "textarea")
+      return;
 
     const key = event.key.toLowerCase();
     if (["x", "delete", "escape"].includes(key)) {

@@ -5,11 +5,15 @@ export interface ActivePages {
   fontStyle: {
     active: boolean;
   };
+  cursorStyle: {
+    active: boolean;
+  };
 }
 
 export interface Settings {
   background: { value: boolean };
   synced: { value: boolean };
+  minimap: { value: boolean };
   colors: {
     value: "";
     backgroundColor: {
@@ -28,11 +32,15 @@ export interface Settings {
   fontStyle: {
     value: string;
   };
+  cursorStyle: {
+    value: CursorStyles;
+  };
 }
 
 export const defaultSettings: Settings = Object.freeze({
   background: Object.freeze({ value: false }),
   synced: Object.freeze({ value: false }),
+  minimap: Object.freeze({ value: false }),
   colors: Object.freeze({
     value: "",
     backgroundColor: {
@@ -51,6 +59,9 @@ export const defaultSettings: Settings = Object.freeze({
   fontStyle: Object.freeze({
     value: "K2D, sans",
   }),
+  cursorStyle: Object.freeze({
+    value: "line",
+  }),
 });
 
 export const defaultActiveSettingsPages: ActivePages = {
@@ -58,6 +69,9 @@ export const defaultActiveSettingsPages: ActivePages = {
     active: false,
   },
   fontStyle: {
+    active: false,
+  },
+  cursorStyle: {
     active: false,
   },
 };
@@ -68,6 +82,25 @@ export const colorsOptionsTitles: { [colorType in ColorTypes]: string } = {
   backgroundColor: "Background color",
   textColor: "Text color",
   indexColor: "Index color",
+};
+
+export type CursorStyles =
+  | "line"
+  | "block"
+  | "underline"
+  | "line-thin"
+  | "block-outline"
+  | "underline-thin";
+
+export const cursorStylesOptionsMeta: {
+  [cursorStyle in CursorStyles]: string;
+} = {
+  line: "Line",
+  block: "Block",
+  underline: "Underline",
+  "line-thin": "Thin line",
+  "block-outline": "Block outline",
+  "underline-thin": "Thin underline",
 };
 
 export type FontStyles =

@@ -60,7 +60,7 @@ export default function FgMediaContainer({
   bundleRef,
   backgroundMedia,
   media,
-  floatingTagContent,
+  floatingContent,
   className,
   popupElements,
   leftLowerControls,
@@ -109,7 +109,7 @@ export default function FgMediaContainer({
   bundleRef: React.RefObject<HTMLDivElement>;
   backgroundMedia: boolean;
   media?: React.ReactNode;
-  floatingTagContent?: React.ReactNode[];
+  floatingContent?: React.ReactNode[];
   className?: string;
   popupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
@@ -387,8 +387,8 @@ export default function FgMediaContainer({
       exit="init"
       transition={MediaContainerTransition}
     >
-      {floatingTagContent &&
-        floatingTagContent.map((item, index) => (
+      {floatingContent &&
+        floatingContent.map((item, index) => (
           <React.Fragment key={index}>{item}</React.Fragment>
         ))}
       <AdjustmentButtons

@@ -25,6 +25,7 @@ export default function SettingsButton({
   setSettings,
   scrollingContainerRef,
   lowerTextController,
+  isReadOnly,
 }: {
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
@@ -35,6 +36,7 @@ export default function SettingsButton({
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   lowerTextController: React.MutableRefObject<LowerTextController>;
+  isReadOnly: boolean;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -141,6 +143,7 @@ export default function SettingsButton({
             indexColor: indexColorPickerPanelRef,
           }}
           lowerTextController={lowerTextController}
+          isReadOnly={isReadOnly}
         />
       )}
     </>

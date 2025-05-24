@@ -7,8 +7,7 @@ class LowerTextController {
     private textContainerRef: React.RefObject<HTMLDivElement>,
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private textAreaRef: React.RefObject<HTMLPreElement>,
-    private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
+    private setIsReadOnly: React.Dispatch<React.SetStateAction<boolean>>,
     private textAreaContainerRef: React.RefObject<HTMLDivElement>,
   ) {}
 
@@ -23,7 +22,7 @@ class LowerTextController {
     }
 
     const tagName = document.activeElement?.tagName.toLowerCase();
-    if (tagName === "input") return;
+    if (tagName === "input" || tagName === "textarea") return;
 
     switch (event.key.toLowerCase()) {
       case "d":
@@ -31,6 +30,12 @@ class LowerTextController {
         break;
       case "b":
         this.handleSetAsBackground();
+        break;
+      case "m":
+        this.handleMinimap();
+        break;
+      case "e":
+        this.handleEdit();
         break;
       default:
         break;
@@ -56,24 +61,22 @@ class LowerTextController {
   handleEdit = () => {
     this.setSettingsActive(false);
 
-    this.setIsEditing(true);
+    this.setIsReadOnly((prev) => !prev);
+  };
 
-    document.addEventListener("pointerdown", this.handlePointerDown);
+  handleMinimap = () => {
+    this.setSettings((prev) => {
+      const newSettings = { ...prev };
 
-    setTimeout(() => {
-      const range = document.createRange();
-      const selection = window.getSelection();
-      if (this.textAreaRef.current)
-        range.selectNodeContents(this.textAreaRef.current);
-      range.collapse(false);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-    }, 0);
+      newSettings.minimap.value = !newSettings.minimap.value;
+
+      return newSettings;
+    });
   };
 
   handlePointerDown = (event: PointerEvent) => {
     if (!this.textAreaContainerRef.current?.contains(event.target as Node)) {
-      this.setIsEditing(false);
+      this.setIsReadOnly(true);
       document.removeEventListener("pointerdown", this.handlePointerDown);
     }
   };

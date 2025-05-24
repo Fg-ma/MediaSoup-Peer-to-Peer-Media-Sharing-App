@@ -84,7 +84,9 @@ class FgGameController {
   }
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (this.hideControls || event.target instanceof HTMLInputElement) return;
+    const tagName = (event.target as HTMLElement).tagName.toLowerCase();
+    if (this.hideControls || tagName === "input" || tagName === "textarea")
+      return;
 
     switch (event.key.toLowerCase()) {
       case "p":

@@ -8,12 +8,14 @@ import ColorsPage from "./ColorsPage";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FontStylePage from "./FontStylePage";
 import LowerTextController from "../../LowerTextController";
+import CursorStylePage from "./CursorStylePage";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
 const minusIcon = nginxAssetServerBaseUrl + "svgs/minusIcon.svg";
 const editIcon = nginxAssetServerBaseUrl + "svgs/editIcon.svg";
+const mapIcon = nginxAssetServerBaseUrl + "svgs/mapIcon.svg";
 const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
 const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
 const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
@@ -64,6 +66,7 @@ export default function SettingsPanel({
   setSettings,
   externalColorPickerPanelRefs,
   lowerTextController,
+  isReadOnly,
 }: {
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -77,6 +80,7 @@ export default function SettingsPanel({
     indexColor: React.RefObject<HTMLDivElement>;
   };
   lowerTextController: React.MutableRefObject<LowerTextController>;
+  isReadOnly: boolean;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -166,6 +170,16 @@ export default function SettingsPanel({
       const newActivePages = { ...prev };
 
       newActivePages.fontStyle.active = !newActivePages.fontStyle.active;
+
+      return newActivePages;
+    });
+  };
+
+  const handleCursorStyleActive = () => {
+    setActivePages((prev) => {
+      const newActivePages = { ...prev };
+
+      newActivePages.cursorStyle.active = !newActivePages.cursorStyle.active;
 
       return newActivePages;
     });
@@ -294,12 +308,43 @@ export default function SettingsPanel({
                       { key: "height", value: "80%" },
                     ]}
                   />
-                  Edit
+                  {isReadOnly ? "Edit" : "Stop editing"}
                 </div>
               )}
               clickFunction={lowerTextController.current.handleEdit}
               hoverContent={
-                <FgHoverContentStandard content="Edit (q)" style="light" />
+                <FgHoverContentStandard
+                  content={isReadOnly ? "Edit (e)" : "Stop editing (e)"}
+                  style="light"
+                />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+              }}
+            />
+            <FgButton
+              className="h-7 w-full"
+              contentFunction={() => (
+                <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+                  <FgSVGElement
+                    src={mapIcon}
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    attributes={[
+                      { key: "width", value: "80%" },
+                      { key: "height", value: "80%" },
+                    ]}
+                  />
+                  {settings.minimap.value ? "Open minimap" : "Close minimap"}
+                </div>
+              )}
+              clickFunction={lowerTextController.current.handleMinimap}
+              hoverContent={
+                <FgHoverContentStandard
+                  content={isReadOnly ? "Open minimap (m)" : "Open minimap (m)"}
+                  style="light"
+                />
               }
               options={{
                 hoverSpacing: 4,
@@ -395,6 +440,15 @@ export default function SettingsPanel({
               )}
               clickFunction={handleFontStyleActive}
             />
+            <FgButton
+              className="h-7 w-full"
+              contentFunction={() => (
+                <div className="flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1">
+                  Cursor
+                </div>
+              )}
+              clickFunction={handleCursorStyleActive}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -428,6 +482,24 @@ export default function SettingsPanel({
               exit="exit"
             >
               <FontStylePage
+                setActivePages={setActivePages}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activePages.cursorStyle.active &&
+          !isDescendantActive(activePages.cursorStyle) && (
+            <motion.div
+              className="w-full"
+              variants={panelVariants}
+              initial="init"
+              animate="animate"
+              exit="exit"
+            >
+              <CursorStylePage
                 setActivePages={setActivePages}
                 settings={settings}
                 setSettings={setSettings}

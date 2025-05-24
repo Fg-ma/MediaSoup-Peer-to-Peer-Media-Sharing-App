@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import { Transition, Variants, motion } from "framer-motion";
 import FgPortalController from "./lib/FgPortalController";
@@ -70,7 +70,7 @@ export default function FgPortal({
     ),
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (insertionPoint) {
       setPortalPosition({ left: 0, top: 0 });
     } else {

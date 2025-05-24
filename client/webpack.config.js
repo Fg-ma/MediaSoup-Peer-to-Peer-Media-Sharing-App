@@ -6,6 +6,7 @@ import webpack from "webpack";
 import fs from "fs";
 import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 
 // Get the current directory using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
@@ -141,6 +142,10 @@ export default {
     new NodePolyfillPlugin(),
     new MiniCssExtractPlugin({
       filename: "all.css",
+    }),
+    new MonacoWebpackPlugin({
+      languages: [],
+      features: [],
     }),
   ],
 };

@@ -3,7 +3,6 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import LowerTextController from "./lib/lowerTextControls/LowerTextController";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import DownloadButton from "./lib/lowerTextControls/downloadButton/DownloadButton";
-import "./lib/fgTextStyles.css";
 import TextController from "./lib/TextController";
 import SettingsButton from "./lib/lowerTextControls/settingsButton/SettingsButton";
 import {
@@ -12,8 +11,10 @@ import {
   defaultSettings,
   Settings,
 } from "./lib/typeConstant";
-import EditableText from "./lib/EditableText";
 import ExpandLineNumbers from "./lib/ExpandLineNumbers";
+import MonacoTextArea from "./lib/monaco/MonacoTextArea";
+import CornersDecorator from "../../elements/decorators/CornersDecorator";
+import "./lib/fgTextStyles.css";
 
 export default function FgTableText({
   textInstanceId,
@@ -49,14 +50,9 @@ export default function FgTableText({
     defaultActiveSettingsPages,
   );
 
-  const [isEditing, setIsEditing] = useState(false);
-  const textAreaContainerRef = useRef<HTMLDivElement>(null);
-  const textAreaRef = useRef<HTMLPreElement>(null);
-
-  const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
-  const lineNumbersRef = useRef<HTMLDivElement>(null);
-
+  const [isReadOnly, setIsReadOnly] = useState(true);
   const [isLineNums, setIsLineNums] = useState(true);
+  const textAreaContainerRef = useRef<HTMLDivElement>(null);
 
   const [_, setRerender] = useState(false);
 
@@ -66,8 +62,7 @@ export default function FgTableText({
       textContainerRef,
       setSettings,
       setSettingsActive,
-      textAreaRef,
-      setIsEditing,
+      setIsReadOnly,
       textAreaContainerRef,
     ),
   );
@@ -107,6 +102,22 @@ export default function FgTableText({
     };
   }, []);
 
+  useEffect(() => {
+    if (isReadOnly) return;
+
+    document.addEventListener(
+      "pointerdown",
+      lowerTextController.current.handlePointerDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        lowerTextController.current.handlePointerDown,
+      );
+    };
+  }, [isReadOnly]);
+
   return (
     <FgMediaContainer
       filename={textMediaInstance.textMedia.filename}
@@ -130,20 +141,25 @@ export default function FgTableText({
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={
-        <EditableText
-          text={text}
+        <MonacoTextArea
+          initialText={text.current}
           settings={settings}
           isLineNums={isLineNums}
           setIsLineNums={setIsLineNums}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
+          isReadOnly={isReadOnly}
+          setIsReadOnly={setIsReadOnly}
+          textMediaInstance={textMediaInstance}
+          externalTextAreaContainerRef={textAreaContainerRef}
         />
       }
-      floatingTagContent={[
+      floatingContent={[
         <ExpandLineNumbers
           isLineNums={isLineNums}
           setIsLineNums={setIsLineNums}
         />,
+        !isReadOnly ? (
+          <CornersDecorator className="z-[100] stroke-fg-red-light" width={4} />
+        ) : null,
       ]}
       bundleRef={bundleRef}
       backgroundMedia={settings.background.value}
@@ -159,6 +175,7 @@ export default function FgTableText({
           setSettings={setSettings}
           scrollingContainerRef={rightLowerTextControlsRef}
           lowerTextController={lowerTextController}
+          isReadOnly={isReadOnly}
         />,
         <DownloadButton
           settingsActive={settingsActive}

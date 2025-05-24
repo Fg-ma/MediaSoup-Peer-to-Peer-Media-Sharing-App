@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
 import GeneralMediaSelection from "../GeneralMediaSelection";
-import EditableText from "../../../../../../../media/fgTableText/lib/EditableText";
 import {
   defaultSettings,
   Settings,
@@ -12,6 +11,7 @@ import LoadingElement from "../../../../../../../elements/loadingElement/Loading
 import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
 import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
+import MonacoTextArea from "../../../../../../../media/fgTableText/lib/monaco/MonacoTextArea";
 
 export default function TextSelection({
   instanceId,
@@ -35,13 +35,7 @@ export default function TextSelection({
   const [settings, setSettings] = useState<Settings>(
     structuredClone(defaultSettings),
   );
-  const [isEditing, setIsEditing] = useState(false);
   const [_, setRerender] = useState(false);
-  const textAreaContainerRef = useRef<HTMLDivElement>(null);
-  const textAreaRef = useRef<HTMLPreElement>(null);
-
-  const expandLineNumbersButtonRef = useRef<HTMLButtonElement>(null);
-  const lineNumbersRef = useRef<HTMLDivElement>(null);
 
   const textSelectionController = new TextSelectionController(
     instanceId,
@@ -74,16 +68,11 @@ export default function TextSelection({
         selectionContentStyle={{ width: "calc(100% - 1rem)" }}
         selectionContent={
           loadingState === "downloaded" ? (
-            <EditableText
-              className="!h-48 !w-full overflow-hidden rounded"
-              text={text}
+            <MonacoTextArea
+              initialText={text.current}
               settings={settings}
-              expandLineNumbersButtonRef={expandLineNumbersButtonRef}
-              lineNumbersRef={lineNumbersRef}
-              textAreaRef={textAreaRef}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              textAreaContainerRef={textAreaContainerRef}
+              isLineNums={false}
+              textMediaInstance={textInstanceMedia}
             />
           ) : loadingState === "downloading" ? (
             <LoadingElement

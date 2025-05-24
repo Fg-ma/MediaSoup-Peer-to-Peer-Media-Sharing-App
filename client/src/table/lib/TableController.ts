@@ -50,6 +50,9 @@ class TableController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
+    const tagName = document.activeElement?.tagName.toLowerCase();
+    if (tagName === "input" || tagName === "textarea") return;
+
     switch (event.key.toLowerCase()) {
       case "s":
         if (event.ctrlKey) {

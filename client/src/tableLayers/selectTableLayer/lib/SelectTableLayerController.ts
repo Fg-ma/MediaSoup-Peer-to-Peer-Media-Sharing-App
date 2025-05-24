@@ -370,6 +370,9 @@ class SelectTableLayerController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
+    const tagName = document.activeElement?.tagName.toLowerCase();
+    if (tagName === "input" || tagName === "textarea") return;
+
     const key = event.key.toLowerCase();
 
     switch (key) {
