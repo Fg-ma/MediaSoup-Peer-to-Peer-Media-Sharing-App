@@ -11,6 +11,10 @@ class Gets {
   lrange = async (prefix: string, start: number = 0, end: number = -1) => {
     return await this.redis.lrange(prefix, start, end);
   };
+
+  lindex = async (prefix: string, idx: number) => {
+    return await this.redis.lindex(prefix, idx);
+  };
 }
 
 export default Gets;

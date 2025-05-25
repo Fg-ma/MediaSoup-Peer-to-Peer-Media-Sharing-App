@@ -44,6 +44,7 @@ const MediaContainerTransition: Transition = {
 };
 
 export default function FgMediaContainer({
+  showLoadingScreen = true,
   filename,
   pauseDownload,
   resumeDownload,
@@ -75,6 +76,7 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
+  showLoadingScreen?: boolean;
   filename?: string;
   pauseDownload?: () => void;
   resumeDownload?: () => void;
@@ -456,7 +458,7 @@ export default function FgMediaContainer({
         data-selectable-id={mediaInstanceId}
       >
         <AnimatePresence>
-          {downloadingState === "downloading" && (
+          {showLoadingScreen && downloadingState === "downloading" && (
             <motion.div
               key="loading-element"
               initial={{ opacity: 0 }}

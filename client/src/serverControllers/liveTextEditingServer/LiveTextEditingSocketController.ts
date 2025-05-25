@@ -60,6 +60,7 @@ class LiveTextEditingSocketController {
               type: header.type,
               header: {
                 contentId: header.header.contentId,
+                instanceId: header.header.instanceId,
               },
               data: {
                 payload: fileBuffer,
@@ -67,6 +68,29 @@ class LiveTextEditingSocketController {
             };
             break;
           case "initialDocResponded":
+            message = {
+              type: header.type,
+              header: {
+                contentId: header.header.contentId,
+                instanceId: header.header.instanceId,
+              },
+              data: {
+                payload: fileBuffer,
+              },
+            };
+            break;
+          case "chunk":
+            message = {
+              type: header.type,
+              header: {
+                contentId: header.header.contentId,
+              },
+              data: {
+                payload: fileBuffer,
+              },
+            };
+            break;
+          case "oneShotDownload":
             message = {
               type: header.type,
               header: {
@@ -177,9 +201,36 @@ class LiveTextEditingSocketController {
     });
   };
 
-  getInitialDocState = (contentId: string) => {
+  getInitialDocState = (contentId: string, instanceId: string) => {
     this.sendMessage({
       type: "getInitialDocState",
+      header: {
+        tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
+        contentId,
+        instanceId,
+      },
+    });
+  };
+
+  docUpdate = (contentId: string, instanceId: string, data: Uint8Array) => {
+    this.sendBinaryMessage(
+      "docUpdate",
+      {
+        tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
+        contentId,
+        instanceId,
+      },
+      data,
+    );
+  };
+
+  getFile = (contentId: string) => {
+    this.sendMessage({
+      type: "getDownloadMeta",
       header: {
         tableId: this.tableId,
         username: this.username,
@@ -189,15 +240,17 @@ class LiveTextEditingSocketController {
     });
   };
 
-  docUpdate = (contentId: string, data: Uint8Array) => {
-    this.sendBinaryMessage(
-      "docUpdate",
-      {
+  getChunk = (contentId: string, idx: number) => {
+    this.sendMessage({
+      type: "getFileChunk",
+      header: {
         tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
         contentId,
       },
-      data,
-    );
+      data: { idx },
+    });
   };
 }
 

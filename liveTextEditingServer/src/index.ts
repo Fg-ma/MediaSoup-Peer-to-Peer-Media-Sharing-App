@@ -11,11 +11,13 @@ import handleMessage from "./lib/websocketMessages";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
+import Gets from "./gets/Gets";
 
 export const tableTopRedis = new TableTopRedis();
 export const tableTopMongo = new TableTopMongo();
 export const tableTopCeph = new TableTopCeph();
 export const broadcaster = new Broadcaster();
+export const gets = new Gets(broadcaster);
 export const liveTextEditingController = new LiveTextEditingController(
   broadcaster
 );
@@ -61,6 +63,7 @@ uWS
                 header: {
                   tableId: header.header.tableId as string,
                   contentId: header.header.contentId as string,
+                  instanceId: header.header.instanceId as string,
                 },
                 data: {
                   payload: fileBuffer,

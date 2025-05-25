@@ -1,15 +1,16 @@
-import TableStaticContentSocketController from "src/serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import * as Y from "yjs";
 import {
   TableContentStateTypes,
   LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import Downloader from "../../tools/downloader/Downloader";
+import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
+import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "../../tools/downloader/lib/typeConstant";
+} from "src/tools/liveTextDownloader/lib/typeConstant";
 
 export type TextMediaEvents = onTextFinishedLoadingType;
 
@@ -26,66 +27,65 @@ export type TextListenerTypes =
   | { type: "stateChanged" };
 
 class TableTextMedia {
-  text: string | undefined;
+  textData: Uint8Array<ArrayBuffer>[] = [];
 
   private fileSize = 0;
   loadingState: LoadingStateTypes = "downloading";
 
   private textListeners: Set<(message: TextListenerTypes) => void> = new Set();
 
-  downloader: undefined | Downloader;
+  liveTextDownloader: LiveTextDownloader | undefined;
 
   constructor(
     public textId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
     public state: TableContentStateTypes[],
-    private tableStaticContentSocket: React.MutableRefObject<
-      TableStaticContentSocketController | undefined
+    private liveTextEditingSocket: React.MutableRefObject<
+      LiveTextEditingSocketController | undefined
     >,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
-    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private addCurrentDownload: (
+      id: string,
+      download: LiveTextDownloader,
+    ) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
-    this.downloader = new Downloader(
-      "text",
+    this.liveTextDownloader = new LiveTextDownloader(
       this.textId,
       this.filename,
       this.mimeType,
-      this.tableStaticContentSocket,
+      this.liveTextEditingSocket,
       this.sendDownloadSignal,
       this.removeCurrentDownload,
     );
-    this.addCurrentDownload(this.textId, this.downloader);
-    this.downloader.addDownloadListener(this.handleDownloadMessage);
-    this.downloader.start();
+    this.addCurrentDownload(this.textId, this.liveTextDownloader);
+    this.liveTextDownloader.addDownloadListener(this.handleDownloadMessage);
+    this.liveTextDownloader.start();
   }
 
   deconstructor = () => {
     this.textListeners.clear();
 
-    if (this.downloader) {
+    if (this.liveTextDownloader) {
       this.removeCurrentDownload(this.textId);
-      this.downloader = undefined;
+      this.liveTextDownloader = undefined;
     }
   };
 
   private onDownloadFinish = async (message: onDownloadFinishType) => {
-    const { blob, fileSize } = message.data;
+    const { payload, fileSize } = message.data;
 
     this.fileSize = fileSize;
+    this.textData = payload;
 
-    blob.arrayBuffer().then((arrayBuffer) => {
-      this.text = new TextDecoder("utf-8").decode(arrayBuffer);
+    this.loadingState = "downloaded";
 
-      this.loadingState = "downloaded";
-
-      this.textListeners.forEach((listener) => {
-        listener({ type: "downloadComplete" });
-      });
+    this.textListeners.forEach((listener) => {
+      listener({ type: "downloadComplete" });
     });
 
-    this.downloader = undefined;
+    this.liveTextDownloader = undefined;
   };
 
   private handleDownloadMessage = (message: DownloadListenerTypes) => {
@@ -95,7 +95,7 @@ class TableTextMedia {
         break;
       case "downloadFailed":
         this.loadingState = "failed";
-        this.downloader = undefined;
+        this.liveTextDownloader = undefined;
 
         this.textListeners.forEach((listener) => {
           listener({ type: "downloadFailed" });
@@ -119,13 +119,19 @@ class TableTextMedia {
   };
 
   downloadText = () => {
-    if (!this.text) {
-      console.error("No text available for download.");
-      return;
+    if (this.textData.length === 0) return;
+
+    const ydoc = new Y.Doc();
+    for (const data of this.textData) {
+      Y.applyUpdate(ydoc, data);
     }
 
+    const ytext = ydoc.getText("monaco");
+
+    const text = ytext.toString();
+
     // Create a Blob with the text content
-    const blob = new Blob([this.text], { type: "text/plain" });
+    const blob = new Blob([text], { type: "text/plain" });
     const blobURL = URL.createObjectURL(blob);
 
     // Create and trigger a download link
@@ -172,22 +178,21 @@ class TableTextMedia {
   };
 
   retryDownload = () => {
-    if (this.downloader || this.loadingState === "downloaded") return;
+    if (this.liveTextDownloader || this.loadingState === "downloaded") return;
 
     this.loadingState = "downloading";
 
-    this.downloader = new Downloader(
-      "text",
+    this.liveTextDownloader = new LiveTextDownloader(
       this.textId,
       this.filename,
       this.mimeType,
-      this.tableStaticContentSocket,
+      this.liveTextEditingSocket,
       this.sendDownloadSignal,
       this.removeCurrentDownload,
     );
-    this.addCurrentDownload(this.textId, this.downloader);
-    this.downloader.addDownloadListener(this.handleDownloadMessage);
-    this.downloader.start();
+    this.addCurrentDownload(this.textId, this.liveTextDownloader);
+    this.liveTextDownloader.addDownloadListener(this.handleDownloadMessage);
+    this.liveTextDownloader.start();
 
     this.textListeners.forEach((listener) => {
       listener({ type: "downloadRetry" });

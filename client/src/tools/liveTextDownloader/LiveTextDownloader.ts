@@ -1,25 +1,24 @@
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import { DownloadListenerTypes } from "./lib/typeConstant";
+import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import {
-  IncomingTableStaticContentMessages,
+  IncomingLiveTextEditingMessages,
   onChunkErrorType,
   onChunkType,
   onDownloadErrorType,
+  onDownloadFinishedType,
   onDownloadMetaType,
   onOneShotDownloadType,
-  TableTopStaticMimeType,
-} from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
-import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { DownloadListenerTypes } from "./lib/typeConstant";
-import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
-import { IncomingUserStaticContentMessages } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
+} from "../../serverControllers/liveTextEditingServer/lib/typeConstant";
+import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 
-class Downloader {
+class LiveTextDownloader {
   private _paused: boolean = false;
 
+  private idx = -1;
   private fileSize = 0;
   private offset = 0;
-  private totalBuffer: Uint8Array | undefined;
+  private data: Uint8Array<ArrayBuffer>[] = [];
 
   private _progress: number = 0;
 
@@ -34,24 +33,25 @@ class Downloader {
 
   private downloadWorker: Worker | undefined;
 
+  private state: "downloading" | "waiting" = "waiting";
+
   constructor(
-    private contentType: StaticContentTypes,
     private contentId: string,
     public filename: string,
     public mimeType: TableTopStaticMimeType,
-    private staticContentSocket: React.MutableRefObject<
-      | TableStaticContentSocketController
-      | UserStaticContentSocketController
-      | undefined
+    private liveTextEditingSocket: React.MutableRefObject<
+      LiveTextEditingSocketController | undefined
     >,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
-    this.staticContentSocket.current?.addMessageListener(this.downloadListener);
+    this.liveTextEditingSocket.current?.addMessageListener(
+      this.downloadListener,
+    );
   }
 
   deconstructor = () => {
-    this.staticContentSocket.current?.removeMessageListener(
+    this.liveTextEditingSocket.current?.removeMessageListener(
       this.downloadListener,
     );
     this.listeners.clear();
@@ -63,43 +63,41 @@ class Downloader {
   };
 
   private onDownloadMeta = (message: onDownloadMetaType) => {
-    const { contentType, contentId } = message.header;
+    const { contentId } = message.header;
 
-    if (contentType !== this.contentType || contentId !== this.contentId) {
+    if (contentId !== this.contentId) {
       return;
     }
 
     this.fileSize = message.data.fileSize;
-    this.totalBuffer = new Uint8Array(this.fileSize);
 
-    this.requestNextChunk();
+    if (this.state !== "downloading") {
+      this.state = "downloading";
+      this.requestNextChunk();
+    }
   };
 
   private requestNextChunk = () => {
-    if (this.offset < this.fileSize)
-      this.staticContentSocket.current?.getChunk(
-        this.contentType,
-        this.contentId,
-        `bytes=${this.offset}-${Math.min(this.fileSize, this.offset + 1024 * 1024)}`,
-      );
+    this.idx += 1;
+    this.liveTextEditingSocket.current?.getChunk(this.contentId, this.idx);
   };
 
   private onChunk = (message: onChunkType) => {
-    const { contentType, contentId } = message.header;
+    const { contentId } = message.header;
 
-    if (contentType !== this.contentType || contentId !== this.contentId) {
+    if (contentId !== this.contentId) {
       return;
     }
 
     const now = Date.now();
-    const chunkData = message.data.chunk;
+    const chunkData = message.data.payload;
     const chunkBytes = chunkData.byteLength;
 
     this.offset += chunkBytes;
     this._progress = this.offset / (this.fileSize ?? 1);
 
     // 1) Append chunk as before
-    this.totalBuffer?.set(chunkData, this.offset - chunkBytes);
+    this.data?.push(chunkData);
 
     // 2) Initialize timing on first chunk
     if (this.lastTimestamp === null) {
@@ -133,78 +131,72 @@ class Downloader {
     this.listeners.forEach((listener) => {
       listener({
         type: "downloadProgress",
+        data: chunkData,
       });
     });
 
     if (!this._paused) {
-      if (this.offset < this.fileSize) {
-        this.requestNextChunk();
-      } else {
-        this.downloadWorker = new Worker(
-          new URL("../../webWorkers/downloadWorker.worker.ts", import.meta.url),
-        );
-
-        this.downloadWorker.onmessage = (e) => {
-          const blob = e.data.blob;
-
-          this.listeners.forEach((listener) => {
-            listener({
-              type: "downloadFinish",
-              data: { blob, fileSize: this.fileSize },
-            });
-          });
-
-          if (this.downloadWorker) {
-            this.downloadWorker.terminate();
-            this.downloadWorker = undefined;
-          }
-
-          this.removeCurrentDownload(this.contentId);
-          this.sendDownloadSignal({ type: "downloadFinish" });
-          this.deconstructor();
-        };
-
-        const bufferToSend = this.totalBuffer?.buffer;
-        this.downloadWorker.postMessage(
-          { buffer: bufferToSend, mimeType: this.mimeType },
-          [bufferToSend!],
-        );
+      if (this.idx % 2 === 0) {
+        this.state = "waiting";
+        return;
       }
+      this.requestNextChunk();
     }
+  };
+
+  private onDownloadFinished = (message: onDownloadFinishedType) => {
+    const { contentId } = message.header;
+
+    if (contentId !== this.contentId) {
+      return;
+    }
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "downloadFinish",
+        data: { payload: this.data, fileSize: this.fileSize },
+      });
+    });
+
+    if (this.downloadWorker) {
+      this.downloadWorker.terminate();
+      this.downloadWorker = undefined;
+    }
+
+    this.removeCurrentDownload(this.contentId);
+    this.sendDownloadSignal({ type: "downloadFinish" });
+    this.deconstructor();
   };
 
   private onChunkError = (message: onChunkErrorType) => {
-    const { contentType, contentId } = message.header;
+    const { contentId } = message.header;
 
-    if (contentType !== this.contentType || contentId !== this.contentId) {
+    if (contentId !== this.contentId) {
       return;
     }
 
-    this.requestNextChunk();
+    if (this.state !== "downloading") {
+      this.state = "downloading";
+      this.requestNextChunk();
+    }
   };
 
   private onOneShotDownloadComplete = (message: onOneShotDownloadType) => {
-    const { contentType, contentId } = message.header;
+    const { contentId } = message.header;
 
-    if (contentType !== this.contentType || contentId !== this.contentId) {
-      return;
-    }
+    if (contentId !== this.contentId) return;
 
-    const { buffer } = message.data;
-
-    const blob = new Blob([buffer], {
-      type: this.mimeType,
-    });
+    const { payload } = message.data;
 
     const finishMessage = {
       type: "downloadFinish",
-      data: { blob, fileSize: this.fileSize },
+      data: { payload: [payload], fileSize: this.fileSize },
     };
     this.listeners.forEach((listener) => {
       listener(
         finishMessage as {
           type: "downloadFinish";
-          data: { blob: Blob; fileSize: number };
+          data: { payload: Uint8Array<ArrayBuffer>[]; fileSize: number };
         },
       );
     });
@@ -217,9 +209,9 @@ class Downloader {
   };
 
   private onDownloadError = (message: onDownloadErrorType) => {
-    const { contentType, contentId } = message.header;
+    const { contentId } = message.header;
 
-    if (contentType !== this.contentType || contentId !== this.contentId) {
+    if (contentId !== this.contentId) {
       return;
     }
 
@@ -236,11 +228,7 @@ class Downloader {
     this.deconstructor();
   };
 
-  private downloadListener = (
-    message:
-      | IncomingTableStaticContentMessages
-      | IncomingUserStaticContentMessages,
-  ) => {
+  private downloadListener = (message: IncomingLiveTextEditingMessages) => {
     switch (message.type) {
       case "downloadMeta":
         this.onDownloadMeta(message);
@@ -250,6 +238,9 @@ class Downloader {
         break;
       case "chunkError":
         this.onChunkError(message);
+        break;
+      case "downloadFinished":
+        this.onDownloadFinished(message);
         break;
       case "oneShotDownload":
         this.onOneShotDownloadComplete(message);
@@ -281,7 +272,7 @@ class Downloader {
 
     this.sendDownloadSignal({ type: "downloadStart" });
 
-    this.staticContentSocket.current?.getFile(this.contentType, this.contentId);
+    this.liveTextEditingSocket.current?.getFile(this.contentId);
 
     this.startTime = Date.now();
   };
@@ -309,7 +300,17 @@ class Downloader {
       });
     });
 
-    this.requestNextChunk();
+    if (this.state !== "downloading") {
+      this.state = "downloading";
+      this.requestNextChunk();
+    }
+  };
+
+  fetchNextSection = () => {
+    if (this.state !== "downloading") {
+      this.state = "downloading";
+      this.requestNextChunk();
+    }
   };
 
   addDownloadListener = (
@@ -389,4 +390,4 @@ class Downloader {
   };
 }
 
-export default Downloader;
+export default LiveTextDownloader;

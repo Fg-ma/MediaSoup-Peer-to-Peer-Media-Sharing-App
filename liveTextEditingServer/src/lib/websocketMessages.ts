@@ -1,4 +1,4 @@
-import { liveTextEditingController } from "src";
+import { gets, liveTextEditingController } from "src";
 import { TableWebSocket, MessageTypes } from "../typeConstant";
 
 const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
@@ -17,6 +17,12 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
       break;
     case "docSave":
       liveTextEditingController.onDocSave(event);
+      break;
+    case "getDownloadMeta":
+      gets.onGetDownloadMeta(event);
+      break;
+    case "getFileChunk":
+      gets.onGetFileChunk(event);
       break;
     default:
       break;

@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import Downloader from "../../../../tools/downloader/Downloader";
+import LiveTextDownloader from "../../../../tools/liveTextDownloader/LiveTextDownloader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -55,7 +56,7 @@ function chooseUnit(KB: number) {
 export default function MoreInfoSection({
   download,
 }: {
-  download: Downloader;
+  download: Downloader | LiveTextDownloader;
 }) {
   const { mimeType, fileSize, downloadSpeed, ETA } = download.getFileInfo();
 

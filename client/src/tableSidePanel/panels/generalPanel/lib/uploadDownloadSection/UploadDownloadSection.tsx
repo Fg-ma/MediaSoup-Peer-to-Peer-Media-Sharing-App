@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { useUploadDownloadContext } from "../../../../../context/uploadDownloadContext/UploadDownloadContext";
 import Downloader from "../../../../../tools/downloader/Downloader";
+import LiveTextDownloader from "../../../../../tools/liveTextDownloader/LiveTextDownloader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -110,7 +111,10 @@ export default function MultiDownloadChart() {
     return {
       filename: t.filename,
       data,
-      type: t instanceof Downloader ? "download" : "upload",
+      type:
+        t instanceof Downloader || t instanceof LiveTextDownloader
+          ? "download"
+          : "upload",
     };
   });
 
@@ -163,7 +167,7 @@ export default function MultiDownloadChart() {
 
   useEffect(() => {
     traffic.forEach((t) => {
-      if (t instanceof Downloader) {
+      if (t instanceof Downloader || t instanceof LiveTextDownloader) {
         t.addDownloadListener(handleDownloadListener);
       } else {
         t.addChunkedUploadListener(handleDownloadListener);
@@ -172,7 +176,7 @@ export default function MultiDownloadChart() {
 
     return () => {
       traffic.forEach((t) => {
-        if (t instanceof Downloader) {
+        if (t instanceof Downloader || t instanceof LiveTextDownloader) {
           t.removeDownloadListener(handleDownloadListener);
         } else {
           t.removeChunkedUploadListener(handleDownloadListener);

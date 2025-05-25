@@ -3,7 +3,9 @@ export type OutGoingLiveTextEditingMessages =
   | onLeaveTableType
   | onGetInitialDocStateType
   | onDocUpdateType
-  | onDocSaveType;
+  | onDocSaveType
+  | onGetDownloadMetaType
+  | onGetFileChunkType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -30,12 +32,19 @@ type onGetInitialDocStateType = {
     username: string;
     instance: string;
     contentId: string;
+    instanceId: string;
   };
 };
 
 type onDocUpdateType = {
   type: "docUpdate";
-  header: { tableId: string; contentId: string };
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+    instanceId: string;
+  };
   data: {
     payload: any;
   };
@@ -46,29 +55,109 @@ type onDocSaveType = {
   header: {
     tableId: string;
     contentId: string;
+    instanceId: string;
+  };
+};
+
+type onGetDownloadMetaType = {
+  type: "getDownloadMeta";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+  };
+};
+
+type onGetFileChunkType = {
+  type: "getFileChunk";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+  };
+  data: {
+    idx: number;
   };
 };
 
 export type IncomingLiveTextEditingMessages =
   | onDocUpdatedType
   | onDocSavedType
-  | onInitialDocResponded;
+  | onInitialDocResponded
+  | onChunkType
+  | onDownloadFinishedType
+  | onChunkErrorType
+  | onDownloadMetaType
+  | onOneShotDownloadType
+  | onDownloadErrorType;
 
 export type onDocUpdatedType = {
   type: "docUpdated";
-  header: { contentId: string };
+  header: { contentId: string; instanceId: string };
   data: { payload: Uint8Array<ArrayBuffer> };
 };
 
 export type onDocSavedType = {
   type: "docSaved";
-  header: { contentId: string };
+  header: { contentId: string; instanceId: string };
 };
 
 export type onInitialDocResponded = {
   type: "initialDocResponded";
-  header: { contentId: string };
+  header: { contentId: string; instanceId: string };
   data: {
     payload: Uint8Array<ArrayBuffer>;
   };
+};
+
+export type onChunkType = {
+  type: "chunk";
+  header: {
+    contentId: string;
+    idx: number;
+  };
+  data: {
+    payload: Uint8Array<ArrayBuffer>;
+  };
+};
+
+export type onDownloadFinishedType = {
+  type: "downloadFinished";
+  header: {
+    contentId: string;
+  };
+};
+
+export type onChunkErrorType = {
+  type: "chunkError";
+  header: {
+    contentId: string;
+  };
+};
+
+export type onDownloadMetaType = {
+  type: "downloadMeta";
+  header: {
+    contentId: string;
+  };
+  data: {
+    fileSize: number;
+  };
+};
+
+export type onOneShotDownloadType = {
+  type: "oneShotDownload";
+  header: {
+    contentId: string;
+  };
+  data: {
+    payload: Uint8Array<ArrayBuffer>;
+  };
+};
+
+export type onDownloadErrorType = {
+  type: "downloadError";
+  header: { contentId: string };
 };

@@ -19,7 +19,9 @@ export type MessageTypes =
   | onLeaveTableType
   | onGetInitialDocStateType
   | onDocUpdateType
-  | onDocSaveType;
+  | onDocSaveType
+  | onGetDownloadMetaType
+  | onGetFileChunkType;
 
 export type onJoinTableType = {
   type: "joinTable";
@@ -41,7 +43,13 @@ export type onLeaveTableType = {
 
 export type onDocUpdateType = {
   type: "docUpdate";
-  header: { tableId: string; contentId: string };
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+    instanceId: string;
+  };
   data: {
     payload: Uint8Array<ArrayBuffer>;
   };
@@ -54,6 +62,7 @@ export type onGetInitialDocStateType = {
     username: string;
     instance: string;
     contentId: string;
+    instanceId: string;
   };
 };
 
@@ -62,6 +71,30 @@ export type onDocSaveType = {
   header: {
     tableId: string;
     contentId: string;
+    instanceId: string;
+  };
+};
+
+export type onGetDownloadMetaType = {
+  type: "getDownloadMeta";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+  };
+};
+
+export type onGetFileChunkType = {
+  type: "getFileChunk";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+  };
+  data: {
+    idx: number;
   };
 };
 

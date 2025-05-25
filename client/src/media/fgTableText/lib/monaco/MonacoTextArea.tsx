@@ -4,14 +4,14 @@ import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import type * as monacoEditor from "monaco-editor";
 import { Settings } from "../typeConstant";
-import { TextListenerTypes } from "../../TableTextMedia";
 import TableTextMediaInstance from "../../TableTextMediaInstance";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
+import { IncomingLiveTextEditingMessages } from "../../../../serverControllers/liveTextEditingServer/lib/typeConstant";
+import { DownloadListenerTypes } from "../../../../tools/liveTextDownloader/lib/typeConstant";
 import "./lib/monaco.css";
 
 export default function MonacoTextArea({
   className,
-  initialText,
   settings,
   isLineNums = false,
   setIsLineNums,
@@ -21,7 +21,6 @@ export default function MonacoTextArea({
   externalTextAreaContainerRef,
 }: {
   className?: string;
-  initialText: string;
   settings: Settings;
   isLineNums?: boolean;
   setIsLineNums?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,35 +43,36 @@ export default function MonacoTextArea({
     ? externalTextAreaContainerRef
     : useRef<HTMLDivElement>(null);
 
-  const messageListener = (msg: any) => {
+  const messageListener = (msg: IncomingLiveTextEditingMessages) => {
     switch (msg.type) {
       case "docSaved":
         break;
       case "docUpdated": {
-        const { contentId } = msg.header;
+        const { contentId, instanceId } = msg.header;
         if (
           contentId !== textMediaInstance.textMedia.textId ||
+          instanceId !== textMediaInstance.textInstanceId ||
           !ydocRef.current
         ) {
           return;
         }
         const payload = msg.data.payload;
 
-        // Apply update without triggering local update event
         Y.applyUpdate(ydocRef.current, payload);
         break;
       }
       case "initialDocResponded": {
-        const { contentId } = msg.header;
+        const { contentId, instanceId } = msg.header;
         if (
           contentId !== textMediaInstance.textMedia.textId ||
+          instanceId !== textMediaInstance.textInstanceId ||
           !ydocRef.current
         ) {
           return;
         }
 
         if (msg.data.payload.byteLength !== 0) {
-          Y.applyUpdate(ydocRef.current, msg.data.payload);
+          Y.applyUpdate(ydocRef.current, msg.data.payload, "noup");
         }
 
         // Mark as initialized after applying initial state
@@ -81,6 +81,12 @@ export default function MonacoTextArea({
       }
       default:
         break;
+    }
+  };
+
+  const handleMessage = (message: DownloadListenerTypes) => {
+    if (message.type === "downloadProgress" && ydocRef.current) {
+      Y.applyUpdate(ydocRef.current, message.data, "noup");
     }
   };
 
@@ -137,6 +143,21 @@ export default function MonacoTextArea({
     ydocRef.current = new Y.Doc();
     yTextRef.current = ydocRef.current.getText("monaco");
 
+    if (
+      textMediaInstance.textMedia.liveTextDownloader &&
+      textMediaInstance.textMedia.loadingState !== "downloaded"
+    ) {
+      textMediaInstance.textMedia.liveTextDownloader.addDownloadListener(
+        handleMessage,
+      );
+    }
+
+    if (textMediaInstance.textMedia.textData.length) {
+      for (const data of textMediaInstance.textMedia.textData) {
+        Y.applyUpdate(ydocRef.current, data);
+      }
+    }
+
     // Create Monaco binding
     bindingRef.current = new MonacoBinding(
       yTextRef.current,
@@ -145,11 +166,27 @@ export default function MonacoTextArea({
     );
 
     ydocRef.current.on("update", (update: Uint8Array, origin) => {
-      if (origin === bindingRef.current && isInitializedRef.current) {
+      if (
+        origin === bindingRef.current &&
+        origin !== "noup" &&
+        isInitializedRef.current
+      ) {
         liveTextEditingSocket.current?.docUpdate(
           textMediaInstance.textMedia.textId,
+          textMediaInstance.textInstanceId,
           update,
         );
+      }
+    });
+
+    editor.onDidScrollChange((e) => {
+      const scrollTop = editor.getScrollTop();
+      const scrollHeight = editor.getScrollHeight();
+      const clientHeight = editor.getLayoutInfo().height;
+
+      // When user scrolls near bottom (e.g., 90% of the way down)
+      if (scrollTop + clientHeight >= scrollHeight * 0.9) {
+        textMediaInstance.textMedia.liveTextDownloader?.fetchNextSection();
       }
     });
 
@@ -157,6 +194,7 @@ export default function MonacoTextArea({
 
     liveTextEditingSocket.current?.getInitialDocState(
       textMediaInstance.textMedia.textId,
+      textMediaInstance.textInstanceId,
     );
 
     editor.onMouseDown((e) => {

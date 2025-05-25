@@ -7,6 +7,7 @@ import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import MoreInfoSection from "./MoreInfoSection";
 import Downloader from "../../../../tools/downloader/Downloader";
 import { DownloadListenerTypes } from "../../../../tools/downloader/lib/typeConstant";
+import LiveTextDownloader from "../../../../tools/liveTextDownloader/LiveTextDownloader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -19,7 +20,7 @@ export default function DownloadingSection({
   download,
   tablePanelRef,
 }: {
-  download: Downloader;
+  download: Downloader | LiveTextDownloader;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);
@@ -27,7 +28,13 @@ export default function DownloadingSection({
   const rightLoadingInfoRef = useRef<HTMLDivElement>(null);
   const filenameRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadListener = (message: DownloadListenerTypes) => {
+  const handleDownloadListener = (
+    message:
+      | { type: "downloadProgress" }
+      | { type: "downloadPaused" }
+      | { type: "downloadResume" }
+      | { type: string },
+  ) => {
     switch (message.type) {
       case "downloadProgress":
         setRerender((prev) => !prev);

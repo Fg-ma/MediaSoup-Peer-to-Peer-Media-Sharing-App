@@ -53,6 +53,8 @@ import TableTextMediaInstance from "../../media/fgTableText/TableTextMediaInstan
 import TableTextMedia from "../../media/fgTableText/TableTextMedia";
 import TableApplicationMediaInstance from "../../media/fgTableApplication/TableApplicationMediaInstance";
 import TableApplicationMedia from "../../media/fgTableApplication/TableApplicationMedia";
+import LiveTextEditingSocketController from "../liveTextEditingServer/LiveTextEditingSocketController";
+import LiveTextDownloader from "src/tools/liveTextDownloader/LiveTextDownloader";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -73,8 +75,14 @@ class TableStaticContentSocketController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
+    private liveTextEditingSocket: React.MutableRefObject<
+      LiveTextEditingSocketController | undefined
+    >,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
-    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private addCurrentDownload: (
+      id: string,
+      upload: Downloader | LiveTextDownloader,
+    ) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
     this.connect(this.url);
@@ -775,13 +783,13 @@ class TableStaticContentSocketController {
     const { contentId, instanceId } = message.header;
     const { filename, mimeType, state, initPositioning } = message.data;
 
-    if (this.tableStaticContentSocket.current) {
+    if (this.liveTextEditingSocket.current) {
       const newTextMedia = new TableTextMedia(
         contentId,
         filename,
         mimeType,
         state,
-        this.tableStaticContentSocket,
+        this.liveTextEditingSocket,
         this.sendDownloadSignal,
         this.addCurrentDownload,
         this.removeCurrentDownload,
@@ -814,13 +822,13 @@ class TableStaticContentSocketController {
     const { contentId } = message.header;
     const { filename, mimeType, state } = message.data;
 
-    if (this.tableStaticContentSocket.current) {
+    if (this.liveTextEditingSocket.current) {
       this.userMedia.current.text.table[contentId] = new TableTextMedia(
         contentId,
         filename,
         mimeType,
         state,
-        this.tableStaticContentSocket,
+        this.liveTextEditingSocket,
         this.sendDownloadSignal,
         this.addCurrentDownload,
         this.removeCurrentDownload,
@@ -968,7 +976,7 @@ class TableStaticContentSocketController {
           textItem.filename,
           textItem.mimeType as TableTopStaticMimeType,
           textItem.state,
-          this.tableStaticContentSocket,
+          this.liveTextEditingSocket,
           this.sendDownloadSignal,
           this.addCurrentDownload,
           this.removeCurrentDownload,

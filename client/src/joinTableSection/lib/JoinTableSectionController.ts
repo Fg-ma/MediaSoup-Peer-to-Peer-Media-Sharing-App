@@ -25,6 +25,7 @@ import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../tools/userDevice/UserDevice";
 import Downloader from "../../tools/downloader/Downloader";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 
 class JoinTableSectionController {
   constructor(
@@ -83,7 +84,10 @@ class JoinTableSectionController {
     private cleanupController: React.MutableRefObject<CleanupController>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
-    private addCurrentDownload: (id: string, upload: Downloader) => void,
+    private addCurrentDownload: (
+      id: string,
+      upload: Downloader | LiveTextDownloader,
+    ) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {}
 
@@ -139,6 +143,7 @@ class JoinTableSectionController {
           this.userEffects,
           this.userEffectsStyles,
           this.tableStaticContentSocket,
+          this.liveTextEditingSocket,
           this.sendDownloadSignal,
           this.addCurrentDownload,
           this.removeCurrentDownload,

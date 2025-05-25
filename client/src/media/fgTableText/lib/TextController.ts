@@ -1,11 +1,8 @@
 import { TextListenerTypes } from "../TableTextMedia";
-import TableTextMediaInstance from "../TableTextMediaInstance";
 
 class TextController {
   constructor(
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private textMediaInstance: TableTextMediaInstance,
-    private text: React.MutableRefObject<string | undefined>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
@@ -14,10 +11,7 @@ class TextController {
   };
 
   private onDownloadComplete = () => {
-    if (this.textMediaInstance.instanceText) {
-      this.text.current = this.textMediaInstance.instanceText;
-      this.setRerender((prev) => !prev);
-    }
+    this.setRerender((prev) => !prev);
   };
 
   handleTextMessages = (event: TextListenerTypes) => {

@@ -10,8 +10,7 @@ import {
   TableWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { tableTopCeph, tableTopRedis } from "src";
-import { Readable } from "stream";
+import { tableTopRedis } from "src";
 
 class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
@@ -47,67 +46,38 @@ class LiveTextEditingController {
   };
 
   onGetInitialDocState = async (event: onGetInitialDocStateType) => {
-    const { tableId, username, instance, contentId } = event.header;
+    const { tableId, username, instance, contentId, instanceId } = event.header;
 
     const ops = await tableTopRedis.gets.lrange(
-      `LTE:${tableId}:${contentId}:ops`
+      `LTE:${tableId}:${contentId}:${instanceId}`
     );
 
     if (ops.length === 0) {
-      const data = await tableTopCeph.gets.getContent("table-text", contentId);
+      const headerObj = {
+        type: "initialDocResponded",
+        header: { contentId, instanceId },
+      };
+      const headerStr = JSON.stringify(headerObj);
+      const encoder = new TextEncoder();
+      const headerBytes = encoder.encode(headerStr);
+      const headerLen = headerBytes.length;
 
-      if (data?.Body instanceof Readable) {
-        const stream = data.Body as Readable;
+      // 2) Allocate a buffer: 1 for prefix + 4 bytes for length + header + data
+      const message = new Uint8Array(4 + headerLen);
 
-        const chunks: Buffer[] = [];
+      // 3) Write header length LE
+      new DataView(message.buffer).setUint32(0, headerLen, true);
 
-        stream
-          .on("data", (chunk) => {
-            chunks.push(chunk);
-          })
-          .on("end", async () => {
-            const fullChunk = Buffer.concat(chunks);
-            const initialText = fullChunk.toString("utf8");
+      // 4) Copy in the header bytes, then the data bytes
+      message.set(headerBytes, 4);
 
-            const ydoc = new Y.Doc();
-            ydoc.getText("monaco").insert(0, initialText);
-            const payload = Y.encodeStateAsUpdate(ydoc);
-
-            await tableTopRedis.posts.rpush(
-              `LTE:${tableId}:${contentId}:ops`,
-              JSON.stringify(Array.from(payload))
-            );
-
-            const headerObj = {
-              type: "initialDocResponded",
-              header: { contentId },
-            };
-            const headerBytes = new TextEncoder().encode(
-              JSON.stringify(headerObj)
-            );
-            const headerLen = headerBytes.length;
-
-            // 2) Allocate a buffer: 1 for prefix + 4 bytes for length + header + data
-            const message = new Uint8Array(4 + headerLen + payload.length);
-
-            // 3) Write header length LE
-            new DataView(message.buffer).setUint32(0, headerLen, true);
-
-            // 4) Copy in the header bytes, then the data bytes
-            message.set(headerBytes, 4);
-            message.set(payload, 4 + headerLen);
-
-            this.broadcaster.broadcastToInstance(
-              tableId,
-              username,
-              instance,
-              message,
-              true
-            );
-            return;
-          })
-          .on("error", (_err) => {});
-      }
+      this.broadcaster.broadcastToInstance(
+        tableId,
+        username,
+        instance,
+        message,
+        true
+      );
       return;
     }
 
@@ -125,7 +95,10 @@ class LiveTextEditingController {
     const payload = Y.encodeStateAsUpdate(ydoc);
 
     // 1) Build the JSON header
-    const headerObj = { type: "initialDocResponded", header: { contentId } };
+    const headerObj = {
+      type: "initialDocResponded",
+      header: { contentId, instanceId },
+    };
     const headerStr = JSON.stringify(headerObj);
     const encoder = new TextEncoder();
     const headerBytes = encoder.encode(headerStr);
@@ -151,11 +124,11 @@ class LiveTextEditingController {
   };
 
   onDocUpdate = async (event: onDocUpdateType) => {
-    const { tableId, contentId } = event.header;
+    const { tableId, username, instance, contentId, instanceId } = event.header;
     const { payload } = event.data;
 
     // 1) Build the JSON header
-    const headerObj = { type: "docUpdated", header: { contentId } };
+    const headerObj = { type: "docUpdated", header: { contentId, instanceId } };
     const headerStr = JSON.stringify(headerObj);
     const encoder = new TextEncoder();
     const headerBytes = encoder.encode(headerStr);
@@ -172,18 +145,23 @@ class LiveTextEditingController {
     message.set(payload, 4 + headerLen);
 
     await tableTopRedis.posts.rpush(
-      `LTE:${tableId}:${contentId}:ops`,
+      `LTE:${tableId}:${contentId}:${instanceId}`,
       JSON.stringify(payload)
     );
 
-    this.broadcaster.broadcastToTable(tableId, message, undefined, true);
+    this.broadcaster.broadcastToTable(
+      tableId,
+      message,
+      [{ username, instance }],
+      true
+    );
   };
 
   onDocSave = async (event: onDocSaveType) => {
-    const { tableId, contentId } = event.header;
+    const { tableId, contentId, instanceId } = event.header;
 
     const ops = await tableTopRedis.gets.lrange(
-      `LTE:${tableId}:${contentId}:ops`
+      `LTE:${tableId}:${contentId}:${instanceId}`
     );
     console.log(ops);
     // save to ceph here

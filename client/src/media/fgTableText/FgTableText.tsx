@@ -40,8 +40,6 @@ export default function FgTableText({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerTextControlsRef = useRef<HTMLDivElement>(null);
 
-  const text = useRef(textMediaInstance.instanceText);
-
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
     structuredClone(defaultSettings),
@@ -68,14 +66,10 @@ export default function FgTableText({
   );
 
   const textController = useRef(
-    new TextController(setSettingsActive, textMediaInstance, text, setRerender),
+    new TextController(setSettingsActive, setRerender),
   );
 
   useEffect(() => {
-    if (textMediaInstance.instanceText) {
-      text.current = textMediaInstance.instanceText;
-      setRerender((prev) => !prev);
-    }
     textMediaInstance.textMedia.addTextListener(
       textController.current.handleTextMessages,
     );
@@ -120,9 +114,10 @@ export default function FgTableText({
 
   return (
     <FgMediaContainer
+      showLoadingScreen={false}
       filename={textMediaInstance.textMedia.filename}
-      pauseDownload={textMediaInstance.textMedia.downloader?.pause}
-      resumeDownload={textMediaInstance.textMedia.downloader?.resume}
+      pauseDownload={textMediaInstance.textMedia.liveTextDownloader?.pause}
+      resumeDownload={textMediaInstance.textMedia.liveTextDownloader?.resume}
       retryDownload={textMediaInstance.textMedia.retryDownload}
       downloadingState={textMediaInstance.textMedia.loadingState}
       addDownloadListener={
@@ -141,18 +136,15 @@ export default function FgTableText({
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={
-        text.current && (
-          <MonacoTextArea
-            initialText={text.current}
-            settings={settings}
-            isLineNums={isLineNums}
-            setIsLineNums={setIsLineNums}
-            isReadOnly={false}
-            setIsReadOnly={setIsReadOnly}
-            textMediaInstance={textMediaInstance}
-            externalTextAreaContainerRef={textAreaContainerRef}
-          />
-        )
+        <MonacoTextArea
+          settings={settings}
+          isLineNums={isLineNums}
+          setIsLineNums={setIsLineNums}
+          isReadOnly={false}
+          setIsReadOnly={setIsReadOnly}
+          textMediaInstance={textMediaInstance}
+          externalTextAreaContainerRef={textAreaContainerRef}
+        />
       }
       floatingContent={[
         <ExpandLineNumbers
