@@ -113,7 +113,7 @@ class TableStaticContentSocketController {
         const headerText = new TextDecoder().decode(headerBytes);
         const header = JSON.parse(headerText);
 
-        // 3) The rest is your file chunk
+        // 3) The rest of file chunk
         const fileBuffer = buf.subarray(4 + headerLen);
 
         switch (header.type) {

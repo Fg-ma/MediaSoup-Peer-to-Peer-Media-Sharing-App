@@ -15,6 +15,7 @@ import TableSocketController from "../../serverControllers/tableServer/TableSock
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
+import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import ProducersController from "../../lib/ProducersController";
 import ConsumersController from "../../lib/ConsumersController";
 import PermissionsController from "../../lib/PermissionsController";
@@ -29,6 +30,9 @@ class JoinTableSectionController {
   constructor(
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
+    >,
+    private liveTextEditingSocket: React.MutableRefObject<
+      LiveTextEditingSocketController | undefined
     >,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
@@ -111,6 +115,13 @@ class JoinTableSectionController {
 
       this.tableSocket.current = new TableSocketController(
         "wss://localhost:8043",
+        this.tableId.current,
+        this.username.current,
+        this.instance.current,
+      );
+
+      this.liveTextEditingSocket.current = new LiveTextEditingSocketController(
+        "wss://localhost:8093",
         this.tableId.current,
         this.username.current,
         this.instance.current,

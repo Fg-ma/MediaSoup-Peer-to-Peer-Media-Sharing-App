@@ -468,7 +468,7 @@ export default function FgMediaContainer({
                 className="h-full w-full"
                 pauseDownload={pauseDownload}
                 aspectRatio={aspectRatio}
-              />{" "}
+              />
             </motion.div>
           )}
         </AnimatePresence>

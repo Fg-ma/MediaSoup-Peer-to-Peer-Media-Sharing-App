@@ -31,6 +31,7 @@
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "browserify": "^17.0.0",
+    "buffer": "^6.0.3",
     "css-loader": "^7.1.2",
     "d3-delaunay": "^6.0.4",
     "dotenv": "^16.4.7",
@@ -66,7 +67,10 @@
     "tone": "^15.0.4",
     "uuid": "^9.0.1",
     "vosk-browser": "^0.0.8",
-    "webpack-dev-server": "^5.0.4"
+    "webpack-dev-server": "^5.0.4",
+    "y-monaco": "^0.1.6",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.27"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",

@@ -41,9 +41,9 @@ class TableSocketController {
     this.ws = new WebSocket(url);
 
     this.ws.onmessage = (event: MessageEvent) => {
-      this.messageListeners.forEach((listener) => {
-        const message = JSON.parse(event.data);
+      const message = JSON.parse(event.data);
 
+      this.messageListeners.forEach((listener) => {
         listener(message as IncomingTableMessages);
       });
     };

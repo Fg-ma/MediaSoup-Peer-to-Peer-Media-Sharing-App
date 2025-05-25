@@ -40,7 +40,7 @@ export default function FgTableText({
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerTextControlsRef = useRef<HTMLDivElement>(null);
 
-  const text = useRef("");
+  const text = useRef(textMediaInstance.instanceText);
 
   const [settingsActive, setSettingsActive] = useState(false);
   const [settings, setSettings] = useState<Settings>(
@@ -141,16 +141,18 @@ export default function FgTableText({
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={
-        <MonacoTextArea
-          initialText={text.current}
-          settings={settings}
-          isLineNums={isLineNums}
-          setIsLineNums={setIsLineNums}
-          isReadOnly={isReadOnly}
-          setIsReadOnly={setIsReadOnly}
-          textMediaInstance={textMediaInstance}
-          externalTextAreaContainerRef={textAreaContainerRef}
-        />
+        text.current && (
+          <MonacoTextArea
+            initialText={text.current}
+            settings={settings}
+            isLineNums={isLineNums}
+            setIsLineNums={setIsLineNums}
+            isReadOnly={false}
+            setIsReadOnly={setIsReadOnly}
+            textMediaInstance={textMediaInstance}
+            externalTextAreaContainerRef={textAreaContainerRef}
+          />
+        )
       }
       floatingContent={[
         <ExpandLineNumbers

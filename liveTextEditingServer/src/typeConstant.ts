@@ -17,6 +17,7 @@ export interface SocketData {
 export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
+  | onGetInitialDocStateType
   | onDocUpdateType
   | onDocSaveType;
 
@@ -42,7 +43,17 @@ export type onDocUpdateType = {
   type: "docUpdate";
   header: { tableId: string; contentId: string };
   data: {
-    payload: any;
+    payload: Uint8Array<ArrayBuffer>;
+  };
+};
+
+export type onGetInitialDocStateType = {
+  type: "getInitialDocState";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
   };
 };
 

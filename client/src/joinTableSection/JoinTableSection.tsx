@@ -72,8 +72,12 @@ export default function JoinTableSection({
 }) {
   const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
   const { userEffects, userEffectsStyles } = useEffectsContext();
-  const { mediasoupSocket, tableSocket, tableStaticContentSocket } =
-    useSocketContext();
+  const {
+    mediasoupSocket,
+    tableSocket,
+    tableStaticContentSocket,
+    liveTextEditingSocket,
+  } = useSocketContext();
   const { tableId, username, instance, device } = useUserInfoContext();
   const { userDevice } = useToolsContext();
   const { sendDownloadSignal, addCurrentDownload, removeCurrentDownload } =
@@ -86,6 +90,7 @@ export default function JoinTableSection({
   const tableFunctionsController = useRef(
     new JoinTableSectionController(
       tableSocket,
+      liveTextEditingSocket,
       tableStaticContentSocket,
       mediasoupSocket,
       tableIdRef,
@@ -141,19 +146,19 @@ export default function JoinTableSection({
   }, [mediasoupSocket.current]);
 
   return (
-    <div className="flex mt-5 justify-center">
+    <div className="mt-5 flex justify-center">
       <input
         ref={tableIdRef}
         id="tableIdyInputField"
         type="text"
-        className="border mr-2 border-gray-400 px-4 py-2"
+        className="mr-2 border border-gray-400 px-4 py-2"
         placeholder="Enter room name"
       />
       <input
         ref={usernameRef}
         id="usernameInputField"
         type="text"
-        className="border mr-2 border-gray-400 px-4 py-2"
+        className="mr-2 border border-gray-400 px-4 py-2"
         placeholder="Enter username"
       />
       <button

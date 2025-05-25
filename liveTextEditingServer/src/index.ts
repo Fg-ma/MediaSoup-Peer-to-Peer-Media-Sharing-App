@@ -1,14 +1,20 @@
 import uWS from "uWebSockets.js";
-import { Buffer } from "buffer";
-import { TableWebSocket, SocketData, tables } from "./typeConstant";
+import {
+  TableWebSocket,
+  SocketData,
+  tables,
+  MessageTypes,
+} from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import LiveTextEditingController from "./lib/LiveTextEditingController";
 import handleMessage from "./lib/websocketMessages";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
+import TableTopCeph from "../../cephServer/src/TableTopCeph";
 
 export const tableTopRedis = new TableTopRedis();
 export const tableTopMongo = new TableTopMongo();
+export const tableTopCeph = new TableTopCeph();
 export const broadcaster = new Broadcaster();
 export const liveTextEditingController = new LiveTextEditingController(
   broadcaster
@@ -25,9 +31,48 @@ uWS
     message: (ws, message) => {
       const tableWS = ws as TableWebSocket;
 
+      const buf = new Uint8Array(message);
+      const prefix = buf[0];
+
+      let msg: MessageTypes | undefined = undefined;
+
       try {
-        const msg = JSON.parse(Buffer.from(message).toString());
-        handleMessage(tableWS, msg);
+        if (prefix === 0x00) {
+          const jsonStr = new TextDecoder().decode(buf.subarray(1));
+          msg = JSON.parse(jsonStr);
+        } else if (prefix === 0x01) {
+          const view = new DataView(buf.buffer, buf.byteOffset);
+
+          // 1) Read first 4 bytes for JSON length
+          const headerLen = view.getUint32(1, true);
+
+          // 2) Slice out the JSON header
+          const headerBytes = buf.subarray(5, 5 + headerLen);
+          const headerText = new TextDecoder().decode(headerBytes);
+          const header = JSON.parse(headerText);
+
+          // 3) The rest of file chunk
+          const fileBuffer = buf.subarray(5 + headerLen);
+
+          switch (header.type) {
+            case "docUpdate":
+              msg = {
+                type: header.type,
+                header: {
+                  tableId: header.header.tableId as string,
+                  contentId: header.header.contentId as string,
+                },
+                data: {
+                  payload: fileBuffer,
+                },
+              };
+              break;
+            default:
+              return;
+          }
+        }
+
+        if (msg) handleMessage(tableWS, msg);
       } catch (error) {
         console.error("Failed to parse message:", error);
       }

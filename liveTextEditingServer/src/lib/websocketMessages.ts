@@ -9,11 +9,14 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
     case "leaveTable":
       liveTextEditingController.onLeaveTable(event);
       break;
-    case "docSave":
-      liveTextEditingController.onDocSave(event);
-      break;
     case "docUpdate":
       liveTextEditingController.onDocUpdate(event);
+      break;
+    case "getInitialDocState":
+      liveTextEditingController.onGetInitialDocState(event);
+      break;
+    case "docSave":
+      liveTextEditingController.onDocSave(event);
       break;
     default:
       break;

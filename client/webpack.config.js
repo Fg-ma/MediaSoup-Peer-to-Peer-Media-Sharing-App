@@ -7,6 +7,9 @@ import fs from "fs";
 import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 // Get the current directory using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +58,7 @@ export default {
       fs: false,
       path: false,
       crypto: false,
+      buffer: require.resolve("buffer/"),
     },
   },
   module: {
@@ -146,6 +150,9 @@ export default {
     new MonacoWebpackPlugin({
       languages: [],
       features: [],
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
     }),
   ],
 };

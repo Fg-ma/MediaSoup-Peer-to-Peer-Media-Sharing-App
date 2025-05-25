@@ -5,7 +5,7 @@ class TextController {
   constructor(
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private textMediaInstance: TableTextMediaInstance,
-    private text: React.MutableRefObject<string>,
+    private text: React.MutableRefObject<string | undefined>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 

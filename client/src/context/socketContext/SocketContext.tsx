@@ -3,6 +3,7 @@ import MediasoupSocketController from "../../serverControllers/mediasoupServer/M
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import LiveTextEditingSocketController from "src/serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;
@@ -10,6 +11,9 @@ export interface SocketContextProviderProps {
 
 export interface SocketContextType {
   tableSocket: React.MutableRefObject<TableSocketController | undefined>;
+  liveTextEditingSocket: React.MutableRefObject<
+    LiveTextEditingSocketController | undefined
+  >;
   mediasoupSocket: React.MutableRefObject<
     MediasoupSocketController | undefined
   >;
@@ -37,6 +41,9 @@ export function SocketContextProvider({
   children,
 }: SocketContextProviderProps) {
   const tableSocket = useRef<TableSocketController | undefined>();
+  const liveTextEditingSocket = useRef<
+    LiveTextEditingSocketController | undefined
+  >();
   const mediasoupSocket = useRef<MediasoupSocketController | undefined>();
   const tableStaticContentSocket = useRef<
     TableStaticContentSocketController | undefined
@@ -49,6 +56,7 @@ export function SocketContextProvider({
     <SocketContext.Provider
       value={{
         tableSocket,
+        liveTextEditingSocket,
         mediasoupSocket,
         tableStaticContentSocket,
         userStaticContentSocket,

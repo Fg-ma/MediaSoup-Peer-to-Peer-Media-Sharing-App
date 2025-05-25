@@ -9,7 +9,7 @@ export default function CornersDecorator({
 }) {
   return (
     <svg
-      className={`${className} pointer-events-none absolute left-[-${width}px] top-[-${width}px] z-[100] stroke-fg-white`}
+      className={`${className} pointer-events-none absolute left-[-${width}px] top-[-${width}px]`}
       style={{ width: "calc(100% + 8px)", height: "calc(100% + 8px)" }}
     >
       <g>
@@ -18,7 +18,7 @@ export default function CornersDecorator({
           y1={`${width / 2}px`}
           x2="33.33%"
           y2={`${width / 2}px`}
-          stroke-width={`${width}px`}
+          strokeWidth={`${width}px`}
           strokeLinecap="round"
         />
         <line
@@ -26,7 +26,7 @@ export default function CornersDecorator({
           y1={`${width / 2}px`}
           x2={`${width / 2}px`}
           y2="33.33%"
-          stroke-width={`${width}px`}
+          strokeWidth={`${width}px`}
           strokeLinecap="round"
         />
       </g>
@@ -37,7 +37,7 @@ export default function CornersDecorator({
           y1={`calc(100% - ${width / 2}px)`}
           x2="66.66%"
           y2={`calc(100% - ${width / 2}px)`}
-          stroke-width={`${width}px`}
+          strokeWidth={`${width}px`}
           strokeLinecap="round"
         />
         <line
@@ -45,7 +45,7 @@ export default function CornersDecorator({
           y1={`calc(100% - ${width / 2}px)`}
           x2={`calc(100% - ${width / 2}px)`}
           y2="66.66%"
-          stroke-width={`${width}px`}
+          strokeWidth={`${width}px`}
           strokeLinecap="round"
         />
       </g>
