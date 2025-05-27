@@ -10,7 +10,7 @@ import LiveTextEditingSocketController from "../../serverControllers/liveTextEdi
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
-} from "src/tools/liveTextDownloader/lib/typeConstant";
+} from "../../tools/liveTextDownloader/lib/typeConstant";
 
 export type TextMediaEvents = onTextFinishedLoadingType;
 
@@ -20,6 +20,7 @@ export type onTextFinishedLoadingType = {
 
 export type TextListenerTypes =
   | { type: "downloadComplete" }
+  | { type: "initialized" }
   | { type: "downloadPaused" }
   | { type: "downloadResumed" }
   | { type: "downloadFailed" }
@@ -29,7 +30,7 @@ export type TextListenerTypes =
 class TableTextMedia {
   textData: Uint8Array<ArrayBuffer>[] = [];
 
-  private fileSize = 0;
+  fileSize = 0;
   loadingState: LoadingStateTypes = "downloading";
 
   private textListeners: Set<(message: TextListenerTypes) => void> = new Set();
@@ -50,18 +51,26 @@ class TableTextMedia {
       download: LiveTextDownloader,
     ) => void,
     private removeCurrentDownload: (id: string) => void,
+    initTextData?: Uint8Array<ArrayBuffer>[],
+    initFileSize?: number,
   ) {
-    this.liveTextDownloader = new LiveTextDownloader(
-      this.textId,
-      this.filename,
-      this.mimeType,
-      this.liveTextEditingSocket,
-      this.sendDownloadSignal,
-      this.removeCurrentDownload,
-    );
-    this.addCurrentDownload(this.textId, this.liveTextDownloader);
-    this.liveTextDownloader.addDownloadListener(this.handleDownloadMessage);
-    this.liveTextDownloader.start();
+    if (initTextData !== undefined && initFileSize !== undefined) {
+      this.loadingState = "downloaded";
+      this.textData = initTextData;
+      this.fileSize = initFileSize;
+    } else {
+      this.liveTextDownloader = new LiveTextDownloader(
+        this.textId,
+        this.filename,
+        this.mimeType,
+        this.liveTextEditingSocket,
+        this.sendDownloadSignal,
+        this.removeCurrentDownload,
+      );
+      this.addCurrentDownload(this.textId, this.liveTextDownloader);
+      this.liveTextDownloader.addDownloadListener(this.handleDownloadMessage);
+      this.liveTextDownloader.start();
+    }
   }
 
   deconstructor = () => {
@@ -111,6 +120,13 @@ class TableTextMedia {
         this.loadingState = "downloading";
         this.textListeners.forEach((listener) => {
           listener({ type: "downloadResumed" });
+        });
+        break;
+      case "initialized":
+        this.textData = message.data.payload;
+        this.loadingState = "initialized";
+        this.textListeners.forEach((listener) => {
+          listener({ type: "initialized" });
         });
         break;
       default:

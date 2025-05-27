@@ -14,9 +14,11 @@ class Posts {
   uploadFile = async (
     bucketName: string,
     key: string,
-    fileStream: internal.Readable & {
-      truncated?: boolean;
-    }
+    fileStream:
+      | (internal.Readable & {
+          truncated?: boolean;
+        })
+      | Buffer<ArrayBuffer>
   ) => {
     try {
       const upload = new Upload({

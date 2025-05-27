@@ -3,6 +3,22 @@ import Redis from "ioredis";
 class Posts {
   constructor(private redis: Redis) {}
 
+  rename = async (oldKey: string, newKey: string): Promise<void> => {
+    try {
+      await this.redis.rename(oldKey, newKey);
+    } catch (_) {
+      return;
+    }
+  };
+
+  copy = async (oldKey: string, newKey: string): Promise<void> => {
+    try {
+      await this.redis.copy(oldKey, newKey);
+    } catch (_) {
+      return;
+    }
+  };
+
   post = async (
     prefix: string,
     id: string,

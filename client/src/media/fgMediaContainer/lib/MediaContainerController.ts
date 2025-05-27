@@ -30,7 +30,7 @@ class MediaContainerController {
 
   constructor(
     private tableId: React.MutableRefObject<string>,
-    private mediaId: string,
+    private mediaIdRef: React.MutableRefObject<string>,
     private mediaInstanceId: string,
     private kind: StaticContentTypes,
     private getAspect: (() => number | undefined) | undefined,
@@ -143,7 +143,7 @@ class MediaContainerController {
 
             this.tableStaticContentSocket.current?.updateContentPositioning(
               this.kind,
-              this.mediaId,
+              this.mediaIdRef.current,
               this.mediaInstanceId,
               { position: this.positioning.current.position },
             );
@@ -190,7 +190,7 @@ class MediaContainerController {
             if (
               data.tableId === this.tableId.current &&
               data.kind === this.kind &&
-              data.mediaId === this.mediaId &&
+              data.mediaId === this.mediaIdRef.current &&
               data.mediaInstanceId === this.mediaInstanceId
             ) {
               this.positioning.current = data.positioning;
@@ -225,7 +225,7 @@ class MediaContainerController {
 
     if (
       contentType === this.kind &&
-      contentId === this.mediaId &&
+      contentId === this.mediaIdRef.current &&
       instanceId === this.mediaInstanceId
     ) {
       this.lowerController.current.reactController.handleReaction(
@@ -319,7 +319,7 @@ class MediaContainerController {
 
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { position: this.positioning.current.position },
     );
@@ -368,7 +368,7 @@ class MediaContainerController {
         JSON.stringify({
           tableId: this.tableId.current,
           kind: this.kind,
-          mediaId: this.mediaId,
+          mediaId: this.mediaIdRef.current,
           mediaInstanceId: this.mediaInstanceId,
           positioning: this.positioning.current,
         }),
@@ -408,7 +408,7 @@ class MediaContainerController {
     this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { position: this.positioning.current.position },
     );
@@ -446,7 +446,7 @@ class MediaContainerController {
     this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { rotation: this.positioning.current.rotation },
     );
@@ -488,7 +488,7 @@ class MediaContainerController {
     this.fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { scale: this.positioning.current.scale },
     );

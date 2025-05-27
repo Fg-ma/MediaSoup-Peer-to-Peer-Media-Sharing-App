@@ -2,12 +2,8 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useSocketContext } from "../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
-import { useToolsContext } from "../context/toolsContext/ToolsContext";
-import { useUploadDownloadContext } from "../context/uploadDownloadContext/UploadDownloadContext";
-import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { BundleOptions, defaultBundleOptions } from "./lib/typeConstant";
 import SharedBundleController from "./lib/SharedBundleController";
-import Deadbanding from "../babylon/Deadbanding";
 import FgTableVideo from "../media/fgTableVideo/FgTableVideo";
 import FgTableImage from "../media/fgTableImage/FgTableImage";
 import FgTableApplication from "../media/fgTableApplication/FgTableApplication";
@@ -18,12 +14,10 @@ const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function SharedBundle({
   name,
-  deadbanding,
   tableRef,
   options,
 }: {
   name?: string;
-  deadbanding: React.MutableRefObject<Deadbanding>;
   tableRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
 }) {
@@ -33,12 +27,9 @@ export default function SharedBundle({
   };
 
   const { userMedia } = useMediaContext();
-  const { tableStaticContentSocket } = useSocketContext();
-  const { userEffectsStyles, userEffects } = useEffectsContext();
+  const { tableStaticContentSocket, liveTextEditingSocket } =
+    useSocketContext();
   const { username } = useUserInfoContext();
-  const { userDevice } = useToolsContext();
-  const { sendDownloadSignal, addCurrentDownload, removeCurrentDownload } =
-    useUploadDownloadContext();
 
   const sharedBundleRef = useRef<HTMLDivElement>(null);
   const videoContentMute = useRef<{
@@ -48,18 +39,7 @@ export default function SharedBundle({
   const [_, setRerender] = useState(false);
 
   const sharedBundleController = useRef(
-    new SharedBundleController(
-      setRerender,
-      userDevice,
-      deadbanding,
-      userEffectsStyles,
-      userEffects,
-      userMedia,
-      tableStaticContentSocket,
-      sendDownloadSignal,
-      addCurrentDownload,
-      removeCurrentDownload,
-    ),
+    new SharedBundleController(setRerender),
   );
 
   useEffect(() => {
@@ -79,11 +59,12 @@ export default function SharedBundle({
       sharedBundleController.current.handleTableStaticContentMessage,
     );
 
-    return () =>
+    return () => {
       tableStaticContentSocket.current?.removeMessageListener(
         sharedBundleController.current.handleTableStaticContentMessage,
       );
-  }, [tableStaticContentSocket.current]);
+    };
+  }, [tableStaticContentSocket.current, liveTextEditingSocket.current]);
 
   return (
     <div

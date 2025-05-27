@@ -3,7 +3,8 @@ export type DownloadListenerTypes =
   | onDownloadPausedType
   | onDownloadResumedType
   | onDownloadProgressType
-  | onDownloadFailedrType;
+  | onDownloadFailedrType
+  | onInitializedType;
 
 export type onDownloadFinishType = {
   type: "downloadFinish";
@@ -14,13 +15,17 @@ export type onDownloadPausedType = {
   type: "downloadPaused";
 };
 
+export type onInitializedType = {
+  type: "initialized";
+  data: { payload: Uint8Array<ArrayBuffer>[] };
+};
+
 export type onDownloadResumedType = {
   type: "downloadResumed";
 };
 
 export type onDownloadProgressType = {
   type: "downloadProgress";
-  data: Uint8Array<ArrayBuffer>;
 };
 
 export type onDownloadFailedrType = {

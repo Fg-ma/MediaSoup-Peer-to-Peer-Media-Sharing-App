@@ -129,6 +129,11 @@ class JoinTableSectionController {
         this.tableId.current,
         this.username.current,
         this.instance.current,
+        this.userMedia,
+        this.liveTextEditingSocket,
+        this.sendDownloadSignal,
+        this.addCurrentDownload,
+        this.removeCurrentDownload,
       );
 
       this.tableStaticContentSocket.current =

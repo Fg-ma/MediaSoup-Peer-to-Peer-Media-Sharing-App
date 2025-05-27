@@ -1,7 +1,13 @@
+import TableTextMedia from "../../media/fgTableText/TableTextMedia";
+import { UserMediaType } from "../../context/mediaContext/typeConstant";
 import {
   IncomingLiveTextEditingMessages,
+  onDocSavedNewContentType,
   OutGoingLiveTextEditingMessages,
 } from "./lib/typeConstant";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
+import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
+import Downloader from "../../tools/downloader/Downloader";
 
 class LiveTextEditingSocketController {
   private ws: WebSocket | undefined;
@@ -14,6 +20,16 @@ class LiveTextEditingSocketController {
     private tableId: string,
     private username: string,
     private instance: string,
+    private userMedia: React.MutableRefObject<UserMediaType>,
+    private liveTextEditingSocket: React.MutableRefObject<
+      LiveTextEditingSocketController | undefined
+    >,
+    private sendDownloadSignal: (signal: DownloadSignals) => void,
+    private addCurrentDownload: (
+      id: string,
+      upload: Downloader | LiveTextDownloader,
+    ) => void,
+    private removeCurrentDownload: (id: string) => void,
   ) {
     this.connect(this.url);
   }
@@ -98,6 +114,7 @@ class LiveTextEditingSocketController {
               },
               data: {
                 payload: fileBuffer,
+                fileSize: header.header.fileSize,
               },
             };
             break;
@@ -110,10 +127,13 @@ class LiveTextEditingSocketController {
         }
       }
 
-      if (message)
+      if (message) {
+        this.handleMessage(message);
+
         this.messageListeners.forEach((listener) => {
           listener(message);
         });
+      }
     };
 
     this.ws.onopen = () => {
@@ -138,6 +158,43 @@ class LiveTextEditingSocketController {
     listener: (message: IncomingLiveTextEditingMessages) => void,
   ): void => {
     this.messageListeners.delete(listener);
+  };
+
+  onDocSavedNewContent = (event: onDocSavedNewContentType) => {
+    const { oldContentId, newContentId, instanceId } = event.header;
+
+    const oldContent = this.userMedia.current.text.table[oldContentId];
+
+    const newTableTextMedia = new TableTextMedia(
+      newContentId,
+      oldContent.filename,
+      oldContent.mimeType,
+      [],
+      this.liveTextEditingSocket,
+      this.sendDownloadSignal,
+      this.addCurrentDownload,
+      this.removeCurrentDownload,
+      oldContent.loadingState === "downloaded"
+        ? oldContent.textData
+        : undefined,
+      oldContent.loadingState === "downloaded"
+        ? oldContent.fileSize
+        : undefined,
+    );
+    this.userMedia.current.text.table[newContentId] = newTableTextMedia;
+
+    this.userMedia.current.text.tableInstances[instanceId].textMedia =
+      newTableTextMedia;
+  };
+
+  handleMessage = (message: IncomingLiveTextEditingMessages) => {
+    switch (message.type) {
+      case "docSavedNewContent":
+        this.onDocSavedNewContent(message);
+        break;
+      default:
+        break;
+    }
   };
 
   sendMessage = (message: OutGoingLiveTextEditingMessages) => {
@@ -226,6 +283,17 @@ class LiveTextEditingSocketController {
       },
       data,
     );
+  };
+
+  docSave = (contentId: string, instanceId: string) => {
+    this.sendMessage({
+      type: "docSave",
+      header: {
+        tableId: this.tableId,
+        contentId,
+        instanceId,
+      },
+    });
   };
 
   getFile = (contentId: string) => {

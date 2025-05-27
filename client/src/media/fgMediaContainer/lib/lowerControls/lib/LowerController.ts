@@ -20,7 +20,7 @@ class LowerController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private mediaId: string,
+    private mediaIdRef: React.MutableRefObject<string>,
     private mediaInstanceId: string,
     private kind: StaticContentTypes,
     private bundleRef: React.RefObject<HTMLDivElement>,
@@ -53,7 +53,7 @@ class LowerController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {
     this.reactController = new ReactController(
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       this.kind,
       this.behindEffectsContainerRef,
@@ -142,7 +142,7 @@ class LowerController {
 
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { scale: this.positioning.current.scale },
     );
@@ -155,7 +155,7 @@ class LowerController {
 
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { rotation: this.positioning.current.rotation },
     );
@@ -168,7 +168,7 @@ class LowerController {
 
     this.tableStaticContentSocket.current?.updateContentPositioning(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
       { position: this.positioning.current.position },
     );
@@ -274,7 +274,7 @@ class LowerController {
   handleClose = () => {
     this.tableStaticContentSocket.current?.deleteContent(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       this.mediaInstanceId,
     );
   };
@@ -294,7 +294,7 @@ class LowerController {
 
     this.tableStaticContentSocket.current?.changeContentState(
       this.kind,
-      this.mediaId,
+      this.mediaIdRef.current,
       newState,
     );
   };

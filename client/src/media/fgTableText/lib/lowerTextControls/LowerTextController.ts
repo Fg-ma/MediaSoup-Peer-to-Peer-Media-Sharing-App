@@ -80,6 +80,10 @@ class LowerTextController {
       document.removeEventListener("pointerdown", this.handlePointerDown);
     }
   };
+
+  handleSave = () => {
+    this.textMediaInstance.saveText();
+  };
 }
 
 export default LowerTextController;

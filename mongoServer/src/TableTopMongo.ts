@@ -415,8 +415,8 @@ class TableTopMongo {
         );
         break;
       case "text":
-        this.tableVideos?.uploads.editMetaData(
-          { tableId, videoId: contentId },
+        this.tableText?.uploads.editMetaData(
+          { tableId, textId: contentId },
           { state }
         );
         break;

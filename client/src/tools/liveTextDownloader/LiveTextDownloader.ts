@@ -79,6 +79,14 @@ class LiveTextDownloader {
 
   private requestNextChunk = () => {
     this.idx += 1;
+    if (this.idx === 5) {
+      this.listeners.forEach((listener) => {
+        listener({
+          type: "initialized",
+          data: { payload: this.data },
+        });
+      });
+    }
     this.liveTextEditingSocket.current?.getChunk(this.contentId, this.idx);
   };
 
@@ -131,15 +139,10 @@ class LiveTextDownloader {
     this.listeners.forEach((listener) => {
       listener({
         type: "downloadProgress",
-        data: chunkData,
       });
     });
 
     if (!this._paused) {
-      if (this.idx % 2 === 0) {
-        this.state = "waiting";
-        return;
-      }
       this.requestNextChunk();
     }
   };
@@ -186,11 +189,11 @@ class LiveTextDownloader {
 
     if (contentId !== this.contentId) return;
 
-    const { payload } = message.data;
+    const { payload, fileSize } = message.data;
 
     const finishMessage = {
       type: "downloadFinish",
-      data: { payload: [payload], fileSize: this.fileSize },
+      data: { payload: [payload], fileSize },
     };
     this.listeners.forEach((listener) => {
       listener(
@@ -300,13 +303,6 @@ class LiveTextDownloader {
       });
     });
 
-    if (this.state !== "downloading") {
-      this.state = "downloading";
-      this.requestNextChunk();
-    }
-  };
-
-  fetchNextSection = () => {
     if (this.state !== "downloading") {
       this.state = "downloading";
       this.requestNextChunk();

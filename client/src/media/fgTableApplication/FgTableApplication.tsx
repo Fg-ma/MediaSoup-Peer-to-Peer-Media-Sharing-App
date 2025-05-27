@@ -177,12 +177,12 @@ export default function FgTableApplication({
       retryDownload={applicationMediaInstance.applicationMedia.retryDownload}
       downloadingState={applicationMediaInstance.applicationMedia.loadingState}
       addDownloadListener={
-        applicationMediaInstance.applicationMedia.loadingState === "downloading"
+        applicationMediaInstance.applicationMedia.loadingState !== "downloaded"
           ? applicationMediaInstance.applicationMedia.addApplicationListener
           : undefined
       }
       removeDownloadListener={
-        applicationMediaInstance.applicationMedia.loadingState === "downloading"
+        applicationMediaInstance.applicationMedia.loadingState !== "downloaded"
           ? applicationMediaInstance.applicationMedia.removeApplicationListener
           : undefined
       }

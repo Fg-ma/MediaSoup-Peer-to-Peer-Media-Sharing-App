@@ -234,12 +234,12 @@ export default function FgTableVideo({
       retryDownload={videoMediaInstance.videoMedia.retryDownload}
       downloadingState={videoMediaInstance.videoMedia.loadingState}
       addDownloadListener={
-        videoMediaInstance.videoMedia.loadingState === "downloading"
+        videoMediaInstance.videoMedia.loadingState !== "downloaded"
           ? videoMediaInstance.videoMedia.addVideoListener
           : undefined
       }
       removeDownloadListener={
-        videoMediaInstance.videoMedia.loadingState === "downloading"
+        videoMediaInstance.videoMedia.loadingState !== "downloaded"
           ? videoMediaInstance.videoMedia.removeVideoListener
           : undefined
       }

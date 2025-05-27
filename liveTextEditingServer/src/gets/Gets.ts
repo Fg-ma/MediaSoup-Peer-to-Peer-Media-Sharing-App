@@ -31,38 +31,54 @@ class Gets {
             const BATCH_SIZE = 0.1 * 1024 * 1024;
             let buffer = Buffer.alloc(0);
 
-            stream.on("data", async (chunk) => {
-              buffer = Buffer.concat([buffer, chunk]);
+            const ydoc = new Y.Doc();
+            const ytext = ydoc.getText("monaco");
+            let offset = 0;
+            let lastStateVector = Y.encodeStateVector(ydoc);
+            await new Promise<void>((resolve) => {
+              stream.on("data", async (chunk) => {
+                buffer = Buffer.concat([buffer, chunk]);
 
-              while (buffer.length >= BATCH_SIZE) {
-                const slice = buffer.subarray(0, BATCH_SIZE);
-                buffer = buffer.subarray(BATCH_SIZE);
+                while (buffer.length >= BATCH_SIZE) {
+                  const slice = buffer.subarray(0, BATCH_SIZE);
+                  buffer = buffer.subarray(BATCH_SIZE);
 
-                const text = slice.toString("utf8");
-                const ydoc = new Y.Doc();
-                ydoc.getText("monaco").insert(0, text);
-                const payload = Y.encodeStateAsUpdate(ydoc);
+                  const text = slice.toString("utf8");
+                  ytext.insert(offset, text);
+                  offset += text.length;
 
-                await tableTopRedis.posts.rpush(
-                  `LTE:${tableId}:${contentId}:file`,
-                  JSON.stringify(Array.from(payload))
-                );
-              }
-            });
+                  const incrementalUpdate = Y.encodeStateAsUpdate(
+                    ydoc,
+                    lastStateVector
+                  );
+                  lastStateVector = Y.encodeStateVector(ydoc);
 
-            stream.on("end", async () => {
-              if (buffer.length > 0) {
-                const text = buffer.toString("utf8");
+                  await tableTopRedis.posts.rpush(
+                    `LTE:${tableId}:${contentId}:file`,
+                    JSON.stringify(Array.from(incrementalUpdate))
+                  );
+                }
+              });
 
-                const ydoc = new Y.Doc();
-                ydoc.getText("monaco").insert(0, text);
-                const payload = Y.encodeStateAsUpdate(ydoc);
+              stream.on("end", async () => {
+                if (buffer.length > 0) {
+                  const text = buffer.toString("utf8");
+                  ytext.insert(offset, text);
 
-                await tableTopRedis.posts.rpush(
-                  `LTE:${tableId}:${contentId}:file`,
-                  JSON.stringify(Array.from(payload))
-                );
-              }
+                  const incrementalUpdate = Y.encodeStateAsUpdate(
+                    ydoc,
+                    lastStateVector
+                  );
+                  lastStateVector = Y.encodeStateVector(ydoc);
+
+                  await tableTopRedis.posts.rpush(
+                    `LTE:${tableId}:${contentId}:file`,
+                    JSON.stringify(Array.from(incrementalUpdate))
+                  );
+
+                  resolve();
+                }
+              });
             });
           }
         }
@@ -109,6 +125,7 @@ class Gets {
                   type: "oneShotDownload",
                   header: {
                     contentId,
+                    fileSize,
                   },
                 };
                 const headerBytes = new TextEncoder().encode(
@@ -163,7 +180,7 @@ class Gets {
           // 1) Build the JSON header
           const headerObj = {
             type: "oneShotDownload",
-            header: { contentId },
+            header: { contentId, fileSize },
           };
           const headerStr = JSON.stringify(headerObj);
           const encoder = new TextEncoder();
@@ -198,7 +215,7 @@ class Gets {
     const { tableId, username, instance, contentId } = event.header;
 
     const { idx } = event.data;
-    console.log(idx);
+
     try {
       const chunk = await tableTopRedis.gets.lindex(
         `LTE:${tableId}:${contentId}:file`,

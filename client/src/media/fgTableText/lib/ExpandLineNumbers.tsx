@@ -24,7 +24,7 @@ export default function ExpandLineNumbers({
       <AnimatePresence>
         {!isLineNums && (
           <motion.div
-            className="absolute right-full top-0 z-[5] h-10 w-12 rounded-l-md bg-fg-tone-black-1 pr-1"
+            className="absolute right-full top-0 z-[200] h-10 w-12 rounded-l-md bg-fg-tone-black-1 pr-1"
             initial={{ y: 0, x: 50, opacity: 0 }}
             animate={{ y: 0, x: 8, opacity: 1 }}
             exit={{ y: 0, x: 50, opacity: 0 }}

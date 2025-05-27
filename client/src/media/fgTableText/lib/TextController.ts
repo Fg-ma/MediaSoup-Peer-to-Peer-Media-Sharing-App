@@ -1,3 +1,4 @@
+import { IncomingLiveTextEditingMessages } from "../../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import { TextListenerTypes } from "../TableTextMedia";
 
 class TextController {
@@ -19,6 +20,9 @@ class TextController {
       case "downloadComplete":
         this.onDownloadComplete();
         break;
+      case "initialized":
+        this.setRerender((prev) => !prev);
+        break;
       case "stateChanged":
         this.setRerender((prev) => !prev);
         break;
@@ -32,6 +36,16 @@ class TextController {
         this.setRerender((prev) => !prev);
         break;
       case "downloadRetry":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleLiveTextEditingMessage = (event: IncomingLiveTextEditingMessages) => {
+    switch (event.type) {
+      case "docSavedNewContent":
         this.setRerender((prev) => !prev);
         break;
       default:

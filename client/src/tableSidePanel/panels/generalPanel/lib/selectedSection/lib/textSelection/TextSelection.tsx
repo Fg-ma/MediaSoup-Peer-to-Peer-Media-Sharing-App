@@ -11,7 +11,7 @@ import LoadingElement from "../../../../../../../elements/loadingElement/Loading
 import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
 import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
-import MonacoTextArea from "../../../../../../../media/fgTableText/lib/monaco/MonacoTextArea";
+import MonacoTextArea from "../../../../../../../media/fgTableText/lib/monaco/Monaco";
 
 export default function TextSelection({
   instanceId,

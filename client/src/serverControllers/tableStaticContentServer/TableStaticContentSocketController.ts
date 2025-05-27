@@ -814,6 +814,7 @@ class TableStaticContentSocketController {
                 },
                 rotation: 0,
               },
+          this.liveTextEditingSocket,
         );
     }
   };
@@ -990,6 +991,7 @@ class TableStaticContentSocketController {
               newTextMedia,
               instance.textInstanceId,
               instance.positioning,
+              this.liveTextEditingSocket,
             );
         }
       }
@@ -1093,6 +1095,7 @@ class TableStaticContentSocketController {
                   this.userMedia.current.text.table[instance.contentId],
                   ins.instanceId,
                   ins.positioning,
+                  this.liveTextEditingSocket,
                 );
             });
           }

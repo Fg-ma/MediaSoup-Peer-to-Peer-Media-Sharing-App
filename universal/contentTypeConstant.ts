@@ -1,5 +1,6 @@
 export type LoadingStateTypes =
   | "downloading"
+  | "initialized"
   | "downloaded"
   | "failed"
   | "paused";

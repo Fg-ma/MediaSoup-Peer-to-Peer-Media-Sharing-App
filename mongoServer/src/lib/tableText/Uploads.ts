@@ -61,9 +61,11 @@ class Uploads {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bulkOps: any[] = [];
 
     // 1. General metadata update
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generalSetFields: Record<string, any> = {};
 
     if (updateData.filename !== undefined) {
@@ -94,6 +96,7 @@ class Uploads {
       for (const { textInstanceId, positioning } of updateData.instances) {
         if (!textInstanceId) continue;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const instanceSetFields: Record<string, any> = {};
 
         if (positioning !== undefined) {
@@ -159,7 +162,7 @@ class Uploads {
     if (updateData && updateData.length > 0) {
       const pushInstances = updateData.map(
         ({ textInstanceId, positioning }) => {
-          const p: any = {
+          const p = {
             p: {
               l: positioning.position.left,
               t: positioning.position.top,

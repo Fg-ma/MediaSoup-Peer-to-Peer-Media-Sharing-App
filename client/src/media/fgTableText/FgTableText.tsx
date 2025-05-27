@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 import LowerTextController from "./lib/lowerTextControls/LowerTextController";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import DownloadButton from "./lib/lowerTextControls/downloadButton/DownloadButton";
@@ -12,8 +13,9 @@ import {
   Settings,
 } from "./lib/typeConstant";
 import ExpandLineNumbers from "./lib/ExpandLineNumbers";
-import MonacoTextArea from "./lib/monaco/MonacoTextArea";
+import Monaco from "./lib/monaco/Monaco";
 import CornersDecorator from "../../elements/decorators/CornersDecorator";
+import SaveSection from "./lib/lowerTextControls/saveSection/SaveSection";
 import "./lib/fgTextStyles.css";
 
 export default function FgTableText({
@@ -26,6 +28,7 @@ export default function FgTableText({
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
+  const { liveTextEditingSocket } = useSocketContext();
 
   const textMediaInstance =
     userMedia.current.text.tableInstances[textInstanceId];
@@ -74,6 +77,10 @@ export default function FgTableText({
       textController.current.handleTextMessages,
     );
 
+    liveTextEditingSocket.current?.addMessageListener(
+      textController.current.handleLiveTextEditingMessage,
+    );
+
     document.addEventListener(
       "keydown",
       lowerTextController.current.handleKeyDown,
@@ -85,6 +92,12 @@ export default function FgTableText({
     );
 
     return () => {
+      textMediaInstance.textMedia.removeTextListener(
+        textController.current.handleTextMessages,
+      );
+      liveTextEditingSocket.current?.removeMessageListener(
+        textController.current.handleLiveTextEditingMessage,
+      );
       document.removeEventListener(
         "keydown",
         lowerTextController.current.handleKeyDown,
@@ -114,19 +127,18 @@ export default function FgTableText({
 
   return (
     <FgMediaContainer
-      showLoadingScreen={false}
       filename={textMediaInstance.textMedia.filename}
       pauseDownload={textMediaInstance.textMedia.liveTextDownloader?.pause}
       resumeDownload={textMediaInstance.textMedia.liveTextDownloader?.resume}
       retryDownload={textMediaInstance.textMedia.retryDownload}
       downloadingState={textMediaInstance.textMedia.loadingState}
       addDownloadListener={
-        textMediaInstance.textMedia.loadingState === "downloading"
+        textMediaInstance.textMedia.loadingState !== "downloaded"
           ? textMediaInstance.textMedia.addTextListener
           : undefined
       }
       removeDownloadListener={
-        textMediaInstance.textMedia.loadingState === "downloading"
+        textMediaInstance.textMedia.loadingState !== "downloaded"
           ? textMediaInstance.textMedia.removeTextListener
           : undefined
       }
@@ -136,15 +148,18 @@ export default function FgTableText({
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={
-        <MonacoTextArea
-          settings={settings}
-          isLineNums={isLineNums}
-          setIsLineNums={setIsLineNums}
-          isReadOnly={false}
-          setIsReadOnly={setIsReadOnly}
-          textMediaInstance={textMediaInstance}
-          externalTextAreaContainerRef={textAreaContainerRef}
-        />
+        (textMediaInstance.textMedia.loadingState === "downloaded" ||
+          textMediaInstance.textMedia.loadingState === "initialized") && (
+          <Monaco
+            settings={settings}
+            isLineNums={isLineNums}
+            setIsLineNums={setIsLineNums}
+            isReadOnly={isReadOnly}
+            setIsReadOnly={setIsReadOnly}
+            textMediaInstance={textMediaInstance}
+            externalTextAreaContainerRef={textAreaContainerRef}
+          />
+        )
       }
       floatingContent={[
         <ExpandLineNumbers
@@ -172,6 +187,13 @@ export default function FgTableText({
           isReadOnly={isReadOnly}
         />,
         <DownloadButton
+          settingsActive={settingsActive}
+          lowerTextController={lowerTextController}
+          scrollingContainerRef={rightLowerTextControlsRef}
+        />,
+      ]}
+      leftLowerControls={[
+        <SaveSection
           settingsActive={settingsActive}
           lowerTextController={lowerTextController}
           scrollingContainerRef={rightLowerTextControlsRef}

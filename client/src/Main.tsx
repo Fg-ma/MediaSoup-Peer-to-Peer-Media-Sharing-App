@@ -385,7 +385,6 @@ export default function Main() {
         bundles={bundles}
         gridActive={gridActive}
         gridSize={gridSize}
-        deadbanding={deadbanding}
       />
       <TableFunctions
         tableFunctionsRef={tableFunctionsRef}

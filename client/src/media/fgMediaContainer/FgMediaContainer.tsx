@@ -17,6 +17,7 @@ import UpperControls from "./lib/upperControls/UpperControls";
 import {
   TableContentStateTypes,
   StaticContentTypes,
+  LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import DownloadFailed from "../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../elements/downloadPaused/DownloadPaused";
@@ -44,7 +45,6 @@ const MediaContainerTransition: Transition = {
 };
 
 export default function FgMediaContainer({
-  showLoadingScreen = true,
   filename,
   pauseDownload,
   resumeDownload,
@@ -76,12 +76,11 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
-  showLoadingScreen?: boolean;
   filename?: string;
   pauseDownload?: () => void;
   resumeDownload?: () => void;
   retryDownload?: () => void;
-  downloadingState: "downloading" | "downloaded" | "failed" | "paused";
+  downloadingState: LoadingStateTypes;
   addDownloadListener?: (
     listener: (
       message: { type: "downloadComplete" } | { type: string },
@@ -153,6 +152,8 @@ export default function FgMediaContainer({
     removeMediaPositioningSignalListener,
   } = useSignalContext();
 
+  const mediaIdRef = useRef(mediaId);
+
   const mediaContainerRef =
     externalMediaContainerRef ?? useRef<HTMLDivElement>(null);
   const subContainerRef =
@@ -207,7 +208,7 @@ export default function FgMediaContainer({
   const lowerController = useRef(
     new LowerController(
       tableStaticContentSocket,
-      mediaId,
+      mediaIdRef,
       mediaInstanceId,
       kind,
       bundleRef,
@@ -230,7 +231,7 @@ export default function FgMediaContainer({
   const mediaContainerController = useRef(
     new MediaContainerController(
       tableId,
-      mediaId,
+      mediaIdRef,
       mediaInstanceId,
       kind,
       getAspect,
@@ -254,6 +255,10 @@ export default function FgMediaContainer({
       userDataStreams,
     ),
   );
+
+  useEffect(() => {
+    mediaIdRef.current = mediaId;
+  }, [mediaId]);
 
   useEffect(() => {
     state.current = initState;
@@ -338,7 +343,7 @@ export default function FgMediaContainer({
         JSON.stringify({
           tableId: tableId.current,
           kind,
-          mediaId,
+          mediaId: mediaIdRef.current,
           mediaInstanceId,
           positioning: positioning.current,
         }),
@@ -395,7 +400,7 @@ export default function FgMediaContainer({
         ))}
       <AdjustmentButtons
         kind={kind}
-        mediaId={mediaId}
+        mediaIdRef={mediaIdRef}
         mediaInstanceId={mediaInstanceId}
         bundleRef={bundleRef}
         panBtnRef={panBtnRef}
@@ -458,7 +463,7 @@ export default function FgMediaContainer({
         data-selectable-id={mediaInstanceId}
       >
         <AnimatePresence>
-          {showLoadingScreen && downloadingState === "downloading" && (
+          {downloadingState === "downloading" && (
             <motion.div
               key="loading-element"
               initial={{ opacity: 0 }}

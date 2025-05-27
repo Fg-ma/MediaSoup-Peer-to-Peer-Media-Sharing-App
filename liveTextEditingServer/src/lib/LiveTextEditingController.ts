@@ -10,7 +10,7 @@ import {
   TableWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { tableTopRedis } from "src";
+import { tableTopCeph, tableTopMongo, tableTopRedis } from "src";
 
 class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
@@ -160,16 +160,79 @@ class LiveTextEditingController {
   onDocSave = async (event: onDocSaveType) => {
     const { tableId, contentId, instanceId } = event.header;
 
-    const ops = await tableTopRedis.gets.lrange(
-      `LTE:${tableId}:${contentId}:${instanceId}`
-    );
-    console.log(ops);
-    // save to ceph here
+    // 1) Upload to ceph
+    const chunksRedisKey = `LTE:${tableId}:${contentId}:file`;
+    const opsRedisKey = `LTE:${tableId}:${contentId}:${instanceId}`;
 
-    this.broadcaster.broadcastToTable(tableId, {
-      type: "docSaved",
-      header: { contentId },
-    });
+    const [chunks, ops] = await Promise.all([
+      tableTopRedis.gets.lrange(chunksRedisKey),
+      tableTopRedis.gets.lrange(opsRedisKey),
+    ]);
+
+    const ydoc = new Y.Doc();
+
+    for (const chunk of chunks) {
+      const update = Uint8Array.from(Object.values(JSON.parse(chunk)));
+      Y.applyUpdate(ydoc, update);
+    }
+
+    for (const op of ops) {
+      const update = Uint8Array.from(Object.values(JSON.parse(op)));
+      Y.applyUpdate(ydoc, update);
+    }
+
+    const fullText = ydoc.getText("monaco").toString();
+
+    const textBuffer = Buffer.from(fullText, "utf8");
+
+    await tableTopCeph.posts.uploadFile("table-text", contentId, textBuffer);
+
+    const mongo = await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
+      tableId,
+      contentId
+    );
+
+    if (mongo?.state.includes("tabled")) {
+      const newContentId = uuidv4();
+
+      await tableTopRedis.posts.rename(
+        opsRedisKey,
+        `LTE:${tableId}:${newContentId}:${instanceId}`
+      );
+      await tableTopRedis.posts.copy(
+        chunksRedisKey,
+        `LTE:${tableId}:${newContentId}:file`
+      );
+
+      const instance = mongo.instances.find(
+        (instance) => instance.textInstanceId === instanceId
+      );
+      if (instance) {
+        tableTopMongo.tableText?.uploads.uploadMetaData({
+          tableId,
+          textId: newContentId,
+          filename: mongo.filename,
+          mimeType: mongo.mimeType,
+          state: [],
+          instances: [instance],
+        });
+        tableTopMongo.tableText?.deletes.deleteInstanceBy_TID_XID_XIID(
+          tableId,
+          contentId,
+          instanceId
+        );
+      }
+
+      this.broadcaster.broadcastToTable(tableId, {
+        type: "docSavedNewContent",
+        header: { oldContentId: contentId, newContentId, instanceId },
+      });
+    } else {
+      this.broadcaster.broadcastToTable(tableId, {
+        type: "docSaved",
+        header: { contentId, instanceId },
+      });
+    }
   };
 }
 

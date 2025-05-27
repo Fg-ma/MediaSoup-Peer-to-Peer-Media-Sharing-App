@@ -85,6 +85,7 @@ type onGetFileChunkType = {
 export type IncomingLiveTextEditingMessages =
   | onDocUpdatedType
   | onDocSavedType
+  | onDocSavedNewContentType
   | onInitialDocResponded
   | onChunkType
   | onDownloadFinishedType
@@ -102,6 +103,11 @@ export type onDocUpdatedType = {
 export type onDocSavedType = {
   type: "docSaved";
   header: { contentId: string; instanceId: string };
+};
+
+export type onDocSavedNewContentType = {
+  type: "docSavedNewContent";
+  header: { oldContentId: string; newContentId: string; instanceId: string };
 };
 
 export type onInitialDocResponded = {
@@ -154,6 +160,7 @@ export type onOneShotDownloadType = {
   };
   data: {
     payload: Uint8Array<ArrayBuffer>;
+    fileSize: number;
   };
 };
 

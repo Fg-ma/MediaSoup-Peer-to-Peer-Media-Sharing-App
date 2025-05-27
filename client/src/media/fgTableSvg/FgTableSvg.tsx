@@ -153,12 +153,12 @@ export default function FgTableSvg({
         retryDownload={svgMediaInstance.svgMedia.retryDownload}
         downloadingState={svgMediaInstance.svgMedia.loadingState}
         addDownloadListener={
-          svgMediaInstance.svgMedia.loadingState === "downloading"
+          svgMediaInstance.svgMedia.loadingState !== "downloaded"
             ? svgMediaInstance.svgMedia.addSvgListener
             : undefined
         }
         removeDownloadListener={
-          svgMediaInstance.svgMedia.loadingState === "downloading"
+          svgMediaInstance.svgMedia.loadingState !== "downloaded"
             ? svgMediaInstance.svgMedia.removeSvgListener
             : undefined
         }

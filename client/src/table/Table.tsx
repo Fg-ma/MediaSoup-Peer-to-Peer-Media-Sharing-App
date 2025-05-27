@@ -26,7 +26,6 @@ export default function Table({
   bundles,
   gridActive,
   gridSize,
-  deadbanding,
 }: {
   tableFunctionsRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -41,7 +40,6 @@ export default function Table({
     rows: number;
     cols: number;
   };
-  deadbanding: React.MutableRefObject<Deadbanding>;
 }) {
   const { tableSocket } = useSocketContext();
   const { sendGroupSignal } = useSignalContext();
@@ -203,7 +201,7 @@ export default function Table({
                     gridColor="#f2f2f2"
                   />
                 )}
-                <SharedBundle deadbanding={deadbanding} tableRef={tableRef} />
+                <SharedBundle tableRef={tableRef} />
                 {bundles &&
                   Object.keys(bundles).length !== 0 &&
                   Object.keys(bundles).map(
