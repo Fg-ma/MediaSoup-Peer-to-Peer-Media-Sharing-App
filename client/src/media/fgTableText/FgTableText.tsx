@@ -148,8 +148,7 @@ export default function FgTableText({
       kind="text"
       initState={textMediaInstance.textMedia.state}
       media={
-        (textMediaInstance.textMedia.loadingState === "downloaded" ||
-          textMediaInstance.textMedia.loadingState === "initialized") && (
+        textMediaInstance.textMedia.loadingState === "downloaded" && (
           <Monaco
             settings={settings}
             isLineNums={isLineNums}

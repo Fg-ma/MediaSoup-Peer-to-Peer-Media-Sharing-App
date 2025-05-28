@@ -11,7 +11,7 @@ import LoadingElement from "../../../../../../../elements/loadingElement/Loading
 import DownloadFailed from "../../../../../../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../../../../../../elements/downloadPaused/DownloadPaused";
 import { useSignalContext } from "../../../../../../../context/signalContext/SignalContext";
-import MonacoTextArea from "../../../../../../../media/fgTableText/lib/monaco/Monaco";
+import Monaco from "../../../../../../../media/fgTableText/lib/monaco/Monaco";
 
 export default function TextSelection({
   instanceId,
@@ -26,8 +26,6 @@ export default function TextSelection({
 
   const textInstanceMedia = userMedia.current.text.tableInstances[instanceId];
   const positioning = textInstanceMedia?.getPositioning();
-
-  const text = useRef(textInstanceMedia.instanceText ?? "");
 
   const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
     textInstanceMedia?.textMedia.loadingState,
@@ -68,16 +66,19 @@ export default function TextSelection({
         selectionContentStyle={{ width: "calc(100% - 1rem)" }}
         selectionContent={
           loadingState === "downloaded" ? (
-            <MonacoTextArea
-              initialText={text.current}
+            <Monaco
               settings={settings}
               isLineNums={false}
+              isReadOnly={true}
               textMediaInstance={textInstanceMedia}
+              limitChunks={2}
             />
           ) : loadingState === "downloading" ? (
             <LoadingElement
               className="h-[12rem] w-full rounded-md"
-              pauseDownload={textInstanceMedia.textMedia.downloader?.pause}
+              pauseDownload={
+                textInstanceMedia.textMedia.liveTextDownloader?.pause
+              }
             />
           ) : loadingState === "failed" ? (
             <DownloadFailed
@@ -87,7 +88,7 @@ export default function TextSelection({
           ) : loadingState === "paused" ? (
             <DownloadPaused
               className="h-[12rem] w-full rounded-md"
-              onClick={textInstanceMedia.textMedia.downloader?.resume}
+              onClick={textInstanceMedia.textMedia.liveTextDownloader?.resume}
             />
           ) : (
             <></>

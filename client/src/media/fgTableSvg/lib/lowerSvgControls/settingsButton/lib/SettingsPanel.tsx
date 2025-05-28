@@ -252,7 +252,7 @@ export default function SettingsPanel({
                 hoverType: "above",
               }}
             />
-            {svgMediaInstance.svgMedia.fileSize < 1 * 1024 * 1024 && (
+            {svgMediaInstance.svgMedia.fileSize < 1024 * 1024 && (
               <FgButton
                 className="h-7 w-full"
                 contentFunction={() => (

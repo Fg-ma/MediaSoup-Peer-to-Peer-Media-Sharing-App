@@ -30,6 +30,7 @@ class MonacoController {
       | undefined,
     private sendGeneralSignal: (signal: GeneralSignals) => void,
     private setIsInitializing: React.Dispatch<React.SetStateAction<boolean>>,
+    private limitChunks: number | undefined,
   ) {}
 
   private messageListener = (msg: IncomingLiveTextEditingMessages) => {
@@ -89,8 +90,11 @@ class MonacoController {
     const newDoc = new Y.Doc();
     const newText = newDoc.getText("monaco");
 
-    for (const update of this.textMediaInstance.textMedia.textData) {
-      Y.applyUpdate(newDoc, update, "noup");
+    const data = this.textMediaInstance.textMedia.textData;
+    for (let i = 0; i < data.length; i++) {
+      if (this.limitChunks === i) break;
+
+      Y.applyUpdate(newDoc, data[i], "noup");
     }
     for (const update of this.textMediaInstance.ops) {
       Y.applyUpdate(newDoc, update, "noup");
@@ -179,8 +183,11 @@ class MonacoController {
     this.yText.current = this.ydoc.current.getText("monaco");
 
     if (this.textMediaInstance.textMedia.textData.length) {
-      for (const data of this.textMediaInstance.textMedia.textData) {
-        Y.applyUpdate(this.ydoc.current, data, "noup");
+      const data = this.textMediaInstance.textMedia.textData;
+      for (let i = 0; i < data.length; i++) {
+        if (this.limitChunks === i) break;
+
+        Y.applyUpdate(this.ydoc.current, data[i], "noup");
       }
     }
 

@@ -210,7 +210,7 @@ export default function FgTableSvg({
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
         options={{ gradient: false, adjustmentAnimation: false }}
       />
-      {svgMediaInstance.svgMedia.fileSize < 1 * 1024 * 1024 &&
+      {svgMediaInstance.svgMedia.fileSize < 1024 * 1024 &&
         editing &&
         svgMediaInstance.svgMedia.svg && (
           <FgPortal

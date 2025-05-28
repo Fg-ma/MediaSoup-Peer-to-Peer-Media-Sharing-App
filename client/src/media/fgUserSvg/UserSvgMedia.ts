@@ -128,7 +128,6 @@ class UserSvgMedia {
   reloadContent = () => {
     if (
       this.loadingState === "downloading" ||
-      this.loadingState === "initialized" ||
       this.loadingState === "failed" ||
       this.downloader
     ) {

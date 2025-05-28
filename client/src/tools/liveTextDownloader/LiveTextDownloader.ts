@@ -79,14 +79,6 @@ class LiveTextDownloader {
 
   private requestNextChunk = () => {
     this.idx += 1;
-    if (this.idx === 5) {
-      this.listeners.forEach((listener) => {
-        listener({
-          type: "initialized",
-          data: { payload: this.data },
-        });
-      });
-    }
     this.liveTextEditingSocket.current?.getChunk(this.contentId, this.idx);
   };
 

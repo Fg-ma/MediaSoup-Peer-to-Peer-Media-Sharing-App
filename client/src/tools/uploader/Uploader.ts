@@ -10,7 +10,7 @@ import {
 import IndexedDB from "../../db/indexedDB/IndexedDB";
 import ReasonableFileSizer from "../reasonableFileSizer.ts/ReasonableFileSizer";
 import TextChunkUploader from "./lib/textChunkUploader/TextChunkUploader";
-import TextOneShotUploader from "./lib/textOneShotUploader copy/TextOneShotUploader";
+import TextOneShotUploader from "./lib/textOneShotUploader/TextOneShotUploader";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -20,7 +20,7 @@ const userStaticContentServerBaseUrl =
 export type TableUploadDirections = "toTable" | "reupload" | "toTabled";
 
 class Uploader {
-  private ONE_SHOT_FILE_SIZE_CUTOFF = 1024 * 1024 * 100;
+  private ONE_SHOT_FILE_SIZE_CUTOFF = 1024 * 1024 * 40;
 
   private oneShotUploader = new OneShotUploader();
   private textOneShotUploader = new TextOneShotUploader();

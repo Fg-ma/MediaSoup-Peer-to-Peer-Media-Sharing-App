@@ -20,9 +20,6 @@ class TextController {
       case "downloadComplete":
         this.onDownloadComplete();
         break;
-      case "initialized":
-        this.setRerender((prev) => !prev);
-        break;
       case "stateChanged":
         this.setRerender((prev) => !prev);
         break;

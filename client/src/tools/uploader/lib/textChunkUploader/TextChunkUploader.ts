@@ -148,8 +148,9 @@ class TextChunkUploader {
     const totalChunks = Math.ceil(
       this.text.length / this.CHUNK_ACCUMULATION_SIZE,
     ).toString();
-    let accumulated = new Uint8Array(0);
     let chunkBatchIndex = 0;
+
+    const chunks: Uint8Array[] = [];
 
     while (this.offset < this.text.length && !this._paused && !this.cancelled) {
       const chunkText = this.text.slice(
@@ -167,23 +168,23 @@ class TextChunkUploader {
       new DataView(wrappedUpdate.buffer).setUint32(0, rawUpdateLength, true);
       wrappedUpdate.set(rawUpdate, 4);
 
-      // Accumulate
-      const combined = new Uint8Array(
-        accumulated.length + wrappedUpdate.length,
-      );
-      combined.set(accumulated);
-      combined.set(wrappedUpdate, accumulated.length);
-      accumulated = combined;
-
-      // Upload only when accumulated updates exceed CHUNK_ACCUMULATION_SIZE
-      if (accumulated.length >= this.CHUNK_ACCUMULATION_SIZE) {
-        await this.uploadChunk(accumulated, chunkBatchIndex++, totalChunks);
-        accumulated = new Uint8Array(0); // Reset buffer
+      const accumulatedSize = chunks.reduce((acc, cur) => acc + cur.length, 0);
+      if (accumulatedSize >= this.CHUNK_ACCUMULATION_SIZE) {
+        const accumulated = Buffer.concat(chunks);
+        const success = await this.uploadChunk(
+          accumulated,
+          chunkBatchIndex,
+          totalChunks,
+        );
+        if (success) chunkBatchIndex += 1;
+        chunks.length = 0;
+        console.log(chunks);
       }
     }
 
     // Upload any remaining updates
-    if (accumulated.length > 0) {
+    if (chunks.length > 0) {
+      const accumulated = Buffer.concat(chunks);
       await this.uploadChunk(accumulated, chunkBatchIndex++, totalChunks);
     }
 
@@ -196,7 +197,7 @@ class TextChunkUploader {
     data: Uint8Array,
     chunkIndex: number,
     totalChunks: string,
-  ) {
+  ): Promise<boolean> {
     const start = Date.now();
 
     const formData = new FormData();
@@ -221,7 +222,7 @@ class TextChunkUploader {
 
       if (!response.ok && response.status !== 409) {
         this.chunkErrorRetryUpload();
-        throw new Error("Upload failed");
+        return false;
       }
 
       if (response.status !== 409) {
@@ -253,9 +254,10 @@ class TextChunkUploader {
           this.offset,
         );
       }
+      return true;
     } catch (error) {
       console.error("Upload failed:", error);
-      throw error;
+      return false;
     }
   }
 

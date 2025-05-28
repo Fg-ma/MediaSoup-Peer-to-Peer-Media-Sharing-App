@@ -19,6 +19,7 @@ export default function Monaco({
   setIsReadOnly,
   textMediaInstance,
   externalTextAreaContainerRef,
+  limitChunks,
 }: {
   className?: string;
   settings: Settings;
@@ -28,6 +29,7 @@ export default function Monaco({
   setIsReadOnly?: React.Dispatch<React.SetStateAction<boolean>>;
   textMediaInstance: TableTextMediaInstance;
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
+  limitChunks?: number;
 }) {
   const { liveTextEditingSocket } = useSocketContext();
   const { sendGeneralSignal } = useSignalContext();
@@ -63,6 +65,7 @@ export default function Monaco({
       setIsLineNums,
       sendGeneralSignal,
       setIsInitializing,
+      limitChunks,
     ),
   );
 
@@ -143,9 +146,16 @@ export default function Monaco({
           lineDecorationsWidth: 10,
           lineNumbersMinChars: 0,
         }}
+        loading={
+          <div className="flex absolute inset-0 items-center justify-center">
+            <span className="font-K2D text-xl text-fg-white">
+              Initializing...
+            </span>
+          </div>
+        }
       />
       {isInitializing && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex absolute inset-0 items-center justify-center">
           <span className="font-K2D text-xl text-fg-white">
             Initializing...
           </span>

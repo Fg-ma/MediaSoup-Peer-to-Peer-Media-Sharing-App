@@ -20,7 +20,6 @@ export type onTextFinishedLoadingType = {
 
 export type TextListenerTypes =
   | { type: "downloadComplete" }
-  | { type: "initialized" }
   | { type: "downloadPaused" }
   | { type: "downloadResumed" }
   | { type: "downloadFailed" }
@@ -120,13 +119,6 @@ class TableTextMedia {
         this.loadingState = "downloading";
         this.textListeners.forEach((listener) => {
           listener({ type: "downloadResumed" });
-        });
-        break;
-      case "initialized":
-        this.textData = message.data.payload;
-        this.loadingState = "initialized";
-        this.textListeners.forEach((listener) => {
-          listener({ type: "initialized" });
         });
         break;
       default:
