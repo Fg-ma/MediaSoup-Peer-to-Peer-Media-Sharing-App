@@ -15,6 +15,19 @@ class Gets {
   lindex = async (prefix: string, idx: number) => {
     return await this.redis.lindex(prefix, idx);
   };
+
+  scanAllKeys = async (match: string): Promise<string[]> => {
+    let cursor = "0";
+    const allKeys: string[] = [];
+
+    do {
+      const [nextCursor, keys] = await this.redis.scan(cursor, "MATCH", match);
+      cursor = nextCursor;
+      allKeys.push(...keys);
+    } while (cursor !== "0");
+
+    return allKeys;
+  };
 }
 
 export default Gets;

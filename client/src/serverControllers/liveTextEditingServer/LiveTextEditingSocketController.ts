@@ -89,9 +89,11 @@ class LiveTextEditingSocketController {
               header: {
                 contentId: header.header.contentId,
                 instanceId: header.header.instanceId,
+                lastOps: header.header.lastOps,
               },
               data: {
-                payload: fileBuffer,
+                payload:
+                  fileBuffer.byteLength !== 0 ? this.unpackOps(fileBuffer) : [],
               },
             };
             break;
@@ -146,6 +148,24 @@ class LiveTextEditingSocketController {
     this.ws.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
+  };
+
+  private unpackOps = (
+    buffer: Uint8Array<ArrayBuffer>,
+  ): Uint8Array<ArrayBuffer>[] => {
+    const updates: Uint8Array<ArrayBuffer>[] = [];
+    let offset = 0;
+    while (offset < buffer.length) {
+      const len = new DataView(
+        buffer.buffer,
+        buffer.byteOffset + offset,
+        4,
+      ).getUint32(0, true);
+      const update = buffer.slice(offset + 4, offset + 4 + len);
+      updates.push(update);
+      offset += 4 + len;
+    }
+    return updates;
   };
 
   addMessageListener = (

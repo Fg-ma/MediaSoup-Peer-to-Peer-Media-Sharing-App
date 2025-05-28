@@ -27,57 +27,44 @@ class Gets {
 
           if (data?.Body instanceof Readable) {
             const stream = data.Body as Readable;
-
-            const BATCH_SIZE = 0.1 * 1024 * 1024;
             let buffer = Buffer.alloc(0);
 
-            const ydoc = new Y.Doc();
-            const ytext = ydoc.getText("monaco");
-            let offset = 0;
-            let lastStateVector = Y.encodeStateVector(ydoc);
             await new Promise<void>((resolve) => {
               stream.on("data", async (chunk) => {
                 buffer = Buffer.concat([buffer, chunk]);
 
-                while (buffer.length >= BATCH_SIZE) {
-                  const slice = buffer.subarray(0, BATCH_SIZE);
-                  buffer = buffer.subarray(BATCH_SIZE);
+                while (buffer.length >= 4) {
+                  const updateLength = buffer.readUInt32LE(0);
 
-                  const text = slice.toString("utf8");
-                  ytext.insert(offset, text);
-                  offset += text.length;
+                  // If not enough data yet to read the full update, wait for more
+                  if (buffer.length < 4 + updateLength) break;
 
-                  const incrementalUpdate = Y.encodeStateAsUpdate(
-                    ydoc,
-                    lastStateVector
-                  );
-                  lastStateVector = Y.encodeStateVector(ydoc);
+                  const update = buffer.subarray(4, 4 + updateLength);
 
+                  buffer = buffer.subarray(4 + updateLength);
+
+                  // Save to Redis for fast rehydration later
                   await tableTopRedis.posts.rpush(
                     `LTE:${tableId}:${contentId}:file`,
-                    JSON.stringify(Array.from(incrementalUpdate))
+                    JSON.stringify(Array.from(update))
                   );
                 }
               });
 
               stream.on("end", async () => {
-                if (buffer.length > 0) {
-                  const text = buffer.toString("utf8");
-                  ytext.insert(offset, text);
+                if (buffer.length >= 4) {
+                  const updateLength = buffer.readUInt32LE(0);
+                  if (buffer.length >= 4 + updateLength) {
+                    const update = buffer.subarray(4, 4 + updateLength);
 
-                  const incrementalUpdate = Y.encodeStateAsUpdate(
-                    ydoc,
-                    lastStateVector
-                  );
-                  lastStateVector = Y.encodeStateVector(ydoc);
-
-                  await tableTopRedis.posts.rpush(
-                    `LTE:${tableId}:${contentId}:file`,
-                    JSON.stringify(Array.from(incrementalUpdate))
-                  );
-
-                  resolve();
+                    await tableTopRedis.posts.rpush(
+                      `LTE:${tableId}:${contentId}:file`,
+                      JSON.stringify(Array.from(update))
+                    );
+                  }
                 }
+
+                resolve();
               });
             });
           }
@@ -105,20 +92,15 @@ class Gets {
             const chunks: Buffer[] = [];
 
             stream
-              .on("data", (chunk) => {
+              .on("data", async (chunk) => {
                 chunks.push(chunk);
               })
               .on("end", async () => {
-                const fullChunk = Buffer.concat(chunks);
-                const initialText = fullChunk.toString("utf8");
-
-                const ydoc = new Y.Doc();
-                ydoc.getText("monaco").insert(0, initialText);
-                const payload = Y.encodeStateAsUpdate(ydoc);
+                const update = Buffer.concat(chunks);
 
                 await tableTopRedis.posts.rpush(
                   `LTE:${tableId}:${contentId}:file`,
-                  JSON.stringify(Array.from(payload))
+                  JSON.stringify(Array.from(update))
                 );
 
                 const headerObj = {
@@ -134,14 +116,14 @@ class Gets {
                 const headerLen = headerBytes.length;
 
                 // 2) Allocate a buffer: 1 for prefix + 4 bytes for length + header + data
-                const message = new Uint8Array(4 + headerLen + payload.length);
+                const message = new Uint8Array(4 + headerLen + update.length);
 
                 // 3) Write header length LE
                 new DataView(message.buffer).setUint32(0, headerLen, true);
 
                 // 4) Copy in the header bytes, then the data bytes
                 message.set(headerBytes, 4);
-                message.set(payload, 4 + headerLen);
+                message.set(update, 4 + headerLen);
 
                 this.broadcaster.broadcastToInstance(
                   tableId,

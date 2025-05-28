@@ -54,14 +54,11 @@ export default function LowerControls({
         fullscreen ||
         backgroundMedia
           ? "bottom-0"
-          : "top-full"
+          : "top-full mt-1"
       } pointer-events-none absolute z-20 h-[12%] max-h-12 min-h-6 w-full flex-col items-end justify-center`}
     >
       <div className="flex h-full w-full justify-between">
-        <div
-          className="z-20 flex h-full w-max items-center space-x-2"
-          style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
-        >
+        <div className="z-20 flex h-full w-max items-center space-x-2">
           {leftLowerControls &&
             leftLowerControls.length > 0 &&
             leftLowerControls.map((control, index) => (

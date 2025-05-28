@@ -6,10 +6,12 @@ import { TablePanels } from "../../../tableSidePanel/TableSidePanel";
 
 export default function LoadingTab({
   activePanel,
+  tableSidePanelActive,
   setTableSidePanelActive,
   setExternalRerender,
 }: {
   activePanel: React.MutableRefObject<TablePanels>;
+  tableSidePanelActive: boolean;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -52,10 +54,10 @@ export default function LoadingTab({
   return (
     <>
       {Object.keys(getCurrentUploads()).length !== 0 &&
-        activePanel.current !== "upload" && (
+        (activePanel.current !== "upload" || !tableSidePanelActive) && (
           <div
             ref={loadingTabRef}
-            className="hide-scroll-bar absolute bottom-0 left-0 z-upload-tab flex h-16 w-[11.25rem] items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden rounded-bl-md rounded-tr-md border-2 border-fg-off-white bg-fg-tone-black-8 px-2"
+            className="hide-scroll-bar absolute bottom-0 left-0 z-upload-tab flex h-16 w-max max-w-[11.25rem] items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden rounded-bl-md rounded-tr-md border-2 border-fg-off-white bg-fg-tone-black-8 px-2"
             onClick={handleOpenLoadingPanel}
             onWheel={(event) => {
               if (loadingTabRef.current)

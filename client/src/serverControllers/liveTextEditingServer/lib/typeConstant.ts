@@ -112,9 +112,13 @@ export type onDocSavedNewContentType = {
 
 export type onInitialDocResponded = {
   type: "initialDocResponded";
-  header: { contentId: string; instanceId: string };
+  header: {
+    contentId: string;
+    instanceId: string;
+    lastOps: boolean;
+  };
   data: {
-    payload: Uint8Array<ArrayBuffer>;
+    payload: Uint8Array<ArrayBuffer>[];
   };
 };
 

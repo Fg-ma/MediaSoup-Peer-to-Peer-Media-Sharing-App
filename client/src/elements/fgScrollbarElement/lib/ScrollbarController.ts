@@ -1,5 +1,6 @@
-class FgScrollbarController {
+class ScrollbarController {
   private scrollTimeoutTime = 1250;
+  private scrollbarDelay = 25;
 
   constructor(
     private scrollingContentRef: React.RefObject<HTMLDivElement>,
@@ -8,6 +9,9 @@ class FgScrollbarController {
     private scrollbarTrackRef: React.RefObject<HTMLDivElement>,
     private scrollbarThumbRef: React.RefObject<HTMLDivElement>,
     private scrollTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private delayScrollBarTimeout: React.MutableRefObject<
+      NodeJS.Timeout | undefined
+    >,
     private directionRef: React.MutableRefObject<"vertical" | "horizontal">,
     private dragging: React.MutableRefObject<boolean>,
     private scrollStart: React.MutableRefObject<{
@@ -177,6 +181,11 @@ class FgScrollbarController {
       this.scrollTimeout.current = undefined;
     }
 
+    if (this.delayScrollBarTimeout.current) {
+      clearTimeout(this.delayScrollBarTimeout.current);
+      this.delayScrollBarTimeout.current = undefined;
+    }
+
     if (!this.dragging.current) {
       this.scrollTimeout.current = setTimeout(() => {
         this.scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
@@ -197,6 +206,11 @@ class FgScrollbarController {
     if (this.scrollTimeout.current) {
       clearTimeout(this.scrollTimeout.current);
       this.scrollTimeout.current = undefined;
+    }
+
+    if (this.delayScrollBarTimeout.current) {
+      clearTimeout(this.delayScrollBarTimeout.current);
+      this.delayScrollBarTimeout.current = undefined;
     }
 
     if (!this.dragging.current) {
@@ -288,6 +302,11 @@ class FgScrollbarController {
       this.scrollTimeout.current = undefined;
     }
 
+    if (this.delayScrollBarTimeout.current) {
+      clearTimeout(this.delayScrollBarTimeout.current);
+      this.delayScrollBarTimeout.current = undefined;
+    }
+
     if (!this.dragging.current) {
       this.scrollTimeout.current = setTimeout(() => {
         this.scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
@@ -334,12 +353,24 @@ class FgScrollbarController {
             "hide-fg-scrollbar",
           )
         ) {
-          this.scrollbarElementRef.current.classList.remove(
-            "hide-fg-scrollbar",
-          );
-          this.updateScrollbar();
+          this.delayScrollBarTimeout.current = setTimeout(() => {
+            this.scrollbarElementRef.current?.classList.remove(
+              "hide-fg-scrollbar",
+            );
+            this.updateScrollbar();
+
+            if (this.delayScrollBarTimeout.current) {
+              clearTimeout(this.delayScrollBarTimeout.current);
+              this.delayScrollBarTimeout.current = undefined;
+            }
+          }, this.scrollbarDelay);
         }
       } else {
+        if (this.delayScrollBarTimeout.current) {
+          clearTimeout(this.delayScrollBarTimeout.current);
+          this.delayScrollBarTimeout.current = undefined;
+        }
+
         if (
           !this.scrollbarElementRef.current.classList.contains(
             "hide-fg-scrollbar",
@@ -364,12 +395,24 @@ class FgScrollbarController {
             "hide-fg-scrollbar",
           )
         ) {
-          this.scrollbarElementRef.current.classList.remove(
-            "hide-fg-scrollbar",
-          );
-          this.updateScrollbar();
+          this.delayScrollBarTimeout.current = setTimeout(() => {
+            this.scrollbarElementRef.current?.classList.remove(
+              "hide-fg-scrollbar",
+            );
+            this.updateScrollbar();
+
+            if (this.delayScrollBarTimeout.current) {
+              clearTimeout(this.delayScrollBarTimeout.current);
+              this.delayScrollBarTimeout.current = undefined;
+            }
+          }, this.scrollbarDelay);
         }
       } else {
+        if (this.delayScrollBarTimeout.current) {
+          clearTimeout(this.delayScrollBarTimeout.current);
+          this.delayScrollBarTimeout.current = undefined;
+        }
+
         if (
           !this.scrollbarElementRef.current.classList.contains(
             "hide-fg-scrollbar",
@@ -399,6 +442,11 @@ class FgScrollbarController {
       this.scrollTimeout.current = undefined;
     }
 
+    if (this.delayScrollBarTimeout.current) {
+      clearTimeout(this.delayScrollBarTimeout.current);
+      this.delayScrollBarTimeout.current = undefined;
+    }
+
     if (
       this.scrollbarElementRef.current &&
       !this.scrollbarElementRef.current.classList.contains("hide-fg-scrollbar")
@@ -408,4 +456,4 @@ class FgScrollbarController {
   };
 }
 
-export default FgScrollbarController;
+export default ScrollbarController;

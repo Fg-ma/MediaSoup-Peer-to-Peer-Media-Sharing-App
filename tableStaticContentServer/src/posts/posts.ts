@@ -54,6 +54,8 @@ class Posts {
           scale: { x: number; y: number };
           rotation: number;
         };
+        mimeType: StaticMimeTypes;
+        filename: string;
       } | null = null;
 
       bb.on("field", (fieldname, val) => {
@@ -66,21 +68,21 @@ class Posts {
         }
       });
 
-      bb.on("file", (_, file, info) => {
-        const { mimeType, filename } = info;
+      bb.on("file", (_, file) => {
+        if (!metadata) return;
 
         const sanitizedFilename = tableStaticContentUtils.sanitizeString(
-          filename.slice(0, -4)
+          metadata.filename.slice(0, -4)
         );
-        const sanitizedMimeType =
-          tableStaticContentUtils.sanitizeMimeType(mimeType);
+        const sanitizedMimeType = tableStaticContentUtils.sanitizeMimeType(
+          metadata.mimeType
+        );
         const completeFilename = `${sanitizedFilename}${
           mimeToExtension[sanitizedMimeType as StaticMimeTypes]
         }`;
         const staticContentType =
-          mimeTypeContentTypeMap[mimeType as StaticMimeTypes] ?? ".bin";
-
-        if (!metadata) return;
+          mimeTypeContentTypeMap[metadata.mimeType as StaticMimeTypes] ??
+          ".bin";
 
         // Save file
         tableTopCeph.posts
@@ -99,7 +101,7 @@ class Posts {
                   metadata.tableId,
                   metadata.contentId,
                   metadata.instanceId,
-                  mimeType as StaticMimeTypes,
+                  metadata.mimeType,
                   completeFilename,
                   metadata.state,
                   metadata.initPositioning
@@ -117,7 +119,7 @@ class Posts {
                   staticContentType,
                   metadata.tableId,
                   metadata.contentId,
-                  mimeType as StaticMimeTypes,
+                  metadata.mimeType,
                   completeFilename,
                   metadata.state
                 );

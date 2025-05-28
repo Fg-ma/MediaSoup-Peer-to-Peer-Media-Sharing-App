@@ -249,10 +249,7 @@ export default function FgLowerVisualMediaControls({
 
   return (
     <div className="visual-media-lower-controls pointer-events-none absolute bottom-[1%] left-0 z-20 flex h-[12%] max-h-12 min-h-6 w-full justify-between px-3">
-      <div
-        className="flex z-20 h-full w-max items-center space-x-2"
-        style={{ boxShadow: "20px 0 15px -12px rgba(0, 0, 0, 0.9)" }}
-      >
+      <div className="z-20 flex h-full w-max items-center space-x-2">
         {fgVisualMediaOptions.isPlayPause && (
           <Suspense fallback={<div>Loading...</div>}>
             <PlayPauseButton

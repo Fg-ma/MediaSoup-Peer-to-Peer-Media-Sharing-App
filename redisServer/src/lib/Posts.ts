@@ -47,6 +47,14 @@ class Posts {
   rpush = async (prefix: string, data: any) => {
     await this.redis.rpush(prefix, data);
   };
+
+  expire = async (key: string, ttl: number) => {
+    return this.redis.expire(key, ttl);
+  };
+
+  persist = async (key: string) => {
+    return this.redis.persist(key);
+  };
 }
 
 export default Posts;

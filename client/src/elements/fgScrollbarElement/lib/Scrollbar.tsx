@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import FgScrollbarElementController from "./FgScrollbarElementController";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import ScrollbarController from "./ScrollbarController";
 
 export default function Scrollbar({
   contentContainerRef,
@@ -20,6 +20,7 @@ export default function Scrollbar({
   const scrollbarTrackRef = useRef<HTMLDivElement>(null);
   const scrollbarThumbRef = useRef<HTMLDivElement>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const delayScrollBarTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const dragging = useRef(false);
   const scrollStart = useRef({ x: 0, y: 0 });
   const startScrollPosition = useRef({ top: 0, left: 0 });
@@ -27,13 +28,14 @@ export default function Scrollbar({
   const scrollbarVisible = useRef(true);
   const [_, setRerender] = useState(false);
 
-  const fgScrollbarElementController = new FgScrollbarElementController(
+  const scrollbarController = new ScrollbarController(
     scrollingContentRef,
     scrollbarElementRef,
     scrollbarRef,
     scrollbarTrackRef,
     scrollbarThumbRef,
     scrollTimeout,
+    delayScrollBarTimeout,
     directionRef,
     dragging,
     scrollStart,
@@ -44,22 +46,22 @@ export default function Scrollbar({
   useEffect(() => {
     directionRef.current = direction;
 
-    fgScrollbarElementController.updateScrollbar();
+    scrollbarController.updateScrollbar();
 
     if (directionRef.current === "vertical") {
       scrollingContentRef.current?.addEventListener(
         "scroll",
-        fgScrollbarElementController.scrollFunction,
+        scrollbarController.scrollFunction,
       );
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        fgScrollbarElementController.verticalScrollWheel,
+        scrollbarController.verticalScrollWheel,
       );
     }
     if (directionRef.current === "horizontal") {
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        fgScrollbarElementController.horizontalScrollWheel,
+        scrollbarController.horizontalScrollWheel,
       );
     }
 
@@ -67,17 +69,17 @@ export default function Scrollbar({
       if (directionRef.current === "vertical") {
         scrollingContentRef.current?.removeEventListener(
           "scroll",
-          fgScrollbarElementController.scrollFunction,
+          scrollbarController.scrollFunction,
         );
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          fgScrollbarElementController.verticalScrollWheel,
+          scrollbarController.verticalScrollWheel,
         );
       }
       if (directionRef.current === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          fgScrollbarElementController.horizontalScrollWheel,
+          scrollbarController.horizontalScrollWheel,
         );
       }
     };
@@ -92,47 +94,52 @@ export default function Scrollbar({
       dragging.current = false;
     }
     setTimeout(() => {
-      fgScrollbarElementController.updateScrollbar();
+      scrollbarController.updateScrollbar();
     }, 0);
   }, [scrollbarVisible.current]);
 
   useEffect(() => {
-    // create a resize observer to cause a rerender when the content changes size
-    let resizeObserver: ResizeObserver | undefined;
-    if (contentContainerRef.current) {
-      resizeObserver = new ResizeObserver(() => {
-        scrollbarVisible.current = contentContainerRef.current
-          ? contentContainerRef.current.scrollHeight >
-            contentContainerRef.current.clientHeight
-          : true;
-        setRerender((prev) => !prev);
-      });
-      resizeObserver.observe(contentContainerRef.current);
-    }
-
     scrollbarElementRef.current?.addEventListener(
       "pointermove",
-      fgScrollbarElementController.hideTableScrollBar,
+      scrollbarController.hideTableScrollBar,
     );
     scrollbarElementRef.current?.addEventListener(
       "pointerleave",
-      fgScrollbarElementController.pointerLeaveFunction,
+      scrollbarController.pointerLeaveFunction,
     );
 
     return () => {
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
       scrollbarElementRef.current?.removeEventListener(
         "pointermove",
-        fgScrollbarElementController.hideTableScrollBar,
+        scrollbarController.hideTableScrollBar,
       );
       scrollbarElementRef.current?.removeEventListener(
         "pointerleave",
-        fgScrollbarElementController.pointerLeaveFunction,
+        scrollbarController.pointerLeaveFunction,
       );
     };
   }, []);
+
+  useLayoutEffect(() => {
+    if (!contentContainerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      scrollbarVisible.current =
+        direction === "vertical"
+          ? contentContainerRef.current
+            ? contentContainerRef.current.scrollHeight >
+              contentContainerRef.current.clientHeight
+            : true
+          : contentContainerRef.current
+            ? contentContainerRef.current.scrollWidth >
+              contentContainerRef.current.clientWidth
+            : true;
+      setRerender((prev) => !prev);
+    });
+    resizeObserver.observe(contentContainerRef.current);
+
+    return resizeObserver.disconnect();
+  }, [direction]);
 
   return (
     scrollbarVisible.current && (
@@ -155,7 +162,7 @@ export default function Scrollbar({
               ? "fg-vertical-scrollbar-track"
               : "fg-horizontal-scrollbar-track"
           }`}
-          onPointerDown={fgScrollbarElementController.trackPointerDown}
+          onPointerDown={scrollbarController.trackPointerDown}
         >
           <div
             ref={scrollbarThumbRef}
@@ -164,7 +171,7 @@ export default function Scrollbar({
                 ? "fg-vertical-scrollbar-thumb"
                 : "fg-horizontal-scrollbar-thumb"
             }`}
-            onPointerDown={fgScrollbarElementController.thumbDragStart}
+            onPointerDown={scrollbarController.thumbDragStart}
           ></div>
         </div>
       </div>

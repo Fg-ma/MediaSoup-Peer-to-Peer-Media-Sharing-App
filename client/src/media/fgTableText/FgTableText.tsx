@@ -197,6 +197,7 @@ export default function FgTableText({
           settingsActive={settingsActive}
           lowerTextController={lowerTextController}
           scrollingContainerRef={rightLowerTextControlsRef}
+          textMediaInstance={textMediaInstance}
         />,
       ]}
       inMediaVariables={[settingsActive]}

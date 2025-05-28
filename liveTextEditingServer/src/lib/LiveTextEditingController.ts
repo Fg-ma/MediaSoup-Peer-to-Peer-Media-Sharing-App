@@ -10,12 +10,18 @@ import {
   TableWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { tableTopCeph, tableTopMongo, tableTopRedis } from "src";
+import {
+  CEPH_CHUNK_SIZE,
+  REDIS_INITIAL_CHUNK_SIZE,
+  tableTopCeph,
+  tableTopMongo,
+  tableTopRedis,
+} from "src";
 
 class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
 
-  onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
+  onJoinTable = async (ws: TableWebSocket, event: onJoinTableType) => {
     const { tableId, username, instance } = event.header;
 
     ws.id = uuidv4();
@@ -25,6 +31,16 @@ class LiveTextEditingController {
 
     if (!tables[tableId]) {
       tables[tableId] = {};
+
+      const tableKeys = await tableTopRedis.gets.scanAllKeys(
+        `LTE:${tableId}:*:*`
+      );
+
+      const promises = [];
+      for (const key of tableKeys) {
+        promises.push(tableTopRedis.posts.persist(key));
+      }
+      await Promise.all(promises);
     }
     if (!tables[tableId][username]) {
       tables[tableId][username] = {};
@@ -48,11 +64,11 @@ class LiveTextEditingController {
   onGetInitialDocState = async (event: onGetInitialDocStateType) => {
     const { tableId, username, instance, contentId, instanceId } = event.header;
 
-    const ops = await tableTopRedis.gets.lrange(
+    const redisOps = await tableTopRedis.gets.lrange(
       `LTE:${tableId}:${contentId}:${instanceId}`
     );
 
-    if (ops.length === 0) {
+    if (redisOps.length === 0) {
       const headerObj = {
         type: "initialDocResponded",
         header: { contentId, instanceId },
@@ -81,46 +97,64 @@ class LiveTextEditingController {
       return;
     }
 
-    const ydoc = new Y.Doc();
-    for (const op of ops) {
-      try {
-        const updateObj = JSON.parse(op);
-        const update = Uint8Array.from(Object.values(updateObj));
-        Y.applyUpdate(ydoc, update);
-      } catch (_e) {
-        console.warn("Invalid Yjs update in Redis:", op);
-      }
-    }
-
-    const payload = Y.encodeStateAsUpdate(ydoc);
-
-    // 1) Build the JSON header
-    const headerObj = {
-      type: "initialDocResponded",
-      header: { contentId, instanceId },
-    };
-    const headerStr = JSON.stringify(headerObj);
-    const encoder = new TextEncoder();
-    const headerBytes = encoder.encode(headerStr);
-    const headerLen = headerBytes.length;
-
-    // 2) Allocate a buffer: 1 for prefix + 4 bytes for length + header + data
-    const message = new Uint8Array(4 + headerLen + payload.length);
-
-    // 3) Write header length LE
-    new DataView(message.buffer).setUint32(0, headerLen, true);
-
-    // 4) Copy in the header bytes, then the data bytes
-    message.set(headerBytes, 4);
-    message.set(payload, 4 + headerLen);
-
-    this.broadcaster.broadcastToInstance(
-      tableId,
-      username,
-      instance,
-      message,
-      true
+    const ops = redisOps.map((op) =>
+      Uint8Array.from(Object.values(JSON.parse(op)))
     );
+
+    let i = 0;
+    while (i < ops.length) {
+      let totalLength = 0;
+      let j = i;
+
+      while (j < ops.length) {
+        const op = ops[j];
+        const opLength = 4 + op.length;
+        if (totalLength + opLength > REDIS_INITIAL_CHUNK_SIZE) break;
+        totalLength += opLength;
+        j++;
+      }
+
+      const sendOps = ops.slice(i, j);
+
+      const opsPayload = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const op of sendOps) {
+        new DataView(opsPayload.buffer).setUint32(offset, op.length, true);
+        opsPayload.set(op, offset + 4);
+        offset += 4 + op.length;
+      }
+
+      const chunkHeaderObj = {
+        type: "initialDocResponded",
+        header: {
+          contentId,
+          instanceId,
+          lastOps: j >= ops.length,
+        },
+      };
+
+      const chunkHeaderStr = JSON.stringify(chunkHeaderObj);
+      const encoder = new TextEncoder();
+      const chunkHeaderBytes = encoder.encode(chunkHeaderStr);
+      const chunkHeaderLen = chunkHeaderBytes.length;
+
+      const chunkMessage = new Uint8Array(
+        4 + chunkHeaderLen + opsPayload.length
+      );
+      new DataView(chunkMessage.buffer).setUint32(0, chunkHeaderLen, true);
+      chunkMessage.set(chunkHeaderBytes, 4);
+      chunkMessage.set(opsPayload, 4 + chunkHeaderLen);
+
+      this.broadcaster.broadcastToInstance(
+        tableId,
+        username,
+        instance,
+        chunkMessage,
+        true
+      );
+
+      i = j;
+    }
   };
 
   onDocUpdate = async (event: onDocUpdateType) => {
@@ -181,11 +215,47 @@ class LiveTextEditingController {
       Y.applyUpdate(ydoc, update);
     }
 
-    const fullText = ydoc.getText("monaco").toString();
+    const fullUpdate = Y.encodeStateAsUpdate(ydoc);
+    const updateBuffer = Buffer.from(fullUpdate);
+    if (updateBuffer.byteLength < 1024 * 1024) {
+      await tableTopCeph.posts.uploadFile(
+        "table-text",
+        contentId,
+        updateBuffer
+      );
+    } else {
+      const updates: Uint8Array<ArrayBuffer>[] = [];
+      const tempDoc = new Y.Doc();
+      let lastStateVector = Y.encodeStateVector(ydoc);
+      let offset = 0;
 
-    const textBuffer = Buffer.from(fullText, "utf8");
+      while (offset < fullUpdate.length) {
+        const end = Math.min(offset + CEPH_CHUNK_SIZE, fullUpdate.length);
+        const chunk = fullUpdate.slice(offset, end);
 
-    await tableTopCeph.posts.uploadFile("table-text", contentId, textBuffer);
+        Y.applyUpdate(tempDoc, chunk);
+        const newUpdate = Y.encodeStateAsUpdate(tempDoc, lastStateVector);
+        lastStateVector = Y.encodeStateVector(tempDoc);
+
+        const lengthPrefixed = new Uint8Array(4 + newUpdate.length);
+        new DataView(lengthPrefixed.buffer).setUint32(
+          0,
+          newUpdate.length,
+          true
+        );
+        lengthPrefixed.set(newUpdate, 4);
+
+        updates.push(lengthPrefixed);
+
+        offset = end;
+      }
+
+      await tableTopCeph.posts.uploadFile(
+        "table-text",
+        contentId,
+        Buffer.concat(updates)
+      );
+    }
 
     const mongo = await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
       tableId,

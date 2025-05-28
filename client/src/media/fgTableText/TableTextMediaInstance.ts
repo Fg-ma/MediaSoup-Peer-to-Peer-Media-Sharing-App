@@ -1,9 +1,11 @@
-import * as Y from "yjs";
 import { IncomingLiveTextEditingMessages } from "../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import TableTextMedia from "./TableTextMedia";
 import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 
 class TableTextMediaInstance {
+  saveState: "saved" | "unsaved" | "saving" = "saved";
+  unsavedChanges = false;
+
   ops: Uint8Array<ArrayBuffer>[] = [];
 
   private positioning: {
@@ -51,8 +53,6 @@ class TableTextMediaInstance {
 
   messageListener = (msg: IncomingLiveTextEditingMessages) => {
     switch (msg.type) {
-      case "docSaved":
-        break;
       case "docUpdated": {
         const { contentId, instanceId } = msg.header;
         if (
@@ -65,15 +65,22 @@ class TableTextMediaInstance {
         break;
       }
       case "initialDocResponded": {
-        const { contentId, instanceId } = msg.header;
+        const { contentId, instanceId, lastOps } = msg.header;
         if (
           contentId !== this.textMedia.textId ||
           instanceId !== this.textInstanceId
         )
           return;
 
-        if (msg.data.payload.byteLength !== 0) {
-          this.ops.push(msg.data.payload);
+        const ops = msg.data.payload;
+
+        if (ops.length !== 0 && ops[0].byteLength !== 0) {
+          for (const op of ops) {
+            this.ops.push(op);
+          }
+        }
+        if (lastOps) {
+          if (this.ops.length) this.saveState = "unsaved";
         }
         break;
       }

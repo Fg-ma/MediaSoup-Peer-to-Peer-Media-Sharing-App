@@ -2,13 +2,15 @@ import { v4 as uuidv4 } from "uuid";
 import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 import { UploadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import OneShotUploader from "./lib/oneShotUploader/OneShotUploader";
-import ChunkedUploader from "./lib/chunkUploader/ChunkUploader";
+import ChunkUploader from "./lib/chunkUploader/ChunkUploader";
 import {
   TableContentStateTypes,
   UserContentStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import IndexedDB from "../../db/indexedDB/IndexedDB";
 import ReasonableFileSizer from "../reasonableFileSizer.ts/ReasonableFileSizer";
+import TextChunkUploader from "./lib/textChunkUploader/TextChunkUploader";
+import TextOneShotUploader from "./lib/textOneShotUploader copy/TextOneShotUploader";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -21,12 +23,16 @@ class Uploader {
   private ONE_SHOT_FILE_SIZE_CUTOFF = 1024 * 1024 * 100;
 
   private oneShotUploader = new OneShotUploader();
+  private textOneShotUploader = new TextOneShotUploader();
 
   constructor(
     private tableId: React.MutableRefObject<string>,
     private userId: React.MutableRefObject<string>,
     private sendUploadSignal: (signal: UploadSignals) => void,
-    private addCurrentUpload: (id: string, upload: ChunkedUploader) => void,
+    private addCurrentUpload: (
+      id: string,
+      upload: ChunkUploader | TextChunkUploader,
+    ) => void,
     private removeCurrentUpload: (id: string) => void,
     private reasonableFileSizer: React.MutableRefObject<ReasonableFileSizer>,
     private indexedDBController: React.MutableRefObject<IndexedDB>,
@@ -57,18 +63,37 @@ class Uploader {
         },
       });
 
-      this.oneShotUploader.handleOneShotFileUpload(
-        file,
-        {
-          tableId: this.tableId.current,
-          contentId: contentId !== undefined ? contentId : uuidv4(),
-          instanceId: uuidv4(),
-          direction: "toTable",
-          state,
-          initPositioning,
-        },
-        tableStaticContentServerBaseUrl,
-      );
+      if (!file.type.startsWith("text/")) {
+        this.oneShotUploader.handleOneShotFileUpload(
+          file,
+          {
+            tableId: this.tableId.current,
+            contentId: contentId !== undefined ? contentId : uuidv4(),
+            instanceId: uuidv4(),
+            direction: "toTable",
+            state,
+            initPositioning,
+            mimeType: file.type,
+            filename: file.name,
+          },
+          tableStaticContentServerBaseUrl,
+        );
+      } else {
+        this.textOneShotUploader.handleOneShotFileUpload(
+          file,
+          {
+            tableId: this.tableId.current,
+            contentId: contentId !== undefined ? contentId : uuidv4(),
+            instanceId: uuidv4(),
+            direction: "toTable",
+            state,
+            initPositioning,
+            mimeType: file.type,
+            filename: file.name,
+          },
+          tableStaticContentServerBaseUrl,
+        );
+      }
     } else {
       const finalContentId = contentId !== undefined ? contentId : uuidv4();
 
@@ -142,21 +167,40 @@ class Uploader {
             }),
           250,
         );
-        const uploader = new ChunkedUploader(
-          this.tableId,
-          file,
-          finalUploadId,
-          finalContentId,
-          this.removeCurrentUpload,
-          this.sendUploadSignal,
-          this.reasonableFileSizer,
-          this.indexedDBController,
-          "toTable",
-          handle,
-          offset,
-          initPositioning,
-          state,
-        );
+        let uploader: ChunkUploader | TextChunkUploader;
+        if (!file.type.startsWith("text/")) {
+          uploader = new ChunkUploader(
+            this.tableId,
+            file,
+            finalUploadId,
+            finalContentId,
+            this.removeCurrentUpload,
+            this.sendUploadSignal,
+            this.reasonableFileSizer,
+            this.indexedDBController,
+            "toTable",
+            handle,
+            offset,
+            initPositioning,
+            state,
+          );
+        } else {
+          uploader = new TextChunkUploader(
+            this.tableId,
+            file,
+            finalUploadId,
+            finalContentId,
+            this.removeCurrentUpload,
+            this.sendUploadSignal,
+            this.reasonableFileSizer,
+            this.indexedDBController,
+            "toTable",
+            handle,
+            offset,
+            initPositioning,
+            state,
+          );
+        }
         this.addCurrentUpload(finalContentId, uploader);
         uploader.start();
       } catch (error) {
@@ -175,6 +219,8 @@ class Uploader {
           tableId: this.tableId.current,
           contentId,
           direction: "reupload",
+          mimeType: file.type,
+          filename: file.name,
         },
         tableStaticContentServerBaseUrl,
       );
@@ -212,7 +258,7 @@ class Uploader {
             }),
           250,
         );
-        const uploader = new ChunkedUploader(
+        const uploader = new ChunkUploader(
           this.tableId,
           file,
           uploadId,
@@ -250,6 +296,8 @@ class Uploader {
           instanceId: uuidv4(),
           direction: "toMuteStyle",
           state,
+          mimeType: file.type,
+          filename: file.name,
         },
         userStaticContentServerBaseUrl,
       );
@@ -290,7 +338,7 @@ class Uploader {
             }),
           250,
         );
-        const uploader = new ChunkedUploader(
+        const uploader = new ChunkUploader(
           this.tableId,
           file,
           uploadId,

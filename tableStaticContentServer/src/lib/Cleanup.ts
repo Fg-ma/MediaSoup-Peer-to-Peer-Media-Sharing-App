@@ -1,4 +1,4 @@
-import { tableTopCeph, tableTopMongo } from "../index";
+import { tableTopCeph, tableTopMongo, tableTopRedis } from "../index";
 import Broadcaster from "./Broadcaster";
 import { contentTypeBucketMap, onDeleteContentType } from "../typeConstant";
 
@@ -15,6 +15,10 @@ class Cleanup {
       instanceId
     );
 
+    await tableTopRedis.deletes.deleteKeys([
+      `LTE:${tableId}:${contentId}:${instanceId}`,
+    ]);
+
     if (document && document.i.length === 0 && !document.s.includes(0)) {
       await tableTopCeph.deletes.deleteFile(
         contentTypeBucketMap[contentType],
@@ -22,6 +26,10 @@ class Cleanup {
       );
 
       await tableTopMongo.deleteTableDocument(tableId, contentType, contentId);
+
+      await tableTopRedis.deletes.deleteKeys([
+        `LTE:${tableId}:${contentId}:file`,
+      ]);
     }
 
     this.broadcaster.broadcastToTable(tableId, {

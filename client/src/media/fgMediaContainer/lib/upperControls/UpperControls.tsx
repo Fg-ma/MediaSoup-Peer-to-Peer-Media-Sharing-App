@@ -59,12 +59,12 @@ export default function UpperControls({
         fullscreen ||
         backgroundMedia
           ? "top-0"
-          : "bottom-full mb-1"
+          : "bottom-full mb-1.5"
       } pointer-events-none absolute z-20 h-[10%] max-h-10 min-h-6 w-full items-center justify-between`}
     >
       <div
         ref={leftControlsRef}
-        className="flex hide-scroll-bar h-full w-max items-center justify-start space-x-2 overflow-x-auto"
+        className="hide-scroll-bar flex h-full w-max items-center justify-start space-x-2 overflow-x-auto"
       >
         <TabledButton state={state} lowerController={lowerController} />
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}

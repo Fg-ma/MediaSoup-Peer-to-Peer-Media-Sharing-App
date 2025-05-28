@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
-import ChunkedUploader, {
+import ChunkUploader, {
   ChunkedUploadListenerTypes,
 } from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
+import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
 
 export default function LoadingElement({
   upload,
   loadingTabRef,
 }: {
-  upload: ChunkedUploader;
+  upload: ChunkUploader | TextChunkUploader;
   loadingTabRef: React.RefObject<HTMLDivElement>;
 }) {
   const [_, setRerender] = useState(false);

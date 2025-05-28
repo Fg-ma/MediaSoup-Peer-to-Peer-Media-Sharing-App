@@ -6,18 +6,21 @@ import TableTextMediaInstance from "../../../TableTextMediaInstance";
 import { IncomingLiveTextEditingMessages } from "../../../../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import LiveTextEditingSocketController from "../../../../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import { Settings } from "../../typeConstant";
+import { GeneralSignals } from "../../../../../context/signalContext/lib/typeConstant";
 
 class MonacoController {
+  private MAX_UPDATE_SIZE_BYTES = 10000;
+
   constructor(
     private textMediaInstance: TableTextMediaInstance,
     private liveTextEditingSocket: React.MutableRefObject<
       LiveTextEditingSocketController | undefined
     >,
-    private editorRef: React.MutableRefObject<monacoEditor.editor.IStandaloneCodeEditor | null>,
-    private monacoRef: React.MutableRefObject<typeof monacoEditor | null>,
-    private ydocRef: React.MutableRefObject<Y.Doc | null>,
-    private yTextRef: React.MutableRefObject<Y.Text | null>,
-    private bindingRef: React.MutableRefObject<MonacoBinding | null>,
+    private editor: React.MutableRefObject<monacoEditor.editor.IStandaloneCodeEditor | null>,
+    private monaco: React.MutableRefObject<typeof monacoEditor | null>,
+    private ydoc: React.MutableRefObject<Y.Doc | null>,
+    private yText: React.MutableRefObject<Y.Text | null>,
+    private binding: React.MutableRefObject<MonacoBinding | null>,
     private recreatedRef: React.MutableRefObject<boolean>,
     private settings: Settings,
     private textAreaContainerRef: React.RefObject<HTMLDivElement>,
@@ -25,6 +28,8 @@ class MonacoController {
     private setIsLineNums:
       | React.Dispatch<React.SetStateAction<boolean>>
       | undefined,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
+    private setIsInitializing: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   private messageListener = (msg: IncomingLiveTextEditingMessages) => {
@@ -34,27 +39,35 @@ class MonacoController {
         if (
           contentId !== this.textMediaInstance.textMedia.textId ||
           instanceId !== this.textMediaInstance.textInstanceId ||
-          !this.ydocRef.current
+          !this.ydoc.current
         ) {
           return;
         }
         const payload = msg.data.payload;
 
-        Y.applyUpdate(this.ydocRef.current, payload);
+        Y.applyUpdate(this.ydoc.current, payload);
         break;
       }
       case "initialDocResponded": {
-        const { contentId, instanceId } = msg.header;
+        const { contentId, instanceId, lastOps } = msg.header;
         if (
           contentId !== this.textMediaInstance.textMedia.textId ||
-          instanceId !== this.textMediaInstance.textInstanceId ||
-          !this.ydocRef.current
-        ) {
+          instanceId !== this.textMediaInstance.textInstanceId
+        )
           return;
-        }
 
-        if (msg.data.payload.byteLength !== 0) {
-          Y.applyUpdate(this.ydocRef.current, msg.data.payload, "noup");
+        const ops = msg.data.payload;
+
+        if (ops.length !== 0 && ops[0].byteLength !== 0) {
+          if (this.ydoc.current)
+            for (const op of ops) {
+              Y.applyUpdate(this.ydoc.current, op, "noup");
+            }
+          if (lastOps) {
+            this.setIsInitializing(false);
+          }
+        } else {
+          this.setIsInitializing(false);
         }
         break;
       }
@@ -84,22 +97,22 @@ class MonacoController {
     }
 
     // 2. Destroy the old binding (prevents memory leaks & lag)
-    this.bindingRef.current?.destroy();
+    this.binding.current?.destroy();
 
     // 3. Rebind the new doc to Monaco
-    this.ydocRef.current?.destroy(); // optional: free memory
-    this.ydocRef.current = newDoc;
-    this.yTextRef.current = newText;
+    this.ydoc.current?.destroy(); // optional: free memory
+    this.ydoc.current = newDoc;
+    this.yText.current = newText;
 
-    this.bindingRef.current = new MonacoBinding(
+    this.binding.current = new MonacoBinding(
       newText,
-      this.editorRef.current!.getModel()!,
-      new Set([this.editorRef.current!]),
+      this.editor.current!.getModel()!,
+      new Set([this.editor.current!]),
     );
 
     // 4. Reattach the update handler
-    this.ydocRef.current.on("update", (update: Uint8Array, origin) => {
-      if (origin === this.bindingRef.current && origin !== "noup") {
+    this.ydoc.current.on("update", (update: Uint8Array, origin) => {
+      if (origin === this.binding.current && origin !== "noup") {
         this.liveTextEditingSocket.current?.docUpdate(
           this.textMediaInstance.textMedia.textId,
           this.textMediaInstance.textInstanceId,
@@ -110,15 +123,18 @@ class MonacoController {
   };
 
   handleEditorDidMount: OnMount = (editor, monaco) => {
-    this.editorRef.current = editor;
-    this.monacoRef.current = monaco;
+    this.editor.current = editor;
+    this.monaco.current = monaco;
 
     // Set the model language to plaintext
-    if (editor.getModel()) {
-      monaco.editor.setModelLanguage(editor.getModel()!, "plaintext");
+    if (this.editor.current.getModel()) {
+      this.monaco.current.editor.setModelLanguage(
+        this.editor.current.getModel()!,
+        "plaintext",
+      );
     }
 
-    monaco.editor.defineTheme("transparent-theme", {
+    this.monaco.current.editor.defineTheme("transparent-theme", {
       base: "vs-dark",
       inherit: true,
       rules: [],
@@ -131,7 +147,7 @@ class MonacoController {
         focusBorder: "#00000000",
       },
     });
-    monaco.editor.setTheme("transparent-theme");
+    this.monaco.current.editor.setTheme("transparent-theme");
 
     const container = this.textAreaContainerRef.current?.getElementsByClassName(
       "monaco-editor",
@@ -152,31 +168,35 @@ class MonacoController {
     }
 
     // Initial editor options
-    editor.updateOptions({
+    this.editor.current.updateOptions({
       fontSize: parseInt(this.settings.fontSize.value, 10),
       fontFamily: this.settings.fontStyle.value,
       lineNumbers: this.isLineNums ? "on" : "off",
     });
 
     // Setup Yjs doc
-    this.ydocRef.current = new Y.Doc();
-    this.yTextRef.current = this.ydocRef.current.getText("monaco");
+    this.ydoc.current = new Y.Doc();
+    this.yText.current = this.ydoc.current.getText("monaco");
 
     if (this.textMediaInstance.textMedia.textData.length) {
       for (const data of this.textMediaInstance.textMedia.textData) {
-        Y.applyUpdate(this.ydocRef.current, data, "noup");
+        Y.applyUpdate(this.ydoc.current, data, "noup");
       }
     }
 
     // Create Monaco binding
-    this.bindingRef.current = new MonacoBinding(
-      this.yTextRef.current,
+    this.binding.current = new MonacoBinding(
+      this.yText.current,
       editor.getModel()!,
       new Set([editor]),
     );
 
-    this.ydocRef.current.on("update", (update: Uint8Array, origin) => {
-      if (origin === this.bindingRef.current && origin !== "noup") {
+    this.ydoc.current.on("update", (update: Uint8Array, origin) => {
+      if (
+        origin === this.binding.current &&
+        origin !== "noup" &&
+        update.length < this.MAX_UPDATE_SIZE_BYTES
+      ) {
         this.liveTextEditingSocket.current?.docUpdate(
           this.textMediaInstance.textMedia.textId,
           this.textMediaInstance.textInstanceId,
@@ -185,14 +205,27 @@ class MonacoController {
       }
     });
 
+    this.editor.current.onDidPaste((e) => {
+      const pastedText = e.range
+        ? this.editor.current?.getModel()?.getValueInRange(e.range)
+        : "";
+      if (pastedText && pastedText.length > this.MAX_UPDATE_SIZE_BYTES) {
+        this.sendGeneralSignal({
+          type: "tableInfoSignal",
+          data: { message: "Pasted text is too long", timeout: 1250 },
+        });
+        this.editor.current?.trigger("cancelPaste", "undo", null);
+      }
+    });
+
     if (this.textMediaInstance.textMedia.loadingState !== "downloaded") {
-      editor.onDidScrollChange(() => {
-        const model = editor.getModel();
+      this.editor.current.onDidScrollChange(() => {
+        const model = this.editor.current?.getModel();
         if (!model || this.recreatedRef.current) return;
 
         const totalLines = model.getLineCount();
-        const visibleRanges = editor.getVisibleRanges();
-        if (visibleRanges.length === 0) return;
+        const visibleRanges = this.editor.current?.getVisibleRanges();
+        if (!visibleRanges || visibleRanges.length === 0) return;
 
         const lastVisibleLine =
           visibleRanges[visibleRanges.length - 1].endLineNumber;
@@ -212,12 +245,12 @@ class MonacoController {
       this.textMediaInstance.textInstanceId,
     );
 
-    editor.onMouseDown((e) => {
+    this.editor.current.onMouseDown((e) => {
       const targetType = e.target.type;
       if (targetType === monaco.editor.MouseTargetType.GUTTER_LINE_NUMBERS) {
         if (this.setIsLineNums) {
           this.setIsLineNums(false);
-          editor.updateOptions({ lineNumbers: "off" });
+          this.editor.current?.updateOptions({ lineNumbers: "off" });
         }
       }
     });
@@ -226,8 +259,8 @@ class MonacoController {
       this.liveTextEditingSocket.current?.removeMessageListener(
         this.messageListener,
       );
-      this.bindingRef.current?.destroy();
-      this.ydocRef.current?.destroy();
+      this.binding.current?.destroy();
+      this.ydoc.current?.destroy();
     };
   };
 }

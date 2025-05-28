@@ -3,12 +3,13 @@ import FgButton from "../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import LoadingBar from "../../../../elements/loadingBar/LoadingBar";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import ChunkedUploader, {
+import ChunkUploader, {
   ChunkedUploadListenerTypes,
 } from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
 import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import MoreInfoSection from "./MoreInfoSection";
+import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -21,7 +22,7 @@ export default function UploadingSection({
   upload,
   tablePanelRef,
 }: {
-  upload: ChunkedUploader;
+  upload: ChunkUploader | TextChunkUploader;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);

@@ -1,3 +1,4 @@
+import * as Y from "yjs";
 import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
@@ -15,8 +16,9 @@ export type ChunkedUploadListenerTypes =
       data: { progress: number };
     };
 
-class ChunkUploader {
-  private readonly CHUNK_SIZE = 1024 * 1024 * 5;
+class TextChunkUploader {
+  private readonly CHUNK_SIZE = 1024 * 1024 * 0.1;
+  private readonly CHUNK_ACCUMULATION_SIZE = 1024 * 1024 * 5;
 
   private offset: number = 0;
 
@@ -35,6 +37,11 @@ class ChunkUploader {
 
   private listeners: Set<(message: ChunkedUploadListenerTypes) => void> =
     new Set();
+
+  private text: string | undefined;
+  private ydoc: Y.Doc | undefined;
+  private ytext: Y.Text | undefined;
+  private lastStateVector: Uint8Array<ArrayBufferLike> | undefined;
 
   constructor(
     private tableId: React.MutableRefObject<string>,
@@ -76,78 +83,6 @@ class ChunkUploader {
     this.removeCurrentUpload(this.contentId);
     this.sendUploadSignal({ type: "uploadFinish" });
     this.listeners.clear();
-  };
-
-  private extractFirstVideoFrame = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.src = URL.createObjectURL(file);
-      video.muted = true;
-      video.playsInline = true;
-
-      // 1. once metadata is loaded, we know dimensions
-      video.addEventListener(
-        "loadedmetadata",
-        () => {
-          // ensure there's a video duration and size
-          if (!video.videoWidth || !video.videoHeight) {
-            return reject(new Error("video metadata missing dimensions"));
-          }
-
-          // set the canvas to those dimensions
-          const canvas = document.createElement("canvas");
-          const scale = Math.min(
-            256 / video.videoWidth,
-            256 / video.videoHeight,
-            1,
-          );
-          canvas.width = video.videoWidth * scale;
-          canvas.height = video.videoHeight * scale;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            return reject(new Error("2D context not available"));
-          }
-
-          // 2. seek to the very first frame
-          video.currentTime = 0;
-          video.addEventListener(
-            "seeked",
-            () => {
-              // 3. draw it
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-              // export to PNG blob → object URL
-              canvas.toBlob((blob) => {
-                if (blob) {
-                  const imgUrl = URL.createObjectURL(blob);
-
-                  // clean up the video URL, element, and canvas
-                  URL.revokeObjectURL(video.src);
-                  video.remove();
-                  canvas.remove();
-
-                  resolve(imgUrl);
-                } else {
-                  reject(new Error("canvas.toBlob() produced no blob"));
-                }
-              }, "image/png");
-            },
-            { once: true },
-          );
-        },
-        { once: true },
-      );
-
-      video.addEventListener(
-        "error",
-        (e) => {
-          URL.revokeObjectURL(video.src);
-          reject(new Error("video load error"));
-        },
-        { once: true },
-      );
-    });
   };
 
   cancel = async () => {
@@ -203,79 +138,126 @@ class ChunkUploader {
 
   private uploadLoop = async () => {
     this.uploadStartTime = Date.now();
+    if (!this.text || !this.ydoc || !this.ytext) {
+      this.text = await this.file.text();
+      this.ydoc = new Y.Doc();
+      this.ytext = this.ydoc.getText("monaco");
+      this.lastStateVector = Y.encodeStateVector(this.ydoc);
+    }
 
-    while (this.offset < this.file.size && !this._paused && !this.cancelled) {
-      const chunk = this.file.slice(this.offset, this.offset + this.CHUNK_SIZE);
-      const chunkIndex = Math.floor(this.offset / this.CHUNK_SIZE);
-      const totalChunks = Math.ceil(this.file.size / this.CHUNK_SIZE);
+    const totalChunks = Math.ceil(
+      this.text.length / this.CHUNK_ACCUMULATION_SIZE,
+    ).toString();
+    let accumulated = new Uint8Array(0);
+    let chunkBatchIndex = 0;
 
-      const start = Date.now();
+    while (this.offset < this.text.length && !this._paused && !this.cancelled) {
+      const chunkText = this.text.slice(
+        this.offset,
+        this.offset + this.CHUNK_SIZE,
+      );
+      this.ytext.insert(this.offset, chunkText);
+      this.offset += chunkText.length;
 
-      const formData = new FormData();
-      formData.append("chunk", chunk);
-      formData.append("chunkIndex", chunkIndex.toString());
-      formData.append("totalChunks", totalChunks.toString());
+      const rawUpdate = Y.encodeStateAsUpdate(this.ydoc, this.lastStateVector);
+      this.lastStateVector = Y.encodeStateVector(this.ydoc);
+      const rawUpdateLength = rawUpdate.length;
+      const wrappedUpdate = new Uint8Array(4 + rawUpdateLength);
 
-      try {
-        this.currentChunkAbortController = new AbortController();
-        const response = await fetch(
-          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
-          {
-            method: "POST",
-            body: formData,
-            signal: this.currentChunkAbortController.signal,
-          },
-        );
-        this.currentChunkAbortController = null;
+      new DataView(wrappedUpdate.buffer).setUint32(0, rawUpdateLength, true);
+      wrappedUpdate.set(rawUpdate, 4);
 
-        if (!response.ok) {
-          if (response.status !== 409) {
-            this.chunkErrorRetryUpload();
-            break;
-          }
-        }
+      // Accumulate
+      const combined = new Uint8Array(
+        accumulated.length + wrappedUpdate.length,
+      );
+      combined.set(accumulated);
+      combined.set(wrappedUpdate, accumulated.length);
+      accumulated = combined;
 
-        if (response.status !== 409) {
-          const end = Date.now();
-          const durationMs = end - start;
-          const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
-
-          this.uploadSpeedHistory.push({
-            time: end - (this.uploadStartTime ?? 0),
-            speedKBps,
-          });
-          this.uploadAbsoluteSpeedHistory.push({
-            time: end,
-            speedKBps,
-          });
-        }
-
-        this.offset += this.CHUNK_SIZE;
-
-        this._progress = this.offset / this.file.size;
-
-        this.listeners.forEach((listener) => {
-          listener({
-            type: "uploadProgress",
-            data: { progress: this._progress },
-          });
-        });
-        if (this.handle) {
-          this.indexedDBController?.current.uploadPosts?.updateProgress(
-            this.contentId,
-            this.offset,
-          );
-        }
-      } catch (error) {
-        console.error("Chunk upload failed:", error);
-        break;
+      // Upload only when accumulated updates exceed CHUNK_ACCUMULATION_SIZE
+      if (accumulated.length >= this.CHUNK_ACCUMULATION_SIZE) {
+        await this.uploadChunk(accumulated, chunkBatchIndex++, totalChunks);
+        accumulated = new Uint8Array(0); // Reset buffer
       }
     }
 
-    if (this.offset >= this.file.size) {
+    // Upload any remaining updates
+    if (accumulated.length > 0) {
+      await this.uploadChunk(accumulated, chunkBatchIndex++, totalChunks);
+    }
+
+    if (this.offset >= this.text.length) {
       this.deconstructor();
     }
   };
+
+  private async uploadChunk(
+    data: Uint8Array,
+    chunkIndex: number,
+    totalChunks: string,
+  ) {
+    const start = Date.now();
+
+    const formData = new FormData();
+    formData.append(
+      "chunk",
+      new Blob([data], { type: "application/octet-stream" }),
+    );
+    formData.append("chunkIndex", chunkIndex.toString());
+    formData.append("totalChunks", totalChunks);
+
+    try {
+      this.currentChunkAbortController = new AbortController();
+      const response = await fetch(
+        `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
+        {
+          method: "POST",
+          body: formData,
+          signal: this.currentChunkAbortController.signal,
+        },
+      );
+      this.currentChunkAbortController = null;
+
+      if (!response.ok && response.status !== 409) {
+        this.chunkErrorRetryUpload();
+        throw new Error("Upload failed");
+      }
+
+      if (response.status !== 409) {
+        const end = Date.now();
+        const durationMs = end - start;
+        const speedKBps =
+          this.CHUNK_ACCUMULATION_SIZE / 1024 / (durationMs / 1000);
+
+        this.uploadSpeedHistory.push({
+          time: end - (this.uploadStartTime ?? 0),
+          speedKBps,
+        });
+        this.uploadAbsoluteSpeedHistory.push({
+          time: end,
+          speedKBps,
+        });
+      }
+
+      if (this.text) this._progress = this.offset / this.text.length;
+      this.listeners.forEach((listener) => {
+        listener({
+          type: "uploadProgress",
+          data: { progress: this._progress },
+        });
+      });
+      if (this.handle) {
+        this.indexedDBController?.current.uploadPosts?.updateProgress(
+          this.contentId,
+          this.offset,
+        );
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      throw error;
+    }
+  }
 
   private chunkErrorRetryUpload = async () => {
     this._progress = 0;
@@ -433,4 +415,4 @@ class ChunkUploader {
   }
 }
 
-export default ChunkUploader;
+export default TextChunkUploader;

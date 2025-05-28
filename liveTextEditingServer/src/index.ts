@@ -27,6 +27,10 @@ const sslOptions = {
   cert_file_name: "../certs/tabletop-table-server.pem",
 };
 
+export const DEAD_TEXT_TTL = 60 * 5;
+export const REDIS_INITIAL_CHUNK_SIZE = 0.25 * 1024 * 1024;
+export const CEPH_CHUNK_SIZE = 0.1 * 1024 * 1024;
+
 uWS
   .SSLApp(sslOptions)
   .ws<SocketData>("/*", {
@@ -81,7 +85,7 @@ uWS
       }
     },
 
-    close: (ws) => {
+    close: async (ws) => {
       const tableWS = ws as TableWebSocket;
       const { tableId, username, instance } = tableWS;
 
@@ -97,6 +101,16 @@ uWS
 
           if (Object.keys(tables[tableId]).length === 0) {
             delete tables[tableId];
+
+            const tableKeys = await tableTopRedis.gets.scanAllKeys(
+              `LTE:${tableId}:*:*`
+            );
+
+            const promises = [];
+            for (const key of tableKeys) {
+              promises.push(tableTopRedis.posts.expire(key, DEAD_TEXT_TTL));
+            }
+            await Promise.all(promises);
           }
         }
       }

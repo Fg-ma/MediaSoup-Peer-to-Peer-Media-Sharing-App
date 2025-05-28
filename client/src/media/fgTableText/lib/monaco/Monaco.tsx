@@ -1,11 +1,12 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import type * as monacoEditor from "monaco-editor";
+import { useSocketContext } from "../../../../context/socketContext/SocketContext";
+import { useSignalContext } from "../../../../context/signalContext/SignalContext";
 import { Settings } from "../typeConstant";
 import TableTextMediaInstance from "../../TableTextMediaInstance";
-import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import MonacoController from "./lib/MonacoController";
 import "./lib/monaco.css";
 
@@ -29,15 +30,16 @@ export default function Monaco({
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
 }) {
   const { liveTextEditingSocket } = useSocketContext();
+  const { sendGeneralSignal } = useSignalContext();
 
-  const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(
-    null,
-  );
-  const monacoRef = useRef<typeof monacoEditor | null>(null);
+  const editor = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const monaco = useRef<typeof monacoEditor | null>(null);
 
-  const ydocRef = useRef<Y.Doc | null>(null);
-  const yTextRef = useRef<Y.Text | null>(null);
-  const bindingRef = useRef<MonacoBinding | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  const ydoc = useRef<Y.Doc | null>(null);
+  const yText = useRef<Y.Text | null>(null);
+  const binding = useRef<MonacoBinding | null>(null);
 
   const recreatedRef = useRef(false);
 
@@ -49,23 +51,24 @@ export default function Monaco({
     new MonacoController(
       textMediaInstance,
       liveTextEditingSocket,
-      editorRef,
-      monacoRef,
-      ydocRef,
-      yTextRef,
-      bindingRef,
+      editor,
+      monaco,
+      ydoc,
+      yText,
+      binding,
       recreatedRef,
       settings,
       textAreaContainerRef,
       isLineNums,
       setIsLineNums,
+      sendGeneralSignal,
+      setIsInitializing,
     ),
   );
 
   useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    editor.updateOptions({
+    if (!editor.current) return;
+    editor.current.updateOptions({
       fontSize: parseInt(settings.fontSize.value, 10),
       fontFamily: settings.fontStyle.value,
       lineNumbers: isLineNums ? "on" : "off",
@@ -91,9 +94,9 @@ export default function Monaco({
   }, [settings]);
 
   useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    editor.updateOptions({
+    if (!editor.current) return;
+
+    editor.current.updateOptions({
       lineNumbers: isLineNums ? "on" : "off",
     });
   }, [isLineNums]);
@@ -110,6 +113,7 @@ export default function Monaco({
       }}
     >
       <Editor
+        className={`${isInitializing ? "absolute opacity-0" : ""}`}
         height="100%"
         width="100%"
         defaultLanguage="plaintext"
@@ -140,6 +144,13 @@ export default function Monaco({
           lineNumbersMinChars: 0,
         }}
       />
+      {isInitializing && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-K2D text-xl text-fg-white">
+            Initializing...
+          </span>
+        </div>
+      )}
     </div>
   );
 }

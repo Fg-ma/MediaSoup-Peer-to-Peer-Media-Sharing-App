@@ -172,6 +172,7 @@ export default function Table({
                 <TableInfoPopup />
                 <LoadingTab
                   activePanel={activePanel}
+                  tableSidePanelActive={tableSidePanelActive}
                   setTableSidePanelActive={setTableSidePanelActive}
                   setExternalRerender={setRerender}
                 />

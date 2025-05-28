@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import {
   AreaChart,
   Area,
@@ -8,7 +8,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import ChunkedUploader from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
+import ChunkUploader from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
+import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -55,7 +56,7 @@ function chooseUnit(KB: number) {
 export default function MoreInfoSection({
   upload,
 }: {
-  upload: ChunkedUploader;
+  upload: ChunkUploader | TextChunkUploader;
 }) {
   const { mimeType, fileSize, uploadSpeed, ETA } = upload.getFileInfo();
 
