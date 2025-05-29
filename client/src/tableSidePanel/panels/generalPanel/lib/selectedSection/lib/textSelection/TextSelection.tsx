@@ -71,7 +71,6 @@ export default function TextSelection({
               isLineNums={false}
               isReadOnly={true}
               textMediaInstance={textInstanceMedia}
-              limitChunks={2}
             />
           ) : loadingState === "downloading" ? (
             <LoadingElement

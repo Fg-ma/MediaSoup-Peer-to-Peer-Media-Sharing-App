@@ -17,8 +17,7 @@ export type ChunkedUploadListenerTypes =
     };
 
 class TextChunkUploader {
-  private readonly CHUNK_SIZE = 1024 * 1024 * 0.1;
-  private readonly CHUNK_ACCUMULATION_SIZE = 1024 * 1024 * 5;
+  private readonly CHUNK_SIZE = 1024 * 1024 * 5;
 
   private offset: number = 0;
 
@@ -38,10 +37,9 @@ class TextChunkUploader {
   private listeners: Set<(message: ChunkedUploadListenerTypes) => void> =
     new Set();
 
-  private text: string | undefined;
   private ydoc: Y.Doc | undefined;
   private ytext: Y.Text | undefined;
-  private lastStateVector: Uint8Array<ArrayBufferLike> | undefined;
+  private fullUpdateUpload: Uint8Array<ArrayBufferLike> | undefined;
 
   constructor(
     private tableId: React.MutableRefObject<string>,
@@ -138,64 +136,43 @@ class TextChunkUploader {
 
   private uploadLoop = async () => {
     this.uploadStartTime = Date.now();
-    if (!this.text || !this.ydoc || !this.ytext) {
-      this.text = await this.file.text();
+
+    if (!this.ydoc || !this.ytext || !this.fullUpdateUpload) {
       this.ydoc = new Y.Doc();
       this.ytext = this.ydoc.getText("monaco");
-      this.lastStateVector = Y.encodeStateVector(this.ydoc);
+      const fullText = await this.file.text();
+      this.ytext.insert(0, fullText);
+      this.fullUpdateUpload = Y.encodeStateAsUpdate(this.ydoc);
     }
 
     const totalChunks = Math.ceil(
-      this.text.length / this.CHUNK_ACCUMULATION_SIZE,
+      this.fullUpdateUpload.length / this.CHUNK_SIZE,
     ).toString();
-    let chunkBatchIndex = 0;
 
-    const chunks: Uint8Array[] = [];
-
-    while (this.offset < this.text.length && !this._paused && !this.cancelled) {
-      const chunkText = this.text.slice(
-        this.offset,
-        this.offset + this.CHUNK_SIZE,
+    while (
+      this.offset * this.CHUNK_SIZE < this.fullUpdateUpload.length &&
+      !this._paused &&
+      !this.cancelled
+    ) {
+      const end = Math.min(
+        (this.offset + 1) * this.CHUNK_SIZE,
+        this.fullUpdateUpload.length,
       );
-      this.ytext.insert(this.offset, chunkText);
-      this.offset += chunkText.length;
-
-      const rawUpdate = Y.encodeStateAsUpdate(this.ydoc, this.lastStateVector);
-      this.lastStateVector = Y.encodeStateVector(this.ydoc);
-      const rawUpdateLength = rawUpdate.length;
-      const wrappedUpdate = new Uint8Array(4 + rawUpdateLength);
-
-      new DataView(wrappedUpdate.buffer).setUint32(0, rawUpdateLength, true);
-      wrappedUpdate.set(rawUpdate, 4);
-
-      const accumulatedSize = chunks.reduce((acc, cur) => acc + cur.length, 0);
-      if (accumulatedSize >= this.CHUNK_ACCUMULATION_SIZE) {
-        const accumulated = Buffer.concat(chunks);
-        const success = await this.uploadChunk(
-          accumulated,
-          chunkBatchIndex,
-          totalChunks,
-        );
-        if (success) chunkBatchIndex += 1;
-        chunks.length = 0;
-        console.log(chunks);
-      }
+      const chunk = this.fullUpdateUpload.slice(
+        this.offset * this.CHUNK_SIZE,
+        end,
+      );
+      this.offset += 1;
+      await this.uploadChunk(chunk, totalChunks);
     }
 
-    // Upload any remaining updates
-    if (chunks.length > 0) {
-      const accumulated = Buffer.concat(chunks);
-      await this.uploadChunk(accumulated, chunkBatchIndex++, totalChunks);
-    }
-
-    if (this.offset >= this.text.length) {
+    if (this.offset * this.CHUNK_SIZE >= this.fullUpdateUpload.length) {
       this.deconstructor();
     }
   };
 
   private async uploadChunk(
     data: Uint8Array,
-    chunkIndex: number,
     totalChunks: string,
   ): Promise<boolean> {
     const start = Date.now();
@@ -205,7 +182,7 @@ class TextChunkUploader {
       "chunk",
       new Blob([data], { type: "application/octet-stream" }),
     );
-    formData.append("chunkIndex", chunkIndex.toString());
+    formData.append("chunkIndex", this.offset.toString());
     formData.append("totalChunks", totalChunks);
 
     try {
@@ -228,8 +205,7 @@ class TextChunkUploader {
       if (response.status !== 409) {
         const end = Date.now();
         const durationMs = end - start;
-        const speedKBps =
-          this.CHUNK_ACCUMULATION_SIZE / 1024 / (durationMs / 1000);
+        const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
 
         this.uploadSpeedHistory.push({
           time: end - (this.uploadStartTime ?? 0),
@@ -241,7 +217,8 @@ class TextChunkUploader {
         });
       }
 
-      if (this.text) this._progress = this.offset / this.text.length;
+      this._progress =
+        (this.offset * this.CHUNK_SIZE) / (this.fullUpdateUpload?.length ?? 1);
       this.listeners.forEach((listener) => {
         listener({
           type: "uploadProgress",
@@ -363,7 +340,8 @@ class TextChunkUploader {
     if (
       !this._paused &&
       this.uploadSpeedHistory.length > 0 &&
-      this._progress > 0
+      this._progress > 0 &&
+      this.fullUpdateUpload
     ) {
       const totalSpeed = this.uploadSpeedHistory.reduce(
         (sum, entry) => sum + entry.speedKBps,
@@ -372,7 +350,8 @@ class TextChunkUploader {
       const avgSpeed = totalSpeed / this.uploadSpeedHistory.length;
 
       if (avgSpeed > 0) {
-        const remainingBytes = this.file.size - this.offset;
+        const remainingBytes =
+          this.fullUpdateUpload.length - this.offset * this.CHUNK_SIZE;
         const remainingSeconds = remainingBytes / 1024 / avgSpeed;
 
         const hours = Math.floor(remainingSeconds / 3600);
@@ -390,7 +369,7 @@ class TextChunkUploader {
 
     return {
       mimeType: this.file.type || "unknown",
-      fileSize: this.formatBytes(this.file.size),
+      fileSize: this.formatBytes(this.fullUpdateUpload?.length ?? 0),
       uploadSpeed: [...this.uploadSpeedHistory],
       ETA,
     };

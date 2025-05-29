@@ -18,6 +18,9 @@ const handleMessage = (ws: TableWebSocket, event: MessageTypes) => {
     case "docSave":
       liveTextEditingController.onDocSave(event);
       break;
+    case "getSavedOps":
+      liveTextEditingController.onGetSavedOps(event);
+      break;
     case "getDownloadMeta":
       gets.onGetDownloadMeta(event);
       break;

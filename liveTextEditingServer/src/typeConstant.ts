@@ -20,6 +20,7 @@ export type MessageTypes =
   | onGetInitialDocStateType
   | onDocUpdateType
   | onDocSaveType
+  | onGetSavedOpsType
   | onGetDownloadMetaType
   | onGetFileChunkType;
 
@@ -75,6 +76,17 @@ export type onDocSaveType = {
   };
 };
 
+export type onGetSavedOpsType = {
+  type: "getSavedOps";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+    instanceId: string;
+  };
+};
+
 export type onGetDownloadMetaType = {
   type: "getDownloadMeta";
   header: {
@@ -94,7 +106,7 @@ export type onGetFileChunkType = {
     contentId: string;
   };
   data: {
-    idx: number;
+    range: string;
   };
 };
 

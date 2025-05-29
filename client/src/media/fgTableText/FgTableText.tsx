@@ -77,8 +77,8 @@ export default function FgTableText({
       textController.current.handleTextMessages,
     );
 
-    liveTextEditingSocket.current?.addMessageListener(
-      textController.current.handleLiveTextEditingMessage,
+    textMediaInstance.addTextInstanceListener(
+      textController.current.handleTextInstanceMessage,
     );
 
     document.addEventListener(
@@ -95,8 +95,8 @@ export default function FgTableText({
       textMediaInstance.textMedia.removeTextListener(
         textController.current.handleTextMessages,
       );
-      liveTextEditingSocket.current?.removeMessageListener(
-        textController.current.handleLiveTextEditingMessage,
+      textMediaInstance.removeTextInstanceListener(
+        textController.current.handleTextInstanceMessage,
       );
       document.removeEventListener(
         "keydown",

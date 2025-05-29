@@ -29,7 +29,6 @@ const sslOptions = {
 
 export const DEAD_TEXT_TTL = 60 * 5;
 export const REDIS_INITIAL_CHUNK_SIZE = 0.25 * 1024 * 1024;
-export const CEPH_CHUNK_SIZE = 0.1 * 1024 * 1024;
 
 uWS
   .SSLApp(sslOptions)

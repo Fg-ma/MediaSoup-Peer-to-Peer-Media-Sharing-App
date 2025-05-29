@@ -1,5 +1,5 @@
-import { IncomingLiveTextEditingMessages } from "../../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import { TextListenerTypes } from "../TableTextMedia";
+import { TextInstanceListenerTypes } from "../TableTextMediaInstance";
 
 class TextController {
   constructor(
@@ -40,9 +40,9 @@ class TextController {
     }
   };
 
-  handleLiveTextEditingMessage = (event: IncomingLiveTextEditingMessages) => {
-    switch (event.type) {
-      case "docSavedNewContent":
+  handleTextInstanceMessage = (msg: TextInstanceListenerTypes) => {
+    switch (msg.type) {
+      case "initialized":
         this.setRerender((prev) => !prev);
         break;
       default:

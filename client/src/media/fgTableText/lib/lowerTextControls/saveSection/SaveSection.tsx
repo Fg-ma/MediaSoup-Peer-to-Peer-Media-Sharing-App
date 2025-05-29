@@ -26,7 +26,9 @@ export default function SaveSection({
 
   const [_, setRerender] = useState(false);
   const savedVisible = useRef(false);
+  const failedVisible = useRef(false);
   const savedTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const failedTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleMessage = (msg: IncomingLiveTextEditingMessages) => {
     switch (msg.type) {
@@ -42,6 +44,11 @@ export default function SaveSection({
           if (savedTimeoutRef.current) {
             clearTimeout(savedTimeoutRef.current);
             savedTimeoutRef.current = undefined;
+          }
+
+          if (failedTimeoutRef.current) {
+            clearTimeout(failedTimeoutRef.current);
+            failedTimeoutRef.current = undefined;
           }
 
           savedTimeoutRef.current = setTimeout(() => {
@@ -64,58 +71,99 @@ export default function SaveSection({
       case "docUpdated": {
         const { contentId, instanceId } = msg.header;
         if (
-          contentId === textMediaInstance.textMedia.textId &&
-          instanceId === textMediaInstance.textInstanceId
-        ) {
-          if (
-            savedTimeoutRef.current === undefined &&
-            textMediaInstance.saveState !== "saving"
-          ) {
-            textMediaInstance.saveState = "unsaved";
-          }
-          textMediaInstance.unsavedChanges = true;
-          setRerender((prev) => !prev);
+          contentId !== textMediaInstance.textMedia.textId &&
+          instanceId !== textMediaInstance.textInstanceId
+        )
+          return;
+
+        if (failedTimeoutRef.current) {
+          clearTimeout(failedTimeoutRef.current);
+          failedTimeoutRef.current = undefined;
         }
+
+        setRerender((prev) => !prev);
         break;
       }
       case "docSavedNewContent": {
         const { newContentId, instanceId } = msg.header;
+
         if (
-          newContentId === textMediaInstance.textMedia.textId &&
-          instanceId === textMediaInstance.textInstanceId
-        ) {
-          textMediaInstance.saveState = "saved";
-          savedVisible.current = true;
+          newContentId !== textMediaInstance.textMedia.textId &&
+          instanceId !== textMediaInstance.textInstanceId
+        )
+          return;
+
+        textMediaInstance.saveState = "saved";
+        savedVisible.current = true;
+        textMediaInstance.unsavedChanges = false;
+
+        if (failedTimeoutRef.current) {
+          clearTimeout(failedTimeoutRef.current);
+          failedTimeoutRef.current = undefined;
+        }
+
+        if (savedTimeoutRef.current) {
+          clearTimeout(savedTimeoutRef.current);
+          savedTimeoutRef.current = undefined;
+        }
+
+        savedTimeoutRef.current = setTimeout(() => {
+          if (textMediaInstance.unsavedChanges) {
+            textMediaInstance.saveState = "unsaved";
+          }
+          savedVisible.current = false;
+          setRerender((prev) => !prev);
 
           if (savedTimeoutRef.current) {
             clearTimeout(savedTimeoutRef.current);
             savedTimeoutRef.current = undefined;
           }
+        }, 3500);
 
-          savedTimeoutRef.current = setTimeout(() => {
-            if (textMediaInstance.unsavedChanges) {
-              textMediaInstance.saveState = "unsaved";
-            }
-            savedVisible.current = false;
-            setRerender((prev) => !prev);
-
-            if (savedTimeoutRef.current) {
-              clearTimeout(savedTimeoutRef.current);
-              savedTimeoutRef.current = undefined;
-            }
-          }, 3500);
-
-          setRerender((prev) => !prev);
-        }
+        setRerender((prev) => !prev);
         break;
       }
-      case "initialDocResponded":
-        if (msg.header.lastOps) {
-          setTimeout(() => {
-            setRerender((prev) => !prev);
-          }, 0);
+      case "docSavedFail": {
+        const { contentId, instanceId } = msg.header;
+        if (
+          contentId !== textMediaInstance.textMedia.textId &&
+          instanceId !== textMediaInstance.textInstanceId
+        )
+          return;
+
+        failedVisible.current = true;
+
+        if (failedTimeoutRef.current) {
+          clearTimeout(failedTimeoutRef.current);
+          failedTimeoutRef.current = undefined;
         }
+
+        failedTimeoutRef.current = setTimeout(() => {
+          failedVisible.current = false;
+
+          if (failedTimeoutRef.current) {
+            clearTimeout(failedTimeoutRef.current);
+            failedTimeoutRef.current = undefined;
+          }
+        });
+
+        setRerender((prev) => !prev);
         break;
+      }
+      case "savedOps": {
+        const { contentId, instanceId } = msg.header;
+        if (
+          contentId !== textMediaInstance.textMedia.textId &&
+          instanceId !== textMediaInstance.textInstanceId
+        )
+          return;
+
+        textMediaInstance.saveState = "saving";
+        textMediaInstance.unsavedChanges = false;
+
+        setRerender((prev) => !prev);
+        break;
+      }
       default:
         break;
     }
@@ -131,7 +179,8 @@ export default function SaveSection({
 
   return (
     <div className="flex h-full items-center justify-center space-x-2">
-      {(textMediaInstance.saveState !== "saved" ||
+      {((textMediaInstance.saveState !== "saved" &&
+        textMediaInstance.saveState !== "saving") ||
         textMediaInstance.unsavedChanges) && (
         <FgButton
           clickFunction={() => {
@@ -161,13 +210,17 @@ export default function SaveSection({
         />
       )}
       {(textMediaInstance.saveState === "saving" ||
-        (textMediaInstance.saveState === "saved" && savedVisible.current)) && (
+        (textMediaInstance.saveState === "saved" && savedVisible.current) ||
+        (textMediaInstance.saveState === "failed" &&
+          failedVisible.current)) && (
         <div className="select-none font-K2D text-lg text-fg-white">
           {textMediaInstance.saveState === "saving"
             ? "Saving..."
             : textMediaInstance.saveState === "saved"
               ? "Saved"
-              : null}
+              : textMediaInstance.saveState === "failed"
+                ? "Save failed"
+                : null}
         </div>
       )}
     </div>

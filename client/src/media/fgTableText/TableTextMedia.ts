@@ -27,7 +27,7 @@ export type TextListenerTypes =
   | { type: "stateChanged" };
 
 class TableTextMedia {
-  textData: Uint8Array<ArrayBuffer>[] = [];
+  textData: Uint8Array | undefined;
 
   fileSize = 0;
   loadingState: LoadingStateTypes = "downloading";
@@ -50,7 +50,7 @@ class TableTextMedia {
       download: LiveTextDownloader,
     ) => void,
     private removeCurrentDownload: (id: string) => void,
-    initTextData?: Uint8Array<ArrayBuffer>[],
+    initTextData?: Uint8Array,
     initFileSize?: number,
   ) {
     if (initTextData !== undefined && initFileSize !== undefined) {
@@ -127,12 +127,10 @@ class TableTextMedia {
   };
 
   downloadText = () => {
-    if (this.textData.length === 0) return;
+    if (!this.textData) return;
 
     const ydoc = new Y.Doc();
-    for (const data of this.textData) {
-      Y.applyUpdate(ydoc, data);
-    }
+    Y.applyUpdate(ydoc, this.textData);
 
     const ytext = ydoc.getText("monaco");
 

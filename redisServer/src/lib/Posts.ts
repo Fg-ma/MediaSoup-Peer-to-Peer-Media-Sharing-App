@@ -26,12 +26,16 @@ class Posts {
     data: any,
     ttlSeconds = 1800
   ): Promise<void> => {
-    await this.redis.set(
-      `${prefix}:${id}`,
-      JSON.stringify(data),
-      "EX",
-      ttlSeconds
-    );
+    if (ttlSeconds !== -1) {
+      await this.redis.set(
+        `${prefix}:${id}`,
+        JSON.stringify(data),
+        "EX",
+        ttlSeconds
+      );
+    } else {
+      await this.redis.set(`${prefix}:${id}`, JSON.stringify(data));
+    }
   };
 
   extendLife = async (

@@ -97,6 +97,34 @@ class LiveTextEditingSocketController {
               },
             };
             break;
+          case "savedOps":
+            message = {
+              type: header.type,
+              header: {
+                contentId: header.header.contentId,
+                instanceId: header.header.instanceId,
+                lastOps: header.header.lastOps,
+              },
+              data: {
+                payload:
+                  fileBuffer.byteLength !== 0 ? this.unpackOps(fileBuffer) : [],
+              },
+            };
+            break;
+          case "getSavedOpsResponse":
+            message = {
+              type: header.type,
+              header: {
+                contentId: header.header.contentId,
+                instanceId: header.header.instanceId,
+                lastOps: header.header.lastOps,
+              },
+              data: {
+                payload:
+                  fileBuffer.byteLength !== 0 ? this.unpackOps(fileBuffer) : [],
+              },
+            };
+            break;
           case "chunk":
             message = {
               type: header.type,
@@ -305,6 +333,19 @@ class LiveTextEditingSocketController {
     );
   };
 
+  getSavedOps = (contentId: string, instanceId: string) => {
+    this.sendMessage({
+      type: "getSavedOps",
+      header: {
+        tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
+        contentId,
+        instanceId,
+      },
+    });
+  };
+
   docSave = (contentId: string, instanceId: string) => {
     this.sendMessage({
       type: "docSave",
@@ -328,7 +369,7 @@ class LiveTextEditingSocketController {
     });
   };
 
-  getChunk = (contentId: string, idx: number) => {
+  getChunk = (contentId: string, range: string) => {
     this.sendMessage({
       type: "getFileChunk",
       header: {
@@ -337,7 +378,7 @@ class LiveTextEditingSocketController {
         instance: this.instance,
         contentId,
       },
-      data: { idx },
+      data: { range },
     });
   };
 }

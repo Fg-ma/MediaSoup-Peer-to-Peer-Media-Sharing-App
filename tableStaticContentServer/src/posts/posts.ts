@@ -282,9 +282,11 @@ class Posts {
             "TSCCS",
             uploadId
           )) as ChunkState;
-          if (!state && !aborted) {
-            this.sendResponse(res, "404 Not Found", "text/plain", "No state");
-            aborted = true;
+          if (!state) {
+            if (!aborted) {
+              this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+              aborted = true;
+            }
             return;
           }
 

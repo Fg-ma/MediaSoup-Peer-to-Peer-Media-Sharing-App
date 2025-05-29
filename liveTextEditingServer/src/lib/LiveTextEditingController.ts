@@ -4,6 +4,7 @@ import {
   onDocSaveType,
   onDocUpdateType,
   onGetInitialDocStateType,
+  onGetSavedOpsType,
   onJoinTableType,
   onLeaveTableType,
   tables,
@@ -11,12 +12,12 @@ import {
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import {
-  CEPH_CHUNK_SIZE,
   REDIS_INITIAL_CHUNK_SIZE,
   tableTopCeph,
   tableTopMongo,
   tableTopRedis,
 } from "src";
+import { Readable } from "stream";
 
 class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
@@ -68,7 +69,7 @@ class LiveTextEditingController {
       `LTE:${tableId}:${contentId}:${instanceId}`
     );
 
-    if (redisOps.length === 0) {
+    if (!redisOps || redisOps.length === 0) {
       const headerObj = {
         type: "initialDocResponded",
         header: { contentId, instanceId },
@@ -191,117 +192,251 @@ class LiveTextEditingController {
     );
   };
 
+  onGetSavedOps = async (event: onGetSavedOpsType) => {
+    const { tableId, username, instance, contentId, instanceId } = event.header;
+
+    const opsRedisKey = `LTE:${tableId}:${contentId}:${instanceId}`;
+    const ops = await tableTopRedis.gets.lrange(opsRedisKey);
+
+    if (ops && ops.length !== 0)
+      await this.sendSavedOps(
+        "savedOps",
+        ops,
+        tableId,
+        username,
+        instance,
+        contentId,
+        instanceId
+      );
+  };
+
   onDocSave = async (event: onDocSaveType) => {
     const { tableId, contentId, instanceId } = event.header;
 
-    // 1) Upload to ceph
-    const chunksRedisKey = `LTE:${tableId}:${contentId}:file`;
+    const savingSessionsKey = `LTE:SS:${tableId}:${contentId}:${instanceId}`;
+
+    const savingSession = await tableTopRedis.gets.getKey(savingSessionsKey);
+
+    if (savingSession) {
+      return;
+    } else {
+      await tableTopRedis.posts.post(
+        `LTE:SS:${tableId}:${contentId}`,
+        instanceId,
+        "true",
+        -1
+      );
+    }
+
     const opsRedisKey = `LTE:${tableId}:${contentId}:${instanceId}`;
 
-    const [chunks, ops] = await Promise.all([
-      tableTopRedis.gets.lrange(chunksRedisKey),
-      tableTopRedis.gets.lrange(opsRedisKey),
-    ]);
-
-    const ydoc = new Y.Doc();
-
-    for (const chunk of chunks) {
-      const update = Uint8Array.from(Object.values(JSON.parse(chunk)));
-      Y.applyUpdate(ydoc, update);
-    }
-
-    for (const op of ops) {
-      const update = Uint8Array.from(Object.values(JSON.parse(op)));
-      Y.applyUpdate(ydoc, update);
-    }
-
-    const fullUpdate = Y.encodeStateAsUpdate(ydoc);
-    const updateBuffer = Buffer.from(fullUpdate);
-    if (updateBuffer.byteLength < 1024 * 1024) {
-      await tableTopCeph.posts.uploadFile(
-        "table-text",
-        contentId,
-        updateBuffer
-      );
-    } else {
-      const updates: Uint8Array<ArrayBuffer>[] = [];
-      const tempDoc = new Y.Doc();
-      let lastStateVector = Y.encodeStateVector(ydoc);
-      let offset = 0;
-
-      while (offset < fullUpdate.length) {
-        const end = Math.min(offset + CEPH_CHUNK_SIZE, fullUpdate.length);
-        const chunk = fullUpdate.slice(offset, end);
-
-        Y.applyUpdate(tempDoc, chunk);
-        const newUpdate = Y.encodeStateAsUpdate(tempDoc, lastStateVector);
-        lastStateVector = Y.encodeStateVector(tempDoc);
-
-        const lengthPrefixed = new Uint8Array(4 + newUpdate.length);
-        new DataView(lengthPrefixed.buffer).setUint32(
-          0,
-          newUpdate.length,
-          true
-        );
-        lengthPrefixed.set(newUpdate, 4);
-
-        updates.push(lengthPrefixed);
-
-        offset = end;
-      }
-
-      await tableTopCeph.posts.uploadFile(
-        "table-text",
-        contentId,
-        Buffer.concat(updates)
-      );
-    }
-
-    const mongo = await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
-      tableId,
-      contentId
-    );
-
-    if (mongo?.state.includes("tabled")) {
-      const newContentId = uuidv4();
-
-      await tableTopRedis.posts.rename(
-        opsRedisKey,
-        `LTE:${tableId}:${newContentId}:${instanceId}`
-      );
-      await tableTopRedis.posts.copy(
-        chunksRedisKey,
-        `LTE:${tableId}:${newContentId}:file`
-      );
-
-      const instance = mongo.instances.find(
-        (instance) => instance.textInstanceId === instanceId
-      );
-      if (instance) {
-        tableTopMongo.tableText?.uploads.uploadMetaData({
-          tableId,
-          textId: newContentId,
-          filename: mongo.filename,
-          mimeType: mongo.mimeType,
-          state: [],
-          instances: [instance],
-        });
-        tableTopMongo.tableText?.deletes.deleteInstanceBy_TID_XID_XIID(
-          tableId,
-          contentId,
-          instanceId
-        );
-      }
+    const ops = await tableTopRedis.gets.lrange(opsRedisKey);
+    if (!ops) {
+      await tableTopRedis.deletes.deleteKeys([
+        `LTE:SS:${tableId}:${contentId}:${instanceId}`,
+      ]);
 
       this.broadcaster.broadcastToTable(tableId, {
-        type: "docSavedNewContent",
-        header: { oldContentId: contentId, newContentId, instanceId },
-      });
-    } else {
-      this.broadcaster.broadcastToTable(tableId, {
-        type: "docSaved",
+        type: "docSavedFail",
         header: { contentId, instanceId },
       });
+      return;
+    }
+    await tableTopRedis.posts.expire(opsRedisKey, 60);
+
+    await this.sendSavedOps(
+      "savedOps",
+      ops,
+      tableId,
+      undefined,
+      undefined,
+      contentId,
+      instanceId
+    );
+
+    const data = await tableTopCeph.gets.getContent("table-text", contentId);
+
+    if (data?.Body instanceof Readable) {
+      const stream = data.Body as Readable;
+
+      const chunks: Buffer[] = [];
+
+      stream
+        .on("data", async (chunk: Buffer) => {
+          chunks.push(chunk);
+        })
+        .on("end", async () => {
+          const update = Buffer.concat(chunks);
+
+          const ydoc = new Y.Doc();
+
+          Y.applyUpdate(ydoc, update);
+
+          for (const op of ops) {
+            const update = Uint8Array.from(Object.values(JSON.parse(op)));
+            Y.applyUpdate(ydoc, update);
+          }
+
+          const fullUpdate = Y.encodeStateAsUpdate(ydoc);
+
+          const mongo =
+            await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
+              tableId,
+              contentId
+            );
+
+          if (mongo?.state.includes("tabled")) {
+            const newContentId = uuidv4();
+
+            await tableTopCeph.posts.uploadFile(
+              "table-text",
+              newContentId,
+              Buffer.from(fullUpdate)
+            );
+
+            const instance = mongo.instances.find(
+              (instance) => instance.textInstanceId === instanceId
+            );
+            if (instance) {
+              tableTopMongo.tableText?.uploads.uploadMetaData({
+                tableId,
+                textId: newContentId,
+                filename: mongo.filename,
+                mimeType: mongo.mimeType,
+                state: [],
+                instances: [instance],
+              });
+              tableTopMongo.tableText?.deletes.deleteInstanceBy_TID_XID_XIID(
+                tableId,
+                contentId,
+                instanceId
+              );
+            }
+
+            await tableTopRedis.deletes.deleteKeys([
+              `LTE:SS:${tableId}:${contentId}:${instanceId}`,
+            ]);
+
+            this.broadcaster.broadcastToTable(tableId, {
+              type: "docSavedNewContent",
+              header: { oldContentId: contentId, newContentId, instanceId },
+            });
+          } else {
+            await tableTopCeph.posts.uploadFile(
+              "table-text",
+              contentId,
+              Buffer.from(fullUpdate)
+            );
+
+            await tableTopRedis.deletes.deleteKeys([
+              `LTE:SS:${tableId}:${contentId}:${instanceId}`,
+            ]);
+
+            this.broadcaster.broadcastToTable(tableId, {
+              type: "docSaved",
+              header: { contentId, instanceId },
+            });
+          }
+        })
+        .on("error", async () => {
+          await tableTopRedis.deletes.deleteKeys([
+            `LTE:SS:${tableId}:${contentId}:${instanceId}`,
+          ]);
+
+          this.broadcaster.broadcastToTable(tableId, {
+            type: "docSavedFail",
+            header: { contentId, instanceId },
+          });
+        });
+    } else {
+      await tableTopRedis.deletes.deleteKeys([
+        `LTE:SS:${tableId}:${contentId}:${instanceId}`,
+      ]);
+
+      this.broadcaster.broadcastToTable(tableId, {
+        type: "docSavedFail",
+        header: { contentId, instanceId },
+      });
+    }
+  };
+
+  private sendSavedOps = async (
+    eventType: "savedOps" | "getSavedOpsResponse",
+    redisOps: string[],
+    tableId: string,
+    username: string | undefined,
+    instance: string | undefined,
+    contentId: string,
+    instanceId: string
+  ) => {
+    if (redisOps.length === 0) return;
+
+    const ops = redisOps.map((op) =>
+      Uint8Array.from(Object.values(JSON.parse(op)))
+    );
+
+    let i = 0;
+    while (i < ops.length) {
+      let totalLength = 0;
+      let j = i;
+
+      while (j < ops.length) {
+        const op = ops[j];
+        const opLength = 4 + op.length;
+        if (totalLength + opLength > REDIS_INITIAL_CHUNK_SIZE) break;
+        totalLength += opLength;
+        j++;
+      }
+
+      const sendOps = ops.slice(i, j);
+
+      const opsPayload = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const op of sendOps) {
+        new DataView(opsPayload.buffer).setUint32(offset, op.length, true);
+        opsPayload.set(op, offset + 4);
+        offset += 4 + op.length;
+      }
+
+      const chunkHeaderObj = {
+        type: eventType,
+        header: {
+          contentId,
+          instanceId,
+          lastOps: j >= ops.length,
+        },
+      };
+
+      const chunkHeaderStr = JSON.stringify(chunkHeaderObj);
+      const encoder = new TextEncoder();
+      const chunkHeaderBytes = encoder.encode(chunkHeaderStr);
+      const chunkHeaderLen = chunkHeaderBytes.length;
+
+      const chunkMessage = new Uint8Array(
+        4 + chunkHeaderLen + opsPayload.length
+      );
+      new DataView(chunkMessage.buffer).setUint32(0, chunkHeaderLen, true);
+      chunkMessage.set(chunkHeaderBytes, 4);
+      chunkMessage.set(opsPayload, 4 + chunkHeaderLen);
+
+      if (username && instance) {
+        this.broadcaster.broadcastToInstance(
+          tableId,
+          username,
+          instance,
+          chunkMessage,
+          true
+        );
+      } else {
+        this.broadcaster.broadcastToTable(
+          tableId,
+          chunkMessage,
+          undefined,
+          true
+        );
+      }
+
+      i = j;
     }
   };
 }

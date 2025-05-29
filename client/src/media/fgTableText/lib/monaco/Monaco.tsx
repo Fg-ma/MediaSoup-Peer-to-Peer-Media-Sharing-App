@@ -19,7 +19,6 @@ export default function Monaco({
   setIsReadOnly,
   textMediaInstance,
   externalTextAreaContainerRef,
-  limitChunks,
 }: {
   className?: string;
   settings: Settings;
@@ -29,21 +28,15 @@ export default function Monaco({
   setIsReadOnly?: React.Dispatch<React.SetStateAction<boolean>>;
   textMediaInstance: TableTextMediaInstance;
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
-  limitChunks?: number;
 }) {
   const { liveTextEditingSocket } = useSocketContext();
   const { sendGeneralSignal } = useSignalContext();
 
   const editor = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const monaco = useRef<typeof monacoEditor | null>(null);
-
-  const [isInitializing, setIsInitializing] = useState(true);
-
-  const ydoc = useRef<Y.Doc | null>(null);
-  const yText = useRef<Y.Text | null>(null);
   const binding = useRef<MonacoBinding | null>(null);
 
-  const recreatedRef = useRef(false);
+  const [_, setRerender] = useState(false);
 
   const textAreaContainerRef = externalTextAreaContainerRef
     ? externalTextAreaContainerRef
@@ -55,17 +48,13 @@ export default function Monaco({
       liveTextEditingSocket,
       editor,
       monaco,
-      ydoc,
-      yText,
       binding,
-      recreatedRef,
       settings,
       textAreaContainerRef,
       isLineNums,
       setIsLineNums,
       sendGeneralSignal,
-      setIsInitializing,
-      limitChunks,
+      setRerender,
     ),
   );
 
@@ -104,6 +93,18 @@ export default function Monaco({
     });
   }, [isLineNums]);
 
+  useEffect(() => {
+    textMediaInstance.addTextInstanceListener(
+      monacoController.current.handleTextInstanceMessage,
+    );
+
+    return () => {
+      textMediaInstance.removeTextInstanceListener(
+        monacoController.current.handleTextInstanceMessage,
+      );
+    };
+  }, []);
+
   return (
     <div
       ref={textAreaContainerRef}
@@ -116,7 +117,7 @@ export default function Monaco({
       }}
     >
       <Editor
-        className={`${isInitializing ? "absolute opacity-0" : ""}`}
+        className={`${textMediaInstance.initializingState === "initializing" ? "absolute opacity-0" : ""}`}
         height="100%"
         width="100%"
         defaultLanguage="plaintext"
@@ -147,15 +148,15 @@ export default function Monaco({
           lineNumbersMinChars: 0,
         }}
         loading={
-          <div className="flex absolute inset-0 items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center">
             <span className="font-K2D text-xl text-fg-white">
               Initializing...
             </span>
           </div>
         }
       />
-      {isInitializing && (
-        <div className="flex absolute inset-0 items-center justify-center">
+      {textMediaInstance.initializingState === "initializing" && (
+        <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-K2D text-xl text-fg-white">
             Initializing...
           </span>

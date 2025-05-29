@@ -8,8 +8,17 @@ class Gets {
     return data ? JSON.parse(data) : null;
   }
 
+  async getKey(key: string) {
+    const data = await this.redis.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+
   lrange = async (prefix: string, start: number = 0, end: number = -1) => {
-    return await this.redis.lrange(prefix, start, end);
+    try {
+      return await this.redis.lrange(prefix, start, end);
+    } catch {
+      return null;
+    }
   };
 
   lindex = async (prefix: string, idx: number) => {

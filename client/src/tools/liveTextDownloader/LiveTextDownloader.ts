@@ -6,7 +6,6 @@ import {
   onChunkErrorType,
   onChunkType,
   onDownloadErrorType,
-  onDownloadFinishedType,
   onDownloadMetaType,
   onOneShotDownloadType,
 } from "../../serverControllers/liveTextEditingServer/lib/typeConstant";
@@ -18,7 +17,6 @@ class LiveTextDownloader {
   private idx = -1;
   private fileSize = 0;
   private offset = 0;
-  private data: Uint8Array<ArrayBuffer>[] = [];
 
   private _progress: number = 0;
 
@@ -34,6 +32,8 @@ class LiveTextDownloader {
   private downloadWorker: Worker | undefined;
 
   private state: "downloading" | "waiting" = "waiting";
+
+  private totalBuffer: Uint8Array<ArrayBuffer> | undefined;
 
   constructor(
     private contentId: string,
@@ -70,6 +70,7 @@ class LiveTextDownloader {
     }
 
     this.fileSize = message.data.fileSize;
+    this.totalBuffer = new Uint8Array(this.fileSize);
 
     if (this.state !== "downloading") {
       this.state = "downloading";
@@ -79,7 +80,10 @@ class LiveTextDownloader {
 
   private requestNextChunk = () => {
     this.idx += 1;
-    this.liveTextEditingSocket.current?.getChunk(this.contentId, this.idx);
+    this.liveTextEditingSocket.current?.getChunk(
+      this.contentId,
+      `bytes=${this.offset}-${Math.min(this.fileSize, this.offset + 1024 * 1024)}`,
+    );
   };
 
   private onChunk = (message: onChunkType) => {
@@ -97,7 +101,7 @@ class LiveTextDownloader {
     this._progress = this.offset / (this.fileSize ?? 1);
 
     // 1) Append chunk as before
-    this.data?.push(chunkData);
+    this.totalBuffer?.set(chunkData, this.offset - chunkBytes);
 
     // 2) Initialize timing on first chunk
     if (this.lastTimestamp === null) {
@@ -135,32 +139,28 @@ class LiveTextDownloader {
     });
 
     if (!this._paused) {
-      this.requestNextChunk();
+      if (this.offset < this.fileSize) {
+        this.requestNextChunk();
+      } else {
+        this.listeners.forEach((listener) => {
+          if (!this.totalBuffer) return;
+
+          listener({
+            type: "downloadFinish",
+            data: { payload: this.totalBuffer, fileSize: this.fileSize },
+          });
+        });
+
+        if (this.downloadWorker) {
+          this.downloadWorker.terminate();
+          this.downloadWorker = undefined;
+        }
+
+        this.removeCurrentDownload(this.contentId);
+        this.sendDownloadSignal({ type: "downloadFinish" });
+        this.deconstructor();
+      }
     }
-  };
-
-  private onDownloadFinished = (message: onDownloadFinishedType) => {
-    const { contentId } = message.header;
-
-    if (contentId !== this.contentId) {
-      return;
-    }
-
-    this.listeners.forEach((listener) => {
-      listener({
-        type: "downloadFinish",
-        data: { payload: this.data, fileSize: this.fileSize },
-      });
-    });
-
-    if (this.downloadWorker) {
-      this.downloadWorker.terminate();
-      this.downloadWorker = undefined;
-    }
-
-    this.removeCurrentDownload(this.contentId);
-    this.sendDownloadSignal({ type: "downloadFinish" });
-    this.deconstructor();
   };
 
   private onChunkError = (message: onChunkErrorType) => {
@@ -185,13 +185,13 @@ class LiveTextDownloader {
 
     const finishMessage = {
       type: "downloadFinish",
-      data: { payload: [payload], fileSize },
+      data: { payload: payload, fileSize },
     };
     this.listeners.forEach((listener) => {
       listener(
         finishMessage as {
           type: "downloadFinish";
-          data: { payload: Uint8Array<ArrayBuffer>[]; fileSize: number };
+          data: { payload: Uint8Array<ArrayBuffer>; fileSize: number };
         },
       );
     });
@@ -233,9 +233,6 @@ class LiveTextDownloader {
         break;
       case "chunkError":
         this.onChunkError(message);
-        break;
-      case "downloadFinished":
-        this.onDownloadFinished(message);
         break;
       case "oneShotDownload":
         this.onOneShotDownloadComplete(message);

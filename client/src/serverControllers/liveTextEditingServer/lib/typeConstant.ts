@@ -3,6 +3,7 @@ export type OutGoingLiveTextEditingMessages =
   | onLeaveTableType
   | onGetInitialDocStateType
   | onDocUpdateType
+  | onGetSavedOpsType
   | onDocSaveType
   | onGetDownloadMetaType
   | onGetFileChunkType;
@@ -50,6 +51,17 @@ type onDocUpdateType = {
   };
 };
 
+type onGetSavedOpsType = {
+  type: "getSavedOps";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+    instanceId: string;
+  };
+};
+
 type onDocSaveType = {
   type: "docSave";
   header: {
@@ -78,17 +90,19 @@ type onGetFileChunkType = {
     contentId: string;
   };
   data: {
-    idx: number;
+    range: string;
   };
 };
 
 export type IncomingLiveTextEditingMessages =
   | onDocUpdatedType
   | onDocSavedType
+  | onDocSavedFailType
   | onDocSavedNewContentType
-  | onInitialDocResponded
+  | onInitialDocRespondedType
+  | onSavedOpsType
+  | onGetSavedOpsResponseRespondedType
   | onChunkType
-  | onDownloadFinishedType
   | onChunkErrorType
   | onDownloadMetaType
   | onOneShotDownloadType
@@ -105,13 +119,42 @@ export type onDocSavedType = {
   header: { contentId: string; instanceId: string };
 };
 
+export type onDocSavedFailType = {
+  type: "docSavedFail";
+  header: { contentId: string; instanceId: string };
+};
+
 export type onDocSavedNewContentType = {
   type: "docSavedNewContent";
   header: { oldContentId: string; newContentId: string; instanceId: string };
 };
 
-export type onInitialDocResponded = {
+export type onInitialDocRespondedType = {
   type: "initialDocResponded";
+  header: {
+    contentId: string;
+    instanceId: string;
+    lastOps: boolean;
+  };
+  data: {
+    payload: Uint8Array<ArrayBuffer>[];
+  };
+};
+
+export type onSavedOpsType = {
+  type: "savedOps";
+  header: {
+    contentId: string;
+    instanceId: string;
+    lastOps: boolean;
+  };
+  data: {
+    payload: Uint8Array<ArrayBuffer>[];
+  };
+};
+
+export type onGetSavedOpsResponseRespondedType = {
+  type: "getSavedOpsResponse";
   header: {
     contentId: string;
     instanceId: string;
@@ -130,13 +173,6 @@ export type onChunkType = {
   };
   data: {
     payload: Uint8Array<ArrayBuffer>;
-  };
-};
-
-export type onDownloadFinishedType = {
-  type: "downloadFinished";
-  header: {
-    contentId: string;
   };
 };
 
