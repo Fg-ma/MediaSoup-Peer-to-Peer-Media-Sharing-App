@@ -55,7 +55,7 @@ class TableController {
 
     switch (event.key.toLowerCase()) {
       case "s":
-        if (event.ctrlKey) {
+        if (event.shiftKey) {
           event.preventDefault();
           event.stopPropagation;
 

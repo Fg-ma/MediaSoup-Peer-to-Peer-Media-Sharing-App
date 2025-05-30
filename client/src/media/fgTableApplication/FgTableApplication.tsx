@@ -220,13 +220,16 @@ export default function FgTableApplication({
           scrollingContainerRef={rightLowerApplicationControlsRef}
           lowerApplicationController={lowerApplicationController}
         />,
-        <DownloadButton
-          settings={settings}
-          recording={recording}
-          lowerApplicationController={lowerApplicationController}
-          applicationEffectsActive={applicationEffectsActive}
-          scrollingContainerRef={rightLowerApplicationControlsRef}
-        />,
+        applicationMediaInstance.applicationMedia.loadingState ===
+          "downloaded" && (
+          <DownloadButton
+            settings={settings}
+            recording={recording}
+            lowerApplicationController={lowerApplicationController}
+            applicationEffectsActive={applicationEffectsActive}
+            scrollingContainerRef={rightLowerApplicationControlsRef}
+          />
+        ),
         settings.downloadType.value === "record" &&
         downloadRecordingReady.current ? (
           <DownloadRecordingButton

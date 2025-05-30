@@ -172,12 +172,11 @@ export default function TabledPortal({
                               (item) => item.sid === svgId,
                             )) ? (
                             <TabledItems
+                              media={svgMedia}
                               contentType="svg"
                               contentId={svgId}
                               selected={selected}
-                              blobURL={svgMedia.blobURL}
                               filename={svgMedia.filename}
-                              aspect={svgMedia.aspect}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -185,6 +184,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                svgMedia.loadingState !== "downloaded"
+                                  ? svgMedia.addSvgListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                svgMedia.loadingState !== "downloaded"
+                                  ? svgMedia.removeSvgListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )
@@ -199,12 +209,11 @@ export default function TabledPortal({
                               (item) => item.iid === imageId,
                             )) ? (
                             <TabledItems
+                              media={imageMedia}
                               contentType="image"
                               contentId={imageId}
                               selected={selected}
-                              blobURL={imageMedia.blobURL}
                               filename={imageMedia.filename}
-                              aspect={imageMedia.aspect}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -212,6 +221,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                imageMedia.loadingState !== "downloaded"
+                                  ? imageMedia.addImageListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                imageMedia.loadingState !== "downloaded"
+                                  ? imageMedia.removeImageListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )
@@ -226,12 +246,11 @@ export default function TabledPortal({
                               (item) => item.vid === videoId,
                             )) ? (
                             <TabledItems
+                              media={videoMedia}
                               contentType="video"
                               contentId={videoId}
                               selected={selected}
-                              blobURL={videoMedia.blobURL}
                               filename={videoMedia.filename}
-                              aspect={videoMedia.aspect}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -239,6 +258,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                videoMedia.loadingState !== "downloaded"
+                                  ? videoMedia.addVideoListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                videoMedia.loadingState !== "downloaded"
+                                  ? videoMedia.removeVideoListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )
@@ -253,12 +283,11 @@ export default function TabledPortal({
                               (item) => item.sid === soundClipId,
                             )) ? (
                             <TabledItems
+                              media={soundClipMedia}
                               contentType="soundClip"
                               contentId={soundClipId}
                               selected={selected}
-                              blobURL={soundClipMedia.blobURL}
                               filename={soundClipMedia.filename}
-                              aspect={undefined}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -266,6 +295,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                soundClipMedia.loadingState !== "downloaded"
+                                  ? soundClipMedia.addSoundClipListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                soundClipMedia.loadingState !== "downloaded"
+                                  ? soundClipMedia.removeSoundClipListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )
@@ -280,12 +320,11 @@ export default function TabledPortal({
                               (item) => item.sid === applicationId,
                             )) ? (
                             <TabledItems
+                              media={applicationMedia}
                               contentType="application"
                               contentId={applicationId}
                               selected={selected}
-                              blobURL={applicationMedia.blobURL}
                               filename={applicationMedia.filename}
-                              aspect={applicationMedia.aspect}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -293,6 +332,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                applicationMedia.loadingState !== "downloaded"
+                                  ? applicationMedia.addApplicationListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                applicationMedia.loadingState !== "downloaded"
+                                  ? applicationMedia.removeApplicationListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )
@@ -307,12 +357,11 @@ export default function TabledPortal({
                               (item) => item.sid === textId,
                             )) ? (
                             <TabledItems
+                              media={textMedia}
                               contentType="text"
                               contentId={textId}
                               selected={selected}
-                              blobURL={undefined}
                               filename={textMedia.filename}
-                              aspect={undefined}
                               tabledSectionScrollingContainerRef={
                                 tabledSectionScrollingContainerRef
                               }
@@ -320,6 +369,17 @@ export default function TabledPortal({
                               setDragging={setDragging}
                               holdTimeout={holdTimeout}
                               holdInterval={holdInterval}
+                              addDownloadListener={
+                                textMedia.loadingState !== "downloaded"
+                                  ? textMedia.addTextListener
+                                  : undefined
+                              }
+                              removeDownloadListener={
+                                textMedia.loadingState !== "downloaded"
+                                  ? textMedia.removeTextListener
+                                  : undefined
+                              }
+                              setExternalRerender={setRerender}
                             />
                           ) : null,
                       )

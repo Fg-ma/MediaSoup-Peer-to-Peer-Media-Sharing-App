@@ -1,7 +1,7 @@
 import React from "react";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import AtomLoader from "../atomLoader/AtomLoader";
-import BouncingLoader from "../bouncingLoader/BouncingLoader";
+import AtomLoader from "../loaders/atomLoader/AtomLoader";
+import BouncingLoader from "../loaders/bouncingLoader/BouncingLoader";
 
 export default function LoadingElement({
   className,

@@ -65,7 +65,7 @@ export default function DownloadPaused({
           lineHeight: `${textSize + 0.5}rem`,
         }}
       >
-        Resume download?
+        {onClick ? "Resume download?" : "Download paused"}
       </div>
       <FgSVGElement
         className="flex aspect-square grow items-center justify-center fill-fg-white stroke-fg-white"

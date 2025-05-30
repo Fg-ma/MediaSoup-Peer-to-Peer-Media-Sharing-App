@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import { useSocketContext } from "../../context/socketContext/SocketContext";
 import LowerTextController from "./lib/lowerTextControls/LowerTextController";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import DownloadButton from "./lib/lowerTextControls/downloadButton/DownloadButton";
@@ -16,6 +15,9 @@ import ExpandLineNumbers from "./lib/ExpandLineNumbers";
 import Monaco from "./lib/monaco/Monaco";
 import CornersDecorator from "../../elements/decorators/CornersDecorator";
 import SaveSection from "./lib/lowerTextControls/saveSection/SaveSection";
+import TinyLoader from "../../elements/loaders/tinyLoader/TinyLoader";
+import HoverElement from "../../elements/hoverElement/HoverElement";
+import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import "./lib/fgTextStyles.css";
 
 export default function FgTableText({
@@ -28,7 +30,6 @@ export default function FgTableText({
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const { userMedia } = useMediaContext();
-  const { liveTextEditingSocket } = useSocketContext();
 
   const textMediaInstance =
     userMedia.current.text.tableInstances[textInstanceId];
@@ -51,7 +52,9 @@ export default function FgTableText({
     defaultActiveSettingsPages,
   );
 
-  const [isReadOnly, setIsReadOnly] = useState(true);
+  const isReadOnly = useRef(true);
+  const initializing = useRef(false);
+  const forceFinishInitialization = useRef(false);
   const [isLineNums, setIsLineNums] = useState(true);
   const textAreaContainerRef = useRef<HTMLDivElement>(null);
 
@@ -63,8 +66,11 @@ export default function FgTableText({
       textContainerRef,
       setSettings,
       setSettingsActive,
-      setIsReadOnly,
       textAreaContainerRef,
+      isReadOnly,
+      setRerender,
+      initializing,
+      forceFinishInitialization,
     ),
   );
 
@@ -110,7 +116,12 @@ export default function FgTableText({
   }, []);
 
   useEffect(() => {
-    if (isReadOnly) return;
+    if (isReadOnly) {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      return;
+    }
 
     document.addEventListener(
       "pointerdown",
@@ -154,9 +165,11 @@ export default function FgTableText({
             isLineNums={isLineNums}
             setIsLineNums={setIsLineNums}
             isReadOnly={isReadOnly}
-            setIsReadOnly={setIsReadOnly}
+            externalInitializing={initializing}
+            externalRerender={setRerender}
             textMediaInstance={textMediaInstance}
             externalTextAreaContainerRef={textAreaContainerRef}
+            forceFinishInitialization={forceFinishInitialization}
           />
         )
       }
@@ -165,7 +178,7 @@ export default function FgTableText({
           isLineNums={isLineNums}
           setIsLineNums={setIsLineNums}
         />,
-        !isReadOnly ? (
+        !isReadOnly.current ? (
           <CornersDecorator className="z-[100] stroke-fg-red-light" width={4} />
         ) : null,
       ]}
@@ -185,19 +198,46 @@ export default function FgTableText({
           lowerTextController={lowerTextController}
           isReadOnly={isReadOnly}
         />,
-        <DownloadButton
-          settingsActive={settingsActive}
-          lowerTextController={lowerTextController}
-          scrollingContainerRef={rightLowerTextControlsRef}
-        />,
+        textMediaInstance.textMedia.loadingState === "downloaded" && (
+          <DownloadButton
+            settingsActive={settingsActive}
+            lowerTextController={lowerTextController}
+            scrollingContainerRef={rightLowerTextControlsRef}
+          />
+        ),
       ]}
       leftLowerControls={[
-        <SaveSection
-          settingsActive={settingsActive}
-          lowerTextController={lowerTextController}
-          scrollingContainerRef={rightLowerTextControlsRef}
-          textMediaInstance={textMediaInstance}
-        />,
+        initializing.current ? (
+          <HoverElement
+            className="aspect-square h-full"
+            content={
+              <TinyLoader
+                className={`${forceFinishInitialization.current ? "rotate-90" : ""} h-full w-full cursor-pointer`}
+                onClick={
+                  lowerTextController.current.handleForceFinishInitialization
+                }
+              />
+            }
+            hoverContent={
+              <FgHoverContentStandard
+                style="light"
+                content={"Initializing... (ctrl+I) [Caution can cause lag!]"}
+              />
+            }
+            options={{
+              hoverSpacing: 4,
+              hoverType: "above",
+              hoverTimeoutDuration: 750,
+            }}
+          />
+        ) : (
+          <SaveSection
+            settingsActive={settingsActive}
+            lowerTextController={lowerTextController}
+            scrollingContainerRef={rightLowerTextControlsRef}
+            textMediaInstance={textMediaInstance}
+          />
+        ),
       ]}
       inMediaVariables={[settingsActive]}
       preventLowerLabelsVariables={[settingsActive]}

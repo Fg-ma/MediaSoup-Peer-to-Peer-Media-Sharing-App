@@ -6,6 +6,18 @@ import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
 import FgImageElement from "../../elements/fgImageElement/FgImageElement";
 import NewInstancesLayerController from "./lib/NewInstancesLayerController";
 import { InstanceLayerModes } from "./lib/typeConstant";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
+import TableImageMedia from "../../media/fgTableImage/TableImageMedia";
+import TableSvgMedia from "../../media/fgTableSvg/TableSvgMedia";
+import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
+import TableApplicationMedia from "../../media/fgTableApplication/TableApplicationMedia";
+import DownloadPaused from "../../elements/downloadPaused/DownloadPaused";
+import DownloadFailed from "../../elements/downloadFailed/DownloadFailed";
+import LoadingElement from "../../elements/loadingElement/LoadingElement";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const textIcon = nginxAssetServerBaseUrl + "svgs/textIcon.svg";
 
 export type InstanceType = {
   contentType: StaticContentTypes;
@@ -129,21 +141,8 @@ export default function NewInstancesLayer({
     >
       {!hideInstances.current &&
         newInstances.current.map((instance) => {
-          let imgSrc: string | null = null;
-          let alt: string = "";
-
-          if (
-            instance.contentType !== "text" &&
-            instance.contentType !== "soundClip"
-          ) {
-            const media =
-              userMedia.current[instance.contentType].table[instance.contentId];
-
-            if (media?.blobURL) {
-              imgSrc = media.blobURL;
-              alt = media.filename;
-            }
-          }
+          const media =
+            userMedia.current[instance.contentType].table[instance.contentId];
 
           return (
             <React.Fragment key={instance.contentId}>
@@ -158,12 +157,41 @@ export default function NewInstancesLayer({
                     top: `${ins.y}px`,
                   }}
                 >
-                  {imgSrc && (
+                  {(media instanceof TableImageMedia ||
+                    media instanceof TableSvgMedia ||
+                    media instanceof TableVideoMedia ||
+                    media instanceof TableApplicationMedia) &&
+                  media.blobURL &&
+                  media.loadingState === "downloaded" ? (
                     <FgImageElement
                       className="h-full w-full object-contain"
-                      src={imgSrc}
-                      alt={alt}
+                      src={media.blobURL}
+                      alt={media.filename}
                     />
+                  ) : media.loadingState === "downloading" ? (
+                    <LoadingElement className="h-full w-full rounded" />
+                  ) : media.loadingState === "failed" ? (
+                    <DownloadFailed className="h-full w-full rounded" />
+                  ) : (
+                    media.loadingState === "paused" && (
+                      <DownloadPaused className="h-full w-full rounded" />
+                    )
+                  )}
+                  {instance.contentType === "text" && (
+                    <div className="flex aspect-square w-full flex-col items-center justify-center">
+                      <div className="h-8 w-full truncate font-K2D text-xl text-fg-white">
+                        {media.filename}
+                      </div>
+                      <FgSVGElement
+                        className="mt-2 aspect-square fill-fg-white"
+                        style={{ height: "calc(100% - 2.5rem)" }}
+                        src={textIcon}
+                        attributes={[
+                          { key: "width", value: "100%" },
+                          { key: "height", value: "100%" },
+                        ]}
+                      />
+                    </div>
                   )}
                 </div>
               ))}

@@ -66,12 +66,18 @@ export default function TextSelection({
         selectionContentStyle={{ width: "calc(100% - 1rem)" }}
         selectionContent={
           loadingState === "downloaded" ? (
-            <Monaco
-              settings={settings}
-              isLineNums={false}
-              isReadOnly={true}
-              textMediaInstance={textInstanceMedia}
-            />
+            textInstanceMedia.textMedia.fileSize < 1024 * 1024 * 5 ? (
+              <Monaco
+                settings={settings}
+                isLineNums={false}
+                isReadOnly={true}
+                textMediaInstance={textInstanceMedia}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded bg-fg-tone-black-1 text-center font-K2D text-xl text-fg-white">
+                Sorry no text preview
+              </div>
+            )
           ) : loadingState === "downloading" ? (
             <LoadingElement
               className="h-[12rem] w-full rounded-md"
@@ -89,9 +95,7 @@ export default function TextSelection({
               className="h-[12rem] w-full rounded-md"
               onClick={textInstanceMedia.textMedia.liveTextDownloader?.resume}
             />
-          ) : (
-            <></>
-          )
+          ) : undefined
         }
         filename={textInstanceMedia.textMedia.filename}
         mimeType={textInstanceMedia.textMedia.mimeType}

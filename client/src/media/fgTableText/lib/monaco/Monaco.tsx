@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
-import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import type * as monacoEditor from "monaco-editor";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
@@ -11,23 +10,27 @@ import MonacoController from "./lib/MonacoController";
 import "./lib/monaco.css";
 
 export default function Monaco({
+  textMediaInstance,
   className,
   settings,
   isLineNums = false,
   setIsLineNums,
-  isReadOnly = true,
-  setIsReadOnly,
-  textMediaInstance,
+  isReadOnly,
+  externalInitializing,
+  externalRerender,
   externalTextAreaContainerRef,
+  forceFinishInitialization,
 }: {
+  textMediaInstance: TableTextMediaInstance;
   className?: string;
   settings: Settings;
   isLineNums?: boolean;
   setIsLineNums?: React.Dispatch<React.SetStateAction<boolean>>;
-  isReadOnly?: boolean;
-  setIsReadOnly?: React.Dispatch<React.SetStateAction<boolean>>;
-  textMediaInstance: TableTextMediaInstance;
+  isReadOnly?: React.MutableRefObject<boolean>;
+  externalInitializing?: React.MutableRefObject<boolean>;
+  externalRerender?: React.Dispatch<React.SetStateAction<boolean>>;
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
+  forceFinishInitialization?: React.MutableRefObject<boolean>;
 }) {
   const { liveTextEditingSocket } = useSocketContext();
   const { sendGeneralSignal } = useSignalContext();
@@ -35,6 +38,9 @@ export default function Monaco({
   const editor = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const monaco = useRef<typeof monacoEditor | null>(null);
   const binding = useRef<MonacoBinding | null>(null);
+  const initializing = externalInitializing
+    ? externalInitializing
+    : useRef(false);
 
   const [_, setRerender] = useState(false);
 
@@ -55,6 +61,10 @@ export default function Monaco({
       setIsLineNums,
       sendGeneralSignal,
       setRerender,
+      isReadOnly,
+      initializing,
+      forceFinishInitialization,
+      externalRerender,
     ),
   );
 
@@ -108,12 +118,15 @@ export default function Monaco({
   return (
     <div
       ref={textAreaContainerRef}
-      className={`${className} ${isReadOnly ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
+      className={`${className} ${isReadOnly?.current ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
       style={{
         backgroundColor: settings.colors.backgroundColor.value,
       }}
       onDoubleClick={() => {
-        if (setIsReadOnly) setIsReadOnly(false);
+        if (isReadOnly && isReadOnly.current) {
+          isReadOnly.current = false;
+          if (externalRerender) externalRerender((prev) => !prev);
+        }
       }}
     >
       <Editor
@@ -123,9 +136,10 @@ export default function Monaco({
         defaultLanguage="plaintext"
         onMount={monacoController.current.handleEditorDidMount}
         options={{
+          stickyScroll: { enabled: false },
           minimap: { enabled: settings.minimap.value },
-          readOnly: isReadOnly,
-          domReadOnly: isReadOnly,
+          readOnly: initializing.current ? true : (isReadOnly?.current ?? true),
+          domReadOnly: isReadOnly?.current ?? true,
           cursorStyle: settings.cursorStyle.value,
           automaticLayout: true,
           largeFileOptimizations: true,
@@ -148,7 +162,7 @@ export default function Monaco({
           lineNumbersMinChars: 0,
         }}
         loading={
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex absolute inset-0 items-center justify-center">
             <span className="font-K2D text-xl text-fg-white">
               Initializing...
             </span>
@@ -156,7 +170,7 @@ export default function Monaco({
         }
       />
       {textMediaInstance.initializingState === "initializing" && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex absolute inset-0 items-center justify-center">
           <span className="font-K2D text-xl text-fg-white">
             Initializing...
           </span>

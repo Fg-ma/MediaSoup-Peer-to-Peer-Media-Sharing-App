@@ -179,36 +179,36 @@ export default function SaveSection({
 
   return (
     <div className="flex h-full items-center justify-center space-x-2">
-      {((textMediaInstance.saveState !== "saved" &&
-        textMediaInstance.saveState !== "saving") ||
-        textMediaInstance.unsavedChanges) && (
-        <FgButton
-          clickFunction={() => {
-            textMediaInstance.saveState = "saving";
-            textMediaInstance.unsavedChanges = false;
-            lowerTextController.current.handleSave();
-            setRerender((prev) => !prev);
-          }}
-          contentFunction={() => (
-            <FgSVGElement
-              src={saveIcon}
-              attributes={[
-                { key: "width", value: "85%" },
-                { key: "height", value: "85%" },
-                { key: "fill", value: "#f2f2f2" },
-                { key: "stroke", value: "#f2f2f2" },
-              ]}
-            />
-          )}
-          hoverContent={
-            !settingsActive ? (
-              <FgHoverContentStandard content="Save (ctrl+s)" style="light" />
-            ) : undefined
-          }
-          scrollingContainerRef={scrollingContainerRef}
-          className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
-        />
-      )}
+      {(textMediaInstance.saveState !== "saved" ||
+        textMediaInstance.unsavedChanges) &&
+        textMediaInstance.saveState !== "saving" && (
+          <FgButton
+            clickFunction={() => {
+              textMediaInstance.saveState = "saving";
+              textMediaInstance.unsavedChanges = false;
+              lowerTextController.current.handleSave();
+              setRerender((prev) => !prev);
+            }}
+            contentFunction={() => (
+              <FgSVGElement
+                src={saveIcon}
+                attributes={[
+                  { key: "width", value: "85%" },
+                  { key: "height", value: "85%" },
+                  { key: "fill", value: "#f2f2f2" },
+                  { key: "stroke", value: "#f2f2f2" },
+                ]}
+              />
+            )}
+            hoverContent={
+              !settingsActive ? (
+                <FgHoverContentStandard content="Save (ctrl+s)" style="light" />
+              ) : undefined
+            }
+            scrollingContainerRef={scrollingContainerRef}
+            className="pointer-events-auto flex aspect-square h-full scale-x-[-1] items-center justify-center"
+          />
+        )}
       {(textMediaInstance.saveState === "saving" ||
         (textMediaInstance.saveState === "saved" && savedVisible.current) ||
         (textMediaInstance.saveState === "failed" &&

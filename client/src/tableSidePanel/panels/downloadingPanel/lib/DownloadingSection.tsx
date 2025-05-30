@@ -6,7 +6,6 @@ import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import MoreInfoSection from "./MoreInfoSection";
 import Downloader from "../../../../tools/downloader/Downloader";
-import { DownloadListenerTypes } from "../../../../tools/downloader/lib/typeConstant";
 import LiveTextDownloader from "../../../../tools/liveTextDownloader/LiveTextDownloader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -25,7 +24,6 @@ export default function DownloadingSection({
 }) {
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);
   const [_, setRerender] = useState(false);
-  const rightLoadingInfoRef = useRef<HTMLDivElement>(null);
   const filenameRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadListener = (
@@ -64,7 +62,7 @@ export default function DownloadingSection({
         <div
           className="flex h-full grow items-center justify-start space-x-2"
           style={{
-            width: `calc(100% - ${rightLoadingInfoRef.current?.clientWidth ?? 0}px)`,
+            width: "calc(100% - 4rem)",
           }}
         >
           <HoverElement
@@ -87,16 +85,13 @@ export default function DownloadingSection({
             }}
           />
         </div>
-        <div
-          ref={rightLoadingInfoRef}
-          className="flex h-full w-max items-center justify-center space-x-1"
-        >
+        <div className="flex h-full w-max items-center justify-center">
           <FgButton
-            className="flex aspect-square h-[90%] items-center justify-center"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={download.paused ? playIcon : pauseIcon}
-                className="fill-fg-white stroke-fg-white"
+                className="aspect-square h-[90%] fill-fg-white stroke-fg-white"
                 attributes={[
                   { key: "height", value: "100%" },
                   { key: "width", value: "100%" },
@@ -124,11 +119,11 @@ export default function DownloadingSection({
             }}
           />
           <FgButton
-            className="flex aspect-square h-[60%] items-center justify-center"
+            className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
               <FgSVGElement
                 src={closeIcon}
-                className="fill-fg-white stroke-fg-white"
+                className="aspect-square h-[60%] fill-fg-white stroke-fg-white"
                 attributes={[
                   { key: "height", value: "100%" },
                   { key: "width", value: "100%" },

@@ -1,0 +1,32 @@
+.tiny-loader-container .tiny-loader {
+  background: #ffffff;
+  -webkit-animation: tiny-loader-animation 1.25s infinite ease-in-out;
+  animation: tiny-loader-animation 1.25s infinite ease-in-out;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 15%;
+  left: 50%;
+}
+
+@-webkit-keyframes tiny-loader-animation {
+  0%,
+  80%,
+  100% {
+    width: 70%;
+  }
+  40% {
+    width: 100%;
+  }
+}
+
+@keyframes tiny-loader-animation {
+  0%,
+  80%,
+  100% {
+    width: 70%;
+  }
+  40% {
+    width: 100%;
+  }
+}

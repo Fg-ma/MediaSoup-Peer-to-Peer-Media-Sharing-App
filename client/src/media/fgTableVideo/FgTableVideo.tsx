@@ -303,13 +303,15 @@ export default function FgTableVideo({
           setSettings={setSettings}
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
-        <DownloadButton
-          settings={settings}
-          recording={recording}
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-        />,
+        videoMediaInstance.videoMedia.loadingState === "downloaded" && (
+          <DownloadButton
+            settings={settings}
+            recording={recording}
+            lowerVideoController={lowerVideoController}
+            videoEffectsActive={videoEffectsActive}
+            scrollingContainerRef={rightLowerVideoControlsRef}
+          />
+        ),
         settings.downloadType.value === "record" &&
         downloadRecordingReady.current ? (
           <DownloadRecordingButton

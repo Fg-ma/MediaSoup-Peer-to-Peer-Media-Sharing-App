@@ -8,7 +8,7 @@ import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import Cleanup from "./lib/Cleanup";
 import Gets from "./gets/Gets";
-import Posts from "./posts/posts";
+import Posts from "./posts/Posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";

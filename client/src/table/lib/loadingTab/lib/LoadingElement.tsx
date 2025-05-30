@@ -34,7 +34,7 @@ export default function LoadingElement({
   const circumference = 2 * Math.PI * radius;
 
   // Clamp in [0,1]:
-  const pct = Math.min(Math.max(upload.progress, 0), 1);
+  const pct = Math.min(Math.max(upload.progress, 0), 0.9999);
 
   return (
     <HoverElement

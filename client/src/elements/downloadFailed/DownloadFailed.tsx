@@ -65,7 +65,7 @@ export default function DownloadFailed({
           lineHeight: `${textSize + 0.5}rem`,
         }}
       >
-        Retry download?
+        {onClick ? "Retry download?" : "Download failed"}
       </div>
       <FgSVGElement
         className="flex aspect-square grow items-center justify-center fill-fg-white stroke-fg-white"

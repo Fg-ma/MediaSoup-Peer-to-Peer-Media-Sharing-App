@@ -25,43 +25,55 @@ export default function Scrollbar({
   const scrollStart = useRef({ x: 0, y: 0 });
   const startScrollPosition = useRef({ top: 0, left: 0 });
   const directionRef = useRef(direction);
-  const scrollbarVisible = useRef(true);
+  const scrollbarVisible = useRef(
+    direction === "vertical"
+      ? contentContainerRef.current
+        ? contentContainerRef.current.scrollHeight >
+          contentContainerRef.current.clientHeight
+        : false
+      : contentContainerRef.current
+        ? contentContainerRef.current.scrollWidth >
+          contentContainerRef.current.clientWidth
+        : false,
+  );
   const [_, setRerender] = useState(false);
 
-  const scrollbarController = new ScrollbarController(
-    scrollingContentRef,
-    scrollbarElementRef,
-    scrollbarRef,
-    scrollbarTrackRef,
-    scrollbarThumbRef,
-    scrollTimeout,
-    delayScrollBarTimeout,
-    directionRef,
-    dragging,
-    scrollStart,
-    startScrollPosition,
-    setRerender,
+  const scrollbarController = useRef(
+    new ScrollbarController(
+      scrollingContentRef,
+      scrollbarElementRef,
+      scrollbarRef,
+      scrollbarTrackRef,
+      scrollbarThumbRef,
+      scrollTimeout,
+      delayScrollBarTimeout,
+      directionRef,
+      dragging,
+      scrollStart,
+      startScrollPosition,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
     directionRef.current = direction;
 
-    scrollbarController.updateScrollbar();
+    scrollbarController.current.updateScrollbar();
 
     if (directionRef.current === "vertical") {
       scrollingContentRef.current?.addEventListener(
         "scroll",
-        scrollbarController.scrollFunction,
+        scrollbarController.current.scrollFunction,
       );
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        scrollbarController.verticalScrollWheel,
+        scrollbarController.current.verticalScrollWheel,
       );
     }
     if (directionRef.current === "horizontal") {
       scrollingContentRef.current?.addEventListener(
         "wheel",
-        scrollbarController.horizontalScrollWheel,
+        scrollbarController.current.horizontalScrollWheel,
       );
     }
 
@@ -69,17 +81,17 @@ export default function Scrollbar({
       if (directionRef.current === "vertical") {
         scrollingContentRef.current?.removeEventListener(
           "scroll",
-          scrollbarController.scrollFunction,
+          scrollbarController.current.scrollFunction,
         );
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          scrollbarController.verticalScrollWheel,
+          scrollbarController.current.verticalScrollWheel,
         );
       }
       if (directionRef.current === "horizontal") {
         scrollingContentRef.current?.removeEventListener(
           "wheel",
-          scrollbarController.horizontalScrollWheel,
+          scrollbarController.current.horizontalScrollWheel,
         );
       }
     };
@@ -94,52 +106,95 @@ export default function Scrollbar({
       dragging.current = false;
     }
     setTimeout(() => {
-      scrollbarController.updateScrollbar();
+      scrollbarController.current.updateScrollbar();
     }, 0);
   }, [scrollbarVisible.current]);
 
   useEffect(() => {
+    setTimeout(() => {
+      if (directionRef.current === "vertical") {
+        scrollbarController.current.updateVerticalScrollbar();
+      } else {
+        scrollbarController.current.updateHorizontalScrollbar;
+      }
+
+      scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
+
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = undefined;
+      }
+
+      if (delayScrollBarTimeout.current) {
+        clearTimeout(delayScrollBarTimeout.current);
+        delayScrollBarTimeout.current = undefined;
+      }
+
+      if (!dragging.current) {
+        scrollTimeout.current = setTimeout(() => {
+          scrollbarElementRef.current?.classList.add("hide-fg-scrollbar");
+
+          clearTimeout(scrollTimeout.current);
+          scrollTimeout.current = undefined;
+        }, 500);
+      }
+    }, 100);
+
     scrollbarElementRef.current?.addEventListener(
       "pointermove",
-      scrollbarController.hideTableScrollBar,
+      scrollbarController.current.hideTableScrollBar,
     );
     scrollbarElementRef.current?.addEventListener(
       "pointerleave",
-      scrollbarController.pointerLeaveFunction,
+      scrollbarController.current.pointerLeaveFunction,
     );
 
     return () => {
       scrollbarElementRef.current?.removeEventListener(
         "pointermove",
-        scrollbarController.hideTableScrollBar,
+        scrollbarController.current.hideTableScrollBar,
       );
       scrollbarElementRef.current?.removeEventListener(
         "pointerleave",
-        scrollbarController.pointerLeaveFunction,
+        scrollbarController.current.pointerLeaveFunction,
       );
     };
   }, []);
 
   useLayoutEffect(() => {
-    if (!contentContainerRef.current) return;
+    setTimeout(() => {
+      if (!contentContainerRef.current) return;
 
-    const resizeObserver = new ResizeObserver(() => {
       scrollbarVisible.current =
         direction === "vertical"
           ? contentContainerRef.current
             ? contentContainerRef.current.scrollHeight >
               contentContainerRef.current.clientHeight
-            : true
+            : false
           : contentContainerRef.current
             ? contentContainerRef.current.scrollWidth >
               contentContainerRef.current.clientWidth
-            : true;
+            : false;
       setRerender((prev) => !prev);
-    });
-    resizeObserver.observe(contentContainerRef.current);
 
-    return resizeObserver.disconnect();
-  }, [direction]);
+      const resizeObserver = new ResizeObserver(() => {
+        scrollbarVisible.current =
+          direction === "vertical"
+            ? contentContainerRef.current
+              ? contentContainerRef.current.scrollHeight >
+                contentContainerRef.current.clientHeight
+              : false
+            : contentContainerRef.current
+              ? contentContainerRef.current.scrollWidth >
+                contentContainerRef.current.clientWidth
+              : false;
+        setRerender((prev) => !prev);
+      });
+      resizeObserver.observe(contentContainerRef.current);
+
+      return resizeObserver.disconnect();
+    }, 0);
+  }, [direction, contentContainerRef.current]);
 
   return (
     scrollbarVisible.current && (
@@ -162,7 +217,7 @@ export default function Scrollbar({
               ? "fg-vertical-scrollbar-track"
               : "fg-horizontal-scrollbar-track"
           }`}
-          onPointerDown={scrollbarController.trackPointerDown}
+          onPointerDown={scrollbarController.current.trackPointerDown}
         >
           <div
             ref={scrollbarThumbRef}
@@ -171,7 +226,7 @@ export default function Scrollbar({
                 ? "fg-vertical-scrollbar-thumb"
                 : "fg-horizontal-scrollbar-thumb"
             }`}
-            onPointerDown={scrollbarController.thumbDragStart}
+            onPointerDown={scrollbarController.current.thumbDragStart}
           ></div>
         </div>
       </div>

@@ -18,6 +18,7 @@ import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton
 import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
 import FgPortal from "../../elements/fgPortal/FgPortal";
 import "./lib/fgSvgStyles.css";
+import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton";
 
 export default function FgTableSvg({
   svgInstanceId,
@@ -195,6 +196,14 @@ export default function FgTableSvg({
             scrollingContainerRef={rightLowerSvgControlsRef}
             lowerSvgController={lowerSvgController}
           />,
+          svgMediaInstance.svgMedia.loadingState === "downloaded" && (
+            <DownloadButton
+              settingsActive={settingsActive}
+              svgEffectsActive={svgEffectsActive}
+              lowerSvgController={lowerSvgController}
+              scrollingContainerRef={rightLowerSvgControlsRef}
+            />
+          ),
           <SvgEffectsButton
             lowerSvgController={lowerSvgController}
             svgEffectsActive={svgEffectsActive}

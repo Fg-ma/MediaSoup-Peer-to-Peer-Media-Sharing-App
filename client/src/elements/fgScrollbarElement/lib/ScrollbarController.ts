@@ -1,5 +1,5 @@
 class ScrollbarController {
-  private scrollTimeoutTime = 1250;
+  private scrollTimeoutTime = 500;
   private scrollbarDelay = 25;
 
   constructor(
@@ -374,9 +374,13 @@ class ScrollbarController {
         if (
           !this.scrollbarElementRef.current.classList.contains(
             "hide-fg-scrollbar",
-          ) &&
-          !this.scrollTimeout.current
+          )
         ) {
+          if (this.scrollTimeout.current) {
+            clearTimeout(this.scrollTimeout.current);
+            this.scrollTimeout.current = undefined;
+          }
+
           this.scrollTimeout.current = setTimeout(() => {
             this.scrollbarElementRef.current?.classList.add(
               "hide-fg-scrollbar",
@@ -416,9 +420,13 @@ class ScrollbarController {
         if (
           !this.scrollbarElementRef.current.classList.contains(
             "hide-fg-scrollbar",
-          ) &&
-          !this.scrollTimeout.current
+          )
         ) {
+          if (this.scrollTimeout.current) {
+            clearTimeout(this.scrollTimeout.current);
+            this.scrollTimeout.current = undefined;
+          }
+
           this.scrollTimeout.current = setTimeout(() => {
             this.scrollbarElementRef.current?.classList.add(
               "hide-fg-scrollbar",

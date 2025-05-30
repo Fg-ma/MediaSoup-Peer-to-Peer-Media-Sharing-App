@@ -36,7 +36,7 @@ export default function SettingsButton({
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   lowerTextController: React.MutableRefObject<LowerTextController>;
-  isReadOnly: boolean;
+  isReadOnly: React.MutableRefObject<boolean>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -110,7 +110,7 @@ export default function SettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className="pointer-events-auto flex aspect-square h-full items-center justify-center"
+        className="flex pointer-events-auto aspect-square h-full items-center justify-center"
         clickFunction={toggleSettings}
         contentFunction={() => (
           <FgSVGElement

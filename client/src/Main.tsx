@@ -13,6 +13,7 @@ import {
 import { usePermissionsContext } from "./context/permissionsContext/PermissionsContext";
 import { useSocketContext } from "./context/socketContext/SocketContext";
 import { useToolsContext } from "./context/toolsContext/ToolsContext";
+import { useSignalContext } from "./context/signalContext/SignalContext";
 import { useUploadDownloadContext } from "./context/uploadDownloadContext/UploadDownloadContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
@@ -33,7 +34,6 @@ import UserStaticContentSocketController from "./serverControllers/userStaticCon
 import Uploader from "./tools/uploader/Uploader";
 import CreditPage from "./creditPage/CreditPage";
 import TableLittleBuddies from "./components/tableLittleBuddies/TableLittleBuddies";
-import { useSignalContext } from "./context/signalContext/SignalContext";
 
 export default function Main() {
   const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =

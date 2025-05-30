@@ -7,22 +7,47 @@ class LowerTextController {
     private textContainerRef: React.RefObject<HTMLDivElement>,
     private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private setIsReadOnly: React.Dispatch<React.SetStateAction<boolean>>,
     private textAreaContainerRef: React.RefObject<HTMLDivElement>,
+    private isReadOnly: React.MutableRefObject<boolean>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private initializing: React.MutableRefObject<boolean>,
+    private forceFinishInitialization: React.MutableRefObject<boolean>,
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
+    const tagName = document.activeElement?.tagName.toLowerCase();
+    if (
+      event.key.toLowerCase() === "s" &&
+      event.ctrlKey &&
+      tagName === "textarea" &&
+      this.textContainerRef.current?.classList.contains("in-media") &&
+      !this.isReadOnly.current
+    ) {
+      event.preventDefault();
+      this.handleSave();
+      return;
+    }
+    if (
+      event.key.toLowerCase() === "i" &&
+      event.ctrlKey &&
+      this.textContainerRef.current?.classList.contains("in-media") &&
+      this.isReadOnly.current
+    ) {
+      this.handleForceFinishInitialization();
+      return;
+    }
+
     if (
       !event.key ||
       !this.textContainerRef.current?.classList.contains("in-media") ||
       event.ctrlKey ||
-      event.shiftKey
+      event.shiftKey ||
+      !this.isReadOnly.current ||
+      tagName === "input" ||
+      tagName === "textarea"
     ) {
       return;
     }
-
-    const tagName = document.activeElement?.tagName.toLowerCase();
-    if (tagName === "input" || tagName === "textarea") return;
 
     switch (event.key.toLowerCase()) {
       case "d":
@@ -61,7 +86,8 @@ class LowerTextController {
   handleEdit = () => {
     this.setSettingsActive(false);
 
-    this.setIsReadOnly((prev) => !prev);
+    this.isReadOnly.current = !this.isReadOnly.current;
+    this.setRerender((prev) => !prev);
   };
 
   handleMinimap = () => {
@@ -76,13 +102,21 @@ class LowerTextController {
 
   handlePointerDown = (event: PointerEvent) => {
     if (!this.textAreaContainerRef.current?.contains(event.target as Node)) {
-      this.setIsReadOnly(true);
+      this.isReadOnly.current = true;
+      this.setRerender((prev) => !prev);
       document.removeEventListener("pointerdown", this.handlePointerDown);
     }
   };
 
   handleSave = () => {
     this.textMediaInstance.saveText();
+  };
+
+  handleForceFinishInitialization = () => {
+    if (!this.forceFinishInitialization.current && this.initializing.current) {
+      this.forceFinishInitialization.current = true;
+      this.setRerender((prev) => !prev);
+    }
   };
 }
 

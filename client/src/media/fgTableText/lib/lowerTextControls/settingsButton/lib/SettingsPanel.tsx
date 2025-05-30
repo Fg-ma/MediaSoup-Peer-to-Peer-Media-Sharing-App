@@ -80,7 +80,7 @@ export default function SettingsPanel({
     indexColor: React.RefObject<HTMLDivElement>;
   };
   lowerTextController: React.MutableRefObject<LowerTextController>;
-  isReadOnly: boolean;
+  isReadOnly: React.MutableRefObject<boolean>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
@@ -208,7 +208,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
+      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -240,7 +240,7 @@ export default function SettingsPanel({
                 >
                   <FgSVGElement
                     src={settings.synced.value ? desyncIcon : syncIcon}
-                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    className="flex mr-2 aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -274,7 +274,7 @@ export default function SettingsPanel({
                 >
                   <FgSVGElement
                     src={backgroundIcon}
-                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    className="flex mr-2 aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -302,19 +302,19 @@ export default function SettingsPanel({
                 <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={editIcon}
-                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    className="flex mr-2 aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
                     ]}
                   />
-                  {isReadOnly ? "Edit" : "Stop editing"}
+                  {isReadOnly.current ? "Edit" : "Stop editing"}
                 </div>
               )}
               clickFunction={lowerTextController.current.handleEdit}
               hoverContent={
                 <FgHoverContentStandard
-                  content={isReadOnly ? "Edit (e)" : "Stop editing (e)"}
+                  content={isReadOnly.current ? "Edit (e)" : "Stop editing (e)"}
                   style="light"
                 />
               }
@@ -330,7 +330,7 @@ export default function SettingsPanel({
                 <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={mapIcon}
-                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    className="flex mr-2 aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -342,7 +342,11 @@ export default function SettingsPanel({
               clickFunction={lowerTextController.current.handleMinimap}
               hoverContent={
                 <FgHoverContentStandard
-                  content={isReadOnly ? "Open minimap (m)" : "Open minimap (m)"}
+                  content={
+                    settings.minimap.value
+                      ? "Open minimap (m)"
+                      : "Open minimap (m)"
+                  }
                   style="light"
                 />
               }

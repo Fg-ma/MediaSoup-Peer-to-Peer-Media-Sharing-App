@@ -1,17 +1,16 @@
 import { OnMount } from "@monaco-editor/react";
-import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import type * as monacoEditor from "monaco-editor";
 import TableTextMediaInstance, {
   TextInstanceListenerTypes,
 } from "../../../TableTextMediaInstance";
-import { IncomingLiveTextEditingMessages } from "../../../../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import LiveTextEditingSocketController from "../../../../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import { Settings } from "../../typeConstant";
 import { GeneralSignals } from "../../../../../context/signalContext/lib/typeConstant";
 
 class MonacoController {
-  private MAX_UPDATE_SIZE_BYTES = 10000;
+  private MAX_UPDATE_SIZE_BYTES = 10_000;
+  private INITIALIZE_CHUNK_SIZE = 1_000_000;
 
   constructor(
     private textMediaInstance: TableTextMediaInstance,
@@ -29,6 +28,14 @@ class MonacoController {
       | undefined,
     private sendGeneralSignal: (signal: GeneralSignals) => void,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private isReadOnly: React.MutableRefObject<boolean> | undefined,
+    private initializing: React.MutableRefObject<boolean>,
+    private forceFinishInitialization:
+      | React.MutableRefObject<boolean>
+      | undefined,
+    private externalRerender:
+      | React.Dispatch<React.SetStateAction<boolean>>
+      | undefined,
   ) {}
 
   handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -83,12 +90,89 @@ class MonacoController {
       lineNumbers: this.isLineNums ? "on" : "off",
     });
 
-    // Create Monaco binding
-    this.binding.current = new MonacoBinding(
-      this.textMediaInstance.yText,
-      this.editor.current.getModel()!,
-      new Set([this.editor.current]),
-    );
+    const model = this.editor.current.getModel()!;
+    const fullText = this.textMediaInstance.yText.toString();
+
+    (async () => {
+      this.initializing.current = true;
+      if (this.externalRerender) this.externalRerender((prev) => !prev);
+      this.editor.current?.updateOptions({
+        readOnly: true,
+      });
+
+      // 1) Loop in fixed‐size steps
+      for (
+        let offset = 0;
+        offset < fullText.length;
+        offset += this.INITIALIZE_CHUNK_SIZE
+      ) {
+        if (!this.monaco.current) continue;
+
+        if (this.forceFinishInitialization?.current) {
+          const remainingText = fullText.substring(offset);
+          const currentValueLength = model.getValueLength();
+          const insertPos = model.getPositionAt(currentValueLength);
+          model.applyEdits([
+            {
+              range: new this.monaco.current.Range(
+                insertPos.lineNumber,
+                insertPos.column,
+                insertPos.lineNumber,
+                insertPos.column,
+              ),
+              text: remainingText,
+              forceMoveMarkers: true,
+            },
+          ]);
+          this.forceFinishInitialization.current = false;
+          break;
+        }
+
+        const textChunk = fullText.substring(
+          offset,
+          offset + this.INITIALIZE_CHUNK_SIZE,
+        );
+
+        // 2) Compute the *exact* insertion position at end of current model
+        const currentValueLength = model.getValueLength();
+        const insertPos = model.getPositionAt(currentValueLength);
+
+        // 3) Apply just that one chunk
+        model.applyEdits([
+          {
+            range: new this.monaco.current.Range(
+              insertPos.lineNumber,
+              insertPos.column,
+              insertPos.lineNumber,
+              insertPos.column,
+            ),
+            text: textChunk,
+            forceMoveMarkers: true,
+          },
+        ]);
+
+        // 4) Yield so we never block >~16ms
+        await new Promise<void>((resolve) => {
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(() => resolve());
+          } else {
+            setTimeout(resolve, 0);
+          }
+        });
+      }
+
+      this.binding.current = new MonacoBinding(
+        this.textMediaInstance.yText,
+        model,
+        new Set([this.editor.current!]),
+      );
+
+      this.initializing.current = false;
+      if (this.externalRerender) this.externalRerender((prev) => !prev);
+      this.editor.current?.updateOptions({
+        readOnly: this.isReadOnly?.current ?? true,
+      });
+    })();
 
     this.textMediaInstance.ydoc.on("update", (update: Uint8Array, origin) => {
       if (

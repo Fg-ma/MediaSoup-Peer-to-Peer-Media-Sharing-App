@@ -19,12 +19,12 @@ export default function FgImageElement({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const loaded = useRef(false);
 
-  const loaded = () => {
-    if (containerRef.current) {
-      containerRef.current.classList.add("loaded");
-      containerRef.current.style.setProperty("background-image", "none");
-    }
+  const onLoad = () => {
+    loaded.current = true;
+    containerRef.current?.classList.add("loaded");
+    containerRef.current?.style.setProperty("background-image", "none");
   };
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function FgImageElement({
   return (
     <div
       ref={containerRef}
-      className={`${className} blurred-img`}
+      className={`${className} ${loaded.current ? "loaded" : ""} blurred-img`}
       style={{
         backgroundImage: `${srcLoading ? `url(${srcLoading})` : ""}`,
         ...style,
@@ -50,7 +50,7 @@ export default function FgImageElement({
         className={`${imageClassName} h-full w-full`}
         ref={imgRef}
         src={src}
-        onLoad={loaded}
+        onLoad={onLoad}
         loading="lazy"
         alt={alt}
         {...props}

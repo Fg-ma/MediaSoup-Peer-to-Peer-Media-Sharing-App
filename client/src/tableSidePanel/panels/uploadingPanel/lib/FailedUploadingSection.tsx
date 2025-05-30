@@ -11,6 +11,7 @@ import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
+const textIcon = nginxAssetServerBaseUrl + "svgs/textIcon.svg";
 
 export default function FailedUploadingSection({
   savedTableId,
@@ -183,29 +184,38 @@ export default function FailedUploadingSection({
         } relative flex h-[6rem] w-full cursor-pointer items-center justify-center space-x-2 bg-fg-tone-black-5 px-8 py-4 transition-all`}
         onClick={clickFunction}
       >
-        {fileUrl.current && (
-          <div className="h-16">
-            {file.current.type === "image/svg+xml" ? (
-              <FgSVGElement
-                className="aspect-square h-full"
-                src={fileUrl.current}
-                attributes={[
-                  { key: "width", value: "100%" },
-                  { key: "height", value: "100%" },
-                ]}
-              />
-            ) : (
-              (file.current.type.startsWith("image/") ||
-                file.current.type.startsWith("video/")) && (
-                <FgImageElement
+        <div className="flex h-16 items-center justify-center">
+          {file.current.type === "image/svg+xml"
+            ? fileUrl.current && (
+                <FgSVGElement
                   className="aspect-square h-full"
-                  imageClassName="object-contain"
                   src={fileUrl.current}
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                  ]}
                 />
               )
-            )}
-          </div>
-        )}
+            : file.current.type.startsWith("image/") ||
+                file.current.type.startsWith("video/")
+              ? fileUrl.current && (
+                  <FgImageElement
+                    className="aspect-square h-full"
+                    imageClassName="object-contain"
+                    src={fileUrl.current}
+                  />
+                )
+              : file.current.type.startsWith("text/") && (
+                  <FgSVGElement
+                    className="aspect-square h-[55%] fill-fg-white"
+                    src={textIcon}
+                    attributes={[
+                      { key: "width", value: "100%" },
+                      { key: "height", value: "100%" },
+                    ]}
+                  />
+                )}
+        </div>
         <HoverElement
           externalRef={filenameRef}
           className={`${

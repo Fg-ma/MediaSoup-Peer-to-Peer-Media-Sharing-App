@@ -212,14 +212,16 @@ export default function FgTableImage({
           scrollingContainerRef={rightLowerImageControlsRef}
           lowerImageController={lowerImageController}
         />,
-        <DownloadButton
-          settings={settings}
-          recording={recording}
-          lowerImageController={lowerImageController}
-          imageEffectsActive={imageEffectsActive}
-          settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerImageControlsRef}
-        />,
+        imageMediaInstance.imageMedia.loadingState === "downloaded" && (
+          <DownloadButton
+            settings={settings}
+            recording={recording}
+            lowerImageController={lowerImageController}
+            imageEffectsActive={imageEffectsActive}
+            settingsActive={settingsActive}
+            scrollingContainerRef={rightLowerImageControlsRef}
+          />
+        ),
         settings.downloadType.value === "record" &&
         downloadRecordingReady.current ? (
           <DownloadRecordingButton
