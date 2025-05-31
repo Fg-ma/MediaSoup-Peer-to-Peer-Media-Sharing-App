@@ -1,6 +1,6 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import shaka from "shaka-player";
-import { UserEffectsType } from "../../../../universal/effectsTypeConstant";
+import { StaticContentEffectsType } from "../../../../universal/effectsTypeConstant";
 import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import TableVideoAudioMedia from "./TableVideoAudioMedia";
 import {
@@ -77,7 +77,7 @@ class TableVideoMedia {
     public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,

@@ -35,7 +35,7 @@ function SnakeGame({
   snakeGameId: string;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { username, instance } = useUserInfoContext();
 
   const [gridSize, setGridSize] = useState(15);
@@ -60,7 +60,7 @@ function SnakeGame({
   const snakeGameController = useRef(
     new SnakeGameController(
       snakeGameId,
-      userMedia,
+      staticContentMedia,
       gridSize,
       gameState,
       setGameState,
@@ -95,28 +95,30 @@ function SnakeGame({
 
   useEffect(() => {
     if (
-      !userMedia.current.games.snake ||
-      !userMedia.current.games.snake[snakeGameId] ||
-      !userMedia.current.games.snake[snakeGameId].ws ||
-      userMedia.current.games.snake[snakeGameId].ws.readyState !==
+      !staticContentMedia.current.games.snake ||
+      !staticContentMedia.current.games.snake[snakeGameId] ||
+      !staticContentMedia.current.games.snake[snakeGameId].ws ||
+      staticContentMedia.current.games.snake[snakeGameId].ws.readyState !==
         WebSocket.OPEN
     ) {
       return;
     }
 
-    userMedia.current.games.snake[snakeGameId].getIntialGameStates();
+    staticContentMedia.current.games.snake[snakeGameId].getIntialGameStates();
 
-    userMedia.current.games.snake[snakeGameId].ws.onmessage = (event) => {
+    staticContentMedia.current.games.snake[snakeGameId].ws.onmessage = (
+      event,
+    ) => {
       const message = JSON.parse(event.data);
       snakeGameController.current.handleMessage(message);
     };
-  }, [userMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
+  }, [staticContentMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
 
   useEffect(() => {
-    if (userMedia.current.games.snake?.[snakeGameId]?.initiator) {
-      userMedia.current.games.snake?.[snakeGameId]?.joinGame({});
+    if (staticContentMedia.current.games.snake?.[snakeGameId]?.initiator) {
+      staticContentMedia.current.games.snake?.[snakeGameId]?.joinGame({});
     }
-  }, [userMedia.current.games.snake?.[snakeGameId]?.initiator]);
+  }, [staticContentMedia.current.games.snake?.[snakeGameId]?.initiator]);
 
   return (
     <>
@@ -285,14 +287,14 @@ function SnakeGame({
         startGameFunction={() => {
           if (!started) {
             setGameOver(false);
-            userMedia.current.games.snake?.[snakeGameId]?.startGame();
+            staticContentMedia.current.games.snake?.[snakeGameId]?.startGame();
           }
         }}
         closeGameFunction={() => {
-          userMedia.current.games.snake?.[snakeGameId]?.closeGame();
+          staticContentMedia.current.games.snake?.[snakeGameId]?.closeGame();
         }}
         joinGameFunction={() => {
-          userMedia.current.games.snake?.[snakeGameId]?.joinGame({
+          staticContentMedia.current.games.snake?.[snakeGameId]?.joinGame({
             snakeColor: userSnakeColor.current,
           });
         }}
@@ -302,9 +304,9 @@ function SnakeGame({
             (Object.keys(playersState).length === 1 &&
               Object.keys(Object.values(playersState)[0]).length <= 1)
           ) {
-            userMedia.current.games.snake?.[snakeGameId]?.closeGame();
+            staticContentMedia.current.games.snake?.[snakeGameId]?.closeGame();
           } else {
-            userMedia.current.games.snake?.[snakeGameId]?.leaveGame();
+            staticContentMedia.current.games.snake?.[snakeGameId]?.leaveGame();
           }
         }}
         popupRefs={[snakeColorPickerPanelRef, snakeGridSizePanelRef]}

@@ -26,7 +26,7 @@ export default function SharedBundle({
     ...options,
   };
 
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { tableStaticContentSocket, liveTextEditingSocket } =
     useSocketContext();
   const { username } = useUserInfoContext();
@@ -43,16 +43,16 @@ export default function SharedBundle({
   );
 
   useEffect(() => {
-    userMedia.current.gamesSignaling?.addMessageListener(
+    staticContentMedia.current.gamesSignaling?.addMessageListener(
       sharedBundleController.current.gameSignalingListener,
     );
 
     return () => {
-      userMedia.current.gamesSignaling?.removeMessageListener(
+      staticContentMedia.current.gamesSignaling?.removeMessageListener(
         sharedBundleController.current.gameSignalingListener,
       );
     };
-  }, [userMedia.current.gamesSignaling]);
+  }, [staticContentMedia.current.gamesSignaling]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
@@ -72,18 +72,21 @@ export default function SharedBundle({
       id={`${username.current}_shared_bundle_container`}
       className="pointer-events-none absolute left-0 top-0 h-full w-full"
     >
-      {userMedia.current.games.snake &&
-        Object.keys(userMedia.current.games.snake).length !== 0 &&
-        Object.keys(userMedia.current.games.snake).map((snakeGameId) => (
-          <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
-            <SnakeGame
-              snakeGameId={snakeGameId}
-              sharedBundleRef={sharedBundleRef}
-            />
-          </Suspense>
-        ))}
-      {Object.keys(userMedia.current.video.tableInstances).length !== 0 &&
-        Object.keys(userMedia.current.video.tableInstances).map(
+      {staticContentMedia.current.games.snake &&
+        Object.keys(staticContentMedia.current.games.snake).length !== 0 &&
+        Object.keys(staticContentMedia.current.games.snake).map(
+          (snakeGameId) => (
+            <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
+              <SnakeGame
+                snakeGameId={snakeGameId}
+                sharedBundleRef={sharedBundleRef}
+              />
+            </Suspense>
+          ),
+        )}
+      {Object.keys(staticContentMedia.current.video.tableInstances).length !==
+        0 &&
+        Object.keys(staticContentMedia.current.video.tableInstances).map(
           (videoInstanceId) => (
             <Suspense key={videoInstanceId} fallback={<div>Loading...</div>}>
               <FgTableVideo
@@ -94,8 +97,9 @@ export default function SharedBundle({
             </Suspense>
           ),
         )}
-      {Object.keys(userMedia.current.image.tableInstances).length !== 0 &&
-        Object.keys(userMedia.current.image.tableInstances).map(
+      {Object.keys(staticContentMedia.current.image.tableInstances).length !==
+        0 &&
+        Object.keys(staticContentMedia.current.image.tableInstances).map(
           (imageInstanceId) => (
             <Suspense key={imageInstanceId} fallback={<div>Loading...</div>}>
               <FgTableImage
@@ -106,8 +110,9 @@ export default function SharedBundle({
             </Suspense>
           ),
         )}
-      {Object.keys(userMedia.current.svg.tableInstances).length !== 0 &&
-        Object.keys(userMedia.current.svg.tableInstances).map(
+      {Object.keys(staticContentMedia.current.svg.tableInstances).length !==
+        0 &&
+        Object.keys(staticContentMedia.current.svg.tableInstances).map(
           (svgInstanceId) => (
             <Suspense key={svgInstanceId} fallback={<div>Loading...</div>}>
               <FgTableSvg
@@ -118,8 +123,9 @@ export default function SharedBundle({
             </Suspense>
           ),
         )}
-      {Object.keys(userMedia.current.application.tableInstances).length !== 0 &&
-        Object.keys(userMedia.current.application.tableInstances).map(
+      {Object.keys(staticContentMedia.current.application.tableInstances)
+        .length !== 0 &&
+        Object.keys(staticContentMedia.current.application.tableInstances).map(
           (applicationInstanceId) => (
             <Suspense
               key={applicationInstanceId}
@@ -133,8 +139,9 @@ export default function SharedBundle({
             </Suspense>
           ),
         )}
-      {Object.keys(userMedia.current.text.tableInstances).length !== 0 &&
-        Object.keys(userMedia.current.text.tableInstances).map(
+      {Object.keys(staticContentMedia.current.text.tableInstances).length !==
+        0 &&
+        Object.keys(staticContentMedia.current.text.tableInstances).map(
           (textInstanceId) => (
             <Suspense key={textInstanceId} fallback={<div>Loading...</div>}>
               <FgText

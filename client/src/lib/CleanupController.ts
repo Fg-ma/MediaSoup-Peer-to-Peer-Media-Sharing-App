@@ -5,7 +5,7 @@ import {
 import {
   RemoteDataStreamsType,
   RemoteMediaType,
-} from "../context/mediaContext/typeConstant";
+} from "../context/mediaContext/lib/typeConstant";
 
 class CleanupController {
   constructor(
@@ -19,12 +19,12 @@ class CleanupController {
           [instance: string]: React.JSX.Element;
         };
       }>
-    >
+    >,
   ) {}
 
   handleUserLeftCleanup = (
     disconnectedUsername: string,
-    disconnectedInstance: string
+    disconnectedInstance: string,
   ) => {
     this.setBundles((prev) => {
       const updatedBundles = { ...prev };

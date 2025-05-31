@@ -5,7 +5,7 @@ import {
 } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import ReactController from "../../../elements/reactButton/lib/ReactController";
-import { RemoteDataStreamsType } from "../../../context/mediaContext/typeConstant";
+import { RemoteDataStreamsType } from "../../../context/mediaContext/lib/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
 import {

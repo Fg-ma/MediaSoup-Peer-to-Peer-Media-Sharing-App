@@ -163,6 +163,28 @@ export type UserEffectsType = {
   audio: {
     [effectType in AudioEffectTypes]: boolean;
   };
+};
+
+export type RemoteEffectsType = {
+  [username: string]: {
+    [instance: string]: {
+      camera: {
+        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
+      };
+      screen: {
+        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
+      };
+      screenAudio: {
+        [screenAudioId: string]: {
+          [effectType in AudioEffectTypes]: boolean;
+        };
+      };
+      audio: { [effectType in AudioEffectTypes]: boolean };
+    };
+  };
+};
+
+export type StaticContentEffectsType = {
   video: {
     [videoId: string]: {
       video: { [effectType in VideoEffectTypes]: boolean };
@@ -186,25 +208,6 @@ export type UserEffectsType = {
   };
   soundClip: {
     [soundClipId: string]: { [effectType in AudioEffectTypes]: boolean };
-  };
-};
-
-export type RemoteEffectsType = {
-  [username: string]: {
-    [instance: string]: {
-      camera: {
-        [cameraId: string]: { [effectType in CameraEffectTypes]: boolean };
-      };
-      screen: {
-        [screenId: string]: { [effectType in ScreenEffectTypes]: boolean };
-      };
-      screenAudio: {
-        [screenAudioId: string]: {
-          [effectType in AudioEffectTypes]: boolean;
-        };
-      };
-      audio: { [effectType in AudioEffectTypes]: boolean };
-    };
   };
 };
 
@@ -536,6 +539,15 @@ export type CaptureEffectStylesType = {
   };
 };
 
+export type TextEffectStylesType = {
+  backgroundColor: string;
+  textColor: string;
+  indexColor: string;
+  fontSize: string;
+  fontStyle: string;
+  letterSpacing: number;
+};
+
 export type BackgroundMusicTypes =
   | "adventureTime"
   | "bottledNoise"
@@ -580,6 +592,15 @@ export type UserEffectsStylesType = {
     [screenAudioId: string]: AudioEffectStylesType;
   };
   audio: AudioEffectStylesType;
+};
+
+export type RemoteEffectStylesType = {
+  [username: string]: {
+    [instance: string]: UserEffectsStylesType;
+  };
+};
+
+export type StaticContentEffectsStylesType = {
   video: {
     [videoId: string]: {
       video: VideoEffectStylesType;
@@ -598,11 +619,8 @@ export type UserEffectsStylesType = {
   soundClip: {
     [soundClipId: string]: AudioEffectStylesType;
   };
-};
-
-export type RemoteEffectStylesType = {
-  [username: string]: {
-    [instance: string]: UserEffectsStylesType;
+  text: {
+    [textId: string]: TextEffectStylesType;
   };
 };
 
@@ -912,6 +930,15 @@ export const defaultApplicationEffectsStyles: ApplicationEffectStylesType =
       style: defaultPostProcess,
     }),
   });
+
+export const defaultTextEffectsStyles: TextEffectStylesType = Object.freeze({
+  backgroundColor: "#090909",
+  textColor: "#f2f2f2",
+  indexColor: "#22c55e",
+  fontSize: "16px",
+  fontStyle: "K2D, sans",
+  letterSpacing: 0,
+});
 
 export const defaultCaptureEffectsStyles: CaptureEffectStylesType =
   Object.freeze({

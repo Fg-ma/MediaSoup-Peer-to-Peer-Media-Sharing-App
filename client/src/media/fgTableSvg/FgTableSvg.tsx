@@ -29,14 +29,16 @@ export default function FgTableSvg({
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
-  const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { staticContentMedia } = useMediaContext();
+  const { staticContentEffects, staticContentEffectsStyles } =
+    useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { uploader } = useToolsContext();
 
   const [editing, setEditing] = useState(false);
 
-  const svgMediaInstance = userMedia.current.svg.tableInstances[svgInstanceId];
+  const svgMediaInstance =
+    staticContentMedia.current.svg.tableInstances[svgInstanceId];
 
   const [svgEffectsActive, setSvgEffectsActive] = useState(false);
 
@@ -66,8 +68,8 @@ export default function FgTableSvg({
       svgMediaInstance,
       svgContainerRef,
       setSvgEffectsActive,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       setSettingsActive,
       settings,
       tableStaticContentSocket,
@@ -81,8 +83,8 @@ export default function FgTableSvg({
       svgInstanceId,
       svgMediaInstance,
       setSettingsActive,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       setRerender,
       subContainerRef,
       positioning,
@@ -217,7 +219,7 @@ export default function FgTableSvg({
         externalMediaContainerRef={svgContainerRef}
         externalSubContainerRef={subContainerRef}
         externalRightLowerControlsRef={rightLowerSvgControlsRef}
-        options={{ gradient: false, adjustmentAnimation: false }}
+        options={{ gradient: false }}
       />
       {svgMediaInstance.svgMedia.fileSize < 1024 * 1024 &&
         editing &&

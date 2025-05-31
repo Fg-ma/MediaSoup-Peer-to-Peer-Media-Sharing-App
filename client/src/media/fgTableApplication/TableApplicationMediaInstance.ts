@@ -1,9 +1,9 @@
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
   defaultApplicationEffects,
   defaultApplicationEffectsStyles,
   ApplicationEffectTypes,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import BabylonScene from "../../babylon/BabylonScene";
 import UserDevice from "../../tools/userDevice/UserDevice";
@@ -36,8 +36,8 @@ class TableApplicationMediaInstance {
   constructor(
     public applicationMedia: TableApplicationMedia,
     public applicationInstanceId: string,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private userDevice: React.MutableRefObject<UserDevice>,
     public initPositioning: {
       position: {
@@ -53,16 +53,22 @@ class TableApplicationMediaInstance {
   ) {
     this.positioning = this.initPositioning;
 
-    if (!this.userEffects.current.application[this.applicationInstanceId]) {
-      this.userEffects.current.application[this.applicationInstanceId] =
-        structuredClone(defaultApplicationEffects);
+    if (
+      !this.staticContentEffects.current.application[this.applicationInstanceId]
+    ) {
+      this.staticContentEffects.current.application[
+        this.applicationInstanceId
+      ] = structuredClone(defaultApplicationEffects);
     }
 
     if (
-      !this.userEffectsStyles.current.application[this.applicationInstanceId]
+      !this.staticContentEffectsStyles.current.application[
+        this.applicationInstanceId
+      ]
     ) {
-      this.userEffectsStyles.current.application[this.applicationInstanceId] =
-        structuredClone(defaultApplicationEffectsStyles);
+      this.staticContentEffectsStyles.current.application[
+        this.applicationInstanceId
+      ] = structuredClone(defaultApplicationEffectsStyles);
     }
 
     this.instanceCanvas = document.createElement("canvas");
@@ -175,17 +181,17 @@ class TableApplicationMediaInstance {
       );
     }
 
-    for (const effect in this.userEffects.current.application[
+    for (const effect in this.staticContentEffects.current.application[
       this.applicationInstanceId
     ]) {
       if (
-        this.userEffects.current.application[this.applicationInstanceId][
-          effect as ApplicationEffectTypes
-        ]
+        this.staticContentEffects.current.application[
+          this.applicationInstanceId
+        ][effect as ApplicationEffectTypes]
       ) {
         if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            this.userEffectsStyles.current.application[
+            this.staticContentEffectsStyles.current.application[
               this.applicationInstanceId
             ].postProcess.style,
           );
@@ -193,14 +199,14 @@ class TableApplicationMediaInstance {
           this.changeEffects(effect as ApplicationEffectTypes);
         } else if (effect === "tint") {
           this.setTintColor(
-            this.userEffectsStyles.current.application[
+            this.staticContentEffectsStyles.current.application[
               this.applicationInstanceId
             ].tint.color,
           );
 
           this.changeEffects(
             effect as ApplicationEffectTypes,
-            this.userEffectsStyles.current.application[
+            this.staticContentEffectsStyles.current.application[
               this.applicationInstanceId
             ].tint.color,
           );

@@ -16,11 +16,12 @@ export default function ImageSelection({
   instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
-  const imageInstanceMedia = userMedia.current.image.tableInstances[instanceId];
+  const imageInstanceMedia =
+    staticContentMedia.current.image.tableInstances[instanceId];
   const positioning = imageInstanceMedia?.getPositioning();
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");

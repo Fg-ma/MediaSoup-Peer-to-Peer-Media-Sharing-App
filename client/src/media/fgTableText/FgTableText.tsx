@@ -18,6 +18,8 @@ import SaveSection from "./lib/lowerTextControls/saveSection/SaveSection";
 import TinyLoader from "../../elements/loaders/tinyLoader/TinyLoader";
 import HoverElement from "../../elements/hoverElement/HoverElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
+import { useSocketContext } from "../../context/socketContext/SocketContext";
 import "./lib/fgTextStyles.css";
 
 export default function FgTableText({
@@ -29,10 +31,12 @@ export default function FgTableText({
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentEffectsStyles } = useEffectsContext();
+  const { tableStaticContentSocket } = useSocketContext();
+  const { staticContentMedia } = useMediaContext();
 
   const textMediaInstance =
-    userMedia.current.text.tableInstances[textInstanceId];
+    staticContentMedia.current.text.tableInstances[textInstanceId];
 
   const positioning = useRef<{
     position: { left: number; top: number };
@@ -75,7 +79,12 @@ export default function FgTableText({
   );
 
   const textController = useRef(
-    new TextController(setSettingsActive, setRerender),
+    new TextController(
+      textMediaInstance,
+      staticContentEffectsStyles,
+      setSettingsActive,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
@@ -85,6 +94,10 @@ export default function FgTableText({
 
     textMediaInstance.addTextInstanceListener(
       textController.current.handleTextInstanceMessage,
+    );
+
+    tableStaticContentSocket.current?.addMessageListener(
+      textController.current.handleTableStaticContentMessage,
     );
 
     document.addEventListener(
@@ -103,6 +116,9 @@ export default function FgTableText({
       );
       textMediaInstance.removeTextInstanceListener(
         textController.current.handleTextInstanceMessage,
+      );
+      tableStaticContentSocket.current?.removeMessageListener(
+        textController.current.handleTableStaticContentMessage,
       );
       document.removeEventListener(
         "keydown",
@@ -187,6 +203,7 @@ export default function FgTableText({
       className="text-container"
       rightLowerControls={[
         <SettingsButton
+          textMediaInstance={textMediaInstance}
           containerRef={textContainerRef}
           settingsActive={settingsActive}
           setSettingsActive={setSettingsActive}
@@ -197,6 +214,7 @@ export default function FgTableText({
           scrollingContainerRef={rightLowerTextControlsRef}
           lowerTextController={lowerTextController}
           isReadOnly={isReadOnly}
+          setRerender={setRerender}
         />,
         textMediaInstance.textMedia.loadingState === "downloaded" && (
           <DownloadButton

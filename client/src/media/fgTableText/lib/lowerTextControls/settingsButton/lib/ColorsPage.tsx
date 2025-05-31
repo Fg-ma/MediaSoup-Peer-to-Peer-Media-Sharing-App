@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
-  Settings,
   ActivePages,
   colorsOptionsTitles,
   ColorTypes,
@@ -11,26 +10,32 @@ import FgDropdownButton from "../../../../../../elements/fgDropdownButton/FgDrop
 import FgInput from "../../../../../../elements/fgInput/FgInput";
 import { tableColorMap } from "../../../../../../table/lib/tableColors";
 import ColorPickerButton from "../../../../../../elements/colorPickerButton/ColorPickerButton";
+import TableTextMediaInstance from "../../../../../../media/fgTableText/TableTextMediaInstance";
+import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
+import { useEffectsContext } from "../../../../../../context/effectsContext/EffectsContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function ColorsPage({
+  textMediaInstance,
   setActivePages,
-  settings,
-  setSettings,
   externalColorPickerPanelRefs,
+  setRerender,
 }: {
+  textMediaInstance: TableTextMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   externalColorPickerPanelRefs: {
     backgroundColor: React.RefObject<HTMLDivElement>;
     textColor: React.RefObject<HTMLDivElement>;
     indexColor: React.RefObject<HTMLDivElement>;
   };
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { staticContentEffectsStyles } = useEffectsContext();
+  const { tableStaticContentSocket } = useSocketContext();
+
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const handleCloseColorsPage = () => {
@@ -44,13 +49,19 @@ export default function ColorsPage({
   };
 
   const handleSelectColor = (key: ColorTypes, color: string) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
+    staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId][
+      key
+    ] = color;
 
-      newSettings.colors[key].value = color;
+    tableStaticContentSocket.current?.updateContentEffects(
+      "text",
+      textMediaInstance.textMedia.textId,
+      textMediaInstance.textInstanceId,
+      undefined,
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    );
 
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   const handleInputColorChange = (
@@ -60,16 +71,21 @@ export default function ColorsPage({
     const newColor = event.target.value?.trim();
 
     if (newColor && /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(newColor)) {
-      setSettings((prev) => {
-        const newSettings = { ...prev };
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId][
+        key
+      ] = newColor.startsWith("#") ? newColor : `#${newColor}`;
 
-        // Ensure the hex has a leading #
-        newSettings.colors[key].value = newColor.startsWith("#")
-          ? newColor
-          : `#${newColor}`;
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.textMedia.textId,
+        textMediaInstance.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.textInstanceId
+        ],
+      );
 
-        return newSettings;
-      });
+      setRerender((prev) => !prev);
     }
   };
 
@@ -129,7 +145,11 @@ export default function ColorsPage({
             <div className="flex h-max w-full items-center">
               <ColorPickerButton
                 className="mr-1 h-7"
-                defaultColor={settings.colors[key as ColorTypes].value}
+                defaultColor={
+                  staticContentEffectsStyles.current.text[
+                    textMediaInstance.textInstanceId
+                  ][key as ColorTypes]
+                }
                 scrollingContainerRef={scrollingContainerRef}
                 handleAcceptColorCallback={(event) =>
                   handleSelectColor(key as ColorTypes, event)

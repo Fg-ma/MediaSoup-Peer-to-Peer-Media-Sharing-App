@@ -1,6 +1,6 @@
 import React from "react";
 import Bundle from "../bundle/Bundle";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { UserMediaType } from "../context/mediaContext/lib/typeConstant";
 import { Permissions } from "../context/permissionsContext/lib/typeConstant";
 import MediasoupSocketController from "../serverControllers/mediasoupServer/MediasoupSocketController";
 
@@ -217,8 +217,7 @@ class BundlesController {
       this.userMedia.current.audio === undefined &&
       Object.keys(this.userMedia.current.camera).length === 0 &&
       Object.keys(this.userMedia.current.screen).length === 0 &&
-      Object.keys(this.userMedia.current.screenAudio).length === 0 &&
-      Object.keys(this.userMedia.current.games).length === 0
+      Object.keys(this.userMedia.current.screenAudio).length === 0
     ) {
       this.setBundles((prev) => {
         const newBundles = {

@@ -6,20 +6,20 @@ import qdrant from "../../../qdrantServer/src/index";
 
 class Search {
   private indexMap: Record<string, string> = {
-    application: "tableApplications",
-    image: "tableImages",
-    soundClip: "tableSoundClips",
-    svg: "tableSvgs",
-    text: "tableText",
-    video: "tableVideos",
+    application: "tableapplications",
+    image: "tableimages",
+    soundClip: "tablesoundclips",
+    svg: "tablesvgs",
+    text: "tabletext",
+    video: "tablevideos",
   };
   private idMap: Record<string, string> = {
-    tableApplications: "aid",
-    tableImages: "iid",
-    tableSoundClips: "sid",
-    tableSvgs: "sid",
-    tableText: "xid",
-    tableVideos: "vid",
+    tableapplications: "aid",
+    tableimages: "iid",
+    tablesoundclips: "sid",
+    tablesvgs: "sid",
+    tabletext: "xid",
+    tablevideos: "vid",
   };
 
   constructor(private broadcaster: Broadcaster) {}

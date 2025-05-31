@@ -14,24 +14,6 @@ export interface Settings {
   background: { value: boolean };
   synced: { value: boolean };
   minimap: { value: boolean };
-  colors: {
-    value: "";
-    backgroundColor: {
-      value: string;
-    };
-    textColor: {
-      value: string;
-    };
-    indexColor: {
-      value: string;
-    };
-  };
-  fontSize: {
-    value: string;
-  };
-  fontStyle: {
-    value: string;
-  };
   cursorStyle: {
     value: CursorStyles;
   };
@@ -41,24 +23,6 @@ export const defaultSettings: Settings = Object.freeze({
   background: Object.freeze({ value: false }),
   synced: Object.freeze({ value: false }),
   minimap: Object.freeze({ value: false }),
-  colors: Object.freeze({
-    value: "",
-    backgroundColor: {
-      value: "#090909",
-    },
-    textColor: {
-      value: "#f2f2f2",
-    },
-    indexColor: {
-      value: "#22c55e",
-    },
-  }),
-  fontSize: Object.freeze({
-    value: "16px",
-  }),
-  fontStyle: Object.freeze({
-    value: "K2D, sans",
-  }),
   cursorStyle: Object.freeze({
     value: "line",
   }),

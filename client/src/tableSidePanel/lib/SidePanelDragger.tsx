@@ -5,9 +5,11 @@ import { useSignalContext } from "../../context/signalContext/SignalContext";
 export default function SidePanelDragger({
   setTableSidePanelWidth,
   tablePanelRef,
+  sidePanelPosition,
 }: {
   setTableSidePanelWidth: React.Dispatch<React.SetStateAction<number>>;
   tablePanelRef: React.RefObject<HTMLDivElement>;
+  sidePanelPosition: "left" | "right";
 }) {
   const { sendGroupSignal } = useSignalContext();
 
@@ -25,7 +27,11 @@ export default function SidePanelDragger({
 
   const handleDividerPointerMove = (event: PointerEvent) => {
     const box = tablePanelRef.current?.getBoundingClientRect();
-    setTableSidePanelWidth(event.clientX - (box?.left ?? 0) - 16);
+    setTableSidePanelWidth(
+      sidePanelPosition === "left"
+        ? event.clientX - (box?.left ?? 0) - 16
+        : (box?.right ?? 0) - event.clientX - 16,
+    );
 
     sendGroupSignal({ type: "groupUpdate" });
   };

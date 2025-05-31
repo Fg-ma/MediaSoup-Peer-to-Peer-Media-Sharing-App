@@ -1,4 +1,4 @@
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConstant";
 import {
   IncomingUserStaticContentMessages,
   onApplicationUploadedToUserContentType,
@@ -23,7 +23,7 @@ import UserSvgMedia from "../../media/fgUserSvg/UserSvgMedia";
 import UserTextMedia from "../../media/fgUserText/UserTextMedia";
 import UserVideoMedia from "../../media/fgUserVideo/UserVideoMedia";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import Downloader from "../../downloader/Downloader";
+import Downloader from "../../tools/downloader/Downloader";
 
 class UserStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -35,7 +35,7 @@ class UserStaticContentSocketController {
     private url: string,
     private userId: string,
     private instance: string,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private userStaticContentSocket: React.MutableRefObject<
       UserStaticContentSocketController | undefined
     >,
@@ -281,7 +281,7 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.application.user[contentId] =
+    this.staticContentMedia.current.application.user[contentId] =
       new UserApplicationMedia(
         contentId,
         filename,
@@ -300,7 +300,7 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.image.user[contentId] = new UserImageMedia(
+    this.staticContentMedia.current.image.user[contentId] = new UserImageMedia(
       contentId,
       filename,
       mimeType,
@@ -318,16 +318,17 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.soundClip.user[contentId] = new UserSoundClipMedia(
-      contentId,
-      filename,
-      mimeType,
-      state,
-      this.userStaticContentSocket,
-      this.sendDownloadSignal,
-      this.addCurrentDownload,
-      this.removeCurrentDownload,
-    );
+    this.staticContentMedia.current.soundClip.user[contentId] =
+      new UserSoundClipMedia(
+        contentId,
+        filename,
+        mimeType,
+        state,
+        this.userStaticContentSocket,
+        this.sendDownloadSignal,
+        this.addCurrentDownload,
+        this.removeCurrentDownload,
+      );
   };
 
   private onSvgUploadedToUserContent = (
@@ -336,7 +337,7 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.svg.user[contentId] = new UserSvgMedia(
+    this.staticContentMedia.current.svg.user[contentId] = new UserSvgMedia(
       contentId,
       filename,
       mimeType,
@@ -354,7 +355,7 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.text.user[contentId] = new UserTextMedia(
+    this.staticContentMedia.current.text.user[contentId] = new UserTextMedia(
       contentId,
       filename,
       mimeType,
@@ -372,7 +373,7 @@ class UserStaticContentSocketController {
     const { contentId } = event.header;
     const { filename, mimeType, state } = event.data;
 
-    this.userMedia.current.video.user[contentId] = new UserVideoMedia(
+    this.staticContentMedia.current.video.user[contentId] = new UserVideoMedia(
       contentId,
       filename,
       mimeType,
@@ -387,9 +388,11 @@ class UserStaticContentSocketController {
   private onContentDeleted = (event: onContentDeletedType) => {
     const { contentType, contentId } = event.header;
 
-    if (this.userMedia.current[contentType].user[contentId]) {
-      this.userMedia.current[contentType].user[contentId].deconstructor();
-      delete this.userMedia.current[contentType].user[contentId];
+    if (this.staticContentMedia.current[contentType].user[contentId]) {
+      this.staticContentMedia.current[contentType].user[
+        contentId
+      ].deconstructor();
+      delete this.staticContentMedia.current[contentType].user[contentId];
     }
   };
 
@@ -397,16 +400,18 @@ class UserStaticContentSocketController {
     const { contentType, contentId } = event.header;
     const { state } = event.data;
 
-    this.userMedia.current[contentType].user[contentId].setState(state);
+    this.staticContentMedia.current[contentType].user[contentId].setState(
+      state,
+    );
   };
 
   private onMuteStylesResponse = (event: onMuteStylesResponseType) => {
     const { svgs } = event.data;
 
     for (const svg of svgs) {
-      if (this.userMedia.current.svg.user[svg.svgId]) continue;
+      if (this.staticContentMedia.current.svg.user[svg.svgId]) continue;
 
-      this.userMedia.current.svg.user[svg.svgId] = new UserSvgMedia(
+      this.staticContentMedia.current.svg.user[svg.svgId] = new UserSvgMedia(
         svg.svgId,
         svg.filename,
         svg.mimeType,

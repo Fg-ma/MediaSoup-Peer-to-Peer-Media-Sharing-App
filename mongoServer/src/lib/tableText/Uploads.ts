@@ -29,6 +29,14 @@ class Uploads {
         };
         rotation: number;
       };
+      effectStyles: {
+        backgroundColor: string;
+        textColor: string;
+        indexColor: string;
+        fontSize: string;
+        fontStyle: string;
+        letterSpacing: number;
+      };
     }[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
@@ -52,6 +60,14 @@ class Uploads {
           position?: { left?: number; top?: number };
           scale?: { x?: number; y?: number };
           rotation?: number;
+        };
+        effectStyles?: {
+          backgroundColor?: string;
+          textColor?: string;
+          indexColor?: string;
+          fontSize?: string;
+          fontStyle?: string;
+          letterSpacing?: number;
         };
       }[];
     }>
@@ -93,7 +109,11 @@ class Uploads {
 
     // 2. Instance updates
     if (updateData.instances !== undefined && updateData.instances.length > 0) {
-      for (const { textInstanceId, positioning } of updateData.instances) {
+      for (const {
+        textInstanceId,
+        positioning,
+        effectStyles,
+      } of updateData.instances) {
         if (!textInstanceId) continue;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,6 +134,27 @@ class Uploads {
           }
           if (positioning.rotation !== undefined) {
             instanceSetFields["i.$.p.r"] = positioning.rotation;
+          }
+        }
+
+        if (effectStyles !== undefined) {
+          if (effectStyles.backgroundColor !== undefined) {
+            instanceSetFields["i.$.es.0"] = effectStyles.backgroundColor;
+          }
+          if (effectStyles.textColor !== undefined) {
+            instanceSetFields["i.$.es.1"] = effectStyles.textColor;
+          }
+          if (effectStyles.indexColor !== undefined) {
+            instanceSetFields["i.$.es.2"] = effectStyles.indexColor;
+          }
+          if (effectStyles.fontSize !== undefined) {
+            instanceSetFields["i.$.es.3"] = effectStyles.fontSize;
+          }
+          if (effectStyles.fontStyle !== undefined) {
+            instanceSetFields["i.$.es.4"] = effectStyles.fontStyle;
+          }
+          if (effectStyles.letterSpacing !== undefined) {
+            instanceSetFields["i.$.es.5"] = effectStyles.letterSpacing;
           }
         }
 
@@ -152,6 +193,14 @@ class Uploads {
         scale: { x: number; y: number };
         rotation: number;
       };
+      effectStyles: {
+        backgroundColor: string;
+        textColor: string;
+        indexColor: string;
+        fontSize: string;
+        fontStyle: string;
+        letterSpacing: number;
+      };
     }[]
   ) => {
     if (!this.tableTextCollection) {
@@ -161,7 +210,7 @@ class Uploads {
 
     if (updateData && updateData.length > 0) {
       const pushInstances = updateData.map(
-        ({ textInstanceId, positioning }) => {
+        ({ textInstanceId, positioning, effectStyles }) => {
           const p = {
             p: {
               l: positioning.position.left,
@@ -173,10 +222,19 @@ class Uploads {
             },
             r: positioning.rotation,
           };
+          const es = {
+            "0": effectStyles.backgroundColor,
+            "1": effectStyles.textColor,
+            "2": effectStyles.indexColor,
+            "3": effectStyles.fontSize,
+            "4": effectStyles.fontStyle,
+            "5": effectStyles.letterSpacing,
+          };
 
           return {
             xiid: textInstanceId,
             p,
+            es,
           };
         }
       );

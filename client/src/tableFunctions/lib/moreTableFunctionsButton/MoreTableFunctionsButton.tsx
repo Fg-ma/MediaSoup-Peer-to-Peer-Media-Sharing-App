@@ -26,6 +26,10 @@ export default function MoreTableFunctionsButton({
   setCaptureMediaActive,
   tabledActive,
   setTabledActive,
+  tableSidePanelActive,
+  setTableSidePanelActive,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
@@ -51,6 +55,10 @@ export default function MoreTableFunctionsButton({
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
   tabledActive: boolean;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
+  tableSidePanelActive: boolean;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
@@ -147,6 +155,10 @@ export default function MoreTableFunctionsButton({
           tabledActive={tabledActive}
           setTabledActive={setTabledActive}
           gridSizeSectionRef={gridSizeSectionRef}
+          tableSidePanelActive={tableSidePanelActive}
+          setTableSidePanelActive={setTableSidePanelActive}
+          sidePanelPosition={sidePanelPosition}
+          setSidePanelPosition={setSidePanelPosition}
         />
       )}
     </>

@@ -1,8 +1,8 @@
 import BundlesController from "../../lib/BundlesController";
 import {
   GameTypes,
-  UserMediaType,
-} from "../../context/mediaContext/typeConstant";
+  StaticContentMediaType,
+} from "../../context/mediaContext/lib/typeConstant";
 import SnakeGameMedia from "./snakeGame/SnakeGameMedia";
 
 type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
@@ -78,7 +78,7 @@ class GamesSignalingMedia {
     private username: string,
     private instance: string,
     private url: string,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private bundlesController: React.MutableRefObject<BundlesController>,
   ) {
     this.connect(this.url);
@@ -153,8 +153,8 @@ class GamesSignalingMedia {
 
     switch (gameType) {
       case "snake": {
-        if (!this.userMedia.current.games.snake) {
-          this.userMedia.current.games.snake = {};
+        if (!this.staticContentMedia.current.games.snake) {
+          this.staticContentMedia.current.games.snake = {};
         }
         const snakeGameMedia = new SnakeGameMedia(
           this.tableId,
@@ -167,7 +167,7 @@ class GamesSignalingMedia {
         );
         await snakeGameMedia.connect();
 
-        this.userMedia.current.games.snake[gameId] = snakeGameMedia;
+        this.staticContentMedia.current.games.snake[gameId] = snakeGameMedia;
         break;
       }
     }
@@ -180,14 +180,17 @@ class GamesSignalingMedia {
       case "snake":
         {
           if (
-            this.userMedia.current.games.snake &&
-            this.userMedia.current.games.snake[gameId]
+            this.staticContentMedia.current.games.snake &&
+            this.staticContentMedia.current.games.snake[gameId]
           ) {
-            this.userMedia.current.games.snake[gameId].destructor();
-            delete this.userMedia.current.games.snake[gameId];
+            this.staticContentMedia.current.games.snake[gameId].destructor();
+            delete this.staticContentMedia.current.games.snake[gameId];
 
-            if (Object.keys(this.userMedia.current.games.snake).length === 0) {
-              delete this.userMedia.current.games.snake;
+            if (
+              Object.keys(this.staticContentMedia.current.games.snake)
+                .length === 0
+            ) {
+              delete this.staticContentMedia.current.games.snake;
             }
           }
         }
@@ -205,8 +208,8 @@ class GamesSignalingMedia {
     activeGames.map(async (activeGame) => {
       switch (activeGame.gameType) {
         case "snake": {
-          if (!this.userMedia.current.games.snake) {
-            this.userMedia.current.games.snake = {};
+          if (!this.staticContentMedia.current.games.snake) {
+            this.staticContentMedia.current.games.snake = {};
           }
           const snakeGameMedia = new SnakeGameMedia(
             this.tableId,
@@ -218,7 +221,7 @@ class GamesSignalingMedia {
           );
           await snakeGameMedia.connect();
 
-          this.userMedia.current.games.snake[activeGame.gameId] =
+          this.staticContentMedia.current.games.snake[activeGame.gameId] =
             snakeGameMedia;
           break;
         }

@@ -44,6 +44,10 @@ export default function TableFunctions({
   setGridSize,
   producersController,
   deadbanding,
+  tableSidePanelActive,
+  setTableSidePanelActive,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   tableFunctionsRef: React.RefObject<HTMLDivElement>;
   tableTopRef: React.RefObject<HTMLDivElement>;
@@ -81,6 +85,10 @@ export default function TableFunctions({
   >;
   producersController: React.MutableRefObject<ProducersController>;
   deadbanding: React.MutableRefObject<Deadbanding>;
+  tableSidePanelActive: boolean;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   const { sendGeneralSignal } = useSignalContext();
   const { tableSocket } = useSocketContext();
@@ -179,6 +187,10 @@ export default function TableFunctions({
           setCaptureMediaActive={setCaptureMediaActive}
           tabledActive={tabledActive}
           setTabledActive={setTabledActive}
+          tableSidePanelActive={tableSidePanelActive}
+          setTableSidePanelActive={setTableSidePanelActive}
+          sidePanelPosition={sidePanelPosition}
+          setSidePanelPosition={setSidePanelPosition}
         />
         <CameraSection
           cameraBtnRef={cameraBtnRef}

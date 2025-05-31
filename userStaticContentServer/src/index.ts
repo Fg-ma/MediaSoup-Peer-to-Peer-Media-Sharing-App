@@ -8,7 +8,7 @@ import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
 import Cleanup from "./lib/Cleanup";
 import Gets from "./gets/Gets";
-import Posts from "./posts/posts";
+import Posts from "./posts/Posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
@@ -29,6 +29,10 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup();
 
+const SOCKET_MAX_PAYLOAD = 16 * 1024 * 1024;
+export const CEPH_CHUNK_MAX_SIZE = 1024 * 1024 * 10;
+export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
+
 // tableTopCeph.emptyBucket("user-svgs");
 // tableTopCeph.emptyBucket("user-images");
 // tableTopCeph.listBucketContents("user-svgs");
@@ -43,7 +47,7 @@ const app = uWS.SSLApp(sslOptions);
 app
   .ws("/*", {
     compression: uWS.SHARED_COMPRESSOR,
-    maxPayloadLength: 16 * 1024 * 1024, // 16 MB
+    maxPayloadLength: SOCKET_MAX_PAYLOAD,
     idleTimeout: 60,
     message: (ws, message) => {
       const tableWS = ws as UserStaticContentWebSocket;

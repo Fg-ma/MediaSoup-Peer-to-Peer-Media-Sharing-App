@@ -1,12 +1,12 @@
 import React from "react";
-import { UserMediaType } from "../../../context/mediaContext/typeConstant";
+import { StaticContentMediaType } from "../../../context/mediaContext/lib/typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
 import { GameState, PlayersState } from "./typeConstant";
 
 class SnakeGameController extends SnakeGameSocket {
   constructor(
     private snakeGameId: string,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private gridSize: number,
     private gameState: GameState,
     setGameState: React.Dispatch<React.SetStateAction<GameState>>,
@@ -16,7 +16,7 @@ class SnakeGameController extends SnakeGameSocket {
     setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
     setPlayersState: React.Dispatch<React.SetStateAction<PlayersState>>,
     private playersState: PlayersState,
-    setGridSize: React.Dispatch<React.SetStateAction<number>>
+    setGridSize: React.Dispatch<React.SetStateAction<number>>,
   ) {
     super(setGameState, setStarted, setGameOver, setPlayersState, setGridSize);
   }
@@ -52,7 +52,9 @@ class SnakeGameController extends SnakeGameSocket {
       key !== "r"
     ) {
       this.setGameOver(false);
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
+      this.staticContentMedia.current.games.snake?.[
+        this.snakeGameId
+      ]?.startGame();
     }
 
     let newDirection: "up" | "down" | "left" | "right" | undefined = undefined;
@@ -85,7 +87,7 @@ class SnakeGameController extends SnakeGameSocket {
     }
 
     if (newDirection) {
-      this.userMedia.current.games.snake?.[
+      this.staticContentMedia.current.games.snake?.[
         this.snakeGameId
       ]?.snakeDirectionChange(newDirection);
     }
@@ -93,14 +95,14 @@ class SnakeGameController extends SnakeGameSocket {
 
   getSegmentClass = (
     snakeSegments: { x: number; y: number }[],
-    index: number
+    index: number,
   ) => {
     if (index === 0)
       return {
         className: "snake-game-snake-head",
         rotation: this.getRotation(
           snakeSegments[index],
-          snakeSegments[index + 1]
+          snakeSegments[index + 1],
         ),
       };
     if (index === snakeSegments.length - 1)
@@ -108,7 +110,7 @@ class SnakeGameController extends SnakeGameSocket {
         className: "snake-game-snake-tail",
         rotation: this.getRotation(
           snakeSegments[index - 1],
-          snakeSegments[index]
+          snakeSegments[index],
         ),
       };
 
@@ -133,7 +135,7 @@ class SnakeGameController extends SnakeGameSocket {
 
   getRotation = (
     from: { x: number; y: number },
-    to: { x: number; y: number }
+    to: { x: number; y: number },
   ) => {
     if (to.x > from.x) return "90deg"; // Right
     if (to.x < from.x) return "-90deg"; // Left
@@ -145,7 +147,7 @@ class SnakeGameController extends SnakeGameSocket {
   getCurveRotation = (
     prev: { x: number; y: number },
     curr: { x: number; y: number },
-    next: { x: number; y: number }
+    next: { x: number; y: number },
   ) => {
     // Right to Down (Default orientation of PNG)
     if (
@@ -195,19 +197,19 @@ class SnakeGameController extends SnakeGameSocket {
         // Check if the cell is part of a snake
         let isSnakeCell = false;
         for (const [playerUsername, instances] of Object.entries(
-          this.gameState.snakes
+          this.gameState.snakes,
         )) {
           for (const [playerInstance, snakeSegments] of Object.entries(
-            instances
+            instances,
           )) {
             const { position } = snakeSegments;
             const segmentIndex = position.findIndex(
-              (segment) => segment.x === x && segment.y === y
+              (segment) => segment.x === x && segment.y === y,
             );
             if (segmentIndex !== -1) {
               const { className, rotation } = this.getSegmentClass(
                 position,
-                segmentIndex
+                segmentIndex,
               );
 
               if (
@@ -230,7 +232,7 @@ class SnakeGameController extends SnakeGameSocket {
         // Check if the cell contains food
         if (!isSnakeCell) {
           const foodIndex = this.gameState.food.findIndex(
-            (item) => item.x === x && item.y === y
+            (item) => item.x === x && item.y === y,
           );
           if (foodIndex !== -1) {
             cellClass = `snake-game-food ${this.gameState.food[foodIndex].class}`;
@@ -248,13 +250,13 @@ class SnakeGameController extends SnakeGameSocket {
             style={{
               rotate: cellBackgroundRotation,
             }}
-          ></div>
+          ></div>,
         );
       }
       board.push(
-        <div key={y} className='snake-game-row'>
+        <div key={y} className="snake-game-row">
           {row}
-        </div>
+        </div>,
       );
     }
 
@@ -264,7 +266,9 @@ class SnakeGameController extends SnakeGameSocket {
   startGameClick = () => {
     if (!this.started) {
       this.setGameOver(false);
-      this.userMedia.current.games.snake?.[this.snakeGameId]?.startGame();
+      this.staticContentMedia.current.games.snake?.[
+        this.snakeGameId
+      ]?.startGame();
     }
   };
 }

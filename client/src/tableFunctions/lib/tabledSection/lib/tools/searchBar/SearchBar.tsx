@@ -42,6 +42,7 @@ export default function SearchBar({
   ) => {
     switch (message.type) {
       case "searchTabledContentResponded":
+        console.log(message);
         if (message.data.length === 0) {
           setSearchContent([]);
         } else {
@@ -88,6 +89,19 @@ export default function SearchBar({
           className="h-[80%] w-full font-K2D text-xl"
           onChange={(event) => {
             searchValue.current = event.target.value;
+            if (event.target.value.length === 0) {
+              if (typingTimeout.current) {
+                clearTimeout(typingTimeout.current);
+                typingTimeout.current = undefined;
+              }
+              if (typingInterval.current) {
+                clearInterval(typingInterval.current);
+                typingInterval.current = undefined;
+              }
+              setSearchContent([]);
+              return;
+            }
+
             setRerender((prev) => !prev);
 
             if (typingTimeout.current) {

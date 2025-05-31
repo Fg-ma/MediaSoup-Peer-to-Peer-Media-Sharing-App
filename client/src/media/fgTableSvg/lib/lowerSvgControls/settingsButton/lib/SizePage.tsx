@@ -132,8 +132,8 @@ export default function SizePage({
             }}
             options={{
               initValue: settings.downloadOptions.size.width.value,
-              ticks: 7,
-              rangeMax: 32768,
+              ticks: 5,
+              rangeMax: 4096,
               rangeMin: 1,
               orientation: "horizontal",
               tickLabels: false,
@@ -158,8 +158,8 @@ export default function SizePage({
             }}
             options={{
               initValue: settings.downloadOptions.size.height.value,
-              ticks: 7,
-              rangeMax: 32768,
+              ticks: 5,
+              rangeMax: 4096,
               rangeMin: 1,
               orientation: "horizontal",
               tickLabels: false,
@@ -183,15 +183,38 @@ export default function SizePage({
                 className="flex grow items-center justify-center"
                 contentFunction={() => (
                   <div className="flex w-full items-start px-2">
-                    {size}x
-                    {parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1)}
+                    {(svgMediaInstance.getAspect() ?? 1) > 1
+                      ? size
+                      : (
+                          parseInt(size) *
+                          (svgMediaInstance.svgMedia.aspect ?? 1)
+                        ).toFixed(0)}
+                    x
+                    {(svgMediaInstance.getAspect() ?? 1) > 1
+                      ? (
+                          parseInt(size) /
+                          (svgMediaInstance.svgMedia.aspect ?? 1)
+                        ).toFixed(0)
+                      : size}
                   </div>
                 )}
                 clickFunction={() => {
-                  setSize("width", parseInt(size));
+                  setSize(
+                    "width",
+                    parseInt(
+                      (svgMediaInstance.getAspect() ?? 1) > 1
+                        ? size
+                        : (
+                            parseInt(size) *
+                            (svgMediaInstance.svgMedia.aspect ?? 1)
+                          ).toFixed(0),
+                    ),
+                  );
                   setSize(
                     "height",
-                    parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1),
+                    (svgMediaInstance.getAspect() ?? 1) > 1
+                      ? parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1)
+                      : parseInt(size),
                   );
                 }}
               />

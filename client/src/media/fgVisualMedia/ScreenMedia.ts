@@ -5,7 +5,7 @@ import {
   ScreenEffectTypes,
   UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../context/mediaContext/lib/typeConstant";
 import UserDevice from "../../tools/userDevice/UserDevice";
 import BabylonScene, {
   EffectType,

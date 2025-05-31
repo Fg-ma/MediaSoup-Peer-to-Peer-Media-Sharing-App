@@ -1,6 +1,6 @@
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
   VideoEffectTypes,
 } from "../../../../../../universal/effectsTypeConstant";
 import {
@@ -32,8 +32,8 @@ class LowerVideoController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
@@ -271,8 +271,12 @@ class LowerVideoController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userEffects.current.video[this.videoInstanceId].video[effect] =
-          !this.userEffects.current.video[this.videoInstanceId].video[effect];
+        this.staticContentEffects.current.video[this.videoInstanceId].video[
+          effect
+        ] =
+          !this.staticContentEffects.current.video[this.videoInstanceId].video[
+            effect
+          ];
       }
 
       this.videoMediaInstance.changeEffects(
@@ -285,8 +289,9 @@ class LowerVideoController {
         "video",
         this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
-        this.userEffects.current.video[this.videoInstanceId].video,
-        this.userEffectsStyles.current.video[this.videoInstanceId].video,
+        this.staticContentEffects.current.video[this.videoInstanceId].video,
+        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+          .video,
       );
     } else {
       this.videoMediaInstance.clearAllEffects();
@@ -295,8 +300,9 @@ class LowerVideoController {
         "video",
         this.videoMediaInstance.videoMedia.videoId,
         this.videoInstanceId,
-        this.userEffects.current.video[this.videoInstanceId].video,
-        this.userEffectsStyles.current.video[this.videoInstanceId].video,
+        this.staticContentEffects.current.video[this.videoInstanceId].video,
+        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+          .video,
       );
     }
   };

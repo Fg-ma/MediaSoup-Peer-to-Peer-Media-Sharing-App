@@ -17,11 +17,12 @@ export default function SvgSelection({
   instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
-  const svgInstanceMedia = userMedia.current.svg.tableInstances[instanceId];
+  const svgInstanceMedia =
+    staticContentMedia.current.svg.tableInstances[instanceId];
   const positioning = svgInstanceMedia?.getPositioning();
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");

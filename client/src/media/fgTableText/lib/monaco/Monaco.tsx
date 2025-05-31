@@ -4,6 +4,7 @@ import { MonacoBinding } from "y-monaco";
 import type * as monacoEditor from "monaco-editor";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useSignalContext } from "../../../../context/signalContext/SignalContext";
+import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
 import { Settings } from "../typeConstant";
 import TableTextMediaInstance from "../../TableTextMediaInstance";
 import MonacoController from "./lib/MonacoController";
@@ -32,6 +33,7 @@ export default function Monaco({
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
   forceFinishInitialization?: React.MutableRefObject<boolean>;
 }) {
+  const { staticContentEffectsStyles } = useEffectsContext();
   const { liveTextEditingSocket } = useSocketContext();
   const { sendGeneralSignal } = useSignalContext();
 
@@ -52,10 +54,10 @@ export default function Monaco({
     new MonacoController(
       textMediaInstance,
       liveTextEditingSocket,
+      staticContentEffectsStyles,
       editor,
       monaco,
       binding,
-      settings,
       textAreaContainerRef,
       isLineNums,
       setIsLineNums,
@@ -70,10 +72,15 @@ export default function Monaco({
 
   useEffect(() => {
     if (!editor.current) return;
+
+    const effectsStyles =
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId];
+
     editor.current.updateOptions({
-      fontSize: parseInt(settings.fontSize.value, 10),
-      fontFamily: settings.fontStyle.value,
+      fontSize: parseInt(effectsStyles.fontSize, 10),
+      fontFamily: effectsStyles.fontStyle,
       lineNumbers: isLineNums ? "on" : "off",
+      letterSpacing: effectsStyles.letterSpacing,
     });
 
     const container = textAreaContainerRef.current?.getElementsByClassName(
@@ -82,18 +89,21 @@ export default function Monaco({
     if (container) {
       container.style.setProperty(
         "--vscode-editor-background",
-        settings.colors.backgroundColor.value,
+        effectsStyles.backgroundColor,
       );
       container.style.setProperty(
         "--vscode-editorLineNumber-foreground",
-        settings.colors.indexColor.value,
+        effectsStyles.indexColor,
       );
       textAreaContainerRef.current?.style.setProperty(
         "--text-color",
-        settings.colors.textColor.value,
+        effectsStyles.textColor,
       );
     }
-  }, [settings]);
+  }, [
+    settings,
+    staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+  ]);
 
   useEffect(() => {
     if (!editor.current) return;
@@ -120,7 +130,10 @@ export default function Monaco({
       ref={textAreaContainerRef}
       className={`${className} ${isReadOnly?.current ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
       style={{
-        backgroundColor: settings.colors.backgroundColor.value,
+        backgroundColor:
+          staticContentEffectsStyles.current.text[
+            textMediaInstance.textInstanceId
+          ].backgroundColor,
       }}
       onDoubleClick={() => {
         if (isReadOnly && isReadOnly.current) {
@@ -162,7 +175,7 @@ export default function Monaco({
           lineNumbersMinChars: 0,
         }}
         loading={
-          <div className="flex absolute inset-0 items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center">
             <span className="font-K2D text-xl text-fg-white">
               Initializing...
             </span>
@@ -170,7 +183,7 @@ export default function Monaco({
         }
       />
       {textMediaInstance.initializingState === "initializing" && (
-        <div className="flex absolute inset-0 items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-K2D text-xl text-fg-white">
             Initializing...
           </span>

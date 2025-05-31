@@ -1,26 +1,28 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import {
-  Settings,
-  ActivePages,
-  fontStylesOptionsMeta,
-} from "../../../typeConstant";
+import { ActivePages, fontStylesOptionsMeta } from "../../../typeConstant";
 import LazyFontButton from "./LazyFontButton";
+import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
+import { useEffectsContext } from "../../../../../../context/effectsContext/EffectsContext";
+import TableTextMediaInstance from "../../../../../../media/fgTableText/TableTextMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function FontStylePage({
+  textMediaInstance,
   setActivePages,
-  settings,
-  setSettings,
+  setRerender,
 }: {
+  textMediaInstance: TableTextMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { staticContentEffectsStyles } = useEffectsContext();
+  const { tableStaticContentSocket } = useSocketContext();
+
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const handleCloseFontStylePage = () => {
@@ -34,13 +36,19 @@ export default function FontStylePage({
   };
 
   const handleSelectFontStyle = (fontStyle: string) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
+    staticContentEffectsStyles.current.text[
+      textMediaInstance.textInstanceId
+    ].fontStyle = fontStyle;
 
-      newSettings.fontStyle.value = fontStyle;
+    tableStaticContentSocket.current?.updateContentEffects(
+      "text",
+      textMediaInstance.textMedia.textId,
+      textMediaInstance.textInstanceId,
+      undefined,
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    );
 
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   return (
@@ -80,7 +88,9 @@ export default function FontStylePage({
             item={
               <FgButton
                 className={`${
-                  settings.fontStyle.value === meta.value
+                  staticContentEffectsStyles.current.text[
+                    textMediaInstance.textInstanceId
+                  ].fontStyle === meta.value
                     ? "bg-fg-white text-fg-tone-black-1"
                     : ""
                 } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}

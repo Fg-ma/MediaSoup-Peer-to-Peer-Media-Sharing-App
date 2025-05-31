@@ -8,6 +8,7 @@ import {
   PetsEffectTypes,
   CameraEffectTypes,
   CaptureEffectStylesType,
+  StaticContentEffectsStylesType,
 } from "../../../universal/effectsTypeConstant";
 import { LandmarkTypes } from "./FaceLandmarks";
 
@@ -692,7 +693,8 @@ class Deadbanding {
 
   constructor(
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
+    private captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>,
   ) {}
 
   update = (
@@ -700,7 +702,7 @@ class Deadbanding {
     id: string,
     effects: {
       [effectType in CameraEffectTypes]?: boolean | undefined;
-    }
+    },
   ) => {
     if (mediaType === "capture" && !this.deadbandingMap.capture) {
       this.deadbandingMap.capture = defaultDeadbandingValues;
@@ -712,20 +714,28 @@ class Deadbanding {
       if (
         effects[effectType] &&
         ((mediaType === "video" &&
-          this.userEffectsStyles.current[mediaType][id].video[effectType]) ||
+          this.staticContentEffectsStyles.current[mediaType][id].video[
+            effectType
+          ]) ||
           (mediaType === "capture" &&
             this.captureEffectsStyles.current[effectType]) ||
-          (mediaType !== "video" &&
-            mediaType !== "capture" &&
-            this.userEffectsStyles.current[mediaType][id][effectType]))
+          (mediaType === "camera" &&
+            this.userEffectsStyles.current[mediaType][id][effectType]) ||
+          (mediaType === "image" &&
+            this.staticContentEffectsStyles.current[mediaType][id][effectType]))
       ) {
         const style =
           mediaType === "video"
-            ? this.userEffectsStyles.current[mediaType][id].video[effectType]
-                .style
+            ? this.staticContentEffectsStyles.current[mediaType][id].video[
+                effectType
+              ].style
             : mediaType === "capture"
-            ? this.captureEffectsStyles.current[effectType]
-            : this.userEffectsStyles.current[mediaType][id][effectType];
+              ? this.captureEffectsStyles.current[effectType]
+              : mediaType === "camera"
+                ? this.userEffectsStyles.current[mediaType][id][effectType]
+                : this.staticContentEffectsStyles.current[mediaType][id][
+                    effectType
+                  ];
 
         // @ts-expect-error: no enforcement between effectType and style
         for (const deadbanding in deadbandingValues[effectType][style]) {
@@ -738,12 +748,12 @@ class Deadbanding {
           if (newDeadbandingValue) {
             const currentDeadbandingValue =
               mediaType === "capture"
-                ? this.deadbandingMap[mediaType][
+                ? (this.deadbandingMap[mediaType][
                     deadbandingType as LandmarkTypes
-                  ] ?? 0
-                : this.deadbandingMap[mediaType][id][
+                  ] ?? 0)
+                : (this.deadbandingMap[mediaType][id][
                     deadbandingType as LandmarkTypes
-                  ] ?? 0;
+                  ] ?? 0);
 
             if (currentDeadbandingValue < newDeadbandingValue) {
               mediaType === "capture"
@@ -768,8 +778,8 @@ class Deadbanding {
     return mediaType === "capture"
       ? this.deadbandingMap.capture
       : id
-      ? this.deadbandingMap[mediaType][id]
-      : null;
+        ? this.deadbandingMap[mediaType][id]
+        : null;
   }
 }
 

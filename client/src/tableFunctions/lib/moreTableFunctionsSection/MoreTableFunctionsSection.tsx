@@ -12,6 +12,7 @@ import TableGridSizeButton from "../tableGrisSizeButton/TableGridSizeButton";
 import FgPanel from "../../../elements/fgPanel/FgPanel";
 import CaptureMediaButton from "../captureMediaButton/CaptureMediaButton";
 import TabledSection from "../tabledSection/TabledSection";
+import SidePanelButton from "../sidePanelButton/SidePanelButton";
 
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton"),
@@ -40,6 +41,10 @@ export default function MoreTableFunctionsSection({
   gridSizeSectionRef,
   tabledActive,
   setTabledActive,
+  tableSidePanelActive,
+  setTableSidePanelActive,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   tableTopRef: React.RefObject<HTMLDivElement>;
   moreTableFunctionsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -71,6 +76,10 @@ export default function MoreTableFunctionsSection({
   gridSizeSectionRef: React.RefObject<HTMLDivElement>;
   tabledActive: boolean;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
+  tableSidePanelActive: boolean;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   const { userMedia } = useMediaContext();
   const { permissions } = usePermissionsContext();
@@ -108,6 +117,7 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white"
       externalRef={moreTableFunctionsPanelRef}
       content={
         <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">
@@ -115,6 +125,12 @@ export default function MoreTableFunctionsSection({
             <TabledSection
               tabledActive={tabledActive}
               setTabledActive={setTabledActive}
+            />
+            <SidePanelButton
+              tableSidePanelActive={tableSidePanelActive}
+              setTableSidePanelActive={setTableSidePanelActive}
+              sidePanelPosition={sidePanelPosition}
+              setSidePanelPosition={setSidePanelPosition}
             />
             <FgBackgroundSelector
               externalPanelRef={tableBackgroundSectionRef}

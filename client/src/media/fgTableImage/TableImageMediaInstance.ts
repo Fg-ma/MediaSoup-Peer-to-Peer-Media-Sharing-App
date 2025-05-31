@@ -1,10 +1,10 @@
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
   defaultImageEffects,
   defaultImageEffectsStyles,
   ImageEffectTypes,
   ImageEffectStylesType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import BabylonScene, {
   EffectType,
@@ -46,8 +46,8 @@ class TableImageMediaInstance {
   constructor(
     public imageMedia: TableImageMedia,
     public imageInstanceId: string,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private deadbanding: React.MutableRefObject<Deadbanding>,
     initPositioning: {
@@ -64,13 +64,13 @@ class TableImageMediaInstance {
   ) {
     this.positioning = initPositioning;
 
-    if (!this.userEffects.current.image[this.imageInstanceId]) {
-      this.userEffects.current.image[this.imageInstanceId] =
+    if (!this.staticContentEffects.current.image[this.imageInstanceId]) {
+      this.staticContentEffects.current.image[this.imageInstanceId] =
         structuredClone(defaultImageEffects);
     }
 
-    if (!this.userEffectsStyles.current.image[this.imageInstanceId]) {
-      this.userEffectsStyles.current.image[this.imageInstanceId] =
+    if (!this.staticContentEffectsStyles.current.image[this.imageInstanceId]) {
+      this.staticContentEffectsStyles.current.image[this.imageInstanceId] =
         structuredClone(defaultImageEffectsStyles);
     }
 
@@ -214,7 +214,7 @@ class TableImageMediaInstance {
 
       if (count < this.imageMedia.maxFaces[0]) {
         const currentEffectStyle =
-          this.userEffectsStyles.current.image[this.imageInstanceId][
+          this.staticContentEffectsStyles.current.image[this.imageInstanceId][
             effect as EffectType
           ];
 
@@ -286,8 +286,8 @@ class TableImageMediaInstance {
     }
     if (
       this.effects.masks &&
-      this.userEffectsStyles.current.image[this.imageInstanceId].masks.style !==
-        "baseMask"
+      this.staticContentEffectsStyles.current.image[this.imageInstanceId].masks
+        .style !== "baseMask"
     ) {
       this.imageMedia.babylonRenderLoopWorker?.addNeed(
         "smoothFaceLandmarks",
@@ -305,7 +305,7 @@ class TableImageMediaInstance {
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
-        this.userEffects.current.image[this.imageInstanceId][
+        this.staticContentEffects.current.image[this.imageInstanceId][
           effect as EffectType
         ] = false;
 
@@ -343,207 +343,213 @@ class TableImageMediaInstance {
   updateAllEffects = (oldEffectStyles?: ImageEffectStylesType) => {
     if (!this.babylonScene) return;
 
-    Object.entries(this.userEffects.current.image[this.imageInstanceId]).map(
-      ([effect, value]) => {
-        if (this.effects[effect as EffectType] && !value) {
-          this.effects[effect as ImageEffectTypes] = false;
+    Object.entries(
+      this.staticContentEffects.current.image[this.imageInstanceId],
+    ).map(([effect, value]) => {
+      if (this.effects[effect as EffectType] && !value) {
+        this.effects[effect as ImageEffectTypes] = false;
 
-          if (effect === "tint") {
-            this.babylonScene?.toggleTintPlane(false);
-          } else if (effect === "blur") {
-            this.babylonScene?.toggleBlurEffect(false);
-          } else if (effect === "hideBackground") {
-            this.babylonScene?.toggleHideBackgroundPlane(false);
-          } else if (effect === "postProcess") {
-            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              false,
-            );
+        if (effect === "tint") {
+          this.babylonScene?.toggleTintPlane(false);
+        } else if (effect === "blur") {
+          this.babylonScene?.toggleBlurEffect(false);
+        } else if (effect === "hideBackground") {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
+        } else if (effect === "postProcess") {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false,
+          );
+        } else {
+          this.babylonScene?.deleteEffectMeshes(effect);
+        }
+      } else if (!this.effects[effect as EffectType] && value) {
+        this.effects[effect as EffectType] = true;
+
+        if (validEffectTypes.includes(effect as EffectType)) {
+          if (
+            effect !== "masks" ||
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId]
+              .masks.style !== "baseMask"
+          ) {
+            this.drawNewEffect(effect as EffectType);
           } else {
             this.babylonScene?.deleteEffectMeshes(effect);
-          }
-        } else if (!this.effects[effect as EffectType] && value) {
-          this.effects[effect as EffectType] = true;
 
-          if (validEffectTypes.includes(effect as EffectType)) {
-            if (
-              effect !== "masks" ||
-              this.userEffectsStyles.current.image[this.imageInstanceId].masks
-                .style !== "baseMask"
-            ) {
-              this.drawNewEffect(effect as EffectType);
-            } else {
-              this.babylonScene?.deleteEffectMeshes(effect);
-
-              if (this.effects[effect]) {
-                for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
-                  this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
-                }
+            if (this.effects[effect]) {
+              for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
+                this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
               }
             }
-          }
-
-          if (effect === "tint") {
-            this.setTintColor(
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .color,
-            );
-            this.babylonScene?.toggleTintPlane(
-              this.effects[effect] ?? false,
-              this.hexToNormalizedRgb(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color,
-              ),
-            );
-          }
-
-          if (effect === "blur") {
-            this.babylonScene?.toggleBlurEffect(this.effects[effect] ?? false);
-          }
-
-          if (effect === "hideBackground") {
-            if (
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style === "color"
-            ) {
-              this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color,
-              );
-            } else {
-              this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].style,
-              );
-            }
-
-            this.babylonScene?.toggleHideBackgroundPlane(
-              this.effects[effect] ?? false,
-            );
-          }
-
-          if (effect === "postProcess") {
-            this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style,
-            );
-
-            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              this.effects[effect] ?? false,
-            );
-          }
-        } else if (this.effects[effect as EffectType] && value) {
-          if (
-            validEffectTypes.includes(effect as EffectType) &&
-            (!oldEffectStyles ||
-              oldEffectStyles[effect as EffectType].style !==
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect as EffectType
-                ].style)
-          ) {
-            if (
-              effect !== "masks" ||
-              this.userEffectsStyles.current.image[this.imageInstanceId].masks
-                .style !== "baseMask"
-            ) {
-              this.babylonScene?.deleteEffectMeshes(effect);
-
-              this.drawNewEffect(effect as EffectType);
-            } else {
-              this.babylonScene?.deleteEffectMeshes(effect);
-
-              if (this.effects[effect]) {
-                for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
-                  this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
-                }
-              }
-            }
-          }
-
-          if (
-            effect === "tint" &&
-            (!oldEffectStyles ||
-              oldEffectStyles[effect].color !==
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color)
-          ) {
-            this.babylonScene?.toggleTintPlane(false);
-
-            this.setTintColor(
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .color,
-            );
-            this.babylonScene?.toggleTintPlane(
-              this.effects[effect] ?? false,
-              this.hexToNormalizedRgb(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color,
-              ),
-            );
-          }
-
-          if (
-            effect === "hideBackground" &&
-            (!oldEffectStyles ||
-              oldEffectStyles[effect].color !==
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color ||
-              oldEffectStyles[effect].style !==
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].style)
-          ) {
-            this.babylonScene?.toggleHideBackgroundPlane(false);
-
-            if (
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style === "color"
-            ) {
-              this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].color,
-              );
-            } else {
-              this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].style,
-              );
-            }
-            this.babylonScene?.toggleHideBackgroundPlane(
-              this.effects[effect] ?? false,
-            );
-          }
-
-          if (
-            effect === "postProcess" &&
-            (!oldEffectStyles ||
-              oldEffectStyles[effect].style !==
-                this.userEffectsStyles.current.image[this.imageInstanceId][
-                  effect
-                ].style)
-          ) {
-            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              false,
-            );
-
-            this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-                .style,
-            );
-            this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
-              this.effects[effect] ?? false,
-            );
           }
         }
-      },
-    );
+
+        if (effect === "tint") {
+          this.setTintColor(
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].color,
+          );
+          this.babylonScene?.toggleTintPlane(
+            this.effects[effect] ?? false,
+            this.hexToNormalizedRgb(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color,
+            ),
+          );
+        }
+
+        if (effect === "blur") {
+          this.babylonScene?.toggleBlurEffect(this.effects[effect] ?? false);
+        }
+
+        if (effect === "hideBackground") {
+          if (
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].style === "color"
+          ) {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color,
+            );
+          } else {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].style,
+            );
+          }
+
+          this.babylonScene?.toggleHideBackgroundPlane(
+            this.effects[effect] ?? false,
+          );
+        }
+
+        if (effect === "postProcess") {
+          this.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].style,
+          );
+
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            this.effects[effect] ?? false,
+          );
+        }
+      } else if (this.effects[effect as EffectType] && value) {
+        if (
+          validEffectTypes.includes(effect as EffectType) &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect as EffectType].style !==
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect as EffectType].style)
+        ) {
+          if (
+            effect !== "masks" ||
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId]
+              .masks.style !== "baseMask"
+          ) {
+            this.babylonScene?.deleteEffectMeshes(effect);
+
+            this.drawNewEffect(effect as EffectType);
+          } else {
+            this.babylonScene?.deleteEffectMeshes(effect);
+
+            if (this.effects[effect]) {
+              for (let i = 0; i < this.imageMedia.maxFaces[0]; i++) {
+                this.babylonScene?.babylonMeshes.createFaceMesh(i, []);
+              }
+            }
+          }
+        }
+
+        if (
+          effect === "tint" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].color !==
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color)
+        ) {
+          this.babylonScene?.toggleTintPlane(false);
+
+          this.setTintColor(
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].color,
+          );
+          this.babylonScene?.toggleTintPlane(
+            this.effects[effect] ?? false,
+            this.hexToNormalizedRgb(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color,
+            ),
+          );
+        }
+
+        if (
+          effect === "hideBackground" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].color !==
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color ||
+            oldEffectStyles[effect].style !==
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].style)
+        ) {
+          this.babylonScene?.toggleHideBackgroundPlane(false);
+
+          if (
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].style === "color"
+          ) {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].color,
+            );
+          } else {
+            this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].style,
+            );
+          }
+          this.babylonScene?.toggleHideBackgroundPlane(
+            this.effects[effect] ?? false,
+          );
+        }
+
+        if (
+          effect === "postProcess" &&
+          (!oldEffectStyles ||
+            oldEffectStyles[effect].style !==
+              this.staticContentEffectsStyles.current.image[
+                this.imageInstanceId
+              ][effect].style)
+        ) {
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            false,
+          );
+
+          this.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+              effect
+            ].style,
+          );
+          this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
+            this.effects[effect] ?? false,
+          );
+        }
+      }
+    });
 
     this.updateNeed();
 
@@ -580,8 +586,8 @@ class TableImageMediaInstance {
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
-        this.userEffectsStyles.current.image[this.imageInstanceId].masks
-          .style !== "baseMask"
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId]
+          .masks.style !== "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
       } else {
@@ -618,17 +624,20 @@ class TableImageMediaInstance {
       this.babylonScene?.toggleHideBackgroundPlane(false);
 
       if (
-        this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-          .style === "color"
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+          effect
+        ].style === "color"
       ) {
         this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-          this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-            .color,
+          this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+            effect
+          ].color,
         );
       } else {
         this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-          this.userEffectsStyles.current.image[this.imageInstanceId][effect]
-            .style,
+          this.staticContentEffectsStyles.current.image[this.imageInstanceId][
+            effect
+          ].style,
         );
       }
 
@@ -652,7 +661,9 @@ class TableImageMediaInstance {
 
   drawNewEffect = (effect: EffectType) => {
     const currentStyle =
-      this.userEffectsStyles.current.image?.[this.imageInstanceId][effect];
+      this.staticContentEffectsStyles.current.image?.[this.imageInstanceId][
+        effect
+      ];
 
     if (!currentStyle) {
       return;

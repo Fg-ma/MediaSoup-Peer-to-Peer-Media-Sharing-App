@@ -20,11 +20,12 @@ export default function TextSelection({
   instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
-  const textInstanceMedia = userMedia.current.text.tableInstances[instanceId];
+  const textInstanceMedia =
+    staticContentMedia.current.text.tableInstances[instanceId];
   const positioning = textInstanceMedia?.getPositioning();
 
   const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
@@ -34,6 +35,7 @@ export default function TextSelection({
     structuredClone(defaultSettings),
   );
   const [_, setRerender] = useState(false);
+  const isReadOnly = useRef(true);
 
   const textSelectionController = new TextSelectionController(
     instanceId,
@@ -70,7 +72,7 @@ export default function TextSelection({
               <Monaco
                 settings={settings}
                 isLineNums={false}
-                isReadOnly={true}
+                isReadOnly={isReadOnly}
                 textMediaInstance={textInstanceMedia}
               />
             ) : (

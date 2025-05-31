@@ -2,6 +2,8 @@ import uWS from "uWebSockets.js";
 import busboy from "busboy";
 import {
   broadcaster,
+  CEPH_CHUNK_MAX_SIZE,
+  CEPH_MAX_SIZE,
   clientBaseUrl,
   tableTopCeph,
   tableTopMongo,
@@ -19,6 +21,7 @@ import {
   defaultSvgEffects,
   defaultVideoEffectsStyles,
   defaultVideoEffects,
+  defaultTextEffectsStyles,
 } from "../../../universal/effectsTypeConstant";
 import {
   TableContentStateTypes,
@@ -32,11 +35,14 @@ import { ChunkState, UploadSession } from "./lib/typeConstant";
 const tableStaticContentUtils = new Utils();
 
 class Posts {
-  private readonly REDIS_LIFE_TIME = 1800;
+  private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
 
   constructor(app: uWS.TemplatedApp) {
     app.post("/upload-one-shot-file", (res, req) => {
-      const bb = busboy({ headers: this.collectHeaders(req) });
+      const bb = busboy({
+        headers: this.collectHeaders(req),
+        limits: { fileSize: CEPH_MAX_SIZE },
+      });
 
       let aborted = false;
       res.onAborted(() => {
@@ -69,7 +75,18 @@ class Posts {
       });
 
       bb.on("file", (_, file) => {
-        if (!metadata) return;
+        if (!metadata || aborted) return;
+
+        file.on("limit", () => {
+          this.sendResponse(
+            res,
+            "413 Payload Too Large",
+            "text/plain",
+            "File too large"
+          );
+          aborted = true;
+          return;
+        });
 
         const sanitizedFilename = tableStaticContentUtils.sanitizeString(
           metadata.filename.slice(0, -4)
@@ -92,6 +109,14 @@ class Posts {
             file
           )
           .then(async () => {
+            if (aborted) {
+              tableTopCeph.deletes.deleteFile(
+                contentTypeBucketMap[staticContentType],
+                metadata!.contentId
+              );
+              return;
+            }
+
             if (!metadata) return;
 
             switch (metadata.direction) {
@@ -205,8 +230,9 @@ class Posts {
               uploadId,
               {
                 parts: [],
+                currentSize: 0,
               },
-              this.REDIS_LIFE_TIME
+              this.REDIS_UPLOAD_LIFE_TIME
             );
 
             const sessionData = {
@@ -227,7 +253,7 @@ class Posts {
               "TSCUS",
               uploadId,
               sessionData,
-              this.REDIS_LIFE_TIME
+              this.REDIS_UPLOAD_LIFE_TIME
             );
 
             if (!aborted) {
@@ -253,7 +279,10 @@ class Posts {
     });
 
     app.post("/upload-chunk/:uploadId", (res, req) => {
-      const bb = busboy({ headers: this.collectHeaders(req) });
+      const bb = busboy({
+        headers: this.collectHeaders(req),
+        limits: { fileSize: CEPH_CHUNK_MAX_SIZE },
+      });
       let chunkIndex = -1,
         totalChunks = -1;
       let buffer = Buffer.alloc(0);
@@ -306,6 +335,31 @@ class Posts {
       });
 
       bb.on("file", async (_fn, stream) => {
+        stream.on("limit", async () => {
+          this.sendResponse(
+            res,
+            "413 Payload Too Large",
+            "text/plain",
+            "Chunk too large"
+          );
+          aborted = true;
+
+          if (!session) return;
+
+          await tableTopCeph.posts.abortMultipartUpload(
+            contentTypeBucketMap[session.staticContentType],
+            session.contentId,
+            uploadId
+          );
+
+          await tableTopRedis.deletes.delete([
+            { prefix: "TSCUS", id: uploadId },
+            { prefix: "TSCCS", id: uploadId },
+          ]);
+
+          return;
+        });
+
         session = (await tableTopRedis.gets.get(
           "TSCUS",
           uploadId
@@ -328,7 +382,7 @@ class Posts {
           return;
         }
 
-        stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
+        stream.on("data", async (d) => (buffer = Buffer.concat([buffer, d])));
 
         stream.on("end", async () => {
           if (aborted) return;
@@ -344,6 +398,34 @@ class Posts {
           if (!ETag) return;
 
           state!.parts.push({ PartNumber: chunkIndex + 1, ETag });
+          state!.currentSize += buffer.byteLength;
+
+          if (aborted) return;
+
+          if (state!.currentSize > CEPH_MAX_SIZE) {
+            this.sendResponse(
+              res,
+              "413 Payload Too Large",
+              "text/plain",
+              "File upload to large"
+            );
+            aborted = true;
+
+            if (!session) return;
+
+            await tableTopCeph.posts.abortMultipartUpload(
+              contentTypeBucketMap[session.staticContentType],
+              session.contentId,
+              uploadId
+            );
+
+            await tableTopRedis.deletes.delete([
+              { prefix: "TSCUS", id: uploadId },
+              { prefix: "TSCCS", id: uploadId },
+            ]);
+
+            return;
+          }
 
           if (aborted) return;
 
@@ -351,12 +433,12 @@ class Posts {
             "TSCCS",
             uploadId,
             state,
-            this.REDIS_LIFE_TIME
+            this.REDIS_UPLOAD_LIFE_TIME
           );
           await tableTopRedis.posts.extendLife(
             "TSCUS",
             uploadId,
-            this.REDIS_LIFE_TIME
+            this.REDIS_UPLOAD_LIFE_TIME
           );
 
           if (aborted) return;
@@ -1190,6 +1272,7 @@ class Posts {
                     },
                     rotation: 0,
                   },
+              effectStyles: structuredClone(defaultTextEffectsStyles),
             },
           ]
         : [],

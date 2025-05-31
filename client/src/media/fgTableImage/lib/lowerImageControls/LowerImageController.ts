@@ -1,7 +1,7 @@
 import {
-  UserEffectsType,
   ImageEffectTypes,
-  UserEffectsStylesType,
+  StaticContentEffectsType,
+  StaticContentEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
@@ -16,8 +16,8 @@ class LowerImageController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
@@ -73,8 +73,10 @@ class LowerImageController {
   ) => {
     if (effect !== "clearAll") {
       if (!blockStateChange) {
-        this.userEffects.current.image[this.imageInstanceId][effect] =
-          !this.userEffects.current.image[this.imageInstanceId][effect];
+        this.staticContentEffects.current.image[this.imageInstanceId][effect] =
+          !this.staticContentEffects.current.image[this.imageInstanceId][
+            effect
+          ];
       }
 
       this.imageMediaInstance.changeEffects(
@@ -87,8 +89,8 @@ class LowerImageController {
         "image",
         this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
-        this.userEffects.current.image[this.imageInstanceId],
-        this.userEffectsStyles.current.image[this.imageInstanceId],
+        this.staticContentEffects.current.image[this.imageInstanceId],
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
       );
     } else {
       this.imageMediaInstance.clearAllEffects();
@@ -97,8 +99,8 @@ class LowerImageController {
         "image",
         this.imageMediaInstance.imageMedia.imageId,
         this.imageInstanceId,
-        this.userEffects.current.image[this.imageInstanceId],
-        this.userEffectsStyles.current.image[this.imageInstanceId],
+        this.staticContentEffects.current.image[this.imageInstanceId],
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
       );
     }
   };

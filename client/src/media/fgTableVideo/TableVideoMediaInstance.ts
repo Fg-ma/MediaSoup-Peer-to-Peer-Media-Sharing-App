@@ -1,12 +1,12 @@
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
   defaultVideoEffects,
   defaultAudioEffects,
   defaultVideoEffectsStyles,
   defaultAudioEffectsStyles,
   VideoEffectTypes,
   VideoEffectStylesType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import UserDevice from "../../tools/userDevice/UserDevice";
 import BabylonScene, {
@@ -46,8 +46,8 @@ class TableVideoMediaInstance {
     public videoInstanceId: string,
     private userDevice: React.MutableRefObject<UserDevice>,
     private deadbanding: React.MutableRefObject<Deadbanding>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     public initPositioning: {
       position: {
         left: number;
@@ -67,19 +67,19 @@ class TableVideoMediaInstance {
   ) {
     this.positioning = this.initPositioning;
 
-    if (!this.userEffects.current.video[this.videoInstanceId]) {
-      this.userEffects.current.video[this.videoInstanceId] = {
+    if (!this.staticContentEffects.current.video[this.videoInstanceId]) {
+      this.staticContentEffects.current.video[this.videoInstanceId] = {
         video: structuredClone(defaultVideoEffects),
         audio: structuredClone(defaultAudioEffects),
       };
     }
-    if (!this.userEffects.current.video[this.videoInstanceId].audio) {
-      this.userEffects.current.video[this.videoInstanceId].audio =
+    if (!this.staticContentEffects.current.video[this.videoInstanceId].audio) {
+      this.staticContentEffects.current.video[this.videoInstanceId].audio =
         structuredClone(defaultAudioEffects);
     }
 
-    if (!this.userEffectsStyles.current.video[this.videoInstanceId]) {
-      this.userEffectsStyles.current.video[this.videoInstanceId] = {
+    if (!this.staticContentEffectsStyles.current.video[this.videoInstanceId]) {
+      this.staticContentEffectsStyles.current.video[this.videoInstanceId] = {
         video: structuredClone(defaultVideoEffectsStyles),
         audio: structuredClone(defaultAudioEffectsStyles),
       };
@@ -197,9 +197,8 @@ class TableVideoMediaInstance {
 
       if (count < this.videoMedia.maxFaces[0]) {
         const currentEffectStyle =
-          this.userEffectsStyles.current.video[this.videoInstanceId].video[
-            effect as EffectType
-          ];
+          this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+            .video[effect as EffectType];
 
         if (effect === "masks" && currentEffectStyle.style === "baseMask") {
           for (let i = count; i < this.videoMedia.maxFaces[0]; i++) {
@@ -269,8 +268,8 @@ class TableVideoMediaInstance {
     }
     if (
       this.effects.masks &&
-      this.userEffectsStyles.current.video[this.videoInstanceId].video.masks
-        .style !== "baseMask"
+      this.staticContentEffectsStyles.current.video[this.videoInstanceId].video
+        .masks.style !== "baseMask"
     ) {
       this.videoMedia.babylonRenderLoopWorker?.addNeed(
         "smoothFaceLandmarks",
@@ -301,7 +300,7 @@ class TableVideoMediaInstance {
 
     Object.entries(this.effects).map(([effect, value]) => {
       if (value) {
-        this.userEffects.current.video[this.videoInstanceId].video[
+        this.staticContentEffects.current.video[this.videoInstanceId].video[
           effect as EffectType
         ] = false;
 
@@ -336,7 +335,7 @@ class TableVideoMediaInstance {
     if (!this.babylonScene) return;
 
     Object.entries(
-      this.userEffects.current.video[this.videoInstanceId].video,
+      this.staticContentEffects.current.video[this.videoInstanceId].video,
     ).map(([effect, value]) => {
       if (this.effects[effect as EffectType] && !value) {
         this.effects[effect as EffectType] = false;
@@ -362,8 +361,8 @@ class TableVideoMediaInstance {
         if (validEffectTypes.includes(effect as EffectType)) {
           if (
             effect !== "masks" ||
-            this.userEffectsStyles.current.video[this.videoInstanceId].video
-              .masks.style !== "baseMask"
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video.masks.style !== "baseMask"
           ) {
             this.drawNewEffect(effect as EffectType);
           } else {
@@ -379,16 +378,15 @@ class TableVideoMediaInstance {
 
         if (effect === "tint") {
           this.setTintColor(
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].color,
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].color,
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color,
             ),
           );
         }
@@ -403,20 +401,19 @@ class TableVideoMediaInstance {
 
         if (effect === "hideBackground") {
           if (
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].style === "color"
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].style === "color"
           ) {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color,
             );
           } else {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].style,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].style,
             );
           }
 
@@ -427,9 +424,8 @@ class TableVideoMediaInstance {
 
         if (effect === "postProcess") {
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].style,
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].style,
           );
 
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
@@ -441,14 +437,14 @@ class TableVideoMediaInstance {
           validEffectTypes.includes(effect as EffectType) &&
           (!oldEffectStyles ||
             oldEffectStyles[effect as EffectType].style !==
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect as EffectType
-              ].style)
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect as EffectType].style)
         ) {
           if (
             effect !== "masks" ||
-            this.userEffectsStyles.current.video[this.videoInstanceId].video
-              .masks.style !== "baseMask"
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video.masks.style !== "baseMask"
           ) {
             this.babylonScene?.deleteEffectMeshes(effect);
 
@@ -468,23 +464,22 @@ class TableVideoMediaInstance {
           effect === "tint" &&
           (!oldEffectStyles ||
             oldEffectStyles[effect].color !==
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color)
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color)
         ) {
           this.babylonScene?.toggleTintPlane(false);
 
           this.setTintColor(
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].color,
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].color,
           );
           this.babylonScene?.toggleTintPlane(
             this.effects[effect] ?? false,
             this.hexToNormalizedRgb(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color,
             ),
           );
         }
@@ -493,31 +488,30 @@ class TableVideoMediaInstance {
           effect === "hideBackground" &&
           (!oldEffectStyles ||
             oldEffectStyles[effect].color !==
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color ||
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color ||
             oldEffectStyles[effect].style !==
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].style)
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].style)
         ) {
           this.babylonScene?.toggleHideBackgroundPlane(false);
 
           if (
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].style === "color"
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].style === "color"
           ) {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].color,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].color,
             );
           } else {
             this.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].style,
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].style,
             );
           }
           this.babylonScene?.toggleHideBackgroundPlane(
@@ -529,18 +523,17 @@ class TableVideoMediaInstance {
           effect === "postProcess" &&
           (!oldEffectStyles ||
             oldEffectStyles[effect].style !==
-              this.userEffectsStyles.current.video[this.videoInstanceId].video[
-                effect
-              ].style)
+              this.staticContentEffectsStyles.current.video[
+                this.videoInstanceId
+              ].video[effect].style)
         ) {
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
             false,
           );
 
           this.babylonScene?.babylonShaderController.swapPostProcessEffects(
-            this.userEffectsStyles.current.video[this.videoInstanceId].video[
-              effect
-            ].style,
+            this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+              .video[effect].style,
           );
           this.babylonScene?.babylonShaderController.togglePostProcessEffectsActive(
             this.effects[effect] ?? false,
@@ -578,8 +571,8 @@ class TableVideoMediaInstance {
     if (validEffectTypes.includes(effect as EffectType)) {
       if (
         effect !== "masks" ||
-        this.userEffectsStyles.current.video[this.videoInstanceId].video.masks
-          .style !== "baseMask"
+        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+          .video.masks.style !== "baseMask"
       ) {
         this.drawNewEffect(effect as EffectType);
       } else {
@@ -631,9 +624,8 @@ class TableVideoMediaInstance {
     if (!this.babylonScene) return;
 
     const currentStyle =
-      this.userEffectsStyles.current.video?.[this.videoInstanceId]?.video[
-        effect
-      ];
+      this.staticContentEffectsStyles.current.video?.[this.videoInstanceId]
+        ?.video[effect];
 
     if (!currentStyle) {
       return;

@@ -2,9 +2,10 @@ import React, { createContext, useContext, useRef } from "react";
 import {
   RemoteDataStreamsType,
   RemoteMediaType,
+  StaticContentMediaType,
   UserDataStreamsType,
   UserMediaType,
-} from "./typeConstant";
+} from "./lib/typeConstant";
 
 export interface MediaContextProviderProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export interface MediaContextProviderProps {
 export interface MediaContextType {
   userMedia: React.MutableRefObject<UserMediaType>;
   remoteMedia: React.MutableRefObject<RemoteMediaType>;
+  staticContentMedia: React.MutableRefObject<StaticContentMediaType>;
   remoteDataStreams: React.MutableRefObject<RemoteDataStreamsType>;
   userDataStreams: React.MutableRefObject<UserDataStreamsType>;
 }
@@ -35,6 +37,9 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     screen: {},
     screenAudio: {},
     audio: undefined,
+  });
+  const remoteMedia = useRef<RemoteMediaType>({});
+  const staticContentMedia = useRef<StaticContentMediaType>({
     video: { user: {}, table: {}, tableInstances: {} },
     image: { user: {}, table: {}, tableInstances: {} },
     svg: { user: {}, table: {}, tableInstances: {} },
@@ -44,7 +49,6 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     gamesSignaling: undefined,
     games: {},
   });
-  const remoteMedia = useRef<RemoteMediaType>({});
   const remoteDataStreams = useRef<RemoteDataStreamsType>({});
   const userDataStreams = useRef<UserDataStreamsType>({});
 
@@ -53,6 +57,7 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
       value={{
         userMedia,
         remoteMedia,
+        staticContentMedia,
         remoteDataStreams,
         userDataStreams,
       }}

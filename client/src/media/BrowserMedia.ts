@@ -1,6 +1,6 @@
 import { types } from "mediasoup-client";
 import { UserMedia } from "tone";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { UserMediaType } from "../context/mediaContext/lib/typeConstant";
 import { GeneralSignals } from "../context/signalContext/lib/typeConstant";
 
 class BrowserMedia {

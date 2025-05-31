@@ -20,10 +20,11 @@ const userStaticContentServerBaseUrl =
 export type TableUploadDirections = "toTable" | "reupload" | "toTabled";
 
 class Uploader {
+  private UPLOAD_SIZE_LIMIT = 1024 * 1024 * 1024;
   private ONE_SHOT_FILE_SIZE_CUTOFF = 1024 * 1024 * 40;
 
-  private oneShotUploader = new OneShotUploader();
-  private textOneShotUploader = new TextOneShotUploader();
+  private oneShotUploader: OneShotUploader;
+  private textOneShotUploader: TextOneShotUploader;
 
   constructor(
     private tableId: React.MutableRefObject<string>,
@@ -37,7 +38,10 @@ class Uploader {
     private reasonableFileSizer: React.MutableRefObject<ReasonableFileSizer>,
     private indexedDBController: React.MutableRefObject<IndexedDB>,
     private sendGeneralSignal: (signal: GeneralSignals) => void,
-  ) {}
+  ) {
+    this.oneShotUploader = new OneShotUploader(this.sendGeneralSignal);
+    this.textOneShotUploader = new TextOneShotUploader(this.sendGeneralSignal);
+  }
 
   uploadToTable = async (
     file: File,
@@ -52,6 +56,17 @@ class Uploader {
     contentId?: string,
     offset = 0,
   ) => {
+    if (file.size > this.UPLOAD_SIZE_LIMIT) {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: `${file.name} exceeds upload size limit`,
+          timeout: 2500,
+        },
+      });
+      return;
+    }
+
     if (!tableStaticContentServerBaseUrl || !this.tableId.current) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
@@ -181,6 +196,7 @@ class Uploader {
             "toTable",
             handle,
             offset,
+            this.sendGeneralSignal,
             initPositioning,
             state,
           );
@@ -197,6 +213,7 @@ class Uploader {
             "toTable",
             handle,
             offset,
+            this.sendGeneralSignal,
             initPositioning,
             state,
           );
@@ -210,6 +227,17 @@ class Uploader {
   };
 
   reuploadTableContent = async (file: File, contentId: string) => {
+    if (file.size > this.UPLOAD_SIZE_LIMIT) {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: `${file.name} exceeds upload size limit`,
+          timeout: 2500,
+        },
+      });
+      return;
+    }
+
     if (!tableStaticContentServerBaseUrl) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
@@ -270,6 +298,7 @@ class Uploader {
           "reupload",
           undefined,
           undefined,
+          this.sendGeneralSignal,
           undefined,
           undefined,
         );
@@ -285,6 +314,17 @@ class Uploader {
     file: File,
     state: UserContentStateTypes[] = [],
   ) => {
+    if (file.size > this.UPLOAD_SIZE_LIMIT) {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: `${file.name} exceeds upload size limit`,
+          timeout: 2500,
+        },
+      });
+      return;
+    }
+
     if (!userStaticContentServerBaseUrl) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
@@ -350,6 +390,7 @@ class Uploader {
           "toMuteStyle",
           undefined,
           undefined,
+          this.sendGeneralSignal,
           undefined,
           undefined,
         );

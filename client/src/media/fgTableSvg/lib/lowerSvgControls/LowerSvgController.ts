@@ -1,6 +1,6 @@
 import {
-  UserEffectsType,
-  UserEffectsStylesType,
+  StaticContentEffectsType,
+  StaticContentEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { Settings } from "../typeConstant";
@@ -12,8 +12,8 @@ class LowerSvgController {
     private svgMediaInstance: TableSvgMediaInstance,
     private svgContainerRef: React.RefObject<HTMLDivElement>,
     private setSvgEffectsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private tableStaticContentSocket: React.MutableRefObject<
@@ -69,8 +69,8 @@ class LowerSvgController {
       "svg",
       this.svgMediaInstance.svgMedia.svgId,
       this.svgInstanceId,
-      this.userEffects.current.svg[this.svgInstanceId],
-      this.userEffectsStyles.current.svg[this.svgInstanceId],
+      this.staticContentEffects.current.svg[this.svgInstanceId],
+      this.staticContentEffectsStyles.current.svg[this.svgInstanceId],
     );
   };
 

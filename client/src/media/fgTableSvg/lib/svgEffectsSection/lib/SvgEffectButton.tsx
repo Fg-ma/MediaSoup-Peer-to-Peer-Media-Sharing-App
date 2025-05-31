@@ -32,7 +32,7 @@ export default function SvgEffectButton({
   handleValueChange?: (key: string, value: number) => void;
   handleAcceptColor?: (key: string, hexa: string) => void;
 }) {
-  const { userEffectsStyles } = useEffectsContext();
+  const { staticContentEffectsStyles } = useEffectsContext();
 
   const [_, setRerender] = useState(false);
 
@@ -57,15 +57,15 @@ export default function SvgEffectButton({
                     className="h-16"
                     externalValue={
                       // @ts-ignore-error no coherence between filter and option.key
-                      userEffectsStyles.current.svg[svgInstanceId][filter][
-                        option.key
-                      ]
+                      staticContentEffectsStyles.current.svg[svgInstanceId][
+                        filter
+                      ][option.key]
                     }
                     externalStyleValue={
                       // @ts-ignore-error no coherence between filter and option.key
-                      userEffectsStyles.current.svg[svgInstanceId][filter][
-                        option.key
-                      ]
+                      staticContentEffectsStyles.current.svg[svgInstanceId][
+                        filter
+                      ][option.key]
                     }
                     onValueChange={(value) => {
                       if (handleValueChange) {
@@ -76,9 +76,9 @@ export default function SvgEffectButton({
                     options={{
                       initValue:
                         // @ts-ignore-error no coherence between filter and option.key
-                        userEffectsStyles.current.svg[svgInstanceId][filter][
-                          option.key
-                        ],
+                        staticContentEffectsStyles.current.svg[svgInstanceId][
+                          filter
+                        ][option.key],
                       ticks: option.ticks,
                       rangeMax: option.rangeMax,
                       rangeMin: option.rangeMin,
@@ -100,9 +100,9 @@ export default function SvgEffectButton({
                     className="aspect-square h-8"
                     defaultColor={
                       // @ts-ignore filter and option.key are strings not types
-                      userEffectsStyles.current.svg[svgInstanceId][filter][
-                        option.key
-                      ]
+                      staticContentEffectsStyles.current.svg[svgInstanceId][
+                        filter
+                      ][option.key]
                     }
                     handleAcceptColorCallback={(_hex, hexa) => {
                       if (handleAcceptColor) {

@@ -1,8 +1,20 @@
+import {
+  IncomingTableStaticContentMessages,
+  onUpdatedContentEffectsType,
+} from "src/serverControllers/tableStaticContentServer/lib/typeConstant";
 import { TextListenerTypes } from "../TableTextMedia";
-import { TextInstanceListenerTypes } from "../TableTextMediaInstance";
+import TableTextMediaInstance, {
+  TextInstanceListenerTypes,
+} from "../TableTextMediaInstance";
+import {
+  StaticContentEffectsStylesType,
+  TextEffectStylesType,
+} from "../../../../../universal/effectsTypeConstant";
 
 class TextController {
   constructor(
+    private textMediaInstance: TableTextMediaInstance,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
@@ -44,6 +56,37 @@ class TextController {
     switch (msg.type) {
       case "initialized":
         this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  private onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
+    const { contentType, contentId, instanceId } = event.header;
+    const { effectStyles } = event.data;
+
+    if (
+      contentType === "text" &&
+      contentId === this.textMediaInstance.textMedia.textId &&
+      instanceId === this.textMediaInstance.textInstanceId
+    ) {
+      if (effectStyles !== undefined) {
+        this.staticContentEffectsStyles.current.text[
+          this.textMediaInstance.textInstanceId
+        ] = effectStyles as TextEffectStylesType;
+      }
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleTableStaticContentMessage = (
+    event: IncomingTableStaticContentMessages,
+  ) => {
+    switch (event.type) {
+      case "updatedContentEffects":
+        this.onUpdatedContentEffects(event);
         break;
       default:
         break;

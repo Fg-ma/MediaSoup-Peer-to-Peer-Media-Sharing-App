@@ -8,6 +8,7 @@ import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHove
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
+const swapIcon = nginxAssetServerBaseUrl + "svgs/swapIcon.svg";
 
 const activePanelTitles: { [tablePanel in TablePanels]: string } = {
   general: "General",
@@ -21,11 +22,15 @@ export default function TableSidePanelHeader({
   activePanel,
   setTableSidePanelActive,
   setExternalRerender,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   tableSidePanelHeaderRef: React.RefObject<HTMLDivElement>;
   activePanel: React.MutableRefObject<TablePanels>;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   return (
     <div
@@ -35,11 +40,11 @@ export default function TableSidePanelHeader({
       <FgDropdownButton
         kind="popup"
         label={activePanelTitles[activePanel.current]}
-        className="h-10 w-36 py-1 font-Josefin text-xl"
+        className="mr-1 h-10 max-w-36 grow px-1 py-1 font-Josefin text-xl"
         elements={Object.entries(activePanelTitles).map(([key, title]) => (
           <div
             key={key}
-            className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] rounded font-K2D hover:bg-fg-tone-black-8`}
+            className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] truncate rounded font-K2D hover:bg-fg-tone-black-8`}
             onClick={() => {
               activePanel.current = key as TablePanels;
               setExternalRerender((prev) => !prev);
@@ -49,26 +54,54 @@ export default function TableSidePanelHeader({
           </div>
         ))}
       />
-      <FgButton
-        className="flex aspect-square h-[75%] items-center justify-center"
-        clickFunction={() => setTableSidePanelActive(false)}
-        contentFunction={() => (
-          <FgSVGElement
-            src={closeIcon}
-            className="fill-fg-white stroke-fg-white"
-            attributes={[
-              { key: "height", value: "100%" },
-              { key: "width", value: "100%" },
-            ]}
-          />
-        )}
-        hoverContent={<FgHoverContentStandard content="Close" style="light" />}
-        options={{
-          hoverSpacing: 4,
-          hoverTimeoutDuration: 750,
-          hoverType: "above",
-        }}
-      />
+      <div className="flex h-full w-max items-center justify-center space-x-1">
+        <FgButton
+          className="flex aspect-square h-full items-center justify-center"
+          clickFunction={() =>
+            setSidePanelPosition((prev) => (prev === "left" ? "right" : "left"))
+          }
+          contentFunction={() => (
+            <FgSVGElement
+              src={swapIcon}
+              className={`${sidePanelPosition === "left" ? "-scale-x-100" : ""} fill-fg-white stroke-fg-white`}
+              attributes={[
+                { key: "height", value: "100%" },
+                { key: "width", value: "100%" },
+              ]}
+            />
+          )}
+          hoverContent={
+            <FgHoverContentStandard content="Swap panel side" style="light" />
+          }
+          options={{
+            hoverSpacing: 4,
+            hoverTimeoutDuration: 750,
+            hoverType: "above",
+          }}
+        />
+        <FgButton
+          className="flex aspect-square h-[75%] items-center justify-center"
+          clickFunction={() => setTableSidePanelActive(false)}
+          contentFunction={() => (
+            <FgSVGElement
+              src={closeIcon}
+              className="fill-fg-white stroke-fg-white"
+              attributes={[
+                { key: "height", value: "100%" },
+                { key: "width", value: "100%" },
+              ]}
+            />
+          )}
+          hoverContent={
+            <FgHoverContentStandard content="Close" style="light" />
+          }
+          options={{
+            hoverSpacing: 4,
+            hoverTimeoutDuration: 750,
+            hoverType: "above",
+          }}
+        />
+      </div>
     </div>
   );
 }

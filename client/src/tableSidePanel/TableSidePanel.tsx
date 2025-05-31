@@ -18,6 +18,8 @@ export default function TableSidePanel({
   setExternalRerender,
   tableSidePanelWidth,
   setTableSidePanelWidth,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   activePanel: React.MutableRefObject<TablePanels>;
   tableSidePanelActive: boolean;
@@ -26,6 +28,8 @@ export default function TableSidePanel({
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
   tableSidePanelWidth: number;
   setTableSidePanelWidth: React.Dispatch<React.SetStateAction<number>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   const tablePanelRef = useRef<HTMLDivElement>(null);
   const tableSidePanelHeaderRef = useRef<HTMLDivElement>(null);
@@ -57,6 +61,8 @@ export default function TableSidePanel({
             activePanel={activePanel}
             setTableSidePanelActive={setTableSidePanelActive}
             setExternalRerender={setExternalRerender}
+            sidePanelPosition={sidePanelPosition}
+            setSidePanelPosition={setSidePanelPosition}
           />
           <FgScrollbarElement
             direction="vertical"
@@ -92,6 +98,7 @@ export default function TableSidePanel({
         <SidePanelDragger
           setTableSidePanelWidth={setTableSidePanelWidth}
           tablePanelRef={tablePanelRef}
+          sidePanelPosition={sidePanelPosition}
         />
       </>
     )

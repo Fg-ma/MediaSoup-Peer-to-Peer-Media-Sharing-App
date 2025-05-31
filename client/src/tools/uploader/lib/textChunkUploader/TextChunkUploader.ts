@@ -4,6 +4,7 @@ import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
 import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
 import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
+import { GeneralSignals } from "../../../../context/signalContext/lib/typeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -53,6 +54,7 @@ class TextChunkUploader {
     private direction: string,
     private handle: FileSystemFileHandle | undefined,
     offset: number | undefined,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
     private initPositioning?: {
       position: { top: number; left: number };
       scale: { x: number; y: number };
@@ -163,80 +165,87 @@ class TextChunkUploader {
         end,
       );
       this.offset += 1;
-      await this.uploadChunk(chunk, totalChunks);
+
+      const start = Date.now();
+
+      const formData = new FormData();
+      formData.append(
+        "chunk",
+        new Blob([chunk], { type: "application/octet-stream" }),
+      );
+      formData.append("chunkIndex", this.offset.toString());
+      formData.append("totalChunks", totalChunks);
+
+      try {
+        this.currentChunkAbortController = new AbortController();
+        const response = await fetch(
+          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
+          {
+            method: "POST",
+            body: formData,
+            signal: this.currentChunkAbortController.signal,
+          },
+        );
+        this.currentChunkAbortController = null;
+
+        if (!response.ok) {
+          if (response.status === 413) {
+            this.sendGeneralSignal({
+              type: "tableInfoSignal",
+              data: {
+                message: `${this.filename} exceeds upload size limit`,
+                timeout: 3500,
+              },
+            });
+            this.deconstructor();
+            return;
+          }
+          if (response.status !== 409) {
+            this.chunkErrorRetryUpload();
+            return;
+          }
+        }
+
+        if (response.status !== 409) {
+          const end = Date.now();
+          const durationMs = end - start;
+          const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
+
+          this.uploadSpeedHistory.push({
+            time: end - (this.uploadStartTime ?? 0),
+            speedKBps,
+          });
+          this.uploadAbsoluteSpeedHistory.push({
+            time: end,
+            speedKBps,
+          });
+        }
+
+        this._progress =
+          (this.offset * this.CHUNK_SIZE) /
+          (this.fullUpdateUpload?.length ?? 1);
+        this.listeners.forEach((listener) => {
+          listener({
+            type: "uploadProgress",
+            data: { progress: this._progress },
+          });
+        });
+        if (this.handle) {
+          this.indexedDBController?.current.uploadPosts?.updateProgress(
+            this.contentId,
+            this.offset,
+          );
+        }
+      } catch (error) {
+        console.error("Upload failed:", error);
+        break;
+      }
     }
 
     if (this.offset * this.CHUNK_SIZE >= this.fullUpdateUpload.length) {
       this.deconstructor();
     }
   };
-
-  private async uploadChunk(
-    data: Uint8Array,
-    totalChunks: string,
-  ): Promise<boolean> {
-    const start = Date.now();
-
-    const formData = new FormData();
-    formData.append(
-      "chunk",
-      new Blob([data], { type: "application/octet-stream" }),
-    );
-    formData.append("chunkIndex", this.offset.toString());
-    formData.append("totalChunks", totalChunks);
-
-    try {
-      this.currentChunkAbortController = new AbortController();
-      const response = await fetch(
-        `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
-        {
-          method: "POST",
-          body: formData,
-          signal: this.currentChunkAbortController.signal,
-        },
-      );
-      this.currentChunkAbortController = null;
-
-      if (!response.ok && response.status !== 409) {
-        this.chunkErrorRetryUpload();
-        return false;
-      }
-
-      if (response.status !== 409) {
-        const end = Date.now();
-        const durationMs = end - start;
-        const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
-
-        this.uploadSpeedHistory.push({
-          time: end - (this.uploadStartTime ?? 0),
-          speedKBps,
-        });
-        this.uploadAbsoluteSpeedHistory.push({
-          time: end,
-          speedKBps,
-        });
-      }
-
-      this._progress =
-        (this.offset * this.CHUNK_SIZE) / (this.fullUpdateUpload?.length ?? 1);
-      this.listeners.forEach((listener) => {
-        listener({
-          type: "uploadProgress",
-          data: { progress: this._progress },
-        });
-      });
-      if (this.handle) {
-        this.indexedDBController?.current.uploadPosts?.updateProgress(
-          this.contentId,
-          this.offset,
-        );
-      }
-      return true;
-    } catch (error) {
-      console.error("Upload failed:", error);
-      return false;
-    }
-  }
 
   private chunkErrorRetryUpload = async () => {
     this._progress = 0;

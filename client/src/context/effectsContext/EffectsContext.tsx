@@ -10,6 +10,8 @@ import {
   CaptureEffectStylesType,
   defaultCaptureEffects,
   defaultCaptureEffectsStyles,
+  StaticContentEffectsType,
+  StaticContentEffectsStylesType,
 } from "../../../../universal/effectsTypeConstant";
 
 export interface EffectsContextProviderProps {
@@ -19,8 +21,10 @@ export interface EffectsContextProviderProps {
 export interface EffectsContextType {
   userEffects: React.MutableRefObject<UserEffectsType>;
   remoteEffects: React.MutableRefObject<RemoteEffectsType>;
+  staticContentEffects: React.MutableRefObject<StaticContentEffectsType>;
   userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>;
   remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>;
+  staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>;
   captureEffects: React.MutableRefObject<CaptureEffectsType>;
   captureEffectsStyles: React.MutableRefObject<CaptureEffectStylesType>;
 }
@@ -31,7 +35,7 @@ export const useEffectsContext = () => {
   const context = useContext(EffectsContext);
   if (!context) {
     throw new Error(
-      "useEffectsContext must be used within an EffectsContextProvider"
+      "useEffectsContext must be used within an EffectsContextProvider",
     );
   }
   return context;
@@ -45,30 +49,35 @@ export function EffectsContextProvider({
     screen: {},
     screenAudio: {},
     audio: structuredClone(defaultAudioEffects),
+  });
+  const remoteEffects = useRef<RemoteEffectsType>({});
+  const staticContentEffects = useRef<StaticContentEffectsType>({
     video: {},
     image: {},
     svg: {},
     application: {},
     soundClip: {},
   });
-  const remoteEffects = useRef<RemoteEffectsType>({});
   const userEffectsStyles = useRef<UserEffectsStylesType>({
     camera: {},
     screen: {},
     screenAudio: {},
     audio: structuredClone(defaultAudioEffectsStyles),
+  });
+  const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});
+  const staticContentEffectsStyles = useRef<StaticContentEffectsStylesType>({
+    text: {},
     video: {},
     image: {},
     svg: {},
     application: {},
     soundClip: {},
   });
-  const remoteEffectsStyles = useRef<RemoteEffectStylesType>({});
   const captureEffects = useRef<CaptureEffectsType>(
-    structuredClone(defaultCaptureEffects)
+    structuredClone(defaultCaptureEffects),
   );
   const captureEffectsStyles = useRef<CaptureEffectStylesType>(
-    structuredClone(defaultCaptureEffectsStyles)
+    structuredClone(defaultCaptureEffectsStyles),
   );
 
   return (
@@ -76,8 +85,10 @@ export function EffectsContextProvider({
       value={{
         userEffects,
         remoteEffects,
+        staticContentEffects,
         userEffectsStyles,
         remoteEffectsStyles,
+        staticContentEffectsStyles,
         captureEffects,
         captureEffectsStyles,
       }}

@@ -90,7 +90,7 @@ export default function VideoSpeedPage({
         <FgSlider
           className="h-10"
           externalValue={settings.videoSpeed.value}
-          externalStyleValue={(settings.videoSpeed.value / 5) * 100}
+          externalStyleValue={settings.videoSpeed.value}
           onValueChange={(value) => {
             setVideoSpeed(value.value);
           }}

@@ -1,4 +1,4 @@
-import { UserMediaType } from "../../../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../../../context/mediaContext/lib/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,

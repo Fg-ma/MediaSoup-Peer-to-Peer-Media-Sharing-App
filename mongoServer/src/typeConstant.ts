@@ -2,6 +2,7 @@ import {
   ApplicationEffectStylesType,
   ImageEffectStylesType,
   SvgEffectStylesType,
+  TextEffectStylesType,
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
 import {
@@ -68,7 +69,7 @@ export type onUpdateContentEffectsType = {
     instanceId: string;
   };
   data: {
-    effects: {
+    effects?: {
       [effectType: string]: boolean;
     };
     effectStyles?:
@@ -76,7 +77,7 @@ export type onUpdateContentEffectsType = {
       | ImageEffectStylesType
       | ApplicationEffectStylesType
       | SvgEffectStylesType
-      | ApplicationEffectStylesType;
+      | TextEffectStylesType;
   };
 };
 

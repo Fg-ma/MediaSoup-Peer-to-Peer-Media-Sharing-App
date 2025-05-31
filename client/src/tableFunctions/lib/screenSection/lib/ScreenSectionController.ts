@@ -1,5 +1,5 @@
 import { types } from "mediasoup-client";
-import { UserMediaType } from "../../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../../context/mediaContext/lib/typeConstant";
 import ProducersController from "../../../../lib/ProducersController";
 import MediasoupSocketController from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 

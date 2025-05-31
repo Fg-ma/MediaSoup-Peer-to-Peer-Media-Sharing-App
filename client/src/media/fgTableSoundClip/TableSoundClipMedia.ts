@@ -4,8 +4,8 @@ import {
   LoadingStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import Downloader from "../../tools/downloader/Downloader";
-import TableStaticContentSocketController from "src/serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { DownloadSignals } from "src/context/uploadDownloadContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
+import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,

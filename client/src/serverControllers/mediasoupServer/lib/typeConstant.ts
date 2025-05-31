@@ -12,7 +12,7 @@ import {
   AudioMixEffectsType,
   MixEffectsOptionsType,
 } from "../../../audioEffects/typeConstant";
-import { DataStreamTypes } from "../../../context/mediaContext/typeConstant";
+import { DataStreamTypes } from "../../../context/mediaContext/lib/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,

@@ -7,7 +7,7 @@ import {
   SoundEffects,
   SoundEffectsMetaData,
 } from "./typeConstant";
-import { UserMediaType } from "../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../context/mediaContext/lib/typeConstant";
 
 class FgSoundBoardController {
   crazyBoardEffectInterval = 75;

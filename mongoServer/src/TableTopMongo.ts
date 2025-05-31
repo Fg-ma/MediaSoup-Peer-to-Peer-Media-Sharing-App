@@ -30,10 +30,12 @@ import {
   defaultImageEffectsStyles,
   defaultSvgEffects,
   defaultSvgEffectsStyles,
+  defaultTextEffectsStyles,
   defaultVideoEffects,
   defaultVideoEffectsStyles,
   ImageEffectStylesType,
   SvgEffectStylesType,
+  TextEffectStylesType,
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
 
@@ -334,6 +336,17 @@ class TableTopMongo {
         );
         break;
       case "text":
+        this.tableText?.uploads.editMetaData(
+          { tableId, textId: contentId },
+          {
+            instances: [
+              {
+                textInstanceId: instanceId,
+                effectStyles: effectStyles as TextEffectStylesType,
+              },
+            ],
+          }
+        );
         break;
       case "soundClip":
         this.tableSoundClips?.uploads.editMetaData(
@@ -501,8 +514,8 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               imageInstanceId: instance.instanceId,
               positioning: instance.positioning,
-              effects: defaultImageEffects,
-              effectStyles: defaultImageEffectsStyles,
+              effects: structuredClone(defaultImageEffects),
+              effectStyles: structuredClone(defaultImageEffectsStyles),
             }))
           );
           break;
@@ -512,8 +525,8 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               videoInstanceId: instance.instanceId,
               positioning: instance.positioning,
-              effects: defaultVideoEffects,
-              effectStyles: defaultVideoEffectsStyles,
+              effects: structuredClone(defaultVideoEffects),
+              effectStyles: structuredClone(defaultVideoEffectsStyles),
               videoPosition: 0,
             }))
           );
@@ -524,6 +537,7 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               textInstanceId: instance.instanceId,
               positioning: instance.positioning,
+              effectStyles: structuredClone(defaultTextEffectsStyles),
             }))
           );
           break;
@@ -533,7 +547,7 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               soundClipInstanceId: instance.instanceId,
               positioning: instance.positioning,
-              effects: defaultAudioEffects,
+              effects: structuredClone(defaultAudioEffects),
             }))
           );
           break;
@@ -543,8 +557,8 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               applicationInstanceId: instance.instanceId,
               positioning: instance.positioning,
-              effects: defaultApplicationEffects,
-              effectStyles: defaultApplicationEffectsStyles,
+              effects: structuredClone(defaultApplicationEffects),
+              effectStyles: structuredClone(defaultApplicationEffectsStyles),
             }))
           );
           break;
@@ -554,8 +568,8 @@ class TableTopMongo {
             update.instances.map((instance) => ({
               svgInstanceId: instance.instanceId,
               positioning: instance.positioning,
-              effects: defaultSvgEffects,
-              effectStyles: defaultSvgEffectsStyles,
+              effects: structuredClone(defaultSvgEffects),
+              effectStyles: structuredClone(defaultSvgEffectsStyles),
             }))
           );
           break;

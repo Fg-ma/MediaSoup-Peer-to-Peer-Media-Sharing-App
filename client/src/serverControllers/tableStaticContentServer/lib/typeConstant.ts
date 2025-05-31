@@ -10,6 +10,7 @@ import {
   ImageEffectTypes,
   SvgEffectStylesType,
   SvgEffectTypes,
+  TextEffectStylesType,
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
@@ -135,14 +136,15 @@ type onUpdateContentEffectsType = {
     instanceId: string;
   };
   data: {
-    effects: {
+    effects?: {
       [effectType: string]: boolean;
     };
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType
-      | SvgEffectStylesType;
+      | SvgEffectStylesType
+      | TextEffectStylesType;
   };
 };
 
@@ -705,6 +707,7 @@ export type onResponsedCatchUpTableDataType = {
               };
               rotation: number;
             };
+            effectStyles: TextEffectStylesType;
           }[];
         }[]
       | undefined;
@@ -790,7 +793,8 @@ export type onUpdatedContentEffectsType = {
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType
-      | SvgEffectStylesType;
+      | SvgEffectStylesType
+      | TextEffectStylesType;
   };
 };
 

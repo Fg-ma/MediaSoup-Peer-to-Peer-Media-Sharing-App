@@ -27,12 +27,13 @@ export default function FgTableImage({
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
-  const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { staticContentMedia } = useMediaContext();
+  const { staticContentEffects, staticContentEffectsStyles } =
+    useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const imageMediaInstance =
-    userMedia.current.image.tableInstances[imageInstanceId];
+    staticContentMedia.current.image.tableInstances[imageInstanceId];
 
   const [imageEffectsActive, setImageEffectsActive] = useState(false);
 
@@ -47,7 +48,7 @@ export default function FgTableImage({
   const rightLowerImageControlsRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(
-    userEffectsStyles.current.image[imageInstanceId].tint.color,
+    staticContentEffectsStyles.current.image[imageInstanceId].tint.color,
   );
 
   const [_, setRerender] = useState(false);
@@ -70,8 +71,8 @@ export default function FgTableImage({
       imageContainerRef,
       setImageEffectsActive,
       tintColor,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       setSettingsActive,
       settings,
       recording,
@@ -87,8 +88,8 @@ export default function FgTableImage({
       imageInstanceId,
       imageMediaInstance,
       setSettingsActive,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       tintColor,
       setRerender,
       subContainerRef,

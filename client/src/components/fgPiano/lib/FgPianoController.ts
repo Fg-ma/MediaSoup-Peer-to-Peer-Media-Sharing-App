@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { UserMediaType } from "../../../context/mediaContext/typeConstant";
+import { UserMediaType } from "../../../context/mediaContext/lib/typeConstant";
 import { keys } from "./Scale";
 import { Notes, NoteStore, Octaves, StringOctaves } from "../FgPiano";
 

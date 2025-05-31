@@ -19,7 +19,7 @@ export default function GamesSection({
 }: {
   gamesSectionRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { tableId, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
@@ -97,7 +97,7 @@ export default function GamesSection({
                       return;
                     }
 
-                    userMedia.current.gamesSignaling?.initiateGame(
+                    staticContentMedia.current.gamesSignaling?.initiateGame(
                       "snake",
                       `snake_game_${uuidv4()}`,
                     );

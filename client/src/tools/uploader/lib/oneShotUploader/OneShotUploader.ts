@@ -1,5 +1,7 @@
+import { GeneralSignals } from "../../../../context/signalContext/lib/typeConstant";
+
 class OneShotUploader {
-  constructor() {}
+  constructor(private sendGeneralSignal: (signal: GeneralSignals) => void) {}
 
   handleOneShotFileUpload = async (
     file: File,
@@ -14,6 +16,18 @@ class OneShotUploader {
       const xhr = new XMLHttpRequest();
 
       xhr.open("POST", baseUrl + `upload-one-shot-file`, true);
+
+      xhr.onload = () => {
+        if (xhr.status === 413) {
+          this.sendGeneralSignal({
+            type: "tableInfoSignal",
+            data: {
+              message: `${file.name} exceeds upload size limit`,
+              timeout: 3500,
+            },
+          });
+        }
+      };
 
       xhr.send(formData);
     } catch (error) {

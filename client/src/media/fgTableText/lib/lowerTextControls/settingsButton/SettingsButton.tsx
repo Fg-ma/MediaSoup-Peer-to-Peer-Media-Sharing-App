@@ -5,6 +5,7 @@ import SettingsPanel from "./lib/SettingsPanel";
 import { Settings, ActivePages } from "../../typeConstant";
 import LowerTextController from "../LowerTextController";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
+import TableTextMediaInstance from "../../../../../media/fgTableText/TableTextMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,6 +17,7 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
+  textMediaInstance,
   containerRef,
   settingsActive,
   setSettingsActive,
@@ -26,7 +28,9 @@ export default function SettingsButton({
   scrollingContainerRef,
   lowerTextController,
   isReadOnly,
+  setRerender,
 }: {
+  textMediaInstance: TableTextMediaInstance;
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,6 +41,7 @@ export default function SettingsButton({
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   lowerTextController: React.MutableRefObject<LowerTextController>;
   isReadOnly: React.MutableRefObject<boolean>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
@@ -110,7 +115,7 @@ export default function SettingsButton({
     <>
       <FgButton
         externalRef={settingsButtonRef}
-        className="flex pointer-events-auto aspect-square h-full items-center justify-center"
+        className="pointer-events-auto flex aspect-square h-full items-center justify-center"
         clickFunction={toggleSettings}
         contentFunction={() => (
           <FgSVGElement
@@ -131,6 +136,7 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
+          textMediaInstance={textMediaInstance}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}
@@ -144,6 +150,7 @@ export default function SettingsButton({
           }}
           lowerTextController={lowerTextController}
           isReadOnly={isReadOnly}
+          setRerender={setRerender}
         />
       )}
     </>

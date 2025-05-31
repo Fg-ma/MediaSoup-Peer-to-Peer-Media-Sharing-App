@@ -81,7 +81,7 @@ export default function SettingsPanel({
   };
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { userStaticContentSocket } = useSocketContext();
 
   const [portalPosition, setPortalPosition] = useState<{
@@ -245,7 +245,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -296,7 +296,7 @@ export default function SettingsPanel({
                       ? muteStylesMeta[
                           settings.muteStyle.value as MuteStyleTypes
                         ].title
-                      : (Object.entries(userMedia.current.svg.user)
+                      : (Object.entries(staticContentMedia.current.svg.user)
                           .find(
                             ([svgId]) => svgId === settings.muteStyle.value,
                           )?.[1]

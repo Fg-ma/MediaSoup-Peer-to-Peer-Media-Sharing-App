@@ -7,6 +7,7 @@ import TableTextMediaInstance, {
 import LiveTextEditingSocketController from "../../../../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import { Settings } from "../../typeConstant";
 import { GeneralSignals } from "../../../../../context/signalContext/lib/typeConstant";
+import { StaticContentEffectsStylesType } from "../../../../../../../universal/effectsTypeConstant";
 
 class MonacoController {
   private MAX_UPDATE_SIZE_BYTES = 10_000;
@@ -17,10 +18,10 @@ class MonacoController {
     private liveTextEditingSocket: React.MutableRefObject<
       LiveTextEditingSocketController | undefined
     >,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private editor: React.MutableRefObject<monacoEditor.editor.IStandaloneCodeEditor | null>,
     private monaco: React.MutableRefObject<typeof monacoEditor | null>,
     private binding: React.MutableRefObject<MonacoBinding | null>,
-    private settings: Settings,
     private textAreaContainerRef: React.RefObject<HTMLDivElement>,
     private isLineNums: boolean,
     private setIsLineNums:
@@ -50,6 +51,11 @@ class MonacoController {
       );
     }
 
+    const effectsStyles =
+      this.staticContentEffectsStyles.current.text[
+        this.textMediaInstance.textInstanceId
+      ];
+
     this.monaco.current.editor.defineTheme("transparent-theme", {
       base: "vs-dark",
       inherit: true,
@@ -57,8 +63,8 @@ class MonacoController {
       colors: {
         "editor.background": "#00000000",
         "editorGutter.background": "#00000000",
-        "editorLineNumber.foreground": this.settings.colors.indexColor.value,
-        "editor.foreground": this.settings.colors.textColor.value,
+        "editorLineNumber.foreground": effectsStyles.indexColor,
+        "editor.foreground": effectsStyles.textColor,
         "minimap.background": "#00000000",
         focusBorder: "#00000000",
       },
@@ -71,23 +77,24 @@ class MonacoController {
     if (container) {
       container.style.setProperty(
         "--vscode-editor-background",
-        this.settings.colors.backgroundColor.value,
+        effectsStyles.backgroundColor,
       );
       container.style.setProperty(
         "--vscode-editorLineNumber-foreground",
-        this.settings.colors.indexColor.value,
+        effectsStyles.indexColor,
       );
       this.textAreaContainerRef.current?.style.setProperty(
         "--text-color",
-        this.settings.colors.textColor.value,
+        effectsStyles.textColor,
       );
     }
 
     // Initial editor options
     this.editor.current.updateOptions({
-      fontSize: parseInt(this.settings.fontSize.value, 10),
-      fontFamily: this.settings.fontStyle.value,
+      fontSize: parseInt(effectsStyles.fontSize, 10),
+      fontFamily: effectsStyles.fontStyle,
       lineNumbers: this.isLineNums ? "on" : "off",
+      letterSpacing: effectsStyles.letterSpacing,
     });
 
     const model = this.editor.current.getModel()!;
@@ -206,7 +213,9 @@ class MonacoController {
       if (targetType === monaco.editor.MouseTargetType.GUTTER_LINE_NUMBERS) {
         if (this.setIsLineNums) {
           this.setIsLineNums(false);
-          this.editor.current?.updateOptions({ lineNumbers: "off" });
+          this.editor.current?.updateOptions({
+            lineNumbers: "off",
+          });
         }
       }
     });

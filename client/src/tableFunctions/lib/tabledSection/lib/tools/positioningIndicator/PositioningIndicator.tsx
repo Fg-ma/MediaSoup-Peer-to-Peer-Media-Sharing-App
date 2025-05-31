@@ -30,7 +30,7 @@ export default function PositioningIndicator({
   tabledPortalController: React.MutableRefObject<TabledPortalController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
 
   const positioningIndicatorRef = useRef<HTMLDivElement>(null);
 
@@ -100,7 +100,9 @@ export default function PositioningIndicator({
           instance.contentType !== "soundClip"
         ) {
           const media =
-            userMedia.current[instance.contentType].table[instance.contentId];
+            staticContentMedia.current[instance.contentType].table[
+              instance.contentId
+            ];
 
           if (media?.blobURL) {
             imgSrc = media.blobURL;

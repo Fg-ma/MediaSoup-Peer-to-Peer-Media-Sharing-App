@@ -35,7 +35,7 @@ export default function NewInstancesLayer({
 }: {
   tableRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { addNewInstanceSignalListener, removeNewInstanceSignalListener } =
     useSignalContext();
@@ -142,7 +142,9 @@ export default function NewInstancesLayer({
       {!hideInstances.current &&
         newInstances.current.map((instance) => {
           const media =
-            userMedia.current[instance.contentType].table[instance.contentId];
+            staticContentMedia.current[instance.contentType].table[
+              instance.contentId
+            ];
 
           return (
             <React.Fragment key={instance.contentId}>

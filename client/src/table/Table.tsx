@@ -26,6 +26,10 @@ export default function Table({
   bundles,
   gridActive,
   gridSize,
+  tableSidePanelActive,
+  setTableSidePanelActive,
+  sidePanelPosition,
+  setSidePanelPosition,
 }: {
   tableFunctionsRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -40,6 +44,10 @@ export default function Table({
     rows: number;
     cols: number;
   };
+  tableSidePanelActive: boolean;
+  setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
+  sidePanelPosition: "left" | "right";
+  setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
   const { tableSocket } = useSocketContext();
   const { sendGroupSignal } = useSignalContext();
@@ -47,7 +55,6 @@ export default function Table({
   const [userData, setUserData] = useState<{
     [username: string]: { color: TableColors; seat: number; online: boolean };
   }>({});
-  const [tableSidePanelActive, setTableSidePanelActive] = useState(false);
   const [tableSidePanelWidth, setTableSidePanelWidth] = useState(256);
   const [_, setRerender] = useState(false);
   const activePanel = useRef<TablePanels>("general");
@@ -118,7 +125,7 @@ export default function Table({
 
   return (
     <div
-      className="flex w-full items-center justify-center"
+      className={`${sidePanelPosition === "right" ? "flex-row-reverse" : ""} flex w-full items-center justify-center`}
       style={{
         height: `calc(100% - ${tableFunctionsRef.current?.clientHeight ?? 0}px - 6.125rem)`,
       }}
@@ -131,6 +138,8 @@ export default function Table({
         setExternalRerender={setRerender}
         tableSidePanelWidth={tableSidePanelWidth}
         setTableSidePanelWidth={setTableSidePanelWidth}
+        sidePanelPosition={sidePanelPosition}
+        setSidePanelPosition={setSidePanelPosition}
       />
       <div
         ref={tableContainerRef}

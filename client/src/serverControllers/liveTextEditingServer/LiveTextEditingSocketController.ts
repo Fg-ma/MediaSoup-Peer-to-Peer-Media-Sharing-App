@@ -1,5 +1,5 @@
 import TableTextMedia from "../../media/fgTableText/TableTextMedia";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConstant";
 import {
   IncomingLiveTextEditingMessages,
   onDocSavedNewContentType,
@@ -20,7 +20,7 @@ class LiveTextEditingSocketController {
     private tableId: string,
     private username: string,
     private instance: string,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private liveTextEditingSocket: React.MutableRefObject<
       LiveTextEditingSocketController | undefined
     >,
@@ -211,7 +211,7 @@ class LiveTextEditingSocketController {
   onDocSavedNewContent = (event: onDocSavedNewContentType) => {
     const { oldContentId, newContentId, instanceId } = event.header;
 
-    const oldContent = this.userMedia.current.text.table[oldContentId];
+    const oldContent = this.staticContentMedia.current.text.table[oldContentId];
 
     const newTableTextMedia = new TableTextMedia(
       newContentId,
@@ -229,9 +229,10 @@ class LiveTextEditingSocketController {
         ? oldContent.fileSize
         : undefined,
     );
-    this.userMedia.current.text.table[newContentId] = newTableTextMedia;
+    this.staticContentMedia.current.text.table[newContentId] =
+      newTableTextMedia;
 
-    this.userMedia.current.text.tableInstances[instanceId].textMedia =
+    this.staticContentMedia.current.text.tableInstances[instanceId].textMedia =
       newTableTextMedia;
   };
 

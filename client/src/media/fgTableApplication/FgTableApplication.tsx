@@ -36,12 +36,15 @@ export default function FgTableApplication({
     ...options,
   };
 
-  const { userMedia } = useMediaContext();
-  const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { staticContentMedia } = useMediaContext();
+  const { staticContentEffects, staticContentEffectsStyles } =
+    useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const applicationMediaInstance =
-    userMedia.current.application.tableInstances[applicationInstanceId];
+    staticContentMedia.current.application.tableInstances[
+      applicationInstanceId
+    ];
 
   const [applicationEffectsActive, setApplicationEffectsActive] =
     useState(false);
@@ -57,7 +60,8 @@ export default function FgTableApplication({
   const rightLowerApplicationControlsRef = useRef<HTMLDivElement>(null);
 
   const tintColor = useRef(
-    userEffectsStyles.current.application[applicationInstanceId].tint.color,
+    staticContentEffectsStyles.current.application[applicationInstanceId].tint
+      .color,
   );
 
   const [_, setRerender] = useState(false);
@@ -80,8 +84,8 @@ export default function FgTableApplication({
       applicationContainerRef,
       setApplicationEffectsActive,
       tintColor,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       setSettingsActive,
       settings,
       recording,

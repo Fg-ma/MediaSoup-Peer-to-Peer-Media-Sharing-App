@@ -18,22 +18,22 @@ export default function SnakeGridSizePanel({
   setGridSizePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setGridSize: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
 
   return (
     <FgPanel
       externalRef={externalRef}
       content={
-        <div className='h-full w-full flex items-center justify-center'>
+        <div className="flex h-full w-full items-center justify-center">
           <FgSlider
             onValueChange={(event) => {
               if (started) {
                 return;
               }
 
-              userMedia.current.games.snake?.[snakeGameId].changeGridSize(
-                event.value
-              );
+              staticContentMedia.current.games.snake?.[
+                snakeGameId
+              ].changeGridSize(event.value);
               setGridSize(event.value);
             }}
             disabled={started}
@@ -60,7 +60,7 @@ export default function SnakeGridSizePanel({
       minWidth={60}
       minHeight={200}
       closeCallback={() => setGridSizePanelActive(false)}
-      closePosition='topRight'
+      closePosition="topRight"
     />
   );
 }

@@ -15,9 +15,20 @@ class Cleanup {
       instanceId
     );
 
-    await tableTopRedis.deletes.deleteKeys([
-      `LTE:${tableId}:${contentId}:${instanceId}`,
-    ]);
+    this.broadcaster.broadcastToTable(tableId, {
+      type: "contentDeleted",
+      header: {
+        contentType,
+        contentId,
+        instanceId,
+      },
+    });
+
+    if (contentType === "text") {
+      await tableTopRedis.deletes.deleteKeys([
+        `LTE:${tableId}:${contentId}:${instanceId}`,
+      ]);
+    }
 
     if (document && document.i.length === 0 && !document.s.includes(0)) {
       await tableTopCeph.deletes.deleteFile(
@@ -31,15 +42,6 @@ class Cleanup {
         `LTE:${tableId}:${contentId}:file`,
       ]);
     }
-
-    this.broadcaster.broadcastToTable(tableId, {
-      type: "contentDeleted",
-      header: {
-        contentType,
-        contentId,
-        instanceId,
-      },
-    });
   };
 }
 

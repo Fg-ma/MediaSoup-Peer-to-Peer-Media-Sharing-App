@@ -1,20 +1,17 @@
 import {
   ApplicationEffectStylesType,
-  ApplicationEffectTypes,
   defaultAudioEffects,
   defaultAudioEffectsStyles,
   defaultVideoEffects,
   defaultVideoEffectsStyles,
   ImageEffectStylesType,
-  ImageEffectTypes,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
   SvgEffectStylesType,
-  SvgEffectTypes,
-  UserEffectsStylesType,
-  UserEffectsType,
+  TextEffectStylesType,
   VideoEffectStylesType,
-  VideoEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
-import { UserMediaType } from "../../context/mediaContext/typeConstant";
+import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConstant";
 import {
   IncomingTableStaticContentMessages,
   onContentDeletedType,
@@ -54,7 +51,7 @@ import TableTextMedia from "../../media/fgTableText/TableTextMedia";
 import TableApplicationMediaInstance from "../../media/fgTableApplication/TableApplicationMediaInstance";
 import TableApplicationMedia from "../../media/fgTableApplication/TableApplicationMedia";
 import LiveTextEditingSocketController from "../liveTextEditingServer/LiveTextEditingSocketController";
-import LiveTextDownloader from "src/tools/liveTextDownloader/LiveTextDownloader";
+import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 
 class TableStaticContentSocketController {
   private ws: WebSocket | undefined;
@@ -67,11 +64,11 @@ class TableStaticContentSocketController {
     private tableId: string,
     private username: string,
     private instance: string,
-    private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
@@ -302,14 +299,15 @@ class TableStaticContentSocketController {
     contentType: StaticContentTypes,
     contentId: string,
     instanceId: string,
-    effects: {
+    effects?: {
       [effectType: string]: boolean;
     },
     effectStyles?:
       | VideoEffectStylesType
       | ImageEffectStylesType
       | ApplicationEffectStylesType
-      | SvgEffectStylesType,
+      | SvgEffectStylesType
+      | TextEffectStylesType,
   ) => {
     this.sendMessage({
       type: "updateContentEffects",
@@ -469,7 +467,7 @@ class TableStaticContentSocketController {
         {
           const { videoId } = message.header;
 
-          // this.userMedia.current.video[videoId]?.preloadDashStream(url);
+          // this.staticContentMedia.current.video[videoId]?.preloadDashStream(url);
         }
         break;
       case "imageUploadedToTable":
@@ -504,23 +502,29 @@ class TableStaticContentSocketController {
   private onContentDeleted = (event: onContentDeletedType) => {
     const { contentType, contentId, instanceId } = event.header;
 
-    if (this.userMedia.current[contentType].tableInstances[instanceId]) {
-      this.userMedia.current[contentType].tableInstances[
+    if (
+      this.staticContentMedia.current[contentType].tableInstances[instanceId]
+    ) {
+      this.staticContentMedia.current[contentType].tableInstances[
         instanceId
       ].deconstructor();
-      delete this.userMedia.current[contentType].tableInstances[instanceId];
+      delete this.staticContentMedia.current[contentType].tableInstances[
+        instanceId
+      ];
     }
 
     if (
-      Object.keys(this.userMedia.current[contentType].tableInstances).length ===
-        0 &&
-      this.userMedia.current[contentType].table[contentId] &&
-      !this.userMedia.current[contentType].table[contentId].state.includes(
-        "tabled",
-      )
+      Object.keys(this.staticContentMedia.current[contentType].tableInstances)
+        .length === 0 &&
+      this.staticContentMedia.current[contentType].table[contentId] &&
+      !this.staticContentMedia.current[contentType].table[
+        contentId
+      ].state.includes("tabled")
     ) {
-      this.userMedia.current[contentType].table[contentId].deconstructor();
-      delete this.userMedia.current[contentType].table[contentId];
+      this.staticContentMedia.current[contentType].table[
+        contentId
+      ].deconstructor();
+      delete this.staticContentMedia.current[contentType].table[contentId];
     }
   };
 
@@ -528,7 +532,9 @@ class TableStaticContentSocketController {
     const { contentType, contentId } = event.header;
     const { state } = event.data;
 
-    this.userMedia.current[contentType].table[contentId].setState(state);
+    this.staticContentMedia.current[contentType].table[contentId].setState(
+      state,
+    );
   };
 
   private onRequestedCatchUpVideoPosition = (
@@ -538,7 +544,7 @@ class TableStaticContentSocketController {
       event.header;
 
     const currentVideoPosition =
-      this.userMedia.current[contentType].tableInstances[instanceId]
+      this.staticContentMedia.current[contentType].tableInstances[instanceId]
         ?.instanceVideo?.currentTime;
 
     if (currentVideoPosition) {
@@ -566,11 +572,11 @@ class TableStaticContentSocketController {
     const { currentVideoPosition } = event.data;
 
     if (
-      this.userMedia.current[contentType].tableInstances[instanceId] &&
-      this.userMedia.current[contentType].tableInstances[instanceId]
+      this.staticContentMedia.current[contentType].tableInstances[instanceId] &&
+      this.staticContentMedia.current[contentType].tableInstances[instanceId]
         .instanceVideo
     )
-      this.userMedia.current[contentType].tableInstances[
+      this.staticContentMedia.current[contentType].tableInstances[
         instanceId
       ].instanceVideo.currentTime = currentVideoPosition;
   };
@@ -587,23 +593,23 @@ class TableStaticContentSocketController {
         state,
         this.deadbanding,
         this.userDevice,
-        this.userEffects,
+        this.staticContentEffects,
         this.tableStaticContentSocket,
         this.sendDownloadSignal,
         this.addCurrentDownload,
         this.removeCurrentDownload,
       );
 
-      this.userMedia.current.video.table[contentId] = newVideoMedia;
+      this.staticContentMedia.current.video.table[contentId] = newVideoMedia;
 
-      this.userMedia.current.video.tableInstances[instanceId] =
+      this.staticContentMedia.current.video.tableInstances[instanceId] =
         new TableVideoMediaInstance(
           newVideoMedia,
           instanceId,
           this.userDevice,
           this.deadbanding,
-          this.userEffectsStyles,
-          this.userEffects,
+          this.staticContentEffectsStyles,
+          this.staticContentEffects,
           initPositioning
             ? initPositioning
             : {
@@ -627,19 +633,20 @@ class TableStaticContentSocketController {
     const { filename, mimeType, state } = message.data;
 
     if (this.tableStaticContentSocket.current) {
-      this.userMedia.current.video.table[contentId] = new TableVideoMedia(
-        contentId,
-        filename,
-        mimeType,
-        state,
-        this.deadbanding,
-        this.userDevice,
-        this.userEffects,
-        this.tableStaticContentSocket,
-        this.sendDownloadSignal,
-        this.addCurrentDownload,
-        this.removeCurrentDownload,
-      );
+      this.staticContentMedia.current.video.table[contentId] =
+        new TableVideoMedia(
+          contentId,
+          filename,
+          mimeType,
+          state,
+          this.deadbanding,
+          this.userDevice,
+          this.staticContentEffects,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
+        );
     }
   };
 
@@ -648,8 +655,8 @@ class TableStaticContentSocketController {
     const { filename, mimeType, state, initPositioning } = message.data;
 
     if (
-      this.userMedia.current.image.table[contentId] ||
-      this.userMedia.current.image.tableInstances[instanceId]
+      this.staticContentMedia.current.image.table[contentId] ||
+      this.staticContentMedia.current.image.tableInstances[instanceId]
     )
       return;
 
@@ -667,14 +674,14 @@ class TableStaticContentSocketController {
         this.removeCurrentDownload,
       );
 
-      this.userMedia.current.image.table[contentId] = newImageMedia;
+      this.staticContentMedia.current.image.table[contentId] = newImageMedia;
 
-      this.userMedia.current.image.tableInstances[instanceId] =
+      this.staticContentMedia.current.image.tableInstances[instanceId] =
         new TableImageMediaInstance(
           newImageMedia,
           instanceId,
-          this.userEffectsStyles,
-          this.userEffects,
+          this.staticContentEffectsStyles,
+          this.staticContentEffects,
           this.userDevice,
           this.deadbanding,
           initPositioning
@@ -699,18 +706,19 @@ class TableStaticContentSocketController {
     const { filename, mimeType, state } = message.data;
 
     if (this.tableStaticContentSocket.current) {
-      this.userMedia.current.image.table[contentId] = new TableImageMedia(
-        contentId,
-        filename,
-        mimeType,
-        state,
-        this.deadbanding,
-        this.userDevice,
-        this.tableStaticContentSocket,
-        this.sendDownloadSignal,
-        this.addCurrentDownload,
-        this.removeCurrentDownload,
-      );
+      this.staticContentMedia.current.image.table[contentId] =
+        new TableImageMedia(
+          contentId,
+          filename,
+          mimeType,
+          state,
+          this.deadbanding,
+          this.userDevice,
+          this.tableStaticContentSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
+        );
     }
   };
 
@@ -730,14 +738,14 @@ class TableStaticContentSocketController {
         this.removeCurrentDownload,
       );
 
-      this.userMedia.current.svg.table[contentId] = newSvgMedia;
+      this.staticContentMedia.current.svg.table[contentId] = newSvgMedia;
 
-      this.userMedia.current.svg.tableInstances[instanceId] =
+      this.staticContentMedia.current.svg.tableInstances[instanceId] =
         new TableSvgMediaInstance(
           newSvgMedia,
           instanceId,
-          this.userEffectsStyles,
-          this.userEffects,
+          this.staticContentEffectsStyles,
+          this.staticContentEffects,
           initPositioning
             ? initPositioning
             : {
@@ -760,7 +768,7 @@ class TableStaticContentSocketController {
     const { filename, mimeType, state } = message.data;
 
     if (this.tableStaticContentSocket.current) {
-      this.userMedia.current.svg.table[contentId] = new TableSvgMedia(
+      this.staticContentMedia.current.svg.table[contentId] = new TableSvgMedia(
         contentId,
         filename,
         mimeType,
@@ -776,7 +784,7 @@ class TableStaticContentSocketController {
   private onSvgReuploaded = (message: onSvgReuploadedType) => {
     const { contentId } = message.header;
 
-    this.userMedia.current.svg.table[contentId].reloadContent();
+    this.staticContentMedia.current.svg.table[contentId].reloadContent();
   };
 
   private onTextUploadedToTable = (message: onTextUploadedToTableType) => {
@@ -795,11 +803,12 @@ class TableStaticContentSocketController {
         this.removeCurrentDownload,
       );
 
-      this.userMedia.current.text.table[contentId] = newTextMedia;
+      this.staticContentMedia.current.text.table[contentId] = newTextMedia;
 
-      this.userMedia.current.text.tableInstances[instanceId] =
+      this.staticContentMedia.current.text.tableInstances[instanceId] =
         new TableTextMediaInstance(
           newTextMedia,
+          this.staticContentEffectsStyles,
           instanceId,
           initPositioning
             ? initPositioning
@@ -824,16 +833,17 @@ class TableStaticContentSocketController {
     const { filename, mimeType, state } = message.data;
 
     if (this.liveTextEditingSocket.current) {
-      this.userMedia.current.text.table[contentId] = new TableTextMedia(
-        contentId,
-        filename,
-        mimeType,
-        state,
-        this.liveTextEditingSocket,
-        this.sendDownloadSignal,
-        this.addCurrentDownload,
-        this.removeCurrentDownload,
-      );
+      this.staticContentMedia.current.text.table[contentId] =
+        new TableTextMedia(
+          contentId,
+          filename,
+          mimeType,
+          state,
+          this.liveTextEditingSocket,
+          this.sendDownloadSignal,
+          this.addCurrentDownload,
+          this.removeCurrentDownload,
+        );
     }
   };
 
@@ -853,44 +863,54 @@ class TableStaticContentSocketController {
           video.state,
           this.deadbanding,
           this.userDevice,
-          this.userEffects,
+          this.staticContentEffects,
           this.tableStaticContentSocket,
           this.sendDownloadSignal,
           this.addCurrentDownload,
           this.removeCurrentDownload,
         );
 
-        this.userMedia.current.video.table[video.videoId] = newVideoMedia;
+        this.staticContentMedia.current.video.table[video.videoId] =
+          newVideoMedia;
 
         for (const instance of video.instances) {
-          if (!this.userEffects.current.video[instance.videoInstanceId]) {
-            this.userEffects.current.video[instance.videoInstanceId] = {
-              video: structuredClone(defaultVideoEffects),
-              audio: structuredClone(defaultAudioEffects),
-            };
+          if (
+            !this.staticContentEffects.current.video[instance.videoInstanceId]
+          ) {
+            this.staticContentEffects.current.video[instance.videoInstanceId] =
+              {
+                video: structuredClone(defaultVideoEffects),
+                audio: structuredClone(defaultAudioEffects),
+              };
           }
-          this.userEffects.current.video[instance.videoInstanceId].video =
-            instance.effects as {
-              [effectType in VideoEffectTypes]: boolean;
-            };
-          if (!this.userEffectsStyles.current.video[instance.videoInstanceId]) {
-            this.userEffectsStyles.current.video[instance.videoInstanceId] = {
+          this.staticContentEffects.current.video[
+            instance.videoInstanceId
+          ].video = instance.effects;
+          if (
+            !this.staticContentEffectsStyles.current.video[
+              instance.videoInstanceId
+            ]
+          ) {
+            this.staticContentEffectsStyles.current.video[
+              instance.videoInstanceId
+            ] = {
               video: structuredClone(defaultVideoEffectsStyles),
               audio: structuredClone(defaultAudioEffectsStyles),
             };
           }
-          this.userEffectsStyles.current.video[instance.videoInstanceId].video =
-            instance.effectStyles as VideoEffectStylesType;
+          this.staticContentEffectsStyles.current.video[
+            instance.videoInstanceId
+          ].video = instance.effectStyles;
 
-          this.userMedia.current.video.tableInstances[
+          this.staticContentMedia.current.video.tableInstances[
             instance.videoInstanceId
           ] = new TableVideoMediaInstance(
             newVideoMedia,
             instance.videoInstanceId,
             this.userDevice,
             this.deadbanding,
-            this.userEffectsStyles,
-            this.userEffects,
+            this.staticContentEffectsStyles,
+            this.staticContentEffects,
             instance.positioning,
             this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
           );
@@ -912,23 +932,23 @@ class TableStaticContentSocketController {
           this.removeCurrentDownload,
         );
 
-        this.userMedia.current.image.table[image.imageId] = newImageMedia;
+        this.staticContentMedia.current.image.table[image.imageId] =
+          newImageMedia;
 
         for (const instance of image.instances) {
-          this.userEffects.current.image[instance.imageInstanceId] =
-            instance.effects as {
-              [effectType in ImageEffectTypes]: boolean;
-            };
-          this.userEffectsStyles.current.image[instance.imageInstanceId] =
-            instance.effectStyles as ImageEffectStylesType;
+          this.staticContentEffects.current.image[instance.imageInstanceId] =
+            instance.effects;
+          this.staticContentEffectsStyles.current.image[
+            instance.imageInstanceId
+          ] = instance.effectStyles;
 
-          this.userMedia.current.image.tableInstances[
+          this.staticContentMedia.current.image.tableInstances[
             instance.imageInstanceId
           ] = new TableImageMediaInstance(
             newImageMedia,
             instance.imageInstanceId,
-            this.userEffectsStyles,
-            this.userEffects,
+            this.staticContentEffectsStyles,
+            this.staticContentEffects,
             this.userDevice,
             this.deadbanding,
             instance.positioning,
@@ -949,24 +969,23 @@ class TableStaticContentSocketController {
           this.removeCurrentDownload,
         );
 
-        this.userMedia.current.svg.table[svg.svgId] = newSvgMedia;
+        this.staticContentMedia.current.svg.table[svg.svgId] = newSvgMedia;
 
         for (const instance of svg.instances) {
-          this.userEffects.current.svg[instance.svgInstanceId] =
-            instance.effects as {
-              [effectType in SvgEffectTypes]: boolean;
-            };
-          this.userEffectsStyles.current.svg[instance.svgInstanceId] =
-            instance.effectStyles as SvgEffectStylesType;
+          this.staticContentEffects.current.svg[instance.svgInstanceId] =
+            instance.effects;
+          this.staticContentEffectsStyles.current.svg[instance.svgInstanceId] =
+            instance.effectStyles;
 
-          this.userMedia.current.svg.tableInstances[instance.svgInstanceId] =
-            new TableSvgMediaInstance(
-              newSvgMedia,
-              instance.svgInstanceId,
-              this.userEffectsStyles,
-              this.userEffects,
-              instance.positioning,
-            );
+          this.staticContentMedia.current.svg.tableInstances[
+            instance.svgInstanceId
+          ] = new TableSvgMediaInstance(
+            newSvgMedia,
+            instance.svgInstanceId,
+            this.staticContentEffectsStyles,
+            this.staticContentEffects,
+            instance.positioning,
+          );
         }
       }
     }
@@ -983,16 +1002,23 @@ class TableStaticContentSocketController {
           this.removeCurrentDownload,
         );
 
-        this.userMedia.current.text.table[textItem.textId] = newTextMedia;
+        this.staticContentMedia.current.text.table[textItem.textId] =
+          newTextMedia;
 
         for (const instance of textItem.instances) {
-          this.userMedia.current.text.tableInstances[instance.textInstanceId] =
-            new TableTextMediaInstance(
-              newTextMedia,
-              instance.textInstanceId,
-              instance.positioning,
-              this.liveTextEditingSocket,
-            );
+          this.staticContentEffectsStyles.current.text[
+            instance.textInstanceId
+          ] = instance.effectStyles;
+
+          this.staticContentMedia.current.text.tableInstances[
+            instance.textInstanceId
+          ] = new TableTextMediaInstance(
+            newTextMedia,
+            this.staticContentEffectsStyles,
+            instance.textInstanceId,
+            instance.positioning,
+            this.liveTextEditingSocket,
+          );
         }
       }
     }
@@ -1009,25 +1035,25 @@ class TableStaticContentSocketController {
           this.removeCurrentDownload,
         );
 
-        this.userMedia.current.application.table[application.applicationId] =
-          newApplication;
+        this.staticContentMedia.current.application.table[
+          application.applicationId
+        ] = newApplication;
 
         for (const instance of application.instances) {
-          this.userEffects.current.application[instance.applicationInstanceId] =
-            instance.effects as {
-              [effectType in ApplicationEffectTypes]: boolean;
-            };
-          this.userEffectsStyles.current.application[
+          this.staticContentEffects.current.application[
             instance.applicationInstanceId
-          ] = instance.effectStyles as ApplicationEffectStylesType;
+          ] = instance.effects;
+          this.staticContentEffectsStyles.current.application[
+            instance.applicationInstanceId
+          ] = instance.effectStyles;
 
-          this.userMedia.current.application.tableInstances[
+          this.staticContentMedia.current.application.tableInstances[
             instance.applicationInstanceId
           ] = new TableApplicationMediaInstance(
             newApplication,
             instance.applicationInstanceId,
-            this.userEffectsStyles,
-            this.userEffects,
+            this.staticContentEffectsStyles,
+            this.staticContentEffects,
             this.userDevice,
             instance.positioning,
           );
@@ -1042,29 +1068,36 @@ class TableStaticContentSocketController {
     newInstances.forEach((instance) => {
       switch (instance.contentType) {
         case "svg":
-          if (this.userMedia.current.svg.table[instance.contentId]) {
+          if (this.staticContentMedia.current.svg.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.svg.tableInstances[ins.instanceId] =
-                new TableSvgMediaInstance(
-                  this.userMedia.current.svg.table[instance.contentId],
-                  ins.instanceId,
-                  this.userEffectsStyles,
-                  this.userEffects,
-                  ins.positioning,
-                );
+              this.staticContentMedia.current.svg.tableInstances[
+                ins.instanceId
+              ] = new TableSvgMediaInstance(
+                this.staticContentMedia.current.svg.table[instance.contentId],
+                ins.instanceId,
+                this.staticContentEffectsStyles,
+                this.staticContentEffects,
+                ins.positioning,
+              );
             });
           }
           break;
         case "application":
-          if (this.userMedia.current.application.table[instance.contentId]) {
+          if (
+            this.staticContentMedia.current.application.table[
+              instance.contentId
+            ]
+          ) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.application.tableInstances[
+              this.staticContentMedia.current.application.tableInstances[
                 ins.instanceId
               ] = new TableApplicationMediaInstance(
-                this.userMedia.current.application.table[instance.contentId],
+                this.staticContentMedia.current.application.table[
+                  instance.contentId
+                ],
                 ins.instanceId,
-                this.userEffectsStyles,
-                this.userEffects,
+                this.staticContentEffectsStyles,
+                this.staticContentEffects,
                 this.userDevice,
                 ins.positioning,
               );
@@ -1072,49 +1105,55 @@ class TableStaticContentSocketController {
           }
           break;
         case "image":
-          if (this.userMedia.current.image.table[instance.contentId]) {
+          if (this.staticContentMedia.current.image.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.image.tableInstances[ins.instanceId] =
-                new TableImageMediaInstance(
-                  this.userMedia.current.image.table[instance.contentId],
-                  ins.instanceId,
-                  this.userEffectsStyles,
-                  this.userEffects,
-                  this.userDevice,
-                  this.deadbanding,
-                  ins.positioning,
-                );
+              this.staticContentMedia.current.image.tableInstances[
+                ins.instanceId
+              ] = new TableImageMediaInstance(
+                this.staticContentMedia.current.image.table[instance.contentId],
+                ins.instanceId,
+                this.staticContentEffectsStyles,
+                this.staticContentEffects,
+                this.userDevice,
+                this.deadbanding,
+                ins.positioning,
+              );
             });
           }
           break;
         case "text":
-          if (this.userMedia.current.text.table[instance.contentId]) {
+          if (this.staticContentMedia.current.text.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
-              this.userMedia.current.text.tableInstances[ins.instanceId] =
-                new TableTextMediaInstance(
-                  this.userMedia.current.text.table[instance.contentId],
-                  ins.instanceId,
-                  ins.positioning,
-                  this.liveTextEditingSocket,
-                );
+              this.staticContentMedia.current.text.tableInstances[
+                ins.instanceId
+              ] = new TableTextMediaInstance(
+                this.staticContentMedia.current.text.table[instance.contentId],
+                this.staticContentEffectsStyles,
+                ins.instanceId,
+                ins.positioning,
+                this.liveTextEditingSocket,
+              );
             });
           }
           break;
         case "video":
-          if (this.userMedia.current.video.table[instance.contentId]) {
+          if (this.staticContentMedia.current.video.table[instance.contentId]) {
             instance.instances.forEach((ins) => {
               if (this.tableStaticContentSocket.current)
-                this.userMedia.current.video.tableInstances[ins.instanceId] =
-                  new TableVideoMediaInstance(
-                    this.userMedia.current.video.table[instance.contentId],
-                    ins.instanceId,
-                    this.userDevice,
-                    this.deadbanding,
-                    this.userEffectsStyles,
-                    this.userEffects,
-                    ins.positioning,
-                    this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
-                  );
+                this.staticContentMedia.current.video.tableInstances[
+                  ins.instanceId
+                ] = new TableVideoMediaInstance(
+                  this.staticContentMedia.current.video.table[
+                    instance.contentId
+                  ],
+                  ins.instanceId,
+                  this.userDevice,
+                  this.deadbanding,
+                  this.staticContentEffectsStyles,
+                  this.staticContentEffects,
+                  ins.positioning,
+                  this.tableStaticContentSocket.current.requestCatchUpVideoPosition,
+                );
             });
           }
           break;

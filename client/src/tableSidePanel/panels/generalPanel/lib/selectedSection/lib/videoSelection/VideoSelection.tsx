@@ -16,11 +16,12 @@ export default function VideoSelection({
   instanceId: string;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
 
-  const videoInstanceMedia = userMedia.current.video.tableInstances[instanceId];
+  const videoInstanceMedia =
+    staticContentMedia.current.video.tableInstances[instanceId];
   const positioning = videoInstanceMedia?.getPositioning();
 
   const [largestDim, setLargestDim] = useState<"width" | "height">("width");

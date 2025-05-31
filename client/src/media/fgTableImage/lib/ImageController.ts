@@ -1,8 +1,8 @@
 import {
   ImageEffectStylesType,
   ImageEffectTypes,
-  UserEffectsStylesType,
-  UserEffectsType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
 } from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
@@ -16,8 +16,8 @@ class ImageController {
     private imageInstanceId: string,
     private imageMediaInstance: TableImageMediaInstance,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
@@ -47,16 +47,17 @@ class ImageController {
       contentId === this.imageMediaInstance.imageMedia.imageId &&
       instanceId === this.imageInstanceId
     ) {
-      this.userEffects.current.image[this.imageInstanceId] = effects as {
-        [effectType in ImageEffectTypes]: boolean;
-      };
+      this.staticContentEffects.current.image[this.imageInstanceId] =
+        effects as {
+          [effectType in ImageEffectTypes]: boolean;
+        };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.image[this.imageInstanceId],
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
       );
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.image[this.imageInstanceId] =
+        this.staticContentEffectsStyles.current.image[this.imageInstanceId] =
           effectStyles as ImageEffectStylesType;
 
         this.tintColor.current = (

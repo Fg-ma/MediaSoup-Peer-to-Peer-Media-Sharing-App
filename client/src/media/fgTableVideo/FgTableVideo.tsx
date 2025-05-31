@@ -43,12 +43,13 @@ export default function FgTableVideo({
     ...options,
   };
 
-  const { userMedia } = useMediaContext();
-  const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { staticContentMedia } = useMediaContext();
+  const { staticContentEffects, staticContentEffectsStyles } =
+    useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const videoMediaInstance =
-    userMedia.current.video.tableInstances[videoInstanceId];
+    staticContentMedia.current.video.tableInstances[videoInstanceId];
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -63,7 +64,7 @@ export default function FgTableVideo({
   const [audioEffectsActive, setAudioEffectsActive] = useState(false);
 
   const tintColor = useRef(
-    userEffectsStyles.current.video[videoInstanceId].video.tint.color,
+    staticContentEffectsStyles.current.video[videoInstanceId].video.tint.color,
   );
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
@@ -111,8 +112,8 @@ export default function FgTableVideo({
       setVideoEffectsActive,
       setAudioEffectsActive,
       tintColor,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       setSettingsActive,
       recording,
       downloadRecordingReady,
@@ -131,8 +132,8 @@ export default function FgTableVideo({
       videoMediaInstance,
       videoContainerRef,
       videoOptions,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       tintColor,
       paused,
       setPausedState,

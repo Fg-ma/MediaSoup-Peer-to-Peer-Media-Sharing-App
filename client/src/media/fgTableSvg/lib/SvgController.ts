@@ -1,8 +1,8 @@
 import {
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
   SvgEffectStylesType,
   SvgEffectTypes,
-  UserEffectsStylesType,
-  UserEffectsType,
 } from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
@@ -16,8 +16,8 @@ class SvgController {
     private svgInstanceId: string,
     private svgMediaInstance: TableSvgMediaInstance,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
     private positioning: React.MutableRefObject<{
@@ -48,12 +48,12 @@ class SvgController {
     ) {
       this.svgMediaInstance.clearAllEffects();
 
-      this.userEffects.current.svg[this.svgInstanceId] = effects as {
+      this.staticContentEffects.current.svg[this.svgInstanceId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
       };
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.svg[this.svgInstanceId] =
+        this.staticContentEffectsStyles.current.svg[this.svgInstanceId] =
           effectStyles as SvgEffectStylesType;
       }
 

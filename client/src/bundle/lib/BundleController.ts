@@ -1,7 +1,7 @@
 import {
   RemoteMediaType,
   UserMediaType,
-} from "../../context/mediaContext/typeConstant";
+} from "../../context/mediaContext/lib/typeConstant";
 import {
   RemoteEffectStylesType,
   RemoteEffectsType,

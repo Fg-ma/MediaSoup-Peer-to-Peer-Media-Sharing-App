@@ -27,7 +27,7 @@ export default function MuteStylePage({
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   setIsBezierCurveEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { userStaticContentSocket } = useSocketContext();
 
   const [_, setRerender] = useState(false);
@@ -60,7 +60,7 @@ export default function MuteStylePage({
 
     setRerender((prev) => !prev);
 
-    for (const svgMedia of Object.values(userMedia.current.svg.user)) {
+    for (const svgMedia of Object.values(staticContentMedia.current.svg.user)) {
       if (!svgMedia.state.includes("muteStyle")) return;
 
       const listener = (message: SvgListenerTypes) => {
@@ -127,7 +127,7 @@ export default function MuteStylePage({
             )}
             clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
           />
-          {Object.entries(userMedia.current.svg.user).map(
+          {Object.entries(staticContentMedia.current.svg.user).map(
             ([svgId, svgMedia]) =>
               svgMedia.state.includes("muteStyle") && (
                 <FgButton

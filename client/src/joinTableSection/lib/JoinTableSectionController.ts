@@ -1,12 +1,13 @@
 import { types } from "mediasoup-client";
 import {
   RemoteMediaType,
+  StaticContentMediaType,
   UserDataStreamsType,
   UserMediaType,
-} from "../../context/mediaContext/typeConstant";
+} from "../../context/mediaContext/lib/typeConstant";
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
 import BundlesController from "../../lib/BundlesController";
@@ -48,10 +49,11 @@ class JoinTableSectionController {
     private instance: React.MutableRefObject<string>,
     private setIsInTable: React.Dispatch<React.SetStateAction<boolean>>,
     private userMedia: React.MutableRefObject<UserMediaType>,
+    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private remoteMedia: React.MutableRefObject<RemoteMediaType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private handleDisableEnableBtns: (disabled: boolean) => void,
     private setBundles: React.Dispatch<
       React.SetStateAction<{
@@ -129,7 +131,7 @@ class JoinTableSectionController {
         this.tableId.current,
         this.username.current,
         this.instance.current,
-        this.userMedia,
+        this.staticContentMedia,
         this.liveTextEditingSocket,
         this.sendDownloadSignal,
         this.addCurrentDownload,
@@ -142,11 +144,11 @@ class JoinTableSectionController {
           this.tableId.current,
           this.username.current,
           this.instance.current,
-          this.userMedia,
+          this.staticContentMedia,
           this.deadbanding,
           this.userDevice,
-          this.userEffects,
-          this.userEffectsStyles,
+          this.staticContentEffects,
+          this.staticContentEffectsStyles,
           this.tableStaticContentSocket,
           this.liveTextEditingSocket,
           this.sendDownloadSignal,
@@ -154,12 +156,12 @@ class JoinTableSectionController {
           this.removeCurrentDownload,
         );
 
-      this.userMedia.current.gamesSignaling = new GamesSignalingMedia(
+      this.staticContentMedia.current.gamesSignaling = new GamesSignalingMedia(
         this.tableId.current,
         this.username.current,
         this.instance.current,
         "wss://localhost:8042",
-        this.userMedia,
+        this.staticContentMedia,
         this.bundlesController,
       );
 
@@ -208,69 +210,87 @@ class JoinTableSectionController {
       delete this.userMedia.current.screenAudio[screenAudioId];
     }
 
-    for (const applicationId in this.userMedia.current.application.table) {
-      this.userMedia.current.application.table[applicationId].deconstructor();
-      delete this.userMedia.current.application.table[applicationId];
-    }
-
-    for (const applicationId in this.userMedia.current.application
-      .tableInstances) {
-      this.userMedia.current.application.tableInstances[
+    for (const applicationId in this.staticContentMedia.current.application
+      .table) {
+      this.staticContentMedia.current.application.table[
         applicationId
       ].deconstructor();
-      delete this.userMedia.current.application.tableInstances[applicationId];
+      delete this.staticContentMedia.current.application.table[applicationId];
     }
 
-    for (const imageId in this.userMedia.current.image.table) {
-      this.userMedia.current.image.table[imageId].deconstructor();
-      delete this.userMedia.current.image.table[imageId];
+    for (const applicationId in this.staticContentMedia.current.application
+      .tableInstances) {
+      this.staticContentMedia.current.application.tableInstances[
+        applicationId
+      ].deconstructor();
+      delete this.staticContentMedia.current.application.tableInstances[
+        applicationId
+      ];
     }
 
-    for (const imageId in this.userMedia.current.image.tableInstances) {
-      this.userMedia.current.image.tableInstances[imageId].deconstructor();
-      delete this.userMedia.current.image.tableInstances[imageId];
+    for (const imageId in this.staticContentMedia.current.image.table) {
+      this.staticContentMedia.current.image.table[imageId].deconstructor();
+      delete this.staticContentMedia.current.image.table[imageId];
     }
 
-    for (const soundClipId in this.userMedia.current.soundClip.table) {
-      this.userMedia.current.soundClip.table[soundClipId].deconstructor();
-      delete this.userMedia.current.soundClip.table[soundClipId];
+    for (const imageId in this.staticContentMedia.current.image
+      .tableInstances) {
+      this.staticContentMedia.current.image.tableInstances[
+        imageId
+      ].deconstructor();
+      delete this.staticContentMedia.current.image.tableInstances[imageId];
     }
 
-    for (const soundClipId in this.userMedia.current.soundClip.tableInstances) {
-      this.userMedia.current.soundClip.tableInstances[
+    for (const soundClipId in this.staticContentMedia.current.soundClip.table) {
+      this.staticContentMedia.current.soundClip.table[
         soundClipId
       ].deconstructor();
-      delete this.userMedia.current.soundClip.tableInstances[soundClipId];
+      delete this.staticContentMedia.current.soundClip.table[soundClipId];
     }
 
-    for (const svgId in this.userMedia.current.svg.table) {
-      this.userMedia.current.svg.table[svgId].deconstructor();
-      delete this.userMedia.current.svg.table[svgId];
+    for (const soundClipId in this.staticContentMedia.current.soundClip
+      .tableInstances) {
+      this.staticContentMedia.current.soundClip.tableInstances[
+        soundClipId
+      ].deconstructor();
+      delete this.staticContentMedia.current.soundClip.tableInstances[
+        soundClipId
+      ];
     }
 
-    for (const svgId in this.userMedia.current.svg.tableInstances) {
-      this.userMedia.current.svg.tableInstances[svgId].deconstructor();
-      delete this.userMedia.current.svg.tableInstances[svgId];
+    for (const svgId in this.staticContentMedia.current.svg.table) {
+      this.staticContentMedia.current.svg.table[svgId].deconstructor();
+      delete this.staticContentMedia.current.svg.table[svgId];
     }
 
-    for (const textId in this.userMedia.current.text.tableInstances) {
-      this.userMedia.current.text.tableInstances[textId].deconstructor();
-      delete this.userMedia.current.text.tableInstances[textId];
+    for (const svgId in this.staticContentMedia.current.svg.tableInstances) {
+      this.staticContentMedia.current.svg.tableInstances[svgId].deconstructor();
+      delete this.staticContentMedia.current.svg.tableInstances[svgId];
     }
 
-    for (const textId in this.userMedia.current.text.table) {
-      this.userMedia.current.text.table[textId].deconstructor();
-      delete this.userMedia.current.text.table[textId];
+    for (const textId in this.staticContentMedia.current.text.tableInstances) {
+      this.staticContentMedia.current.text.tableInstances[
+        textId
+      ].deconstructor();
+      delete this.staticContentMedia.current.text.tableInstances[textId];
     }
 
-    for (const videoId in this.userMedia.current.video.table) {
-      this.userMedia.current.video.table[videoId].deconstructor();
-      delete this.userMedia.current.video.table[videoId];
+    for (const textId in this.staticContentMedia.current.text.table) {
+      this.staticContentMedia.current.text.table[textId].deconstructor();
+      delete this.staticContentMedia.current.text.table[textId];
     }
 
-    for (const videoId in this.userMedia.current.video.tableInstances) {
-      this.userMedia.current.video.tableInstances[videoId].deconstructor();
-      delete this.userMedia.current.video.tableInstances[videoId];
+    for (const videoId in this.staticContentMedia.current.video.table) {
+      this.staticContentMedia.current.video.table[videoId].deconstructor();
+      delete this.staticContentMedia.current.video.table[videoId];
+    }
+
+    for (const videoId in this.staticContentMedia.current.video
+      .tableInstances) {
+      this.staticContentMedia.current.video.tableInstances[
+        videoId
+      ].deconstructor();
+      delete this.staticContentMedia.current.video.tableInstances[videoId];
     }
 
     if (this.userMedia.current.audio) {
@@ -278,18 +298,18 @@ class JoinTableSectionController {
       this.userMedia.current.audio = undefined;
     }
 
-    if (this.userMedia.current.gamesSignaling) {
-      this.userMedia.current.gamesSignaling.deconstructor();
-      this.userMedia.current.gamesSignaling = undefined;
+    if (this.staticContentMedia.current.gamesSignaling) {
+      this.staticContentMedia.current.gamesSignaling.deconstructor();
+      this.staticContentMedia.current.gamesSignaling = undefined;
     }
 
-    for (const gameType in this.userMedia.current.games) {
+    for (const gameType in this.staticContentMedia.current.games) {
       // @ts-expect-error gameType stupid
-      for (const game in this.userMedia.current.games[gameType]) {
+      for (const game in this.staticContentMedia.current.games[gameType]) {
         // @ts-expect-error gameType stupid
-        this.userMedia.current.games[gameType][game].deconstructor();
+        this.staticContentMedia.current.games[gameType][game].deconstructor();
         // @ts-expect-error gameType stupid
-        delete this.userMedia.current.games[gameType][game];
+        delete this.staticContentMedia.current.games[gameType][game];
       }
     }
 

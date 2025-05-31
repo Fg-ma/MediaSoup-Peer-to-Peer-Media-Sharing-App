@@ -38,7 +38,8 @@ export default function ApplicationEffectsSection({
   applicationMediaInstance: TableApplicationMediaInstance;
   applicationContainerRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { userEffectsStyles, userEffects } = useEffectsContext();
+  const { staticContentEffectsStyles, staticContentEffects } =
+    useEffectsContext();
 
   const [effectsDisabled, setEffectsDisabled] = useState(false);
 
@@ -119,16 +120,19 @@ export default function ApplicationEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
-            userEffects.current.application[applicationInstanceId].postProcess
+            staticContentEffects.current.application[applicationInstanceId]
+              .postProcess
           }
           effectsStyles={
-            userEffectsStyles.current.application[applicationInstanceId]
-              .postProcess
+            staticContentEffectsStyles.current.application[
+              applicationInstanceId
+            ].postProcess
           }
           clickFunctionCallback={async () => {
             applicationMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
-              userEffectsStyles.current.application[applicationInstanceId]
-                .postProcess.style,
+              staticContentEffectsStyles.current.application[
+                applicationInstanceId
+              ].postProcess.style,
             );
 
             await lowerApplicationController.current.handleApplicationEffect(
@@ -137,7 +141,7 @@ export default function ApplicationEffectsSection({
             );
           }}
           holdFunctionCallback={async (effectType) => {
-            userEffectsStyles.current.application[
+            staticContentEffectsStyles.current.application[
               applicationInstanceId
             ].postProcess.style = effectType;
 
@@ -147,7 +151,7 @@ export default function ApplicationEffectsSection({
 
             await lowerApplicationController.current.handleApplicationEffect(
               "postProcess",
-              userEffects.current.application[applicationInstanceId]
+              staticContentEffects.current.application[applicationInstanceId]
                 .postProcess,
             );
           }}
@@ -157,7 +161,7 @@ export default function ApplicationEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
-            userEffects.current.application[applicationInstanceId].blur
+            staticContentEffects.current.application[applicationInstanceId].blur
           }
           clickFunctionCallback={async () => {
             await lowerApplicationController.current.handleApplicationEffect(
@@ -172,10 +176,10 @@ export default function ApplicationEffectsSection({
           setEffectsDisabled={setEffectsDisabled}
           scrollingContainerRef={effectsContainerRef}
           streamEffects={
-            userEffects.current.application[applicationInstanceId].tint
+            staticContentEffects.current.application[applicationInstanceId].tint
           }
           clickFunctionCallback={async () => {
-            userEffectsStyles.current.application[
+            staticContentEffectsStyles.current.application[
               applicationInstanceId
             ].tint.color = tintColor.current;
 
@@ -185,13 +189,14 @@ export default function ApplicationEffectsSection({
             );
           }}
           acceptColorCallback={async () => {
-            userEffectsStyles.current.application[
+            staticContentEffectsStyles.current.application[
               applicationInstanceId
             ].tint.color = tintColor.current;
 
             await lowerApplicationController.current.handleApplicationEffect(
               "tint",
-              userEffects.current.application[applicationInstanceId].tint,
+              staticContentEffects.current.application[applicationInstanceId]
+                .tint,
             );
           }}
         />

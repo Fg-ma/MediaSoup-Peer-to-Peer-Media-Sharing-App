@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
+import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
+import { useEffectsContext } from "../../../../../../context/effectsContext/EffectsContext";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import { Settings, ActivePages } from "../../../typeConstant";
@@ -9,6 +11,7 @@ import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FontStylePage from "./FontStylePage";
 import LowerTextController from "../../LowerTextController";
 import CursorStylePage from "./CursorStylePage";
+import TableTextMediaInstance from "../../../../../../media/fgTableText/TableTextMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -58,6 +61,7 @@ const panelVariants: Variants = {
 };
 
 export default function SettingsPanel({
+  textMediaInstance,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -67,7 +71,9 @@ export default function SettingsPanel({
   externalColorPickerPanelRefs,
   lowerTextController,
   isReadOnly,
+  setRerender,
 }: {
+  textMediaInstance: TableTextMediaInstance;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -81,11 +87,20 @@ export default function SettingsPanel({
   };
   lowerTextController: React.MutableRefObject<LowerTextController>;
   isReadOnly: React.MutableRefObject<boolean>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { staticContentEffectsStyles } = useEffectsContext();
+  const { tableStaticContentSocket } = useSocketContext();
+
+  const effectsStyles =
+    staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId];
+
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
     bottom: number;
   } | null>(null);
+  const holdTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const holdInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Function to check if a key or its descendants are active
   const isDescendantActive = (
@@ -189,26 +204,60 @@ export default function SettingsPanel({
     type: "increment" | "decrement" | "value",
     value: number,
   ) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
-      const currentValue = parseInt(newSettings.fontSize.value.slice(0, -2));
+    const effectStyles =
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId];
+    const currentValue = parseInt(effectStyles.fontSize.slice(0, -2));
 
-      if (type === "increment") {
-        newSettings.fontSize.value = `${currentValue + value}px`;
-      } else if (type === "decrement") {
-        newSettings.fontSize.value = `${Math.max(1, currentValue - value)}px`;
-      } else {
-        newSettings.fontSize.value = `${Math.max(1, value)}px`;
-      }
+    if (type === "increment") {
+      effectStyles.fontSize = `${currentValue + value}px`;
+    } else if (type === "decrement") {
+      effectStyles.fontSize = `${Math.max(1, currentValue - value)}px`;
+    } else {
+      effectStyles.fontSize = `${Math.max(1, value)}px`;
+    }
 
-      return newSettings;
-    });
+    tableStaticContentSocket.current?.updateContentEffects(
+      "text",
+      textMediaInstance.textMedia.textId,
+      textMediaInstance.textInstanceId,
+      undefined,
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    );
+
+    setRerender((prev) => !prev);
+  };
+
+  const handleLetterSpacingChange = (
+    type: "increment" | "decrement" | "value",
+    value: number,
+  ) => {
+    const effectStyles =
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId];
+    const currentValue = effectStyles.letterSpacing;
+
+    if (type === "increment") {
+      effectStyles.letterSpacing = currentValue + value;
+    } else if (type === "decrement") {
+      effectStyles.letterSpacing = Math.max(-5, currentValue - value);
+    } else {
+      effectStyles.letterSpacing = Math.max(-5, value);
+    }
+
+    tableStaticContentSocket.current?.updateContentEffects(
+      "text",
+      textMediaInstance.textMedia.textId,
+      textMediaInstance.textInstanceId,
+      undefined,
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    );
+
+    setRerender((prev) => !prev);
   };
 
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -240,7 +289,7 @@ export default function SettingsPanel({
                 >
                   <FgSVGElement
                     src={settings.synced.value ? desyncIcon : syncIcon}
-                    className="flex mr-2 aspect-square h-full items-center justify-center"
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -274,7 +323,7 @@ export default function SettingsPanel({
                 >
                   <FgSVGElement
                     src={backgroundIcon}
-                    className="flex mr-2 aspect-square h-full items-center justify-center"
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -302,7 +351,7 @@ export default function SettingsPanel({
                 <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={editIcon}
-                    className="flex mr-2 aspect-square h-full items-center justify-center"
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -330,7 +379,7 @@ export default function SettingsPanel({
                 <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                   <FgSVGElement
                     src={mapIcon}
-                    className="flex mr-2 aspect-square h-full items-center justify-center"
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
@@ -385,6 +434,32 @@ export default function SettingsPanel({
                       ]}
                     />
                   )}
+                  pointerDownFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+
+                    holdTimeout.current = setTimeout(() => {
+                      holdInterval.current = setInterval(() => {
+                        handleFontSizeChange("increment", 1);
+                      }, 50);
+                    }, 1000);
+                  }}
+                  pointerUpFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+                  }}
                   hoverContent={
                     <FgHoverContentStandard content="Increase" style="light" />
                   }
@@ -397,7 +472,7 @@ export default function SettingsPanel({
                 <input
                   type="text"
                   className="flex h-full w-12 bg-transparent text-center font-K2D text-xl focus:outline-none"
-                  value={settings.fontSize.value.slice(0, -2)}
+                  value={effectsStyles.fontSize.slice(0, -2)}
                   onChange={(event) => {
                     const inputValue = event.target.value;
                     const parsedValue =
@@ -424,6 +499,32 @@ export default function SettingsPanel({
                       ]}
                     />
                   )}
+                  pointerDownFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+
+                    holdTimeout.current = setTimeout(() => {
+                      holdInterval.current = setInterval(() => {
+                        handleFontSizeChange("decrement", 1);
+                      }, 50);
+                    }, 1000);
+                  }}
+                  pointerUpFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+                  }}
                   hoverContent={
                     <FgHoverContentStandard content="Decrease" style="light" />
                   }
@@ -444,6 +545,132 @@ export default function SettingsPanel({
               )}
               clickFunction={handleFontStyleActive}
             />
+            <div className="flex h-7 w-full items-center justify-between">
+              <div className="flex w-max items-center justify-start text-nowrap rounded px-2 text-lg">
+                Letter gap
+              </div>
+              <div className="flex h-full w-max items-center justify-center space-x-1">
+                <FgButton
+                  className="h-full"
+                  clickFunction={() =>
+                    handleLetterSpacingChange("increment", 1)
+                  }
+                  pointerDownFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+
+                    holdTimeout.current = setTimeout(() => {
+                      holdInterval.current = setInterval(() => {
+                        handleLetterSpacingChange("increment", 1);
+                      }, 50);
+                    }, 1000);
+                  }}
+                  pointerUpFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+                  }}
+                  contentFunction={() => (
+                    <FgSVGElement
+                      src={additionIcon}
+                      className="aspect-square h-full"
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
+                      ]}
+                    />
+                  )}
+                  hoverContent={
+                    <FgHoverContentStandard content="Increase" style="light" />
+                  }
+                  options={{
+                    hoverType: "above",
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 2500,
+                  }}
+                />
+                <input
+                  type="text"
+                  className="flex h-full w-12 bg-transparent text-center font-K2D text-xl focus:outline-none"
+                  value={effectsStyles.letterSpacing}
+                  onChange={(event) => {
+                    const inputValue = event.target.value;
+                    const parsedValue =
+                      inputValue.trim() !== "" && !isNaN(Number(inputValue))
+                        ? parseInt(inputValue, 10)
+                        : 0;
+
+                    handleLetterSpacingChange("value", parsedValue);
+                  }}
+                  placeholder="Space..."
+                />
+                <FgButton
+                  className="h-full"
+                  clickFunction={() =>
+                    handleLetterSpacingChange("decrement", 1)
+                  }
+                  contentFunction={() => (
+                    <FgSVGElement
+                      src={minusIcon}
+                      className="aspect-square h-full"
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
+                      ]}
+                    />
+                  )}
+                  pointerDownFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+
+                    holdTimeout.current = setTimeout(() => {
+                      holdInterval.current = setInterval(() => {
+                        handleLetterSpacingChange("decrement", 1);
+                      }, 50);
+                    }, 1000);
+                  }}
+                  pointerUpFunction={() => {
+                    if (holdTimeout.current) {
+                      clearTimeout(holdTimeout.current);
+                      holdTimeout.current = undefined;
+                    }
+                    if (holdInterval.current) {
+                      clearInterval(holdInterval.current);
+                      holdInterval.current = undefined;
+                    }
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard content="Decrease" style="light" />
+                  }
+                  options={{
+                    hoverType: "above",
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 2500,
+                  }}
+                />
+              </div>
+            </div>
             <FgButton
               className="h-7 w-full"
               contentFunction={() => (
@@ -467,10 +694,10 @@ export default function SettingsPanel({
               exit="exit"
             >
               <ColorsPage
+                textMediaInstance={textMediaInstance}
                 setActivePages={setActivePages}
-                settings={settings}
-                setSettings={setSettings}
                 externalColorPickerPanelRefs={externalColorPickerPanelRefs}
+                setRerender={setRerender}
               />
             </motion.div>
           )}
@@ -486,9 +713,9 @@ export default function SettingsPanel({
               exit="exit"
             >
               <FontStylePage
+                textMediaInstance={textMediaInstance}
                 setActivePages={setActivePages}
-                settings={settings}
-                setSettings={setSettings}
+                setRerender={setRerender}
               />
             </motion.div>
           )}

@@ -73,13 +73,7 @@ export type DownloadMimeTypes =
   | "tiff"
   | "heic";
 
-export type DownloadSizeTypes =
-  | "256"
-  | "512"
-  | "1024"
-  | "2048"
-  | "4096"
-  | "16384";
+export type DownloadSizeTypes = "256" | "512" | "1024" | "2048" | "4096";
 
 export type DownloadCompressionTypes = "Minified" | "Plain" | "Zipped";
 
@@ -95,6 +89,6 @@ export const downloadOptionsArrays: {
   compression: DownloadCompressionTypes[];
 } = {
   mimeType: ["svg", "svgz", "jpg", "png", "webp", "tiff", "heic"],
-  size: ["256", "512", "1024", "2048", "4096", "16384"],
+  size: ["256", "512", "1024", "2048", "4096"],
   compression: ["Minified", "Plain", "Zipped"],
 };

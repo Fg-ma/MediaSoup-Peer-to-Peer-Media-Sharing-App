@@ -44,7 +44,7 @@ export default function TabledPortal({
   setDragging: React.Dispatch<React.SetStateAction<boolean>>;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const [advanced, setAdvanced] = useState(false);
@@ -163,7 +163,7 @@ export default function TabledPortal({
                 }}
                 items={[
                   ...(activePage === "all" || activePage === "svg"
-                    ? Object.entries(userMedia.current.svg.table).map(
+                    ? Object.entries(staticContentMedia.current.svg.table).map(
                         ([svgId, svgMedia]) =>
                           (searchContent.length === 0 &&
                             svgMedia.state.includes("tabled")) ||
@@ -200,161 +200,165 @@ export default function TabledPortal({
                       )
                     : []),
                   ...(activePage === "all" || activePage === "image"
-                    ? Object.entries(userMedia.current.image.table).map(
-                        ([imageId, imageMedia]) =>
-                          (searchContent.length === 0 &&
-                            imageMedia.state.includes("tabled")) ||
-                          (searchContent.length !== 0 &&
-                            searchContent.some(
-                              (item) => item.iid === imageId,
-                            )) ? (
-                            <TabledItems
-                              media={imageMedia}
-                              contentType="image"
-                              contentId={imageId}
-                              selected={selected}
-                              filename={imageMedia.filename}
-                              tabledSectionScrollingContainerRef={
-                                tabledSectionScrollingContainerRef
-                              }
-                              lastPressed={lastPressed}
-                              setDragging={setDragging}
-                              holdTimeout={holdTimeout}
-                              holdInterval={holdInterval}
-                              addDownloadListener={
-                                imageMedia.loadingState !== "downloaded"
-                                  ? imageMedia.addImageListener
-                                  : undefined
-                              }
-                              removeDownloadListener={
-                                imageMedia.loadingState !== "downloaded"
-                                  ? imageMedia.removeImageListener
-                                  : undefined
-                              }
-                              setExternalRerender={setRerender}
-                            />
-                          ) : null,
+                    ? Object.entries(
+                        staticContentMedia.current.image.table,
+                      ).map(([imageId, imageMedia]) =>
+                        (searchContent.length === 0 &&
+                          imageMedia.state.includes("tabled")) ||
+                        (searchContent.length !== 0 &&
+                          searchContent.some(
+                            (item) => item.iid === imageId,
+                          )) ? (
+                          <TabledItems
+                            media={imageMedia}
+                            contentType="image"
+                            contentId={imageId}
+                            selected={selected}
+                            filename={imageMedia.filename}
+                            tabledSectionScrollingContainerRef={
+                              tabledSectionScrollingContainerRef
+                            }
+                            lastPressed={lastPressed}
+                            setDragging={setDragging}
+                            holdTimeout={holdTimeout}
+                            holdInterval={holdInterval}
+                            addDownloadListener={
+                              imageMedia.loadingState !== "downloaded"
+                                ? imageMedia.addImageListener
+                                : undefined
+                            }
+                            removeDownloadListener={
+                              imageMedia.loadingState !== "downloaded"
+                                ? imageMedia.removeImageListener
+                                : undefined
+                            }
+                            setExternalRerender={setRerender}
+                          />
+                        ) : null,
                       )
                     : []),
                   ...(activePage === "all" || activePage === "video"
-                    ? Object.entries(userMedia.current.video.table).map(
-                        ([videoId, videoMedia]) =>
-                          (searchContent.length === 0 &&
-                            videoMedia.state.includes("tabled")) ||
-                          (searchContent.length !== 0 &&
-                            searchContent.some(
-                              (item) => item.vid === videoId,
-                            )) ? (
-                            <TabledItems
-                              media={videoMedia}
-                              contentType="video"
-                              contentId={videoId}
-                              selected={selected}
-                              filename={videoMedia.filename}
-                              tabledSectionScrollingContainerRef={
-                                tabledSectionScrollingContainerRef
-                              }
-                              lastPressed={lastPressed}
-                              setDragging={setDragging}
-                              holdTimeout={holdTimeout}
-                              holdInterval={holdInterval}
-                              addDownloadListener={
-                                videoMedia.loadingState !== "downloaded"
-                                  ? videoMedia.addVideoListener
-                                  : undefined
-                              }
-                              removeDownloadListener={
-                                videoMedia.loadingState !== "downloaded"
-                                  ? videoMedia.removeVideoListener
-                                  : undefined
-                              }
-                              setExternalRerender={setRerender}
-                            />
-                          ) : null,
+                    ? Object.entries(
+                        staticContentMedia.current.video.table,
+                      ).map(([videoId, videoMedia]) =>
+                        (searchContent.length === 0 &&
+                          videoMedia.state.includes("tabled")) ||
+                        (searchContent.length !== 0 &&
+                          searchContent.some(
+                            (item) => item.vid === videoId,
+                          )) ? (
+                          <TabledItems
+                            media={videoMedia}
+                            contentType="video"
+                            contentId={videoId}
+                            selected={selected}
+                            filename={videoMedia.filename}
+                            tabledSectionScrollingContainerRef={
+                              tabledSectionScrollingContainerRef
+                            }
+                            lastPressed={lastPressed}
+                            setDragging={setDragging}
+                            holdTimeout={holdTimeout}
+                            holdInterval={holdInterval}
+                            addDownloadListener={
+                              videoMedia.loadingState !== "downloaded"
+                                ? videoMedia.addVideoListener
+                                : undefined
+                            }
+                            removeDownloadListener={
+                              videoMedia.loadingState !== "downloaded"
+                                ? videoMedia.removeVideoListener
+                                : undefined
+                            }
+                            setExternalRerender={setRerender}
+                          />
+                        ) : null,
                       )
                     : []),
                   ...(activePage === "all" || activePage === "soundClip"
-                    ? Object.entries(userMedia.current.soundClip.table).map(
-                        ([soundClipId, soundClipMedia]) =>
-                          (searchContent.length === 0 &&
-                            soundClipMedia.state.includes("tabled")) ||
-                          (searchContent.length !== 0 &&
-                            searchContent.some(
-                              (item) => item.sid === soundClipId,
-                            )) ? (
-                            <TabledItems
-                              media={soundClipMedia}
-                              contentType="soundClip"
-                              contentId={soundClipId}
-                              selected={selected}
-                              filename={soundClipMedia.filename}
-                              tabledSectionScrollingContainerRef={
-                                tabledSectionScrollingContainerRef
-                              }
-                              lastPressed={lastPressed}
-                              setDragging={setDragging}
-                              holdTimeout={holdTimeout}
-                              holdInterval={holdInterval}
-                              addDownloadListener={
-                                soundClipMedia.loadingState !== "downloaded"
-                                  ? soundClipMedia.addSoundClipListener
-                                  : undefined
-                              }
-                              removeDownloadListener={
-                                soundClipMedia.loadingState !== "downloaded"
-                                  ? soundClipMedia.removeSoundClipListener
-                                  : undefined
-                              }
-                              setExternalRerender={setRerender}
-                            />
-                          ) : null,
+                    ? Object.entries(
+                        staticContentMedia.current.soundClip.table,
+                      ).map(([soundClipId, soundClipMedia]) =>
+                        (searchContent.length === 0 &&
+                          soundClipMedia.state.includes("tabled")) ||
+                        (searchContent.length !== 0 &&
+                          searchContent.some(
+                            (item) => item.sid === soundClipId,
+                          )) ? (
+                          <TabledItems
+                            media={soundClipMedia}
+                            contentType="soundClip"
+                            contentId={soundClipId}
+                            selected={selected}
+                            filename={soundClipMedia.filename}
+                            tabledSectionScrollingContainerRef={
+                              tabledSectionScrollingContainerRef
+                            }
+                            lastPressed={lastPressed}
+                            setDragging={setDragging}
+                            holdTimeout={holdTimeout}
+                            holdInterval={holdInterval}
+                            addDownloadListener={
+                              soundClipMedia.loadingState !== "downloaded"
+                                ? soundClipMedia.addSoundClipListener
+                                : undefined
+                            }
+                            removeDownloadListener={
+                              soundClipMedia.loadingState !== "downloaded"
+                                ? soundClipMedia.removeSoundClipListener
+                                : undefined
+                            }
+                            setExternalRerender={setRerender}
+                          />
+                        ) : null,
                       )
                     : []),
                   ...(activePage === "all" || activePage === "application"
-                    ? Object.entries(userMedia.current.application.table).map(
-                        ([applicationId, applicationMedia]) =>
-                          (searchContent.length === 0 &&
-                            applicationMedia.state.includes("tabled")) ||
-                          (searchContent.length !== 0 &&
-                            searchContent.some(
-                              (item) => item.sid === applicationId,
-                            )) ? (
-                            <TabledItems
-                              media={applicationMedia}
-                              contentType="application"
-                              contentId={applicationId}
-                              selected={selected}
-                              filename={applicationMedia.filename}
-                              tabledSectionScrollingContainerRef={
-                                tabledSectionScrollingContainerRef
-                              }
-                              lastPressed={lastPressed}
-                              setDragging={setDragging}
-                              holdTimeout={holdTimeout}
-                              holdInterval={holdInterval}
-                              addDownloadListener={
-                                applicationMedia.loadingState !== "downloaded"
-                                  ? applicationMedia.addApplicationListener
-                                  : undefined
-                              }
-                              removeDownloadListener={
-                                applicationMedia.loadingState !== "downloaded"
-                                  ? applicationMedia.removeApplicationListener
-                                  : undefined
-                              }
-                              setExternalRerender={setRerender}
-                            />
-                          ) : null,
+                    ? Object.entries(
+                        staticContentMedia.current.application.table,
+                      ).map(([applicationId, applicationMedia]) =>
+                        (searchContent.length === 0 &&
+                          applicationMedia.state.includes("tabled")) ||
+                        (searchContent.length !== 0 &&
+                          searchContent.some(
+                            (item) => item.aid === applicationId,
+                          )) ? (
+                          <TabledItems
+                            media={applicationMedia}
+                            contentType="application"
+                            contentId={applicationId}
+                            selected={selected}
+                            filename={applicationMedia.filename}
+                            tabledSectionScrollingContainerRef={
+                              tabledSectionScrollingContainerRef
+                            }
+                            lastPressed={lastPressed}
+                            setDragging={setDragging}
+                            holdTimeout={holdTimeout}
+                            holdInterval={holdInterval}
+                            addDownloadListener={
+                              applicationMedia.loadingState !== "downloaded"
+                                ? applicationMedia.addApplicationListener
+                                : undefined
+                            }
+                            removeDownloadListener={
+                              applicationMedia.loadingState !== "downloaded"
+                                ? applicationMedia.removeApplicationListener
+                                : undefined
+                            }
+                            setExternalRerender={setRerender}
+                          />
+                        ) : null,
                       )
                     : []),
                   ...(activePage === "all" || activePage === "text"
-                    ? Object.entries(userMedia.current.text.table).map(
+                    ? Object.entries(staticContentMedia.current.text.table).map(
                         ([textId, textMedia]) =>
                           (searchContent.length === 0 &&
                             textMedia.state.includes("tabled")) ||
                           (searchContent.length !== 0 &&
                             searchContent.some(
-                              (item) => item.sid === textId,
+                              (item) => item.xid === textId,
                             )) ? (
                             <TabledItems
                               media={textMedia}

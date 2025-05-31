@@ -41,7 +41,7 @@ export default function FgAudioElement({
   fgAudioElementContainerOptions: FgAudioElementContainerOptionsType;
   settings: Settings;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
 
   const [movingY, setMovingY] = useState<number[]>(
     Array(settings.numFixedPoints.value - 1).fill(50),
@@ -208,13 +208,13 @@ export default function FgAudioElement({
       className="h-full w-full"
       contentFunction={() =>
         (localMute.current || clientMute.current) &&
-        Object.entries(userMedia.current.svg.user).find(
+        Object.entries(staticContentMedia.current.svg.user).find(
           ([svgId]) => svgId === settings.muteStyle.value,
         ) !== undefined ? (
           <FgSVGElement
             externalRef={svgRef}
             src={
-              Object.entries(userMedia.current.svg.user).find(
+              Object.entries(staticContentMedia.current.svg.user).find(
                 ([svgId]) => svgId === settings.muteStyle.value,
               )?.[1].blobURL ?? ""
             }

@@ -3,7 +3,7 @@ import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupS
 import {
   RemoteDataStreamsType,
   UserDataStreamsType,
-} from "../../../context/mediaContext/typeConstant";
+} from "../../../context/mediaContext/lib/typeConstant";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import {
   IncomingTableMessages,

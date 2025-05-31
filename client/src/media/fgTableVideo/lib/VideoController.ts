@@ -5,8 +5,8 @@ import {
   onUpdatedVideoPositionType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
-  UserEffectsStylesType,
-  UserEffectsType,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
@@ -20,8 +20,8 @@ class VideoController {
     private videoMediaInstance: TableVideoMediaInstance,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private videoOptions: VideoOptions,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
     private paused: React.MutableRefObject<boolean>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
@@ -57,17 +57,20 @@ class VideoController {
       contentId === this.videoMediaInstance.videoMedia.videoId &&
       instanceId === this.videoInstanceId
     ) {
-      this.userEffects.current.video[this.videoInstanceId].video = effects as {
-        [effectType in VideoEffectTypes]: boolean;
-      };
+      this.staticContentEffects.current.video[this.videoInstanceId].video =
+        effects as {
+          [effectType in VideoEffectTypes]: boolean;
+        };
 
       const oldEffectStyle = structuredClone(
-        this.userEffectsStyles.current.video[this.videoInstanceId].video,
+        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+          .video,
       );
 
       if (effectStyles !== undefined) {
-        this.userEffectsStyles.current.video[this.videoInstanceId].video =
-          effectStyles as VideoEffectStylesType;
+        this.staticContentEffectsStyles.current.video[
+          this.videoInstanceId
+        ].video = effectStyles as VideoEffectStylesType;
 
         this.tintColor.current = (
           effectStyles as VideoEffectStylesType
@@ -76,7 +79,10 @@ class VideoController {
 
       this.videoMediaInstance.updateAllEffects(oldEffectStyle);
 
-      if (this.userEffects.current.video[this.videoInstanceId].video.pause) {
+      if (
+        this.staticContentEffects.current.video[this.videoInstanceId].video
+          .pause
+      ) {
         this.paused.current = true;
         if (
           this.videoMediaInstance.instanceVideo &&

@@ -22,7 +22,7 @@ import {
   RemoteDataStreamsType,
   UserDataStreamsType,
   UserMediaType,
-} from "../../../context/mediaContext/typeConstant";
+} from "../../../context/mediaContext/lib/typeConstant";
 import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import {
   IncomingTableMessages,

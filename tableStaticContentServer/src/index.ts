@@ -29,6 +29,10 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
+const SOCKET_MAX_PAYLOAD = 16 * 1024 * 1024;
+export const CEPH_CHUNK_MAX_SIZE = 1024 * 1024 * 10;
+export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
+
 // tableTopCeph.deletes.emptyBucket("table-svgs");
 // tableTopCeph.deletes.emptyBucket("table-images");
 // tableTopCeph.deletes.emptyBucket("table-videos");
@@ -60,7 +64,7 @@ const app = uWS.SSLApp(sslOptions);
 app
   .ws("/*", {
     compression: uWS.SHARED_COMPRESSOR,
-    maxPayloadLength: 16 * 1024 * 1024, // 16 MB
+    maxPayloadLength: SOCKET_MAX_PAYLOAD,
     idleTimeout: 60,
     message: (ws, message) => {
       const tableWS = ws as TableStaticContentWebSocket;

@@ -1,7 +1,7 @@
 import {
-  UserEffectsType,
   ApplicationEffectTypes,
-  UserEffectsStylesType,
+  StaticContentEffectsType,
+  StaticContentEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import { downloadRecordingMimeMap, Settings } from "../typeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
@@ -16,8 +16,8 @@ class LowerApplicationController {
       React.SetStateAction<boolean>
     >,
     private tintColor: React.MutableRefObject<string>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
@@ -72,10 +72,12 @@ class LowerApplicationController {
     blockStateChange: boolean,
   ) => {
     if (!blockStateChange) {
-      this.userEffects.current.application[this.applicationInstanceId][effect] =
-        !this.userEffects.current.application[this.applicationInstanceId][
-          effect
-        ];
+      this.staticContentEffects.current.application[this.applicationInstanceId][
+        effect
+      ] =
+        !this.staticContentEffects.current.application[
+          this.applicationInstanceId
+        ][effect];
     }
 
     this.applicationMediaInstance.changeEffects(
@@ -88,8 +90,10 @@ class LowerApplicationController {
       "application",
       this.applicationMediaInstance.applicationMedia.applicationId,
       this.applicationInstanceId,
-      this.userEffects.current.application[this.applicationInstanceId],
-      this.userEffectsStyles.current.application[this.applicationInstanceId],
+      this.staticContentEffects.current.application[this.applicationInstanceId],
+      this.staticContentEffectsStyles.current.application[
+        this.applicationInstanceId
+      ],
     );
   };
 

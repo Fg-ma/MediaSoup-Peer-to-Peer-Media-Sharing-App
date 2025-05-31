@@ -3,9 +3,9 @@ import SvgMedia, { SvgListenerTypes } from "./TableSvgMedia";
 import {
   defaultSvgEffects,
   defaultSvgEffectsStyles,
+  StaticContentEffectsStylesType,
+  StaticContentEffectsType,
   SvgEffectTypes,
-  UserEffectsStylesType,
-  UserEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import {
   DownloadCompressionTypes,
@@ -36,8 +36,8 @@ class TableSvgMediaInstance {
   constructor(
     public svgMedia: SvgMedia,
     private svgInstanceId: string,
-    private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     initPositioning: {
       position: {
         left: number;
@@ -52,15 +52,14 @@ class TableSvgMediaInstance {
   ) {
     this.positioning = initPositioning;
 
-    if (!this.userEffects.current.svg[this.svgInstanceId]) {
-      this.userEffects.current.svg[this.svgInstanceId] =
+    if (!this.staticContentEffects.current.svg[this.svgInstanceId]) {
+      this.staticContentEffects.current.svg[this.svgInstanceId] =
         structuredClone(defaultSvgEffects);
     }
 
-    if (!this.userEffectsStyles.current.svg[this.svgInstanceId]) {
-      this.userEffectsStyles.current.svg[this.svgInstanceId] = structuredClone(
-        defaultSvgEffectsStyles,
-      );
+    if (!this.staticContentEffectsStyles.current.svg[this.svgInstanceId]) {
+      this.staticContentEffectsStyles.current.svg[this.svgInstanceId] =
+        structuredClone(defaultSvgEffectsStyles);
     }
 
     if (this.svgMedia.svg) {
@@ -89,50 +88,50 @@ class TableSvgMediaInstance {
   };
 
   clearAllEffects = () => {
-    Object.entries(this.userEffects.current.svg[this.svgInstanceId]).map(
-      ([effect, value]) => {
-        if (value) {
-          let effectId = "";
-          switch (effect) {
-            case "blur":
-              effectId = "#fgSvgBlurFilter_" + this.svgInstanceId;
-              break;
-            case "shadow":
-              effectId = "#fgSvgShadowFilter_" + this.svgInstanceId;
-              break;
-            case "grayscale":
-              effectId = "#fgSvgGrayscaleFilter_" + this.svgInstanceId;
-              break;
-            case "saturate":
-              effectId = "#fgSvgSaturateFilter_" + this.svgInstanceId;
-              break;
-            case "edgeDetection":
-              effectId = "#fgSvgEdgeDetectionFilter_" + this.svgInstanceId;
-              break;
-            case "colorOverlay":
-              effectId = "#fgSvgColorOverlayFilter_" + this.svgInstanceId;
-              break;
-            case "waveDistortion":
-              effectId = "#fgSvgWaveDistortionFilter_" + this.svgInstanceId;
-              break;
-            case "crackedGlass":
-              effectId = "#fgSvgCrackedGlassFilter_" + this.svgInstanceId;
-              break;
-            case "neonGlow":
-              effectId = "#fgSvgNeonGlowFilter_" + this.svgInstanceId;
-              break;
-            default:
-              break;
-          }
-
-          if (effectId) this.removeEffect(effectId);
-
-          this.userEffects.current.svg[this.svgInstanceId][
-            effect as SvgEffectTypes
-          ] = false;
+    Object.entries(
+      this.staticContentEffects.current.svg[this.svgInstanceId],
+    ).map(([effect, value]) => {
+      if (value) {
+        let effectId = "";
+        switch (effect) {
+          case "blur":
+            effectId = "#fgSvgBlurFilter_" + this.svgInstanceId;
+            break;
+          case "shadow":
+            effectId = "#fgSvgShadowFilter_" + this.svgInstanceId;
+            break;
+          case "grayscale":
+            effectId = "#fgSvgGrayscaleFilter_" + this.svgInstanceId;
+            break;
+          case "saturate":
+            effectId = "#fgSvgSaturateFilter_" + this.svgInstanceId;
+            break;
+          case "edgeDetection":
+            effectId = "#fgSvgEdgeDetectionFilter_" + this.svgInstanceId;
+            break;
+          case "colorOverlay":
+            effectId = "#fgSvgColorOverlayFilter_" + this.svgInstanceId;
+            break;
+          case "waveDistortion":
+            effectId = "#fgSvgWaveDistortionFilter_" + this.svgInstanceId;
+            break;
+          case "crackedGlass":
+            effectId = "#fgSvgCrackedGlassFilter_" + this.svgInstanceId;
+            break;
+          case "neonGlow":
+            effectId = "#fgSvgNeonGlowFilter_" + this.svgInstanceId;
+            break;
+          default:
+            break;
         }
-      },
-    );
+
+        if (effectId) this.removeEffect(effectId);
+
+        this.staticContentEffects.current.svg[this.svgInstanceId][
+          effect as SvgEffectTypes
+        ] = false;
+      }
+    });
 
     this.svgInstanceListeners.forEach((listener) => {
       listener({ type: "effectsChanged" });
@@ -140,57 +139,58 @@ class TableSvgMediaInstance {
   };
 
   updateAllEffects = () => {
-    Object.entries(this.userEffects.current.svg[this.svgInstanceId]).map(
-      ([effect, value]) => {
-        if (value) {
-          const styles = this.userEffectsStyles.current.svg[this.svgInstanceId];
+    Object.entries(
+      this.staticContentEffects.current.svg[this.svgInstanceId],
+    ).map(([effect, value]) => {
+      if (value) {
+        const styles =
+          this.staticContentEffectsStyles.current.svg[this.svgInstanceId];
 
-          switch (effect) {
-            case "blur":
-              this.applyBlurEffect(`${styles.blur.strength}`);
-              break;
-            case "shadow":
-              this.applyShadowEffect(
-                styles.shadow.shadowColor,
-                `${styles.shadow.strength}`,
-                `${styles.shadow.offsetX}`,
-                `${styles.shadow.offsetY}`,
-              );
-              break;
-            case "grayscale":
-              this.applyGrayscaleEffect(`${styles.grayscale.scale}`);
-              break;
-            case "saturate":
-              this.applySaturateEffect(`${styles.saturate.saturation}`);
-              break;
-            case "edgeDetection":
-              this.applyEdgeDetectionEffect();
-              break;
-            case "colorOverlay":
-              this.applyColorOverlayEffect(styles.colorOverlay.overlayColor);
-              break;
-            case "waveDistortion":
-              this.applyWaveDistortionEffect(
-                `${styles.waveDistortion.frequency}`,
-                `${styles.waveDistortion.strength}`,
-              );
-              break;
-            case "crackedGlass":
-              this.applyCrackedGlassEffect(
-                `${styles.crackedGlass.density}`,
-                `${styles.crackedGlass.detail}`,
-                `${styles.crackedGlass.strength}`,
-              );
-              break;
-            case "neonGlow":
-              this.applyNeonGlowEffect(styles.neonGlow.neonColor);
-              break;
-            default:
-              break;
-          }
+        switch (effect) {
+          case "blur":
+            this.applyBlurEffect(`${styles.blur.strength}`);
+            break;
+          case "shadow":
+            this.applyShadowEffect(
+              styles.shadow.shadowColor,
+              `${styles.shadow.strength}`,
+              `${styles.shadow.offsetX}`,
+              `${styles.shadow.offsetY}`,
+            );
+            break;
+          case "grayscale":
+            this.applyGrayscaleEffect(`${styles.grayscale.scale}`);
+            break;
+          case "saturate":
+            this.applySaturateEffect(`${styles.saturate.saturation}`);
+            break;
+          case "edgeDetection":
+            this.applyEdgeDetectionEffect();
+            break;
+          case "colorOverlay":
+            this.applyColorOverlayEffect(styles.colorOverlay.overlayColor);
+            break;
+          case "waveDistortion":
+            this.applyWaveDistortionEffect(
+              `${styles.waveDistortion.frequency}`,
+              `${styles.waveDistortion.strength}`,
+            );
+            break;
+          case "crackedGlass":
+            this.applyCrackedGlassEffect(
+              `${styles.crackedGlass.density}`,
+              `${styles.crackedGlass.detail}`,
+              `${styles.crackedGlass.strength}`,
+            );
+            break;
+          case "neonGlow":
+            this.applyNeonGlowEffect(styles.neonGlow.neonColor);
+            break;
+          default:
+            break;
         }
-      },
-    );
+      }
+    });
 
     this.svgInstanceListeners.forEach((listener) => {
       listener({ type: "effectsChanged" });

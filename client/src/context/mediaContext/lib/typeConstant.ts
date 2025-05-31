@@ -1,29 +1,29 @@
 import { DataConsumer } from "mediasoup-client/lib/DataConsumer";
 import { DataProducer } from "mediasoup-client/lib/DataProducer";
-import AudioMedia from "../../media/audio/AudioMedia";
-import CameraMedia from "../../media/fgVisualMedia/CameraMedia";
-import SnakeGameMedia from "../../media/games/snakeGame/SnakeGameMedia";
-import ScreenAudioMedia from "../../media/screenAudio/ScreenAudioMedia";
-import ScreenMedia from "../../media/fgVisualMedia/ScreenMedia";
-import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
-import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
-import TableImageMedia from "../../media/fgTableImage/TableImageMedia";
-import TableApplicationMedia from "../../media/fgTableApplication/TableApplicationMedia";
-import TableTextMedia from "../../media/fgTableText/TableTextMedia";
-import TableSoundClipMedia from "../../media/fgTableSoundClip/TableSoundClipMedia";
-import TableSvgMedia from "../../media/fgTableSvg/TableSvgMedia";
-import TableSvgMediaInstance from "../../media/fgTableSvg/TableSvgMediaInstance";
-import TableTextMediaInstance from "../../media/fgTableText/TableTextMediaInstance";
-import TableApplicationMediaInstance from "../../media/fgTableApplication/TableApplicationMediaInstance";
-import TableImageMediaInstance from "../../media/fgTableImage/TableImageMediaInstance";
-import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaInstance";
-import TableSoundClipMediaInstance from "../../media/fgTableSoundClip/TableSoundClipMediaInstance";
-import UserVideoMedia from "../../media/fgUserVideo/UserVideoMedia";
-import UserImageMedia from "../../media/fgUserImage/UserImageMedia";
-import UserSvgMedia from "../../media/fgUserSvg/UserSvgMedia";
-import UserApplicationMedia from "../../media/fgUserApplication /UserApplicationMedia";
-import UserTextMedia from "../../media/fgUserText/UserTextMedia";
-import UserSoundClipMedia from "../../media/fgUserSoundClip/UserSoundClipMedia";
+import AudioMedia from "../../../media/audio/AudioMedia";
+import CameraMedia from "../../../media/fgVisualMedia/CameraMedia";
+import SnakeGameMedia from "../../../media/games/snakeGame/SnakeGameMedia";
+import ScreenAudioMedia from "../../../media/screenAudio/ScreenAudioMedia";
+import ScreenMedia from "../../../media/fgVisualMedia/ScreenMedia";
+import GamesSignalingMedia from "../../../media/games/GamesSignalingMedia";
+import TableVideoMedia from "../../../media/fgTableVideo/TableVideoMedia";
+import TableImageMedia from "../../../media/fgTableImage/TableImageMedia";
+import TableApplicationMedia from "../../../media/fgTableApplication/TableApplicationMedia";
+import TableTextMedia from "../../../media/fgTableText/TableTextMedia";
+import TableSoundClipMedia from "../../../media/fgTableSoundClip/TableSoundClipMedia";
+import TableSvgMedia from "../../../media/fgTableSvg/TableSvgMedia";
+import TableSvgMediaInstance from "../../../media/fgTableSvg/TableSvgMediaInstance";
+import TableTextMediaInstance from "../../../media/fgTableText/TableTextMediaInstance";
+import TableApplicationMediaInstance from "../../../media/fgTableApplication/TableApplicationMediaInstance";
+import TableImageMediaInstance from "../../../media/fgTableImage/TableImageMediaInstance";
+import TableVideoMediaInstance from "../../../media/fgTableVideo/TableVideoMediaInstance";
+import TableSoundClipMediaInstance from "../../../media/fgTableSoundClip/TableSoundClipMediaInstance";
+import UserVideoMedia from "../../../media/fgUserVideo/UserVideoMedia";
+import UserImageMedia from "../../../media/fgUserImage/UserImageMedia";
+import UserSvgMedia from "../../../media/fgUserSvg/UserSvgMedia";
+import UserApplicationMedia from "../../../media/fgUserApplication /UserApplicationMedia";
+import UserTextMedia from "../../../media/fgUserText/UserTextMedia";
+import UserSoundClipMedia from "../../../media/fgUserSoundClip/UserSoundClipMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -36,6 +36,9 @@ export type UserMediaType = {
   screen: { [screenId: string]: ScreenMedia };
   screenAudio: { [screenAudioId: string]: ScreenAudioMedia };
   audio: AudioMedia | undefined;
+};
+
+export type StaticContentMediaType = {
   video: {
     user: {
       [videoId: string]: UserVideoMedia;

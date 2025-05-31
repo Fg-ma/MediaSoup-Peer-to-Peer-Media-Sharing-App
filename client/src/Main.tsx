@@ -15,6 +15,7 @@ import { useSocketContext } from "./context/socketContext/SocketContext";
 import { useToolsContext } from "./context/toolsContext/ToolsContext";
 import { useSignalContext } from "./context/signalContext/SignalContext";
 import { useUploadDownloadContext } from "./context/uploadDownloadContext/UploadDownloadContext";
+import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
 import ProducersController from "./lib/ProducersController";
 import ConsumersController from "./lib/ConsumersController";
 import BrowserMedia from "./media/BrowserMedia";
@@ -26,20 +27,25 @@ import TableFunctions from "./tableFunctions/TableFunctions";
 import PermissionsController from "./lib/PermissionsController";
 import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
-import { useUserInfoContext } from "./context/userInfoContext/UserInfoContext";
+import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
+import Uploader from "./tools/uploader/Uploader";
 import "./css/scrollbar.css";
 import "./css/fontStyles.css";
 import "./css/tips.css";
-import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
-import Uploader from "./tools/uploader/Uploader";
 import CreditPage from "./creditPage/CreditPage";
 import TableLittleBuddies from "./components/tableLittleBuddies/TableLittleBuddies";
 
 export default function Main() {
-  const { userMedia, remoteMedia, remoteDataStreams, userDataStreams } =
-    useMediaContext();
+  const {
+    userMedia,
+    staticContentMedia,
+    remoteMedia,
+    remoteDataStreams,
+    userDataStreams,
+  } = useMediaContext();
   const {
     userEffectsStyles,
+    staticContentEffectsStyles,
     remoteEffectsStyles,
     userEffects,
     remoteEffects,
@@ -91,6 +97,11 @@ export default function Main() {
   const [gridActive, setGridActive] = useState(false);
   const [gridSize, setGridSize] = useState({ rows: 4, cols: 4 });
 
+  const [tableSidePanelActive, setTableSidePanelActive] = useState(false);
+  const [sidePanelPosition, setSidePanelPosition] = useState<"left" | "right">(
+    "left",
+  );
+
   const [_, setRerender] = useState(false);
 
   const tableFunctionsRef = useRef<HTMLDivElement>(null);
@@ -102,7 +113,7 @@ export default function Main() {
       "wss://localhost:8049",
       userId.current,
       instance.current,
-      userMedia,
+      staticContentMedia,
       userStaticContentSocket,
       sendDownloadSignal,
       addCurrentDownload,
@@ -196,11 +207,6 @@ export default function Main() {
         screen: {},
         screenAudio: {},
         audio: structuredClone(defaultAudioEffectsStyles),
-        video: {},
-        image: {},
-        svg: {},
-        application: {},
-        soundClip: {},
       };
     }
 
@@ -284,7 +290,11 @@ export default function Main() {
   );
 
   const deadbanding = useRef(
-    new Deadbanding(userEffectsStyles, captureEffectsStyles),
+    new Deadbanding(
+      userEffectsStyles,
+      staticContentEffectsStyles,
+      captureEffectsStyles,
+    ),
   );
 
   const browserMedia = useRef(
@@ -385,6 +395,10 @@ export default function Main() {
         bundles={bundles}
         gridActive={gridActive}
         gridSize={gridSize}
+        tableSidePanelActive={tableSidePanelActive}
+        setTableSidePanelActive={setTableSidePanelActive}
+        sidePanelPosition={sidePanelPosition}
+        setSidePanelPosition={setSidePanelPosition}
       />
       <TableFunctions
         tableFunctionsRef={tableFunctionsRef}
@@ -412,6 +426,10 @@ export default function Main() {
         setGridSize={setGridSize}
         producersController={producersController}
         deadbanding={deadbanding}
+        tableSidePanelActive={tableSidePanelActive}
+        setTableSidePanelActive={setTableSidePanelActive}
+        sidePanelPosition={sidePanelPosition}
+        setSidePanelPosition={setSidePanelPosition}
       />
       <JoinTableSection
         producerTransport={producerTransport}

@@ -23,6 +23,14 @@ class Decoder {
         };
         r: number;
       };
+      es: {
+        "0": string;
+        "1": string;
+        "2": string;
+        "3": string;
+        "4": string;
+        "5": number;
+      };
     }[];
   }): {
     tableId: string;
@@ -43,6 +51,14 @@ class Decoder {
         };
         rotation: number;
       };
+      effectStyles: {
+        backgroundColor: string;
+        textColor: string;
+        indexColor: string;
+        fontSize: string;
+        fontStyle: string;
+        letterSpacing: number;
+      };
     }[];
   } => {
     const { tid, xid, n, m, s, i } = data;
@@ -53,7 +69,7 @@ class Decoder {
       filename: n,
       mimeType: m,
       state: s.map((ate) => tableStateDecodingMap[ate]),
-      instances: i.map(({ xiid, p }) => ({
+      instances: i.map(({ xiid, p, es }) => ({
         textInstanceId: xiid,
         positioning: {
           position: {
@@ -65,6 +81,14 @@ class Decoder {
             y: p.s.y,
           },
           rotation: p.r,
+        },
+        effectStyles: {
+          backgroundColor: es["0"],
+          textColor: es["1"],
+          indexColor: es["2"],
+          fontSize: es["3"],
+          fontStyle: es["4"],
+          letterSpacing: es["5"],
         },
       })),
     };

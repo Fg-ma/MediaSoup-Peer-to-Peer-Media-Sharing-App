@@ -3,6 +3,7 @@ import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
 import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
 import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
+import { GeneralSignals } from "src/context/signalContext/lib/typeConstant";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -48,6 +49,7 @@ class ChunkUploader {
     private direction: string,
     private handle: FileSystemFileHandle | undefined,
     offset: number | undefined,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
     private initPositioning?: {
       position: { top: number; left: number };
       scale: { x: number; y: number };
@@ -157,6 +159,17 @@ class ChunkUploader {
         this.currentChunkAbortController = null;
 
         if (!response.ok) {
+          if (response.status === 413) {
+            this.sendGeneralSignal({
+              type: "tableInfoSignal",
+              data: {
+                message: `${this.filename} exceeds upload size limit`,
+                timeout: 3500,
+              },
+            });
+            this.deconstructor();
+            return;
+          }
           if (response.status !== 409) {
             this.chunkErrorRetryUpload();
             break;

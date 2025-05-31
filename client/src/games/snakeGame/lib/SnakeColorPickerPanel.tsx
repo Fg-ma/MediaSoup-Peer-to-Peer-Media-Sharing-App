@@ -26,7 +26,7 @@ export default function SnakeColorPickerPanel({
   playersState: PlayersState;
   userSnakeColor: React.MutableRefObject<SnakeColorsType | undefined>;
 }) {
-  const { userMedia } = useMediaContext();
+  const { staticContentMedia } = useMediaContext();
 
   const snakeColorPickerRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +86,7 @@ export default function SnakeColorPickerPanel({
                             color.secondary === secondaryColor,
                         )
                       ) {
-                        userMedia.current.games.snake?.[
+                        staticContentMedia.current.games.snake?.[
                           snakeGameId
                         ]?.changeSnakeColor({
                           primary: primaryColor,

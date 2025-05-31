@@ -7,7 +7,7 @@ import {
   onBundleMetadataRequestedType,
   onRequestedCatchUpDataType,
 } from "../serverControllers/mediasoupServer/lib/typeConstant";
-import { UserMediaType } from "../context/mediaContext/typeConstant";
+import { UserMediaType } from "../context/mediaContext/lib/typeConstant";
 
 class Metadata {
   constructor(

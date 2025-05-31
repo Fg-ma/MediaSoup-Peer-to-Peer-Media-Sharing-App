@@ -16,7 +16,7 @@ import {
   RemoteMediaType,
   UserDataStreamsType,
   UserMediaType,
-} from "../context/mediaContext/typeConstant";
+} from "../context/mediaContext/lib/typeConstant";
 import CameraMedia from "../media/fgVisualMedia/CameraMedia";
 import ScreenMedia from "../media/fgVisualMedia/ScreenMedia";
 import AudioMedia from "../media/audio/AudioMedia";

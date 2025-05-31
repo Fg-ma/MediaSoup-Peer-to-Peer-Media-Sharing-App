@@ -70,8 +70,10 @@ export default function JoinTableSection({
   cleanupController: React.MutableRefObject<CleanupController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { userMedia, remoteMedia, userDataStreams } = useMediaContext();
-  const { userEffects, userEffectsStyles } = useEffectsContext();
+  const { userMedia, staticContentMedia, remoteMedia, userDataStreams } =
+    useMediaContext();
+  const { staticContentEffects, staticContentEffectsStyles } =
+    useEffectsContext();
   const {
     mediasoupSocket,
     tableSocket,
@@ -100,10 +102,11 @@ export default function JoinTableSection({
       instance,
       setIsInTable,
       userMedia,
+      staticContentMedia,
       userDataStreams,
       remoteMedia,
-      userEffects,
-      userEffectsStyles,
+      staticContentEffects,
+      staticContentEffectsStyles,
       handleDisableEnableBtns,
       setBundles,
       consumerTransport,

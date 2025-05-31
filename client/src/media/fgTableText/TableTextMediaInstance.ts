@@ -2,6 +2,10 @@ import * as Y from "yjs";
 import { IncomingLiveTextEditingMessages } from "../../serverControllers/liveTextEditingServer/lib/typeConstant";
 import TableTextMedia, { TextListenerTypes } from "./TableTextMedia";
 import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
+import {
+  defaultTextEffectsStyles,
+  StaticContentEffectsStylesType,
+} from "../../../../universal/effectsTypeConstant";
 
 export type TextInstanceListenerTypes =
   | { type: "initialized" }
@@ -36,6 +40,7 @@ class TableTextMediaInstance {
 
   constructor(
     public textMedia: TableTextMedia,
+    private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     public textInstanceId: string,
     public initPositioning: {
       position: {
@@ -52,6 +57,11 @@ class TableTextMediaInstance {
       LiveTextEditingSocketController | undefined
     >,
   ) {
+    if (!this.staticContentEffectsStyles.current.text[this.textInstanceId]) {
+      this.staticContentEffectsStyles.current.text[this.textInstanceId] =
+        structuredClone(defaultTextEffectsStyles);
+    }
+
     this.positioning = this.initPositioning;
 
     this.textMedia.addTextListener(this.handleTextMessage);
