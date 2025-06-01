@@ -9,7 +9,9 @@ import {
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { ImageListenerTypes } from "../TableImageMedia";
-import TableImageMediaInstance from "../TableImageMediaInstance";
+import TableImageMediaInstance, {
+  ImageInstanceListenerTypes,
+} from "../TableImageMediaInstance";
 
 class ImageController {
   constructor(
@@ -129,6 +131,16 @@ class ImageController {
         this.setRerender((prev) => !prev);
         break;
       case "downloadRetry":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleImageInstanceMessages = (event: ImageInstanceListenerTypes) => {
+    switch (event.type) {
+      case "settingsChanged":
         this.setRerender((prev) => !prev);
         break;
       default:

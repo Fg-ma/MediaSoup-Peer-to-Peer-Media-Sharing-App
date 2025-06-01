@@ -3,7 +3,6 @@ import {
   StaticContentEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { Settings } from "../typeConstant";
 import TableSvgMediaInstance from "../../TableSvgMediaInstance";
 
 class LowerSvgController {
@@ -15,12 +14,11 @@ class LowerSvgController {
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private settings: Settings,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setEditing: React.Dispatch<React.SetStateAction<boolean>>,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   handleSvgEffects = () => {
@@ -79,23 +77,19 @@ class LowerSvgController {
   };
 
   handleSetAsBackground = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.svgMediaInstance.settings.background.value =
+      !this.svgMediaInstance.settings.background.value;
 
-      newSettings.background.value = !newSettings.background.value;
+    this.setSettingsActive(false);
 
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 
   handleSync = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.svgMediaInstance.settings.synced.value =
+      !this.svgMediaInstance.settings.synced.value;
 
-      newSettings.synced.value = !newSettings.synced.value;
-
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 
   handleEdit = () => {
@@ -105,16 +99,16 @@ class LowerSvgController {
 
   handleDownload = () => {
     this.svgMediaInstance.downloadSvg(
-      this.settings.downloadOptions.mimeType.value,
-      this.settings.downloadOptions.size.width.value,
-      this.settings.downloadOptions.size.height.value,
-      this.settings.downloadOptions.compression.value,
+      this.svgMediaInstance.settings.downloadOptions.mimeType.value,
+      this.svgMediaInstance.settings.downloadOptions.size.width.value,
+      this.svgMediaInstance.settings.downloadOptions.size.height.value,
+      this.svgMediaInstance.settings.downloadOptions.compression.value,
     );
   };
 
   handleCopyToClipBoard = () => {
     this.svgMediaInstance.copyToClipboard(
-      this.settings.downloadOptions.compression.value,
+      this.svgMediaInstance.settings.downloadOptions.compression.value,
     );
   };
 }

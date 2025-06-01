@@ -16,7 +16,9 @@ import BottomTableSection from "./lib/sideSections/BottomTableSection";
 import { TableColors } from "../serverControllers/tableServer/lib/typeConstant";
 import TableInfoPopup from "./lib/tableInfoPopup/TableInfoPopup";
 import LoadingTab from "./lib/loadingTab/LoadingTab";
-import TableSidePanel, { TablePanels } from "../tableSidePanel/TableSidePanel";
+import TableSidePanel, {
+  TableSidePanels,
+} from "../tableSidePanel/TableSidePanel";
 import "./lib/fgTable.css";
 
 export default function Table({
@@ -57,7 +59,7 @@ export default function Table({
   }>({});
   const [tableSidePanelWidth, setTableSidePanelWidth] = useState(256);
   const [_, setRerender] = useState(false);
-  const activePanel = useRef<TablePanels>("general");
+  const activePanel = useRef<TableSidePanels>("general");
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
@@ -190,7 +192,7 @@ export default function Table({
             content={
               <div
                 ref={tableTopRef}
-                className="relative aspect-square overflow-hidden bg-fg-tone-black-6"
+                className="bg-fg-tone-black-6.5 relative aspect-square overflow-hidden"
                 style={{
                   ...(aspectDir.current === "width"
                     ? { width: "100%" }

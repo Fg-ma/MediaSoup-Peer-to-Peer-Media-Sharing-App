@@ -1,10 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { Settings, ActivePages } from "../../typeConstant";
+import { ActivePages } from "../../typeConstant";
 import LowerImageController from "../LowerImageController";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
+import TableImageMediaInstance from "../../../../../media/fgTableImage/TableImageMediaInstance";
+import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
+import { TableSidePanels } from "../../../../../tableSidePanel/TableSidePanel";
+import { SettingsSignals } from "../../../../../context/signalContext/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,30 +20,39 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
+  imageMediaInstance,
   effectsActive,
   containerRef,
   settingsActive,
   setSettingsActive,
   activePages,
   setActivePages,
-  settings,
-  setSettings,
   scrollingContainerRef,
   lowerImageController,
 }: {
+  imageMediaInstance: TableImageMediaInstance;
   effectsActive: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
   settingsActive: boolean;
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
   lowerImageController: React.MutableRefObject<LowerImageController>;
 }) {
+  const {
+    sendSettingsSignal,
+    addSettingsSignalListener,
+    removeSettingsSignalListener,
+  } = useSignalContext();
+
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
+
+  const sidePanelState = useRef<undefined | TableSidePanels>(undefined);
+  const openInSidePanel = useRef(false);
+
+  const [_, setRerender] = useState(false);
 
   const deactivateAll = (obj: RecursiveObject) => {
     // Check if the current object has an 'active' property and if it's true
@@ -100,16 +113,85 @@ export default function SettingsButton({
     };
   }, [settingsActive]);
 
+  const handleSettingsSignals = (signal: SettingsSignals) => {
+    switch (signal.type) {
+      case "sidePanelChanged": {
+        const { activePanel, currentSettingsActive } = signal.header;
+
+        sidePanelState.current = activePanel;
+        openInSidePanel.current =
+          currentSettingsActive !== undefined &&
+          currentSettingsActive.contentType === "image" &&
+          currentSettingsActive.instanceId ===
+            imageMediaInstance.imageInstanceId;
+
+        setRerender((prev) => !prev);
+        break;
+      }
+      case "sidePanelClosed": {
+        sidePanelState.current = undefined;
+        setRerender((prev) => !prev);
+        break;
+      }
+      case "sidePanelOpened": {
+        sidePanelState.current = signal.header.activePanel;
+        setRerender((prev) => !prev);
+        break;
+      }
+      case "respondedSidePanelState": {
+        const { contentType, instanceId, activePanel } = signal.header;
+        if (
+          contentType === "image" &&
+          instanceId === imageMediaInstance.imageInstanceId
+        ) {
+          sidePanelState.current = activePanel;
+          setRerender((prev) => !prev);
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    addSettingsSignalListener(handleSettingsSignals);
+
+    sendSettingsSignal({
+      type: "requestSidePanelState",
+      header: {
+        contentType: "image",
+        instanceId: imageMediaInstance.imageInstanceId,
+      },
+    });
+
+    return () => {
+      removeSettingsSignalListener(handleSettingsSignals);
+    };
+  }, []);
+
   return (
     <>
       <FgButton
         externalRef={settingsButtonRef}
         className="pointer-events-auto flex aspect-square h-full items-center justify-center"
-        clickFunction={toggleSettings}
+        clickFunction={(event) => {
+          if (event.ctrlKey || openInSidePanel.current) {
+            sendSettingsSignal({
+              type: "toggleSettingsPanel",
+              header: {
+                contentType: "image",
+                instanceId: imageMediaInstance.imageInstanceId,
+              },
+            });
+          }
+
+          toggleSettings();
+        }}
         contentFunction={() => (
           <FgSVGElement
             src={settingsIcon}
-            className={`${settingsActive ? "-rotate-[30deg]" : "rotate-0"} h-[90%] w-[90%] fill-fg-white stroke-fg-white transition-transform`}
+            className={`${settingsActive || openInSidePanel.current ? "-rotate-[30deg]" : "rotate-0"} h-[90%] w-[90%] fill-fg-white stroke-fg-white transition-transform`}
             attributes={[
               { key: "height", value: "100%" },
               { key: "width", value: "100%" },
@@ -123,14 +205,13 @@ export default function SettingsButton({
         }
         scrollingContainerRef={scrollingContainerRef}
       />
-      {settingsActive && (
+      {!openInSidePanel.current && settingsActive && (
         <SettingsPanel
+          imageMediaInstance={imageMediaInstance}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}
           setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
           lowerImageController={lowerImageController}
         />
       )}

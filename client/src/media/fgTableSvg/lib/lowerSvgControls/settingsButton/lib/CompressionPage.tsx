@@ -1,12 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
-  Settings,
   ActivePages,
   DownloadCompressionTypes,
   downloadOptionsArrays,
 } from "../../../typeConstant";
+import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -14,23 +14,17 @@ const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function CompressionPage({
   setActivePages,
-  settings,
-  setSettings,
+  svgMediaInstance,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  svgMediaInstance: TableSvgMediaInstance;
 }) {
+  const [_, setRerender] = useState(false);
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const setCompression = (compression: DownloadCompressionTypes) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
-
-      newSettings.downloadOptions.compression.value = compression;
-
-      return newSettings;
-    });
+    svgMediaInstance.settings.downloadOptions.compression.value = compression;
+    setRerender((prev) => !prev);
   };
 
   const handleCloseCompressionPage = () => {
@@ -45,11 +39,11 @@ export default function CompressionPage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
-      <div className='flex h-6 w-full justify-between'>
-        <div className='flex w-full space-x-1'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+      <div className="flex h-6 w-full justify-between">
+        <div className="flex w-full space-x-1">
           <FgButton
-            className='h-full aspect-square'
+            className="aspect-square h-full"
             contentFunction={() => (
               <FgSVGElement
                 src={navigateBackIcon}
@@ -64,7 +58,7 @@ export default function CompressionPage({
             clickFunction={handleCloseCompressionPage}
           />
           <div
-            className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+            className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
             onClick={handleCloseCompressionPage}
           >
             Compression
@@ -72,24 +66,25 @@ export default function CompressionPage({
         </div>
         <div></div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-fg-white'></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
-        className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
       >
         {downloadOptionsArrays.compression.map((compression) => (
           <div
             key={compression}
-            className={`w-full text-nowrap flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              compression === settings.downloadOptions.compression.value
+            className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              compression ===
+              svgMediaInstance.settings.downloadOptions.compression.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}
           >
             <FgButton
-              className='flex items-center justify-center grow'
+              className="flex grow items-center justify-center"
               contentFunction={() => (
-                <div className='flex w-full px-2 items-start'>
+                <div className="flex w-full items-start px-2">
                   {compression}
                 </div>
               )}

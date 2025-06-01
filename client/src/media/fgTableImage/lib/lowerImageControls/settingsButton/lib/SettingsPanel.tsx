@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import {
-  Settings,
   ActivePages,
   downloadTypeSelections,
   downloadTypeOptions,
@@ -15,6 +14,14 @@ import DownloadTypePage from "./DownloadTypePage";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
 import PageTemplate from "./PageTemplate";
 import LowerImageController from "../../LowerImageController";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
+const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
 
 const SelectionPanelVar: Variants = {
   init: { opacity: 0 },
@@ -54,26 +61,25 @@ const panelVariants: Variants = {
 };
 
 export default function SettingsPanel({
+  imageMediaInstance,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
   setActivePages,
-  settings,
-  setSettings,
   lowerImageController,
 }: {
+  imageMediaInstance: TableImageMediaInstance;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   lowerImageController: React.MutableRefObject<LowerImageController>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
     left: number;
     bottom: number;
   } | null>(null);
+  const [_, setRerender] = useState(false);
 
   // Function to check if a key or its descendants are active
   const isDescendantActive = (
@@ -156,7 +162,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-black bg-opacity-75 p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-black p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -181,7 +187,49 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div
                   className={`${
-                    settings.background.value === "true"
+                    imageMediaInstance.settings.synced.value
+                      ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                      : "fill-fg-white stroke-fg-white"
+                  } flex h-full w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                >
+                  <FgSVGElement
+                    src={
+                      imageMediaInstance.settings.synced.value
+                        ? desyncIcon
+                        : syncIcon
+                    }
+                    className="mr-2 flex aspect-square h-full items-center justify-center"
+                    attributes={[
+                      { key: "width", value: "80%" },
+                      { key: "height", value: "80%" },
+                    ]}
+                  />
+                  {imageMediaInstance.settings.synced.value ? "Desync" : "Sync"}
+                </div>
+              )}
+              clickFunction={lowerImageController.current.handleSync}
+              hoverContent={
+                <FgHoverContentStandard
+                  content={
+                    imageMediaInstance.settings.synced.value
+                      ? "Desync (h)"
+                      : "Sync (h)"
+                  }
+                  style="light"
+                />
+              }
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 3500,
+                hoverType: "above",
+              }}
+            />
+            <FgButton
+              className="h-7 w-full"
+              contentFunction={() => (
+                <div
+                  className={`${
+                    imageMediaInstance.settings.background.value
                       ? "bg-fg-white text-fg-tone-black-1"
                       : ""
                   } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
@@ -199,8 +247,11 @@ export default function SettingsPanel({
                   <div>
                     {Object.prototype.hasOwnProperty.call(
                       downloadTypeSelections,
-                      settings.downloadType.value,
-                    ) && downloadTypeSelections[settings.downloadType.value]}
+                      imageMediaInstance.settings.downloadType.value,
+                    ) &&
+                      downloadTypeSelections[
+                        imageMediaInstance.settings.downloadType.value
+                      ]}
                   </div>
                 </div>
               )}
@@ -220,9 +271,8 @@ export default function SettingsPanel({
               exit="exit"
             >
               <DownloadTypePage
+                imageMediaInstance={imageMediaInstance}
                 setActivePages={setActivePages}
-                settings={settings}
-                setSettings={setSettings}
               />
             </motion.div>
           )}
@@ -239,8 +289,8 @@ export default function SettingsPanel({
               exit="exit"
             >
               <DownloadTypeOptionsPage
+                imageMediaInstance={imageMediaInstance}
                 setActivePages={setActivePages}
-                settings={settings}
               />
             </motion.div>
           )}
@@ -262,7 +312,7 @@ export default function SettingsPanel({
                     option as DownloadTypeOptionsTypes
                   ];
                 const activeSetting =
-                  settings.downloadType.downloadTypeOptions[
+                  imageMediaInstance.settings.downloadType.downloadTypeOptions[
                     option as DownloadTypeOptionsTypes
                   ];
 
@@ -275,7 +325,7 @@ export default function SettingsPanel({
                       ].map((type) => (
                         <FgButton
                           key={type}
-                          className={`w-full min-w-32 rounded bg-opacity-75 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                          className={`w-full min-w-32 rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                             type === activeSetting.value
                               ? "bg-fg-white text-fg-tone-black-1"
                               : ""
@@ -286,15 +336,11 @@ export default function SettingsPanel({
                             </div>
                           )}
                           clickFunction={() => {
-                            setSettings((prev) => {
-                              const newSettings = { ...prev };
+                            imageMediaInstance.settings.downloadType.downloadTypeOptions[
+                              option as DownloadTypeOptionsTypes
+                            ].value = type;
 
-                              newSettings.downloadType.downloadTypeOptions[
-                                option as DownloadTypeOptionsTypes
-                              ].value = type;
-
-                              return newSettings;
-                            });
+                            setRerender((prev) => !prev);
                           }}
                         />
                       ))}

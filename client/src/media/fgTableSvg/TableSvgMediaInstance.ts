@@ -8,11 +8,14 @@ import {
   SvgEffectTypes,
 } from "../../../../universal/effectsTypeConstant";
 import {
+  defaultSettings,
   DownloadCompressionTypes,
   DownloadMimeTypes,
 } from "./lib/typeConstant";
 
-export type SvgInstanceListenerTypes = { type: "effectsChanged" };
+export type SvgInstanceListenerTypes =
+  | { type: "effectsChanged" }
+  | { type: "settingsChanged" };
 
 class TableSvgMediaInstance {
   instanceSvg: SVGSVGElement | undefined = undefined;
@@ -29,13 +32,15 @@ class TableSvgMediaInstance {
     rotation: number;
   };
 
+  settings = structuredClone(defaultSettings);
+
   private svgInstanceListeners: Set<
     (message: SvgInstanceListenerTypes) => void
   > = new Set();
 
   constructor(
     public svgMedia: SvgMedia,
-    private svgInstanceId: string,
+    public svgInstanceId: string,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     initPositioning: {
@@ -64,6 +69,15 @@ class TableSvgMediaInstance {
 
     if (this.svgMedia.svg) {
       this.instanceSvg = this.svgMedia.svg?.cloneNode(true) as SVGSVGElement;
+      if ((this.svgMedia.aspect ?? 1) > 1) {
+        this.settings.downloadOptions.size.height.value =
+          this.settings.downloadOptions.size.width.value /
+          (this.svgMedia.aspect ?? 1);
+      } else {
+        this.settings.downloadOptions.size.width.value =
+          this.settings.downloadOptions.size.height.value *
+          (this.svgMedia.aspect ?? 1);
+      }
     }
     this.svgMedia.addSvgListener(this.handleSvgMessages);
   }
@@ -84,7 +98,22 @@ class TableSvgMediaInstance {
 
   private onDownloadComplete = () => {
     this.instanceSvg = this.svgMedia.svg!.cloneNode(true) as SVGSVGElement;
+    if ((this.svgMedia.aspect ?? 1) > 1) {
+      this.settings.downloadOptions.size.height.value =
+        this.settings.downloadOptions.size.width.value /
+        (this.svgMedia.aspect ?? 1);
+    } else {
+      this.settings.downloadOptions.size.width.value =
+        this.settings.downloadOptions.size.height.value *
+        (this.svgMedia.aspect ?? 1);
+    }
     this.updateAllEffects();
+  };
+
+  settingsChanged = () => {
+    this.svgInstanceListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
   };
 
   clearAllEffects = () => {

@@ -111,6 +111,9 @@ export default function TableFunctions({
   const [tabledActive, setTabledActive] = useState(false);
   const [dragging, setDragging] = useState(false);
 
+  const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
+    useState(false);
+
   const [_, setRerender] = useState(false);
 
   const tableFunctionsController = useRef(
@@ -118,6 +121,8 @@ export default function TableFunctions({
       externalBackgroundChange,
       setTableBackground,
       setCaptureMediaActive,
+      setMoreTableFunctionsActive,
+      sendGeneralSignal,
       captureMedia,
       userDevice,
       deadbanding,
@@ -171,6 +176,8 @@ export default function TableFunctions({
     >
       <div className="flex h-full w-max space-x-3 rounded-xl border-2 border-fg-off-white bg-fg-tone-black-6 px-4 py-2">
         <MoreTableFunctionsButton
+          moreTableFunctionsActive={moreTableFunctionsActive}
+          setMoreTableFunctionsActive={setMoreTableFunctionsActive}
           tableTopRef={tableTopRef}
           mutedAudioRef={mutedAudioRef}
           isAudio={isAudio}

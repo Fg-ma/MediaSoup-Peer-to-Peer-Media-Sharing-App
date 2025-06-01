@@ -28,7 +28,7 @@ export type ImageListenerTypes =
 class TableImageMedia {
   image: HTMLImageElement | undefined;
 
-  private fileSize = 0;
+  fileSize = 0;
   blobURL: string | undefined;
   loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;

@@ -34,7 +34,6 @@ export default function FgToggleButton({
   const [hovering, setHovering] = useState(false);
   const portalVisibleTimeout = useRef<NodeJS.Timeout | undefined>();
   const containerRef = useRef<HTMLDivElement>(null);
-  const invisibleBtnThumbRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     const newBtnState = btnState === 0 ? 1 : 0;
@@ -93,20 +92,10 @@ export default function FgToggleButton({
           variants={positionVariants}
           animate={`${btnState}`}
         />
-        <div
-          ref={invisibleBtnThumbRef}
-          className="absolute top-1/2 aspect-square h-full rounded-full opacity-0"
-          style={{
-            left: btnState === 0 ? "0%" : "50%",
-            transform:
-              btnState === 0 ? "translate(0%, -40%)" : "translate(-50%, -40%)",
-          }}
-        />
         {(portalVisible || hovering) && (
           <Suspense fallback={<div>Loading...</div>}>
             <FgPortal
-              type={portalVisible ? "below" : "mouse"}
-              mouseType="bottomRight"
+              type="above"
               content={
                 <div className="text-md relative bottom-0 mb-1 w-max rounded-md bg-white px-2 py-1 font-K2D text-black shadow-lg">
                   {portalVisible
@@ -114,7 +103,7 @@ export default function FgToggleButton({
                     : btnLabels && btnLabels[hoveringState]}
                 </div>
               }
-              externalRef={invisibleBtnThumbRef}
+              externalRef={containerRef}
             />
           </Suspense>
         )}

@@ -162,9 +162,9 @@ export default function Scrollbar({
   }, []);
 
   useLayoutEffect(() => {
-    setTimeout(() => {
-      if (!contentContainerRef.current) return;
+    if (!contentContainerRef.current) return;
 
+    setTimeout(() => {
       scrollbarVisible.current =
         direction === "vertical"
           ? contentContainerRef.current
@@ -176,24 +176,26 @@ export default function Scrollbar({
               contentContainerRef.current.clientWidth
             : false;
       setRerender((prev) => !prev);
+    }, 100);
 
-      const resizeObserver = new ResizeObserver(() => {
-        scrollbarVisible.current =
-          direction === "vertical"
-            ? contentContainerRef.current
-              ? contentContainerRef.current.scrollHeight >
-                contentContainerRef.current.clientHeight
-              : false
-            : contentContainerRef.current
-              ? contentContainerRef.current.scrollWidth >
-                contentContainerRef.current.clientWidth
-              : false;
-        setRerender((prev) => !prev);
-      });
-      resizeObserver.observe(contentContainerRef.current);
+    const resizeObserver = new ResizeObserver(() => {
+      scrollbarVisible.current =
+        direction === "vertical"
+          ? contentContainerRef.current
+            ? contentContainerRef.current.scrollHeight >
+              contentContainerRef.current.clientHeight
+            : false
+          : contentContainerRef.current
+            ? contentContainerRef.current.scrollWidth >
+              contentContainerRef.current.clientWidth
+            : false;
+      setRerender((prev) => !prev);
+    });
+    resizeObserver.observe(contentContainerRef.current);
 
-      return resizeObserver.disconnect();
-    }, 0);
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [direction, contentContainerRef.current]);
 
   return (

@@ -1,16 +1,18 @@
 import React from "react";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import FgButton from "../../elements/fgButton/FgButton";
 import FgDropdownButton from "../../elements/fgDropdownButton/FgDropdownButton";
-import { TablePanels } from "../TableSidePanel";
+import { TableSidePanels } from "../TableSidePanel";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import { ContentTypes } from "../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const swapIcon = nginxAssetServerBaseUrl + "svgs/swapIcon.svg";
 
-const activePanelTitles: { [tablePanel in TablePanels]: string } = {
+const activePanelTitles: { [tablePanel in TableSidePanels]: string } = {
   general: "General",
   settings: "Settings",
   upload: "Uploads",
@@ -24,14 +26,24 @@ export default function TableSidePanelHeader({
   setExternalRerender,
   sidePanelPosition,
   setSidePanelPosition,
+  currentSettingsActive,
 }: {
   tableSidePanelHeaderRef: React.RefObject<HTMLDivElement>;
-  activePanel: React.MutableRefObject<TablePanels>;
+  activePanel: React.MutableRefObject<TableSidePanels>;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
   sidePanelPosition: "left" | "right";
   setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
+  currentSettingsActive: React.MutableRefObject<
+    | {
+        contentType: ContentTypes;
+        instanceId: string;
+      }
+    | undefined
+  >;
 }) {
+  const { sendSettingsSignal } = useSignalContext();
+
   return (
     <div
       ref={tableSidePanelHeaderRef}
@@ -46,8 +58,16 @@ export default function TableSidePanelHeader({
             key={key}
             className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] truncate rounded font-K2D hover:bg-fg-tone-black-8`}
             onClick={() => {
-              activePanel.current = key as TablePanels;
+              activePanel.current = key as TableSidePanels;
               setExternalRerender((prev) => !prev);
+              currentSettingsActive.current = undefined;
+              sendSettingsSignal({
+                type: "sidePanelChanged",
+                header: {
+                  activePanel: activePanel.current,
+                  currentSettingsActive: currentSettingsActive.current,
+                },
+              });
             }}
           >
             {title}

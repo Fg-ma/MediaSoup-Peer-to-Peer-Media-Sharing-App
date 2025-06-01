@@ -1,11 +1,7 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import {
-  Settings,
-  ActivePages,
-  downloadOptionsArrays,
-} from "../../../typeConstant";
+import { ActivePages, downloadOptionsArrays } from "../../../typeConstant";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 import TableSvgMediaInstance from "../../../../TableSvgMediaInstance";
 
@@ -16,24 +12,16 @@ const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 export default function SizePage({
   svgMediaInstance,
   setActivePages,
-  settings,
-  setSettings,
 }: {
   svgMediaInstance: TableSvgMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
+  const [_, setRerender] = useState(false);
+
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
   const setSize = (type: "width" | "height", value: number) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
-
-      newSettings.downloadOptions.size[type].value = value;
-
-      return newSettings;
-    });
+    svgMediaInstance.settings.downloadOptions.size[type].value = value;
   };
 
   const handleCloseSizePage = () => {
@@ -48,22 +36,21 @@ export default function SizePage({
   };
 
   const handleToggleAspect = () => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
-
-      if (newSettings.downloadOptions.size.value === "free") {
-        newSettings.downloadOptions.size.value = "aspect";
-        setSize(
-          "height",
-          newSettings.downloadOptions.size.width.value /
+    if (svgMediaInstance.settings.downloadOptions.size.value === "free") {
+      svgMediaInstance.settings.downloadOptions.size.value = "aspect";
+      setSize(
+        "height",
+        Math.min(
+          4096,
+          svgMediaInstance.settings.downloadOptions.size.width.value /
             (svgMediaInstance.svgMedia.aspect ?? 1),
-        );
-      } else {
-        newSettings.downloadOptions.size.value = "free";
-      }
+        ),
+      );
+    } else {
+      svgMediaInstance.settings.downloadOptions.size.value = "free";
+    }
 
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   return (
@@ -105,12 +92,14 @@ export default function SizePage({
             contentFunction={() => (
               <div
                 className={`${
-                  settings.downloadOptions.size.value === "aspect"
+                  svgMediaInstance.settings.downloadOptions.size.value ===
+                  "aspect"
                     ? "bg-fg-white text-fg-tone-black-1"
                     : ""
                 } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
               >
-                {settings.downloadOptions.size.value === "aspect"
+                {svgMediaInstance.settings.downloadOptions.size.value ===
+                "aspect"
                   ? "Disable aspect"
                   : "Enable aspect"}
               </div>
@@ -119,19 +108,28 @@ export default function SizePage({
           />
           <FgSlider
             style={{ height: "2.5rem" }}
-            externalValue={settings.downloadOptions.size.width.value}
-            externalStyleValue={settings.downloadOptions.size.width.value}
+            externalValue={
+              svgMediaInstance.settings.downloadOptions.size.width.value
+            }
+            externalStyleValue={
+              svgMediaInstance.settings.downloadOptions.size.width.value
+            }
             onValueChange={(value) => {
               setSize("width", value.value);
-              if (settings.downloadOptions.size.value === "aspect") {
+              if (
+                svgMediaInstance.settings.downloadOptions.size.value ===
+                "aspect"
+              ) {
                 setSize(
                   "height",
                   value.value / (svgMediaInstance.svgMedia.aspect ?? 1),
                 );
               }
+              setRerender((prev) => !prev);
             }}
             options={{
-              initValue: settings.downloadOptions.size.width.value,
+              initValue:
+                svgMediaInstance.settings.downloadOptions.size.width.value,
               ticks: 5,
               rangeMax: 4096,
               rangeMin: 1,
@@ -145,19 +143,28 @@ export default function SizePage({
           />
           <FgSlider
             style={{ height: "2.5rem" }}
-            externalValue={settings.downloadOptions.size.height.value}
-            externalStyleValue={settings.downloadOptions.size.height.value}
+            externalValue={
+              svgMediaInstance.settings.downloadOptions.size.height.value
+            }
+            externalStyleValue={
+              svgMediaInstance.settings.downloadOptions.size.height.value
+            }
             onValueChange={(value) => {
               setSize("height", value.value);
-              if (settings.downloadOptions.size.value === "aspect") {
+              if (
+                svgMediaInstance.settings.downloadOptions.size.value ===
+                "aspect"
+              ) {
                 setSize(
                   "width",
                   value.value * (svgMediaInstance.svgMedia.aspect ?? 1),
                 );
               }
+              setRerender((prev) => !prev);
             }}
             options={{
-              initValue: settings.downloadOptions.size.height.value,
+              initValue:
+                svgMediaInstance.settings.downloadOptions.size.height.value,
               ticks: 5,
               rangeMax: 4096,
               rangeMin: 1,
@@ -173,8 +180,10 @@ export default function SizePage({
             <div
               key={size}
               className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                parseInt(size) === settings.downloadOptions.size.width.value &&
-                settings.downloadOptions.size.value === "aspect"
+                parseInt(size) ===
+                  svgMediaInstance.settings.downloadOptions.size.width.value &&
+                svgMediaInstance.settings.downloadOptions.size.value ===
+                  "aspect"
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
@@ -216,6 +225,7 @@ export default function SizePage({
                       ? parseInt(size) / (svgMediaInstance.svgMedia.aspect ?? 1)
                       : parseInt(size),
                   );
+                  setRerender((prev) => !prev);
                 }}
               />
             </div>

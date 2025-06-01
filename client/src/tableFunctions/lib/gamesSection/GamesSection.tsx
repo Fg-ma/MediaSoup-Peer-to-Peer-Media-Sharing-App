@@ -66,6 +66,7 @@ export default function GamesSection({
       {gamesActive && (
         <FgPanel
           externalRef={gamesSectionRef}
+          className="border border-fg-white shadow-md shadow-fg-white"
           content={
             <LazyScrollingContainer
               externalRef={gamesScrollingContainerRef}
@@ -123,8 +124,8 @@ export default function GamesSection({
           closeCallback={() => setGamesActive(false)}
           closePosition="topRight"
           shadow={{ top: true, bottom: true }}
-          backgroundColor={"#161616"}
-          secondaryBackgroundColor={"#212121"}
+          backgroundColor={"#090909"}
+          secondaryBackgroundColor={"#161616"}
         />
       )}
     </>

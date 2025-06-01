@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import { Settings, ActivePages } from "../../../typeConstant";
+import { ActivePages } from "../../../typeConstant";
 import LowerSvgController from "../../LowerSvgController";
 import MimeTypePage from "./MimeTypePage";
 import SizePage from "./SizePage";
@@ -64,8 +64,6 @@ export default function SettingsPanel({
   settingsButtonRef,
   activePages,
   setActivePages,
-  settings,
-  setSettings,
   lowerSvgController,
 }: {
   svgMediaInstance: TableSvgMediaInstance;
@@ -73,8 +71,6 @@ export default function SettingsPanel({
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   lowerSvgController: React.MutableRefObject<LowerSvgController>;
 }) {
   const [portalPosition, setPortalPosition] = useState<{
@@ -164,7 +160,7 @@ export default function SettingsPanel({
   return ReactDOM.createPortal(
     <motion.div
       ref={settingsPanelRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-black p-2 font-K2D text-base text-white shadow-md"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md bg-fg-tone-black-1 p-2 font-K2D text-base text-white shadow-md"
       style={{
         bottom: `${portalPosition?.bottom}px`,
         left: `${portalPosition?.left}px`,
@@ -189,26 +185,34 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div
                   className={`${
-                    settings.synced.value
+                    svgMediaInstance.settings.synced.value
                       ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                       : "fill-fg-white stroke-fg-white"
                   } flex h-full w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                 >
                   <FgSVGElement
-                    src={settings.synced.value ? desyncIcon : syncIcon}
+                    src={
+                      svgMediaInstance.settings.synced.value
+                        ? desyncIcon
+                        : syncIcon
+                    }
                     className="mr-2 flex aspect-square h-full items-center justify-center"
                     attributes={[
                       { key: "width", value: "80%" },
                       { key: "height", value: "80%" },
                     ]}
                   />
-                  {settings.synced.value ? "Desync" : "Sync"}
+                  {svgMediaInstance.settings.synced.value ? "Desync" : "Sync"}
                 </div>
               )}
               clickFunction={lowerSvgController.current.handleSync}
               hoverContent={
                 <FgHoverContentStandard
-                  content={settings.synced.value ? "Desync (h)" : "Sync (h)"}
+                  content={
+                    svgMediaInstance.settings.synced.value
+                      ? "Desync (h)"
+                      : "Sync (h)"
+                  }
                   style="light"
                 />
               }
@@ -223,7 +227,7 @@ export default function SettingsPanel({
               contentFunction={() => (
                 <div
                   className={`${
-                    settings.background.value
+                    svgMediaInstance.settings.background.value
                       ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                       : "fill-fg-white stroke-fg-white"
                   } flex h-full w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
@@ -357,7 +361,7 @@ export default function SettingsPanel({
             >
               <DownloadOptionsPage
                 setActivePages={setActivePages}
-                settings={settings}
+                svgMediaInstance={svgMediaInstance}
               />
             </motion.div>
           )}
@@ -374,8 +378,7 @@ export default function SettingsPanel({
           >
             <MimeTypePage
               setActivePages={setActivePages}
-              settings={settings}
-              setSettings={setSettings}
+              svgMediaInstance={svgMediaInstance}
             />
           </motion.div>
         )}
@@ -393,8 +396,6 @@ export default function SettingsPanel({
             <SizePage
               svgMediaInstance={svgMediaInstance}
               setActivePages={setActivePages}
-              settings={settings}
-              setSettings={setSettings}
             />
           </motion.div>
         )}
@@ -411,8 +412,7 @@ export default function SettingsPanel({
           >
             <CompressionPage
               setActivePages={setActivePages}
-              settings={settings}
-              setSettings={setSettings}
+              svgMediaInstance={svgMediaInstance}
             />
           </motion.div>
         )}

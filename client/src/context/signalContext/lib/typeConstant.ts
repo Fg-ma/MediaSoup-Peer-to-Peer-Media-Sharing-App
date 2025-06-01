@@ -1,3 +1,4 @@
+import { TableSidePanels } from "../../../tableSidePanel/TableSidePanel";
 import {
   ContentTypes,
   StaticContentTypes,
@@ -5,6 +6,14 @@ import {
 import { InstanceLayerModes } from "../../../tableLayers/newInstancesLayer/lib/typeConstant";
 
 export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
+
+export type SettingsSignals =
+  | onToggleSettingsPanelType
+  | onSidePanelChangedType
+  | onRequestSidePanelStateType
+  | onRespondedSidePanelStateType
+  | onSidePanelClosedType
+  | onSidePanelOpenedType;
 
 export type NewInstanceSignals =
   | onStartInstancesDragType
@@ -34,6 +43,55 @@ export type onLocalMuteChangeType = {
     instance: string;
     producerType: "audio" | "screenAudio";
     producerId: string | undefined;
+  };
+};
+
+export type onRequestSidePanelStateType = {
+  type: "requestSidePanelState";
+  header: {
+    contentType: ContentTypes;
+    instanceId: string;
+  };
+};
+
+export type onRespondedSidePanelStateType = {
+  type: "respondedSidePanelState";
+  header: {
+    contentType: ContentTypes;
+    instanceId: string;
+    activePanel: TableSidePanels;
+  };
+};
+
+export type onSidePanelOpenedType = {
+  type: "sidePanelOpened";
+  header: {
+    activePanel: TableSidePanels;
+  };
+};
+
+export type onSidePanelClosedType = {
+  type: "sidePanelClosed";
+};
+
+export type onSidePanelChangedType = {
+  type: "sidePanelChanged";
+  header: {
+    activePanel: TableSidePanels;
+    currentSettingsActive:
+      | {
+          contentType: ContentTypes;
+          instanceId: string;
+        }
+      | undefined;
+  };
+};
+
+export type onToggleSettingsPanelType = {
+  type: "toggleSettingsPanel";
+  header: {
+    contentType: ContentTypes;
+    instanceId: string;
   };
 };
 

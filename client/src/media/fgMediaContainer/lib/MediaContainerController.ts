@@ -78,7 +78,6 @@ class MediaContainerController {
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private bundleRef: React.RefObject<HTMLDivElement>,
     private sendGroupSignal: (signal: GroupSignals) => void,
-    private adjustingDimensions: boolean,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
   ) {}
 

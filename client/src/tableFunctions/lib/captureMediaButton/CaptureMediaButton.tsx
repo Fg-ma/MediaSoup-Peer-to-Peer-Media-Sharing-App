@@ -19,8 +19,6 @@ export default function CaptureMediaButton({
     if (captureMediaActive) return;
 
     setCaptureMediaActive(true);
-
-    setMoreTableFunctionsActive(false);
   };
 
   return (

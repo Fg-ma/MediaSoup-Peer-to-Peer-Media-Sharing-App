@@ -10,6 +10,8 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const additionIcon = nginxAssetServerBaseUrl + "svgs/additionIcon.svg";
 
 export default function MoreTableFunctionsButton({
+  moreTableFunctionsActive,
+  setMoreTableFunctionsActive,
   tableTopRef,
   mutedAudioRef,
   isAudio,
@@ -31,6 +33,8 @@ export default function MoreTableFunctionsButton({
   sidePanelPosition,
   setSidePanelPosition,
 }: {
+  moreTableFunctionsActive: boolean;
+  setMoreTableFunctionsActive: React.Dispatch<React.SetStateAction<boolean>>;
   tableTopRef: React.RefObject<HTMLDivElement>;
   mutedAudioRef: React.MutableRefObject<boolean>;
   isAudio: React.MutableRefObject<boolean>;
@@ -60,8 +64,6 @@ export default function MoreTableFunctionsButton({
   sidePanelPosition: "left" | "right";
   setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
-  const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
-    useState(false);
   const moreTableFunctionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreTableFunctionsPanelRef = useRef<HTMLDivElement>(null);
   const gamesSectionRef = useRef<HTMLDivElement>(null);

@@ -117,11 +117,16 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
-      className="border-2 border-fg-white"
+      className="border border-fg-white shadow-md shadow-fg-white"
       externalRef={moreTableFunctionsPanelRef}
       content={
         <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">
-          <div className="my-2 grid h-max w-full grid-cols-3 gap-3">
+          <div
+            className="my-2 grid h-max w-full gap-3"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
+            }}
+          >
             <TabledSection
               tabledActive={tabledActive}
               setTabledActive={setTabledActive}
@@ -196,15 +201,15 @@ export default function MoreTableFunctionsSection({
         placement: "above",
         padding: 8,
       }}
-      initWidth={"300px"}
+      initWidth={"324px"}
       initHeight={"230px"}
-      minWidth={200}
+      minWidth={234}
       minHeight={80}
       closeCallback={() => setMoreTableFunctionsActive(false)}
       closePosition="topRight"
       shadow={{ top: true, bottom: true }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

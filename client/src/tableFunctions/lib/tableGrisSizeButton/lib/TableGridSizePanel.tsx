@@ -25,11 +25,11 @@ export default function TableGridSizePanel({
   >;
 }) {
   const [squareActive, setSquareActive] = useState(false);
-  const [externalStyleValue, setExternalStyleValue] = useState(gridSize);
 
   return (
     <FgPanel
       externalRef={gridSizeSectionRef}
+      className="border border-fg-white shadow-md shadow-fg-white"
       content={
         <div className="flex h-full w-full flex-col items-start justify-between space-y-2">
           <div className="h-8 w-[4.5rem]">
@@ -43,23 +43,15 @@ export default function TableGridSizePanel({
           </div>
           <FgSlider
             externalValue={gridSize.rows}
-            externalStyleValue={externalStyleValue.rows}
+            externalStyleValue={gridSize.rows}
             onValueChange={(event) => {
               if (squareActive) {
                 setGridSize({
                   rows: event.value,
                   cols: event.value,
                 });
-                setExternalStyleValue({
-                  rows: event.styleValue,
-                  cols: event.styleValue,
-                });
               } else {
                 setGridSize((prev) => ({ ...prev, rows: event.value }));
-                setExternalStyleValue((prev) => ({
-                  ...prev,
-                  rows: event.styleValue,
-                }));
               }
             }}
             options={{
@@ -76,23 +68,15 @@ export default function TableGridSizePanel({
           />
           <FgSlider
             externalValue={gridSize.cols}
-            externalStyleValue={externalStyleValue.cols}
+            externalStyleValue={gridSize.cols}
             onValueChange={(event) => {
               if (squareActive) {
                 setGridSize({
                   rows: event.value,
                   cols: event.value,
                 });
-                setExternalStyleValue({
-                  rows: event.styleValue,
-                  cols: event.styleValue,
-                });
               } else {
                 setGridSize((prev) => ({ ...prev, cols: event.value }));
-                setExternalStyleValue((prev) => ({
-                  ...prev,
-                  cols: event.styleValue,
-                }));
               }
             }}
             options={{
@@ -120,8 +104,8 @@ export default function TableGridSizePanel({
       minHeight={160}
       closeCallback={() => setGridSizePanelActive(false)}
       closePosition="topRight"
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

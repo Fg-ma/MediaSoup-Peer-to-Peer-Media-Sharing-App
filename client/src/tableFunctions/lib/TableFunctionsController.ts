@@ -7,6 +7,7 @@ import {
   CaptureEffectStylesType,
   CaptureEffectsType,
 } from "../../../../universal/effectsTypeConstant";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class TableFunctionsController {
   constructor(
@@ -17,6 +18,10 @@ class TableFunctionsController {
     private setCaptureMediaActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
+    private setMoreTableFunctionsActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
     private captureMedia: React.MutableRefObject<CaptureMedia | undefined>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private deadbanding: React.MutableRefObject<Deadbanding>,
@@ -49,8 +54,17 @@ class TableFunctionsController {
       this.captureMedia.current.video.srcObject = stream;
 
       this.setRerender((prev) => !prev);
+
+      this.setMoreTableFunctionsActive(false);
     } catch (error) {
       console.error("Error accessing media devices:", error);
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Error accessing camera",
+          timeout: 1750,
+        },
+      });
       this.setCaptureMediaActive(false);
     }
   };

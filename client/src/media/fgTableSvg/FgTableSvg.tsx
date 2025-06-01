@@ -5,12 +5,7 @@ import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 import SvgController from "./lib/SvgController";
 import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
-import {
-  ActivePages,
-  defaultActivePages,
-  defaultSettings,
-  Settings,
-} from "./lib/typeConstant";
+import { ActivePages, defaultActivePages } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import SvgEffectsButton from "./lib/lowerSvgControls/svgEffectsButton/SvgEffectsButton";
 import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
@@ -55,9 +50,6 @@ export default function FgTableSvg({
   const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
-  const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings),
-  );
   const [activePages, setActivePages] = useState<ActivePages>(
     structuredClone(defaultActivePages),
   );
@@ -71,10 +63,9 @@ export default function FgTableSvg({
       staticContentEffects,
       staticContentEffectsStyles,
       setSettingsActive,
-      settings,
       tableStaticContentSocket,
-      setSettings,
       setEditing,
+      setRerender,
     ),
   );
 
@@ -106,6 +97,9 @@ export default function FgTableSvg({
     svgMediaInstance.svgMedia.addSvgListener(
       svgController.current.handleSvgMessages,
     );
+    svgMediaInstance.addSvgInstanceListener(
+      svgController.current.handleSvgInstanceMessages,
+    );
 
     document.addEventListener(
       "keydown",
@@ -124,6 +118,9 @@ export default function FgTableSvg({
       );
       svgMediaInstance.svgMedia.removeSvgListener(
         svgController.current.handleSvgMessages,
+      );
+      svgMediaInstance.removeSvgInstanceListener(
+        svgController.current.handleSvgInstanceMessages,
       );
       tableRef.current?.removeEventListener(
         "scroll",
@@ -172,7 +169,7 @@ export default function FgTableSvg({
         kind="svg"
         initState={svgMediaInstance.svgMedia.state}
         bundleRef={bundleRef}
-        backgroundMedia={settings.background.value}
+        backgroundMedia={svgMediaInstance.settings.background.value}
         className="svg-container"
         popupElements={[
           svgEffectsActive ? (
@@ -193,8 +190,6 @@ export default function FgTableSvg({
             setSettingsActive={setSettingsActive}
             activePages={activePages}
             setActivePages={setActivePages}
-            settings={settings}
-            setSettings={setSettings}
             scrollingContainerRef={rightLowerSvgControlsRef}
             lowerSvgController={lowerSvgController}
           />,

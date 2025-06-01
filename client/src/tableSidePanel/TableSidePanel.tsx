@@ -1,14 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSignalContext } from "../context/signalContext/SignalContext";
+import { SettingsSignals } from "../context/signalContext/lib/typeConstant";
 import UploadingPanel from "./panels/uploadingPanel/UploadingPanel";
 import TableController from "../table/lib/TableController";
 import TableSidePanelHeader from "./lib/TableSidePanelHeader";
 import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElement";
 import GeneralPanel from "./panels/generalPanel/GeneralPanel";
 import SidePanelDragger from "./lib/SidePanelDragger";
-import "./lib/tableSidePanel.css";
 import DownloadingPanel from "./panels/downloadingPanel/DownloadingPanel";
+import "./lib/tableSidePanel.css";
+import { ContentTypes } from "../../../universal/contentTypeConstant";
+import SettingsPanel from "./panels/settingsPanel/SettingsPanel";
 
-export type TablePanels = "upload" | "download" | "general" | "settings";
+export type TableSidePanels = "upload" | "download" | "general" | "settings";
 
 export default function TableSidePanel({
   activePanel,
@@ -21,7 +25,7 @@ export default function TableSidePanel({
   sidePanelPosition,
   setSidePanelPosition,
 }: {
-  activePanel: React.MutableRefObject<TablePanels>;
+  activePanel: React.MutableRefObject<TableSidePanels>;
   tableSidePanelActive: boolean;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   tableController: React.MutableRefObject<TableController>;
@@ -31,8 +35,17 @@ export default function TableSidePanel({
   sidePanelPosition: "left" | "right";
   setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }) {
+  const {
+    sendSettingsSignal,
+    addSettingsSignalListener,
+    removeSettingsSignalListener,
+  } = useSignalContext();
+
   const tablePanelRef = useRef<HTMLDivElement>(null);
   const tableSidePanelHeaderRef = useRef<HTMLDivElement>(null);
+  const currentSettingsActive = useRef<
+    { contentType: ContentTypes; instanceId: string } | undefined
+  >(undefined);
 
   const [_, setRerender] = useState(false);
 
@@ -43,6 +56,70 @@ export default function TableSidePanel({
   useEffect(() => {
     setRerender((prev) => !prev);
   }, [activePanel.current]);
+
+  const handleSettingsSignals = (signal: SettingsSignals) => {
+    switch (signal.type) {
+      case "toggleSettingsPanel": {
+        const { contentType, instanceId } = signal.header;
+
+        const condition =
+          activePanel.current !== "settings" ||
+          !currentSettingsActive.current ||
+          contentType !== currentSettingsActive.current.contentType ||
+          instanceId !== currentSettingsActive.current.instanceId;
+
+        setTableSidePanelActive(condition);
+
+        currentSettingsActive.current = condition
+          ? { contentType, instanceId }
+          : undefined;
+        activePanel.current = condition ? "settings" : "general";
+
+        sendSettingsSignal({
+          type: "sidePanelChanged",
+          header: {
+            activePanel: activePanel.current,
+            currentSettingsActive: currentSettingsActive.current,
+          },
+        });
+
+        setRerender((prev) => !prev);
+        break;
+      }
+      case "requestSidePanelState": {
+        const { contentType, instanceId } = signal.header;
+
+        sendSettingsSignal({
+          type: "respondedSidePanelState",
+          header: { contentType, instanceId, activePanel: activePanel.current },
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    addSettingsSignalListener(handleSettingsSignals);
+
+    return () => {
+      removeSettingsSignalListener(handleSettingsSignals);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (tableSidePanelActive) {
+      sendSettingsSignal({
+        type: "sidePanelOpened",
+        header: { activePanel: activePanel.current },
+      });
+    } else {
+      sendSettingsSignal({
+        type: "sidePanelClosed",
+      });
+    }
+  }, [tableSidePanelActive]);
 
   return (
     tableSidePanelActive && (
@@ -63,6 +140,7 @@ export default function TableSidePanel({
             setExternalRerender={setExternalRerender}
             sidePanelPosition={sidePanelPosition}
             setSidePanelPosition={setSidePanelPosition}
+            currentSettingsActive={currentSettingsActive}
           />
           <FgScrollbarElement
             direction="vertical"
@@ -88,6 +166,11 @@ export default function TableSidePanel({
                   <DownloadingPanel
                     tablePanelRef={tablePanelRef}
                     setExternalRerender={setRerender}
+                  />
+                )}
+                {activePanel.current === "settings" && (
+                  <SettingsPanel
+                    currentSettingsActive={currentSettingsActive}
                   />
                 )}
               </>

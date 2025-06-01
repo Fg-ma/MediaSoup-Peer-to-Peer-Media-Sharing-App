@@ -1,37 +1,29 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import {
-  Settings,
-  ActivePages,
-  downloadTypeSelections,
-} from "../../../typeConstant";
+import { ActivePages, downloadTypeSelections } from "../../../typeConstant";
+import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function DownloadTypePage({
+  imageMediaInstance,
   setActivePages,
-  settings,
-  setSettings,
 }: {
+  imageMediaInstance: TableImageMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
+  const [_, setRerender] = useState(false);
 
   const setDownloadType = (
-    downloadType: keyof typeof downloadTypeSelections
+    downloadType: keyof typeof downloadTypeSelections,
   ) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
+    imageMediaInstance.settings.downloadType.value = downloadType;
 
-      newSettings.downloadType.value = downloadType;
-
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   const handleCloseDownloadTypePage = () => {
@@ -56,11 +48,11 @@ export default function DownloadTypePage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
-      <div className='flex h-6 w-full justify-between'>
-        <div className='flex w-full space-x-1'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+      <div className="flex h-6 w-full justify-between">
+        <div className="flex w-full space-x-1">
           <FgButton
-            className='h-full aspect-square'
+            className="aspect-square h-full"
             contentFunction={() => (
               <FgSVGElement
                 src={navigateBackIcon}
@@ -75,16 +67,16 @@ export default function DownloadTypePage({
             clickFunction={handleCloseDownloadTypePage}
           />
           <div
-            className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+            className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
             onClick={handleCloseDownloadTypePage}
           >
             Download
           </div>
         </div>
-        {settings.downloadType.value === "record" ? (
+        {imageMediaInstance.settings.downloadType.value === "record" ? (
           <FgButton
             contentFunction={() => (
-              <div className='px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded font-Josefin text-lg font-bold pt-0.5'>
+              <div className="rounded px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">
                 Options
               </div>
             )}
@@ -94,26 +86,24 @@ export default function DownloadTypePage({
           <div></div>
         )}
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
-        className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
       >
         {Object.entries(downloadTypeSelections).map(([key, lang]) => (
           <div
             key={key}
-            className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              key === settings.downloadType.value
+            className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              key === imageMediaInstance.settings.downloadType.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}
           >
             <FgButton
-              className='flex items-center justify-center grow'
+              className="flex grow items-center justify-center"
               contentFunction={() => (
-                <div className='flex w-full bg-opacity-75 px-2 items-start'>
-                  {lang}
-                </div>
+                <div className="flex w-full items-start px-2">{lang}</div>
               )}
               clickFunction={() =>
                 setDownloadType(key as keyof typeof downloadTypeSelections)

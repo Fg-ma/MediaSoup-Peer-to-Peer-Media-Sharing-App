@@ -9,7 +9,9 @@ import {
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { SvgListenerTypes } from "../TableSvgMedia";
-import TableSvgMediaInstance from "../TableSvgMediaInstance";
+import TableSvgMediaInstance, {
+  SvgInstanceListenerTypes,
+} from "../TableSvgMediaInstance";
 
 class SvgController {
   constructor(
@@ -119,6 +121,16 @@ class SvgController {
         this.setRerender((prev) => !prev);
         break;
       case "downloadRetry":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleSvgInstanceMessages = (event: SvgInstanceListenerTypes) => {
+    switch (event.type) {
+      case "settingsChanged":
         this.setRerender((prev) => !prev);
         break;
       default:

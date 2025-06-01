@@ -2,11 +2,11 @@ import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
-  Settings,
   ActivePages,
   downloadOptionsTitles,
   downloadOptionsArrays,
 } from "../../../typeConstant";
+import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,10 +16,10 @@ const navigateForwardIcon =
 
 export default function DownloadOptionsPage({
   setActivePages,
-  settings,
+  svgMediaInstance,
 }: {
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
+  svgMediaInstance: TableSvgMediaInstance;
 }) {
   const handleDownloadOptionsActive = () => {
     setActivePages((prev) => {
@@ -44,10 +44,10 @@ export default function DownloadOptionsPage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2 font-K2D'>
-      <div className='flex h-6 w-full space-x-1 justify-start'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2 font-K2D">
+      <div className="flex h-6 w-full justify-start space-x-1">
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -62,23 +62,23 @@ export default function DownloadOptionsPage({
           clickFunction={handleDownloadOptionsActive}
         />
         <div
-          className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
           onClick={handleDownloadOptionsActive}
         >
           Download options
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-fg-white'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
+      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col justify-start space-y-1 overflow-y-auto px-2">
         {Object.keys(downloadOptionsArrays).map((option) => (
           <FgButton
             key={option}
-            className='w-full h-8'
+            className="h-8 w-full"
             clickFunction={() =>
               handleOptionSelect(option as keyof typeof downloadOptionsArrays)
             }
             contentFunction={() => (
-              <div className='flex justify-between w-full space-x-4 px-2 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                 <div>
                   {
                     downloadOptionsTitles[
@@ -86,34 +86,32 @@ export default function DownloadOptionsPage({
                     ]
                   }
                 </div>
-                {option !== "antialiasing" && (
-                  <div className='flex space-x-1 items-center justify-center'>
-                    <div>
-                      {option === "size"
-                        ? `${parseFloat(
-                            settings.downloadOptions[
-                              option
-                            ].width.value.toFixed(2)
-                          )}x${parseFloat(
-                            settings.downloadOptions[
-                              option
-                            ].height.value.toFixed(2)
-                          )}`
-                        : settings.downloadOptions[
-                            option as keyof typeof downloadOptionsArrays
-                          ].value}
-                    </div>
-                    <FgSVGElement
-                      src={navigateForwardIcon}
-                      attributes={[
-                        { key: "width", value: "1.25rem" },
-                        { key: "height", value: "1.25rem" },
-                        { key: "fill", value: "#f2f2f2" },
-                        { key: "stroke", value: "#f2f2f2" },
-                      ]}
-                    />
+                <div className="flex items-center justify-center space-x-1">
+                  <div>
+                    {option === "size"
+                      ? `${parseFloat(
+                          svgMediaInstance.settings.downloadOptions[
+                            option
+                          ].width.value.toFixed(2),
+                        )}x${parseFloat(
+                          svgMediaInstance.settings.downloadOptions[
+                            option
+                          ].height.value.toFixed(2),
+                        )}`
+                      : svgMediaInstance.settings.downloadOptions[
+                          option as keyof typeof downloadOptionsArrays
+                        ].value}
                   </div>
-                )}
+                  <FgSVGElement
+                    src={navigateForwardIcon}
+                    attributes={[
+                      { key: "width", value: "1.25rem" },
+                      { key: "height", value: "1.25rem" },
+                      { key: "fill", value: "#f2f2f2" },
+                      { key: "stroke", value: "#f2f2f2" },
+                    ]}
+                  />
+                </div>
               </div>
             )}
           />

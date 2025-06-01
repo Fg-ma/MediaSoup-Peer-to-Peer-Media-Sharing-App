@@ -16,14 +16,14 @@ export default function PageTemplate({
   backFunction?: (event: React.MouseEvent) => void;
 }) {
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
       <div
-        className={`h-6 w-full flex items-start ${
+        className={`flex h-6 w-full items-start ${
           pageTitle ? "space-x-1" : ""
         }`}
       >
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -40,15 +40,15 @@ export default function PageTemplate({
         />
         {pageTitle && (
           <div
-            className='cursor-pointer font-Josefin text-lg font-bold pt-0.5 pr-2'
+            className="cursor-pointer pr-2 pt-0.5 font-Josefin text-lg font-bold"
             onClick={backFunction}
           >
             {pageTitle}
           </div>
         )}
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
+      <div className="h-0.5 w-[95%] rounded-full bg-white"></div>
+      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2">
         {content}
       </div>
     </div>

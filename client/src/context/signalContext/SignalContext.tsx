@@ -4,6 +4,7 @@ import {
   GroupSignals,
   MediaPositioningSignals,
   NewInstanceSignals,
+  SettingsSignals,
 } from "./lib/typeConstant";
 import { ContentTypes } from "../../../../universal/contentTypeConstant";
 
@@ -28,6 +29,13 @@ export interface SignalContextType {
     listener: (signal: GeneralSignals) => void,
   ) => void;
   sendGeneralSignal: (signal: GeneralSignals) => void;
+  addSettingsSignalListener: (
+    listener: (signal: SettingsSignals) => void,
+  ) => void;
+  removeSettingsSignalListener: (
+    listener: (signal: SettingsSignals) => void,
+  ) => void;
+  sendSettingsSignal: (signal: SettingsSignals) => void;
   addNewInstanceSignalListener: (
     listener: (signal: NewInstanceSignals) => void,
   ) => void;
@@ -74,6 +82,8 @@ export function SignalContextProvider({
 
   const generalSignalListeners: Set<(signal: GeneralSignals) => void> =
     new Set();
+  const settingsSignalListeners: Set<(signal: SettingsSignals) => void> =
+    new Set();
   const newInstanceSignalListeners: Set<(signal: NewInstanceSignals) => void> =
     new Set();
   const groupSignalListeners: Set<(signal: GroupSignals) => void> = new Set();
@@ -95,6 +105,24 @@ export function SignalContextProvider({
 
   const sendGeneralSignal = (signal: GeneralSignals) => {
     generalSignalListeners.forEach((listener) => {
+      listener(signal);
+    });
+  };
+
+  const addSettingsSignalListener = (
+    listener: (signal: SettingsSignals) => void,
+  ): void => {
+    settingsSignalListeners.add(listener);
+  };
+
+  const removeSettingsSignalListener = (
+    listener: (signal: SettingsSignals) => void,
+  ): void => {
+    settingsSignalListeners.delete(listener);
+  };
+
+  const sendSettingsSignal = (signal: SettingsSignals) => {
+    settingsSignalListeners.forEach((listener) => {
       listener(signal);
     });
   };
@@ -164,6 +192,9 @@ export function SignalContextProvider({
         addGeneralSignalListener,
         removeGeneralSignalListener,
         sendGeneralSignal,
+        addSettingsSignalListener,
+        removeSettingsSignalListener,
+        sendSettingsSignal,
         addNewInstanceSignalListener,
         removeNewInstanceSignalListener,
         sendNewInstanceSignal,

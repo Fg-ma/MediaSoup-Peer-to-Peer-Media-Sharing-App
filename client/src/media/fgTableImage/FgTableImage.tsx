@@ -4,12 +4,7 @@ import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import ImageController from "./lib/ImageController";
 import LowerImageController from "./lib/lowerImageControls/LowerImageController";
-import {
-  ActivePages,
-  defaultActiveSettingsPages,
-  defaultSettings,
-  Settings,
-} from "./lib/typeConstant";
+import { ActivePages, defaultActiveSettingsPages } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import ImageEffectsButton from "./lib/lowerImageControls/imageEffectsButton/ImageEffectsButton";
 import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
@@ -54,9 +49,6 @@ export default function FgTableImage({
   const [_, setRerender] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
-  const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings),
-  );
   const [activePages, setActivePages] = useState<ActivePages>(
     defaultActiveSettingsPages,
   );
@@ -74,12 +66,10 @@ export default function FgTableImage({
       staticContentEffects,
       staticContentEffectsStyles,
       setSettingsActive,
-      settings,
       recording,
       downloadRecordingReady,
       setRerender,
       tableStaticContentSocket,
-      setSettings,
     ),
   );
 
@@ -113,6 +103,9 @@ export default function FgTableImage({
     imageMediaInstance.imageMedia.addImageListener(
       imageController.current.handleImageMessages,
     );
+    imageMediaInstance.addImageInstanceListener(
+      imageController.current.handleImageInstanceMessages,
+    );
 
     document.addEventListener(
       "keydown",
@@ -127,6 +120,9 @@ export default function FgTableImage({
     return () => {
       imageMediaInstance.imageMedia.removeImageListener(
         imageController.current.handleImageMessages,
+      );
+      imageMediaInstance.removeImageInstanceListener(
+        imageController.current.handleImageInstanceMessages,
       );
       document.removeEventListener(
         "keydown",
@@ -144,12 +140,15 @@ export default function FgTableImage({
   }, [settingsActive]);
 
   useEffect(() => {
-    if (settings.downloadType.value !== "record" && recording.current) {
+    if (
+      imageMediaInstance.settings.downloadType.value !== "record" &&
+      recording.current
+    ) {
       imageMediaInstance.babylonScene?.stopRecording();
       downloadRecordingReady.current = true;
       recording.current = false;
     }
-  }, [settings.downloadType.value]);
+  }, [imageMediaInstance.settings.downloadType.value]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
@@ -186,7 +185,7 @@ export default function FgTableImage({
       kind="image"
       initState={imageMediaInstance.imageMedia.state}
       bundleRef={bundleRef}
-      backgroundMedia={settings.background.value === "true"}
+      backgroundMedia={imageMediaInstance.settings.background.value}
       className="image-container"
       popupElements={[
         imageEffectsActive ? (
@@ -202,20 +201,19 @@ export default function FgTableImage({
       leftLowerControls={[]}
       rightLowerControls={[
         <SettingsButton
+          imageMediaInstance={imageMediaInstance}
           effectsActive={imageEffectsActive}
           containerRef={imageContainerRef}
           settingsActive={settingsActive}
           setSettingsActive={setSettingsActive}
           activePages={activePages}
           setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
           scrollingContainerRef={rightLowerImageControlsRef}
           lowerImageController={lowerImageController}
         />,
         imageMediaInstance.imageMedia.loadingState === "downloaded" && (
           <DownloadButton
-            settings={settings}
+            imageMediaInstance={imageMediaInstance}
             recording={recording}
             lowerImageController={lowerImageController}
             imageEffectsActive={imageEffectsActive}
@@ -223,7 +221,7 @@ export default function FgTableImage({
             scrollingContainerRef={rightLowerImageControlsRef}
           />
         ),
-        settings.downloadType.value === "record" &&
+        imageMediaInstance.settings.downloadType.value === "record" &&
         downloadRecordingReady.current ? (
           <DownloadRecordingButton
             lowerImageController={lowerImageController}

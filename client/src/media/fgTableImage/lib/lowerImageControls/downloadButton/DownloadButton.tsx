@@ -3,7 +3,7 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerImageController from "../LowerImageController";
-import { Settings } from "../../typeConstant";
+import TableImageMediaInstance from "../../../../../media/fgTableImage/TableImageMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -13,14 +13,14 @@ const recordIcon = nginxAssetServerBaseUrl + "svgs/recordIcon.svg";
 const recordOffIcon = nginxAssetServerBaseUrl + "svgs/recordOffIcon.svg";
 
 export default function DownloadButton({
-  settings,
+  imageMediaInstance,
   recording,
   lowerImageController,
   imageEffectsActive,
   settingsActive,
   scrollingContainerRef,
 }: {
-  settings: Settings;
+  imageMediaInstance: TableImageMediaInstance;
   recording: React.MutableRefObject<boolean>;
   lowerImageController: React.MutableRefObject<LowerImageController>;
   imageEffectsActive: boolean;
@@ -34,9 +34,9 @@ export default function DownloadButton({
       }}
       contentFunction={() => {
         const src =
-          settings.downloadType.value === "snapShot"
+          imageMediaInstance.settings.downloadType.value === "snapShot"
             ? snapShotIcon
-            : settings.downloadType.value === "original"
+            : imageMediaInstance.settings.downloadType.value === "original"
               ? downloadIcon
               : recording.current
                 ? recordOffIcon
@@ -58,9 +58,9 @@ export default function DownloadButton({
         !imageEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={
-              settings.downloadType.value === "snapShot"
+              imageMediaInstance.settings.downloadType.value === "snapShot"
                 ? "Take snap shot (d)"
-                : settings.downloadType.value === "original"
+                : imageMediaInstance.settings.downloadType.value === "original"
                   ? "Download (d)"
                   : recording.current
                     ? "Stop recording (d)"

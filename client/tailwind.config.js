@@ -48,6 +48,7 @@ export default {
         "fg-tone-black-4": "#212121",
         "fg-tone-black-5": "#313131",
         "fg-tone-black-6": "#3e3e3e",
+        "fg-tone-black-6.5": "#474747",
         "fg-tone-black-7": "#515151",
         "fg-tone-black-8": "#696969",
 

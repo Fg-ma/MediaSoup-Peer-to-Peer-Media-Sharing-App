@@ -16,7 +16,8 @@ export interface ActivePages {
 export type DownloadTypes = "snapShot" | "original" | "record";
 
 export interface Settings {
-  background: { value: "true" | "false" };
+  synced: { value: boolean };
+  background: { value: boolean };
   downloadType: {
     value: DownloadTypes;
     downloadTypeOptions: {
@@ -32,7 +33,8 @@ export interface Settings {
 }
 
 export const defaultSettings: Settings = Object.freeze({
-  background: Object.freeze({ value: "false" }),
+  synced: Object.freeze({ value: true }),
+  background: Object.freeze({ value: false }),
   downloadType: Object.freeze({
     value: "snapShot",
     downloadTypeOptions: Object.freeze({

@@ -14,8 +14,11 @@ import UserDevice from "../../tools/userDevice/UserDevice";
 import Deadbanding from "../../babylon/Deadbanding";
 import assetMeshes from "../../babylon/meshes";
 import TableImageMedia, { ImageListenerTypes } from "./TableImageMedia";
+import { defaultSettings } from "./lib/typeConstant";
 
-export type ImageInstanceListenerTypes = { type: "effectsChanged" };
+export type ImageInstanceListenerTypes =
+  | { type: "effectsChanged" }
+  | { type: "settingsChanged" };
 
 class TableImageMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -38,6 +41,8 @@ class TableImageMediaInstance {
     };
     rotation: number;
   };
+
+  settings = structuredClone(defaultSettings);
 
   private imageInstanceListeners: Set<
     (message: ImageInstanceListenerTypes) => void
@@ -189,6 +194,12 @@ class TableImageMediaInstance {
     }
 
     this.updateAllEffects();
+  };
+
+  settingsChanged = () => {
+    this.imageInstanceListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
   };
 
   private rectifyEffectMeshCount = () => {

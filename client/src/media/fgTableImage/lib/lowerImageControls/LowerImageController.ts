@@ -19,14 +19,12 @@ class LowerImageController {
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private settings: Settings,
     private recording: React.MutableRefObject<boolean>,
     private downloadRecordingReady: React.MutableRefObject<boolean>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
   ) {}
 
   handleImageEffects = () => {
@@ -61,6 +59,9 @@ class LowerImageController {
         break;
       case "b":
         this.handleSetAsBackground();
+        break;
+      case "h":
+        this.handleSync();
         break;
       default:
         break;
@@ -106,18 +107,23 @@ class LowerImageController {
   };
 
   handleDownload = () => {
-    if (this.settings.downloadType.value === "snapShot") {
+    if (this.imageMediaInstance.settings.downloadType.value === "snapShot") {
       this.imageMediaInstance.babylonScene?.downloadSnapShot();
-    } else if (this.settings.downloadType.value === "original") {
+    } else if (
+      this.imageMediaInstance.settings.downloadType.value === "original"
+    ) {
       this.imageMediaInstance.imageMedia.downloadImage();
-    } else if (this.settings.downloadType.value === "record") {
+    } else if (
+      this.imageMediaInstance.settings.downloadType.value === "record"
+    ) {
       if (!this.recording.current) {
         this.imageMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
-            this.settings.downloadType.downloadTypeOptions.mimeType.value
+            this.imageMediaInstance.settings.downloadType.downloadTypeOptions
+              .mimeType.value
           ],
           parseInt(
-            this.settings.downloadType.downloadTypeOptions.fps.value.slice(
+            this.imageMediaInstance.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
               -4,
             ),
@@ -142,18 +148,18 @@ class LowerImageController {
     this.setSettingsActive((prev) => !prev);
   };
 
+  handleSync = () => {
+    this.imageMediaInstance.settings.synced.value =
+      !this.imageMediaInstance.settings.synced.value;
+
+    this.setRerender((prev) => !prev);
+  };
+
   handleSetAsBackground = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.imageMediaInstance.settings.background.value =
+      !this.imageMediaInstance.settings.background.value;
 
-      if (newSettings.background.value === "true") {
-        newSettings.background.value = "false";
-      } else {
-        newSettings.background.value = "true";
-      }
-
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 }
 
