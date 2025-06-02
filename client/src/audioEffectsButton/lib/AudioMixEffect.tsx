@@ -35,10 +35,7 @@ export default function AudioMixEffect({
 }) {
   return (
     <div
-      className={`border-2 border-black p-5 rounded absolute
-        ${dynamicMixEffect.orientation === "vertical" ? "h-60" : ""}
-        ${dynamicMixEffect.orientation === "horizontal" ? "w-60" : ""}  
-      `}
+      className={`absolute rounded border-2 border-fg-tone-black-1 p-5 ${dynamicMixEffect.orientation === "vertical" ? "h-60" : ""} ${dynamicMixEffect.orientation === "horizontal" ? "w-60" : ""} `}
       style={{
         left: `${dynamicMixEffect.x}px`,
         top: `${dynamicMixEffect.y}px`,
@@ -54,47 +51,35 @@ export default function AudioMixEffect({
       }}
     >
       <div
-        className={`justify-center items-center absolute text-lg bg-white rounded-sm border-2 border-black font-Josefin text-center
-        ${
+        className={`absolute items-center justify-center rounded-sm border-2 border-fg-tone-black-1 bg-fg-white text-center font-Josefin text-lg ${
           labelPlacement.side === "top"
-            ? "top-0 -translate-y-1/2 px-1 py-0.5 w-max leading-4.5 flex space-x-2"
+            ? "top-0 flex w-max -translate-y-1/2 space-x-2 px-1 py-0.5 leading-4.5"
             : ""
-        } 
-        ${
+        } ${
           labelPlacement.side === "bottom"
-            ? "bottom-0 translate-y-1/2 px-1 py-0.5 w-max leading-4.5 flex space-x-2"
+            ? "bottom-0 flex w-max translate-y-1/2 space-x-2 px-1 py-0.5 leading-4.5"
             : ""
-        } 
-        ${
+        } ${
           labelPlacement.side === "left"
-            ? `whitespace-pre-line leading-4 left-0 -translate-x-1/2 py-1 flex flex-col space-y-2 ${
+            ? `left-0 flex -translate-x-1/2 flex-col space-y-2 whitespace-pre-line py-1 leading-4 ${
                 staticMixEffect.labelIcon ? "px-0.5" : "px-1"
               }`
             : ""
-        }
-        ${
+        } ${
           labelPlacement.side === "right"
-            ? `whitespace-pre-line leading-4 right-0 translate-x-1/2 py-1 flex flex-col space-y-2 ${
+            ? `right-0 flex translate-x-1/2 flex-col space-y-2 whitespace-pre-line py-1 leading-4 ${
                 staticMixEffect.labelIcon ? "px-0.5" : "px-1"
               }`
             : ""
-        }
-
-        ${labelPlacement.sidePlacement === "top" ? "top-4" : ""}
-        ${
+        } ${labelPlacement.sidePlacement === "top" ? "top-4" : ""} ${
           labelPlacement.sidePlacement === "middle"
             ? "top-1/2 -translate-y-1/2"
             : ""
-        }
-        ${labelPlacement.sidePlacement === "bottom" ? "bottom-4" : ""}
-        ${labelPlacement.sidePlacement === "left" ? "left-4" : ""}
-        ${
+        } ${labelPlacement.sidePlacement === "bottom" ? "bottom-4" : ""} ${labelPlacement.sidePlacement === "left" ? "left-4" : ""} ${
           labelPlacement.sidePlacement === "center"
             ? "left-1/2 -translate-x-1/2"
             : ""
-        }
-        ${labelPlacement.sidePlacement === "right" ? "right-4" : ""}
-        `}
+        } ${labelPlacement.sidePlacement === "right" ? "right-4" : ""} `}
       >
         {staticMixEffect.labelIcon && (
           <FgSVGElement
@@ -122,9 +107,7 @@ export default function AudioMixEffect({
         </div>
       </div>
       <div
-        className={`h-full flex items-center justify-center 
-          ${dynamicMixEffect.orientation === "horizontal" ? "flex-col" : ""}  
-        `}
+        className={`flex h-full items-center justify-center ${dynamicMixEffect.orientation === "horizontal" ? "flex-col" : ""} `}
       >
         {Object.entries(staticMixEffect.options).map(([key, option], index) => (
           <FgSlider

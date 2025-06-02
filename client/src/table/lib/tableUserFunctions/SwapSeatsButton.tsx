@@ -25,11 +25,10 @@ export default function SwapSeatsbutton({
       contentFunction={() => (
         <FgSVGElement
           src={swapIcon}
+          className="fill-fg-white stroke-fg-white"
           attributes={[
             { key: "width", value: "95%" },
             { key: "height", value: "95%" },
-            { key: "fill", value: "black" },
-            { key: "stroke", value: "black" },
           ]}
         />
       )}

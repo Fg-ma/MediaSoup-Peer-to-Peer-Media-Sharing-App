@@ -17,11 +17,13 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function MuteStylePage({
+  setSettingsActive,
   setActivePages,
   settings,
   setSettings,
   setIsBezierCurveEditor,
 }: {
+  setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   settings: Settings;
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
@@ -112,20 +114,23 @@ export default function MuteStylePage({
           Mute style
         </div>
       </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
         className="small-vertical-scroll-bar h-max max-h-[11.375rem] w-full overflow-y-auto px-2"
       >
         <div className="flex h-max w-full flex-col space-y-1">
           <FgButton
-            className="flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-tone-black-6"
+            className="flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-tone-black-6"
             contentFunction={() => (
-              <div className="flex w-full items-center justify-start bg-opacity-75 px-2 text-lg">
+              <div className="flex w-full items-center justify-start px-2 text-lg">
                 Make your own
               </div>
             )}
-            clickFunction={() => setIsBezierCurveEditor((prev) => !prev)}
+            clickFunction={() => {
+              setIsBezierCurveEditor((prev) => !prev);
+              setSettingsActive((prev) => !prev);
+            }}
           />
           {Object.entries(staticContentMedia.current.svg.user).map(
             ([svgId, svgMedia]) =>
@@ -141,7 +146,7 @@ export default function MuteStylePage({
                     <div
                       className={`${
                         svgMedia.filename ? "justify-between" : "justify-start"
-                      } flex w-full items-center bg-opacity-75 px-2 text-lg`}
+                      } flex w-full items-center px-2 text-lg`}
                     >
                       <div className="h-full grow truncate text-left">
                         {svgMedia.filename.slice(0, -4)}
@@ -176,7 +181,7 @@ export default function MuteStylePage({
                 <div
                   className={`${
                     meta.url ? "justify-between" : "justify-start"
-                  } flex w-full items-center bg-opacity-75 px-2 text-lg`}
+                  } flex w-full items-center px-2 text-lg`}
                 >
                   <>{meta.title}</>
                   {meta.url && (

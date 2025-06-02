@@ -57,6 +57,9 @@ class TextController {
       case "initialized":
         this.setRerender((prev) => !prev);
         break;
+      case "settingsChanged":
+        this.setRerender((prev) => !prev);
+        break;
       default:
         break;
     }

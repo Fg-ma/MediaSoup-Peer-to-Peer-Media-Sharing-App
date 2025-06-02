@@ -19,9 +19,9 @@ export default function DownloadOptionsPage({
   const [isMimeTypePage, setIsMimeTypePage] = useState(false);
   const [isSizePage, setIsSizePage] = useState(false);
   const [isCompressionPage, setIsCompressionPage] = useState(false);
-  const mimeTypeButtonRef = useRef<HTMLDivElement>(null);
-  const sizeButtonRef = useRef<HTMLDivElement>(null);
-  const compressionButtonRef = useRef<HTMLDivElement>(null);
+  const mimeTypeLabelRef = useRef<HTMLDivElement>(null);
+  const sizeLabelRef = useRef<HTMLDivElement>(null);
+  const compressionLabelRef = useRef<HTMLDivElement>(null);
 
   const [_, setRerender] = useState(false);
 
@@ -36,20 +36,23 @@ export default function DownloadOptionsPage({
         className="h-8 w-full"
         clickFunction={() => setIsMimeTypePage((prev) => !prev)}
         contentFunction={() => (
-          <div
-            ref={mimeTypeButtonRef}
-            className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1"
-          >
-            <div>Mime type</div>
-            <div className="flex items-center justify-center space-x-2">
-              {(mimeTypeButtonRef.current?.clientWidth ?? 0) >= 160 && ( // bad very bad
-                <div>
-                  {
-                    svgMediaInstance.current.settings.downloadOptions.mimeType
-                      .value
-                  }
-                </div>
-              )}
+          <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+            <div ref={mimeTypeLabelRef}>Mime type</div>
+            <div
+              className="flex items-center justify-center space-x-2"
+              style={{
+                width: `calc(100% - ${mimeTypeLabelRef.current?.clientWidth ?? 0}px - 1rem)`,
+              }}
+            >
+              <div
+                className="truncate text-end"
+                style={{ width: "calc(100% - 1.25rem)" }}
+              >
+                {
+                  svgMediaInstance.current.settings.downloadOptions.mimeType
+                    .value
+                }
+              </div>
               <FgSVGElement
                 className={`${isMimeTypePage ? "-scale-x-100" : ""} rotate-90`}
                 src={navigateForwardIcon}
@@ -72,25 +75,28 @@ export default function DownloadOptionsPage({
         className="h-8 w-full"
         clickFunction={() => setIsSizePage((prev) => !prev)}
         contentFunction={() => (
-          <div
-            ref={sizeButtonRef}
-            className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1"
-          >
-            <div>Size</div>
-            <div className="flex items-center justify-center space-x-2">
-              {(sizeButtonRef.current?.clientWidth ?? 0) >= 170 && (
-                <div>
-                  {`${parseFloat(
-                    svgMediaInstance.current.settings.downloadOptions.size.width.value.toFixed(
-                      0,
-                    ),
-                  )}x${parseFloat(
-                    svgMediaInstance.current.settings.downloadOptions.size.height.value.toFixed(
-                      0,
-                    ),
-                  )}`}
-                </div>
-              )}
+          <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+            <div ref={sizeLabelRef}>Size</div>
+            <div
+              className="flex items-center justify-center space-x-2"
+              style={{
+                width: `calc(100% - ${sizeLabelRef.current?.clientWidth ?? 0}px - 1rem)`,
+              }}
+            >
+              <div
+                className="truncate text-end"
+                style={{ width: "calc(100% - 1.25rem)" }}
+              >
+                {`${parseFloat(
+                  svgMediaInstance.current.settings.downloadOptions.size.width.value.toFixed(
+                    0,
+                  ),
+                )}x${parseFloat(
+                  svgMediaInstance.current.settings.downloadOptions.size.height.value.toFixed(
+                    0,
+                  ),
+                )}`}
+              </div>
               <FgSVGElement
                 className={`${isSizePage ? "-scale-x-100" : ""} rotate-90`}
                 src={navigateForwardIcon}
@@ -113,20 +119,23 @@ export default function DownloadOptionsPage({
         className="h-8 w-full"
         clickFunction={() => setIsCompressionPage((prev) => !prev)}
         contentFunction={() => (
-          <div
-            ref={compressionButtonRef}
-            className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1"
-          >
-            <div>Squash</div>
-            <div className="flex items-center justify-center space-x-2">
-              {(compressionButtonRef.current?.clientWidth ?? 0) >= 150 && (
-                <div>
-                  {
-                    svgMediaInstance.current.settings.downloadOptions
-                      .compression.value
-                  }
-                </div>
-              )}
+          <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+            <div ref={compressionLabelRef}>Squash</div>
+            <div
+              className="flex items-center justify-center space-x-2"
+              style={{
+                width: `calc(100% - ${compressionLabelRef.current?.clientWidth ?? 0}px - 1rem)`,
+              }}
+            >
+              <div
+                className="truncate text-end"
+                style={{ width: "calc(100% - 1.25rem)" }}
+              >
+                {
+                  svgMediaInstance.current.settings.downloadOptions.compression
+                    .value
+                }
+              </div>
               <FgSVGElement
                 className={`${isCompressionPage ? "-scale-x-100" : ""} rotate-90`}
                 src={navigateForwardIcon}

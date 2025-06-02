@@ -127,10 +127,11 @@ export default function FgPiano({
   };
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (event.target instanceof HTMLInputElement) {
-      return;
-    }
+    const tagName = (event.target as HTMLElement).tagName.toLowerCase();
 
+    if (tagName === "input" || tagName === "textarea") return;
+
+    event.stopPropagation();
     event.preventDefault();
 
     const eventKey = event.key.toLowerCase();
@@ -159,12 +160,12 @@ export default function FgPiano({
     if (focus) {
       if (!isKeydownListenerAdded.current) {
         isKeydownListenerAdded.current = true;
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("keydown", handleKeyDown, true);
       }
     } else {
       if (isKeydownListenerAdded.current) {
         isKeydownListenerAdded.current = false;
-        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("keydown", handleKeyDown, true);
       }
     }
   };
@@ -194,6 +195,7 @@ export default function FgPiano({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       content={
         <div className="piano">
           <SamplerToolbar
@@ -245,8 +247,8 @@ export default function FgPiano({
         left: true,
         right: true,
       }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

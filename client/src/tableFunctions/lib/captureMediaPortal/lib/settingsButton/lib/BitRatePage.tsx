@@ -55,11 +55,11 @@ export default function BitRatePage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
-      <div className='flex h-6 w-full justify-between'>
-        <div className='flex w-full space-x-1'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+      <div className="flex h-6 w-full justify-between">
+        <div className="flex w-full space-x-1">
           <FgButton
-            className='h-full aspect-square'
+            className="aspect-square h-full"
             contentFunction={() => (
               <FgSVGElement
                 src={navigateBackIcon}
@@ -74,7 +74,7 @@ export default function BitRatePage({
             clickFunction={handleCloseBitRatePage}
           />
           <div
-            className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+            className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
             onClick={handleCloseBitRatePage}
           >
             Bite rate
@@ -82,13 +82,13 @@ export default function BitRatePage({
         </div>
         <div></div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
-        className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
       >
         <FgSlider
-          className='h-10'
+          className="h-10"
           externalValue={
             settings.downloadVideoOptions.bitRate.value !== "default"
               ? settings.downloadVideoOptions.bitRate.value
@@ -121,7 +121,7 @@ export default function BitRatePage({
           .map(([key, bitRate]) => (
             <div
               key={key}
-              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 parseFloat(bitRate) ===
                 settings.downloadVideoOptions.bitRate.value
                   ? "bg-fg-white text-fg-tone-black-1"
@@ -129,16 +129,16 @@ export default function BitRatePage({
               }`}
             >
               <FgButton
-                className='flex items-center justify-center grow'
+                className="flex grow items-center justify-center"
                 contentFunction={() => (
-                  <div className='flex w-full bg-opacity-75 px-2 items-start'>
+                  <div className="flex w-full items-start px-2">
                     {bitRate}
                     {bitRate === "default" ? "" : " Mbps"}
                   </div>
                 )}
                 clickFunction={() => {
                   setBitRate(
-                    bitRate === "default" ? "default" : parseFloat(bitRate)
+                    bitRate === "default" ? "default" : parseFloat(bitRate),
                   );
                 }}
               />

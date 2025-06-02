@@ -499,7 +499,7 @@ export default function FgAudioElementContainer({
           <FgPortal
             type="mouse"
             content={
-              <div className="relative z-[50] h-max w-max rounded-md bg-white px-4 py-2 font-Josefin text-lg shadow-lg">
+              <div className="relative z-[50] h-max w-max rounded-md bg-fg-white px-4 py-2 font-Josefin text-lg shadow-lg">
                 {name ? name : username}
               </div>
             }

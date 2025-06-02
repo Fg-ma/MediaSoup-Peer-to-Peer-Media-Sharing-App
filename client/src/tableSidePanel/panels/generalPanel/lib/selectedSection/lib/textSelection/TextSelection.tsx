@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../../../context/mediaContext/MediaContext";
 import GeneralMediaSelection from "../GeneralMediaSelection";
-import {
-  defaultSettings,
-  Settings,
-} from "../../../../../../../media/fgTableText/lib/typeConstant";
 import { LoadingStateTypes } from "../../../../../../../../../universal/contentTypeConstant";
 import TextSelectionController from "./lib/TextSelectionController";
 import LoadingElement from "../../../../../../../elements/loadingElement/LoadingElement";
@@ -31,11 +27,7 @@ export default function TextSelection({
   const [loadingState, setLoadingState] = useState<LoadingStateTypes>(
     textInstanceMedia?.textMedia.loadingState,
   );
-  const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings),
-  );
   const [_, setRerender] = useState(false);
-  const isReadOnly = useRef(true);
 
   const textSelectionController = new TextSelectionController(
     instanceId,
@@ -70,10 +62,9 @@ export default function TextSelection({
           loadingState === "downloaded" ? (
             textInstanceMedia.textMedia.fileSize < 1024 * 1024 * 5 ? (
               <Monaco
-                settings={settings}
                 isLineNums={false}
-                isReadOnly={isReadOnly}
                 textMediaInstance={textInstanceMedia}
+                forceIsReadOnly={true}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center rounded bg-fg-tone-black-1 text-center font-K2D text-xl text-fg-white">

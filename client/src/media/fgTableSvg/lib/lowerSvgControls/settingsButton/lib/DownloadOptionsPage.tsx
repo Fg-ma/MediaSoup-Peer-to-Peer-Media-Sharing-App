@@ -78,7 +78,7 @@ export default function DownloadOptionsPage({
               handleOptionSelect(option as keyof typeof downloadOptionsArrays)
             }
             contentFunction={() => (
-              <div className="flex w-full justify-between space-x-4 text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                 <div>
                   {
                     downloadOptionsTitles[
@@ -107,8 +107,6 @@ export default function DownloadOptionsPage({
                     attributes={[
                       { key: "width", value: "1.25rem" },
                       { key: "height", value: "1.25rem" },
-                      { key: "fill", value: "#f2f2f2" },
-                      { key: "stroke", value: "#f2f2f2" },
                     ]}
                   />
                 </div>

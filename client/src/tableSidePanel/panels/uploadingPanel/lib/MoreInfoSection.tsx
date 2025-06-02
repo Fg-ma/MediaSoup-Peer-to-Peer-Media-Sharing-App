@@ -90,7 +90,7 @@ export default function MoreInfoSection({
 
   return (
     <div className="w-full space-y-2 rounded-xl p-4 font-K2D">
-      <div className="space-y-1 text-white">
+      <div className="space-y-1 text-fg-white">
         <p>
           <strong>ETA:</strong> {ETA}
         </p>

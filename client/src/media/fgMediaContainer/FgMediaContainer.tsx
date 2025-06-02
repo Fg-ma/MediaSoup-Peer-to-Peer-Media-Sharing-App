@@ -457,7 +457,7 @@ export default function FgMediaContainer({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-white"
+        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >

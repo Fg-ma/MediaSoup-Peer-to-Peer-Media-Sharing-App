@@ -15,7 +15,7 @@ export default function SliderValuePortal({
       type="mouse"
       mouseType="topRight"
       content={
-        <div className="slider-value-portal text-md h-min w-max rounded bg-white p-1 font-K2D shadow">
+        <div className="slider-value-portal text-md h-min w-max rounded bg-fg-white p-1 font-K2D shadow">
           {value.toFixed(precision)} {units && units}
         </div>
       }

@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
-import {
-  downloadTypeOptionsArrays,
-  downloadTypeOptionsTitles,
-} from "./typeConstant";
-import PageTemplate from "./PageTemplate";
+import { downloadTypeOptionsArrays } from "../../../../../../media/fgTableImage/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -18,9 +14,16 @@ export default function DownloadTypeOptionsPage({
 }: {
   imageMediaInstance: React.MutableRefObject<TableImageMediaInstance>;
 }) {
-  const [_, setRerender] = useState(false);
   const [fpsActive, setFpsActive] = useState(false);
   const [mimeTypeActive, setMimeTypeActive] = useState(false);
+  const fpsLabelRef = useRef<HTMLDivElement>(null);
+  const mimeTypeLabelRef = useRef<HTMLDivElement>(null);
+
+  const [_, setRerender] = useState(false);
+
+  useEffect(() => {
+    setRerender((prev) => !prev);
+  }, []);
 
   return (
     <>
@@ -30,9 +33,17 @@ export default function DownloadTypeOptionsPage({
         clickFunction={() => setFpsActive((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
-            <div>FPS</div>
-            <div className="flex items-center justify-center space-x-1">
-              <div>
+            <div ref={fpsLabelRef}>FPS</div>
+            <div
+              className="flex items-center justify-center space-x-1"
+              style={{
+                width: `calc(100% - ${fpsLabelRef.current?.clientWidth ?? 0}px - 1rem)`,
+              }}
+            >
+              <div
+                className="truncate text-end"
+                style={{ width: "calc(100% - 1.25rem)" }}
+              >
                 {
                   imageMediaInstance.current.settings.downloadType
                     .downloadTypeOptions.fps.value
@@ -80,9 +91,17 @@ export default function DownloadTypeOptionsPage({
         clickFunction={() => setMimeTypeActive((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
-            <div>Mime type</div>
-            <div className="flex items-center justify-center space-x-1">
-              <div>
+            <div ref={mimeTypeLabelRef}>Mime type</div>
+            <div
+              className="flex items-center justify-center space-x-1"
+              style={{
+                width: `calc(100% - ${mimeTypeLabelRef.current?.clientWidth ?? 0}px - 1rem)`,
+              }}
+            >
+              <div
+                className="truncate text-end"
+                style={{ width: "calc(100% - 1.25rem)" }}
+              >
                 {
                   imageMediaInstance.current.settings.downloadType
                     .downloadTypeOptions.mimeType.value

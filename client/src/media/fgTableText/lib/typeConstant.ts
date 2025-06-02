@@ -21,7 +21,7 @@ export interface Settings {
 
 export const defaultSettings: Settings = Object.freeze({
   background: Object.freeze({ value: false }),
-  synced: Object.freeze({ value: false }),
+  synced: Object.freeze({ value: true }),
   minimap: Object.freeze({ value: false }),
   cursorStyle: Object.freeze({
     value: "line",

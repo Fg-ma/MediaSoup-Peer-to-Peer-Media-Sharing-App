@@ -101,6 +101,7 @@ export default function BackgroundSelectorPanel({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       externalRef={externalPanelRef}
       content={
         activeCategory === "" ? (
@@ -180,7 +181,7 @@ export default function BackgroundSelectorPanel({
                         return (
                           <FgSVGElement
                             src={categoryMetadata.url}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-center fill-fg-white stroke-fg-white"
                             attributes={[
                               { key: "width", value: "80%" },
                               { key: "height", value: "80%" },
@@ -208,7 +209,14 @@ export default function BackgroundSelectorPanel({
                   activeBackground.categorySelection,
                 ) ? (
                   <FgButton
-                    className="flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light"
+                    className={`${
+                      // @ts-expect-error: type correspondance issue
+                      categories[activeBackground.category][
+                        activeBackground.categorySelection
+                      ].color === "light"
+                        ? "bg-fg-off-white"
+                        : ""
+                    } flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light`}
                     contentFunction={() => {
                       const data =
                         // @ts-expect-error: type correspondance issue
@@ -253,6 +261,10 @@ export default function BackgroundSelectorPanel({
                     <FgButton
                       key={recommendationName}
                       className={`flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light ${
+                        recommendation.color === "light"
+                          ? "bg-fg-off-white"
+                          : ""
+                      } ${
                         activeBackground.categorySelection ===
                         recommendationName
                           ? "border-fg-red-light"
@@ -332,6 +344,10 @@ export default function BackgroundSelectorPanel({
                       <FgButton
                         key={categorySelection}
                         className={`flex aspect-square h-full items-center justify-center overflow-clip rounded border-2 hover:border-3 hover:border-fg-red-light ${
+                          categorySelectionData.color === "light"
+                            ? "bg-fg-off-white"
+                            : ""
+                        } ${
                           activeBackground.categorySelection ===
                           categorySelection
                             ? "border-fg-red-light"
@@ -383,8 +399,8 @@ export default function BackgroundSelectorPanel({
         placement: "below",
         padding: 4,
       }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

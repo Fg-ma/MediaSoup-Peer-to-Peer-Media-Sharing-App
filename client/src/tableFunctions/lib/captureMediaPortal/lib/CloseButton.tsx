@@ -22,7 +22,7 @@ export default function CloseButton({
 }) {
   return (
     <FgButton
-      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-tone-black-4 bg-opacity-80 shadow"
+      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-tone-black-4 shadow"
       clickFunction={(event) => {
         event.stopPropagation();
 

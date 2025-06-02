@@ -113,14 +113,14 @@ export default function ClosedCaptionsPage({
         </div>
         <FgButton
           contentFunction={() => (
-            <div className="rounded bg-opacity-75 px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">
+            <div className="rounded px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">
               Options
             </div>
           )}
           clickFunction={handleClosedCaptionOptionsActive}
         />
       </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
         className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
@@ -128,7 +128,7 @@ export default function ClosedCaptionsPage({
         {Object.entries(closedCaptionsSelections).map(([key, lang]) => (
           <div
             key={key}
-            className={`flex w-full items-center justify-center text-nowrap rounded bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+            className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
               key === settings.closedCaption.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
@@ -137,9 +137,7 @@ export default function ClosedCaptionsPage({
             <FgButton
               className="flex grow items-center justify-center"
               contentFunction={() => (
-                <div className="flex w-full items-start bg-opacity-75 px-2">
-                  {lang}
-                </div>
+                <div className="flex w-full items-start px-2">{lang}</div>
               )}
               clickFunction={() =>
                 setClosedCaptionsLang(
@@ -149,9 +147,7 @@ export default function ClosedCaptionsPage({
             />
             <FgButton
               className="flex w-max items-center justify-center"
-              contentFunction={() => (
-                <div className="w-full bg-opacity-75 px-2">(AG)</div>
-              )}
+              contentFunction={() => <div className="w-full px-2">(AG)</div>}
               clickFunction={() =>
                 setClosedCaptionsLang(
                   key as keyof typeof closedCaptionsSelections,

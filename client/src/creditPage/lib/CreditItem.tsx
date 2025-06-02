@@ -17,19 +17,19 @@ export default function CreditItem({
   hoverContent: string;
 }) {
   return (
-    <div className='flex h-8 items-center justify-start space-x-4 pl-[2%]'>
+    <div className="flex h-8 items-center justify-start space-x-4 pl-[2%]">
       <FgButton
         clickFunction={() => {
           window.open(link, "_blank");
         }}
         contentFunction={() => (
-          <div className='text-white text-xl font-K2D'>{content}</div>
+          <div className="font-K2D text-xl text-fg-white">{content}</div>
         )}
         hoverContent={
           <FgHoverContentStandard
             content={
               <div
-                className='text-fg-tone-black-2 text-lg font-K2D max-w-96 p-2'
+                className="max-w-96 p-2 font-K2D text-lg text-fg-tone-black-2"
                 style={{
                   overflowWrap: "break-word",
                   wordBreak: "break-word",
@@ -44,14 +44,14 @@ export default function CreditItem({
         options={{ hoverSpacing: 4, hoverTimeoutDuration: 1500 }}
       />
       <FgButton
-        className='flex h-full aspect-square bg-fg-red-light rounded-full items-center justify-center'
+        className="flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light"
         clickFunction={() => {
           window.open(link, "_blank");
         }}
         contentFunction={() => (
           <FgSVGElement
             src={linkIcon}
-            className='flex items-center justify-center pr-0.75 pt-0.5'
+            className="flex items-center justify-center pr-0.75 pt-0.5"
             attributes={[
               { key: "width", value: "70%" },
               { key: "height", value: "70%" },
@@ -64,7 +64,7 @@ export default function CreditItem({
           <FgHoverContentStandard
             content={
               <div
-                className='text-fg-tone-black-2 text-lg font-K2D max-w-96 p-2'
+                className="max-w-96 p-2 font-K2D text-lg text-fg-tone-black-2"
                 style={{
                   overflowWrap: "break-word",
                   wordBreak: "break-word",

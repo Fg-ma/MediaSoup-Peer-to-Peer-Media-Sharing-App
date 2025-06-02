@@ -370,6 +370,7 @@ export default function AudioMixEffectsPortal({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       content={
         <div
           ref={portalRef}
@@ -400,7 +401,7 @@ export default function AudioMixEffectsPortal({
                   )}
                 </div>
               }
-              buttonBackgroundColor={focus ? "#161616" : "#212121"}
+              buttonBackgroundColor={focus ? "#090909" : "#161616"}
             />
           </div>
           <div className="relative">
@@ -469,8 +470,8 @@ export default function AudioMixEffectsPortal({
       closePosition="topRight"
       focusCallback={(newFocus) => setFocus(newFocus)}
       shadow={{ top: true, bottom: true }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

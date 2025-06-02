@@ -170,7 +170,7 @@ export default function JoinTableSection({
           isInTable
             ? "bg-orange-500 hover:bg-orange-700"
             : "bg-blue-500 hover:bg-blue-700"
-        } max-h-[42px] px-4 py-2 font-Josefin font-bold text-white`}
+        } max-h-[42px] px-4 py-2 font-Josefin font-bold text-fg-white`}
       >
         {isInTable ? "Join New Room" : "Join Room"}
       </button>

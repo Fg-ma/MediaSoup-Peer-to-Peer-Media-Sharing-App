@@ -8,9 +8,9 @@ import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElemen
 import GeneralPanel from "./panels/generalPanel/GeneralPanel";
 import SidePanelDragger from "./lib/SidePanelDragger";
 import DownloadingPanel from "./panels/downloadingPanel/DownloadingPanel";
-import "./lib/tableSidePanel.css";
 import { ContentTypes } from "../../../universal/contentTypeConstant";
 import SettingsPanel from "./panels/settingsPanel/SettingsPanel";
+import "./lib/tableSidePanel.css";
 
 export type TableSidePanels = "upload" | "download" | "general" | "settings";
 

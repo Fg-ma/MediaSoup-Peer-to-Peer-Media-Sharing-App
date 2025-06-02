@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
-import { useToolsContext } from "../../../../../context/toolsContext/ToolsContext";
 import { ContentTypes } from "../../../../../../../universal/contentTypeConstant";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";

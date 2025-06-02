@@ -81,7 +81,7 @@ export default function UserBubble({
     >
       <FgButton
         externalRef={userBubbleButtonRef}
-        className='h-full w-full rounded-full border-2 overflow-hidden'
+        className="h-full w-full overflow-hidden rounded-full border-2"
         style={{
           borderColor: primaryColor,
           boxShadow: `0px 4px 8px ${secondaryColor}`,
@@ -92,21 +92,21 @@ export default function UserBubble({
       {hovering && Object.keys(userData).length > 1 && (
         <>
           <FgButton
-            className={`absolute w-1/2 aspect-square flex justify-start items-center ${
+            className={`absolute flex aspect-square w-1/2 items-center justify-start ${
               placement === "top"
-                ? "bottom-1/2 translate-y-1/2 right-full pr-2"
+                ? "bottom-1/2 right-full translate-y-1/2 pr-2"
                 : placement === "bottom"
-                ? "top-1/2 -translate-y-1/2 right-full pr-2"
-                : placement === "right"
-                ? "left-1/2 -translate-x-1/2 top-full -rotate-90 pr-2"
-                : placement === "left"
-                ? "right-1/2 translate-x-1/2 top-full -rotate-90 pr-2"
-                : ""
+                  ? "right-full top-1/2 -translate-y-1/2 pr-2"
+                  : placement === "right"
+                    ? "left-1/2 top-full -translate-x-1/2 -rotate-90 pr-2"
+                    : placement === "left"
+                      ? "right-1/2 top-full translate-x-1/2 -rotate-90 pr-2"
+                      : ""
             }`}
             clickFunction={() =>
               tableSocket.current?.moveSeats(
                 placement === "top" || placement === "left" ? "left" : "right",
-                username
+                username,
               )
             }
             contentFunction={() => (
@@ -123,21 +123,21 @@ export default function UserBubble({
             )}
           />
           <FgButton
-            className={`absolute w-1/2 aspect-square flex justify-start items-center ${
+            className={`absolute flex aspect-square w-1/2 items-center justify-start ${
               placement === "top"
-                ? "bottom-1/2 translate-y-1/2 left-full pl-2"
+                ? "bottom-1/2 left-full translate-y-1/2 pl-2"
                 : placement === "bottom"
-                ? "top-1/2 -translate-y-1/2 left-full pl-2"
-                : placement === "right"
-                ? "left-1/2 -translate-x-1/2 bottom-full -rotate-90 pl-2"
-                : placement === "left"
-                ? "right-1/2 translate-x-1/2 bottom-full -rotate-90 pl-2"
-                : ""
+                  ? "left-full top-1/2 -translate-y-1/2 pl-2"
+                  : placement === "right"
+                    ? "bottom-full left-1/2 -translate-x-1/2 -rotate-90 pl-2"
+                    : placement === "left"
+                      ? "bottom-full right-1/2 translate-x-1/2 -rotate-90 pl-2"
+                      : ""
             }`}
             clickFunction={() =>
               tableSocket.current?.moveSeats(
                 placement === "top" || placement === "left" ? "right" : "left",
-                username
+                username,
               )
             }
             contentFunction={() => (
@@ -157,25 +157,26 @@ export default function UserBubble({
       )}
       {moreUserInformationActive && (
         <FgPanel
+          className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
           content={
             <div
               ref={userPanelRef}
-              className='flex small-vertical-scroll-bar w-full h-full overflow-y-auto py-2 flex-col space-y-2'
+              className="small-vertical-scroll-bar flex h-full w-full flex-col space-y-2 overflow-y-auto py-2"
             >
-              <div className='flex items-center justify-center h-max w-full space-x-2'>
+              <div className="flex h-max w-full items-center justify-center space-x-2">
                 <div
-                  className='w-1/5 h-full rounded-lg border-2 overflow-hidden'
+                  className="h-full w-1/5 overflow-hidden rounded-lg border-2"
                   style={{
                     borderColor: primaryColor,
                   }}
                 >
                   <FgImage src={src} srcLoading={srcLoading} />
                 </div>
-                <div className='grow h-max text-fg-tone-black-2 font-K2D truncate text-xl'>
+                <div className="h-max grow truncate font-K2D text-xl text-fg-white">
                   {username}
                 </div>
               </div>
-              <div className='grid grid-cols-3 w-full h-max gap-3'>
+              <div className="grid h-max w-full grid-cols-3 gap-3">
                 <SwapSeatsbutton
                   username={username}
                   userPanelRef={userPanelRef}
@@ -203,8 +204,10 @@ export default function UserBubble({
           minWidth={200}
           minHeight={80}
           closeCallback={() => setMoreUserInformationActive(false)}
-          closePosition='topRight'
+          closePosition="topRight"
           shadow={{ top: true, bottom: true }}
+          backgroundColor={"#090909"}
+          secondaryBackgroundColor={"#161616"}
         />
       )}
     </div>

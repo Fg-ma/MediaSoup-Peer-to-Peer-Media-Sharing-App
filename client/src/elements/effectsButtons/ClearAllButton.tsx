@@ -32,7 +32,7 @@ export default function ClearAllButton({
 
   return (
     <FgButton
-      className="!aspect-square h-full rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
+      className="!aspect-square h-full rounded-full border-2 border-fg-white hover:border-fg-red-light"
       clickFunction={clickFunction}
       contentFunction={() => (
         <FgSVGElement

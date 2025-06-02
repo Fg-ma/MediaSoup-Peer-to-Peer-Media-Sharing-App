@@ -204,6 +204,7 @@ export default function FgBackgroundMusicPortal({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       content={
         <div ref={backgroundMusicContainerRef} className="h-full w-full">
           <input
@@ -353,8 +354,8 @@ export default function FgBackgroundMusicPortal({
       closeCallback={closeCallback}
       closePosition="topRight"
       shadow={{ bottom: true, top: true }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

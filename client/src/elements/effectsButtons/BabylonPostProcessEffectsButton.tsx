@@ -63,7 +63,7 @@ export default function BabylonPostProcessEffectsButton({
 
   return (
     <FgButton
-      className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
+      className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white hover:border-fg-red-light"
       clickFunction={clickFunction}
       contentFunction={() => (
         <svg
@@ -87,7 +87,7 @@ export default function BabylonPostProcessEffectsButton({
       holdContent={
         <LazyScrollingContainer
           externalRef={postProcessEffectsContainerRef}
-          className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-2 gap-y-2 overflow-y-auto rounded-md border-3 border-fg-black-45 border-opacity-90 bg-fg-black-10 bg-opacity-90 py-3 pl-3 pr-1 shadow-lg"
+          className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-2 gap-y-2 overflow-y-auto rounded-md border-3 border-fg-black-45 bg-fg-tone-black-1 py-3 pl-3 pr-1 shadow-lg"
           items={[
             ...Object.entries(postProcessEffectsChoices).map(
               ([postProcessEffect, choice]) => (
@@ -98,9 +98,9 @@ export default function BabylonPostProcessEffectsButton({
                     <div
                       className={`${
                         postProcessEffect === effectsStyles.style
-                          ? "border-3 border-fg-secondary border-opacity-100"
+                          ? "border-3 border-fg-red-light border-opacity-100"
                           : ""
-                      } flex h-full w-full items-center justify-center rounded border-2 border-white border-opacity-75 hover:border-3 hover:border-fg-secondary`}
+                      } flex h-full w-full items-center justify-center rounded border-2 border-fg-white hover:border-3 hover:border-fg-red-light`}
                       onClick={(event) => {
                         holdFunction(event as unknown as PointerEvent);
                       }}

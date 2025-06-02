@@ -15,7 +15,7 @@ export default function ConfirmButton({
 }) {
   return (
     <FgButton
-      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light bg-opacity-80"
+      className="pointer-events-auto z-20 flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light"
       clickFunction={(event) => {
         event.stopPropagation();
         captureMediaController.confirmCapture();

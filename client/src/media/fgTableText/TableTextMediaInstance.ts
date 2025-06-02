@@ -6,10 +6,12 @@ import {
   defaultTextEffectsStyles,
   StaticContentEffectsStylesType,
 } from "../../../../universal/effectsTypeConstant";
+import { defaultSettings } from "./lib/typeConstant";
 
 export type TextInstanceListenerTypes =
   | { type: "initialized" }
-  | { type: "saved" };
+  | { type: "saved" }
+  | { type: "settingsChanged" };
 
 class TableTextMediaInstance {
   initializingState: "initializing" | "initialized" = "initializing";
@@ -30,6 +32,10 @@ class TableTextMediaInstance {
     };
     rotation: number;
   };
+
+  settings = structuredClone(defaultSettings);
+
+  isReadOnly = true;
 
   private textInstanceListeners: Set<
     (message: TextInstanceListenerTypes) => void
@@ -348,6 +354,12 @@ class TableTextMediaInstance {
       default:
         break;
     }
+  };
+
+  settingsChanged = () => {
+    this.textInstanceListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
   };
 
   setPositioning = (positioning: {

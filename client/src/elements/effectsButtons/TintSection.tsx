@@ -36,7 +36,7 @@ export default function TintSection({
   return (
     <>
       <FgButton
-        className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
+        className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white hover:border-fg-red-light"
         clickFunction={async () => {
           setEffectsDisabled(true);
 

@@ -61,7 +61,7 @@ export default function HatsButton({
 
   return (
     <FgButton
-      className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
+      className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white hover:border-fg-red-light"
       clickFunction={clickFunction}
       holdFunction={holdFunction}
       contentFunction={() => {
@@ -116,7 +116,7 @@ export default function HatsButton({
       holdContent={
         <LazyScrollingContainer
           externalRef={hatsContainerRef}
-          className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-white border-opacity-75 bg-black bg-opacity-75 p-2 shadow-lg"
+          className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-fg-white bg-fg-tone-black-1 p-2 shadow-lg"
           items={[
             ...Object.entries(hatsEffects).map(([hat, effect]) => (
               <FgButton
@@ -126,14 +126,14 @@ export default function HatsButton({
                   <div
                     className={`${
                       hat === effectsStyles.style
-                        ? "border-3 border-fg-secondary border-opacity-100"
+                        ? "border-3 border-fg-red-light border-opacity-100"
                         : ""
                     } ${effect.flipped && "scale-x-[-1]"} ${
                       effect.bgColor === "white" &&
                       "border-fg-black-35 bg-fg-white"
                     } ${
                       effect.bgColor === "black" && "border-fg-white"
-                    } flex h-full w-full items-center justify-center rounded border-2 border-opacity-75 hover:border-3 hover:border-fg-secondary`}
+                    } flex h-full w-full items-center justify-center rounded border-2 hover:border-3 hover:border-fg-red-light`}
                     onClick={(event) => {
                       holdFunction(event as unknown as PointerEvent);
                     }}

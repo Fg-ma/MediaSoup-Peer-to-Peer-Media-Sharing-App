@@ -125,6 +125,16 @@ export default function Table({
     };
   }, [tableSocket.current]);
 
+  useEffect(() => {
+    if (!tableRef.current) return;
+
+    const observer = new ResizeObserver(tableController.current.getAspectDir);
+
+    observer.observe(tableRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
       className={`${sidePanelPosition === "right" ? "flex-row-reverse" : ""} flex w-full items-center justify-center`}
@@ -192,7 +202,7 @@ export default function Table({
             content={
               <div
                 ref={tableTopRef}
-                className="bg-fg-tone-black-6.5 relative aspect-square overflow-hidden"
+                className="relative aspect-square overflow-hidden bg-fg-tone-black-6.5"
                 style={{
                   ...(aspectDir.current === "width"
                     ? { width: "100%" }
@@ -213,7 +223,7 @@ export default function Table({
                     gridColor="#f2f2f2"
                   />
                 )}
-                <SharedBundle tableRef={tableRef} />
+                <SharedBundle tableRef={tableRef} tableTopRef={tableTopRef} />
                 {bundles &&
                   Object.keys(bundles).length !== 0 &&
                   Object.keys(bundles).map(

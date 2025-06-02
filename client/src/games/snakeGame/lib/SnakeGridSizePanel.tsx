@@ -22,6 +22,7 @@ export default function SnakeGridSizePanel({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       externalRef={externalRef}
       content={
         <div className="flex h-full w-full items-center justify-center">
@@ -40,6 +41,7 @@ export default function SnakeGridSizePanel({
             options={{
               initValue: 15,
               bottomLabel: "Grid size",
+              labelsColor: "#f2f2f2",
               ticks: 6,
               rangeMax: 60,
               rangeMin: 10,
@@ -61,6 +63,8 @@ export default function SnakeGridSizePanel({
       minHeight={200}
       closeCallback={() => setGridSizePanelActive(false)}
       closePosition="topRight"
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

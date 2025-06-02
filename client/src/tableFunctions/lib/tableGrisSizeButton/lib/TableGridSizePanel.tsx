@@ -29,7 +29,7 @@ export default function TableGridSizePanel({
   return (
     <FgPanel
       externalRef={gridSizeSectionRef}
-      className="border border-fg-white shadow-md shadow-fg-white"
+      className="border border-fg-white shadow-md shadow-fg-tone-black-8"
       content={
         <div className="flex h-full w-full flex-col items-start justify-between space-y-2">
           <div className="h-8 w-[4.5rem]">

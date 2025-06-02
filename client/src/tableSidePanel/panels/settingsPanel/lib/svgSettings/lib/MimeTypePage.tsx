@@ -1,7 +1,10 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMediaInstance";
-import { DownloadMimeTypes, downloadOptionsArrays } from "./typeConstant";
+import {
+  DownloadMimeTypes,
+  downloadOptionsArrays,
+} from "../../../../../../media/fgTableSvg/lib/typeConstant";
 
 export default function MimeTypePage({
   svgMediaInstance,

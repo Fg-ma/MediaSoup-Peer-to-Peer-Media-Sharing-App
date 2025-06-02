@@ -23,11 +23,10 @@ export default function KickFromTableButton({
       contentFunction={() => (
         <FgSVGElement
           src={kickIcon}
+          className="fill-fg-white stroke-fg-white"
           attributes={[
             { key: "width", value: "95%" },
             { key: "height", value: "95%" },
-            { key: "fill", value: "black" },
-            { key: "stroke", value: "black" },
           ]}
         />
       )}

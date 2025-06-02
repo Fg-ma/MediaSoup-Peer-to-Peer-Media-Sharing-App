@@ -125,6 +125,7 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
+          setSettingsActive={setSettingsActive}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}

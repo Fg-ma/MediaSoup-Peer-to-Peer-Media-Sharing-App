@@ -72,7 +72,7 @@ export default function EnvelopeTypePage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
       <div
         className={`${
           settings.envelopeType.value !== "mixGaussian"
@@ -80,9 +80,9 @@ export default function EnvelopeTypePage({
             : "justify-start"
         } flex h-6 w-full items-center space-x-1`}
       >
-        <div className='flex h-full w-max justify-center items-center space-x-1'>
+        <div className="flex h-full w-max items-center justify-center space-x-1">
           <FgButton
-            className='h-full aspect-square'
+            className="aspect-square h-full"
             contentFunction={() => (
               <FgSVGElement
                 src={navigateBackIcon}
@@ -97,7 +97,7 @@ export default function EnvelopeTypePage({
             clickFunction={handleCloseEnvelopeTypePage}
           />
           <div
-            className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+            className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
             onClick={handleCloseEnvelopeTypePage}
           >
             Envelope
@@ -106,7 +106,7 @@ export default function EnvelopeTypePage({
         {settings.envelopeType.value !== "mixGaussian" && (
           <FgButton
             contentFunction={() => (
-              <div className='px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded font-Josefin text-lg font-bold pt-0.5'>
+              <div className="rounded px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">
                 Options
               </div>
             )}
@@ -114,24 +114,22 @@ export default function EnvelopeTypePage({
           />
         )}
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
-        className='w-full overflow-y-auto px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'
+        className="small-vertical-scroll-bar h-max max-h-[11.375rem] w-full overflow-y-auto px-2"
       >
-        <div className='flex w-full flex-col space-y-1 h-max'>
+        <div className="flex h-max w-full flex-col space-y-1">
           {Object.entries(envelopeTypesTitles).map(([key, title]) => (
             <FgButton
               key={key}
-              className={`w-full text-nowrap bg-opacity-75 flex rounded items-center justify-center hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 key === settings.envelopeType.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
               contentFunction={() => (
-                <div className='flex w-full bg-opacity-75 px-2 items-start'>
-                  {title}
-                </div>
+                <div className="flex w-full items-start px-2">{title}</div>
               )}
               clickFunction={() => setEnvelopeType(key as EnvelopeTypes)}
             />

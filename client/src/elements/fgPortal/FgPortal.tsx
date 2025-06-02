@@ -97,7 +97,7 @@ export default function FgPortal({
           fgPortalController.current.getDynamicPortalPosition,
         );
       };
-  }, [content]);
+  }, [content, externalRef?.current]);
 
   if (type === "mouse" && portalPosition === null) return;
 

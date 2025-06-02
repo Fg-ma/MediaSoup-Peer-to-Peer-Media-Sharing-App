@@ -102,9 +102,7 @@ export default function SamplerToolbar({
       <motion.div
         className="z-20 flex h-8 w-max items-center space-x-2 pr-2"
         animate={{
-          boxShadow: `8px 0 4px -3px  ${
-            focus ? "rgb(22, 22, 22)" : "rgba(33, 33, 33)"
-          }`,
+          boxShadow: `8px 0 4px -3px  ${focus ? "#090909" : "#161616"}`,
         }}
         transition={{
           boxShadow: { duration: 0.3, ease: "linear" },

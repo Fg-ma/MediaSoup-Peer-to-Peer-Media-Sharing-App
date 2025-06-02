@@ -213,7 +213,7 @@ export default function GeneralMediaSelection({
               />
             )}
           {(mimeType || fileSize) && (
-            <div className="space-y-1 px-3 text-white">
+            <div className="space-y-1 px-3 text-fg-white">
               {mimeType && (
                 <p>
                   <strong>MIME type:</strong> {mimeType}
@@ -228,7 +228,7 @@ export default function GeneralMediaSelection({
           )}
           <div className="flex flex-col items-start justify-center space-y-2 px-3">
             <div className="flex items-center justify-center space-x-2">
-              <div className="text-lg text-white">X:</div>
+              <div className="text-lg text-fg-white">X:</div>
               <FgInput
                 className="h-8 w-12 grow rounded border-fg-off-white bg-fg-white font-K2D hover:border-fg-red focus:border-fg-red"
                 type="number"
@@ -293,7 +293,7 @@ export default function GeneralMediaSelection({
               />
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <div className="text-lg text-white">Y:</div>
+              <div className="text-lg text-fg-white">Y:</div>
               <FgInput
                 className="h-8 w-12 grow rounded border-fg-off-white bg-fg-white font-K2D hover:border-fg-red focus:border-fg-red"
                 type="number"
@@ -358,7 +358,7 @@ export default function GeneralMediaSelection({
               />
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <div className="text-lg text-white">Scale:</div>
+              <div className="text-lg text-fg-white">Scale:</div>
               <FgInput
                 className="h-8 w-12 grow rounded border-fg-off-white bg-fg-white font-K2D hover:border-fg-red focus:border-fg-red"
                 type="number"
@@ -418,7 +418,7 @@ export default function GeneralMediaSelection({
               />
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <div className="text-lg text-white">Angle:</div>
+              <div className="text-lg text-fg-white">Angle:</div>
               <FgInput
                 className="h-8 w-12 grow rounded border-fg-off-white bg-fg-white font-K2D hover:border-fg-red focus:border-fg-red"
                 type="number"

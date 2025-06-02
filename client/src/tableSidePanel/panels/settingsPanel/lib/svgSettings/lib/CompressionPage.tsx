@@ -4,7 +4,7 @@ import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMe
 import {
   DownloadCompressionTypes,
   downloadOptionsArrays,
-} from "./typeConstant";
+} from "../../../../../../media/fgTableSvg/lib/typeConstant";
 
 export default function CompressionPage({
   svgMediaInstance,

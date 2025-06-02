@@ -5,7 +5,6 @@ import type * as monacoEditor from "monaco-editor";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { useSignalContext } from "../../../../context/signalContext/SignalContext";
 import { useEffectsContext } from "../../../../context/effectsContext/EffectsContext";
-import { Settings } from "../typeConstant";
 import TableTextMediaInstance from "../../TableTextMediaInstance";
 import MonacoController from "./lib/MonacoController";
 import "./lib/monaco.css";
@@ -13,25 +12,23 @@ import "./lib/monaco.css";
 export default function Monaco({
   textMediaInstance,
   className,
-  settings,
   isLineNums = false,
   setIsLineNums,
-  isReadOnly,
   externalInitializing,
   externalRerender,
   externalTextAreaContainerRef,
   forceFinishInitialization,
+  forceIsReadOnly,
 }: {
   textMediaInstance: TableTextMediaInstance;
   className?: string;
-  settings: Settings;
   isLineNums?: boolean;
   setIsLineNums?: React.Dispatch<React.SetStateAction<boolean>>;
-  isReadOnly?: React.MutableRefObject<boolean>;
   externalInitializing?: React.MutableRefObject<boolean>;
   externalRerender?: React.Dispatch<React.SetStateAction<boolean>>;
   externalTextAreaContainerRef?: React.RefObject<HTMLDivElement>;
   forceFinishInitialization?: React.MutableRefObject<boolean>;
+  forceIsReadOnly?: boolean;
 }) {
   const { staticContentEffectsStyles } = useEffectsContext();
   const { liveTextEditingSocket } = useSocketContext();
@@ -63,10 +60,10 @@ export default function Monaco({
       setIsLineNums,
       sendGeneralSignal,
       setRerender,
-      isReadOnly,
       initializing,
       forceFinishInitialization,
       externalRerender,
+      forceIsReadOnly,
     ),
   );
 
@@ -101,7 +98,6 @@ export default function Monaco({
       );
     }
   }, [
-    settings,
     staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
   ]);
 
@@ -128,7 +124,7 @@ export default function Monaco({
   return (
     <div
       ref={textAreaContainerRef}
-      className={`${className} ${isReadOnly?.current ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
+      className={`${className} ${forceIsReadOnly || textMediaInstance.isReadOnly ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
       style={{
         backgroundColor:
           staticContentEffectsStyles.current.text[
@@ -136,8 +132,8 @@ export default function Monaco({
           ].backgroundColor,
       }}
       onDoubleClick={() => {
-        if (isReadOnly && isReadOnly.current) {
-          isReadOnly.current = false;
+        if (!forceIsReadOnly && textMediaInstance.isReadOnly) {
+          textMediaInstance.isReadOnly = false;
           if (externalRerender) externalRerender((prev) => !prev);
         }
       }}
@@ -150,10 +146,12 @@ export default function Monaco({
         onMount={monacoController.current.handleEditorDidMount}
         options={{
           stickyScroll: { enabled: false },
-          minimap: { enabled: settings.minimap.value },
-          readOnly: initializing.current ? true : (isReadOnly?.current ?? true),
-          domReadOnly: isReadOnly?.current ?? true,
-          cursorStyle: settings.cursorStyle.value,
+          minimap: { enabled: textMediaInstance.settings.minimap.value },
+          readOnly: initializing.current
+            ? true
+            : forceIsReadOnly || textMediaInstance.isReadOnly,
+          domReadOnly: forceIsReadOnly || textMediaInstance.isReadOnly,
+          cursorStyle: textMediaInstance.settings.cursorStyle.value,
           automaticLayout: true,
           largeFileOptimizations: true,
           overviewRulerLanes: 0,

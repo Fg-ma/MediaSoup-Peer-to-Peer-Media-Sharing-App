@@ -26,11 +26,10 @@ export default function FriendStatusButton({
         return (
           <FgSVGElement
             src={src}
+            className="fill-fg-white stroke-fg-white"
             attributes={[
               { key: "width", value: "95%" },
               { key: "height", value: "95%" },
-              { key: "fill", value: "black" },
-              { key: "stroke", value: "black" },
             ]}
           />
         );

@@ -18,11 +18,10 @@ export default function PrivateMessageButton({
       contentFunction={() => (
         <FgSVGElement
           src={privateMessageIcon}
+          className="fill-fg-white stroke-fg-white"
           attributes={[
             { key: "width", value: "95%" },
             { key: "height", value: "95%" },
-            { key: "fill", value: "black" },
-            { key: "stroke", value: "black" },
           ]}
         />
       )}

@@ -13,12 +13,12 @@ import FgTableSvg from "../media/fgTableSvg/FgTableSvg";
 const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
 
 export default function SharedBundle({
-  name,
   tableRef,
+  tableTopRef,
   options,
 }: {
-  name?: string;
   tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
   options?: BundleOptions;
 }) {
   const bundleOptions = {
@@ -148,6 +148,7 @@ export default function SharedBundle({
                 textInstanceId={textInstanceId}
                 bundleRef={sharedBundleRef}
                 tableRef={tableRef}
+                tableTopRef={tableTopRef}
               />
             </Suspense>
           ),

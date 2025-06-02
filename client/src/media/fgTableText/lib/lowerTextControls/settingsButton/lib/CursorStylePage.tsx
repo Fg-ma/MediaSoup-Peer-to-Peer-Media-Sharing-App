@@ -1,29 +1,26 @@
-import React, { useRef } from "react";
+import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import {
-  Settings,
   ActivePages,
   cursorStylesOptionsMeta,
   CursorStyles,
 } from "../../../typeConstant";
-import LazyFontButton from "./LazyFontButton";
+import TableTextMediaInstance from "../../../../../../media/fgTableText/TableTextMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 
 export default function CursorStylePage({
+  textMediaInstance,
+  setRerender,
   setActivePages,
-  settings,
-  setSettings,
 }: {
+  textMediaInstance: TableTextMediaInstance;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
-  const scrollingContainerRef = useRef<HTMLDivElement>(null);
-
   const handleCloseCursorStylePage = () => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
@@ -35,13 +32,9 @@ export default function CursorStylePage({
   };
 
   const handleSelectCursorStyle = (cursorStyle: CursorStyles) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
+    textMediaInstance.settings.cursorStyle.value = cursorStyle;
 
-      newSettings.cursorStyle.value = cursorStyle;
-
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   return (
@@ -69,28 +62,18 @@ export default function CursorStylePage({
           Cursor
         </div>
       </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
-      <div
-        ref={scrollingContainerRef}
-        className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
-      >
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
+      <div className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2">
         {Object.entries(cursorStylesOptionsMeta).map(([key, title]) => (
-          <LazyFontButton
+          <FgButton
             key={key}
-            scrollingContainerRef={scrollingContainerRef}
-            item={
-              <FgButton
-                className={`${
-                  settings.fontStyle.value === key
-                    ? "bg-fg-white text-fg-tone-black-1"
-                    : ""
-                } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
-                contentFunction={() => <>{title}</>}
-                clickFunction={() =>
-                  handleSelectCursorStyle(key as CursorStyles)
-                }
-              />
-            }
+            className={`${
+              textMediaInstance.settings.cursorStyle.value === key
+                ? "bg-fg-white text-fg-tone-black-1"
+                : ""
+            } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
+            contentFunction={() => <>{title}</>}
+            clickFunction={() => handleSelectCursorStyle(key as CursorStyles)}
           />
         ))}
       </div>

@@ -186,7 +186,7 @@ export default function FgTriToggleButton({
               type={portalVisible ? "below" : "mouse"}
               mouseType="bottomRight"
               content={
-                <div className="text-md relative bottom-0 mb-1 w-max rounded-md bg-white px-2 py-1 font-K2D text-black shadow-lg">
+                <div className="text-md relative bottom-0 mb-1 w-max rounded-md bg-fg-white px-2 py-1 font-K2D text-fg-tone-black-1 shadow-lg">
                   {portalVisible
                     ? btnLabels && btnLabels[btnState]
                     : btnLabels && btnLabels[hoveringState]}

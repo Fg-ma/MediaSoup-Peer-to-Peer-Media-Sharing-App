@@ -17,8 +17,7 @@ class FgSoundBoardController {
     private soundEffects: SoundEffects,
     private setSoundEffects: React.Dispatch<React.SetStateAction<SoundEffects>>,
     private soundEffectsMetaDataRef: React.MutableRefObject<SoundEffectsMetaData>,
-    private boardMode: BoardModes,
-    private setBoardMode: React.Dispatch<React.SetStateAction<BoardModes>>,
+    private boardMode: React.MutableRefObject<BoardModes>,
     private seizureBoardEffectIntevalRef: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
@@ -47,6 +46,7 @@ class FgSoundBoardController {
     private audioEndTimeouts: React.MutableRefObject<
       Record<number, NodeJS.Timeout | undefined>
     >,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   toggleButton = (key: number) => {
@@ -364,10 +364,16 @@ class FgSoundBoardController {
   };
 
   private toggleSeizureMode = (key: number) => {
-    if (!this.soundEffects[key].playing && this.boardMode === "seizure") {
+    if (
+      !this.soundEffects[key].playing &&
+      this.boardMode.current === "seizure"
+    ) {
       this.startCrazyBoardEffect();
       this.startSeizureBoardEffect(key);
-    } else if (this.soundEffects[key].playing && this.boardMode === "seizure") {
+    } else if (
+      this.soundEffects[key].playing &&
+      this.boardMode.current === "seizure"
+    ) {
       if (this.seizureBoardEffectIntevalRef.current) {
         clearInterval(this.seizureBoardEffectIntevalRef.current);
         this.seizureBoardEffectIntevalRef.current = undefined;
@@ -389,7 +395,10 @@ class FgSoundBoardController {
         return;
       }
 
-      if (!this.soundEffects[key].playing && this.boardMode === "crazy") {
+      if (
+        !this.soundEffects[key].playing &&
+        this.boardMode.current === "crazy"
+      ) {
         this.startCrazyBoardEffect();
       }
       this.toggleSeizureMode(key);
@@ -428,11 +437,11 @@ class FgSoundBoardController {
 
   stateChangeFunction = (state: 0 | 1 | 2) => {
     if (state === 0) {
-      this.setBoardMode("standard");
+      this.boardMode.current = "standard";
     } else if (state === 1) {
-      this.setBoardMode("crazy");
+      this.boardMode.current = "crazy";
     } else {
-      this.setBoardMode("seizure");
+      this.boardMode.current = "seizure";
     }
   };
 

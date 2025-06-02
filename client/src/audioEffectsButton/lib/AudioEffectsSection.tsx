@@ -259,10 +259,11 @@ export default function AudioEffectsSection({
   return (
     <>
       <FgPanel
+        className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
         content={
           <LazyScrollingContainer
             externalRef={audioSectionRef}
-            className="grid small-vertical-scroll-bar h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
+            className="small-vertical-scroll-bar grid h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
             style={{
               gridTemplateColumns: "repeat(auto-fit, minmax(2rem, 5rem))",
             }}
@@ -349,7 +350,7 @@ export default function AudioEffectsSection({
               <FgButton
                 scrollingContainerRef={audioSectionRef}
                 externalRef={audioMixEffectsButtonRef}
-                className="flex w-fullitems-center aspect-square justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
+                className="w-fullitems-center flex aspect-square justify-center rounded bg-fg-tone-black-4 hover:bg-fg-red-light"
                 clickFunction={() => {
                   setAudioMixEffectsActive((prev) => !prev);
                 }}
@@ -529,7 +530,7 @@ export default function AudioEffectsSection({
           placement: placement,
           padding: padding,
         }}
-        initWidth={"300px"}
+        initWidth={"310px"}
         initHeight={"268px"}
         minWidth={140}
         minHeight={190}
@@ -537,8 +538,8 @@ export default function AudioEffectsSection({
         closeLabelElement={closeLabelElement}
         closePosition="topRight"
         shadow={{ top: true, bottom: true }}
-        backgroundColor={"#161616"}
-        secondaryBackgroundColor={"#212121"}
+        backgroundColor={"#090909"}
+        secondaryBackgroundColor={"#161616"}
       />
       {audioMixEffectsActive && (
         <Suspense fallback={<div>Loading...</div>}>

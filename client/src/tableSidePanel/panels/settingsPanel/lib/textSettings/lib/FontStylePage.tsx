@@ -1,23 +1,16 @@
 import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import { ActivePages, fontStylesOptionsMeta } from "../../../typeConstant";
-import LazyFontButton from "./LazyFontButton";
 import { useSocketContext } from "../../../../../../context/socketContext/SocketContext";
 import { useEffectsContext } from "../../../../../../context/effectsContext/EffectsContext";
 import TableTextMediaInstance from "../../../../../../media/fgTableText/TableTextMediaInstance";
-
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-
-const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
+import { fontStylesOptionsMeta } from "../../../../../../media/fgTableText/lib/typeConstant";
+import LazyFontButton from "../../../../../../media/fgTableText/lib/lowerTextControls/settingsButton/lib/LazyFontButton";
 
 export default function FontStylePage({
   textMediaInstance,
-  setActivePages,
   setRerender,
 }: {
-  textMediaInstance: TableTextMediaInstance;
-  setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  textMediaInstance: React.MutableRefObject<TableTextMediaInstance>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { staticContentEffectsStyles } = useEffectsContext();
@@ -25,58 +18,27 @@ export default function FontStylePage({
 
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleCloseFontStylePage = () => {
-    setActivePages((prev) => {
-      const newActivePages = { ...prev };
-
-      newActivePages.fontStyle.active = !newActivePages.fontStyle.active;
-
-      return newActivePages;
-    });
-  };
-
   const handleSelectFontStyle = (fontStyle: string) => {
     staticContentEffectsStyles.current.text[
-      textMediaInstance.textInstanceId
+      textMediaInstance.current.textInstanceId
     ].fontStyle = fontStyle;
 
     tableStaticContentSocket.current?.updateContentEffects(
       "text",
-      textMediaInstance.textMedia.textId,
-      textMediaInstance.textInstanceId,
+      textMediaInstance.current.textMedia.textId,
+      textMediaInstance.current.textInstanceId,
       undefined,
-      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+      staticContentEffectsStyles.current.text[
+        textMediaInstance.current.textInstanceId
+      ],
     );
 
     setRerender((prev) => !prev);
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
-      <div className="flex h-6 w-full justify-start space-x-1">
-        <FgButton
-          className="aspect-square h-full"
-          contentFunction={() => (
-            <FgSVGElement
-              src={navigateBackIcon}
-              attributes={[
-                { key: "width", value: "95%" },
-                { key: "height", value: "95%" },
-                { key: "fill", value: "#f2f2f2" },
-                { key: "stroke", value: "#f2f2f2" },
-              ]}
-            />
-          )}
-          clickFunction={handleCloseFontStylePage}
-        />
-        <div
-          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
-          onClick={handleCloseFontStylePage}
-        >
-          Font styles
-        </div>
-      </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
+    <>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
       <div
         ref={scrollingContainerRef}
         className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
@@ -89,7 +51,7 @@ export default function FontStylePage({
               <FgButton
                 className={`${
                   staticContentEffectsStyles.current.text[
-                    textMediaInstance.textInstanceId
+                    textMediaInstance.current.textInstanceId
                   ].fontStyle === meta.value
                     ? "bg-fg-white text-fg-tone-black-1"
                     : ""
@@ -97,13 +59,15 @@ export default function FontStylePage({
                 style={{
                   fontFamily: meta.value,
                 }}
-                contentFunction={() => <>{meta.title}</>}
+                contentFunction={() => (
+                  <div className="truncate">{meta.title}</div>
+                )}
                 clickFunction={() => handleSelectFontStyle(meta.value)}
               />
             }
           />
         ))}
       </div>
-    </div>
+    </>
   );
 }

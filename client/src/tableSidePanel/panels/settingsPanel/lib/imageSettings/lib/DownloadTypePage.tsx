@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
-import { downloadTypeSelections } from "./typeConstant";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import { downloadTypeSelections } from "../../../../../../media/fgTableImage/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 

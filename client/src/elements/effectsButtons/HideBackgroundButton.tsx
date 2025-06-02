@@ -92,7 +92,7 @@ export default function HideBackgroundButton({
   return (
     <>
       <FgButton
-        className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white border-opacity-90 hover:border-fg-red-light"
+        className="flex !aspect-square h-full items-center justify-center rounded-full border-2 border-fg-white hover:border-fg-red-light"
         clickFunction={clickFunction}
         contentFunction={() => {
           return (
@@ -116,11 +116,11 @@ export default function HideBackgroundButton({
         holdContent={
           <LazyScrollingContainer
             externalRef={hideBackgroundContainerRef}
-            className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-white border-opacity-75 bg-black bg-opacity-75 p-2 shadow-lg"
+            className="small-vertical-scroll-bar mb-4 grid max-h-48 w-60 grid-cols-3 gap-x-1 gap-y-1 overflow-y-auto rounded-md border border-fg-white bg-fg-tone-black-1 p-2 shadow-lg"
             items={[
               <div className="flex h-full w-full items-center justify-center">
                 <div
-                  className="rounded border-3 border-white border-opacity-75"
+                  className="rounded border-3 border-fg-white"
                   style={{
                     backgroundColor: colorRef.current,
                     width: "100%",
@@ -141,9 +141,9 @@ export default function HideBackgroundButton({
                       <div
                         className={`${
                           background === effectsStyles.style
-                            ? "border-3 border-fg-secondary border-opacity-100"
+                            ? "border-3 border-fg-red-light border-opacity-100"
                             : ""
-                        } flex h-full w-full items-center justify-center rounded border-2 border-white border-opacity-75 hover:border-3 hover:border-fg-secondary`}
+                        } flex h-full w-full items-center justify-center rounded border-2 border-fg-white hover:border-3 hover:border-fg-red-light`}
                         onClick={(event) => {
                           holdFunction(event as unknown as PointerEvent);
                         }}

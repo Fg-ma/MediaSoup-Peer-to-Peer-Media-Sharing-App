@@ -783,10 +783,6 @@ const warCassette2_500x500 =
 const warCassette2_64x64 =
   nginxAssetServerBaseUrl + "backgroundImages/pixelArt/warCassette2_64x64.png";
 
-const alien_960x960 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/alien_960x960.jpg";
-const alien_64x64 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/alien_64x64.jpg";
 const apollo_1280x1262 =
   nginxAssetServerBaseUrl + "backgroundImages/space/apollo_1280x1262.png";
 const apollo_64x63 =
@@ -992,10 +988,6 @@ const theWorldAwaits_1280x828 =
   "backgroundImages/space/theWorldAwaits_1280x828.png";
 const theWorldAwaits_64x41 =
   nginxAssetServerBaseUrl + "backgroundImages/space/theWorldAwaits_64x41.png";
-const ufo_1280x720 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/ufo_1280x720.jpg";
-const ufo_64x36 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/ufo_64x36.jpg";
 const westerlund1_1280x836 =
   nginxAssetServerBaseUrl + "backgroundImages/space/westerlund1_1280x836.jpg";
 const westerlund1_64x42 =
@@ -1067,10 +1059,6 @@ const gameController2_1280x1280 =
 const gameController2_64x64 =
   nginxAssetServerBaseUrl +
   "backgroundImages/technology/gameController2_64x64.png";
-const keyboard_1280x953 =
-  nginxAssetServerBaseUrl + "backgroundImages/technology/keyboard_1280x953.jpg";
-const keyboard_64x48 =
-  nginxAssetServerBaseUrl + "backgroundImages/technology/keyboard_64x48.jpg";
 const lightBulb_640x640 =
   nginxAssetServerBaseUrl + "backgroundImages/technology/lightBulb_640x640.png";
 const lightBulb_64x64 =
@@ -1335,7 +1323,6 @@ export type PixelArtCategories =
   | "warCassette1"
   | "warCassette2";
 export type SpaceCategories =
-  | "alien"
   | "apollo"
   | "ARP107"
   | "ARP107_MIRI"
@@ -1382,7 +1369,6 @@ export type SpaceCategories =
   | "starMap"
   | "theBigQuestions"
   | "theWorldAwaits"
-  | "ufo"
   | "westerlund1"
   | "WR124";
 export type TechnologyCategories =
@@ -1400,7 +1386,6 @@ export type TechnologyCategories =
   | "gameController1"
   | "gameController2"
   | "jet"
-  | "keyboard"
   | "lightBulb"
   | "mouse"
   | "oscilloscope"
@@ -1459,6 +1444,7 @@ export const recommendations: {
     url: string;
     loadingUrl: string;
     pixelated: boolean;
+    color: "light" | "dark";
   };
 } = {
   geometric4: {
@@ -1467,6 +1453,7 @@ export const recommendations: {
     url: geometric4_1280x843,
     loadingUrl: geometric4_64x42,
     pixelated: false,
+    color: "dark",
   },
   geometric6: {
     category: "geometric",
@@ -1474,6 +1461,7 @@ export const recommendations: {
     url: geometric6_1280x720,
     loadingUrl: geometric6_64x36,
     pixelated: false,
+    color: "dark",
   },
   mountains: {
     category: "nature",
@@ -1481,6 +1469,7 @@ export const recommendations: {
     url: mountains_1024x1280,
     loadingUrl: mountains_51x64,
     pixelated: false,
+    color: "dark",
   },
   shoreSide: {
     category: "nature",
@@ -1488,6 +1477,7 @@ export const recommendations: {
     url: shoreSide_1024x1280,
     loadingUrl: shoreSide_51x64,
     pixelated: false,
+    color: "dark",
   },
   submarine: {
     category: "nature",
@@ -1495,6 +1485,7 @@ export const recommendations: {
     url: submarine_854x1280,
     loadingUrl: submarine_43x64,
     pixelated: false,
+    color: "dark",
   },
   sunnySideUp: {
     category: "nature",
@@ -1502,6 +1493,7 @@ export const recommendations: {
     url: sunnySideUp_1280x1280,
     loadingUrl: sunnySideUp_64x64,
     pixelated: false,
+    color: "dark",
   },
   blueBall: {
     category: "space",
@@ -1509,6 +1501,7 @@ export const recommendations: {
     url: blueBall_1280x800,
     loadingUrl: blueBall_64x40,
     pixelated: false,
+    color: "dark",
   },
   solarParty: {
     category: "space",
@@ -1516,6 +1509,7 @@ export const recommendations: {
     url: solarParty_960x1280,
     loadingUrl: solarParty_48x64,
     pixelated: false,
+    color: "dark",
   },
   starMap: {
     category: "space",
@@ -1523,6 +1517,7 @@ export const recommendations: {
     url: starMap_1169x1280,
     loadingUrl: starMap_58x64,
     pixelated: false,
+    color: "light",
   },
   binary: {
     category: "technology",
@@ -1530,6 +1525,7 @@ export const recommendations: {
     url: binary_1280x1280,
     loadingUrl: binary_64x64,
     pixelated: false,
+    color: "light",
   },
   circuit: {
     category: "technology",
@@ -1537,6 +1533,7 @@ export const recommendations: {
     url: circuit_1280x1273,
     loadingUrl: circuit_64x64,
     pixelated: false,
+    color: "light",
   },
   robot: {
     category: "technology",
@@ -1544,6 +1541,7 @@ export const recommendations: {
     url: robot_854x1280,
     loadingUrl: robot_43x64,
     pixelated: false,
+    color: "dark",
   },
   M16_pillarsOfCreation: {
     category: "space",
@@ -1551,6 +1549,7 @@ export const recommendations: {
     url: M16_pillarsOfCreation_864x814,
     loadingUrl: M16_pillarsOfCreation_64x60,
     pixelated: false,
+    color: "dark",
   },
   theBigQuestions: {
     category: "space",
@@ -1558,6 +1557,7 @@ export const recommendations: {
     url: theBigQuestions_1280x1280,
     loadingUrl: theBigQuestions_64x64,
     pixelated: false,
+    color: "dark",
   },
   moonLight: {
     category: "nature",
@@ -1565,6 +1565,7 @@ export const recommendations: {
     url: moonLight_768x1280,
     loadingUrl: moonLight_38x64,
     pixelated: false,
+    color: "dark",
   },
   redMoon: {
     category: "nature",
@@ -1572,6 +1573,7 @@ export const recommendations: {
     url: redMoon_1280x964,
     loadingUrl: redMoon_64x48,
     pixelated: false,
+    color: "dark",
   },
 };
 
@@ -1582,6 +1584,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   geometric: {
@@ -1590,6 +1593,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   holiday: {
@@ -1598,6 +1602,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   misc: {
@@ -1606,6 +1611,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   music: {
@@ -1614,6 +1620,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   nature: {
@@ -1622,6 +1629,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   neon: {
@@ -1630,6 +1638,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   pixelArt: {
@@ -1638,6 +1647,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   space: {
@@ -1646,6 +1656,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
   technology: {
@@ -1654,6 +1665,7 @@ export const categories: {
       url: string;
       loadingUrl: string;
       pixelated: boolean;
+      color: "light" | "dark";
     };
   };
 } = {
@@ -1663,102 +1675,119 @@ export const categories: {
       url: actor_1280x836,
       loadingUrl: actor_64x42,
       pixelated: false,
+      color: "light",
     },
     alley: {
       label: "Alley",
       url: alley_1280x961,
       loadingUrl: alley_64x48,
       pixelated: false,
+      color: "dark",
     },
     burstingWithFlames: {
       label: "Bursting with flames",
       url: burstingWithFlames_1280x1062,
       loadingUrl: burstingWithFlames_64x53,
       pixelated: false,
+      color: "dark",
     },
     crow: {
       label: "Crow",
       url: crow_1280x1280,
       loadingUrl: crow_64x64,
       pixelated: false,
+      color: "light",
     },
     evilPumpkin: {
       label: "Evil pumpkin",
       url: evilPumpkin_1280x1280,
       loadingUrl: evilPumpkin_64x64,
       pixelated: false,
+      color: "dark",
     },
     hauntedHouses: {
       label: "Haunted houses",
       url: hauntedHouses_1280x1269,
       loadingUrl: hauntedHouses_64x63,
       pixelated: false,
+      color: "light",
     },
     headHunter: {
       label: "Head hunter",
       url: headHunter_905x905,
       loadingUrl: headHunter_64x64,
       pixelated: false,
+      color: "dark",
     },
     jackOLantern: {
       label: "Jack 'O lantern",
       url: jackOLantern_1067x1067,
       loadingUrl: jackOLantern_64x64,
       pixelated: false,
+      color: "dark",
     },
     nightStreet: {
       label: "Night street",
       url: nightStreet_1280x961,
       loadingUrl: nightStreet_64x48,
       pixelated: false,
+      color: "dark",
     },
     pirateFlag: {
       label: "Pirate flag",
       url: pirateFlag_1280x1280,
       loadingUrl: pirateFlag_64x64,
       pixelated: false,
+      color: "dark",
     },
     skullOperator: {
       label: "Skull operator",
       url: skullOperator_1280x1280,
       loadingUrl: skullOperator_64x64,
       pixelated: false,
+      color: "dark",
     },
     skulls: {
       label: "Skulls",
       url: skulls_1280x959,
       loadingUrl: skulls_64x48,
       pixelated: false,
+      color: "dark",
     },
     skyline: {
       label: "Skyline",
       url: skyline_1280x806,
       loadingUrl: skyline_64x40,
       pixelated: false,
+      color: "dark",
     },
     splatter: {
       label: "Splatter",
       url: splatter_1280_768,
       loadingUrl: splatter_64x38,
       pixelated: false,
+      color: "dark",
     },
     streetScene: {
       label: "Street scene",
       url: streetScene_904x1280,
       loadingUrl: streetScene_45x64,
       pixelated: false,
+      color: "dark",
     },
     walkInTheForest: {
       label: "Walk in the forest",
       url: walkInTheForest_1280x853,
       loadingUrl: walkInTheForest_64x43,
       pixelated: false,
+      color: "light",
     },
     zombie: {
       label: "Zombie",
       url: zombie_1280x727,
       loadingUrl: zombie_64x36,
       pixelated: false,
+      color: "dark",
     },
   },
   geometric: {
@@ -1767,78 +1796,91 @@ export const categories: {
       url: geometric1_1280x720,
       loadingUrl: geometric1_64x36,
       pixelated: false,
+      color: "dark",
     },
     geometric2: {
       label: "Geometric 2",
       url: geometric2_1280x720,
       loadingUrl: geometric2_64x36,
       pixelated: false,
+      color: "dark",
     },
     geometric3: {
       label: "Geometric 3",
       url: geometric3_1280x720,
       loadingUrl: geometric3_64x36,
       pixelated: false,
+      color: "dark",
     },
     geometric4: {
       label: "Geometric 4",
       url: geometric4_1280x843,
       loadingUrl: geometric4_64x42,
       pixelated: false,
+      color: "dark",
     },
     geometric5: {
       label: "Geometric 5",
       url: geometric5_1280x959,
       loadingUrl: geometric5_64x48,
       pixelated: false,
+      color: "dark",
     },
     geometric6: {
       label: "Geometric 6",
       url: geometric6_1280x720,
       loadingUrl: geometric6_64x36,
       pixelated: false,
+      color: "dark",
     },
     geometric7: {
       label: "Geometric 7",
       url: geometric7_869x1224,
       loadingUrl: geometric7_45x64,
       pixelated: false,
+      color: "dark",
     },
     geometric8: {
       label: "Geometric 8",
       url: geometric8_1280x735,
       loadingUrl: geometric8_64x37,
       pixelated: false,
+      color: "dark",
     },
     geometric9: {
       label: "Geometric 9",
       url: geometric9_1280x1280,
       loadingUrl: geometric9_64x64,
       pixelated: false,
+      color: "dark",
     },
     geometric10: {
       label: "Geometric 10",
       url: geometric10_1280x653,
       loadingUrl: geometric10_64x33,
       pixelated: false,
+      color: "dark",
     },
     geometric11: {
       label: "Geometric 11",
       url: geometric11_1280x853,
       loadingUrl: geometric11_64x43,
       pixelated: false,
+      color: "dark",
     },
     geometric12: {
       label: "Geometric 12",
       url: geometric12_1280x720,
       loadingUrl: geometric12_64x36,
       pixelated: false,
+      color: "dark",
     },
     geometric13: {
       label: "Geometric 13",
       url: geometric13_1280x730,
       loadingUrl: geometric13_64x37,
       pixelated: false,
+      color: "dark",
     },
   },
   holiday: {
@@ -1847,90 +1889,105 @@ export const categories: {
       url: cabin_854x1280,
       loadingUrl: cabin_43x64,
       pixelated: false,
+      color: "dark",
     },
     christmasCard1: {
       label: "Christmas card 1",
       url: christmasCard1_1280x1087,
       loadingUrl: christmasCard1_64x54,
       pixelated: false,
+      color: "dark",
     },
     christmasCard2: {
       label: "Christmas card 2",
       url: christmasCard2_1280x887,
       loadingUrl: christmasCard2_64x44,
       pixelated: false,
+      color: "dark",
     },
     christmasCassette: {
       label: "Christmas cassette",
       url: christmasCassette_1042x979,
       loadingUrl: christmasCassette_64x60,
       pixelated: false,
+      color: "dark",
     },
     forest: {
       label: "Forest",
       url: forest_1280x777,
       loadingUrl: forest_64x39,
       pixelated: false,
+      color: "dark",
     },
     igloo: {
       label: "Igloo",
       url: igloo_1280x1280,
       loadingUrl: igloo_64x64,
       pixelated: false,
+      color: "dark",
     },
     landscape: {
       label: "Landscape",
       url: landscape_1280x640,
       loadingUrl: landscape_64x32,
       pixelated: false,
+      color: "light",
     },
     leprechaun: {
       label: "Leprechaun",
       url: leprechaun_1280x1280,
       loadingUrl: leprechaun_64x64,
       pixelated: false,
+      color: "dark",
     },
     merryChristmas: {
       label: "Merry Christmas",
       url: merryChristmas_1280x731,
       loadingUrl: merryChristmas_64x37,
       pixelated: false,
+      color: "dark",
     },
     snowflake: {
       label: "Snowflake",
       url: snowflake_1280x852,
       loadingUrl: snowflake_64x43,
       pixelated: false,
+      color: "dark",
     },
     snowman: {
       label: "Snowman",
       url: snowman_1280x880,
       loadingUrl: snowman_64x44,
       pixelated: false,
+      color: "dark",
     },
     whiteChristmas: {
       label: "White christmas",
       url: whiteChristmas_1280x910,
       loadingUrl: whiteChristmas_64x46,
       pixelated: false,
+      color: "dark",
     },
     winterStreets: {
       label: "Winter streets",
       url: winterStreets_841x1280,
       loadingUrl: winterStreets_42x64,
       pixelated: false,
+      color: "dark",
     },
     winterVillage: {
       label: "Winter village",
       url: winterVillage_895x1280,
       loadingUrl: winterVillage_45x64,
       pixelated: false,
+      color: "dark",
     },
     winterWonderLand: {
       label: "Winter wonder land",
       url: winterWonderLand_1280x956,
       loadingUrl: winterWonderLand_64x48,
       pixelated: false,
+      color: "dark",
     },
   },
   misc: {
@@ -1939,108 +1996,126 @@ export const categories: {
       url: abstract_1280x880,
       loadingUrl: abstract_64x44,
       pixelated: false,
+      color: "dark",
     },
     ambulance: {
       label: "Ambulance",
       url: ambulance_1280x1280,
       loadingUrl: ambulance_64x64,
       pixelated: false,
+      color: "dark",
     },
     biking: {
       label: "Biking",
       url: biking_1280x1280,
       loadingUrl: biking_64x64,
       pixelated: false,
+      color: "dark",
     },
     boots: {
       label: "Boots",
       url: boots_960x1280,
       loadingUrl: boots_48x64,
       pixelated: false,
+      color: "dark",
     },
     coffee: {
       label: "Coffee",
       url: coffee_1280x1280,
       loadingUrl: coffee_64x64,
       pixelated: false,
+      color: "dark",
     },
     dragon: {
       label: "Dragon",
       url: dragon_misc_1280x1280,
       loadingUrl: dragon_misc_64x64,
       pixelated: false,
+      color: "dark",
     },
     jackOfSpades: {
       label: "Jack of spades",
       url: jackOfSpades_1280x1280,
       loadingUrl: jackOfSpades_64x64,
       pixelated: false,
+      color: "dark",
     },
     kingOfHearts: {
       label: "King of hearts",
       url: kingOfHearts_1280x1280,
       loadingUrl: kingOfHearts_64x64,
       pixelated: false,
+      color: "dark",
     },
     knight: {
       label: "Knight",
       url: knight_1280x960,
       loadingUrl: knight_64x48,
       pixelated: false,
+      color: "dark",
     },
     map: {
       label: "Map",
       url: map_1280x904,
       loadingUrl: map_64x45,
       pixelated: false,
+      color: "dark",
     },
     queenOfDiamonds: {
       label: "Queen of diamonds",
       url: queenOfDiamonds_1280x1280,
       loadingUrl: queenOfDiamonds_64x64,
       pixelated: false,
+      color: "dark",
     },
     scroll: {
       label: "Scroll",
       url: scroll_1280x1280,
       loadingUrl: scroll_64x64,
       pixelated: false,
+      color: "dark",
     },
     study: {
       label: "Study",
       url: study_1280x826,
       loadingUrl: study_64x41,
       pixelated: false,
+      color: "dark",
     },
     temple: {
       label: "Temple",
       url: temple_1280x1280,
       loadingUrl: temple_64x64,
       pixelated: false,
+      color: "light",
     },
     theCircles: {
       label: "The circles",
       url: theCircles_1280x359,
       loadingUrl: theCircles_64x18,
       pixelated: false,
+      color: "dark",
     },
     theLastSupper: {
       label: "The last supper",
       url: theLastSupper_1280x640,
       loadingUrl: theLastSupper_64x32,
       pixelated: false,
+      color: "dark",
     },
     worldMap: {
       label: "World map",
       url: worldMap_1280x767,
       loadingUrl: worldMap_64x38,
       pixelated: false,
+      color: "dark",
     },
     yellow: {
       label: "Yellow",
       url: yellow_985x985,
       loadingUrl: yellow_64x64,
       pixelated: false,
+      color: "dark",
     },
   },
   music: {
@@ -2049,186 +2124,217 @@ export const categories: {
       url: abstractInstruments_1280x853,
       loadingUrl: abstractInstruments_64x43,
       pixelated: false,
+      color: "dark",
     },
     acousticGuitar: {
       label: "Acoustic guitar",
       url: acousticGuitar_960x1280,
       loadingUrl: acousticGuitar_48x64,
       pixelated: false,
+      color: "dark",
     },
     acousticGuitarSketch: {
       label: "Acoustic guitar sketch",
       url: acousticGuitarSketch_1280x1280,
       loadingUrl: acousticGuitarSketch_64x64,
       pixelated: false,
+      color: "dark",
     },
     audioMan: {
       label: "Audio man",
       url: audioMan_1280x1280,
       loadingUrl: audioMan_64x64,
       pixelated: false,
+      color: "dark",
     },
     bassMan: {
       label: "Bass man",
       url: bassMan_1280x1280,
       loadingUrl: bassMan_64x64,
       pixelated: false,
+      color: "dark",
     },
     cello: {
       label: "Cello",
       url: cello_1280x853,
       loadingUrl: cello_64x43,
       pixelated: false,
+      color: "dark",
     },
     clarinet: {
       label: "Clarinet",
       url: clarinet_1280x960,
       loadingUrl: clarinet_64x48,
       pixelated: false,
+      color: "dark",
     },
     cleanGuitar: {
       label: "Clean guitar",
       url: cleanGuitar_1190x853,
       loadingUrl: cleanGuitar_64x46,
       pixelated: false,
+      color: "dark",
     },
     controls: {
       label: "Controls",
       url: controls_1280x853,
       loadingUrl: controls_64x43,
       pixelated: false,
+      color: "dark",
     },
     dj: {
       label: "DJ",
       url: dj_1280x1280,
       loadingUrl: dj_64x64,
       pixelated: false,
+      color: "dark",
     },
     drums: {
       label: "Drums",
       url: drums_854x1280,
       loadingUrl: drums_43x64,
       pixelated: false,
+      color: "dark",
     },
     electricGuitar: {
       label: "Electric guitar",
       url: electricGuitar_1280x1014,
       loadingUrl: electricGuitar_64x51,
       pixelated: false,
+      color: "dark",
     },
     flute: {
       label: "Flute",
       url: flute_1280x853,
       loadingUrl: flute_64x43,
       pixelated: false,
+      color: "dark",
     },
     FrenchHornCombo: {
       label: "French horn combo",
       url: FrenchHornCombo_1280x1057,
       loadingUrl: FrenchHornCombo_64x53,
       pixelated: false,
+      color: "dark",
     },
     limeLightGuitar: {
       label: "Lime light guitar",
       url: limeLightGuitar_1280x855,
       loadingUrl: limeLightGuitar_64x43,
       pixelated: false,
+      color: "dark",
     },
     musicPattern: {
       label: "Music pattern",
       url: musicPattern_1280x640,
       loadingUrl: musicPattern_64x32,
       pixelated: false,
+      color: "dark",
     },
     musicStream: {
       label: "Music stream",
       url: musicStream_1280x1280,
       loadingUrl: musicStream_64x64,
       pixelated: false,
+      color: "dark",
     },
     note: {
       label: "Note",
       url: note_868x1280,
       loadingUrl: note_43x64,
       pixelated: false,
+      color: "dark",
     },
     organ: {
       label: "Organ",
       url: organ_1280x853,
       loadingUrl: organ_64x43,
       pixelated: false,
+      color: "dark",
     },
     paintElectricGuitar: {
       label: "Paint electric guitar",
       url: paintElectricGuitar_1280x1098,
       loadingUrl: paintElectricGuitar_64x55,
       pixelated: false,
+      color: "dark",
     },
     pianoKeys: {
       label: "Piano keys",
       url: pianoKeys_1280x855,
       loadingUrl: pianoKeys_64x43,
       pixelated: false,
+      color: "dark",
     },
     rockGodGuitar: {
       label: "Rock god guitar",
       url: rockGodGuitar_919x1280,
       loadingUrl: rockGodGuitar_46x64,
       pixelated: false,
+      color: "dark",
     },
     sheetMusic: {
       label: "Sheet music",
       url: sheetMusic_1280x852,
       loadingUrl: sheetMusic_64x43,
       pixelated: false,
+      color: "dark",
     },
     speakers: {
       label: "Speakers",
       url: speakers_1280x720,
       loadingUrl: speakers_64x36,
       pixelated: false,
+      color: "dark",
     },
     subwaySaxophone: {
       label: "Subway saxophone",
       url: subwaySaxophone_1280x860,
       loadingUrl: subwaySaxophone_64x43,
       pixelated: false,
+      color: "dark",
     },
     trumpetMan: {
       label: "Trumpet man",
       url: trumpetMan_1280x768,
       loadingUrl: trumpetMan_64x38,
       pixelated: false,
+      color: "dark",
     },
     turtleDJ: {
       label: "Turtle DJ",
       url: turtleDJ_1232x1280,
       loadingUrl: turtleDJ_62x64,
       pixelated: false,
+      color: "dark",
     },
     velvetGuitar: {
       label: "Velvet guitar",
       url: velvetGuitar_1280x848,
       loadingUrl: velvetGuitar_64x42,
       pixelated: false,
+      color: "dark",
     },
     venue: {
       label: "Venue",
       url: venue_1280x854,
       loadingUrl: venue_64x43,
       pixelated: false,
+      color: "dark",
     },
     vinyl: {
       label: "Vinyl",
       url: vinyl_1280x853,
       loadingUrl: vinyl_64x43,
       pixelated: false,
+      color: "dark",
     },
     violin: {
       label: "Violin",
       url: violin_960x1280,
       loadingUrl: violin_48x64,
       pixelated: false,
+      color: "dark",
     },
   },
   nature: {
@@ -2237,282 +2343,329 @@ export const categories: {
       url: avocado_1280x1280,
       loadingUrl: avocado_64x64,
       pixelated: false,
+      color: "dark",
     },
     bear: {
       label: "Bear",
       url: bear_1280x915,
       loadingUrl: bear_64x46,
       pixelated: false,
+      color: "dark",
     },
     bird: {
       label: "Bird",
       url: bird_1280x1280,
       loadingUrl: bird_64x64,
       pixelated: false,
+      color: "dark",
     },
     birds: {
       label: "Birds",
       url: birds_1280x841,
       loadingUrl: birds_64x42,
       pixelated: false,
+      color: "dark",
     },
     cave: {
       label: "Cave",
       url: cave_1280x1011,
       loadingUrl: cave_64x51,
       pixelated: false,
+      color: "dark",
     },
     clearing: {
       label: "Clearing",
       url: clearing_1205x1280,
       loadingUrl: clearing_60x64,
       pixelated: false,
+      color: "dark",
     },
     creatures: {
       label: "Creatures",
       url: creatures_1280x960,
       loadingUrl: creatures_64x48,
       pixelated: false,
+      color: "dark",
     },
     desert: {
       label: "Desert",
       url: desert_1280x911,
       loadingUrl: desert_64x46,
       pixelated: false,
+      color: "dark",
     },
     dragon: {
       label: "Dragon",
       url: dragon_1280x1280,
       loadingUrl: dragon_64x64,
       pixelated: false,
+      color: "dark",
     },
     dragonFight: {
       label: "Dragon fight",
       url: dragonFight_1280x1280,
       loadingUrl: dragonFight_64x64,
       pixelated: false,
+      color: "dark",
     },
     elephant: {
       label: "Elephant",
       url: elephant_1280x1280,
       loadingUrl: elephant_64x64,
       pixelated: false,
+      color: "light",
     },
     flowering: {
       label: "Flowering",
       url: flowering_1280x1280,
       loadingUrl: flowering_64x64,
       pixelated: false,
+      color: "dark",
     },
     fungus: {
       label: "Fungus",
       url: fungus_1280x1172,
       loadingUrl: fungus_64x59,
       pixelated: false,
+      color: "dark",
     },
     house: {
       label: "House",
       url: house_1280x1280,
       loadingUrl: house_64x64,
       pixelated: false,
+      color: "dark",
     },
     houseOnTheHill: {
       label: "House on the hill",
       url: houseOnTheHill_965x965,
       loadingUrl: houseOnTheHill_64x64,
       pixelated: false,
+      color: "dark",
     },
     houseOnTheMountain: {
       label: "House on the mountain",
       url: houseOnTheMountain_1280x1280,
       loadingUrl: houseOnTheMountain_64x64,
       pixelated: false,
+      color: "dark",
     },
     hummingBird: {
       label: "Humming bird",
       url: hummingBird_1280x1280,
       loadingUrl: hummingBird_64x64,
       pixelated: false,
+      color: "dark",
     },
     island: {
       label: "Island",
       url: island_1280x1280,
       loadingUrl: island_64x64,
       pixelated: false,
+      color: "dark",
     },
     koi: {
       label: "Koi",
       url: koi_1280x1280,
       loadingUrl: koi_64x64,
       pixelated: false,
+      color: "dark",
     },
     lakeSide: {
       label: "Lake side",
       url: lakeSide_1280x720,
       loadingUrl: lakeSide_64x36,
       pixelated: false,
+      color: "dark",
     },
     lifesInHand: {
       label: "Life's in hand",
       url: lifesInHand_1280x1280,
       loadingUrl: lifesInHand_64x64,
       pixelated: false,
+      color: "dark",
     },
     lightHouse: {
       label: "Light house",
       url: lightHouse_1064x1064,
       loadingUrl: lightHouse_64x64,
       pixelated: false,
+      color: "dark",
     },
     lonelySea: {
       label: "Lonely sea",
       url: lonelySea_1280x1280,
       loadingUrl: lonelySea_64x64,
       pixelated: false,
+      color: "dark",
     },
     loveUnderTheMoon: {
       label: "Love under the moon",
       url: loveUnderTheMoon_854x1280,
       loadingUrl: loveUnderTheMoon_43x64,
       pixelated: false,
+      color: "dark",
     },
     moonLight: {
       label: "Moon light",
       url: moonLight_768x1280,
       loadingUrl: moonLight_38x64,
       pixelated: false,
+      color: "dark",
     },
     mountainLake: {
       label: "Mountain lake",
       url: mountainLake_1280x1020,
       loadingUrl: mountainLake_64x51,
       pixelated: false,
+      color: "dark",
     },
     mountains: {
       label: "Mountains",
       url: mountains_1024x1280,
       loadingUrl: mountains_51x64,
       pixelated: false,
+      color: "dark",
     },
     mountainView: {
       label: "Mountain view",
       url: mountainView_964x1280,
       loadingUrl: mountainView_48x64,
       pixelated: false,
+      color: "dark",
     },
     mushrooms: {
       label: "Mushrooms",
       url: mushrooms_1280x1280,
       loadingUrl: mushrooms_64x64,
       pixelated: false,
+      color: "dark",
     },
     nightCity: {
       label: "Night city",
       url: nightCity_905x1280,
       loadingUrl: nightCity_45x64,
       pixelated: false,
+      color: "dark",
     },
     path: {
       label: "Path",
       url: path_1280x1280,
       loadingUrl: path_64x64,
       pixelated: false,
+      color: "dark",
     },
     plant: {
       label: "Plant",
       url: plant_905x1280,
       loadingUrl: plant_45x64,
       pixelated: false,
+      color: "dark",
     },
     redMoon: {
       label: "Red moon",
       url: redMoon_1280x964,
       loadingUrl: redMoon_64x48,
       pixelated: false,
+      color: "dark",
     },
     reflection: {
       label: "Reflection",
       url: reflection_1280x720,
       loadingUrl: reflection_64x36,
       pixelated: false,
+      color: "dark",
     },
     rollingHills: {
       label: "Rolling hills",
       url: rollingHills_1280x827,
       loadingUrl: rollingHills_64x41,
       pixelated: false,
+      color: "dark",
     },
     seagull: {
       label: "Seagull",
       url: seagull_1280x1280,
       loadingUrl: seagull_64x64,
       pixelated: false,
+      color: "dark",
     },
     shoreSide: {
       label: "Shore side",
       url: shoreSide_1024x1280,
       loadingUrl: shoreSide_51x64,
       pixelated: false,
+      color: "dark",
     },
     sprouting: {
       label: "Sprouting",
       url: sprouting_1280x1280,
       loadingUrl: sprouting_64x64,
       pixelated: false,
+      color: "dark",
     },
     submarine: {
       label: "Submarine",
       url: submarine_854x1280,
       loadingUrl: submarine_43x64,
       pixelated: false,
+      color: "dark",
     },
     sunnySideUp: {
       label: "Sunny side up",
       url: sunnySideUp_1280x1280,
       loadingUrl: sunnySideUp_64x64,
       pixelated: false,
+      color: "dark",
     },
     sunset: {
       label: "Sunset",
       url: sunset_800x1280,
       loadingUrl: sunset_40x64,
       pixelated: false,
+      color: "dark",
     },
     swordfish: {
       label: "Swordfish",
       url: swordfish_1280x929,
       loadingUrl: swordfish_64x46,
       pixelated: false,
+      color: "dark",
     },
     temple: {
       label: "Temple",
       url: temple_1280x894,
       loadingUrl: temple_64x45,
       pixelated: false,
+      color: "dark",
     },
     tree: {
       label: "Tree",
       url: tree_1280x1280,
       loadingUrl: tree_64x64,
       pixelated: false,
+      color: "dark",
     },
     watermelon: {
       label: "Watermelon",
       url: watermelon_1280x1280,
       loadingUrl: watermelon_64x64,
       pixelated: false,
+      color: "dark",
     },
     witchingHour: {
       label: "Witching hour",
       url: witchingHour_1006x1280,
       loadingUrl: witchingHour_50x64,
       pixelated: false,
+      color: "dark",
     },
     wolf: {
       label: "Wolf",
       url: wolf_1277x1280,
       loadingUrl: wolf_64x64,
       pixelated: false,
+      color: "dark",
     },
   },
   neon: {
@@ -2521,54 +2674,63 @@ export const categories: {
       url: gotMeat_1280x931,
       loadingUrl: gotMeat_64x47,
       pixelated: false,
+      color: "dark",
     },
     map: {
       label: "Map",
       url: map_1280x792,
       loadingUrl: map_64x40,
       pixelated: false,
+      color: "dark",
     },
     neon: {
       label: "Neon",
       url: neon_1280x720,
       loadingUrl: neon_64x36,
       pixelated: false,
+      color: "dark",
     },
     neonDrive: {
       label: "Neon drive",
       url: neonDrive_720x720,
       loadingUrl: neonDrive_64x64,
       pixelated: false,
+      color: "dark",
     },
     open24Hours: {
       label: "Open 24 hours",
       url: open24Hours_1280x850,
       loadingUrl: open24Hours_64x43,
       pixelated: false,
+      color: "dark",
     },
     rome: {
       label: "Rome",
       url: rome_1280x836,
       loadingUrl: rome_64x42,
       pixelated: false,
+      color: "dark",
     },
     sign: {
       label: "Sign",
       url: sign_1280x836,
       loadingUrl: sign_64x42,
       pixelated: false,
+      color: "dark",
     },
     tiger: {
       label: "Tiger",
       url: tiger_1280x836,
       loadingUrl: tiger_64x42,
       pixelated: false,
+      color: "dark",
     },
     trex: {
       label: "T-rex",
       url: trex_1280x836,
       loadingUrl: trex_64x42,
       pixelated: false,
+      color: "dark",
     },
   },
   pixelArt: {
@@ -2577,470 +2739,534 @@ export const categories: {
       url: beer_64x64,
       loadingUrl: beer_64x64,
       pixelated: true,
+      color: "dark",
     },
     bikingThroughTheCity: {
       label: "Biking through the city",
       url: bikingThroughTheCity_717x1280,
       loadingUrl: bikingThroughTheCity_36x64,
       pixelated: false,
+      color: "dark",
     },
     blackBoard: {
       label: "Black board",
       url: blackboard_128x128,
       loadingUrl: blackboard_64x64,
       pixelated: true,
+      color: "dark",
     },
     downByTheRiver: {
       label: "Down by the river",
       url: downByTheRiver_1100x572,
       loadingUrl: downByTheRiver_64x33,
       pixelated: false,
+      color: "dark",
     },
     dragonCassette: {
       label: "Dragon cassette",
       url: dragonCassette_960x960,
       loadingUrl: dragonCassette_64x64,
       pixelated: true,
+      color: "dark",
     },
     executioner: {
       label: "Executioner",
       url: executioner_64x64,
       loadingUrl: executioner_64x64,
       pixelated: true,
+      color: "dark",
     },
     floatingIsland: {
       label: "Floating island",
       url: floatingIsland_1280x978,
       loadingUrl: floatingIsland_64x49,
       pixelated: false,
+      color: "dark",
     },
     hamster: {
       label: "Hamster",
       url: hamster_852x852,
       loadingUrl: hamster_64x64,
       pixelated: false,
+      color: "dark",
     },
     knightInShiningArmor: {
       label: "Knight in shining armor",
       url: knightInShiningArmor_1280x720,
       loadingUrl: knightInShiningArmor_64x36,
       pixelated: false,
+      color: "dark",
     },
     moon: {
       label: "Moon",
       url: moon_400x400,
       loadingUrl: moon_64x64,
       pixelated: true,
+      color: "dark",
     },
     nightTrain: {
       label: "Night train",
       url: nightTrain_1280x434,
       loadingUrl: nightTrain_64x22,
       pixelated: false,
+      color: "dark",
     },
     octopusAttack: {
       label: "Octopus attack",
       url: octopusAttack_1280x1280,
       loadingUrl: octopusAttack_64x64,
       pixelated: false,
+      color: "dark",
     },
     pixelHouse: {
       label: "Pixel house",
       url: pixelHouse_1182x1280,
       loadingUrl: pixelHouse_59x64,
       pixelated: false,
+      color: "dark",
     },
     raccoon: {
       label: "Raccoon",
       url: raccoon_1280x1280,
       loadingUrl: raccoon_64x64,
       pixelated: false,
+      color: "dark",
     },
     rainbowTV: {
       label: "Rainbow TV",
       url: rainbowTV_980x980,
       loadingUrl: rainbowTV_64x64,
       pixelated: false,
+      color: "dark",
     },
     robotActionFigure: {
       label: "Robot action figure",
       url: robotActionFigure_64x64,
       loadingUrl: robotActionFigure_64x64,
       pixelated: true,
+      color: "dark",
     },
     seaMonster: {
       label: "Sea monster",
       url: seaMonster_1280x1280,
       loadingUrl: seaMonster_64x64,
       pixelated: false,
+      color: "dark",
     },
     spaceJunk: {
       label: "Space junk",
       url: spaceJunk_128x128,
       loadingUrl: spaceJunk_64x64,
       pixelated: true,
+      color: "dark",
     },
     speedometer: {
       label: "Speedometer",
       url: speedometer_64x64,
       loadingUrl: speedometer_64x64,
       pixelated: true,
+      color: "dark",
     },
     steeringWheel: {
       label: "Steering wheel",
       url: steeringWheel_64x64,
       loadingUrl: steeringWheel_64x64,
       pixelated: true,
+      color: "dark",
     },
     store: {
       label: "Store",
       url: store_1280x1280,
       loadingUrl: store_64x64,
       pixelated: false,
+      color: "dark",
     },
     streetLight: {
       label: "Street light",
       url: streetLight_804x1280,
       loadingUrl: streetLight_40x64,
       pixelated: false,
+      color: "dark",
     },
     sword: {
       label: "Sword",
       url: sword_1280x1280,
       loadingUrl: sword_64x64,
       pixelated: false,
+      color: "dark",
     },
     tank: {
       label: "Tank",
       url: tank_64x64,
       loadingUrl: tank_64x64,
       pixelated: true,
+      color: "dark",
     },
     treacherousSea: {
       label: "Treacherous sea",
       url: treacherousSea_128x128,
       loadingUrl: treacherousSea_64x64,
       pixelated: true,
+      color: "dark",
     },
     village: {
       label: "Village",
       url: village_1280x1280,
       loadingUrl: village_64x64,
       pixelated: false,
+      color: "dark",
     },
     warCassette1: {
       label: "War cassette 1",
       url: warCassette1_1280x979,
       loadingUrl: warCassette1_64x49,
       pixelated: true,
+      color: "dark",
     },
     warCassette2: {
       label: "War cassette 2",
       url: warCassette2_500x500,
       loadingUrl: warCassette2_64x64,
       pixelated: true,
+      color: "dark",
     },
   },
   space: {
-    alien: {
-      label: "Alien",
-      url: alien_960x960,
-      loadingUrl: alien_64x64,
-      pixelated: false,
-    },
     apollo: {
       label: "Apollo",
       url: apollo_1280x1262,
       loadingUrl: apollo_64x63,
       pixelated: false,
+      color: "light",
     },
     ARP107: {
       label: "ARP107",
       url: ARP107_799x319,
       loadingUrl: ARP107_64x26,
       pixelated: false,
+      color: "dark",
     },
     ARP107_MIRI: {
       label: "ARP107 (MIRI)",
       url: ARP107_MIRI_1291x1356,
       loadingUrl: ARP107_MIRI_61x64,
       pixelated: false,
+      color: "dark",
     },
     astronaut: {
       label: "Astronaut",
       url: astronaut_1280x857,
       loadingUrl: astronaut_64x43,
       pixelated: false,
+      color: "dark",
     },
     bigDipper: {
       label: "Big dipper",
       url: bigDipper_1280x1277,
       loadingUrl: bigDipper_64x64,
       pixelated: false,
+      color: "dark",
     },
     blueAstronaut: {
       label: "Blue astronaut",
       url: blueAstronaut_1280x836,
       loadingUrl: blueAstronaut_64x42,
       pixelated: false,
+      color: "dark",
     },
     blueBall: {
       label: "Blue ball",
       url: blueBall_1280x800,
       loadingUrl: blueBall_64x40,
       pixelated: false,
+      color: "dark",
     },
     blueNight: {
       label: "Blue night",
       url: blueNight_1280x1280,
       loadingUrl: blueNight_64x64,
       pixelated: false,
+      color: "dark",
     },
     carinaNebula: {
       label: "Carina nebula",
       url: carinaNebula_800x463,
       loadingUrl: carinaNebula_64x37,
       pixelated: false,
+      color: "dark",
     },
     dreamyNight: {
       label: "Dreamy night",
       url: dreamyNight_896x1280,
       loadingUrl: dreamyNight_45x64,
       pixelated: false,
+      color: "dark",
     },
     greenAstronaut: {
       label: "Green astronaut",
       url: greenAstronaut_1280x1280,
       loadingUrl: greenAstronaut_64x64,
       pixelated: false,
+      color: "dark",
     },
     heyTheresEarth: {
       label: "Hey there's Earth!",
       url: heyTheresEarth_1280x1280,
       loadingUrl: heyTheresEarth_64x64,
       pixelated: false,
+      color: "dark",
     },
     landscape1: {
       label: "Landscape 1",
       url: landscape1_1280x721,
       loadingUrl: landscape1_64x36,
       pixelated: false,
+      color: "dark",
     },
     landscape2: {
       label: "Landscape 2",
       url: landscape2_1280x720,
       loadingUrl: landscape2_64x36,
       pixelated: false,
+      color: "dark",
     },
     M16_pillarsOfCreation: {
       label: "Pillars of creation (M16)",
       url: M16_pillarsOfCreation_864x814,
       loadingUrl: M16_pillarsOfCreation_64x60,
       pixelated: false,
+      color: "dark",
     },
     M74_phantomGalaxy: {
       label: "Phantom galaxy (M74)",
       url: M74_phantomGalaxy_799x245,
       loadingUrl: M74_phantomGalaxy_64x20,
       pixelated: false,
+      color: "dark",
     },
     M104_sombreroGalaxy: {
       label: "Sombrero galaxy (M104)",
       url: M104_sombreroGalaxy_799x267,
       loadingUrl: M104_sombreroGalaxy_64x21,
       pixelated: false,
+      color: "dark",
     },
     NGC602_smallMagellanicCloud: {
       label: "Small magellanic cloud (NGC602)",
       url: NGC602_smallMagellanicCloud_799x693,
       loadingUrl: NGC602_smallMagellanicCloud_64x55,
       pixelated: false,
+      color: "dark",
     },
     NGC628_phantomGalaxy: {
       label: "Phantom galaxy (NGC628)",
       url: NGC628_phantomGalaxy_800x501,
       loadingUrl: NGC628_phantomGalaxy_64x40,
       pixelated: false,
+      color: "dark",
     },
     NGC1385: {
       label: "NGC1385",
       url: NGC1385_1348x1963,
       loadingUrl: NGC1385_44x64,
       pixelated: false,
+      color: "dark",
     },
     NGC1672_seyfertGalaxy: {
       label: "Seyfert galaxy (NGC1672)",
       url: NGC1672_seyfertGalaxy_800x304,
       loadingUrl: NGC1672_seyfertGalaxy_64x24,
       pixelated: false,
+      color: "dark",
     },
     NGC2090: {
       label: "NGC2090",
       url: NGC2090_1280x1218,
       loadingUrl: NGC2090_64x61,
       pixelated: false,
+      color: "dark",
     },
     NGC2207: {
       label: "NGC2207",
       url: NGC2207_800x613,
       loadingUrl: NGC2207_64x49,
       pixelated: false,
+      color: "dark",
     },
     NGC2566: {
       label: "NGC2566",
       url: NGC2566_729x800,
       loadingUrl: NGC2566_58x64,
       pixelated: false,
+      color: "dark",
     },
     NGC3132_southernRingNebula: {
       label: "Southern ring nebula (NGC3132)",
       url: NGC3132_southernRingNebula_800x745,
       loadingUrl: NGC3132_southernRingNebula_64x60,
       pixelated: false,
+      color: "dark",
     },
     NGC3324: {
       label: "NGC3324",
       url: NGC3324_864x657,
       loadingUrl: NGC3324_64x49,
       pixelated: false,
+      color: "dark",
     },
     NGC3351: {
       label: "NGC3351",
       url: NGC3351_799x468,
       loadingUrl: NGC3351_64x37,
       pixelated: false,
+      color: "dark",
     },
     NGC4449: {
       label: "NGC4449",
       url: NGC4449_1280x741,
       loadingUrl: NGC4449_64x37,
       pixelated: false,
+      color: "dark",
     },
     NGC4449_NIR: {
       label: "NGC4449 (NIR)",
       url: NGC4449_NIR_1280x569,
       loadingUrl: NGC4449_NIR_64x28,
       pixelated: false,
+      color: "dark",
     },
     NGC6440: {
       label: "NGC6440",
       url: NGC6440_800x512,
       loadingUrl: NGC6440_64x41,
       pixelated: false,
+      color: "dark",
     },
     onceInABlueMoon: {
       label: "Once in a blue moon",
       url: onceInABlueMoon_1280x1280,
       loadingUrl: onceInABlueMoon_64x64,
       pixelated: false,
+      color: "dark",
     },
     overTheMoon: {
       label: "Over the moon",
       url: overTheMoon_1280x915,
       loadingUrl: overTheMoon_64x46,
       pixelated: false,
+      color: "dark",
     },
     planet: {
       label: "Planet",
       url: planet_800x800,
       loadingUrl: planet_64x64,
       pixelated: false,
+      color: "dark",
     },
     planetRing: {
       label: "Planet ring",
       url: planetRing_1280x1280,
       loadingUrl: planetRing_64x64,
       pixelated: false,
+      color: "light",
     },
     rocket: {
       label: "Rocket",
       url: rocket_1024x1280,
       loadingUrl: rocket_51x64,
       pixelated: false,
+      color: "dark",
     },
     SN1987A: {
       label: "SN1987A",
       url: SN1987A_864x714,
       loadingUrl: SN1987A_64x53,
       pixelated: false,
+      color: "dark",
     },
     solarParty: {
       label: "Solar party",
       url: solarParty_960x1280,
       loadingUrl: solarParty_48x64,
       pixelated: false,
+      color: "dark",
     },
     spaceChart: {
       label: "Space chart",
       url: spaceChart_1280x1280,
       loadingUrl: spaceChart_64x64,
       pixelated: false,
+      color: "light",
     },
     spacePyramid: {
       label: "Space pyramid",
       url: spacePyramid_700x700,
       loadingUrl: spacePyramid_64x64,
       pixelated: false,
+      color: "dark",
     },
     spaceShuttle1: {
       label: "Space shuttle 1",
       url: spaceShuttle1_1280x720,
       loadingUrl: spaceShuttle1_64x36,
       pixelated: false,
+      color: "light",
     },
     spaceShuttle2: {
       label: "Space shuttle 2",
       url: spaceShuttle2_684x684,
       loadingUrl: spaceShuttle2_64x64,
       pixelated: false,
+      color: "light",
     },
     spaceTriangle: {
       label: "Space triangle",
       url: spaceTriangle_726x726,
       loadingUrl: spaceTriangle_64x64,
       pixelated: false,
+      color: "dark",
     },
     spiderwebProtocluster: {
       label: "Spiderweb protocluster",
       url: spiderwebProtocluster_800x501,
       loadingUrl: spiderwebProtocluster_64x40,
       pixelated: false,
+      color: "dark",
     },
     starMap: {
       label: "Star map",
       url: starMap_1169x1280,
       loadingUrl: starMap_58x64,
       pixelated: false,
+      color: "light",
     },
     theBigQuestions: {
       label: "The big questions",
       url: theBigQuestions_1280x1280,
       loadingUrl: theBigQuestions_64x64,
       pixelated: false,
+      color: "dark",
     },
     theWorldAwaits: {
       label: "The world awaits",
       url: theWorldAwaits_1280x828,
       loadingUrl: theWorldAwaits_64x41,
       pixelated: false,
-    },
-    ufo: {
-      label: "UFO",
-      url: ufo_1280x720,
-      loadingUrl: ufo_64x36,
-      pixelated: false,
+      color: "dark",
     },
     westerlund1: {
       label: "Westerlund 1",
       url: westerlund1_1280x836,
       loadingUrl: westerlund1_64x42,
       pixelated: false,
+      color: "dark",
     },
     WR124: {
       label: "WR124",
       url: WR124_864x851,
       loadingUrl: WR124_64x63,
       pixelated: false,
+      color: "dark",
     },
   },
   technology: {
@@ -3049,168 +3275,189 @@ export const categories: {
       url: atm_1280x1280,
       loadingUrl: atm_64x64,
       pixelated: false,
+      color: "dark",
     },
     atom: {
       label: "Atom",
       url: atom_1280x1280,
       loadingUrl: atom_64x64,
       pixelated: false,
+      color: "dark",
     },
     bigData: {
       label: "Big data",
       url: bigData_853x853,
       loadingUrl: bigData_64x64,
       pixelated: false,
+      color: "dark",
     },
     binary: {
       label: "Binary",
       url: binary_1280x1280,
       loadingUrl: binary_64x64,
       pixelated: false,
+      color: "light",
     },
     bitcoin: {
       label: "Bitcoin",
       url: bitcoin_1280x1280,
       loadingUrl: bitcoin_64x64,
       pixelated: false,
+      color: "dark",
     },
     calculator: {
       label: "Calculator",
       url: calculator_973x1280,
       loadingUrl: calculator_49x64,
       pixelated: false,
+      color: "dark",
     },
     camera: {
       label: "Camera",
       url: camera_1280x1280,
       loadingUrl: camera_64x64,
       pixelated: false,
+      color: "dark",
     },
     circuit: {
       label: "Circuit",
       url: circuit_1280x1273,
       loadingUrl: circuit_64x64,
       pixelated: false,
+      color: "light",
     },
     citySketch: {
       label: "City sketch",
       url: citySketch_1280x1112,
       loadingUrl: citySketch_64x56,
       pixelated: false,
+      color: "dark",
     },
     communications: {
       label: "Communications",
       url: communications_1280x1280,
       loadingUrl: communications_64x64,
       pixelated: false,
+      color: "light",
     },
     controlPanel: {
       label: "Control panel",
       url: controlPanel_1075x1100,
       loadingUrl: controlPanel_63x64,
       pixelated: false,
+      color: "dark",
     },
     gameController1: {
       label: "Game controller 1",
       url: gameController1_1280x1280,
       loadingUrl: gameController1_64x64,
       pixelated: false,
+      color: "dark",
     },
     gameController2: {
       label: "Game controller 2",
       url: gameController2_1280x1280,
       loadingUrl: gameController2_64x64,
       pixelated: false,
+      color: "dark",
     },
     jet: {
       label: "Jet",
       url: jet_960x960,
       loadingUrl: jet_64x64,
       pixelated: false,
-    },
-    keyboard: {
-      label: "Keyboard",
-      url: keyboard_1280x953,
-      loadingUrl: keyboard_64x48,
-      pixelated: false,
+      color: "dark",
     },
     lightBulb: {
       label: "Light bulb",
       url: lightBulb_640x640,
       loadingUrl: lightBulb_64x64,
       pixelated: false,
+      color: "dark",
     },
     mouse: {
       label: "Mouse",
       url: mouse_1280x1280,
       loadingUrl: mouse_64x64,
       pixelated: false,
+      color: "dark",
     },
     oscilloscope: {
       label: "Oscilloscope",
       url: oscilloscope_1280x1280,
       loadingUrl: oscilloscope_64x64,
       pixelated: false,
+      color: "dark",
     },
     robot: {
       label: "Robot",
       url: robot_854x1280,
       loadingUrl: robot_43x64,
       pixelated: false,
+      color: "dark",
     },
     robotMech: {
       label: "Robot mech",
       url: robotMech_1280x1280,
       loadingUrl: robotMech_64x64,
       pixelated: false,
+      color: "dark",
     },
     scienceChicken: {
       label: "Science chicken",
       url: scienceChicken_1280x1280,
       loadingUrl: scienceChicken_64x64,
       pixelated: false,
+      color: "dark",
     },
     signal: {
       label: "Signal",
       url: signal_1280x1280,
       loadingUrl: signal_64x64,
       pixelated: false,
+      color: "dark",
     },
     submarine: {
       label: "Submarine",
       url: submarine_1280x1280,
       loadingUrl: submarine_64x64,
       pixelated: false,
+      color: "dark",
     },
     technology1: {
       label: "Technology 1",
       url: technology1_963x1280,
       loadingUrl: technology1_48x64,
       pixelated: false,
+      color: "dark",
     },
     technology2: {
       label: "Technology 2",
       url: technology2_985x1280,
       loadingUrl: technology2_49x64,
       pixelated: false,
+      color: "dark",
     },
     theCloud: {
       label: "The cloud",
       url: theCloud_1280x1280,
       loadingUrl: theCloud_64x64,
       pixelated: false,
+      color: "dark",
     },
     WWW: {
       label: "World Wide Web",
       url: WWW_1280x1280,
       loadingUrl: WWW_64x64,
       pixelated: false,
+      color: "dark",
     },
     zsh: {
       label: "zsh",
       url: zsh_1280x1075,
       loadingUrl: zsh_64x54,
       pixelated: false,
+      color: "dark",
     },
   },
 };

@@ -51,7 +51,7 @@ export default function FiltersPage({
   const handleAcceptColor = (
     filter: FiltersTypes,
     option: string,
-    color: string
+    color: string,
   ) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
@@ -66,7 +66,7 @@ export default function FiltersPage({
   const handleValueChange = (
     filter: FiltersTypes,
     option: string,
-    value: number
+    value: number,
   ) => {
     setSettings((prev) => {
       const newSettings = { ...prev };
@@ -79,10 +79,10 @@ export default function FiltersPage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2 font-K2D'>
-      <div className='flex h-6 w-full space-x-1 justify-start'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2 font-K2D">
+      <div className="flex h-6 w-full justify-start space-x-1">
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -97,18 +97,18 @@ export default function FiltersPage({
           clickFunction={handleFiltersActive}
         />
         <div
-          className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
           onClick={handleFiltersActive}
         >
           Filters
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
+      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col justify-start space-y-1 overflow-y-auto px-2">
         {Object.entries(filtersMeta).map(([key, filter]) => (
           <div
             key={key}
-            className={`flex flex-col items-center justify-center w-full h-max space-y-1 rounded ${
+            className={`flex h-max w-full flex-col items-center justify-center space-y-1 rounded ${
               settings.filters[key as FiltersTypes].value === true &&
               filter.options.length !== 0
                 ? "bg-fg-tone-black-7"
@@ -116,7 +116,7 @@ export default function FiltersPage({
             }`}
           >
             <FgButton
-              className='w-full h-8'
+              className="h-8 w-full"
               clickFunction={() => handleOptionSelect(key as FiltersTypes)}
               contentFunction={() => (
                 <div
@@ -124,7 +124,7 @@ export default function FiltersPage({
                     settings.filters[key as FiltersTypes].value === true
                       ? "bg-fg-white text-fg-tone-black-1"
                       : ""
-                  } flex w-full text-nowrap hover:bg-fg-white hover:text-fg-tone-black-1 justify-center px-2 rounded items-center text-lg`}
+                  } flex w-full items-center justify-center text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
                 >
                   {filter.title}
                 </div>
@@ -133,9 +133,9 @@ export default function FiltersPage({
             {settings.filters[key as FiltersTypes].value === true &&
               filter.options.map((option) =>
                 option.type === "number" ? (
-                  <div key={option.key} className='h-max w-[95%]'>
+                  <div key={option.key} className="h-max w-[95%]">
                     <FgSlider
-                      className='h-16'
+                      className="h-16"
                       externalValue={
                         // @ts-ignore-error no coherence between filter and option
                         settings.filters[key as FiltersTypes][option.key].value
@@ -148,7 +148,7 @@ export default function FiltersPage({
                         handleValueChange(
                           key as FiltersTypes,
                           option.key,
-                          value.value
+                          value.value,
                         );
                       }}
                       options={{
@@ -170,11 +170,11 @@ export default function FiltersPage({
                 ) : (
                   <div
                     key={option.key}
-                    className='flex items-center justify-between w-[95%] h-max'
+                    className="flex h-max w-[95%] items-center justify-between"
                   >
                     {option.title}
                     <ColorPickerButton
-                      className='h-full aspect-square'
+                      className="aspect-square h-full"
                       defaultColor={
                         // @ts-ignore key and option.key are string not types
                         settings.filters[key][option.key].value
@@ -188,7 +188,7 @@ export default function FiltersPage({
                       isAlpha={true}
                     />
                   </div>
-                )
+                ),
               )}
           </div>
         ))}

@@ -136,7 +136,7 @@ function SnakeGame({
             {snakeGameController.current.renderBoard()}
             {gameOver && (
               <div
-                className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-black bg-opacity-30"
+                className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.current.startGameClick}
               >
                 <div
@@ -147,7 +147,7 @@ function SnakeGame({
             )}
             {!started && !gameOver && (
               <div
-                className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-30"
+                className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.current.startGameClick}
               >
                 <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 font-K2D text-2xl">
@@ -165,7 +165,7 @@ function SnakeGame({
               playersState[username.current][instance.current] && (
                 <>
                   <FgButton
-                    className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-white"
+                    className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-fg-white"
                     clickFunction={() =>
                       setSnakeColorPanelActive((prev) => !prev)
                     }

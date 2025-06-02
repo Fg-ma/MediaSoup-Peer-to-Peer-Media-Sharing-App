@@ -33,7 +33,7 @@ export default function DownloadTypeOptionsPage({
   };
 
   const handleOptionSelect = (
-    option: keyof typeof downloadTypeOptionsTitles
+    option: keyof typeof downloadTypeOptionsTitles,
   ) => {
     setActivePages((prev) => {
       const newActivePages = { ...prev };
@@ -46,10 +46,10 @@ export default function DownloadTypeOptionsPage({
   };
 
   return (
-    <div className='flex w-full h-full flex-col justify-center items-center space-y-2 font-K2D'>
-      <div className='flex h-6 w-full space-x-1 justify-start'>
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-2 font-K2D">
+      <div className="flex h-6 w-full justify-start space-x-1">
         <FgButton
-          className='h-full aspect-square'
+          className="aspect-square h-full"
           contentFunction={() => (
             <FgSVGElement
               src={navigateBackIcon}
@@ -64,25 +64,25 @@ export default function DownloadTypeOptionsPage({
           clickFunction={handleDownloadTypeOptionsActive}
         />
         <div
-          className='cursor-pointer font-Josefin text-lg font-bold pt-0.5'
+          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
           onClick={handleDownloadTypeOptionsActive}
         >
           Options
         </div>
       </div>
-      <div className='w-[95%] h-0.5 rounded-full bg-white bg-opacity-75'></div>
-      <div className='small-scroll-bar w-full flex flex-col space-y-1 overflow-y-auto justify-start px-2 h-max max-h-[11.375rem] small-vertical-scroll-bar'>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
+      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col justify-start space-y-1 overflow-y-auto px-2">
         {Object.keys(downloadTypeOptionsArrays).map((option) => (
           <FgButton
             key={option}
-            className='w-full h-8'
+            className="h-8 w-full"
             clickFunction={() =>
               handleOptionSelect(
-                option as keyof typeof downloadTypeOptionsArrays
+                option as keyof typeof downloadTypeOptionsArrays,
               )
             }
             contentFunction={() => (
-              <div className='flex w-full justify-between space-x-4 px-2 bg-opacity-75 hover:bg-fg-white hover:text-fg-tone-black-1 rounded text-nowrap'>
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                 <div>
                   {
                     downloadTypeOptionsTitles[
@@ -90,7 +90,7 @@ export default function DownloadTypeOptionsPage({
                     ]
                   }
                 </div>
-                <div className='flex space-x-1 items-center justify-center'>
+                <div className="flex items-center justify-center space-x-1">
                   <div>
                     {
                       settings.downloadType.downloadTypeOptions[

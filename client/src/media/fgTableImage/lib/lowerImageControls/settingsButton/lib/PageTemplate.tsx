@@ -47,7 +47,7 @@ export default function PageTemplate({
           </div>
         )}
       </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-white"></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2">
         {content}
       </div>

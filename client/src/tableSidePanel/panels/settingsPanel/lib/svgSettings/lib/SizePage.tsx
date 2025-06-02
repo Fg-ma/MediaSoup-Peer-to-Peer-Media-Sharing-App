@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMediaInstance";
-import { downloadOptionsArrays } from "./typeConstant";
+import { downloadOptionsArrays } from "../../../../../../media/fgTableSvg/lib/typeConstant";
 
 export default function SizePage({
   svgMediaInstance,

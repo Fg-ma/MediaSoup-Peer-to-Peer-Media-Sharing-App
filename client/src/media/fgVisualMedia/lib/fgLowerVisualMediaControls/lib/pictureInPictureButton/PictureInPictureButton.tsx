@@ -26,12 +26,12 @@ export default function PictureInPictureButton({
         return (
           <div className="flex aspect-square h-[90%] items-center justify-center">
             <div
-              className={`flex h-[65%] w-[80%] rounded-md border-3 border-white ${
+              className={`flex h-[65%] w-[80%] rounded-md border-3 border-fg-white ${
                 active ? "items-start justify-start" : "items-end justify-end"
               }`}
             >
               <div
-                className={`h-[50%] w-[60%] rounded-sm bg-white ${
+                className={`h-[50%] w-[60%] rounded-sm bg-fg-white ${
                   active ? "ml-[10%] mt-[10%]" : "mb-[10%] mr-[10%]"
                 }`}
               ></div>

@@ -66,7 +66,7 @@ export default function GamesSection({
       {gamesActive && (
         <FgPanel
           externalRef={gamesSectionRef}
-          className="border border-fg-white shadow-md shadow-fg-white"
+          className="border border-fg-white shadow-md shadow-fg-tone-black-8"
           content={
             <LazyScrollingContainer
               externalRef={gamesScrollingContainerRef}

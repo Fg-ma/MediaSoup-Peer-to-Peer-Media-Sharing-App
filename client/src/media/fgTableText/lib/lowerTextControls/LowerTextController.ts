@@ -1,14 +1,12 @@
 import TableTextMediaInstance from "../../TableTextMediaInstance";
-import { Settings } from "../typeConstant";
 
 class LowerTextController {
   constructor(
     private textMediaInstance: TableTextMediaInstance,
+    private tableTopRef: React.RefObject<HTMLDivElement>,
     private textContainerRef: React.RefObject<HTMLDivElement>,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private textAreaContainerRef: React.RefObject<HTMLDivElement>,
-    private isReadOnly: React.MutableRefObject<boolean>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private initializing: React.MutableRefObject<boolean>,
     private forceFinishInitialization: React.MutableRefObject<boolean>,
@@ -21,7 +19,7 @@ class LowerTextController {
       event.ctrlKey &&
       tagName === "textarea" &&
       this.textContainerRef.current?.classList.contains("in-media") &&
-      !this.isReadOnly.current
+      !this.textMediaInstance.isReadOnly
     ) {
       event.preventDefault();
       this.handleSave();
@@ -31,7 +29,7 @@ class LowerTextController {
       event.key.toLowerCase() === "i" &&
       event.ctrlKey &&
       this.textContainerRef.current?.classList.contains("in-media") &&
-      this.isReadOnly.current
+      this.textMediaInstance.isReadOnly
     ) {
       this.handleForceFinishInitialization();
       return;
@@ -42,7 +40,7 @@ class LowerTextController {
       !this.textContainerRef.current?.classList.contains("in-media") ||
       event.ctrlKey ||
       event.shiftKey ||
-      !this.isReadOnly.current ||
+      !this.textMediaInstance.isReadOnly ||
       tagName === "input" ||
       tagName === "textarea"
     ) {
@@ -72,37 +70,40 @@ class LowerTextController {
   };
 
   handleSetAsBackground = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.textMediaInstance.settings.background.value =
+      !this.textMediaInstance.settings.background.value;
 
-      newSettings.background.value = !newSettings.background.value;
-
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 
-  handleSync = () => {};
+  handleSync = () => {
+    this.textMediaInstance.settings.synced.value =
+      !this.textMediaInstance.settings.synced.value;
+
+    this.setRerender((prev) => !prev);
+  };
 
   handleEdit = () => {
     this.setSettingsActive(false);
 
-    this.isReadOnly.current = !this.isReadOnly.current;
+    this.textMediaInstance.isReadOnly = !this.textMediaInstance.isReadOnly;
+
     this.setRerender((prev) => !prev);
   };
 
   handleMinimap = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.textMediaInstance.settings.minimap.value =
+      !this.textMediaInstance.settings.minimap.value;
 
-      newSettings.minimap.value = !newSettings.minimap.value;
-
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 
   handlePointerDown = (event: PointerEvent) => {
-    if (!this.textAreaContainerRef.current?.contains(event.target as Node)) {
-      this.isReadOnly.current = true;
+    if (
+      this.tableTopRef.current?.contains(event.target as Node) &&
+      !this.textAreaContainerRef.current?.contains(event.target as Node)
+    ) {
+      this.textMediaInstance.isReadOnly = true;
       this.setRerender((prev) => !prev);
       document.removeEventListener("pointerdown", this.handlePointerDown);
     }

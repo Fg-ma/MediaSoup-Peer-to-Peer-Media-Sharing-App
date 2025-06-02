@@ -219,7 +219,7 @@ export default function SelectionPanel({
   return ReactDOM.createPortal(
     <div
       ref={externalPanelRef ? externalPanelRef : panelRef}
-      className="z-selection-button-panel absolute flex max-h-80 w-max"
+      className="absolute z-selection-button-panel flex max-h-80 w-max"
       style={{
         top: `${portalPosition?.top}px`,
         left: `${portalPosition?.left}px`,
@@ -250,7 +250,7 @@ export default function SelectionPanel({
         ></div>
       )}
       <div
-        className={`h-max max-h-80 w-full rounded bg-white px-2 shadow-md ${
+        className={`h-max max-h-80 w-full rounded bg-fg-white px-2 shadow-md ${
           scrollingAvailable ? "py-4" : "py-2"
         }`}
       >

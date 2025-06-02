@@ -36,6 +36,7 @@ export default function SnakeColorPickerPanel({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       externalRef={externalRef}
       content={
         <LazyScrollingContainer
@@ -125,8 +126,8 @@ export default function SnakeColorPickerPanel({
       closeCallback={() => setSnakeColorPanelActive(false)}
       closePosition="topRight"
       shadow={{ top: true, bottom: true }}
-      backgroundColor={"#161616"}
-      secondaryBackgroundColor={"#212121"}
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

@@ -9,10 +9,10 @@ export default function FgHoverContentStandard({
 }) {
   return (
     <div
-      className={`mb-1 w-max py-1 px-2 font-K2D text-base shadow-lg rounded-md ${
+      className={`mb-1 w-max rounded-md px-2 py-1 font-K2D text-base shadow-lg ${
         style === "light"
-          ? "text-black bg-white"
-          : "text-white bg-black bg-opacity-75"
+          ? "bg-fg-white text-fg-tone-black-1"
+          : "bg-fg-tone-black-1 text-fg-white"
       }`}
     >
       {content}

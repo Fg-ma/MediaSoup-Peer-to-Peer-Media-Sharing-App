@@ -114,7 +114,7 @@ export default function ColorsPage({
           Colors
         </div>
       </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-white bg-opacity-75"></div>
+      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
       <div
         ref={scrollingContainerRef}
         className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-4 overflow-y-auto px-2"

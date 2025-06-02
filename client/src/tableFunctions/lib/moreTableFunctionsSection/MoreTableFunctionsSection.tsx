@@ -117,7 +117,7 @@ export default function MoreTableFunctionsSection({
 
   return (
     <FgPanel
-      className="border border-fg-white shadow-md shadow-fg-white"
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       externalRef={moreTableFunctionsPanelRef}
       content={
         <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">

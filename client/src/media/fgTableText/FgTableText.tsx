@@ -26,10 +26,12 @@ export default function FgTableText({
   textInstanceId,
   bundleRef,
   tableRef,
+  tableTopRef,
 }: {
   textInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
 }) {
   const { staticContentEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
@@ -49,14 +51,10 @@ export default function FgTableText({
   const rightLowerTextControlsRef = useRef<HTMLDivElement>(null);
 
   const [settingsActive, setSettingsActive] = useState(false);
-  const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings),
-  );
   const [activePages, setActivePages] = useState<ActivePages>(
     defaultActiveSettingsPages,
   );
 
-  const isReadOnly = useRef(true);
   const initializing = useRef(false);
   const forceFinishInitialization = useRef(false);
   const [isLineNums, setIsLineNums] = useState(true);
@@ -67,11 +65,10 @@ export default function FgTableText({
   const lowerTextController = useRef(
     new LowerTextController(
       textMediaInstance,
+      tableTopRef,
       textContainerRef,
-      setSettings,
       setSettingsActive,
       textAreaContainerRef,
-      isReadOnly,
       setRerender,
       initializing,
       forceFinishInitialization,
@@ -132,7 +129,7 @@ export default function FgTableText({
   }, []);
 
   useEffect(() => {
-    if (isReadOnly) {
+    if (textMediaInstance.isReadOnly) {
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
@@ -150,7 +147,7 @@ export default function FgTableText({
         lowerTextController.current.handlePointerDown,
       );
     };
-  }, [isReadOnly]);
+  }, [textMediaInstance.isReadOnly]);
 
   return (
     <FgMediaContainer
@@ -177,10 +174,8 @@ export default function FgTableText({
       media={
         textMediaInstance.textMedia.loadingState === "downloaded" && (
           <Monaco
-            settings={settings}
             isLineNums={isLineNums}
             setIsLineNums={setIsLineNums}
-            isReadOnly={isReadOnly}
             externalInitializing={initializing}
             externalRerender={setRerender}
             textMediaInstance={textMediaInstance}
@@ -194,12 +189,12 @@ export default function FgTableText({
           isLineNums={isLineNums}
           setIsLineNums={setIsLineNums}
         />,
-        !isReadOnly.current ? (
+        !textMediaInstance.isReadOnly ? (
           <CornersDecorator className="z-[100] stroke-fg-red-light" width={4} />
         ) : null,
       ]}
       bundleRef={bundleRef}
-      backgroundMedia={settings.background.value}
+      backgroundMedia={textMediaInstance.settings.background.value}
       className="text-container"
       rightLowerControls={[
         <SettingsButton
@@ -209,11 +204,8 @@ export default function FgTableText({
           setSettingsActive={setSettingsActive}
           activePages={activePages}
           setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
           scrollingContainerRef={rightLowerTextControlsRef}
           lowerTextController={lowerTextController}
-          isReadOnly={isReadOnly}
           setRerender={setRerender}
         />,
         textMediaInstance.textMedia.loadingState === "downloaded" && (

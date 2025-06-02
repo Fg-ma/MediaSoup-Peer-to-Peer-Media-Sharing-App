@@ -320,6 +320,7 @@ export default function ColorPicker({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       externalRef={externalColorPickerPanelRef}
       content={
         <div ref={colorPickerRef} className="flex flex-col space-y-2">
@@ -362,10 +363,10 @@ export default function ColorPicker({
                 isAlpha ? "w-[88px]" : "w-[70px]"
               }`}
             >
-              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-fg-tone-black-1">
                 <input
                   type="text"
-                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1 pr-0.5 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-fg-white pl-1 pr-0.5 font-K2D text-sm text-fg-tone-black-1 focus:border-2 focus:border-fg-red-light focus:outline-none"
                   onChange={handleHexColorChanges}
                   autoComplete="off"
                   value={hexValue}
@@ -374,10 +375,10 @@ export default function ColorPicker({
               </label>
             </div>
             <div className="flex w-10 flex-col items-center justify-center space-y-1">
-              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-fg-tone-black-1">
                 <input
                   type="text"
-                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-fg-white pl-1.5 pr-1 font-K2D text-sm text-fg-tone-black-1 focus:border-2 focus:border-fg-red-light focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "r")}
                   autoComplete="off"
                   value={rgba.r}
@@ -386,10 +387,10 @@ export default function ColorPicker({
               </label>
             </div>
             <div className="flex w-10 flex-col items-center justify-center space-y-1">
-              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-fg-tone-black-1">
                 <input
                   type="text"
-                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-fg-white pl-1.5 pr-1 font-K2D text-sm text-fg-tone-black-1 focus:border-2 focus:border-fg-red-light focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "g")}
                   autoComplete="off"
                   value={rgba.g}
@@ -398,10 +399,10 @@ export default function ColorPicker({
               </label>
             </div>
             <div className="flex w-10 flex-col items-center justify-center space-y-1">
-              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
+              <label className="flex cursor-pointer flex-col items-center justify-center text-base text-fg-tone-black-1">
                 <input
                   type="text"
-                  className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
+                  className="h-8 w-full rounded-md border border-fg-white-85 bg-fg-white pl-1.5 pr-1 font-K2D text-sm text-fg-tone-black-1 focus:border-2 focus:border-fg-red-light focus:outline-none"
                   onChange={(event) => handleRGBColorChanges(event, "b")}
                   autoComplete="off"
                   value={rgba.b}
@@ -411,10 +412,10 @@ export default function ColorPicker({
             </div>
             {isAlpha && (
               <div className="flex w-[3.25rem] flex-col items-center justify-center space-y-1 pl-1">
-                <label className="flex cursor-pointer flex-col items-center justify-center text-base text-black">
+                <label className="flex cursor-pointer flex-col items-center justify-center text-base text-fg-tone-black-1">
                   <input
                     type="text"
-                    className="h-8 w-full rounded-md border border-fg-white-85 bg-white pl-1.5 pr-1 font-K2D text-sm text-black focus:border-2 focus:border-fg-secondary focus:outline-none"
+                    className="h-8 w-full rounded-md border border-fg-white-85 bg-fg-white pl-1.5 pr-1 font-K2D text-sm text-fg-tone-black-1 focus:border-2 focus:border-fg-red-light focus:outline-none"
                     onChange={(event) => handleAlphaChanges(event)}
                     autoComplete="off"
                     value={rgba.a}
@@ -483,6 +484,8 @@ export default function ColorPicker({
       resizeable={false}
       initHeight="max-content"
       initWidth="max-content"
+      backgroundColor={"#090909"}
+      secondaryBackgroundColor={"#161616"}
     />
   );
 }

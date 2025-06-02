@@ -93,6 +93,7 @@ export default function ReactButton({
       />
       {reactionsPanelActive && (
         <FgPanel
+          className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
           externalRef={reactionsPanelRef}
           content={
             <LazyScrollingContainer
@@ -146,7 +147,7 @@ export default function ReactButton({
             placement: "above",
             padding: 4,
           }}
-          initWidth={"290px"}
+          initWidth={"300px"}
           initHeight={"268px"}
           minWidth={176}
           minHeight={190}
@@ -156,8 +157,8 @@ export default function ReactButton({
           }
           closePosition="topRight"
           shadow={{ top: true, bottom: true }}
-          backgroundColor={"#161616"}
-          secondaryBackgroundColor={"#212121"}
+          backgroundColor={"#090909"}
+          secondaryBackgroundColor={"#161616"}
         />
       )}
     </>

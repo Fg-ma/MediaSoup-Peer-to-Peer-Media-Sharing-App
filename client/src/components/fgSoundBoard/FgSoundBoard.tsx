@@ -40,7 +40,7 @@ export default function FgSoundBoard({
     classes: string[];
   }>(defaultImportButton);
 
-  const [boardMode, setBoardMode] = useState<BoardModes>("standard");
+  const boardMode = useRef<BoardModes>("standard");
   const seizureBoardEffectIntevalRef = useRef<NodeJS.Timeout | undefined>(
     undefined,
   );
@@ -62,24 +62,24 @@ export default function FgSoundBoard({
     {},
   );
 
-  const fgSoundBoardController = useRef(
-    new FgSoundBoardController(
-      soundEffects,
-      setSoundEffects,
-      soundEffectsMetaDataRef,
-      boardMode,
-      setBoardMode,
-      seizureBoardEffectIntevalRef,
-      seizureBoardEffectTimeoutRef,
-      importButton,
-      setImportButton,
-      fileSelectorRef,
-      importedFiles,
-      setImportedFiles,
-      tempImportedFiles,
-      userMedia,
-      audioEndTimeouts,
-    ),
+  const [_, setRerender] = useState(false);
+
+  const fgSoundBoardController = new FgSoundBoardController(
+    soundEffects,
+    setSoundEffects,
+    soundEffectsMetaDataRef,
+    boardMode,
+    seizureBoardEffectIntevalRef,
+    seizureBoardEffectTimeoutRef,
+    importButton,
+    setImportButton,
+    fileSelectorRef,
+    importedFiles,
+    setImportedFiles,
+    tempImportedFiles,
+    userMedia,
+    audioEndTimeouts,
+    setRerender,
   );
 
   useEffect(() => {
@@ -117,13 +117,14 @@ export default function FgSoundBoard({
 
   return (
     <FgPanel
+      className="border-2 border-fg-white shadow-md shadow-fg-tone-black-8"
       content={
         <div className="flex h-full w-full flex-col">
           <input
             ref={fileSelectorRef}
             className="hidden"
             type="file"
-            onChange={fgSoundBoardController.current.handleFileInput}
+            onChange={fgSoundBoardController.handleFileInput}
             multiple
           />
           <motion.div
@@ -143,15 +144,14 @@ export default function FgSoundBoard({
               <FgTriToggleButton
                 kind="cycle"
                 initPosition={0}
-                stateChangeFunction={
-                  fgSoundBoardController.current.stateChangeFunction
-                }
+                stateChangeFunction={fgSoundBoardController.stateChangeFunction}
                 btnLabels={["Standard", "Crazy", "Seizure"]}
               />
             </div>
-            {(boardMode === "crazy" || boardMode === "seizure") && (
+            {(boardMode.current === "crazy" ||
+              boardMode.current === "seizure") && (
               <div className="w-max select-none truncate font-K2D text-xl text-fg-off-white">
-                {boardMode === "crazy" ? "Crazy mode" : "Seizure mode"}
+                {boardMode.current === "crazy" ? "Crazy mode" : "Seizure mode"}
               </div>
             )}
             <div className="select-none truncate font-K2D text-xl text-fg-off-white">
@@ -167,10 +167,10 @@ export default function FgSoundBoard({
                   importButton.pressed ? "pressed" : ""
                 } ${importButton.classes.join(" ")}`}
                 pointerDownFunction={
-                  fgSoundBoardController.current.handleImportEffectClickDown
+                  fgSoundBoardController.handleImportEffectClickDown
                 }
                 pointerUpFunction={
-                  fgSoundBoardController.current.handleImportEffectClickUp
+                  fgSoundBoardController.handleImportEffectClickUp
                 }
                 contentFunction={() => (
                   <>
@@ -204,10 +204,10 @@ export default function FgSoundBoard({
                     effect.pressed ? "pressed" : ""
                   } ${effect.classes.join(" ")}`}
                   pointerDownFunction={() =>
-                    fgSoundBoardController.current.clickDown(parseInt(key))
+                    fgSoundBoardController.clickDown(parseInt(key))
                   }
                   pointerUpFunction={() =>
-                    fgSoundBoardController.current.clickUp(parseInt(key))
+                    fgSoundBoardController.clickUp(parseInt(key))
                   }
                   contentFunction={() => (
                     <>
@@ -234,7 +234,7 @@ export default function FgSoundBoard({
       initWidth="605px"
       shadow={{ left: true, right: false, bottom: false, top: false }}
       closeCallback={() => {
-        fgSoundBoardController.current.closeSoundBoard();
+        fgSoundBoardController.closeSoundBoard();
 
         if (closeCallback) {
           closeCallback();

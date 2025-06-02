@@ -29,7 +29,6 @@ class MonacoController {
       | undefined,
     private sendGeneralSignal: (signal: GeneralSignals) => void,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private isReadOnly: React.MutableRefObject<boolean> | undefined,
     private initializing: React.MutableRefObject<boolean>,
     private forceFinishInitialization:
       | React.MutableRefObject<boolean>
@@ -37,6 +36,7 @@ class MonacoController {
     private externalRerender:
       | React.Dispatch<React.SetStateAction<boolean>>
       | undefined,
+    private forceIsReadOnly: boolean | undefined,
   ) {}
 
   handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -177,7 +177,7 @@ class MonacoController {
       this.initializing.current = false;
       if (this.externalRerender) this.externalRerender((prev) => !prev);
       this.editor.current?.updateOptions({
-        readOnly: this.isReadOnly?.current ?? true,
+        readOnly: this.forceIsReadOnly || this.textMediaInstance.isReadOnly,
       });
     })();
 
