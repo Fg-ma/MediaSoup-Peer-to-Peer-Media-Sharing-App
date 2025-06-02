@@ -23,7 +23,6 @@ class LowerVideoController {
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private settings: Settings,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
     private setVideoEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
@@ -44,7 +43,6 @@ class LowerVideoController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
-    private setSettings: React.Dispatch<React.SetStateAction<Settings>>,
   ) {}
 
   formatDuration = (time: number) => {
@@ -235,7 +233,7 @@ class LowerVideoController {
 
     const style = this.videoContainerRef.current.style;
     const captionOptions =
-      this.settings.closedCaption.closedCaptionOptionsActive;
+      this.videoMediaInstance.settings.closedCaption.closedCaptionOptionsActive;
 
     style.setProperty(
       "--closed-captions-font-family",
@@ -308,18 +306,23 @@ class LowerVideoController {
   };
 
   handleDownload = () => {
-    if (this.settings.downloadType.value === "snapShot") {
+    if (this.videoMediaInstance.settings.downloadType.value === "snapShot") {
       this.videoMediaInstance.babylonScene?.downloadSnapShot();
-    } else if (this.settings.downloadType.value === "original") {
+    } else if (
+      this.videoMediaInstance.settings.downloadType.value === "original"
+    ) {
       this.videoMediaInstance.videoMedia.downloadVideo();
-    } else if (this.settings.downloadType.value === "record") {
+    } else if (
+      this.videoMediaInstance.settings.downloadType.value === "record"
+    ) {
       if (!this.recording.current) {
         this.videoMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
-            this.settings.downloadType.downloadTypeOptions.mimeType.value
+            this.videoMediaInstance.settings.downloadType.downloadTypeOptions
+              .mimeType.value
           ],
           parseInt(
-            this.settings.downloadType.downloadTypeOptions.fps.value.slice(
+            this.videoMediaInstance.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
               -4,
             ),
@@ -450,17 +453,10 @@ class LowerVideoController {
   };
 
   handleSetAsBackground = () => {
-    this.setSettings((prev) => {
-      const newSettings = { ...prev };
+    this.videoMediaInstance.settings.background.value =
+      !this.videoMediaInstance.settings.background.value;
 
-      if (newSettings.background.value === "true") {
-        newSettings.background.value = "false";
-      } else {
-        newSettings.background.value = "true";
-      }
-
-      return newSettings;
-    });
+    this.setRerender((prev) => !prev);
   };
 }
 

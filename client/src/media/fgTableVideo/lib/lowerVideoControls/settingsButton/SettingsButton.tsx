@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import SettingsPanel from "./lib/SettingsPanel";
-import { ActivePages, Settings } from "../../typeConstant";
+import { ActivePages } from "../../typeConstant";
 import LowerVideoController from "../LowerVideoController";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
+import TableVideoMediaInstance from "../../../../../media/fgTableVideo/TableVideoMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -16,6 +17,7 @@ type RecursiveObject = {
 };
 
 export default function SettingsButton({
+  videoMediaInstance,
   lowerVideoController,
   videoEffectsActive,
   videoContainerRef,
@@ -23,10 +25,9 @@ export default function SettingsButton({
   setSettingsActive,
   activePages,
   setActivePages,
-  settings,
-  setSettings,
   scrollingContainerRef,
 }: {
+  videoMediaInstance: TableVideoMediaInstance;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
@@ -34,8 +35,6 @@ export default function SettingsButton({
   setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
@@ -125,13 +124,12 @@ export default function SettingsButton({
       />
       {settingsActive && (
         <SettingsPanel
+          videoMediaInstance={videoMediaInstance}
           lowerVideoController={lowerVideoController}
           settingsPanelRef={settingsPanelRef}
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}
           setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
         />
       )}
     </>

@@ -16,6 +16,7 @@ import BabylonScene, {
 import assetMeshes from "../../babylon/meshes";
 import Deadbanding from "../../babylon/Deadbanding";
 import TableVideoMedia, { VideoListenerTypes } from "./TableVideoMedia";
+import { defaultSettings } from "./lib/typeConstant";
 
 class TableVideoMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -40,6 +41,8 @@ class TableVideoMediaInstance {
     };
     rotation: number;
   };
+
+  settings = structuredClone(defaultSettings);
 
   constructor(
     public videoMedia: TableVideoMedia,

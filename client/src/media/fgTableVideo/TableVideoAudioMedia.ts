@@ -2,7 +2,7 @@ import { BaseContext, getContext, start } from "tone";
 import {
   AudioEffectTypes,
   defaultAudioEffects,
-  UserEffectsType,
+  StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
 import AudioEffects from "../../audioEffects/AudioEffects";
 import {
@@ -34,9 +34,9 @@ class TableVideoAudioMedia {
   constructor(
     private videoId: string,
     private audioStream: MediaStream,
-    private userEffects: React.MutableRefObject<UserEffectsType>,
+    private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
   ) {
-    this.userEffects.current.video[this.videoId].audio =
+    this.staticContentEffects.current.video[this.videoId].audio =
       structuredClone(defaultAudioEffects);
 
     // Create an AudioContext and MediaStreamDestination
@@ -122,31 +122,32 @@ class TableVideoAudioMedia {
   ) => {
     if (!blockStateChange) {
       // Clear all old effects
-      for (const oldEffect in this.userEffects.current.video[this.videoId]
-        .audio) {
+      for (const oldEffect in this.staticContentEffects.current.video[
+        this.videoId
+      ].audio) {
         if (
-          this.userEffects.current.video[this.videoId].audio[
+          this.staticContentEffects.current.video[this.videoId].audio[
             oldEffect as AudioEffectTypes
           ]
         ) {
           this.removeEffect(oldEffect as AudioEffectTypes);
         }
         if (oldEffect !== effect) {
-          this.userEffects.current.video[this.videoId].audio[
+          this.staticContentEffects.current.video[this.videoId].audio[
             oldEffect as AudioEffectTypes
           ] = false;
         }
       }
 
-      this.userEffects.current.video[this.videoId].audio[
+      this.staticContentEffects.current.video[this.videoId].audio[
         effect as AudioEffectTypes
       ] =
-        !this.userEffects.current.video[this.videoId].audio[
+        !this.staticContentEffects.current.video[this.videoId].audio[
           effect as AudioEffectTypes
         ];
 
       this.effects[effect] =
-        this.userEffects.current.video[this.videoId].audio[
+        this.staticContentEffects.current.video[this.videoId].audio[
           effect as AudioEffectTypes
         ];
     }

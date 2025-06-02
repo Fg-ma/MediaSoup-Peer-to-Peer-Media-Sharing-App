@@ -36,7 +36,7 @@ class TableVideoMedia {
 
   dashUrl: string | undefined;
 
-  private fileSize = 0;
+  fileSize = 0;
   blobURL: string | undefined;
   loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
@@ -301,7 +301,7 @@ class TableVideoMedia {
       //   this.videoAudioMedia = new TableVideoAudioMedia(
       //     this.videoId,
       //     this.audioStream,
-      //     this.userEffects,
+      //     this.staticContentEffects,
       //   );
       // }
 

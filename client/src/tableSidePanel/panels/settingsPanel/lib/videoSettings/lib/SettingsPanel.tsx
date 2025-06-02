@@ -196,11 +196,13 @@ export default function SettingsPanel({
                     <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                       <div>Download</div>
                       <div>
-                        {
+                        {Object.prototype.hasOwnProperty.call(
+                          downloadTypeSelections,
+                          videoMediaInstance.settings.downloadType.value,
+                        ) &&
                           downloadTypeSelections[
                             videoMediaInstance.settings.downloadType.value
-                          ]
-                        }
+                          ]}
                       </div>
                     </div>
                   )}
@@ -224,11 +226,13 @@ export default function SettingsPanel({
                     <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                       <div>Subtitles</div>
                       <div>
-                        {
+                        {Object.prototype.hasOwnProperty.call(
+                          closedCaptionsSelections,
+                          videoMediaInstance.settings.closedCaption.value,
+                        ) &&
                           closedCaptionsSelections[
                             videoMediaInstance.settings.closedCaption.value
-                          ]
-                        }
+                          ]}
                       </div>
                     </div>
                   )}

@@ -3,6 +3,7 @@ import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import SvgSettingsPanel from "./lib/svgSettings/SvgSettingsPanel";
 import ImageSettingsPanel from "./lib/imageSettings/ImageSettingsPanel";
 import TextSettingsPanel from "./lib/textSettings/TextSettingsPanel";
+import VideoSettingsPanel from "./lib/videoSettings/VideoSettingsPanel";
 
 export default function SettingsPanel({
   currentSettingsActive,
@@ -24,6 +25,8 @@ export default function SettingsPanel({
           <ImageSettingsPanel currentSettingsActive={currentSettingsActive} />
         ) : currentSettingsActive.current.contentType === "text" ? (
           <TextSettingsPanel currentSettingsActive={currentSettingsActive} />
+        ) : currentSettingsActive.current.contentType === "video" ? (
+          <VideoSettingsPanel currentSettingsActive={currentSettingsActive} />
         ) : null)}
     </>
   );

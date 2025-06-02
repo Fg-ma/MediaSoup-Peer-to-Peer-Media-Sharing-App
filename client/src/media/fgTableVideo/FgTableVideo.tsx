@@ -72,9 +72,6 @@ export default function FgTableVideo({
   const [captionsActive, setCaptionsActive] = useState(false);
 
   const [settingsActive, setSettingsActive] = useState(false);
-  const [settings, setSettings] = useState<Settings>(
-    structuredClone(defaultSettings),
-  );
   const [activePages, setActivePages] =
     useState<ActivePages>(defaultActivePages);
 
@@ -107,7 +104,6 @@ export default function FgTableVideo({
       setPausedState,
       paused,
       setCaptionsActive,
-      settings,
       currentTimeRef,
       setVideoEffectsActive,
       setAudioEffectsActive,
@@ -122,7 +118,6 @@ export default function FgTableVideo({
       isScrubbing,
       wasPaused,
       tableStaticContentSocket,
-      setSettings,
     ),
   );
 
@@ -214,7 +209,7 @@ export default function FgTableVideo({
 
   useEffect(() => {
     lowerVideoController.current.updateCaptionsStyles();
-  }, [settings]);
+  }, [videoMediaInstance.settings]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
@@ -251,7 +246,7 @@ export default function FgTableVideo({
       kind="video"
       initState={videoMediaInstance.videoMedia.state}
       bundleRef={bundleRef}
-      backgroundMedia={settings.background.value === "true"}
+      backgroundMedia={videoMediaInstance.settings.background.value}
       className="video-container"
       popupElements={[
         videoEffectsActive ? (
@@ -293,6 +288,7 @@ export default function FgTableVideo({
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         <SettingsButton
+          videoMediaInstance={videoMediaInstance}
           lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           videoContainerRef={videoContainerRef}
@@ -300,20 +296,18 @@ export default function FgTableVideo({
           setSettingsActive={setSettingsActive}
           activePages={activePages}
           setActivePages={setActivePages}
-          settings={settings}
-          setSettings={setSettings}
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
         videoMediaInstance.videoMedia.loadingState === "downloaded" && (
           <DownloadButton
-            settings={settings}
+            videoMediaInstance={videoMediaInstance}
             recording={recording}
             lowerVideoController={lowerVideoController}
             videoEffectsActive={videoEffectsActive}
             scrollingContainerRef={rightLowerVideoControlsRef}
           />
         ),
-        settings.downloadType.value === "record" &&
+        videoMediaInstance.settings.downloadType.value === "record" &&
         downloadRecordingReady.current ? (
           <DownloadRecordingButton
             lowerVideoController={lowerVideoController}
@@ -322,10 +316,10 @@ export default function FgTableVideo({
           />
         ) : null,
         <CaptionButton
+          videoMediaInstance={videoMediaInstance}
           lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
-          settings={settings}
           audioStream={videoMediaInstance.getAudioTrack()!}
           videoContainerRef={videoContainerRef}
           scrollingContainerRef={rightLowerVideoControlsRef}

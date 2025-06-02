@@ -6,7 +6,7 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import LowerVideoController from "../LowerVideoController";
-import { Settings } from "../../typeConstant";
+import TableVideoMediaInstance from "../../../../../media/fgTableVideo/TableVideoMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -45,19 +45,19 @@ const voskModels: { [model: string]: string } = {
 };
 
 export default function CaptionButton({
+  videoMediaInstance,
   lowerVideoController,
   videoEffectsActive,
   settingsActive,
-  settings,
   audioStream,
   videoContainerRef,
   scrollingContainerRef,
   containerRef,
 }: {
+  videoMediaInstance: TableVideoMediaInstance;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
-  settings: Settings;
   audioStream: MediaStream;
   videoContainerRef: React.RefObject<HTMLDivElement>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -96,9 +96,9 @@ export default function CaptionButton({
     }
 
     captionsController.current.loadVoskModel(
-      voskModels[settings.closedCaption.value],
+      voskModels[videoMediaInstance.settings.closedCaption.value],
     );
-  }, [settings.closedCaption.value]);
+  }, [videoMediaInstance.settings.closedCaption.value]);
 
   return (
     <>
@@ -106,7 +106,7 @@ export default function CaptionButton({
         clickFunction={() => {
           if (!active) {
             captionsController.current.loadVoskModel(
-              voskModels[settings.closedCaption.value],
+              voskModels[videoMediaInstance.settings.closedCaption.value],
             );
           }
 
