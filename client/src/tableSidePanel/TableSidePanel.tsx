@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSignalContext } from "../context/signalContext/SignalContext";
+import { useSocketContext } from "../context/socketContext/SocketContext";
+import { IncomingTableStaticContentMessages } from "../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { SettingsSignals } from "../context/signalContext/lib/typeConstant";
 import UploadingPanel from "./panels/uploadingPanel/UploadingPanel";
 import TableController from "../table/lib/TableController";
@@ -11,6 +13,7 @@ import DownloadingPanel from "./panels/downloadingPanel/DownloadingPanel";
 import { ContentTypes } from "../../../universal/contentTypeConstant";
 import SettingsPanel from "./panels/settingsPanel/SettingsPanel";
 import "./lib/tableSidePanel.css";
+import { IncomingMediasoupMessages } from "src/serverControllers/mediasoupServer/lib/typeConstant";
 
 export type TableSidePanels = "upload" | "download" | "general" | "settings";
 
@@ -40,11 +43,21 @@ export default function TableSidePanel({
     addSettingsSignalListener,
     removeSettingsSignalListener,
   } = useSignalContext();
+  const { tableStaticContentSocket, mediasoupSocket } = useSocketContext();
 
   const tablePanelRef = useRef<HTMLDivElement>(null);
   const tableSidePanelHeaderRef = useRef<HTMLDivElement>(null);
   const currentSettingsActive = useRef<
-    { contentType: ContentTypes; instanceId: string } | undefined
+    | {
+        contentType: ContentTypes;
+        instanceId: string;
+        visualMediaInfo?: {
+          isUser: boolean;
+          username: string;
+          instance: string;
+        };
+      }
+    | undefined
   >(undefined);
 
   const [_, setRerender] = useState(false);
@@ -70,9 +83,7 @@ export default function TableSidePanel({
 
         setTableSidePanelActive(condition);
 
-        currentSettingsActive.current = condition
-          ? { contentType, instanceId }
-          : undefined;
+        currentSettingsActive.current = condition ? signal.header : undefined;
         activePanel.current = condition ? "settings" : "general";
 
         sendSettingsSignal({
@@ -100,6 +111,39 @@ export default function TableSidePanel({
     }
   };
 
+  const handleTableStaticContentMessages = (
+    msg: IncomingTableStaticContentMessages,
+  ) => {
+    switch (msg.type) {
+      case "contentDeleted":
+        const { contentType, instanceId } = msg.header;
+        if (
+          instanceId === currentSettingsActive.current?.instanceId &&
+          contentType === currentSettingsActive.current?.contentType
+        ) {
+          currentSettingsActive.current = undefined;
+          setRerender((prev) => !prev);
+        }
+        break;
+    }
+  };
+
+  const handleMediasoupMessages = (msg: IncomingMediasoupMessages) => {
+    switch (msg.type) {
+      case "producerDisconnected":
+        const { producerType, producerId, dataStreamType } = msg.header;
+        if (
+          producerId === currentSettingsActive.current?.instanceId &&
+          producerType === currentSettingsActive.current?.contentType &&
+          dataStreamType === undefined
+        ) {
+          currentSettingsActive.current = undefined;
+          setRerender((prev) => !prev);
+        }
+        break;
+    }
+  };
+
   useEffect(() => {
     addSettingsSignalListener(handleSettingsSignals);
 
@@ -107,6 +151,26 @@ export default function TableSidePanel({
       removeSettingsSignalListener(handleSettingsSignals);
     };
   }, []);
+
+  useEffect(() => {
+    tableStaticContentSocket.current?.addMessageListener(
+      handleTableStaticContentMessages,
+    );
+
+    return () => {
+      tableStaticContentSocket.current?.removeMessageListener(
+        handleTableStaticContentMessages,
+      );
+    };
+  }, [tableStaticContentSocket.current]);
+
+  useEffect(() => {
+    mediasoupSocket.current?.addMessageListener(handleMediasoupMessages);
+
+    return () => {
+      mediasoupSocket.current?.removeMessageListener(handleMediasoupMessages);
+    };
+  }, [mediasoupSocket.current]);
 
   useEffect(() => {
     if (tableSidePanelActive) {

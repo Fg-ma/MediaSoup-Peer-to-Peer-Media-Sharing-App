@@ -12,6 +12,9 @@ import BabylonScene, {
   validEffectTypes,
 } from "../../babylon/BabylonScene";
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
+import { defaultSettings } from "./lib/typeConstant";
+
+export type ScreenMediaListenerTypes = { type: "settingsChanged" };
 
 class ScreenMedia {
   canvas: HTMLCanvasElement;
@@ -26,6 +29,11 @@ class ScreenMedia {
   };
 
   babylonScene: BabylonScene | undefined;
+
+  settings = structuredClone(defaultSettings);
+
+  private screenListeners: Set<(message: ScreenMediaListenerTypes) => void> =
+    new Set();
 
   constructor(
     private tableId: string,
@@ -132,6 +140,12 @@ class ScreenMedia {
     // Deconstruct base shader
     this.babylonScene?.deconstructor();
   }
+
+  settingsChanged = () => {
+    this.screenListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
+  };
 
   private hexToNormalizedRgb = (hex: string): [number, number, number] => {
     // Remove the leading '#' if present
@@ -267,6 +281,18 @@ class ScreenMedia {
 
   getTimeEllapsed = () => {
     return Date.now() - this.creationTime;
+  };
+
+  addVisualMediaListener = (
+    listener: (message: ScreenMediaListenerTypes) => void,
+  ): void => {
+    this.screenListeners.add(listener);
+  };
+
+  removeVisualMediaListener = (
+    listener: (message: ScreenMediaListenerTypes) => void,
+  ): void => {
+    this.screenListeners.delete(listener);
   };
 }
 

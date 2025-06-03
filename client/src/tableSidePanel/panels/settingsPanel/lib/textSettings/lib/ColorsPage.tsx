@@ -66,11 +66,15 @@ export default function ColorsPage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 1rem)" }}
+      ></div>
       {Object.entries(colorsOptionsTitles).map(([key, title]) => (
         <div
           key={key}
-          className="flex h-max w-full flex-col items-center justify-center space-y-1 px-2"
+          className="flex h-max flex-col items-center justify-center space-y-1"
+          style={{ width: "calc(100% - 1rem)" }}
         >
           <FgDropdownButton
             className="h-max min-h-8 w-full !bg-fg-tone-black-6 text-lg"

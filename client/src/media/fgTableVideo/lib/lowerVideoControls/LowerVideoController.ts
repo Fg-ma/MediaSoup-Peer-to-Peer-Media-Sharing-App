@@ -233,7 +233,7 @@ class LowerVideoController {
 
     const style = this.videoContainerRef.current.style;
     const captionOptions =
-      this.videoMediaInstance.settings.closedCaption.closedCaptionOptionsActive;
+      this.videoMediaInstance.settings.closedCaption.closedCaptionOptions;
 
     style.setProperty(
       "--closed-captions-font-family",
@@ -455,6 +455,13 @@ class LowerVideoController {
   handleSetAsBackground = () => {
     this.videoMediaInstance.settings.background.value =
       !this.videoMediaInstance.settings.background.value;
+
+    this.setRerender((prev) => !prev);
+  };
+
+  handleSync = () => {
+    this.videoMediaInstance.settings.synced.value =
+      !this.videoMediaInstance.settings.synced.value;
 
     this.setRerender((prev) => !prev);
   };

@@ -152,7 +152,7 @@ class BundleSocket {
         if (producerId) {
           const track =
             this.remoteMedia.current[producerUsername][producerInstance]
-              .camera?.[producerId];
+              .camera?.[producerId].track;
           if (track) {
             newStream.addTrack(track);
           }
@@ -168,7 +168,7 @@ class BundleSocket {
         if (producerId) {
           const track =
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screen?.[producerId];
+              .screen?.[producerId]?.track;
           if (track) {
             newStream.addTrack(track);
           }
@@ -184,7 +184,7 @@ class BundleSocket {
         if (producerId) {
           const track =
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screenAudio?.[producerId];
+              .screenAudio?.[producerId]?.track;
           if (track) {
             newStream.addTrack(track);
           }
@@ -196,7 +196,8 @@ class BundleSocket {
     } else if (producerType === "audio") {
       const newStream = new MediaStream();
       const track =
-        this.remoteMedia.current[producerUsername][producerInstance].audio;
+        this.remoteMedia.current[producerUsername][producerInstance].audio
+          ?.track;
       if (track) {
         newStream.addTrack(track);
       }

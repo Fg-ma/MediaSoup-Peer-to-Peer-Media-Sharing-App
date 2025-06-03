@@ -29,11 +29,15 @@ export default function DownloadTypePage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 1rem)" }}
+      ></div>
       {Object.entries(downloadTypeSelections).map(([key, type]) => (
         <FgButton
           key={key}
-          className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
+          style={{ width: "calc(100% - 1rem)" }}
+          className={`flex items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
             key === imageMediaInstance.current.settings.downloadType.value
               ? "bg-fg-white text-fg-tone-black-1"
               : ""
@@ -48,7 +52,8 @@ export default function DownloadTypePage({
       ))}
       {imageMediaInstance.current.settings.downloadType.value === "record" && (
         <FgButton
-          className="h-7 w-full"
+          className="h-7"
+          style={{ width: "calc(100% - 1rem)" }}
           contentFunction={() => (
             <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
               <FgSVGElement

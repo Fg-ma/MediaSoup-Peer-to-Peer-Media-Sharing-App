@@ -690,6 +690,9 @@ class ProducersController {
             producerType
           ]![producerId]
         ) {
+          this.remoteMedia.current[producerUsername][producerInstance]?.[
+            producerType
+          ]?.[producerId].deconstructor();
           delete this.remoteMedia.current[producerUsername][producerInstance]?.[
             producerType
           ]?.[producerId];
@@ -736,6 +739,9 @@ class ProducersController {
             producerType
           ]
         ) {
+          this.remoteMedia.current[producerUsername][producerInstance][
+            producerType
+          ].deconstructor();
           delete this.remoteMedia.current[producerUsername][producerInstance][
             producerType
           ];

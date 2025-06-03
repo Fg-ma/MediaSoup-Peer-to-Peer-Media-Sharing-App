@@ -22,12 +22,13 @@ export type DownloadRecordingFPSTypes =
   | "60 fps";
 
 export interface Settings {
+  synced: { value: boolean };
   background: {
     value: boolean;
   };
   closedCaption: {
     value: keyof typeof closedCaptionsSelections;
-    closedCaptionOptionsActive: {
+    closedCaptionOptions: {
       value: "";
       fontFamily: { value: FontFamilies };
       fontColor: { value: FontColors };
@@ -144,7 +145,7 @@ export type DownloadTypeOptionsTypes = "fps" | "mimeType";
 
 export const downloadTypeOptionsTitles = {
   fps: "FPS",
-  mimeType: "Mime type",
+  mimeType: "Mime",
 };
 
 export const downloadTypeOptionsArrays: {
@@ -265,10 +266,11 @@ export const defaultActivePages: ActivePages = {
 };
 
 export const defaultSettings: Settings = Object.freeze({
+  synced: Object.freeze({ value: true }),
   background: Object.freeze({ value: false }),
   closedCaption: Object.freeze({
     value: "en-US",
-    closedCaptionOptionsActive: Object.freeze({
+    closedCaptionOptions: Object.freeze({
       value: "",
       fontFamily: Object.freeze({ value: "K2D" }),
       fontColor: Object.freeze({ value: "white" }),

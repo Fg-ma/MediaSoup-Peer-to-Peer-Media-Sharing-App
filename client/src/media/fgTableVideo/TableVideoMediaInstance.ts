@@ -18,6 +18,8 @@ import Deadbanding from "../../babylon/Deadbanding";
 import TableVideoMedia, { VideoListenerTypes } from "./TableVideoMedia";
 import { defaultSettings } from "./lib/typeConstant";
 
+export type VideoInstanceListenerTypes = { type: "settingsChanged" };
+
 class TableVideoMediaInstance {
   instanceCanvas: HTMLCanvasElement;
   instanceVideo: HTMLVideoElement | undefined;
@@ -43,6 +45,10 @@ class TableVideoMediaInstance {
   };
 
   settings = structuredClone(defaultSettings);
+
+  private videoInstanceListeners: Set<
+    (message: VideoInstanceListenerTypes) => void
+  > = new Set();
 
   constructor(
     public videoMedia: TableVideoMedia,
@@ -124,6 +130,12 @@ class TableVideoMediaInstance {
       default:
         break;
     }
+  };
+
+  settingsChanged = () => {
+    this.videoInstanceListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
   };
 
   private setVideo = () => {
@@ -710,6 +722,18 @@ class TableVideoMediaInstance {
 
   getPositioning = () => {
     return this.positioning;
+  };
+
+  addVideoInstanceListener = (
+    listener: (message: VideoInstanceListenerTypes) => void,
+  ): void => {
+    this.videoInstanceListeners.add(listener);
+  };
+
+  removeVideoInstanceListener = (
+    listener: (message: VideoInstanceListenerTypes) => void,
+  ): void => {
+    this.videoInstanceListeners.delete(listener);
   };
 }
 

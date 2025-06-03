@@ -31,9 +31,13 @@ export default function DownloadOptionsPage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 1rem)" }}
+      ></div>
       <FgButton
-        className="h-8 w-full"
+        className="h-7"
+        style={{ width: "calc(100% - 1rem)" }}
         clickFunction={() => setIsMimeTypePage((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
@@ -72,7 +76,8 @@ export default function DownloadOptionsPage({
         />
       )}
       <FgButton
-        className="h-8 w-full"
+        className="h-7"
+        style={{ width: "calc(100% - 1rem)" }}
         clickFunction={() => setIsSizePage((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
@@ -116,7 +121,8 @@ export default function DownloadOptionsPage({
         />
       )}
       <FgButton
-        className="h-8 w-full"
+        className="h-7"
+        style={{ width: "calc(100% - 1rem)" }}
         clickFunction={() => setIsCompressionPage((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">

@@ -24,6 +24,9 @@ import UserSvgMedia from "../../../media/fgUserSvg/UserSvgMedia";
 import UserApplicationMedia from "../../../media/fgUserApplication /UserApplicationMedia";
 import UserTextMedia from "../../../media/fgUserText/UserTextMedia";
 import UserSoundClipMedia from "../../../media/fgUserSoundClip/UserSoundClipMedia";
+import RemoteVisualMedia from "../../../media/fgVisualMedia/RemoteVisualMedia";
+import RemoteScreenAudioMedia from "../../../media/fgVisualMedia/RemoteScreenAudioMedia";
+import RemoteAudioMedia from "../../../media/audio/RemoteAudioMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
 
@@ -116,10 +119,10 @@ export type StaticContentMediaType = {
 export type RemoteMediaType = {
   [username: string]: {
     [instance: string]: {
-      camera?: { [cameraId: string]: MediaStreamTrack };
-      screen?: { [screenId: string]: MediaStreamTrack };
-      screenAudio?: { [screenAudioId: string]: MediaStreamTrack };
-      audio?: MediaStreamTrack;
+      camera?: { [cameraId: string]: RemoteVisualMedia };
+      screen?: { [screenId: string]: RemoteVisualMedia };
+      screenAudio?: { [screenAudioId: string]: RemoteScreenAudioMedia };
+      audio?: RemoteAudioMedia;
     };
   };
 };

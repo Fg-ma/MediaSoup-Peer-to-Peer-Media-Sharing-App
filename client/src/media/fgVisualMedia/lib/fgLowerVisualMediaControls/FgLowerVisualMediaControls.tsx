@@ -10,8 +10,11 @@ import FgLowerVisualMediaController from "./lib/FgLowerVisualMediaController";
 import {
   defaultFgVisualMediaOptions,
   FgVisualMediaOptions,
-  Settings,
 } from "../typeConstant";
+import FgSettingsButton from "./lib/fgSettingsButton/FgSettingsButton";
+import CameraMedia from "../../CameraMedia";
+import ScreenMedia from "../../ScreenMedia";
+import RemoteVisualMedia from "../../RemoteVisualMedia";
 
 const PlayPauseButton = React.lazy(
   () => import("./lib/playPauseButton/PlayPauseButton"),
@@ -27,9 +30,6 @@ const PictureInPictureButton = React.lazy(
 );
 const CaptionButton = React.lazy(
   () => import("./lib/captionsButton/CaptionButton"),
-);
-const FgSettingsButton = React.lazy(
-  () => import("./lib/fgSettingsButton/FgSettingsButton"),
 );
 const VisualEffectsButton = React.lazy(
   () => import("./lib/visualEffectsButton/VisualEffectsButton"),
@@ -109,6 +109,7 @@ export interface ActivePages {
 }
 
 export default function FgLowerVisualMediaControls({
+  visualMedia,
   tableId,
   username,
   instance,
@@ -126,19 +127,18 @@ export default function FgLowerVisualMediaControls({
   audioRef,
   subContainerRef,
   currentTimeRef,
-  tintColor,
   visualEffectsActive,
   audioEffectsActive,
   setAudioEffectsActive,
-  settings,
-  setSettings,
   fgVisualMediaOptions,
   handleVisualEffectChange,
   handleAudioEffectChange,
   handleMuteCallback,
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
+  setRerender,
 }: {
+  visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
   tableId: string;
   username: string;
   instance: string;
@@ -160,12 +160,9 @@ export default function FgLowerVisualMediaControls({
   audioRef: React.RefObject<HTMLAudioElement>;
   subContainerRef: React.RefObject<HTMLDivElement>;
   currentTimeRef: React.RefObject<HTMLDivElement>;
-  tintColor: React.MutableRefObject<string>;
   visualEffectsActive: boolean;
   audioEffectsActive: boolean;
   setAudioEffectsActive: React.Dispatch<React.SetStateAction<boolean>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   fgVisualMediaOptions: FgVisualMediaOptions;
   handleVisualEffectChange: (
     effect: CameraEffectTypes | ScreenEffectTypes,
@@ -191,6 +188,7 @@ export default function FgLowerVisualMediaControls({
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
   ) => void;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { mediasoupSocket } = useSocketContext();
 
@@ -210,7 +208,6 @@ export default function FgLowerVisualMediaControls({
       },
     },
   });
-  const [_, setRerender] = useState(false);
   const rightVisualMediaControlsRef = useRef<HTMLDivElement>(null);
 
   const handleMessage = (event: IncomingMediasoupMessages) => {
@@ -339,10 +336,10 @@ export default function FgLowerVisualMediaControls({
           audioStream && (
             <Suspense fallback={<div>Loading...</div>}>
               <CaptionButton
+                visualMedia={visualMedia}
                 fgLowerVisualMediaController={fgLowerVisualMediaController}
                 visualEffectsActive={visualEffectsActive}
                 settingsActive={settingsActive}
-                settings={settings}
                 audioStream={audioStream}
                 visualMediaContainerRef={visualMediaContainerRef}
                 scrollingContainerRef={rightVisualMediaControlsRef}
@@ -350,22 +347,22 @@ export default function FgLowerVisualMediaControls({
               />
             </Suspense>
           )}
-        {fgVisualMediaOptions.isVolume && (
-          <Suspense fallback={<div>Loading...</div>}>
-            <FgSettingsButton
-              fgVisualMediaOptions={fgVisualMediaOptions}
-              visualEffectsActive={visualEffectsActive}
-              visualMediaContainerRef={visualMediaContainerRef}
-              settingsActive={settingsActive}
-              setSettingsActive={setSettingsActive}
-              activePages={activePages}
-              setActivePages={setActivePages}
-              settings={settings}
-              setSettings={setSettings}
-              scrollingContainerRef={rightVisualMediaControlsRef}
-            />
-          </Suspense>
-        )}
+        <FgSettingsButton
+          username={username}
+          instance={instance}
+          visualMedia={visualMedia}
+          type={type}
+          visualMediaId={visualMediaId}
+          fgVisualMediaOptions={fgVisualMediaOptions}
+          visualEffectsActive={visualEffectsActive}
+          visualMediaContainerRef={visualMediaContainerRef}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
+          activePages={activePages}
+          setActivePages={setActivePages}
+          scrollingContainerRef={rightVisualMediaControlsRef}
+          setRerender={setRerender}
+        />
         {(fgVisualMediaOptions.isUser ||
           (type === "camera" &&
             fgVisualMediaOptions.permissions?.acceptsCameraEffects) ||

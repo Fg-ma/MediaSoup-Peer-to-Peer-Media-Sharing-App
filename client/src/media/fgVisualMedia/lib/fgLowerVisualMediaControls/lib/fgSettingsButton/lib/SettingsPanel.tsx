@@ -9,8 +9,17 @@ import ClosedCaptionsOptionsPage, {
 } from "./ClosedCaptionsOptionsPage";
 import PageTemplate from "./PageTemplate";
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
-import { FgVisualMediaOptions, Settings } from "../../../../typeConstant";
+import { FgVisualMediaOptions } from "../../../../typeConstant";
 import FgPortal from "../../../../../../../elements/fgPortal/FgPortal";
+import RemoteVisualMedia from "../../../../../../../media/fgVisualMedia/RemoteVisualMedia";
+import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
+import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
+import FgHoverContentStandard from "../../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
 
 const panelVariants: Variants = {
   init: {
@@ -68,24 +77,24 @@ const closedCaptionOptionsPageTitles = {
 };
 
 export default function SettingsPanel({
+  visualMedia,
   fgVisualMediaOptions,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
   setActivePages,
-  settings,
-  setSettings,
+  setSettingsActive,
+  setRerender,
 }: {
+  visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
   fgVisualMediaOptions: FgVisualMediaOptions;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const [_, setRerender] = useState(false);
-
   // Function to check if a key or its descendants are active
   const isDescendantActive = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -124,7 +133,7 @@ export default function SettingsPanel({
 
   useEffect(() => {
     setRerender((prev) => !prev);
-  }, []);
+  }, [activePages]);
 
   return (
     <FgPortal
@@ -144,6 +153,134 @@ export default function SettingsPanel({
                 animate="animate"
                 exit="exit"
               >
+                <FgButton
+                  className="h-7 w-full"
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        visualMedia.settings.background.value
+                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                          : "fill-fg-white stroke-fg-white"
+                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                    >
+                      <FgSVGElement
+                        src={backgroundIcon}
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        attributes={[
+                          { key: "width", value: "80%" },
+                          { key: "height", value: "80%" },
+                        ]}
+                      />
+                      <div className="truncate">Set as background</div>
+                    </div>
+                  )}
+                  clickFunction={() => {
+                    visualMedia.settings.background.value =
+                      !visualMedia.settings.background.value;
+
+                    setSettingsActive(false);
+                    setRerender((prev) => !prev);
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content="Set as background (b)"
+                      style="light"
+                    />
+                  }
+                  options={{
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 3500,
+                    hoverType: "above",
+                  }}
+                />
+                <FgButton
+                  className="h-7 w-full"
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        visualMedia.settings.pictureInPicture.value
+                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                          : "fill-fg-white stroke-fg-white"
+                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                    >
+                      <FgSVGElement
+                        src={backgroundIcon}
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        attributes={[
+                          { key: "width", value: "80%" },
+                          { key: "height", value: "80%" },
+                        ]}
+                      />
+                      <div className="truncate">
+                        {visualMedia.settings.pictureInPicture.value
+                          ? "Close picture in picture"
+                          : "Open picture in picture"}
+                      </div>
+                    </div>
+                  )}
+                  clickFunction={() => {
+                    visualMedia.settings.pictureInPicture.value =
+                      !visualMedia.settings.pictureInPicture.value;
+
+                    setSettingsActive(false);
+                    setRerender((prev) => !prev);
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content="Picture in picture (i)"
+                      style="light"
+                    />
+                  }
+                  options={{
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 3500,
+                    hoverType: "above",
+                  }}
+                />
+                <FgButton
+                  className="h-7 w-full"
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        visualMedia.settings.captions.value
+                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                          : "fill-fg-white stroke-fg-white"
+                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                    >
+                      <FgSVGElement
+                        src={backgroundIcon}
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        attributes={[
+                          { key: "width", value: "80%" },
+                          { key: "height", value: "80%" },
+                        ]}
+                      />
+                      <div className="truncate">
+                        {visualMedia.settings.captions.value
+                          ? "Disable captions"
+                          : "Enable captions"}
+                      </div>
+                    </div>
+                  )}
+                  clickFunction={() => {
+                    visualMedia.settings.captions.value =
+                      !visualMedia.settings.captions.value;
+
+                    setSettingsActive(false);
+                    setRerender((prev) => !prev);
+                  }}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content="Captions (c)"
+                      style="light"
+                    />
+                  }
+                  options={{
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 3500,
+                    hoverType: "above",
+                  }}
+                />
                 {fgVisualMediaOptions.isVolume && (
                   <FgButton
                     className="w-full"
@@ -151,13 +288,11 @@ export default function SettingsPanel({
                       <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
                         <div>Subtitles</div>
                         <div>
-                          {Object.prototype.hasOwnProperty.call(
-                            closedCaptionsSelections,
-                            settings.closedCaption.value,
-                          ) &&
+                          {
                             closedCaptionsSelections[
-                              settings.closedCaption.value
-                            ]}
+                              visualMedia.settings.closedCaption.value
+                            ]
+                          }
                         </div>
                       </div>
                     )}
@@ -178,9 +313,8 @@ export default function SettingsPanel({
                   exit="exit"
                 >
                   <ClosedCaptionsPage
+                    visualMedia={visualMedia}
                     setActivePages={setActivePages}
-                    settings={settings}
-                    setSettings={setSettings}
                   />
                 </motion.div>
               )}
@@ -199,8 +333,8 @@ export default function SettingsPanel({
                   exit="exit"
                 >
                   <ClosedCaptionsOptionsPage
+                    visualMedia={visualMedia}
                     setActivePages={setActivePages}
-                    settings={settings}
                   />
                 </motion.div>
               )}
@@ -224,7 +358,7 @@ export default function SettingsPanel({
                         option as ClosedCaptionOptions
                       ];
                     const activeSetting =
-                      settings.closedCaption.closedCaptionOptionsActive[
+                      visualMedia.settings.closedCaption.closedCaptionOptions[
                         option as ClosedCaptionOptions
                       ];
 
@@ -248,15 +382,11 @@ export default function SettingsPanel({
                                 </div>
                               )}
                               clickFunction={() => {
-                                setSettings((prev) => {
-                                  const newSettings = { ...prev };
+                                visualMedia.settings.closedCaption.closedCaptionOptions[
+                                  option as ClosedCaptionOptions
+                                ].value = type;
 
-                                  newSettings.closedCaption.closedCaptionOptionsActive[
-                                    option as ClosedCaptionOptions
-                                  ].value = type;
-
-                                  return newSettings;
-                                });
+                                setRerender((prev) => !prev);
                               }}
                             />
                           ))}

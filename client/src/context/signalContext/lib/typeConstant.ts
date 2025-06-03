@@ -82,6 +82,11 @@ export type onSidePanelChangedType = {
       | {
           contentType: ContentTypes;
           instanceId: string;
+          visualMediaInfo?: {
+            isUser: boolean;
+            username: string;
+            instance: string;
+          };
         }
       | undefined;
   };
@@ -92,6 +97,11 @@ export type onToggleSettingsPanelType = {
   header: {
     contentType: ContentTypes;
     instanceId: string;
+    visualMediaInfo?: {
+      isUser: boolean;
+      username: string;
+      instance: string;
+    };
   };
 };
 

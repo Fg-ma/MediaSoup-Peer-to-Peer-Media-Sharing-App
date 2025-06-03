@@ -92,6 +92,7 @@ export default function SharedBundle({
               <FgTableVideo
                 videoInstanceId={videoInstanceId}
                 bundleRef={sharedBundleRef}
+                tableRef={tableRef}
                 videoContentMute={videoContentMute}
               />
             </Suspense>

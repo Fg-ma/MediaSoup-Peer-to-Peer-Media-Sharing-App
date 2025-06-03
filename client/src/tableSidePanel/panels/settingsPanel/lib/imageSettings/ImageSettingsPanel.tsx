@@ -6,6 +6,7 @@ import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import ImageSettingsController from "./lib/ImageSettingsController";
 import DownloadTypePage from "./lib/DownloadTypePage";
+import HoverElement from "../../../../../elements/hoverElement/HoverElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -37,6 +38,7 @@ export default function ImageSettingsPanel({
 
   const [downloadTypePageActive, setDownloadTypePageActive] = useState(false);
   const [_, setRerender] = useState(false);
+  const filenameRef = useRef<HTMLDivElement>(null);
 
   const imageSettingsController = new ImageSettingsController(
     imageMediaInstance,
@@ -59,12 +61,28 @@ export default function ImageSettingsPanel({
 
   return (
     <div
-      className="mx-6 my-4 flex h-max flex-col items-center justify-center space-y-1 rounded border border-fg-white bg-fg-tone-black-8 px-2 py-2 font-K2D text-fg-white"
+      className="mx-6 my-4 flex h-max max-w-[320px] flex-col items-center justify-center space-y-1 rounded border border-fg-white bg-fg-tone-black-8 px-2 py-2 font-K2D text-fg-white"
       style={{ width: "calc(100% - 3rem)" }}
     >
-      <div className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4">
-        {imageMediaInstance.current.imageMedia.filename}
-      </div>
+      <HoverElement
+        externalRef={filenameRef}
+        className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4"
+        content={<>{imageMediaInstance.current.imageMedia.filename}</>}
+        hoverContent={
+          (filenameRef.current?.scrollWidth ?? 0) >
+          (filenameRef.current?.clientWidth ?? 0) ? (
+            <FgHoverContentStandard
+              style="light"
+              content={imageMediaInstance.current.imageMedia.filename}
+            />
+          ) : undefined
+        }
+        options={{
+          hoverSpacing: 4,
+          hoverType: "above",
+          hoverTimeoutDuration: 750,
+        }}
+      />
       <FgButton
         className="h-7 w-full"
         contentFunction={() => (

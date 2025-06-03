@@ -189,14 +189,14 @@ export default function SettingsPanel({
 
   useEffect(() => {
     setRerender((prev) => !prev);
-  }, []);
+  }, [activePages]);
 
   return (
     <FgPortal
       type="above"
       spacing={4}
       externalRef={settingsButtonRef}
-      className="pointer-events-auto z-settings-panel flex h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
+      className="flex pointer-events-auto z-settings-panel h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
       externalPortalRef={settingsPanelRef}
       content={
         <>
@@ -242,11 +242,19 @@ export default function SettingsPanel({
                           ? muteStylesMeta[
                               settings.muteStyle.value as MuteStyleTypes
                             ].title
-                          : (Object.entries(staticContentMedia.current.svg.user)
-                              .find(
+                          : (() => {
+                              const entry = Object.entries(
+                                staticContentMedia.current.svg.user,
+                              ).find(
                                 ([svgId]) => svgId === settings.muteStyle.value,
-                              )?.[1]
-                              .filename.slice(0, -4) ?? "")}
+                              );
+                              return entry
+                                ? entry[1].filename.slice(
+                                    0,
+                                    entry[1].filename.lastIndexOf("."),
+                                  )
+                                : "";
+                            })()}
                       </div>
                     </div>
                   )}

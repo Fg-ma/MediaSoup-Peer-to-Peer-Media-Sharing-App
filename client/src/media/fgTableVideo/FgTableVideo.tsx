@@ -7,9 +7,7 @@ import LowerVideoController from "./lib/lowerVideoControls/LowerVideoController"
 import {
   defaultVideoOptions,
   VideoOptions,
-  Settings,
   ActivePages,
-  defaultSettings,
   defaultActivePages,
 } from "./lib/typeConstant";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
@@ -25,14 +23,14 @@ import "./lib/fgVideoStyles.css";
 
 export default function FgTableVideo({
   videoInstanceId,
-  name,
   bundleRef,
+  tableRef,
   videoContentMute,
   options,
 }: {
   videoInstanceId: string;
-  name?: string;
   bundleRef: React.RefObject<HTMLDivElement>;
+  tableRef: React.RefObject<HTMLDivElement>;
   videoContentMute: React.MutableRefObject<{
     [videoId: string]: boolean;
   }>;
@@ -136,6 +134,7 @@ export default function FgTableVideo({
       setRerender,
       subContainerRef,
       positioning,
+      setSettingsActive,
     ),
   );
 
@@ -177,9 +176,18 @@ export default function FgTableVideo({
       videoController.current.handleVideoMessages,
     );
 
+    videoMediaInstance.addVideoInstanceListener(
+      videoController.current.handleVideoInstanceMessages,
+    );
+
     document.addEventListener(
       "keydown",
       lowerVideoController.current.handleKeyDown,
+    );
+
+    tableRef.current?.addEventListener(
+      "scroll",
+      videoController.current.handleTableScroll,
     );
 
     return () => {
@@ -192,6 +200,9 @@ export default function FgTableVideo({
       videoMediaInstance.videoMedia.removeVideoListener(
         videoController.current.handleVideoMessages,
       );
+      videoMediaInstance.removeVideoInstanceListener(
+        videoController.current.handleVideoInstanceMessages,
+      );
       document.removeEventListener(
         "keydown",
         lowerVideoController.current.handleKeyDown,
@@ -203,6 +214,10 @@ export default function FgTableVideo({
       videoMediaInstance.instanceVideo?.removeEventListener(
         "leavepictureinpicture",
         () => lowerVideoController.current.handlePictureInPicture("leave"),
+      );
+      tableRef.current?.addEventListener(
+        "scroll",
+        videoController.current.handleTableScroll,
       );
     };
   }, []);

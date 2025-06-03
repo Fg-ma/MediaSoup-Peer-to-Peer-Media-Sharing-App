@@ -155,7 +155,7 @@ export default function ClosedCaptionsOptionsPage({
                   <div>
                     {
                       videoMediaInstance.settings.closedCaption
-                        .closedCaptionOptionsActive[
+                        .closedCaptionOptions[
                         option as keyof typeof closedCaptionsOptionsArrays
                       ].value
                     }

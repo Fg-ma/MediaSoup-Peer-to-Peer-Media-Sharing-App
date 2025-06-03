@@ -78,7 +78,10 @@ export async function createTruncatedMP4(
   outputPath: string
 ): Promise<void> {
   try {
-    const tempFilePath = `${outputPath.slice(0, -4)}_temp.mp4`; // Temporary path for intermediate file
+    const tempFilePath = `${outputPath.slice(
+      0,
+      outputPath.lastIndexOf(".")
+    )}_temp.mp4`; // Temporary path for intermediate file
 
     // Write the initial truncated MP4
     const dataBuffer = Buffer.from(data);

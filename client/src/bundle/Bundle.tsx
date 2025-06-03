@@ -11,7 +11,7 @@ const UserVisualMedia = React.lazy(
   () => import("../media/fgVisualMedia/UserVisualMedia"),
 );
 const RemoteVisualMedia = React.lazy(
-  () => import("../media/fgVisualMedia/RemoteVisualMedia"),
+  () => import("../media/fgVisualMedia/RemoteVisualMedia.tsx"),
 );
 const FgAudioElementContainer = React.lazy(
   () => import("../media/audio/FgAudioElementContainer"),

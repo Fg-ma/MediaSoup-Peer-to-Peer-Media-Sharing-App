@@ -20,27 +20,27 @@ export default function MimeTypePage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 2rem)" }}
+      ></div>
       {downloadOptionsArrays.mimeType.map((mimeType) => (
-        <div
+        <FgButton
           key={mimeType}
-          className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
+          className={`flex items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
             mimeType ===
             svgMediaInstance.current.settings.downloadOptions.mimeType.value
               ? "bg-fg-white text-fg-tone-black-1"
               : ""
           }`}
-        >
-          <FgButton
-            className="flex grow items-center justify-center"
-            contentFunction={() => (
-              <div className="flex w-full items-start px-4">{mimeType}</div>
-            )}
-            clickFunction={() => {
-              setMimeType(mimeType);
-            }}
-          />
-        </div>
+          style={{ width: "calc(100% - 2rem)" }}
+          contentFunction={() => (
+            <div className="flex w-full items-start px-4">{mimeType}</div>
+          )}
+          clickFunction={() => {
+            setMimeType(mimeType);
+          }}
+        />
       ))}
     </>
   );

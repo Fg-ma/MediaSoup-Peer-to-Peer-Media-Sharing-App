@@ -15,6 +15,9 @@ import assetMeshes from "../../babylon/meshes";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import Deadbanding from "../../babylon/Deadbanding";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
+import { defaultSettings } from "./lib/typeConstant";
+
+export type CameraMediaListenerTypes = { type: "settingsChanged" };
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -43,6 +46,11 @@ class CameraMedia {
 
   babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
   babylonScene: BabylonScene | undefined;
+
+  settings = structuredClone(defaultSettings);
+
+  private cameraListeners: Set<(message: CameraMediaListenerTypes) => void> =
+    new Set();
 
   constructor(
     private cameraId: string,
@@ -288,6 +296,12 @@ class CameraMedia {
     }
   };
 
+  settingsChanged = () => {
+    this.cameraListeners.forEach((listener) => {
+      listener({ type: "settingsChanged" });
+    });
+  };
+
   private updateNeed = () => {
     this.babylonRenderLoopWorker?.removeAllNeed(this.cameraId);
 
@@ -477,6 +491,18 @@ class CameraMedia {
 
   getTimeEllapsed = () => {
     return Date.now() - this.creationTime;
+  };
+
+  addVisualMediaListener = (
+    listener: (message: CameraMediaListenerTypes) => void,
+  ): void => {
+    this.cameraListeners.add(listener);
+  };
+
+  removeVisualMediaListener = (
+    listener: (message: CameraMediaListenerTypes) => void,
+  ): void => {
+    this.cameraListeners.delete(listener);
   };
 }
 

@@ -21,7 +21,10 @@ export default function CursorStylePage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 1rem)" }}
+      ></div>
       {Object.entries(cursorStylesOptionsMeta).map(([key, title]) => (
         <FgButton
           key={key}

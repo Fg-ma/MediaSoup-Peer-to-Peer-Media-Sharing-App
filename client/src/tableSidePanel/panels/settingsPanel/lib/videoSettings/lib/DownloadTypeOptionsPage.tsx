@@ -1,35 +1,36 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import {
-  ActivePages,
-  downloadTypeOptionsTitles,
-  downloadTypeOptionsArrays,
-} from "../../../typeConstant";
+
 import TableVideoMediaInstance from "../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import {
+  downloadTypeOptionsArrays,
+  downloadTypeOptionsTitles,
+  DownloadTypeOptionsTypes,
+} from "../../../../../../media/fgTableVideo/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 const navigateForwardIcon =
   nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function DownloadTypeOptionsPage({
   videoMediaInstance,
-  setActivePages,
+  setRerender,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
-  setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const handleDownloadTypeOptionsActive = () => {
-    setActivePages((prev) => {
-      const newActivePages = { ...prev };
+  const [activePages, setActivePages] = useState({
+    fps: false,
+    mimeType: false,
+  });
 
-      newActivePages.downloadType.downloadTypeOptions.active =
-        !newActivePages.downloadType.downloadTypeOptions.active;
-
-      return newActivePages;
-    });
+  const fpsRef = useRef<HTMLDivElement>(null);
+  const mimeTypeRef = useRef<HTMLDivElement>(null);
+  const refs = {
+    fps: fpsRef,
+    mimeType: mimeTypeRef,
   };
 
   const handleOptionSelect = (
@@ -38,62 +39,56 @@ export default function DownloadTypeOptionsPage({
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadType.downloadTypeOptions[option].active =
-        !newActivePages.downloadType.downloadTypeOptions[option].active;
+      newActivePages[option] = !newActivePages[option];
 
       return newActivePages;
     });
   };
 
+  useEffect(() => {
+    setRerender((prev) => !prev);
+  }, []);
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-2 font-K2D">
-      <div className="flex h-6 w-full justify-start space-x-1">
-        <FgButton
-          className="aspect-square h-full"
-          contentFunction={() => (
-            <FgSVGElement
-              src={navigateBackIcon}
-              attributes={[
-                { key: "width", value: "95%" },
-                { key: "height", value: "95%" },
-                { key: "fill", value: "#f2f2f2" },
-                { key: "stroke", value: "#f2f2f2" },
-              ]}
-            />
-          )}
-          clickFunction={handleDownloadTypeOptionsActive}
-        />
-        <div
-          className="cursor-pointer pt-0.5 font-Josefin text-lg font-bold"
-          onClick={handleDownloadTypeOptionsActive}
-        >
-          Options
-        </div>
-      </div>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-white"></div>
-      <div className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col justify-start space-y-1 overflow-y-auto px-2">
-        {Object.keys(downloadTypeOptionsArrays).map((option) => (
+    <>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 2rem)" }}
+      ></div>
+      {Object.keys(downloadTypeOptionsArrays).map((option) => (
+        <>
           <FgButton
             key={option}
-            className="h-8 w-full"
+            className="h-7"
+            style={{ width: "calc(100% - 2rem)" }}
             clickFunction={() =>
               handleOptionSelect(
                 option as keyof typeof downloadTypeOptionsArrays,
               )
             }
             contentFunction={() => (
-              <div className="flex w-full justify-between space-x-4 text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
-                <div>
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+                <div
+                  ref={refs[option as keyof typeof downloadTypeOptionsArrays]}
+                >
                   {
                     downloadTypeOptionsTitles[
                       option as keyof typeof downloadTypeOptionsArrays
                     ]
                   }
                 </div>
-                <div className="flex items-center justify-center space-x-1">
-                  <div>
+                <div
+                  className="flex items-center justify-center space-x-1"
+                  style={{
+                    width: `calc(100% - ${refs[option as keyof typeof downloadTypeOptionsArrays].current?.clientWidth ?? 0}px - 1rem)`,
+                  }}
+                >
+                  <div
+                    className="truncate text-end"
+                    style={{ width: "calc(100% - 1.25rem)" }}
+                  >
                     {
-                      videoMediaInstance.settings.downloadType
+                      videoMediaInstance.current.settings.downloadType
                         .downloadTypeOptions[
                         option as keyof typeof downloadTypeOptionsArrays
                       ].value
@@ -101,19 +96,57 @@ export default function DownloadTypeOptionsPage({
                   </div>
                   <FgSVGElement
                     src={navigateForwardIcon}
+                    className={`${activePages[option as keyof typeof downloadTypeOptionsTitles] ? "-scale-x-100" : ""} rotate-90`}
                     attributes={[
                       { key: "width", value: "1.25rem" },
                       { key: "height", value: "1.25rem" },
-                      { key: "fill", value: "#f2f2f2" },
-                      { key: "stroke", value: "#f2f2f2" },
                     ]}
                   />
                 </div>
               </div>
             )}
           />
-        ))}
-      </div>
-    </div>
+          {activePages[option as keyof typeof downloadTypeOptionsTitles] && (
+            <>
+              <div
+                className="h-0.5 rounded-full bg-fg-red-light"
+                style={{ width: "calc(100% - 2.5rem)" }}
+              ></div>
+              {downloadTypeOptionsArrays[
+                option as DownloadTypeOptionsTypes
+              ].map((type) => (
+                <FgButton
+                  key={type}
+                  className="h-7"
+                  style={{ width: "calc(100% - 2.5rem)" }}
+                  contentFunction={() => (
+                    <div
+                      className={`flex w-full items-center justify-start rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                        type ===
+                        videoMediaInstance.current.settings.downloadType
+                          .downloadTypeOptions[
+                          option as DownloadTypeOptionsTypes
+                        ].value
+                          ? "bg-fg-white text-fg-tone-black-1"
+                          : ""
+                      }`}
+                    >
+                      {type}
+                    </div>
+                  )}
+                  clickFunction={() => {
+                    videoMediaInstance.current.settings.downloadType.downloadTypeOptions[
+                      option as DownloadTypeOptionsTypes
+                    ].value = type;
+
+                    setRerender((prev) => !prev);
+                  }}
+                />
+              ))}
+            </>
+          )}
+        </>
+      ))}
+    </>
   );
 }

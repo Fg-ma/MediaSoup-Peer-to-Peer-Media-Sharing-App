@@ -11,7 +11,9 @@ import {
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
 import LowerVideoController from "./lowerVideoControls/LowerVideoController";
-import TableVideoMediaInstance from "../TableVideoMediaInstance";
+import TableVideoMediaInstance, {
+  VideoInstanceListenerTypes,
+} from "../TableVideoMediaInstance";
 import { VideoListenerTypes } from "../TableVideoMedia";
 
 class VideoController {
@@ -39,6 +41,7 @@ class VideoController {
       };
       rotation: number;
     }>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   init = () => {
@@ -204,6 +207,20 @@ class VideoController {
       default:
         break;
     }
+  };
+
+  handleVideoInstanceMessages = (event: VideoInstanceListenerTypes) => {
+    switch (event.type) {
+      case "settingsChanged":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleTableScroll = () => {
+    this.setSettingsActive(false);
   };
 }
 

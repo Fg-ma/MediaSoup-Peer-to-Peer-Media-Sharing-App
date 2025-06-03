@@ -27,9 +27,13 @@ export default function DownloadTypeOptionsPage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 2rem)" }}
+      ></div>
       <FgButton
-        className="h-8 w-full"
+        className="h-7"
+        style={{ width: "calc(100% - 2rem)" }}
         clickFunction={() => setFpsActive((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
@@ -51,6 +55,7 @@ export default function DownloadTypeOptionsPage({
               </div>
               <FgSVGElement
                 src={navigateForwardIcon}
+                className={`${fpsActive ? "-scale-x-100" : ""} rotate-90`}
                 attributes={[
                   { key: "width", value: "1.25rem" },
                   { key: "height", value: "1.25rem" },
@@ -62,17 +67,21 @@ export default function DownloadTypeOptionsPage({
       />
       {fpsActive && (
         <>
-          <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+          <div
+            className="h-0.5 rounded-full bg-fg-red-light"
+            style={{ width: "calc(100% - 2.5rem)" }}
+          ></div>
           {downloadTypeOptionsArrays.fps.map((type) => (
             <FgButton
               key={type}
-              className={`w-full min-w-32 rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 type ===
                 imageMediaInstance.current.settings.downloadType
                   .downloadTypeOptions.fps.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
+              style={{ width: "calc(100% - 2.5rem)" }}
               contentFunction={() => (
                 <div className="flex items-start justify-start">{type}</div>
               )}
@@ -87,7 +96,8 @@ export default function DownloadTypeOptionsPage({
         </>
       )}
       <FgButton
-        className="h-8 w-full"
+        className="h-7"
+        style={{ width: "calc(100% - 2rem)" }}
         clickFunction={() => setMimeTypeActive((prev) => !prev)}
         contentFunction={() => (
           <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-2 hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
@@ -109,6 +119,7 @@ export default function DownloadTypeOptionsPage({
               </div>
               <FgSVGElement
                 src={navigateForwardIcon}
+                className={`${mimeTypeActive ? "-scale-x-100" : ""} rotate-90`}
                 attributes={[
                   { key: "width", value: "1.25rem" },
                   { key: "height", value: "1.25rem" },
@@ -120,17 +131,21 @@ export default function DownloadTypeOptionsPage({
       />
       {mimeTypeActive && (
         <>
-          <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+          <div
+            className="h-0.5 rounded-full bg-fg-red-light"
+            style={{ width: "calc(100% - 2.5rem)" }}
+          ></div>
           {downloadTypeOptionsArrays.mimeType.map((type) => (
             <FgButton
               key={type}
-              className={`w-full min-w-32 rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+              className={`rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                 type ===
                 imageMediaInstance.current.settings.downloadType
                   .downloadTypeOptions.mimeType.value
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}
+              style={{ width: "calc(100% - 2.5rem)" }}
               contentFunction={() => (
                 <div className="flex items-start justify-start">{type}</div>
               )}

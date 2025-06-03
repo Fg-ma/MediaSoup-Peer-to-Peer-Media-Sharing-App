@@ -38,10 +38,14 @@ export default function FontStylePage({
 
   return (
     <>
-      <div className="h-0.5 w-[95%] rounded-full bg-fg-red-light"></div>
+      <div
+        className="h-0.5 rounded-full bg-fg-red-light"
+        style={{ width: "calc(100% - 1rem)" }}
+      ></div>
       <div
         ref={scrollingContainerRef}
-        className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
+        className="small-vertical-scroll-bar flex h-max max-h-[11.375rem] flex-col space-y-1 overflow-y-auto px-2"
+        style={{ width: "calc(100% - 1rem)" }}
       >
         {Object.entries(fontStylesOptionsMeta).map(([key, meta]) => (
           <LazyFontButton

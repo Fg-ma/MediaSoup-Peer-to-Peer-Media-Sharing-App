@@ -1,8 +1,10 @@
 import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import TableVideoMediaInstance from "../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import RemoteVisualMedia from "../../../../../../media/fgVisualMedia/RemoteVisualMedia";
+import ScreenMedia from "../../../../../../media/fgVisualMedia/ScreenMedia";
+import CameraMedia from "../../../../../../media/fgVisualMedia/CameraMedia";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import ClosedCaptionsOptionsPage from "./ClosedCaptionsOptionsPage";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -43,10 +45,12 @@ export const closedCaptionsSelections = {
 };
 
 export default function ClosedCaptionsPage({
-  videoMediaInstance,
+  visualMedia,
   setRerender,
 }: {
-  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
+  visualMedia: React.MutableRefObject<
+    CameraMedia | ScreenMedia | RemoteVisualMedia | undefined
+  >;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [closedCaptionsOptionActive, setClosedCaptionsOptionsActive] =
@@ -56,7 +60,8 @@ export default function ClosedCaptionsPage({
   const setClosedCaptionsLang = (
     newLang: keyof typeof closedCaptionsSelections,
   ) => {
-    videoMediaInstance.current.settings.closedCaption.value = newLang;
+    if (visualMedia.current)
+      visualMedia.current.settings.closedCaption.value = newLang;
 
     setRerender((prev) => !prev);
   };
@@ -76,13 +81,13 @@ export default function ClosedCaptionsPage({
           <div
             key={key}
             className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              key === videoMediaInstance.current.settings.closedCaption.value
+              key === visualMedia.current?.settings.closedCaption.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}
           >
             <FgButton
-              className="flex items-center justify-center"
+              className="flex grow items-center justify-center"
               style={{ width: "calc(100% - 3rem)" }}
               contentFunction={() => (
                 <div className="w-full truncate px-2 text-start">{lang}</div>
@@ -130,7 +135,7 @@ export default function ClosedCaptionsPage({
       />
       {closedCaptionsOptionActive && (
         <ClosedCaptionsOptionsPage
-          videoMediaInstance={videoMediaInstance}
+          visualMedia={visualMedia}
           setRerender={setRerender}
         />
       )}

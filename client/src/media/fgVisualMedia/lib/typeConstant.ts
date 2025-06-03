@@ -30,9 +30,10 @@ export interface FgVisualMediaOptions {
 }
 
 export interface Settings {
+  background: { value: boolean };
   closedCaption: {
     value: keyof typeof closedCaptionsSelections;
-    closedCaptionOptionsActive: {
+    closedCaptionOptions: {
       value: "";
       fontFamily: { value: FontFamilies };
       fontColor: { value: FontColors };
@@ -44,6 +45,23 @@ export interface Settings {
     };
   };
 }
+
+export const defaultSettings: Settings = {
+  background: { value: false },
+  closedCaption: {
+    value: "en-US",
+    closedCaptionOptions: {
+      value: "",
+      fontFamily: { value: "K2D" },
+      fontColor: { value: "white" },
+      fontOpacity: { value: "100%" },
+      fontSize: { value: "base" },
+      backgroundColor: { value: "black" },
+      backgroundOpacity: { value: "75%" },
+      characterEdgeStyle: { value: "None" },
+    },
+  },
+};
 
 export const defaultFgVisualMediaOptions = {
   isUser: false,

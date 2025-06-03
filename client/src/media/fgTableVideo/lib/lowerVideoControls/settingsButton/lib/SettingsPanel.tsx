@@ -22,6 +22,17 @@ import VideoSpeedPage from "./VideoSpeedPage";
 import LowerVideoController from "../../LowerVideoController";
 import FgPortal from "../../../../../../elements/fgPortal/FgPortal";
 import TableVideoMediaInstance from "../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+
+const downloadIcon = nginxAssetServerBaseUrl + "svgs/downloadIcon.svg";
+const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
+const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
+const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
+const navigateForwardIcon =
+  nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 const panelVariants: Variants = {
   init: {
@@ -153,7 +164,7 @@ export default function SettingsPanel({
 
   useEffect(() => {
     setRerender((prev) => !prev);
-  }, []);
+  }, [activePages]);
 
   return (
     <FgPortal
@@ -178,29 +189,109 @@ export default function SettingsPanel({
                   contentFunction={() => (
                     <div
                       className={`${
-                        videoMediaInstance.settings.background.value
-                          ? "bg-fg-white text-fg-tone-black-1"
-                          : ""
-                      } flex w-full items-center justify-start text-nowrap rounded px-2 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
+                        videoMediaInstance.settings.synced.value
+                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                          : "fill-fg-white stroke-fg-white"
+                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                     >
-                      Set as background (b)
+                      <FgSVGElement
+                        src={
+                          videoMediaInstance.settings.synced.value
+                            ? desyncIcon
+                            : syncIcon
+                        }
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        attributes={[
+                          { key: "width", value: "80%" },
+                          { key: "height", value: "80%" },
+                        ]}
+                      />
+                      {videoMediaInstance.settings.synced.value
+                        ? "Desync"
+                        : "Sync"}
+                    </div>
+                  )}
+                  clickFunction={lowerVideoController.current.handleSync}
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content={
+                        videoMediaInstance.settings.synced.value
+                          ? "Desync (h)"
+                          : "Sync (h)"
+                      }
+                      style="light"
+                    />
+                  }
+                  options={{
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 3500,
+                    hoverType: "above",
+                  }}
+                />
+                <FgButton
+                  className="h-7 w-full"
+                  contentFunction={() => (
+                    <div
+                      className={`${
+                        videoMediaInstance.settings.background.value
+                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
+                          : "fill-fg-white stroke-fg-white"
+                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                    >
+                      <FgSVGElement
+                        src={backgroundIcon}
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        attributes={[
+                          { key: "width", value: "80%" },
+                          { key: "height", value: "80%" },
+                        ]}
+                      />
+                      Set as background
                     </div>
                   )}
                   clickFunction={
                     lowerVideoController.current.handleSetAsBackground
                   }
+                  hoverContent={
+                    <FgHoverContentStandard
+                      content="Set as background (b)"
+                      style="light"
+                    />
+                  }
+                  options={{
+                    hoverSpacing: 4,
+                    hoverTimeoutDuration: 3500,
+                    hoverType: "above",
+                  }}
                 />
                 <FgButton
-                  className="w-full"
+                  className="h-7 w-full"
                   contentFunction={() => (
-                    <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
-                      <div>Download</div>
-                      <div>
+                    <div className="flex h-full w-full items-center justify-between text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+                      <div className="flex h-full items-center justify-center">
+                        <FgSVGElement
+                          src={downloadIcon}
+                          className="mr-2 flex aspect-square h-full items-center justify-center"
+                          attributes={[
+                            { key: "width", value: "85%" },
+                            { key: "height", value: "85%" },
+                          ]}
+                        />
+                        Download
+                      </div>
+                      <div className="flex space-x-1">
                         {
                           downloadTypeSelections[
                             videoMediaInstance.settings.downloadType.value
                           ]
                         }
+                        <FgSVGElement
+                          src={navigateForwardIcon}
+                          attributes={[
+                            { key: "width", value: "1.25rem" },
+                            { key: "height", value: "1.25rem" },
+                          ]}
+                        />
                       </div>
                     </div>
                   )}
@@ -209,11 +300,22 @@ export default function SettingsPanel({
                 <FgButton
                   className="w-full"
                   contentFunction={() => (
-                    <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
+                    <div className="flex w-full items-center justify-between text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                       <div>Video speed</div>
-                      <div>{`${parseFloat(
-                        videoMediaInstance.settings.videoSpeed.value.toFixed(2),
-                      )}x`}</div>
+                      <div className="flex space-x-1">
+                        {`${parseFloat(
+                          videoMediaInstance.settings.videoSpeed.value.toFixed(
+                            2,
+                          ),
+                        )}x`}
+                        <FgSVGElement
+                          src={navigateForwardIcon}
+                          attributes={[
+                            { key: "width", value: "1.25rem" },
+                            { key: "height", value: "1.25rem" },
+                          ]}
+                        />
+                      </div>
                     </div>
                   )}
                   clickFunction={handleVideoSpeedActive}
@@ -221,14 +323,21 @@ export default function SettingsPanel({
                 <FgButton
                   className="w-full"
                   contentFunction={() => (
-                    <div className="flex w-full items-center justify-between text-nowrap rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1">
+                    <div className="flex w-full items-center justify-between text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                       <div>Subtitles</div>
-                      <div>
+                      <div className="flex space-x-1">
                         {
                           closedCaptionsSelections[
                             videoMediaInstance.settings.closedCaption.value
                           ]
                         }
+                        <FgSVGElement
+                          src={navigateForwardIcon}
+                          attributes={[
+                            { key: "width", value: "1.25rem" },
+                            { key: "height", value: "1.25rem" },
+                          ]}
+                        />
                       </div>
                     </div>
                   )}
@@ -294,9 +403,7 @@ export default function SettingsPanel({
                       ];
                     const activeSetting =
                       videoMediaInstance.settings.closedCaption
-                        .closedCaptionOptionsActive[
-                        option as ClosedCaptionOptions
-                      ];
+                        .closedCaptionOptions[option as ClosedCaptionOptions];
 
                     return (
                       activePage.active && (
@@ -318,7 +425,7 @@ export default function SettingsPanel({
                                 </div>
                               )}
                               clickFunction={() => {
-                                videoMediaInstance.settings.closedCaption.closedCaptionOptionsActive[
+                                videoMediaInstance.settings.closedCaption.closedCaptionOptions[
                                   option as ClosedCaptionOptions
                                 ].value = type;
 

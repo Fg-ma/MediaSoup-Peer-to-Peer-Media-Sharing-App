@@ -40,12 +40,16 @@ import {
   onScaleToType,
 } from "../../../context/signalContext/lib/typeConstant";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import CameraMedia from "../CameraMedia";
+import ScreenMedia from "../ScreenMedia";
+import RemoteVisualMedia from "../RemoteVisualMedia";
 
 class FgVisualMediaController {
   groupStartDragPosition: { x: number; y: number } | undefined;
   savedMediaPosition: { top: number; left: number } | undefined;
 
   constructor(
+    private visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia,
     private tableId: string,
     private username: string,
     private instance: string,
@@ -71,7 +75,6 @@ class FgVisualMediaController {
     }>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private remoteEffects: React.MutableRefObject<RemoteEffectsType>,
     private userEffectsStyles: React.MutableRefObject<UserEffectsStylesType>,
     private remoteEffectsStyles: React.MutableRefObject<RemoteEffectStylesType>,
@@ -159,8 +162,16 @@ class FgVisualMediaController {
         (this.type === "screen" &&
           this.fgVisualMediaOptions.permissions.acceptsScreenEffects)) &&
       this.type === requestedProducerType &&
-      this.visualMediaId === requestedProducerId
+      this.visualMediaId === requestedProducerId &&
+      (this.visualMedia instanceof CameraMedia ||
+        this.visualMedia instanceof ScreenMedia)
     ) {
+      if (
+        !(this.visualMedia instanceof CameraMedia) &&
+        !(this.visualMedia instanceof ScreenMedia)
+      )
+        return;
+
       // @ts-expect-error: ts can't verify type, visualMediaId, and effect correlate
       this.userEffectsStyles.current[this.type][this.visualMediaId][effect] =
         style;
@@ -170,25 +181,19 @@ class FgVisualMediaController {
       }
 
       if (effect === "hideBackground" && hideBackgroundColor !== undefined) {
-        this.userMedia.current.camera[
-          this.visualMediaId
-        ].babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+        this.visualMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
           hideBackgroundColor,
         );
       }
 
       if (effect === "hideBackground" && hideBackgroundStyle !== undefined) {
-        this.userMedia.current.camera[
-          this.visualMediaId
-        ].babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+        this.visualMedia.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
           hideBackgroundStyle,
         );
       }
 
       if (effect === "postProcess" && postProcessStyle !== undefined) {
-        this.userMedia.current[this.type][
-          this.visualMediaId
-        ].babylonScene?.babylonShaderController.swapPostProcessEffects(
+        this.visualMedia.babylonScene?.babylonShaderController.swapPostProcessEffects(
           postProcessStyle,
         );
       }
@@ -293,9 +298,11 @@ class FgVisualMediaController {
         (this.type === "screen" &&
           this.fgVisualMediaOptions.permissions?.acceptsScreenEffects)) &&
       requestedProducerType === this.type &&
-      requestedProducerId === this.visualMediaId
+      requestedProducerId === this.visualMediaId &&
+      (this.visualMedia instanceof CameraMedia ||
+        this.visualMedia instanceof ScreenMedia)
     ) {
-      this.userMedia.current[this.type][this.visualMediaId].clearAllEffects();
+      this.visualMedia.clearAllEffects();
 
       this.mediasoupSocket?.current?.sendMessage({
         type: "clientClearEffects",
@@ -728,6 +735,18 @@ class FgVisualMediaController {
         break;
       case "scaleTo":
         this.handleScaleTo(signal);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleVisualMediaMessage = (
+    msg: { type: "settingsChanged" } | { type: string },
+  ) => {
+    switch (msg.type) {
+      case "settingsChanged":
+        this.setRerender((prev) => !prev);
         break;
       default:
         break;

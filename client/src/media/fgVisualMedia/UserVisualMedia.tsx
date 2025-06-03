@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import {
@@ -17,7 +17,6 @@ import FgContentAdjustmentController from "../../elements/fgAdjustmentElements/l
 import {
   defaultFgVisualMediaOptions,
   FgVisualMediaOptions,
-  Settings,
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
 import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
@@ -98,7 +97,8 @@ export default function UserVisualMedia({
     ...options,
   };
 
-  const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
+  const { userMedia, remoteMedia, userDataStreams, remoteDataStreams } =
+    useMediaContext();
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
@@ -109,6 +109,8 @@ export default function UserVisualMedia({
     addGroupSignalListener,
     removeGroupSignalListener,
   } = useSignalContext();
+
+  const visualMedia = userMedia.current[type][visualMediaId];
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -142,22 +144,6 @@ export default function UserVisualMedia({
 
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const [settings, setSettings] = useState<Settings>({
-    closedCaption: {
-      value: "en-US",
-      closedCaptionOptionsActive: {
-        value: "",
-        fontFamily: { value: "K2D" },
-        fontColor: { value: "white" },
-        fontOpacity: { value: "100%" },
-        fontSize: { value: "base" },
-        backgroundColor: { value: "black" },
-        backgroundOpacity: { value: "75%" },
-        characterEdgeStyle: { value: "None" },
-      },
-    },
-  });
-
   const initTimeOffset = useRef(0);
 
   const [_, setRerender] = useState(false);
@@ -168,9 +154,7 @@ export default function UserVisualMedia({
     };
   }>({});
 
-  const aspectRatio = useRef(
-    userMedia.current[type][visualMediaId].aspectRatio ?? 1 - 0.01,
-  );
+  const aspectRatio = useRef((visualMedia.aspectRatio ?? 1) - 0.01);
 
   const positioning = useRef<{
     position: { left: number; top: number };
@@ -222,7 +206,7 @@ export default function UserVisualMedia({
         });
       }
     } else {
-      userMedia.current[type][visualMediaId].clearAllEffects();
+      visualMedia.clearAllEffects();
 
       mediasoupSocket?.current?.sendMessage({
         type: "clientClearEffects",
@@ -248,6 +232,7 @@ export default function UserVisualMedia({
 
   const fgLowerVisualMediaController = useRef(
     new FgLowerVisualMediaController(
+      visualMedia,
       mediasoupSocket,
       visualMediaId,
       tableId,
@@ -263,7 +248,6 @@ export default function UserVisualMedia({
       setPausedState,
       paused,
       setCaptionsActive,
-      settings,
       currentTimeRef,
       setVisualEffectsActive,
       setAudioEffectsActive,
@@ -272,7 +256,6 @@ export default function UserVisualMedia({
       tracksColorSetterCallback,
       tintColor,
       userEffects,
-      userMedia,
       initTimeOffset,
       fgContentAdjustmentController,
       positioning,
@@ -287,6 +270,7 @@ export default function UserVisualMedia({
 
   const fgVisualMediaController = useRef(
     new FgVisualMediaController(
+      visualMedia,
       tableId,
       username,
       instance,
@@ -298,7 +282,6 @@ export default function UserVisualMedia({
       positioning,
       setPausedState,
       paused,
-      userMedia,
       remoteEffects,
       userEffectsStyles,
       remoteEffectsStyles,
@@ -322,7 +305,7 @@ export default function UserVisualMedia({
   );
 
   useEffect(() => {
-    const canvas = userMedia.current[type][visualMediaId].canvas;
+    const canvas = visualMedia.canvas;
     const stream = canvas.captureStream();
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
@@ -384,11 +367,15 @@ export default function UserVisualMedia({
       );
     }
 
-    const videoElement = userMedia.current[type][visualMediaId].video;
+    visualMedia.addVisualMediaListener(
+      fgVisualMediaController.current.handleVisualMediaMessage,
+    );
 
-    if (videoElement) {
-      videoElement.addEventListener("loadedmetadata", () =>
-        fgVisualMediaController.current.handleVideoMetadataLoaded(videoElement),
+    if (visualMedia.video) {
+      visualMedia.video.addEventListener("loadedmetadata", () =>
+        fgVisualMediaController.current.handleVideoMetadataLoaded(
+          visualMedia.video,
+        ),
       );
     }
 
@@ -435,10 +422,13 @@ export default function UserVisualMedia({
           fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
         );
       }
-      if (videoElement) {
-        videoElement.removeEventListener("loadedmetadata", () =>
+      visualMedia.removeVisualMediaListener(
+        fgVisualMediaController.current.handleVisualMediaMessage,
+      );
+      if (visualMedia.video) {
+        visualMedia.video.removeEventListener("loadedmetadata", () =>
           fgVisualMediaController.current.handleVideoMetadataLoaded(
-            videoElement,
+            visualMedia.video,
           ),
         );
       }
@@ -447,18 +437,13 @@ export default function UserVisualMedia({
 
   useEffect(() => {
     fgLowerVisualMediaController.current.updateCaptionsStyles();
-  }, [settings]);
+  }, [visualMedia.settings]);
 
   useEffect(() => {
-    if (
-      subContainerRef.current &&
-      userMedia.current[type][visualMediaId]?.canvas
-    ) {
-      userMedia.current[type][visualMediaId].canvas.style.width = "100%";
-      userMedia.current[type][visualMediaId].canvas.style.height = "100%";
-      subContainerRef.current.appendChild(
-        userMedia.current[type][visualMediaId].canvas,
-      );
+    if (subContainerRef.current && visualMedia.canvas) {
+      visualMedia.canvas.style.width = "100%";
+      visualMedia.canvas.style.height = "100%";
+      subContainerRef.current.appendChild(visualMedia.canvas);
     }
   }, [visualMediaId]);
 
@@ -496,7 +481,7 @@ export default function UserVisualMedia({
   }, [fgVisualMediaOptions.permissions]);
 
   return (
-    <div
+    <motion.div
       ref={visualMediaContainerRef}
       id={`${visualMediaId}_container`}
       className={`visual-media-container ${pausedState ? "paused" : ""} ${
@@ -507,19 +492,55 @@ export default function UserVisualMedia({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } z-base-content flex items-center justify-center`}
-      style={{
-        position: "absolute",
-        left: `${positioning.current.position.left}%`,
-        top: `${positioning.current.position.top}%`,
-        width: `${positioning.current.scale.x}%`,
-        height: `${positioning.current.scale.y}%`,
-        rotate: `${positioning.current.rotation}deg`,
-        transformOrigin: "0% 0%",
-      }}
+      } ${visualMedia.settings.background.value ? "z-background-content" : "z-base-content"} absolute flex items-center justify-center`}
+      style={
+        visualMedia.settings.background.value
+          ? {
+              left: "50%",
+              top: "50%",
+              width: (visualMedia.aspectRatio ?? 1) > 1 ? "" : "100%",
+              height: (visualMedia.aspectRatio ?? 1) > 1 ? "100%" : "",
+              aspectRatio: visualMedia.aspectRatio ?? 1,
+              rotate: "0deg",
+            }
+          : {
+              left: `${positioning.current.position.left}%`,
+              top: `${positioning.current.position.top}%`,
+              width: `${positioning.current.scale.x}%`,
+              height: `${positioning.current.scale.y}%`,
+              rotate: `${positioning.current.rotation}deg`,
+              transformOrigin: "0% 0%",
+            }
+      }
       onPointerEnter={fgVisualMediaController.current.handlePointerEnter}
       onPointerLeave={fgVisualMediaController.current.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
+      variants={{
+        init: {
+          opacity: 0,
+          scale: 0.8,
+          transform: visualMedia.settings.background.value
+            ? "translate(-50%, -50%)"
+            : "",
+        },
+        animate: {
+          opacity: 1,
+          scale: 1,
+          transform: visualMedia.settings.background.value
+            ? "translate(-50%, -50%)"
+            : "",
+          transition: {
+            scale: { type: "spring", stiffness: 100 },
+          },
+        },
+      }}
+      initial="init"
+      animate="animate"
+      exit="init"
+      transition={{
+        opacity: { duration: 0.001 },
+        scale: { duration: 0.001 },
+      }}
     >
       {fgVisualMediaOptions.permissions
         .acceptsPositionScaleRotationManipulation && (
@@ -597,6 +618,7 @@ export default function UserVisualMedia({
           setReactionsPanelActive={setReactionsPanelActive}
         />
         <FgLowerVisualMediaControls
+          visualMedia={visualMedia}
           tableId={tableId}
           username={username}
           instance={instance}
@@ -614,21 +636,19 @@ export default function UserVisualMedia({
           audioRef={audioRef}
           subContainerRef={subContainerRef}
           currentTimeRef={currentTimeRef}
-          tintColor={tintColor}
           visualEffectsActive={visualEffectsActive}
           audioEffectsActive={audioEffectsActive}
           setAudioEffectsActive={setAudioEffectsActive}
-          settings={settings}
-          setSettings={setSettings}
           fgVisualMediaOptions={fgVisualMediaOptions}
           handleVisualEffectChange={handleVisualEffectChange}
           handleAudioEffectChange={handleAudioEffectChange}
           handleMuteCallback={handleMuteCallback}
           handleVolumeSliderCallback={handleVolumeSliderCallback}
           tracksColorSetterCallback={tracksColorSetterCallback}
+          setRerender={setRerender}
         />
         <VisualMediaGradient />
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import FgButton from "../../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { ActivePages } from "../../../FgLowerVisualMediaControls";
-import { Settings } from "../../../../typeConstant";
+import RemoteVisualMedia from "../../../../../../../media/fgVisualMedia/RemoteVisualMedia";
+import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
+import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -42,26 +44,21 @@ export const closedCaptionsSelections = {
 };
 
 export default function ClosedCaptionsPage({
+  visualMedia,
   setActivePages,
-  settings,
-  setSettings,
 }: {
+  visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
+  const [_, setRerender] = useState(false);
 
   const setClosedCaptionsLang = (
     newLang: keyof typeof closedCaptionsSelections,
   ) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev };
+    visualMedia.settings.closedCaption.value = newLang;
 
-      newSettings.closedCaption.value = newLang;
-
-      return newSettings;
-    });
+    setRerender((prev) => !prev);
   };
 
   const handleCloseClosedCaptionPage = () => {
@@ -130,7 +127,7 @@ export default function ClosedCaptionsPage({
           <div
             key={key}
             className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              key === settings.closedCaption.value
+              key === visualMedia.settings.closedCaption.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}

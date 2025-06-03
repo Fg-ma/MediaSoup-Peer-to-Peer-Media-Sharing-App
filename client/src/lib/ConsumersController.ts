@@ -14,6 +14,9 @@ import {
   onNewJSONConsumerSubscribedType,
   onSubscribedType,
 } from "../serverControllers/mediasoupServer/lib/typeConstant";
+import RemoteAudioMedia from "../media/audio/RemoteAudioMedia";
+import RemoteScreenAudioMedia from "../media/fgVisualMedia/RemoteScreenAudioMedia";
+import RemoteVisualMedia from "../media/fgVisualMedia/RemoteVisualMedia";
 
 class ConsumersController {
   constructor(
@@ -68,10 +71,10 @@ class ConsumersController {
     for (const producerUsername in subscriptions) {
       for (const producerInstance in subscriptions[producerUsername]) {
         const newRemoteTrack: {
-          camera?: { [cameraId: string]: MediaStreamTrack };
-          screen?: { [screenId: string]: MediaStreamTrack };
-          screenAudio?: { [screenAudioId: string]: MediaStreamTrack };
-          audio?: MediaStreamTrack;
+          camera?: { [cameraId: string]: RemoteVisualMedia };
+          screen?: { [screenId: string]: RemoteVisualMedia };
+          screenAudio?: { [screenAudioId: string]: RemoteScreenAudioMedia };
+          audio?: RemoteAudioMedia;
         } = {};
         const newRemoteDataStream: {
           [dataStreamType in DataStreamTypes]?: DataConsumer;
@@ -94,7 +97,13 @@ class ConsumersController {
               kind,
               rtpParameters,
             });
-            newRemoteTrack.camera[key] = consumer.track;
+            newRemoteTrack.camera[key] = new RemoteVisualMedia(
+              producerUsername,
+              producerInstance,
+              producerId,
+              "camera",
+              consumer.track,
+            );
           }
         }
 
@@ -115,7 +124,13 @@ class ConsumersController {
               kind,
               rtpParameters,
             });
-            newRemoteTrack.screen[key] = consumer.track;
+            newRemoteTrack.screen[key] = new RemoteVisualMedia(
+              producerUsername,
+              producerInstance,
+              producerId,
+              "screen",
+              consumer.track,
+            );
           }
         }
 
@@ -138,7 +153,12 @@ class ConsumersController {
               kind,
               rtpParameters,
             });
-            newRemoteTrack.screenAudio[key] = consumer.track;
+            newRemoteTrack.screenAudio[key] = new RemoteScreenAudioMedia(
+              producerUsername,
+              producerInstance,
+              producerId,
+              consumer.track,
+            );
           }
         }
 
@@ -153,7 +173,11 @@ class ConsumersController {
             kind,
             rtpParameters,
           });
-          newRemoteTrack.audio = consumer.track;
+          newRemoteTrack.audio = new RemoteAudioMedia(
+            producerUsername,
+            producerInstance,
+            consumer.track,
+          );
         }
 
         if (subscriptions[producerUsername][producerInstance].json) {
@@ -257,7 +281,8 @@ class ConsumersController {
                   .camera) {
                   const remoteCameraStream = new MediaStream();
                   remoteCameraStream.addTrack(
-                    this.remoteMedia.current[username][instance].camera![key],
+                    this.remoteMedia.current[username][instance].camera![key]
+                      .track,
                   );
                   remoteCameraStreams[key] = remoteCameraStream;
                 }
@@ -269,7 +294,8 @@ class ConsumersController {
                   .screen) {
                   const remoteScreenStream = new MediaStream();
                   remoteScreenStream.addTrack(
-                    this.remoteMedia.current[username][instance].screen![key],
+                    this.remoteMedia.current[username][instance].screen![key]
+                      .track,
                   );
                   remoteScreenStreams[key] = remoteScreenStream;
                 }
@@ -283,7 +309,7 @@ class ConsumersController {
                   remoteScreenAudioStream.addTrack(
                     this.remoteMedia.current[username][instance].screenAudio![
                       key
-                    ],
+                    ].track,
                   );
                   remoteScreenAudioStreams[key] = remoteScreenAudioStream;
                 }
@@ -292,7 +318,7 @@ class ConsumersController {
                 if (this.remoteMedia.current[username][instance].audio) {
                   remoteAudioStream = new MediaStream();
                   remoteAudioStream.addTrack(
-                    this.remoteMedia.current[username][instance].audio!,
+                    this.remoteMedia.current[username][instance].audio!.track,
                   );
                 }
 
@@ -387,11 +413,29 @@ class ConsumersController {
       if (producerId) {
         this.remoteMedia.current[producerUsername][producerInstance][
           producerType
-        ]![producerId] = consumer.track;
+        ]![producerId] =
+          producerType !== "screenAudio"
+            ? new RemoteVisualMedia(
+                producerUsername,
+                producerInstance,
+                producerId,
+                producerType,
+                consumer.track,
+              )
+            : new RemoteScreenAudioMedia(
+                producerUsername,
+                producerInstance,
+                producerId,
+                consumer.track,
+              );
       }
     } else {
       this.remoteMedia.current[producerUsername][producerInstance].audio =
-        consumer.track;
+        new RemoteAudioMedia(
+          producerUsername,
+          producerInstance,
+          consumer.track,
+        );
     }
 
     this.setUpEffectContext(
@@ -430,7 +474,7 @@ class ConsumersController {
           const remoteCameraStream = new MediaStream();
           remoteCameraStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .camera![key],
+              .camera![key].track,
           );
           remoteCameraStreams[key] = remoteCameraStream;
         }
@@ -446,7 +490,7 @@ class ConsumersController {
           const remoteScreenStream = new MediaStream();
           remoteScreenStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screen![key],
+              .screen![key].track,
           );
           remoteScreenStreams[key] = remoteScreenStream;
         }
@@ -464,7 +508,7 @@ class ConsumersController {
           const remoteScreenAudioStream = new MediaStream();
           remoteScreenAudioStream.addTrack(
             this.remoteMedia.current[producerUsername][producerInstance]
-              .screenAudio![key],
+              .screenAudio![key].track,
           );
           remoteScreenAudioStreams[key] = remoteScreenAudioStream;
         }
@@ -477,7 +521,8 @@ class ConsumersController {
       ) {
         remoteAudioStream = new MediaStream();
         remoteAudioStream.addTrack(
-          this.remoteMedia.current[producerUsername][producerInstance].audio!,
+          this.remoteMedia.current[producerUsername][producerInstance].audio!
+            .track,
         );
       }
 

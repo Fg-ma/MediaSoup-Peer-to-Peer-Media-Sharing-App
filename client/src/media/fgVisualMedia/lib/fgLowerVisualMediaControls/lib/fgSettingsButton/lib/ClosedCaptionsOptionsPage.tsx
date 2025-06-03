@@ -11,7 +11,9 @@ import {
   FontOpacities,
   FontSizes,
 } from "../../../FgLowerVisualMediaControls";
-import { Settings } from "../../../../typeConstant";
+import RemoteVisualMedia from "../../../../../../../media/fgVisualMedia/RemoteVisualMedia";
+import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
+import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -76,11 +78,11 @@ const closedCaptionsOptionsTitles = {
 };
 
 export default function ClosedCaptionsOptionsPage({
+  visualMedia,
   setActivePages,
-  settings,
 }: {
+  visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
-  settings: Settings;
 }) {
   const handleClosedCaptionOptionsActive = () => {
     setActivePages((prev) => {
@@ -154,7 +156,7 @@ export default function ClosedCaptionsOptionsPage({
                 <div className="flex items-center justify-center space-x-1">
                   <div>
                     {
-                      settings.closedCaption.closedCaptionOptionsActive[
+                      visualMedia.settings.closedCaption.closedCaptionOptions[
                         option as keyof typeof closedCaptionsOptionsArrays
                       ].value
                     }

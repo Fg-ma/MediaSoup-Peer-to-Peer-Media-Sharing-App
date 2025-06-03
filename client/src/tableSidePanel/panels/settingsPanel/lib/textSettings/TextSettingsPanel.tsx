@@ -10,6 +10,7 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import ColorsPage from "./lib/ColorsPage";
 import FontStylePage from "./lib/FontStylePage";
 import CursorStylePage from "./lib/CursorStylePage";
+import HoverElement from "../../../../../elements/hoverElement/HoverElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -55,6 +56,7 @@ export default function TextSettingsPanel({
   const [colorsPageActive, setColorsPageActive] = useState(false);
   const [fontStylePageActive, setFontStylePageActive] = useState(false);
   const [cursorStylePageActive, setCursorStylePageActive] = useState(false);
+  const filenameRef = useRef<HTMLDivElement>(null);
   const holdTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const holdInterval = useRef<NodeJS.Timeout | undefined>(undefined);
   const letterGapButtonsRef = useRef<HTMLDivElement>(null);
@@ -90,12 +92,28 @@ export default function TextSettingsPanel({
 
   return (
     <div
-      className="mx-6 my-4 flex h-max flex-col items-center justify-center space-y-1 rounded border border-fg-white bg-fg-tone-black-8 px-2 py-2 font-K2D text-fg-white"
+      className="mx-6 my-4 flex h-max max-w-[320px] flex-col items-center justify-center space-y-1 rounded border border-fg-white bg-fg-tone-black-8 px-2 py-2 font-K2D text-fg-white"
       style={{ width: "calc(100% - 3rem)" }}
     >
-      <div className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4">
-        {textMediaInstance.current.textMedia.filename}
-      </div>
+      <HoverElement
+        externalRef={filenameRef}
+        className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4"
+        content={<>{textMediaInstance.current.textMedia.filename}</>}
+        hoverContent={
+          (filenameRef.current?.scrollWidth ?? 0) >
+          (filenameRef.current?.clientWidth ?? 0) ? (
+            <FgHoverContentStandard
+              style="light"
+              content={textMediaInstance.current.textMedia.filename}
+            />
+          ) : undefined
+        }
+        options={{
+          hoverSpacing: 4,
+          hoverType: "above",
+          hoverTimeoutDuration: 750,
+        }}
+      />
       <FgButton
         className="h-7 w-full"
         contentFunction={() => (

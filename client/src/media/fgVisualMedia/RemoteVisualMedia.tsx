@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import {
@@ -20,7 +20,6 @@ import FgLowerVisualMediaController from "./lib/fgLowerVisualMediaControls/lib/F
 import {
   defaultFgVisualMediaOptions,
   FgVisualMediaOptions,
-  Settings,
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
 import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
@@ -105,7 +104,7 @@ export default function RemoteVisualMedia({
     ...options,
   };
 
-  const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
+  const { remoteMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();
@@ -118,6 +117,11 @@ export default function RemoteVisualMedia({
     addGroupSignalListener,
     removeGroupSignalListener,
   } = useSignalContext();
+
+  const visualMedia =
+    remoteMedia.current[username][instance][type]?.[visualMediaId];
+
+  if (!visualMedia) return;
 
   const visualMediaContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -149,22 +153,6 @@ export default function RemoteVisualMedia({
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
   const [captionsActive, setCaptionsActive] = useState(false);
-
-  const [settings, setSettings] = useState<Settings>({
-    closedCaption: {
-      value: "en-US",
-      closedCaptionOptionsActive: {
-        value: "",
-        fontFamily: { value: "K2D" },
-        fontColor: { value: "white" },
-        fontOpacity: { value: "100%" },
-        fontSize: { value: "base" },
-        backgroundColor: { value: "black" },
-        backgroundOpacity: { value: "75%" },
-        characterEdgeStyle: { value: "None" },
-      },
-    },
-  });
 
   const initTimeOffset = useRef(0);
 
@@ -255,6 +243,7 @@ export default function RemoteVisualMedia({
 
   const fgLowerVisualMediaController = useRef(
     new FgLowerVisualMediaController(
+      visualMedia,
       mediasoupSocket,
       visualMediaId,
       tableId,
@@ -270,7 +259,6 @@ export default function RemoteVisualMedia({
       setPausedState,
       paused,
       setCaptionsActive,
-      settings,
       currentTimeRef,
       setVisualEffectsActive,
       setAudioEffectsActive,
@@ -279,7 +267,6 @@ export default function RemoteVisualMedia({
       tracksColorSetterCallback,
       tintColor,
       userEffects,
-      userMedia,
       initTimeOffset,
       fgContentAdjustmentController,
       positioning,
@@ -294,6 +281,7 @@ export default function RemoteVisualMedia({
 
   const fgVisualMediaController = useRef(
     new FgVisualMediaController(
+      visualMedia,
       tableId,
       username,
       instance,
@@ -305,7 +293,6 @@ export default function RemoteVisualMedia({
       positioning,
       setPausedState,
       paused,
-      userMedia,
       remoteEffects,
       userEffectsStyles,
       remoteEffectsStyles,
@@ -391,6 +378,10 @@ export default function RemoteVisualMedia({
       );
     }
 
+    visualMedia.addRemoteVisualListener(
+      fgVisualMediaController.current.handleVisualMediaMessage,
+    );
+
     const videoElement = videoRef.current;
 
     if (videoElement) {
@@ -438,6 +429,9 @@ export default function RemoteVisualMedia({
           fgLowerVisualMediaController.current.handlePictureInPicture("leave"),
         );
       }
+      visualMedia.removeRemoteVisualListener(
+        fgVisualMediaController.current.handleVisualMediaMessage,
+      );
       if (videoElement) {
         videoElement.removeEventListener("loadedmetadata", () =>
           fgVisualMediaController.current.handleVideoMetadataLoaded(
@@ -450,7 +444,7 @@ export default function RemoteVisualMedia({
 
   useEffect(() => {
     fgLowerVisualMediaController.current.updateCaptionsStyles();
-  }, [settings]);
+  }, [visualMedia.settings]);
 
   useEffect(() => {
     if (
@@ -487,7 +481,7 @@ export default function RemoteVisualMedia({
   }, [fgVisualMediaOptions.permissions]);
 
   return (
-    <div
+    <motion.div
       ref={visualMediaContainerRef}
       id={`${visualMediaId}_container`}
       className={`visual-media-container ${pausedState ? "paused" : ""} ${
@@ -498,16 +492,27 @@ export default function RemoteVisualMedia({
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
-      } z-base-content flex items-center justify-center`}
-      style={{
-        position: "absolute",
-        left: `${positioning.current.position.left}%`,
-        top: `${positioning.current.position.top}%`,
-        width: `${positioning.current.scale.x}%`,
-        height: `${positioning.current.scale.y}%`,
-        rotate: `${positioning.current.rotation}deg`,
-        transformOrigin: "0% 0%",
-      }}
+      } ${visualMedia.settings.background.value ? "z-background-content" : "z-base-content"} absolute flex items-center justify-center`}
+      style={
+        visualMedia.settings.background.value
+          ? {
+              left: "50%",
+              top: "50%",
+              width: aspectRatio.current > 1 ? "" : "100%",
+              height: aspectRatio.current > 1 ? "100%" : "",
+              aspectRatio: aspectRatio.current,
+              rotate: "0deg",
+              transform: "translate(-50%, -50%)",
+            }
+          : {
+              left: `${positioning.current.position.left}%`,
+              top: `${positioning.current.position.top}%`,
+              width: `${positioning.current.scale.x}%`,
+              height: `${positioning.current.scale.y}%`,
+              rotate: `${positioning.current.rotation}deg`,
+              transformOrigin: "0% 0%",
+            }
+      }
       onPointerEnter={() =>
         fgVisualMediaController.current.handlePointerEnter()
       }
@@ -515,6 +520,32 @@ export default function RemoteVisualMedia({
         fgVisualMediaController.current.handlePointerLeave()
       }
       data-positioning={JSON.stringify(positioning.current)}
+      variants={{
+        init: {
+          opacity: 0,
+          scale: 0.8,
+          transform: visualMedia.settings.background.value
+            ? "translate(-50%, -50%)"
+            : "",
+        },
+        animate: {
+          opacity: 1,
+          scale: 1,
+          transform: visualMedia.settings.background.value
+            ? "translate(-50%, -50%)"
+            : "",
+          transition: {
+            scale: { type: "spring", stiffness: 100 },
+          },
+        },
+      }}
+      initial="init"
+      animate="animate"
+      exit="init"
+      transition={{
+        opacity: { duration: 0.001 },
+        scale: { duration: 0.001 },
+      }}
     >
       {fgVisualMediaOptions.permissions
         .acceptsPositionScaleRotationManipulation && (
@@ -601,6 +632,7 @@ export default function RemoteVisualMedia({
           setReactionsPanelActive={setReactionsPanelActive}
         />
         <FgLowerVisualMediaControls
+          visualMedia={visualMedia}
           tableId={tableId}
           username={username}
           instance={instance}
@@ -618,18 +650,16 @@ export default function RemoteVisualMedia({
           audioRef={audioRef}
           subContainerRef={subContainerRef}
           currentTimeRef={currentTimeRef}
-          tintColor={tintColor}
           visualEffectsActive={visualEffectsActive}
           audioEffectsActive={audioEffectsActive}
           setAudioEffectsActive={setAudioEffectsActive}
-          settings={settings}
-          setSettings={setSettings}
           fgVisualMediaOptions={fgVisualMediaOptions}
           handleVisualEffectChange={handleVisualEffectChange}
           handleAudioEffectChange={handleAudioEffectChange}
           handleMuteCallback={handleMuteCallback}
           handleVolumeSliderCallback={handleVolumeSliderCallback}
           tracksColorSetterCallback={tracksColorSetterCallback}
+          setRerender={setRerender}
         />
         <VisualMediaGradient />
       </div>
@@ -641,6 +671,6 @@ export default function RemoteVisualMedia({
           autoPlay={true}
         ></audio>
       )}
-    </div>
+    </motion.div>
   );
 }

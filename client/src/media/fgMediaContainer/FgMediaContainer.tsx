@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, Transition, Variants } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
@@ -25,24 +25,6 @@ import LoadingElement from "../../elements/loadingElement/LoadingElement";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
-
-const MediaContainerVar: Variants = {
-  init: { opacity: 0, scale: 0.8 },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      scale: { type: "spring", stiffness: 100 },
-    },
-  },
-};
-
-const MediaContainerTransition: Transition = {
-  transition: {
-    opacity: { duration: 0.001 },
-    scale: { duration: 0.001 },
-  },
-};
 
 export default function FgMediaContainer({
   filename,
@@ -369,11 +351,13 @@ export default function FgMediaContainer({
       style={
         backgroundMedia
           ? {
-              left: "0%",
-              top: "0%",
-              width: "100%",
-              height: "100%",
+              left: "50%",
+              top: "50%",
+              width: (aspectRatio.current ?? 1) > 1 ? "" : "100%",
+              height: (aspectRatio.current ?? 1) > 1 ? "100%" : "",
+              aspectRatio: aspectRatio.current ?? 1,
               rotate: "0deg",
+              transform: "translate(-50%, -50%) !important",
             }
           : {
               left: `${positioning.current.position.left}%`,
@@ -387,11 +371,28 @@ export default function FgMediaContainer({
       onPointerEnter={mediaContainerController.current.handlePointerEnter}
       onPointerLeave={mediaContainerController.current.handlePointerLeave}
       data-positioning={JSON.stringify(positioning.current)}
-      variants={MediaContainerVar}
+      variants={{
+        init: {
+          opacity: 0,
+          scale: 0.8,
+          transform: backgroundMedia ? "translate(-50%, -50%)" : "",
+        },
+        animate: {
+          opacity: 1,
+          scale: 1,
+          transform: backgroundMedia ? "translate(-50%, -50%)" : "",
+          transition: {
+            scale: { type: "spring", stiffness: 100 },
+          },
+        },
+      }}
       initial="init"
       animate="animate"
       exit="init"
-      transition={MediaContainerTransition}
+      transition={{
+        opacity: { duration: 0.001 },
+        scale: { duration: 0.001 },
+      }}
     >
       {floatingContent &&
         floatingContent.map((item, index) => (

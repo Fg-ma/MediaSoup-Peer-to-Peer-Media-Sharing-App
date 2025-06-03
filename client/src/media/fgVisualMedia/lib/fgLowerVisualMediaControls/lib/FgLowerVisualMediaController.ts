@@ -1,14 +1,17 @@
-import { UserMediaType } from "../../../../../context/mediaContext/lib/typeConstant";
+import { RemoteMediaType } from "../../../../../context/mediaContext/lib/typeConstant";
 import {
   AudioEffectTypes,
   CameraEffectTypes,
   ScreenEffectTypes,
 } from "../../../../../../../universal/effectsTypeConstant";
 import FgContentAdjustmentController from "../../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import { FgVisualMediaOptions, Settings } from "../../typeConstant";
+import { FgVisualMediaOptions } from "../../typeConstant";
 import MediasoupSocketController from "../../../../../serverControllers/mediasoupServer/MediasoupSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
+import CameraMedia from "../../../../../media/fgVisualMedia/CameraMedia";
+import ScreenMedia from "../../../../../media/fgVisualMedia/ScreenMedia";
+import RemoteVisualMedia from "../../../../../media/fgVisualMedia/RemoteVisualMedia";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -63,6 +66,7 @@ class FgLowerVisualMediaController {
   reactController: ReactController;
 
   constructor(
+    private visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
     >,
@@ -80,7 +84,6 @@ class FgLowerVisualMediaController {
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    private settings: Settings,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
     private setVisualEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
@@ -110,7 +113,6 @@ class FgLowerVisualMediaController {
       };
       audio: { [effectType in AudioEffectTypes]: boolean };
     }>,
-    private userMedia: React.MutableRefObject<UserMediaType>,
     private initTimeOffset: React.MutableRefObject<number>,
     private fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>,
     private positioning: React.MutableRefObject<{
@@ -238,13 +240,13 @@ class FgLowerVisualMediaController {
         .then(() => {
           this.visualMediaContainerRef.current?.classList.remove("full-screen");
 
-          if (this.fgVisualMediaOptions.isUser) {
-            this.userMedia.current[this.type][
-              this.visualMediaId
-            ].canvas.style.width = "100%";
-            this.userMedia.current[this.type][
-              this.visualMediaId
-            ].canvas.style.height = "100%";
+          if (
+            this.fgVisualMediaOptions.isUser &&
+            (this.visualMedia instanceof CameraMedia ||
+              this.visualMedia instanceof ScreenMedia)
+          ) {
+            this.visualMedia.canvas.style.width = "100%";
+            this.visualMedia.canvas.style.height = "100%";
           }
         })
         .catch((error) => {
@@ -256,28 +258,20 @@ class FgLowerVisualMediaController {
         .then(() => {
           this.visualMediaContainerRef.current?.classList.add("full-screen");
 
-          if (this.fgVisualMediaOptions.isUser) {
+          if (
+            this.fgVisualMediaOptions.isUser &&
+            (this.visualMedia instanceof CameraMedia ||
+              this.visualMedia instanceof ScreenMedia)
+          ) {
             if (
-              this.userMedia.current[this.type][this.visualMediaId].canvas
-                .width /
-                document.body.clientWidth >
-              this.userMedia.current[this.type][this.visualMediaId].canvas
-                .height /
-                document.body.clientHeight
+              this.visualMedia.canvas.width / document.body.clientWidth >
+              this.visualMedia.canvas.height / document.body.clientHeight
             ) {
-              this.userMedia.current[this.type][
-                this.visualMediaId
-              ].canvas.style.width = "100%";
-              this.userMedia.current[this.type][
-                this.visualMediaId
-              ].canvas.style.height = "auto";
+              this.visualMedia.canvas.style.width = "100%";
+              this.visualMedia.canvas.style.height = "auto";
             } else {
-              this.userMedia.current[this.type][
-                this.visualMediaId
-              ].canvas.style.width = "auto";
-              this.userMedia.current[this.type][
-                this.visualMediaId
-              ].canvas.style.height = "100%";
+              this.visualMedia.canvas.style.width = "auto";
+              this.visualMedia.canvas.style.height = "100%";
             }
           }
         })
@@ -291,13 +285,13 @@ class FgLowerVisualMediaController {
     if (!document.fullscreenElement) {
       this.visualMediaContainerRef.current?.classList.remove("full-screen");
 
-      if (this.fgVisualMediaOptions.isUser) {
-        this.userMedia.current[this.type][
-          this.visualMediaId
-        ].canvas.style.width = "100%";
-        this.userMedia.current[this.type][
-          this.visualMediaId
-        ].canvas.style.height = "100%";
+      if (
+        this.fgVisualMediaOptions.isUser &&
+        (this.visualMedia instanceof CameraMedia ||
+          this.visualMedia instanceof ScreenMedia)
+      ) {
+        this.visualMedia.canvas.style.width = "100%";
+        this.visualMedia.canvas.style.height = "100%";
       }
     }
   };
@@ -627,13 +621,11 @@ class FgLowerVisualMediaController {
   };
 
   updateCaptionsStyles = () => {
-    if (!this.visualMediaContainerRef.current) {
-      return;
-    }
+    if (!this.visualMediaContainerRef.current) return;
 
     const style = this.visualMediaContainerRef.current.style;
     const captionOptions =
-      this.settings.closedCaption.closedCaptionOptionsActive;
+      this.visualMedia.settings.closedCaption.closedCaptionOptions;
 
     style.setProperty(
       "--closed-captions-font-family",
@@ -686,18 +678,23 @@ class FgLowerVisualMediaController {
       }
     }
 
-    if (this.type === "camera") {
-      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
-        effect as CameraEffectTypes,
-        this.tintColor.current,
-        blockStateChange,
-      );
-    } else if (this.type === "screen") {
-      this.userMedia.current[this.type][this.visualMediaId].changeEffects(
-        effect as ScreenEffectTypes,
-        this.tintColor.current,
-        blockStateChange,
-      );
+    if (
+      this.visualMedia instanceof CameraMedia ||
+      this.visualMedia instanceof ScreenMedia
+    ) {
+      if (this.type === "camera") {
+        this.visualMedia.changeEffects(
+          effect as any,
+          this.tintColor.current,
+          blockStateChange,
+        );
+      } else if (this.type === "screen") {
+        this.visualMedia.changeEffects(
+          effect as ScreenEffectTypes,
+          this.tintColor.current,
+          blockStateChange,
+        );
+      }
     }
   };
 

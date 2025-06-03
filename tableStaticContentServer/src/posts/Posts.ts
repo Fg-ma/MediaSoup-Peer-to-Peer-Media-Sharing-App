@@ -89,7 +89,7 @@ class Posts {
         });
 
         const sanitizedFilename = tableStaticContentUtils.sanitizeString(
-          metadata.filename.slice(0, -4)
+          metadata.filename.slice(0, metadata.filename.lastIndexOf("."))
         );
         const sanitizedMimeType = tableStaticContentUtils.sanitizeMimeType(
           metadata.mimeType

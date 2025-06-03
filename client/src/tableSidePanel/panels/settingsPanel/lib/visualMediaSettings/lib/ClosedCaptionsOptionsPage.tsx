@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
-import TableVideoMediaInstance from "../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import CameraMedia from "../../../../../../media/fgVisualMedia/CameraMedia";
+import ScreenMedia from "../../../../../../media/fgVisualMedia/ScreenMedia";
+import RemoteVisualMedia from "../../../../../../media/fgVisualMedia/RemoteVisualMedia";
 import {
-  ActivePages,
   BackgroundColors,
   BackgroundOpacities,
   CharacterEdgeStyles,
@@ -11,11 +12,10 @@ import {
   FontFamilies,
   FontOpacities,
   FontSizes,
-} from "../../../../../../media/fgTableVideo/lib/typeConstant";
+} from "../../../../../../media/fgVisualMedia/lib/fgLowerVisualMediaControls/FgLowerVisualMediaControls";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 const navigateForwardIcon =
   nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
@@ -76,10 +76,12 @@ const closedCaptionsOptionsTitles = {
 };
 
 export default function ClosedCaptionsOptionsPage({
-  videoMediaInstance,
+  visualMedia,
   setRerender,
 }: {
-  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
+  visualMedia: React.MutableRefObject<
+    CameraMedia | ScreenMedia | RemoteVisualMedia | undefined
+  >;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [activePages, setActivePages] = useState({
@@ -143,7 +145,7 @@ export default function ClosedCaptionsOptionsPage({
               )
             }
             contentFunction={() => (
-              <div className="flex w-full justify-between space-x-2 text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
+              <div className="flex w-full justify-between space-x-4 text-nowrap rounded fill-fg-white stroke-fg-white px-1 text-fg-white hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                 <div
                   className="truncate"
                   ref={refs[option as keyof typeof closedCaptionsOptionsArrays]}
@@ -166,7 +168,7 @@ export default function ClosedCaptionsOptionsPage({
                     style={{ width: "calc(100% - 1.25rem)" }}
                   >
                     {
-                      videoMediaInstance.current.settings.closedCaption
+                      visualMedia.current?.settings.closedCaption
                         .closedCaptionOptions[
                         option as keyof typeof closedCaptionsOptionsArrays
                       ].value
@@ -198,7 +200,7 @@ export default function ClosedCaptionsOptionsPage({
                   style={{ width: "calc(100% - 2.5rem)" }}
                   className={`rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
                     type ===
-                    videoMediaInstance.current.settings.closedCaption
+                    visualMedia.current?.settings.closedCaption
                       .closedCaptionOptions[
                       option as keyof typeof closedCaptionsOptionsArrays
                     ].value
@@ -209,9 +211,10 @@ export default function ClosedCaptionsOptionsPage({
                     <div className="flex items-start justify-start">{type}</div>
                   )}
                   clickFunction={() => {
-                    videoMediaInstance.current.settings.closedCaption.closedCaptionOptions[
-                      option as keyof typeof closedCaptionsOptionsArrays
-                    ].value = type;
+                    if (visualMedia.current)
+                      visualMedia.current.settings.closedCaption.closedCaptionOptions[
+                        option as keyof typeof closedCaptionsOptionsArrays
+                      ].value = type;
 
                     setRerender((prev) => !prev);
                   }}

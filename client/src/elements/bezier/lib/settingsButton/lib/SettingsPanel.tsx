@@ -118,12 +118,12 @@ export default function SettingsPanel({
 
   useEffect(() => {
     setRerender((prev) => !prev);
-  }, []);
+  }, [activePages]);
 
   return (
     <FgPortal
       externalPortalRef={settingsPanelRef}
-      className="pointer-events-auto z-settings-panel flex h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
+      className="flex pointer-events-auto z-settings-panel h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
       type="above"
       spacing={4}
       content={

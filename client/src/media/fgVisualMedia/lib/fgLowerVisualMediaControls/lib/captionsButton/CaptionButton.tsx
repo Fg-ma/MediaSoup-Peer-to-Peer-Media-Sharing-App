@@ -6,7 +6,9 @@ import FgHoverContentStandard from "../../../../../../elements/fgHoverContentSta
 import Captions from "./lib/Captions";
 import CaptionsController from "./lib/CaptionsController";
 import FgLowerVisualMediaController from "../FgLowerVisualMediaController";
-import { Settings } from "../../../typeConstant";
+import ScreenMedia from "../../../../../../media/fgVisualMedia/ScreenMedia";
+import CameraMedia from "../../../../../../media/fgVisualMedia/CameraMedia";
+import RemoteVisualMedia from "../../../../../../media/fgVisualMedia/RemoteVisualMedia";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -45,19 +47,19 @@ const voskModels: { [model: string]: string } = {
 };
 
 export default function CaptionButton({
+  visualMedia,
   fgLowerVisualMediaController,
   visualEffectsActive,
   settingsActive,
-  settings,
   audioStream,
   visualMediaContainerRef,
   scrollingContainerRef,
   containerRef,
 }: {
+  visualMedia: RemoteVisualMedia | CameraMedia | ScreenMedia;
   fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   visualEffectsActive: boolean;
   settingsActive: boolean;
-  settings: Settings;
   audioStream: MediaStream;
   visualMediaContainerRef: React.RefObject<HTMLDivElement>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
@@ -96,9 +98,9 @@ export default function CaptionButton({
     }
 
     captionsController.current.loadVoskModel(
-      voskModels[settings.closedCaption.value],
+      voskModels[visualMedia.settings.closedCaption.value],
     );
-  }, [settings.closedCaption.value]);
+  }, [visualMedia.settings.closedCaption.value]);
 
   return (
     <>
@@ -106,7 +108,7 @@ export default function CaptionButton({
         clickFunction={() => {
           if (!active) {
             captionsController.current.loadVoskModel(
-              voskModels[settings.closedCaption.value],
+              voskModels[visualMedia.settings.closedCaption.value],
             );
           }
 

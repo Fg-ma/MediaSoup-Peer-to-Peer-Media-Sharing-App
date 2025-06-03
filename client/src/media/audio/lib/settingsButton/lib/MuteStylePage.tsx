@@ -149,7 +149,10 @@ export default function MuteStylePage({
                       } flex w-full items-center px-2 text-lg`}
                     >
                       <div className="h-full grow truncate text-left">
-                        {svgMedia.filename.slice(0, -4)}
+                        {svgMedia.filename.slice(
+                          0,
+                          svgMedia.filename.lastIndexOf("."),
+                        )}
                       </div>
                       {svgMedia.blobURL && (
                         <FgSVGElement
