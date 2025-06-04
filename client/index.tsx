@@ -8,6 +8,7 @@ import { EffectsContextProvider } from "./src/context/effectsContext/EffectsCont
 import { PermissionsContextProvider } from "./src/context/permissionsContext/PermissionsContext";
 import { SocketContextProvider } from "./src/context/socketContext/SocketContext";
 import { UserInfoContextProvider } from "./src/context/userInfoContext/UserInfoContext";
+import { GeneralContextProvider } from "./src/context/generalContext/GeneralContext";
 import Main from "./src/Main";
 import "./index.css";
 
@@ -18,22 +19,24 @@ root.render(<App />);
 
 function App() {
   return (
-    <MediaContextProvider>
-      <EffectsContextProvider>
-        <SignalContextProvider>
-          <PermissionsContextProvider>
-            <SocketContextProvider>
-              <UserInfoContextProvider>
-                <UploadDownloadContextProvider>
-                  <ToolsContextProvider>
-                    <Main />
-                  </ToolsContextProvider>
-                </UploadDownloadContextProvider>
-              </UserInfoContextProvider>
-            </SocketContextProvider>
-          </PermissionsContextProvider>
-        </SignalContextProvider>
-      </EffectsContextProvider>
-    </MediaContextProvider>
+    <GeneralContextProvider>
+      <MediaContextProvider>
+        <EffectsContextProvider>
+          <SignalContextProvider>
+            <PermissionsContextProvider>
+              <SocketContextProvider>
+                <UserInfoContextProvider>
+                  <UploadDownloadContextProvider>
+                    <ToolsContextProvider>
+                      <Main />
+                    </ToolsContextProvider>
+                  </UploadDownloadContextProvider>
+                </UserInfoContextProvider>
+              </SocketContextProvider>
+            </PermissionsContextProvider>
+          </SignalContextProvider>
+        </EffectsContextProvider>
+      </MediaContextProvider>
+    </GeneralContextProvider>
   );
 }

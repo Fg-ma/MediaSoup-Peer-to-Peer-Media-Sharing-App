@@ -14,8 +14,10 @@ import BabylonScene, {
 import MediasoupSocketController from "../../serverControllers/mediasoupServer/MediasoupSocketController";
 import { defaultSettings } from "./lib/typeConstant";
 
-export type ScreenMediaListenerTypes = { type: "settingsChanged" };
-
+export type ScreenMediaListenerTypes =
+  | { type: "settingsChanged" }
+  | { type: "toggleMiniPlayer" }
+  | { type: "toggleClosedCaptions" };
 class ScreenMedia {
   canvas: HTMLCanvasElement;
   video: HTMLVideoElement;
@@ -144,6 +146,18 @@ class ScreenMedia {
   settingsChanged = () => {
     this.screenListeners.forEach((listener) => {
       listener({ type: "settingsChanged" });
+    });
+  };
+
+  handleMiniPlayer = () => {
+    this.screenListeners.forEach((listener) => {
+      listener({ type: "toggleMiniPlayer" });
+    });
+  };
+
+  handleClosedCaptions = () => {
+    this.screenListeners.forEach((listener) => {
+      listener({ type: "toggleClosedCaptions" });
     });
   };
 

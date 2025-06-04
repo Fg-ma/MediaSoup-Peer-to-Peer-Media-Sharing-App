@@ -1,16 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import LoadingElement from "./lib/LoadingElement";
 import { useUploadDownloadContext } from "../../../context/uploadDownloadContext/UploadDownloadContext";
 import { UploadSignals } from "../../../context/uploadDownloadContext/lib/typeConstant";
-import { TablePanels } from "../../../tableSidePanel/TableSidePanel";
+import { useGeneralContext } from "../../../context/generalContext/GeneralContext";
+import LoadingElement from "./lib/LoadingElement";
 
 export default function LoadingTab({
-  activePanel,
   tableSidePanelActive,
   setTableSidePanelActive,
   setExternalRerender,
 }: {
-  activePanel: React.MutableRefObject<TablePanels>;
   tableSidePanelActive: boolean;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,6 +18,7 @@ export default function LoadingTab({
     addUploadSignalListener,
     removeUploadSignalListener,
   } = useUploadDownloadContext();
+  const { activeSidePanel } = useGeneralContext();
 
   const [_, setRerender] = useState(false);
   const loadingTabRef = useRef<HTMLDivElement>(null);
@@ -38,7 +37,7 @@ export default function LoadingTab({
   };
 
   const handleOpenLoadingPanel = () => {
-    activePanel.current = "upload";
+    activeSidePanel.current = "upload";
     setTableSidePanelActive(true);
     setExternalRerender((prev) => !prev);
   };
@@ -54,7 +53,7 @@ export default function LoadingTab({
   return (
     <>
       {Object.keys(getCurrentUploads()).length !== 0 &&
-        (activePanel.current !== "upload" || !tableSidePanelActive) && (
+        (activeSidePanel.current !== "upload" || !tableSidePanelActive) && (
           <div
             ref={loadingTabRef}
             className="hide-scroll-bar absolute bottom-0 left-0 z-upload-tab flex h-16 w-max max-w-[11.25rem] items-center justify-start space-x-2 overflow-x-auto overflow-y-hidden rounded-bl-md rounded-tr-md border-2 border-fg-off-white bg-fg-tone-black-8 px-2"

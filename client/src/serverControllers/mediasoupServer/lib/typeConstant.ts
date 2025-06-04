@@ -49,9 +49,7 @@ export type OutGoingMediasoupMessages =
   | onPermissionsResponseType
   | onBundleMetadataResponseType
   | onRequestCatchUpDataType
-  | onRequestGameCatchUpDataType
   | onResponseCatchUpDataType
-  | onResponseGameCatchUpDataType
   | onRequestMixEffectActivityChangeType
   | onClientMixEffectActivityChangeType
   | onRequestMixEffectValueChangeType
@@ -376,16 +374,6 @@ type onRequestCatchUpDataType = {
   };
 };
 
-type onRequestGameCatchUpDataType = {
-  type: "requestGameCatchUpData";
-  header: {
-    tableId: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    gameId: string;
-  };
-};
-
 type onResponseCatchUpDataType = {
   type: "responseCatchUpData";
   header: {
@@ -442,29 +430,6 @@ type onResponseCatchUpDataType = {
         };
       }
     | undefined;
-};
-
-type onResponseGameCatchUpDataType = {
-  type: "responseGameCatchUpData";
-  header: {
-    tableId: string;
-    inquiringUsername: string;
-    inquiringInstance: string;
-    gameId: string;
-  };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-  };
 };
 
 type onRequestMixEffectActivityChangeType = {
@@ -606,8 +571,6 @@ export type IncomingMediasoupMessages =
   | onPermissionsResponsedType
   | onBundleMetadataResponsedType
   | onResponsedCatchUpDataType
-  | onRequestedGameCatchUpDataType
-  | onResponsedGameCatchUpDataType
   | onRouterCapabilitiesType
   | onLocalMuteChangeType
   | onClientMuteStateResponsedType
@@ -1028,35 +991,6 @@ export type onResponsedCatchUpDataType = {
         };
       }
     | undefined;
-};
-
-export type onRequestedGameCatchUpDataType = {
-  type: "requestedGameCatchUpData";
-  header: {
-    inquiringUsername: string;
-    inquiringInstance: string;
-    gameId: string;
-  };
-};
-
-export type onResponsedGameCatchUpDataType = {
-  type: "responsedGameCatchUpData";
-  header: {
-    gameId: string;
-  };
-  data: {
-    positioning: {
-      position: {
-        left: number;
-        top: number;
-      };
-      scale: {
-        x: number;
-        y: number;
-      };
-      rotation: number;
-    };
-  };
 };
 
 export type onRouterCapabilitiesType = {

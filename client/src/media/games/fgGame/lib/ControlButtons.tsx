@@ -1,6 +1,6 @@
 import React from "react";
-import FgGameButton from "../../fgGameButton/FgGameButton";
-import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import FgGameButton from "../../../../elements/fgGameButton/FgGameButton";
+import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 export default function ControlButtons({
   startGameFunction,
@@ -16,11 +16,11 @@ export default function ControlButtons({
   playerCount: number;
 }) {
   return (
-    <div className='flex items-center justify-center w-max h-full space-x-2 py-2'>
+    <div className="flex h-full w-max items-center justify-center space-x-2 py-2">
       <FgGameButton
-        className='h-full aspect-square'
+        className="aspect-square h-full"
         clickFunction={startGameFunction}
-        hoverContent={<FgHoverContentStandard content='Start (p)' />}
+        hoverContent={<FgHoverContentStandard content="Start (p)" />}
         options={{
           primaryColor: "#3cf599",
           secondaryColor: "#00e359",
@@ -30,9 +30,9 @@ export default function ControlButtons({
         }}
       />
       <FgGameButton
-        className='h-full aspect-square'
+        className="aspect-square h-full"
         clickFunction={joinGameFunction}
-        hoverContent={<FgHoverContentStandard content='Join game (j)' />}
+        hoverContent={<FgHoverContentStandard content="Join game (j)" />}
         options={{
           primaryColor: "#3991ff",
           secondaryColor: "#095dcc",
@@ -42,7 +42,7 @@ export default function ControlButtons({
         }}
       />
       <FgGameButton
-        className='h-full aspect-square'
+        className="aspect-square h-full"
         clickFunction={leaveGameFunction}
         hoverContent={
           <FgHoverContentStandard

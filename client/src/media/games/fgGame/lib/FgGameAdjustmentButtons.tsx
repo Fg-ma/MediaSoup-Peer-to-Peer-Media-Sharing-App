@@ -1,15 +1,21 @@
 import React from "react";
-import PanButton from "../../../elements/fgAdjustmentElements/PanButton";
-import RotateButton from "../../../elements/fgAdjustmentElements/RotateButton";
-import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
-import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import PanButton from "../../../../elements/fgAdjustmentElements/PanButton";
+import RotateButton from "../../../../elements/fgAdjustmentElements/RotateButton";
+import ScaleButton from "../../../../elements/fgAdjustmentElements/ScaleButton";
+import FgContentAdjustmentController from "../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import { useSocketContext } from "../../../../context/socketContext/SocketContext";
+import { GameTypes } from "../../../../../../universal/contentTypeConstant";
 
 export default function FgGameAdjustmentButtons({
+  gameId,
+  gameType,
   sharedBundleRef,
   panBtnRef,
   fgContentAdjustmentController,
   positioning,
 }: {
+  gameId: string;
+  gameType: GameTypes;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
   panBtnRef: React.RefObject<HTMLButtonElement>;
   fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>;
@@ -25,6 +31,8 @@ export default function FgGameAdjustmentButtons({
     rotation: number;
   }>;
 }) {
+  const { gamesSocket } = useSocketContext();
+
   return (
     <>
       <RotateButton
@@ -51,9 +59,13 @@ export default function FgGameAdjustmentButtons({
         pointerDownFunction={() =>
           fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
-        pointerUpFunction={() =>
-          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+          gamesSocket.current?.updateContentPositioning(gameType, gameId, {
+            rotation: positioning.current.rotation,
+          });
+        }}
       />
       <PanButton
         externalRef={panBtnRef}
@@ -106,9 +118,13 @@ export default function FgGameAdjustmentButtons({
             { rotationPointPlacement: "topLeft" },
           )
         }
-        pointerUpFunction={() =>
-          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+          gamesSocket.current?.updateContentPositioning(gameType, gameId, {
+            position: positioning.current.position,
+          });
+        }}
       />
       <ScaleButton
         className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-12 pl-1 pt-1"
@@ -137,9 +153,13 @@ export default function FgGameAdjustmentButtons({
         pointerDownFunction={() =>
           fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction()
         }
-        pointerUpFunction={() =>
-          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
-        }
+        pointerUpFunction={() => {
+          fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction();
+
+          gamesSocket.current?.updateContentPositioning(gameType, gameId, {
+            scale: positioning.current.scale,
+          });
+        }}
       />
     </>
   );

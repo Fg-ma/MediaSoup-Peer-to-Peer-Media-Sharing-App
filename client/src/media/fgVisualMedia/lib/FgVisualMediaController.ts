@@ -103,6 +103,7 @@ class FgVisualMediaController {
     private bundleRef: React.RefObject<HTMLDivElement>,
     private sendGroupSignal: (signal: GroupSignals) => void,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   init = () => {
@@ -742,15 +743,29 @@ class FgVisualMediaController {
   };
 
   handleVisualMediaMessage = (
-    msg: { type: "settingsChanged" } | { type: string },
+    msg:
+      | { type: "settingsChanged" }
+      | { type: "toggleMiniPlayer" }
+      | { type: "toggleClosedCaptions" }
+      | { type: string },
   ) => {
     switch (msg.type) {
       case "settingsChanged":
         this.setRerender((prev) => !prev);
         break;
+      case "toggleMiniPlayer":
+        this.fgLowerVisualMediaController.current.handleMiniPlayer();
+        break;
+      case "toggleClosedCaptions":
+        this.fgLowerVisualMediaController.current.handleClosedCaptions();
+        break;
       default:
         break;
     }
+  };
+
+  handleTableScroll = () => {
+    this.setSettingsActive((prev) => !prev);
   };
 }
 

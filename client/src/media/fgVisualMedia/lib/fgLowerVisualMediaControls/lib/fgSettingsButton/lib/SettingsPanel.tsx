@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { motion, Transition, Variants, AnimatePresence } from "framer-motion";
+import React, { useEffect } from "react";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import FgButton from "../../../../../../../elements/fgButton/FgButton";
 import ClosedCaptionsPage, {
   closedCaptionsSelections,
@@ -16,10 +16,12 @@ import ScreenMedia from "../../../../../../../media/fgVisualMedia/ScreenMedia";
 import CameraMedia from "../../../../../../../media/fgVisualMedia/CameraMedia";
 import FgHoverContentStandard from "../../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import FgSVGElement from "../../../../../../../elements/fgSVGElement/FgSVGElement";
+import FgLowerVisualMediaController from "../../FgLowerVisualMediaController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
+const captionsIcon = nginxAssetServerBaseUrl + "svgs/captionsIcon.svg";
 
 const panelVariants: Variants = {
   init: {
@@ -79,6 +81,7 @@ const closedCaptionOptionsPageTitles = {
 export default function SettingsPanel({
   visualMedia,
   fgVisualMediaOptions,
+  fgLowerVisualMediaController,
   settingsPanelRef,
   settingsButtonRef,
   activePages,
@@ -88,6 +91,7 @@ export default function SettingsPanel({
 }: {
   visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
   fgVisualMediaOptions: FgVisualMediaOptions;
+  fgLowerVisualMediaController: React.MutableRefObject<FgLowerVisualMediaController>;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
@@ -140,7 +144,7 @@ export default function SettingsPanel({
       type="above"
       spacing={4}
       externalRef={settingsButtonRef}
-      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
+      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
       externalPortalRef={settingsPanelRef}
       content={
         <>
@@ -165,7 +169,7 @@ export default function SettingsPanel({
                     >
                       <FgSVGElement
                         src={backgroundIcon}
-                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        className="flex mr-2 aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -199,18 +203,27 @@ export default function SettingsPanel({
                     <div
                       className={`${
                         visualMedia.settings.pictureInPicture.value
-                          ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
-                          : "fill-fg-white stroke-fg-white"
-                      } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
+                          ? "bg-fg-white text-fg-tone-black-1"
+                          : ""
+                      } group/pictureInPicture flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:text-fg-tone-black-1`}
                     >
-                      <FgSVGElement
-                        src={backgroundIcon}
-                        className="mr-2 flex aspect-square h-full items-center justify-center"
-                        attributes={[
-                          { key: "width", value: "80%" },
-                          { key: "height", value: "80%" },
-                        ]}
-                      />
+                      <div className="mr-2 flex aspect-square h-[90%] items-center justify-center">
+                        <div
+                          className={`flex h-[65%] w-[80%] rounded-md border-3 group-hover/pictureInPicture:border-fg-tone-black-1 ${
+                            visualMedia.settings.pictureInPicture.value
+                              ? "items-start justify-start border-fg-tone-black-1"
+                              : "items-end justify-end border-fg-white"
+                          }`}
+                        >
+                          <div
+                            className={`h-[50%] w-[60%] rounded-sm group-hover/pictureInPicture:bg-fg-tone-black-1 ${
+                              visualMedia.settings.pictureInPicture.value
+                                ? "ml-[10%] mt-[10%] bg-fg-tone-black-1"
+                                : "mb-[10%] mr-[10%] bg-fg-white"
+                            }`}
+                          ></div>
+                        </div>
+                      </div>
                       <div className="truncate">
                         {visualMedia.settings.pictureInPicture.value
                           ? "Close picture in picture"
@@ -219,10 +232,8 @@ export default function SettingsPanel({
                     </div>
                   )}
                   clickFunction={() => {
-                    visualMedia.settings.pictureInPicture.value =
-                      !visualMedia.settings.pictureInPicture.value;
+                    fgLowerVisualMediaController.current.handleMiniPlayer();
 
-                    setSettingsActive(false);
                     setRerender((prev) => !prev);
                   }}
                   hoverContent={
@@ -248,8 +259,8 @@ export default function SettingsPanel({
                       } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                     >
                       <FgSVGElement
-                        src={backgroundIcon}
-                        className="mr-2 flex aspect-square h-full items-center justify-center"
+                        src={captionsIcon}
+                        className="flex mr-2 aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -263,11 +274,13 @@ export default function SettingsPanel({
                     </div>
                   )}
                   clickFunction={() => {
-                    visualMedia.settings.captions.value =
-                      !visualMedia.settings.captions.value;
+                    fgLowerVisualMediaController.current.handleClosedCaptions();
 
-                    setSettingsActive(false);
-                    setRerender((prev) => !prev);
+                    fgLowerVisualMediaController.current.updateCaptionsStyles();
+
+                    setTimeout(() => {
+                      setRerender((prev) => !prev);
+                    }, 0);
                   }}
                   hoverContent={
                     <FgHoverContentStandard

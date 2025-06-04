@@ -47,6 +47,7 @@ export default function UserVisualMedia({
   handleMuteCallback,
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
+  tableRef,
 }: {
   visualMediaId: string;
   tableId: string;
@@ -91,6 +92,7 @@ export default function UserVisualMedia({
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
   ) => void;
+  tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const fgVisualMediaOptions = {
     ...defaultFgVisualMediaOptions,
@@ -140,7 +142,7 @@ export default function UserVisualMedia({
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [captionsActive, setCaptionsActive] = useState(false);
+  const [settingsActive, setSettingsActive] = useState(false);
 
   const timeUpdateInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -247,7 +249,7 @@ export default function UserVisualMedia({
       panBtnRef,
       setPausedState,
       paused,
-      setCaptionsActive,
+      setSettingsActive,
       currentTimeRef,
       setVisualEffectsActive,
       setAudioEffectsActive,
@@ -265,6 +267,7 @@ export default function UserVisualMedia({
       frontEffectsContainerRef,
       tableSocket,
       setReactionsPanelActive,
+      setRerender,
     ),
   );
 
@@ -301,6 +304,7 @@ export default function UserVisualMedia({
       bundleRef,
       sendGroupSignal,
       userDataStreams,
+      setSettingsActive,
     ),
   );
 
@@ -379,6 +383,11 @@ export default function UserVisualMedia({
       );
     }
 
+    tableRef.current?.addEventListener(
+      "scroll",
+      fgVisualMediaController.current.handleTableScroll,
+    );
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -432,6 +441,10 @@ export default function UserVisualMedia({
           ),
         );
       }
+      tableRef.current?.removeEventListener(
+        "scroll",
+        fgVisualMediaController.current.handleTableScroll,
+      );
     };
   }, []);
 
@@ -574,7 +587,7 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
+        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
         data-selectable-isuser={true}
@@ -645,6 +658,8 @@ export default function UserVisualMedia({
           handleMuteCallback={handleMuteCallback}
           handleVolumeSliderCallback={handleVolumeSliderCallback}
           tracksColorSetterCallback={tracksColorSetterCallback}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
           setRerender={setRerender}
         />
         <VisualMediaGradient />

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
-import { ContentTypes } from "../../../../../../../universal/contentTypeConstant";
+import { useGeneralContext } from "../../../../../context/generalContext/GeneralContext";
+import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
@@ -10,30 +11,25 @@ import HoverElement from "../../../../../elements/hoverElement/HoverElement";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
+const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const syncIcon = nginxAssetServerBaseUrl + "svgs/syncIcon.svg";
 const desyncIcon = nginxAssetServerBaseUrl + "svgs/desyncIcon.svg";
 const backgroundIcon = nginxAssetServerBaseUrl + "svgs/backgroundIcon.svg";
 const navigateForward = nginxAssetServerBaseUrl + "svgs/navigateForward.svg";
 
 export default function ImageSettingsPanel({
-  currentSettingsActive,
+  instanceId,
+  setExternalRerender,
 }: {
-  currentSettingsActive: React.MutableRefObject<
-    | {
-        contentType: ContentTypes;
-        instanceId: string;
-      }
-    | undefined
-  >;
+  instanceId: string;
+  setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  if (!currentSettingsActive.current) return null;
-
   const { staticContentMedia } = useMediaContext();
+  const { currentSettingsActive } = useGeneralContext();
+  const { sendSettingsSignal } = useSignalContext();
 
   const imageMediaInstance = useRef(
-    staticContentMedia.current.image.tableInstances[
-      currentSettingsActive.current.instanceId
-    ],
+    staticContentMedia.current.image.tableInstances[instanceId],
   );
 
   const [downloadTypePageActive, setDownloadTypePageActive] = useState(false);
@@ -47,42 +43,77 @@ export default function ImageSettingsPanel({
   );
 
   useEffect(() => {
-    if (!currentSettingsActive.current) return;
-
     imageMediaInstance.current =
-      staticContentMedia.current.image.tableInstances[
-        currentSettingsActive.current.instanceId
-      ];
+      staticContentMedia.current.image.tableInstances[instanceId];
 
     setDownloadTypePageActive(false);
 
     setRerender((prev) => !prev);
-  }, [currentSettingsActive.current.instanceId]);
+  }, [instanceId]);
 
   return (
     <div
       className="mx-6 my-4 flex h-max max-w-[320px] flex-col items-center justify-center space-y-1 rounded border border-fg-white bg-fg-tone-black-8 px-2 py-2 font-K2D text-fg-white"
       style={{ width: "calc(100% - 3rem)" }}
     >
-      <HoverElement
-        externalRef={filenameRef}
-        className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4"
-        content={<>{imageMediaInstance.current.imageMedia.filename}</>}
-        hoverContent={
-          (filenameRef.current?.scrollWidth ?? 0) >
-          (filenameRef.current?.clientWidth ?? 0) ? (
-            <FgHoverContentStandard
-              style="light"
-              content={imageMediaInstance.current.imageMedia.filename}
+      <div className="flex h-7 w-full items-center justify-start px-1">
+        <FgButton
+          className="mr-2 flex h-full items-center justify-center"
+          contentFunction={() => (
+            <FgSVGElement
+              src={closeIcon}
+              className="aspect-square h-[55%] fill-fg-white stroke-fg-white"
+              attributes={[
+                { key: "width", value: "100%" },
+                { key: "height", value: "100%" },
+              ]}
             />
-          ) : undefined
-        }
-        options={{
-          hoverSpacing: 4,
-          hoverType: "above",
-          hoverTimeoutDuration: 750,
-        }}
-      />
+          )}
+          clickFunction={() => {
+            const idx = currentSettingsActive.current.findIndex(
+              (active) =>
+                "image" === active.contentType &&
+                instanceId === active.instanceId,
+            );
+
+            if (idx !== -1) {
+              currentSettingsActive.current.splice(idx, 1);
+              sendSettingsSignal({
+                type: "sidePanelChanged",
+              });
+              setExternalRerender((prev) => !prev);
+            }
+          }}
+          hoverContent={
+            <FgHoverContentStandard content={"Close settings"} style="light" />
+          }
+          options={{
+            hoverSpacing: 4,
+            hoverTimeoutDuration: 3500,
+            hoverType: "above",
+          }}
+        />
+        <HoverElement
+          externalRef={filenameRef}
+          className="truncate py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4"
+          style={{ width: "calc(100% - 2.25rem)" }}
+          content={<>{imageMediaInstance.current.imageMedia.filename}</>}
+          hoverContent={
+            (filenameRef.current?.scrollWidth ?? 0) >
+            (filenameRef.current?.clientWidth ?? 0) ? (
+              <FgHoverContentStandard
+                style="light"
+                content={imageMediaInstance.current.imageMedia.filename}
+              />
+            ) : undefined
+          }
+          options={{
+            hoverSpacing: 4,
+            hoverType: "above",
+            hoverTimeoutDuration: 750,
+          }}
+        />
+      </div>
       <FgButton
         className="h-7 w-full"
         contentFunction={() => (

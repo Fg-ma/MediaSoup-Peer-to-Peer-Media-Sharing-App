@@ -25,12 +25,6 @@ const FgVolumeElement = React.lazy(
 const FullScreenButton = React.lazy(
   () => import("./lib/fullScreenButton/FullScreenButton"),
 );
-const PictureInPictureButton = React.lazy(
-  () => import("./lib/pictureInPictureButton/PictureInPictureButton"),
-);
-const CaptionButton = React.lazy(
-  () => import("./lib/captionsButton/CaptionButton"),
-);
 const VisualEffectsButton = React.lazy(
   () => import("./lib/visualEffectsButton/VisualEffectsButton"),
 );
@@ -136,6 +130,8 @@ export default function FgLowerVisualMediaControls({
   handleMuteCallback,
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
+  settingsActive,
+  setSettingsActive,
   setRerender,
 }: {
   visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia;
@@ -188,11 +184,12 @@ export default function FgLowerVisualMediaControls({
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
   ) => void;
+  settingsActive: boolean;
+  setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { mediasoupSocket } = useSocketContext();
 
-  const [settingsActive, setSettingsActive] = useState(false);
   const [activePages, setActivePages] = useState<ActivePages>({
     closedCaption: {
       active: false,
@@ -246,7 +243,7 @@ export default function FgLowerVisualMediaControls({
 
   return (
     <div className="visual-media-lower-controls pointer-events-none absolute bottom-[1%] left-0 z-20 flex h-[12%] max-h-12 min-h-6 w-full justify-between px-3">
-      <div className="z-20 flex h-full w-max items-center space-x-2">
+      <div className="flex z-20 h-full w-max items-center space-x-2">
         {fgVisualMediaOptions.isPlayPause && (
           <Suspense fallback={<div>Loading...</div>}>
             <PlayPauseButton
@@ -321,32 +318,6 @@ export default function FgLowerVisualMediaControls({
             />
           </Suspense>
         )}
-        {fgVisualMediaOptions.isPictureInPicture && (
-          <Suspense fallback={<div>Loading...</div>}>
-            <PictureInPictureButton
-              fgLowerVisualMediaController={fgLowerVisualMediaController}
-              visualEffectsActive={visualEffectsActive}
-              settingsActive={settingsActive}
-              scrollingContainerRef={rightVisualMediaControlsRef}
-            />
-          </Suspense>
-        )}
-        {fgVisualMediaOptions.isClosedCaptions &&
-          fgVisualMediaOptions.isVolume &&
-          audioStream && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <CaptionButton
-                visualMedia={visualMedia}
-                fgLowerVisualMediaController={fgLowerVisualMediaController}
-                visualEffectsActive={visualEffectsActive}
-                settingsActive={settingsActive}
-                audioStream={audioStream}
-                visualMediaContainerRef={visualMediaContainerRef}
-                scrollingContainerRef={rightVisualMediaControlsRef}
-                containerRef={subContainerRef}
-              />
-            </Suspense>
-          )}
         <FgSettingsButton
           username={username}
           instance={instance}
@@ -361,6 +332,7 @@ export default function FgLowerVisualMediaControls({
           activePages={activePages}
           setActivePages={setActivePages}
           scrollingContainerRef={rightVisualMediaControlsRef}
+          fgLowerVisualMediaController={fgLowerVisualMediaController}
           setRerender={setRerender}
         />
         {(fgVisualMediaOptions.isUser ||

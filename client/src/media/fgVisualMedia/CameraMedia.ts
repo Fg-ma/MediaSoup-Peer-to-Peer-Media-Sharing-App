@@ -17,7 +17,10 @@ import Deadbanding from "../../babylon/Deadbanding";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 import { defaultSettings } from "./lib/typeConstant";
 
-export type CameraMediaListenerTypes = { type: "settingsChanged" };
+export type CameraMediaListenerTypes =
+  | { type: "settingsChanged" }
+  | { type: "toggleMiniPlayer" }
+  | { type: "toggleClosedCaptions" };
 
 class CameraMedia {
   canvas: HTMLCanvasElement;
@@ -299,6 +302,18 @@ class CameraMedia {
   settingsChanged = () => {
     this.cameraListeners.forEach((listener) => {
       listener({ type: "settingsChanged" });
+    });
+  };
+
+  handleMiniPlayer = () => {
+    this.cameraListeners.forEach((listener) => {
+      listener({ type: "toggleMiniPlayer" });
+    });
+  };
+
+  handleClosedCaptions = () => {
+    this.cameraListeners.forEach((listener) => {
+      listener({ type: "toggleClosedCaptions" });
     });
   };
 

@@ -7,8 +7,8 @@ import LowerTextController from "../LowerTextController";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import TableTextMediaInstance from "../../../../../media/fgTableText/TableTextMediaInstance";
 import { useSignalContext } from "../../../../../context/signalContext/SignalContext";
-import { TableSidePanels } from "../../../../../tableSidePanel/TableSidePanel";
 import { SettingsSignals } from "../../../../../context/signalContext/lib/typeConstant";
+import { useGeneralContext } from "../../../../../context/generalContext/GeneralContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -45,14 +45,13 @@ export default function SettingsButton({
     addSettingsSignalListener,
     removeSettingsSignalListener,
   } = useSignalContext();
+  const { activeSidePanel, currentSettingsActive } = useGeneralContext();
 
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
   const backgroundColorPickerPanelRef = useRef<HTMLDivElement>(null);
   const textColorPickerPanelRef = useRef<HTMLDivElement>(null);
   const indexColorPickerPanelRef = useRef<HTMLDivElement>(null);
-  const sidePanelState = useRef<undefined | TableSidePanels>(undefined);
-  const openInSidePanel = useRef(false);
 
   const deactivateAll = (obj: RecursiveObject) => {
     // Check if the current object has an 'active' property and if it's true
@@ -118,39 +117,15 @@ export default function SettingsButton({
 
   const handleSettingsSignals = (signal: SettingsSignals) => {
     switch (signal.type) {
-      case "sidePanelChanged": {
-        const { activePanel, currentSettingsActive } = signal.header;
-
-        sidePanelState.current = activePanel;
-        openInSidePanel.current =
-          currentSettingsActive !== undefined &&
-          currentSettingsActive.contentType === "text" &&
-          currentSettingsActive.instanceId === textMediaInstance.textInstanceId;
-
+      case "sidePanelChanged":
         setRerender((prev) => !prev);
         break;
-      }
-      case "sidePanelClosed": {
-        sidePanelState.current = undefined;
+      case "sidePanelClosed":
         setRerender((prev) => !prev);
         break;
-      }
-      case "sidePanelOpened": {
-        sidePanelState.current = signal.header.activePanel;
+      case "sidePanelOpened":
         setRerender((prev) => !prev);
         break;
-      }
-      case "respondedSidePanelState": {
-        const { contentType, instanceId, activePanel } = signal.header;
-        if (
-          contentType === "text" &&
-          instanceId === textMediaInstance.textInstanceId
-        ) {
-          sidePanelState.current = activePanel;
-          setRerender((prev) => !prev);
-        }
-        break;
-      }
       default:
         break;
     }
@@ -158,14 +133,6 @@ export default function SettingsButton({
 
   useEffect(() => {
     addSettingsSignalListener(handleSettingsSignals);
-
-    sendSettingsSignal({
-      type: "requestSidePanelState",
-      header: {
-        contentType: "text",
-        instanceId: textMediaInstance.textInstanceId,
-      },
-    });
 
     return () => {
       removeSettingsSignalListener(handleSettingsSignals);
@@ -178,7 +145,7 @@ export default function SettingsButton({
         externalRef={settingsButtonRef}
         className="pointer-events-auto flex aspect-square h-full items-center justify-center"
         clickFunction={(event) => {
-          if (event.ctrlKey || openInSidePanel.current) {
+          if (event.ctrlKey || activeSidePanel.current === "settings") {
             sendSettingsSignal({
               type: "toggleSettingsPanel",
               header: {
@@ -193,7 +160,17 @@ export default function SettingsButton({
         contentFunction={() => (
           <FgSVGElement
             src={settingsIcon}
-            className={`${settingsActive || openInSidePanel.current ? "-rotate-[30deg]" : "rotate-0"} h-[90%] w-[90%] fill-fg-white stroke-fg-white transition-transform`}
+            className={`${
+              settingsActive ||
+              (activeSidePanel.current === "settings" &&
+                currentSettingsActive.current.some(
+                  (active) =>
+                    active.contentType === "text" &&
+                    active.instanceId === textMediaInstance.textInstanceId,
+                ))
+                ? "-rotate-[30deg]"
+                : "rotate-0"
+            } h-[90%] w-[90%] fill-fg-white stroke-fg-white transition-transform`}
             attributes={[
               { key: "height", value: "100%" },
               { key: "width", value: "100%" },
@@ -207,7 +184,7 @@ export default function SettingsButton({
         }
         scrollingContainerRef={scrollingContainerRef}
       />
-      {!openInSidePanel.current && settingsActive && (
+      {activeSidePanel.current !== "settings" && settingsActive && (
         <SettingsPanel
           textMediaInstance={textMediaInstance}
           settingsPanelRef={settingsPanelRef}

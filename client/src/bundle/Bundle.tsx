@@ -33,6 +33,7 @@ export default function Bundle({
   handleMuteCallback,
   onRendered,
   onNewConsumerWasCreatedCallback,
+  tableRef,
 }: {
   tableId: string;
   username: string;
@@ -52,6 +53,7 @@ export default function Bundle({
   ) => void;
   onRendered?: () => void;
   onNewConsumerWasCreatedCallback?: () => void;
+  tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const bundleOptions = {
     ...defaultBundleOptions,
@@ -243,6 +245,7 @@ export default function Bundle({
                 tracksColorSetterCallback={
                   bundleController.current.tracksColorSetterCallback
                 }
+                tableRef={tableRef}
               />
             ) : (
               <RemoteVisualMedia
@@ -288,6 +291,7 @@ export default function Bundle({
                 tracksColorSetterCallback={
                   bundleController.current.tracksColorSetterCallback
                 }
+                tableRef={tableRef}
               />
             )}
           </Suspense>
@@ -347,6 +351,7 @@ export default function Bundle({
                 tracksColorSetterCallback={
                   bundleController.current.tracksColorSetterCallback
                 }
+                tableRef={tableRef}
               />
             ) : (
               <RemoteVisualMedia
@@ -393,6 +398,7 @@ export default function Bundle({
                 tracksColorSetterCallback={
                   bundleController.current.tracksColorSetterCallback
                 }
+                tableRef={tableRef}
               />
             )}
           </Suspense>

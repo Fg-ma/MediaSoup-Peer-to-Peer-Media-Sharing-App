@@ -52,6 +52,7 @@ export default function RemoteVisualMedia({
   handleMuteCallback,
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
+  tableRef,
 }: {
   tableId: string;
   visualMediaId: string;
@@ -98,6 +99,7 @@ export default function RemoteVisualMedia({
     producerType: "audio" | "screenAudio",
     producerId: string | undefined,
   ) => void;
+  tableRef: React.RefObject<HTMLDivElement>;
 }) {
   const fgVisualMediaOptions = {
     ...defaultFgVisualMediaOptions,
@@ -152,9 +154,9 @@ export default function RemoteVisualMedia({
 
   const currentTimeRef = useRef<HTMLDivElement>(null);
 
-  const [captionsActive, setCaptionsActive] = useState(false);
-
   const initTimeOffset = useRef(0);
+
+  const [settingsActive, setSettingsActive] = useState(false);
 
   const [_, setRerender] = useState(false);
 
@@ -258,7 +260,7 @@ export default function RemoteVisualMedia({
       panBtnRef,
       setPausedState,
       paused,
-      setCaptionsActive,
+      setSettingsActive,
       currentTimeRef,
       setVisualEffectsActive,
       setAudioEffectsActive,
@@ -276,6 +278,7 @@ export default function RemoteVisualMedia({
       frontEffectsContainerRef,
       tableSocket,
       setReactionsPanelActive,
+      setRerender,
     ),
   );
 
@@ -312,6 +315,7 @@ export default function RemoteVisualMedia({
       bundleRef,
       sendGroupSignal,
       userDataStreams,
+      setSettingsActive,
     ),
   );
 
@@ -390,6 +394,11 @@ export default function RemoteVisualMedia({
       );
     }
 
+    tableRef.current?.addEventListener(
+      "scroll",
+      fgVisualMediaController.current.handleTableScroll,
+    );
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -439,6 +448,10 @@ export default function RemoteVisualMedia({
           ),
         );
       }
+      tableRef.current?.removeEventListener(
+        "scroll",
+        fgVisualMediaController.current.handleTableScroll,
+      );
     };
   }, []);
 
@@ -579,7 +592,7 @@ export default function RemoteVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
+        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
         data-selectable-isuser={false}
@@ -659,6 +672,8 @@ export default function RemoteVisualMedia({
           handleMuteCallback={handleMuteCallback}
           handleVolumeSliderCallback={handleVolumeSliderCallback}
           tracksColorSetterCallback={tracksColorSetterCallback}
+          settingsActive={settingsActive}
+          setSettingsActive={setSettingsActive}
           setRerender={setRerender}
         />
         <VisualMediaGradient />

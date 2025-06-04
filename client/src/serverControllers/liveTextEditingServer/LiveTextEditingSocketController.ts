@@ -31,7 +31,7 @@ class LiveTextEditingSocketController {
     ) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
-    this.connect(this.url);
+    this.connect();
   }
 
   deconstructor = () => {
@@ -48,8 +48,8 @@ class LiveTextEditingSocketController {
     this.messageListeners.clear();
   };
 
-  private connect = (url: string) => {
-    this.ws = new WebSocket(url);
+  private connect = () => {
+    this.ws = new WebSocket(this.url);
     this.ws.binaryType = "arraybuffer";
 
     this.ws.onmessage = (event: MessageEvent) => {

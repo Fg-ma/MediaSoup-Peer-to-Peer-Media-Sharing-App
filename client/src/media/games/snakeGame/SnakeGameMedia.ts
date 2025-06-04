@@ -1,4 +1,4 @@
-import { SnakeColorsType } from "../../../games/snakeGame/lib/typeConstant";
+import { GameState, PlayersState, SnakeColorsType } from "./lib/typeConstant";
 import GameMediaUniversalFunctions from "../GameMediaUniversalFunctions";
 
 type OutGoingMessages =
@@ -37,8 +37,79 @@ type OutGoingMessages =
       };
     };
 
+export type SnakeGameListenerTypes =
+  | onGameStartedType
+  | onGameStateUpdateType
+  | onGameOverType
+  | onPlayersStateUpdatedType
+  | onGridSizeChangedType
+  | onInitialGameStatesReturnedType;
+
+export type onGameStartedType = {
+  type: "gameStarted";
+};
+
+export type onGameStateUpdateType = {
+  type: "gameStateUpdate";
+  data: {
+    gameState: GameState;
+  };
+};
+
+export type onGameOverType = {
+  type: "gameOver";
+};
+
+export type onPlayersStateUpdatedType = {
+  type: "playersStateUpdated";
+  data: {
+    playersState: PlayersState;
+  };
+};
+
+export type onGridSizeChangedType = {
+  type: "gridSizeChanged";
+  data: {
+    gridSize: number;
+  };
+};
+
+export type onInitialGameStatesReturnedType = {
+  type: "initialGameStatesReturned";
+  data: {
+    started: boolean;
+    gameOver: boolean;
+    playersState: PlayersState;
+  };
+};
+
 class SnakeGameMedia extends GameMediaUniversalFunctions {
   initiator = false;
+
+  positioning: {
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  } = {
+    position: {
+      left: 37.5,
+      top: 37.5,
+    },
+    scale: {
+      x: 25,
+      y: 25,
+    },
+    rotation: 0,
+  };
+
+  private snakeGameListeners: Set<(message: SnakeGameListenerTypes) => void> =
+    new Set();
 
   constructor(
     tableId: string,
@@ -47,10 +118,24 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     gameId: string,
     private url: string,
     initiator: boolean,
+    initPositioning?: {
+      position: {
+        left: number;
+        top: number;
+      };
+      scale: {
+        x: number;
+        y: number;
+      };
+      rotation: number;
+    },
   ) {
     super(tableId, username, instance, "snake", gameId);
 
     this.initiator = initiator;
+    if (initPositioning) this.positioning = initPositioning;
+
+    this.connect();
   }
 
   destructor = () => {
@@ -59,6 +144,8 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
       this.ws.onmessage = null;
       this.ws.onerror = null;
       this.ws.onclose = null;
+
+      this.snakeGameListeners.clear();
 
       if (
         this.ws.readyState === WebSocket.OPEN ||
@@ -69,19 +156,21 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
     }
   };
 
-  connect = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(this.url);
+  connect = () => {
+    this.ws = new WebSocket(this.url);
 
-      this.ws.onopen = () => {
-        this.newGameSocket();
-        resolve();
-      };
+    this.ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
 
-      this.ws.onerror = (err) => {
-        reject(err);
-      };
-    });
+      this.snakeGameListeners.forEach((listener) => {
+        listener(message);
+      });
+    };
+
+    this.ws.onopen = () => {
+      this.newGameSocket();
+      this.getIntialGameStates();
+    };
   };
 
   sendMessage = (message: OutGoingMessages) => {
@@ -131,6 +220,18 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
         newSnakeColor,
       },
     });
+  };
+
+  addSnakeGameListener = (
+    listener: (message: SnakeGameListenerTypes) => void,
+  ): void => {
+    this.snakeGameListeners.add(listener);
+  };
+
+  removeSnakeGameListener = (
+    listener: (message: SnakeGameListenerTypes) => void,
+  ): void => {
+    this.snakeGameListeners.delete(listener);
   };
 }
 

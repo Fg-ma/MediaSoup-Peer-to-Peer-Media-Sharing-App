@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMediaContext } from "../../context/mediaContext/MediaContext";
-import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import FgGame from "../../elements/fgGame/FgGame";
-import FgButton from "../../elements/fgButton/FgButton";
-import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
-import FgImageElement from "../../elements/fgImageElement/FgImageElement";
+import { useMediaContext } from "../../../context/mediaContext/MediaContext";
+import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
+import FgGame from "../fgGame/FgGame";
+import FgButton from "../../../elements/fgButton/FgButton";
+import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
+import FgImageElement from "../../../elements/fgImageElement/FgImageElement";
 import SnakeGameController from "./lib/SnakeGameController";
 import SnakeColorPickerPanel from "./lib/SnakeColorPickerPanel";
 import SnakeGridSizePanel from "./lib/SnakeGridSizePanel";
@@ -38,13 +38,19 @@ function SnakeGame({
   const { staticContentMedia } = useMediaContext();
   const { username, instance } = useUserInfoContext();
 
+  const snakeGame = useRef(
+    staticContentMedia.current.games.snake?.[snakeGameId],
+  );
+
+  if (!snakeGame.current) return;
+
   const [gridSize, setGridSize] = useState(15);
 
   const [gameState, setGameState] = useState<GameState>({
     snakes: {},
     food: [],
   });
-  const [playersState, setPlayersState] = useState<PlayersState>({});
+  const playersState = useRef<PlayersState>({});
   const [gameOver, setGameOver] = useState(false);
   const [started, setStarted] = useState(false);
   const [snakeColorPanelActive, setSnakeColorPanelActive] = useState(false);
@@ -57,28 +63,24 @@ function SnakeGame({
   const snakeGridSizePanelRef = useRef<HTMLDivElement>(null);
   const userSnakeColor = useRef<SnakeColorsType | undefined>(undefined);
 
-  const snakeGameController = useRef(
-    new SnakeGameController(
-      snakeGameId,
-      staticContentMedia,
-      gridSize,
-      gameState,
-      setGameState,
-      focused,
-      started,
-      setStarted,
-      setGameOver,
-      setPlayersState,
-      playersState,
-      setGridSize,
-    ),
+  const [_, setRerender] = useState(false);
+
+  const snakeGameController = new SnakeGameController(
+    snakeGame,
+    gridSize,
+    gameState,
+    setGameState,
+    focused,
+    started,
+    setStarted,
+    setGameOver,
+    playersState,
+    setGridSize,
+    setRerender,
   );
 
   useEffect(() => {
-    document.addEventListener(
-      "keydown",
-      snakeGameController.current.handleKeyPress,
-    );
+    document.addEventListener("keydown", snakeGameController.handleKeyPress);
 
     boardRef.current?.style.setProperty(
       "--nginx-asset-server-base-url",
@@ -88,42 +90,34 @@ function SnakeGame({
     return () => {
       document.removeEventListener(
         "keydown",
-        snakeGameController.current.handleKeyPress,
+        snakeGameController.handleKeyPress,
       );
     };
   }, [started]);
 
   useEffect(() => {
-    if (
-      !staticContentMedia.current.games.snake ||
-      !staticContentMedia.current.games.snake[snakeGameId] ||
-      !staticContentMedia.current.games.snake[snakeGameId].ws ||
-      staticContentMedia.current.games.snake[snakeGameId].ws.readyState !==
-        WebSocket.OPEN
-    ) {
-      return;
-    }
+    snakeGame.current?.addSnakeGameListener(
+      snakeGameController.handleSnakeGameMessage,
+    );
 
-    staticContentMedia.current.games.snake[snakeGameId].getIntialGameStates();
-
-    staticContentMedia.current.games.snake[snakeGameId].ws.onmessage = (
-      event,
-    ) => {
-      const message = JSON.parse(event.data);
-      snakeGameController.current.handleMessage(message);
+    return () => {
+      snakeGame.current?.removeSnakeGameListener(
+        snakeGameController.handleSnakeGameMessage,
+      );
     };
-  }, [staticContentMedia.current.games.snake?.[snakeGameId]?.ws?.readyState]);
+  }, []);
 
   useEffect(() => {
-    if (staticContentMedia.current.games.snake?.[snakeGameId]?.initiator) {
-      staticContentMedia.current.games.snake?.[snakeGameId]?.joinGame({});
+    if (snakeGame.current?.initiator) {
+      snakeGame.current?.joinGame({});
     }
-  }, [staticContentMedia.current.games.snake?.[snakeGameId]?.initiator]);
+  }, [snakeGame.current?.initiator]);
 
   return (
     <>
       <FgGame
         gameId={snakeGameId}
+        gameType="snake"
         gameStarted={started}
         sharedBundleRef={sharedBundleRef}
         content={
@@ -133,11 +127,11 @@ function SnakeGame({
             data-selectable-type="game"
             data-selectable-id={snakeGameId}
           >
-            {snakeGameController.current.renderBoard()}
+            {snakeGameController.renderBoard()}
             {gameOver && (
               <div
                 className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
-                onClick={snakeGameController.current.startGameClick}
+                onClick={snakeGameController.startGameClick}
               >
                 <div
                   className="flex h-3/5 w-4/5 items-center justify-center rounded-lg bg-cover bg-no-repeat font-K2D text-2xl"
@@ -148,9 +142,9 @@ function SnakeGame({
             {!started && !gameOver && (
               <div
                 className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
-                onClick={snakeGameController.current.startGameClick}
+                onClick={snakeGameController.startGameClick}
               >
-                <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 font-K2D text-2xl">
+                <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 text-center font-K2D text-2xl">
                   Press any key to start
                 </div>
               </div>
@@ -161,8 +155,8 @@ function SnakeGame({
           <div
             className={`flex h-max w-full flex-col items-center justify-center space-y-2 px-2`}
           >
-            {playersState[username.current] &&
-              playersState[username.current][instance.current] && (
+            {playersState.current[username.current] &&
+              playersState.current[username.current][instance.current] && (
                 <>
                   <FgButton
                     className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-fg-white"
@@ -171,7 +165,7 @@ function SnakeGame({
                     }
                     contentFunction={() => {
                       const { primary, secondary } =
-                        playersState[username.current][instance.current]
+                        playersState.current[username.current][instance.current]
                           .snakeColor;
 
                       return (
@@ -249,23 +243,23 @@ function SnakeGame({
         }
         players={{
           user:
-            playersState[username.current] &&
-            playersState[username.current][instance.current]
+            playersState.current[username.current] &&
+            playersState.current[username.current][instance.current]
               ? {
                   primaryColor:
-                    playersState[username.current][instance.current].snakeColor
-                      .primary,
+                    playersState.current[username.current][instance.current]
+                      .snakeColor.primary,
                   secondaryColor:
-                    playersState[username.current][instance.current].snakeColor
-                      .secondary,
+                    playersState.current[username.current][instance.current]
+                      .snakeColor.secondary,
                   shadowColor:
                     colorMap[
-                      playersState[username.current][instance.current]
+                      playersState.current[username.current][instance.current]
                         .snakeColor.primary
                     ],
                 }
               : undefined,
-          players: Object.entries(playersState)
+          players: Object.entries(playersState.current)
             .flatMap(([playerUsername, userState]) =>
               Object.entries(userState).map(
                 ([playerInstance, instanceState]) => {
@@ -287,30 +281,33 @@ function SnakeGame({
         startGameFunction={() => {
           if (!started) {
             setGameOver(false);
-            staticContentMedia.current.games.snake?.[snakeGameId]?.startGame();
+            snakeGame.current?.startGame();
           }
         }}
         closeGameFunction={() => {
-          staticContentMedia.current.games.snake?.[snakeGameId]?.closeGame();
+          snakeGame.current?.closeGame();
         }}
         joinGameFunction={() => {
-          staticContentMedia.current.games.snake?.[snakeGameId]?.joinGame({
+          snakeGame.current?.joinGame({
             snakeColor: userSnakeColor.current,
           });
         }}
         leaveGameFunction={() => {
           if (
-            Object.keys(playersState).length === 0 ||
-            (Object.keys(playersState).length === 1 &&
-              Object.keys(Object.values(playersState)[0]).length <= 1)
+            Object.keys(playersState.current).length === 0 ||
+            (Object.keys(playersState.current).length === 1 &&
+              Object.keys(Object.values(playersState.current)[0]).length <= 1)
           ) {
-            staticContentMedia.current.games.snake?.[snakeGameId]?.closeGame();
+            snakeGame.current?.closeGame();
           } else {
-            staticContentMedia.current.games.snake?.[snakeGameId]?.leaveGame();
+            snakeGame.current?.leaveGame();
           }
         }}
         popupRefs={[snakeColorPickerPanelRef, snakeGridSizePanelRef]}
-        initPosition={{ relativeToBoundaries: "center" }}
+        initPositioning={snakeGame.current.positioning}
+        setPositioning={(positioning) => {
+          if (snakeGame.current) snakeGame.current.positioning = positioning;
+        }}
       />
       {snakeColorPanelActive && (
         <SnakeColorPickerPanel

@@ -46,7 +46,6 @@ export function MediaContextProvider({ children }: MediaContextProviderProps) {
     application: { user: {}, table: {}, tableInstances: {} },
     text: { user: {}, table: {}, tableInstances: {} },
     soundClip: { user: {}, table: {}, tableInstances: {} },
-    gamesSignaling: undefined,
     games: {},
   });
   const remoteDataStreams = useRef<RemoteDataStreamsType>({});

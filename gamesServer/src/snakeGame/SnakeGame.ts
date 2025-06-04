@@ -517,7 +517,7 @@ class SnakeGame {
     username: string,
     instance: string,
     newSnake: Snake,
-    head: any
+    head: { x: number; y: number }
   ): boolean => {
     const collidedWithWall =
       head.x < 0 ||

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import {
-  GameTypes,
   GameWebSocket,
   onJoinTableType,
   onLeaveTableType,
@@ -8,11 +7,13 @@ import {
   tables,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { tableTopMongo } from "src";
+import { GameTypes } from "../../../universal/contentTypeConstant";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
-  onJoinTable = (ws: GameWebSocket, event: onJoinTableType) => {
+  onJoinTable = async (ws: GameWebSocket, event: onJoinTableType) => {
     const { tableId, username, instance } = event.header;
 
     if (!tables[tableId]) {
@@ -33,7 +34,7 @@ class TablesController {
     ws.instance = instance;
     ws.socketType = "signaling";
 
-    const activeGames = this.getUniqueGames(tableId);
+    const activeGames = await this.getUniqueGames(tableId);
 
     this.broadcaster.broadcastToInstance(
       tableId,
@@ -108,35 +109,30 @@ class TablesController {
     });
   };
 
-  private getUniqueGames = (
+  private getUniqueGames = async (
     tableId: string
-  ): { gameType: GameTypes; gameId: string }[] => {
-    const uniqueGames = new Set<string>();
-    const result: { gameType: GameTypes; gameId: string }[] = [];
+  ): Promise<
+    {
+      gameType: GameTypes;
+      gameId: string;
+      positioning: {
+        position: {
+          left: number;
+          top: number;
+        };
+        scale: {
+          x: number;
+          y: number;
+        };
+        rotation: number;
+      };
+    }[]
+  > => {
+    const mongoData = await tableTopMongo.tableGames?.gets.getAllBy_TID(
+      tableId
+    );
 
-    if (!tables[tableId]) return result;
-
-    const usernames = Object.values(tables[tableId]);
-    for (const username of usernames) {
-      const instances = Object.values(username);
-      for (const instance of instances) {
-        if (instance.games) {
-          for (const [gameType, gamesById] of Object.entries(instance.games)) {
-            if (gamesById) {
-              for (const gameId of Object.keys(gamesById)) {
-                const key = `${gameType}:${gameId}`;
-                if (!uniqueGames.has(key)) {
-                  uniqueGames.add(key);
-                  result.push({ gameType: gameType as GameTypes, gameId });
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return result;
+    return mongoData ?? [];
   };
 }
 

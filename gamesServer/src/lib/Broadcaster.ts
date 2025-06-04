@@ -1,4 +1,5 @@
-import { GameTypes, SocketTypes, tables } from "../typeConstant";
+import { GameTypes } from "../../../universal/contentTypeConstant";
+import { SocketTypes, tables } from "../typeConstant";
 
 class Broadcaster {
   constructor() {}

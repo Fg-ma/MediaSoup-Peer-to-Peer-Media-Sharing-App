@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
+import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import FgPanel from "../../../elements/fgPanel/FgPanel";
@@ -19,7 +19,7 @@ export default function GamesSection({
 }: {
   gamesSectionRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { staticContentMedia } = useMediaContext();
+  const { gamesSocket } = useSocketContext();
   const { tableId, username, instance } = useUserInfoContext();
 
   const [gamesActive, setGamesActive] = useState(false);
@@ -70,7 +70,7 @@ export default function GamesSection({
           content={
             <LazyScrollingContainer
               externalRef={gamesScrollingContainerRef}
-              className="small-vertical-scroll-bar grid h-full items-center justify-center gap-1 overflow-y-auto py-2"
+              className="grid small-vertical-scroll-bar h-full items-center justify-center gap-1 overflow-y-auto py-2"
               style={{
                 gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
                 gridAutoRows: "max-content",
@@ -98,7 +98,7 @@ export default function GamesSection({
                       return;
                     }
 
-                    staticContentMedia.current.gamesSignaling?.initiateGame(
+                    gamesSocket.current?.initiateGame(
                       "snake",
                       `snake_game_${uuidv4()}`,
                     );

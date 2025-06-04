@@ -3,7 +3,8 @@ import MediasoupSocketController from "../../serverControllers/mediasoupServer/M
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
-import LiveTextEditingSocketController from "src/serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
+import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
+import GamesServerController from "../../serverControllers/gamesServer/GamesServerController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export interface SocketContextType {
   userStaticContentSocket: React.MutableRefObject<
     UserStaticContentSocketController | undefined
   >;
+  gamesSocket: React.MutableRefObject<GamesServerController | undefined>;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -51,6 +53,7 @@ export function SocketContextProvider({
   const userStaticContentSocket = useRef<
     UserStaticContentSocketController | undefined
   >();
+  const gamesSocket = useRef<GamesServerController | undefined>();
 
   return (
     <SocketContext.Provider
@@ -60,6 +63,7 @@ export function SocketContextProvider({
         mediasoupSocket,
         tableStaticContentSocket,
         userStaticContentSocket,
+        gamesSocket,
       }}
     >
       {children}

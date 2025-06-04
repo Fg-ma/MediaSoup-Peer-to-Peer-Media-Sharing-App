@@ -9,7 +9,7 @@ import {
   StaticContentEffectsStylesType,
   StaticContentEffectsType,
 } from "../../../../universal/effectsTypeConstant";
-import GamesSignalingMedia from "../../media/games/GamesSignalingMedia";
+import GamesServerController from "../../serverControllers/gamesServer/GamesServerController";
 import BundlesController from "../../lib/BundlesController";
 import onRouterCapabilities from "../../lib/onRouterCapabilities";
 import TableSocketController from "../../serverControllers/tableServer/TableSocketController";
@@ -41,6 +41,9 @@ class JoinTableSectionController {
     >,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
+    >,
+    private gamesSocket: React.MutableRefObject<
+      GamesServerController | undefined
     >,
     private tableIdRef: React.RefObject<HTMLInputElement>,
     private usernameRef: React.RefObject<HTMLInputElement>,
@@ -156,7 +159,7 @@ class JoinTableSectionController {
           this.removeCurrentDownload,
         );
 
-      this.staticContentMedia.current.gamesSignaling = new GamesSignalingMedia(
+      this.gamesSocket.current = new GamesServerController(
         this.tableId.current,
         this.username.current,
         this.instance.current,
@@ -296,11 +299,6 @@ class JoinTableSectionController {
     if (this.userMedia.current.audio) {
       this.userMedia.current.audio.deconstructor();
       this.userMedia.current.audio = undefined;
-    }
-
-    if (this.staticContentMedia.current.gamesSignaling) {
-      this.staticContentMedia.current.gamesSignaling.deconstructor();
-      this.staticContentMedia.current.gamesSignaling = undefined;
     }
 
     for (const gameType in this.staticContentMedia.current.games) {

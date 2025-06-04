@@ -9,14 +9,30 @@ import {
   onLeaveGameType,
   onGetPlayersStateType,
   onGetIntialGameStatesType,
+  onUpdateContentPositioningType,
 } from "../typeConstant";
 import SnakeGame from "../snakeGame/SnakeGame";
 import { SnakeColorsType } from "../snakeGame/lib/typeConstant";
+import { tableTopMongo } from "src";
 
 class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
 
-  onInitiateGame = (event: onInitiateGameType) => {
+  onUpdateContentPositioning = async (
+    event: onUpdateContentPositioningType
+  ) => {
+    const { tableId, gameId } = event.header;
+    const { positioning } = event.data;
+
+    await tableTopMongo.tableGames?.uploads.editMetaData(
+      { tableId, gameId },
+      {
+        positioning,
+      }
+    );
+  };
+
+  onInitiateGame = async (event: onInitiateGameType) => {
     const { tableId, gameType, gameId } = event.header;
     const { initiator } = event.data;
 
@@ -30,6 +46,17 @@ class UniversalGameController {
         tableId,
         gameId
       );
+
+      await tableTopMongo.tableGames?.uploads.uploadMetaData({
+        tableId,
+        gameId,
+        gameType,
+        positioning: {
+          position: { left: 37.5, top: 37.5 },
+          scale: { x: 25, y: 25 },
+          rotation: 0,
+        },
+      });
     }
 
     this.broadcaster.broadcastToTable(
@@ -62,8 +89,27 @@ class UniversalGameController {
     });
   };
 
-  onCloseGame = (event: onCloseGameType) => {
+  onCloseGame = async (event: onCloseGameType) => {
     const { tableId, gameType, gameId } = event.header;
+
+    this.broadcaster.broadcastToTable(
+      tableId,
+      "signaling",
+      undefined,
+      undefined,
+      {
+        type: "gameClosed",
+        header: {
+          gameType,
+          gameId,
+        },
+      }
+    );
+
+    await tableTopMongo.tableGames?.deletes.deleteMetaDataBy_TID_GID(
+      tableId,
+      gameId
+    );
 
     for (const username in tables[tableId]) {
       for (const instance in tables[tableId][username]) {
@@ -86,19 +132,17 @@ class UniversalGameController {
       }
     }
 
-    this.broadcaster.broadcastToTable(
-      tableId,
-      "signaling",
-      undefined,
-      undefined,
-      {
-        type: "gameClosed",
-        header: {
-          gameType,
-          gameId,
-        },
-      }
-    );
+    switch (gameType) {
+      case "snake":
+        delete snakeGames[tableId][gameId];
+
+        if (Object.keys(snakeGames[tableId]).length === 0) {
+          delete snakeGames[tableId];
+        }
+        break;
+      default:
+        break;
+    }
   };
 
   onJoinGame = (event: onJoinGameType) => {

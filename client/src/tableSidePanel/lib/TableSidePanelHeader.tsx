@@ -6,13 +6,14 @@ import { TableSidePanels } from "../TableSidePanel";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import { ContentTypes } from "../../../../universal/contentTypeConstant";
+import { useGeneralContext } from "../../context/generalContext/GeneralContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const swapIcon = nginxAssetServerBaseUrl + "svgs/swapIcon.svg";
 
-const activePanelTitles: { [tablePanel in TableSidePanels]: string } = {
+const activeSidePanelTitles: { [tablePanel in TableSidePanels]: string } = {
   general: "General",
   settings: "Settings",
   upload: "Uploads",
@@ -21,28 +22,19 @@ const activePanelTitles: { [tablePanel in TableSidePanels]: string } = {
 
 export default function TableSidePanelHeader({
   tableSidePanelHeaderRef,
-  activePanel,
   setTableSidePanelActive,
   setExternalRerender,
   sidePanelPosition,
   setSidePanelPosition,
-  currentSettingsActive,
 }: {
   tableSidePanelHeaderRef: React.RefObject<HTMLDivElement>;
-  activePanel: React.MutableRefObject<TableSidePanels>;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
   sidePanelPosition: "left" | "right";
   setSidePanelPosition: React.Dispatch<React.SetStateAction<"left" | "right">>;
-  currentSettingsActive: React.MutableRefObject<
-    | {
-        contentType: ContentTypes;
-        instanceId: string;
-      }
-    | undefined
-  >;
 }) {
   const { sendSettingsSignal } = useSignalContext();
+  const { activeSidePanel, currentSettingsActive } = useGeneralContext();
 
   return (
     <div
@@ -51,22 +43,17 @@ export default function TableSidePanelHeader({
     >
       <FgDropdownButton
         kind="popup"
-        label={activePanelTitles[activePanel.current]}
+        label={activeSidePanelTitles[activeSidePanel.current]}
         className="mr-1 h-10 max-w-36 grow px-1 py-1 font-Josefin text-xl"
-        elements={Object.entries(activePanelTitles).map(([key, title]) => (
+        elements={Object.entries(activeSidePanelTitles).map(([key, title]) => (
           <div
             key={key}
-            className={`${activePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] truncate rounded font-K2D hover:bg-fg-tone-black-8`}
+            className={`${activeSidePanel.current === key ? "bg-fg-tone-black-8" : ""} h-max w-[95%] truncate rounded font-K2D hover:bg-fg-tone-black-8`}
             onClick={() => {
-              activePanel.current = key as TableSidePanels;
+              activeSidePanel.current = key as TableSidePanels;
               setExternalRerender((prev) => !prev);
-              currentSettingsActive.current = undefined;
               sendSettingsSignal({
                 type: "sidePanelChanged",
-                header: {
-                  activePanel: activePanel.current,
-                  currentSettingsActive: currentSettingsActive.current,
-                },
               });
             }}
           >

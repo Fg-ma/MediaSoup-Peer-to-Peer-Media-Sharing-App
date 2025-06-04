@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
-import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import FgPanel from "../../../elements/fgPanel/FgPanel";
-import FgButton from "../../../elements/fgButton/FgButton";
-import FgImageElement from "../../../elements/fgImageElement/FgImageElement";
-import FgHoverContentStandard from "../../../elements/fgHoverContentStandard/FgHoverContentStandard";
-import LazyScrollingContainer from "../../../elements/lazyScrollingContainer/LazyScrollingContainer";
+import React, { useRef } from "react";
+import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
+import FgPanel from "../../../../elements/fgPanel/FgPanel";
+import FgButton from "../../../../elements/fgButton/FgButton";
+import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
+import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import LazyScrollingContainer from "../../../../elements/lazyScrollingContainer/LazyScrollingContainer";
 import {
   PlayersState,
   snakeColorIconMap,
@@ -23,14 +23,14 @@ export default function SnakeColorPickerPanel({
   snakeGameId: string;
   snakeColorPickerButtonRef: React.RefObject<HTMLButtonElement>;
   setSnakeColorPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
-  playersState: PlayersState;
+  playersState: React.MutableRefObject<PlayersState>;
   userSnakeColor: React.MutableRefObject<SnakeColorsType | undefined>;
 }) {
   const { staticContentMedia } = useMediaContext();
 
   const snakeColorPickerRef = useRef<HTMLDivElement>(null);
 
-  const usedColors = Object.values(playersState).flatMap((instances) =>
+  const usedColors = Object.values(playersState.current).flatMap((instances) =>
     Object.values(instances).map((playerState) => playerState.snakeColor),
   );
 
@@ -41,7 +41,7 @@ export default function SnakeColorPickerPanel({
       content={
         <LazyScrollingContainer
           externalRef={snakeColorPickerRef}
-          className="small-vertical-scroll-bar grid h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
+          className="grid small-vertical-scroll-bar h-full w-full items-center justify-center gap-1 overflow-y-auto py-2"
           style={{
             gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
             gridAutoRows: "max-content",

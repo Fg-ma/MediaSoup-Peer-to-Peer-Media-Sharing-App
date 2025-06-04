@@ -1,4 +1,6 @@
 import { MongoClient, Db } from "mongodb";
+import dotenv from "dotenv";
+import path from "path";
 import TableImages from "./lib/tableImages/TableImages";
 import TableVideos from "./lib/tableVideos/TableVideos";
 import TableSoundClips from "./lib/tableSoundClips/TableSoundClips";
@@ -38,10 +40,18 @@ import {
   TextEffectStylesType,
   VideoEffectStylesType,
 } from "../../universal/effectsTypeConstant";
+import TableGames from "./lib/tableGames/TableGames";
 
-const uri =
-  "mongodb://admin:tableTopAbigailDavis@localhost:27017/?tls=true&replicaSet=rs0";
-const dbName = "tableTopMongo";
+dotenv.config({
+  path: path.resolve(__dirname, "../../.env"),
+});
+
+const mongoUri = process.env.MONGO_URI;
+const mongodbName = process.env.MONGO_DB_NAME;
+const tlsCAFilePath = process.env.TLS_CA_FILE_PATH;
+const tlsCertificateKeyFile = process.env.TLS_CERTIFICATE_KEY_FILE;
+const tlsCertificateKeyFilePassword =
+  process.env.TLS_CERTIFICATE_KEY_FILE_PASSWORD;
 
 class TableTopMongo {
   private client: MongoClient | undefined;
@@ -60,6 +70,7 @@ class TableTopMongo {
   userApplications: UserApplications | undefined;
   userText: UserText | undefined;
   userSvgs: UserSvgs | undefined;
+  tableGames: TableGames | undefined;
 
   constructor() {
     this.getDbConnection();
@@ -70,17 +81,16 @@ class TableTopMongo {
   };
 
   private getDbConnection = async () => {
-    this.client = new MongoClient(uri, {
+    this.client = new MongoClient(mongoUri ?? "", {
       tls: true,
-      tlsCAFile: "/home/fg/Desktop/tableTopSecrets/ca.pem",
-      tlsCertificateKeyFile:
-        "/home/fg/Desktop/tableTopSecrets/mongodb/mongodb.pem",
-      tlsCertificateKeyFilePassword: "tableTopAbigailDavis",
+      tlsCAFile: tlsCAFilePath,
+      tlsCertificateKeyFile: tlsCertificateKeyFile,
+      tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword,
     });
 
     await this.client.connect();
 
-    this.db = this.client.db(dbName);
+    this.db = this.client.db(mongodbName);
 
     this.tablesMeta = new TablesMeta(this.db);
     this.tableImages = new TableImages(this.db);
@@ -95,6 +105,7 @@ class TableTopMongo {
     this.userApplications = new UserApplications(this.db);
     this.userText = new UserText(this.db);
     this.userSvgs = new UserSvgs(this.db);
+    this.tableGames = new TableGames(this.db);
   };
 
   deleteTableDocument = async (

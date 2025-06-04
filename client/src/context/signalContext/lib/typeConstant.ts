@@ -10,8 +10,6 @@ export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
 export type SettingsSignals =
   | onToggleSettingsPanelType
   | onSidePanelChangedType
-  | onRequestSidePanelStateType
-  | onRespondedSidePanelStateType
   | onSidePanelClosedType
   | onSidePanelOpenedType;
 
@@ -46,28 +44,8 @@ export type onLocalMuteChangeType = {
   };
 };
 
-export type onRequestSidePanelStateType = {
-  type: "requestSidePanelState";
-  header: {
-    contentType: ContentTypes;
-    instanceId: string;
-  };
-};
-
-export type onRespondedSidePanelStateType = {
-  type: "respondedSidePanelState";
-  header: {
-    contentType: ContentTypes;
-    instanceId: string;
-    activePanel: TableSidePanels;
-  };
-};
-
 export type onSidePanelOpenedType = {
   type: "sidePanelOpened";
-  header: {
-    activePanel: TableSidePanels;
-  };
 };
 
 export type onSidePanelClosedType = {
@@ -76,20 +54,6 @@ export type onSidePanelClosedType = {
 
 export type onSidePanelChangedType = {
   type: "sidePanelChanged";
-  header: {
-    activePanel: TableSidePanels;
-    currentSettingsActive:
-      | {
-          contentType: ContentTypes;
-          instanceId: string;
-          visualMediaInfo?: {
-            isUser: boolean;
-            username: string;
-            instance: string;
-          };
-        }
-      | undefined;
-  };
 };
 
 export type onToggleSettingsPanelType = {

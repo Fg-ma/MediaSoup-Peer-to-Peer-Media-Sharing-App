@@ -16,6 +16,9 @@ const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
     case "leaveTable":
       tablesController.onLeaveTable(event);
       break;
+    case "updateContentPositioning":
+      universalGameController.onUpdateContentPositioning(event);
+      break;
     case "initiateGame":
       universalGameController.onInitiateGame(event);
       break;

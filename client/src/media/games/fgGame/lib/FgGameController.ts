@@ -1,24 +1,20 @@
-import {
-  IncomingMediasoupMessages,
-  onRequestedGameCatchUpDataType,
-  onResponsedGameCatchUpDataType,
-} from "../../../serverControllers/mediasoupServer/lib/typeConstant";
-import MediasoupSocketController from "../../../serverControllers/mediasoupServer/MediasoupSocketController";
-import ReactController from "../../../elements/reactButton/lib/ReactController";
-import { RemoteDataStreamsType } from "../../../context/mediaContext/lib/typeConstant";
-import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
-import TableSocketController from "../../../serverControllers/tableServer/TableSocketController";
+import { IncomingMediasoupMessages } from "../../../../serverControllers/mediasoupServer/lib/typeConstant";
+import MediasoupSocketController from "../../../../serverControllers/mediasoupServer/MediasoupSocketController";
+import ReactController from "../../../../elements/reactButton/lib/ReactController";
+import { RemoteDataStreamsType } from "../../../../context/mediaContext/lib/typeConstant";
+import FgContentAdjustmentController from "../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import TableSocketController from "../../../../serverControllers/tableServer/TableSocketController";
 import {
   IncomingTableMessages,
   onReactionOccurredType,
-} from "../../../serverControllers/tableServer/lib/typeConstant";
+} from "../../../../serverControllers/tableServer/lib/typeConstant";
 import {
   GroupSignals,
   onGroupDeleteType,
   onGroupDragEndType,
   onGroupDragStartType,
   onGroupDragType,
-} from "../../../context/signalContext/lib/typeConstant";
+} from "../../../../context/signalContext/lib/typeConstant";
 
 class FgGameController {
   reactController: ReactController;
@@ -26,9 +22,6 @@ class FgGameController {
   savedMediaPosition: { top: number; left: number } | undefined;
 
   constructor(
-    private mediasoupSocket: React.MutableRefObject<
-      MediasoupSocketController | undefined
-    >,
     private tableId: React.MutableRefObject<string>,
     private gameId: string,
     private hideControls: boolean,
@@ -295,45 +288,10 @@ class FgGameController {
     }
   };
 
-  onRequestedGameCatchUpData = (event: onRequestedGameCatchUpDataType) => {
-    const { inquiringUsername, inquiringInstance, gameId } = event.header;
-
-    if (gameId === this.gameId) {
-      this.mediasoupSocket.current?.sendMessage({
-        type: "responseGameCatchUpData",
-        header: {
-          tableId: this.tableId.current,
-          inquiringUsername,
-          inquiringInstance,
-          gameId,
-        },
-        data: {
-          positioning: this.positioning.current,
-        },
-      });
-    }
-  };
-
-  onResponsedGameCatchUpData = (event: onResponsedGameCatchUpDataType) => {
-    const { gameId } = event.header;
-    const { positioning } = event.data;
-
-    if (gameId === this.gameId) {
-      this.positioning.current = positioning;
-      this.setRerender((prev) => !prev);
-    }
-  };
-
   handleMessage = (event: IncomingMediasoupMessages) => {
     switch (event.type) {
       case "newConsumerWasCreated":
         this.attachPositioningListeners();
-        break;
-      case "requestedGameCatchUpData":
-        this.onRequestedGameCatchUpData(event);
-        break;
-      case "responsedGameCatchUpData":
-        this.onResponsedGameCatchUpData(event);
         break;
       default:
         break;

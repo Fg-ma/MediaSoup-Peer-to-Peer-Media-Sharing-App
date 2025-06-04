@@ -1,12 +1,11 @@
 import React from "react";
-import { StaticContentMediaType } from "../../../context/mediaContext/lib/typeConstant";
 import SnakeGameSocket from "./SnakeGameSocket";
 import { GameState, PlayersState } from "./typeConstant";
+import SnakeGameMedia from "../SnakeGameMedia";
 
 class SnakeGameController extends SnakeGameSocket {
   constructor(
-    private snakeGameId: string,
-    private staticContentMedia: React.MutableRefObject<StaticContentMediaType>,
+    private snakeGame: React.MutableRefObject<SnakeGameMedia | undefined>,
     private gridSize: number,
     private gameState: GameState,
     setGameState: React.Dispatch<React.SetStateAction<GameState>>,
@@ -14,11 +13,18 @@ class SnakeGameController extends SnakeGameSocket {
     private started: boolean,
     setStarted: React.Dispatch<React.SetStateAction<boolean>>,
     setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
-    setPlayersState: React.Dispatch<React.SetStateAction<PlayersState>>,
-    private playersState: PlayersState,
+    playersState: React.MutableRefObject<PlayersState>,
     setGridSize: React.Dispatch<React.SetStateAction<number>>,
+    setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {
-    super(setGameState, setStarted, setGameOver, setPlayersState, setGridSize);
+    super(
+      setGameState,
+      setStarted,
+      setGameOver,
+      playersState,
+      setGridSize,
+      setRerender,
+    );
   }
 
   handleKeyPress = (event: KeyboardEvent) => {
@@ -52,9 +58,7 @@ class SnakeGameController extends SnakeGameSocket {
       key !== "r"
     ) {
       this.setGameOver(false);
-      this.staticContentMedia.current.games.snake?.[
-        this.snakeGameId
-      ]?.startGame();
+      this.snakeGame.current?.startGame();
     }
 
     let newDirection: "up" | "down" | "left" | "right" | undefined = undefined;
@@ -87,9 +91,7 @@ class SnakeGameController extends SnakeGameSocket {
     }
 
     if (newDirection) {
-      this.staticContentMedia.current.games.snake?.[
-        this.snakeGameId
-      ]?.snakeDirectionChange(newDirection);
+      this.snakeGame.current?.snakeDirectionChange(newDirection);
     }
   };
 
@@ -213,11 +215,12 @@ class SnakeGameController extends SnakeGameSocket {
               );
 
               if (
-                this.playersState[playerUsername] &&
-                this.playersState[playerUsername][playerInstance]
+                this.playersState.current[playerUsername] &&
+                this.playersState.current[playerUsername][playerInstance]
               ) {
                 const { primary, secondary } =
-                  this.playersState[playerUsername][playerInstance].snakeColor;
+                  this.playersState.current[playerUsername][playerInstance]
+                    .snakeColor;
 
                 cellClass = `${className}-${primary}-${secondary} snake-game-snake`;
               }
@@ -266,9 +269,7 @@ class SnakeGameController extends SnakeGameSocket {
   startGameClick = () => {
     if (!this.started) {
       this.setGameOver(false);
-      this.staticContentMedia.current.games.snake?.[
-        this.snakeGameId
-      ]?.startGame();
+      this.snakeGame.current?.startGame();
     }
   };
 }

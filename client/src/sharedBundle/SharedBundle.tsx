@@ -10,7 +10,9 @@ import FgTableApplication from "../media/fgTableApplication/FgTableApplication";
 import FgText from "../media/fgTableText/FgTableText";
 import FgTableSvg from "../media/fgTableSvg/FgTableSvg";
 
-const SnakeGame = React.lazy(() => import("../games/snakeGame/SnakeGame"));
+const SnakeGame = React.lazy(
+  () => import("../media/games/snakeGame/SnakeGame"),
+);
 
 export default function SharedBundle({
   tableRef,
@@ -27,7 +29,7 @@ export default function SharedBundle({
   };
 
   const { staticContentMedia } = useMediaContext();
-  const { tableStaticContentSocket, liveTextEditingSocket } =
+  const { tableStaticContentSocket, liveTextEditingSocket, gamesSocket } =
     useSocketContext();
   const { username } = useUserInfoContext();
 
@@ -43,16 +45,16 @@ export default function SharedBundle({
   );
 
   useEffect(() => {
-    staticContentMedia.current.gamesSignaling?.addMessageListener(
+    gamesSocket.current?.addMessageListener(
       sharedBundleController.current.gameSignalingListener,
     );
 
     return () => {
-      staticContentMedia.current.gamesSignaling?.removeMessageListener(
+      gamesSocket.current?.removeMessageListener(
         sharedBundleController.current.gameSignalingListener,
       );
     };
-  }, [staticContentMedia.current.gamesSignaling]);
+  }, [gamesSocket.current]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(

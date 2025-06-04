@@ -1,7 +1,7 @@
 import React from "react";
-import { useMediaContext } from "../../../context/mediaContext/MediaContext";
-import FgPanel from "../../../elements/fgPanel/FgPanel";
-import FgSlider from "../../../elements/fgSlider/FgSlider";
+import { useMediaContext } from "../../../../context/mediaContext/MediaContext";
+import FgPanel from "../../../../elements/fgPanel/FgPanel";
+import FgSlider from "../../../../elements/fgSlider/FgSlider";
 
 export default function SnakeGridSizePanel({
   externalRef,

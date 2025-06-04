@@ -1,6 +1,9 @@
 import { defaultSettings } from "./lib/typeConstant";
 
-export type RemoteVisualMediaListenerTypes = { type: "settingsChanged" };
+export type RemoteVisualMediaListenerTypes =
+  | { type: "settingsChanged" }
+  | { type: "toggleMiniPlayer" }
+  | { type: "toggleClosedCaptions" };
 
 class RemoteVisualMedia {
   settings = structuredClone(defaultSettings);
@@ -24,6 +27,18 @@ class RemoteVisualMedia {
   settingsChanged = () => {
     this.remoteVisualListeners.forEach((listener) => {
       listener({ type: "settingsChanged" });
+    });
+  };
+
+  handleMiniPlayer = () => {
+    this.remoteVisualListeners.forEach((listener) => {
+      listener({ type: "toggleMiniPlayer" });
+    });
+  };
+
+  handleClosedCaptions = () => {
+    this.remoteVisualListeners.forEach((listener) => {
+      listener({ type: "toggleClosedCaptions" });
     });
   };
 

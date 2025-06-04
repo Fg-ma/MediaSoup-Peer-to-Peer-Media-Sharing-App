@@ -1,7 +1,7 @@
 import React from "react";
-import FgButton from "../../fgButton/FgButton";
-import FgSVGElement from "../../fgSVGElement/FgSVGElement";
-import FgHoverContentStandard from "../../fgHoverContentStandard/FgHoverContentStandard";
+import FgButton from "../../../../elements/fgButton/FgButton";
+import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
+import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -14,11 +14,11 @@ export default function EndGameButton({
 }) {
   return (
     <FgButton
-      className='h-[60%] aspect-square rounded pb-3 pr-2'
+      className="aspect-square h-[60%] rounded pb-3 pr-2"
       clickFunction={closeGameFunction}
       contentFunction={() => (
         <FgSVGElement
-          className='flex items-center justify-center h-full aspect-square'
+          className="flex aspect-square h-full items-center justify-center"
           src={closeIcon}
           attributes={[
             { key: "width", value: "100%" },
@@ -28,7 +28,7 @@ export default function EndGameButton({
           ]}
         />
       )}
-      hoverContent={<FgHoverContentStandard content='End game (x)' />}
+      hoverContent={<FgHoverContentStandard content="End game (x)" />}
       options={{
         hoverTimeoutDuration: 750,
         hoverType: "above",

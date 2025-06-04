@@ -8,7 +8,6 @@ import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../tableLayers/newInstancesLayer/NewInstancesLayer";
 import SelectTableLayer from "../tableLayers/selectTableLayer/SelectTableLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
-import Deadbanding from "../babylon/Deadbanding";
 import LeftTableSection from "./lib/sideSections/LeftTableSection";
 import RightTableSection from "./lib/sideSections/RightTableSection";
 import TopTableSection from "./lib/sideSections/TopTableSection";
@@ -59,7 +58,6 @@ export default function Table({
   }>({});
   const [tableSidePanelWidth, setTableSidePanelWidth] = useState(256);
   const [_, setRerender] = useState(false);
-  const activePanel = useRef<TableSidePanels>("general");
   const aspectDir = useRef<"width" | "height">("width");
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const innerTableContainerRef = useRef<HTMLDivElement>(null);
@@ -143,7 +141,6 @@ export default function Table({
       }}
     >
       <TableSidePanel
-        activePanel={activePanel}
         tableSidePanelActive={tableSidePanelActive}
         setTableSidePanelActive={setTableSidePanelActive}
         tableController={tableController}
@@ -192,7 +189,6 @@ export default function Table({
               <>
                 <TableInfoPopup />
                 <LoadingTab
-                  activePanel={activePanel}
                   tableSidePanelActive={tableSidePanelActive}
                   setTableSidePanelActive={setTableSidePanelActive}
                   setExternalRerender={setRerender}

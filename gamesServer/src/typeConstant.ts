@@ -1,10 +1,9 @@
 import uWS from "uWebSockets.js";
 import SnakeGame from "./snakeGame/SnakeGame";
 import { SnakeColorsType } from "./snakeGame/lib/typeConstant";
+import { GameTypes } from "../../universal/contentTypeConstant";
 
 export type SocketTypes = "signaling" | "games";
-
-export type GameTypes = "snake";
 
 export interface Tables {
   [tableId: string]: {
@@ -43,6 +42,7 @@ export type MessageTypes =
   | onJoinTableType
   | onNewGameSocketType
   | onLeaveTableType
+  | onUpdateContentPositioningType
   | onInitiateGameType
   | onJoinGameType
   | onLeaveGameType
@@ -87,6 +87,27 @@ export type onLeaveTableType = {
 };
 
 // Universal
+export type onUpdateContentPositioningType = {
+  type: "updateContentPositioning";
+  header: {
+    tableId: string;
+    gameId: string;
+  };
+  data: {
+    positioning: {
+      position?: {
+        left: number;
+        top: number;
+      };
+      scale?: {
+        x: number;
+        y: number;
+      };
+      rotation?: number;
+    };
+  };
+};
+
 export type onInitiateGameType = {
   type: "initiateGame";
   header: {

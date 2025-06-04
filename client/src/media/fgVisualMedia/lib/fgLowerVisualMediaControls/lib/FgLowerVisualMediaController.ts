@@ -83,7 +83,7 @@ class FgLowerVisualMediaController {
     private panBtnRef: React.RefObject<HTMLButtonElement>,
     private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private paused: React.MutableRefObject<boolean>,
-    private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
     private setVisualEffectsActive: React.Dispatch<
       React.SetStateAction<boolean>
@@ -136,6 +136,7 @@ class FgLowerVisualMediaController {
     private setReactionsPanelActive: React.Dispatch<
       React.SetStateAction<boolean>
     >,
+    private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
   ) {
     this.initTime = Date.now();
 
@@ -169,7 +170,9 @@ class FgLowerVisualMediaController {
   handleClosedCaptions = () => {
     if (this.visualMediaContainerRef.current) {
       this.visualMediaContainerRef.current.classList.toggle("captions");
-      this.setCaptionsActive((prev) => !prev);
+      this.visualMedia.settings.captions.value =
+        !this.visualMedia.settings.captions.value;
+      this.setRerender((prev) => !prev);
     }
   };
 
@@ -575,9 +578,10 @@ class FgLowerVisualMediaController {
   };
 
   handleMiniPlayer = () => {
-    if (
-      this.visualMediaContainerRef.current?.classList.contains("mini-player")
-    ) {
+    this.visualMedia.settings.pictureInPicture.value =
+      !this.visualMedia.settings.pictureInPicture.value;
+
+    if (!this.visualMedia.settings.pictureInPicture.value) {
       document.exitPictureInPicture().catch((error) => {
         console.error("Failed to exit picture in picture:", error);
       });
@@ -586,6 +590,8 @@ class FgLowerVisualMediaController {
         console.error("Failed to request picture in picture:", error);
       });
     }
+
+    this.setSettingsActive(false);
   };
 
   handlePausePlay = () => {

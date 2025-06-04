@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import FgImageElement from "../../../../fgImageElement/FgImageElement";
+import FgImageElement from "../../../../../../elements/fgImageElement/FgImageElement";
 import "./gamePlayerIcon.css";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -22,7 +22,7 @@ export default function GamePlayerIcon({
 
   return (
     <div
-      className='game-player-icon relative w-full aspect-square rounded-full overflow-hidden'
+      className="game-player-icon relative aspect-square w-full overflow-hidden rounded-full"
       style={{
         boxShadow: `0px 3px 5px rgba(${shadowColor.r}, ${shadowColor.g}, ${shadowColor.b}, 0.6)`,
       }}
@@ -30,7 +30,7 @@ export default function GamePlayerIcon({
       onPointerLeave={() => setHover(false)}
     >
       <div
-        className='game-player-icon-border absolute inset-0'
+        className="game-player-icon-border absolute inset-0"
         style={{
           background: primaryColor
             ? secondaryColor

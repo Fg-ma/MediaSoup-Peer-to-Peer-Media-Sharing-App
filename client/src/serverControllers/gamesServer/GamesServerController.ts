@@ -1,75 +1,16 @@
 import BundlesController from "../../lib/BundlesController";
+import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConstant";
+import SnakeGameMedia from "../../media/games/snakeGame/SnakeGameMedia";
 import {
-  GameTypes,
-  StaticContentMediaType,
-} from "../../context/mediaContext/lib/typeConstant";
-import SnakeGameMedia from "./snakeGame/SnakeGameMedia";
+  IncomingMessages,
+  onGameClosedType,
+  onGameInitiatedType,
+  onUserJoinedTableType,
+  OutGoingMessages,
+} from "./lib/typeConstant";
+import { GameTypes } from "../../../../universal/contentTypeConstant";
 
-type OutGoingMessages = onJoinTableType | onLeaveTableType | onInitiateGameType;
-
-type onJoinTableType = {
-  type: "joinTable";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-  };
-};
-
-type onLeaveTableType = {
-  type: "leaveTable";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    socketType: "signaling";
-  };
-};
-
-type onInitiateGameType = {
-  type: "initiateGame";
-  header: {
-    tableId: string;
-    gameType: GameTypes;
-    gameId: string;
-  };
-  data: {
-    initiator: { username: string; instance: string };
-  };
-};
-
-type IncomingMessages =
-  | onGameInitiatedType
-  | onGameClosedType
-  | onUserJoinedTableType;
-
-type onGameInitiatedType = {
-  type: "gameInitiated";
-  header: {
-    gameType: GameTypes;
-    gameId: string;
-  };
-  data: {
-    initiator: { username: string; instance: string };
-  };
-};
-
-type onGameClosedType = {
-  type: "gameClosed";
-  header: {
-    gameType: GameTypes;
-    gameId: string;
-  };
-};
-
-type onUserJoinedTableType = {
-  type: "userJoinedTable";
-  data: {
-    activeGames: { gameType: GameTypes; gameId: string }[];
-  };
-};
-
-class GamesSignalingMedia {
+class GamesServerController {
   protected ws: WebSocket | undefined;
   private messageListeners: Set<(message: MessageEvent) => void> = new Set();
 
@@ -165,7 +106,6 @@ class GamesSignalingMedia {
           initiator.username === this.username &&
             initiator.instance === this.instance,
         );
-        await snakeGameMedia.connect();
 
         this.staticContentMedia.current.games.snake[gameId] = snakeGameMedia;
         break;
@@ -218,8 +158,8 @@ class GamesSignalingMedia {
             activeGame.gameId,
             "https://localhost:8042",
             false,
+            activeGame.positioning,
           );
-          await snakeGameMedia.connect();
 
           this.staticContentMedia.current.games.snake[activeGame.gameId] =
             snakeGameMedia;
@@ -265,6 +205,34 @@ class GamesSignalingMedia {
       },
     });
   };
+
+  updateContentPositioning = (
+    gameType: GameTypes,
+    gameId: string,
+    positioning: {
+      position?: {
+        left: number;
+        top: number;
+      };
+      scale?: {
+        x: number;
+        y: number;
+      };
+      rotation?: number;
+    },
+  ) => {
+    this.sendMessage({
+      type: "updateContentPositioning",
+      header: {
+        tableId: this.tableId,
+        gameType,
+        gameId,
+      },
+      data: {
+        positioning,
+      },
+    });
+  };
 }
 
-export default GamesSignalingMedia;
+export default GamesServerController;

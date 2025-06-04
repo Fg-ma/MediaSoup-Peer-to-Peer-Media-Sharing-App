@@ -79,6 +79,7 @@ export default function JoinTableSection({
     tableSocket,
     tableStaticContentSocket,
     liveTextEditingSocket,
+    gamesSocket,
   } = useSocketContext();
   const { tableId, username, instance, device } = useUserInfoContext();
   const { userDevice } = useToolsContext();
@@ -95,6 +96,7 @@ export default function JoinTableSection({
       liveTextEditingSocket,
       tableStaticContentSocket,
       mediasoupSocket,
+      gamesSocket,
       tableIdRef,
       usernameRef,
       tableId,
@@ -149,19 +151,19 @@ export default function JoinTableSection({
   }, [mediasoupSocket.current]);
 
   return (
-    <div className="mt-5 flex justify-center">
+    <div className="flex mt-5 justify-center">
       <input
         ref={tableIdRef}
         id="tableIdyInputField"
         type="text"
-        className="mr-2 border border-gray-400 px-4 py-2"
+        className="border mr-2 border-gray-400 px-4 py-2"
         placeholder="Enter room name"
       />
       <input
         ref={usernameRef}
         id="usernameInputField"
         type="text"
-        className="mr-2 border border-gray-400 px-4 py-2"
+        className="border mr-2 border-gray-400 px-4 py-2"
         placeholder="Enter username"
       />
       <button

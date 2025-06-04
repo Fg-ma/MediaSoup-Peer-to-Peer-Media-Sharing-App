@@ -54,6 +54,8 @@ export type StaticMimeTypes =
   | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   | "text/plain";
 
+export type GameTypes = "snake";
+
 export const mimeTypeContentTypeMap: {
   [tableTopStaticMimeType in StaticMimeTypes]: StaticContentTypes;
 } = {

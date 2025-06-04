@@ -31,6 +31,8 @@ export interface FgVisualMediaOptions {
 
 export interface Settings {
   background: { value: boolean };
+  pictureInPicture: { value: boolean };
+  captions: { value: boolean };
   closedCaption: {
     value: keyof typeof closedCaptionsSelections;
     closedCaptionOptions: {
@@ -48,6 +50,8 @@ export interface Settings {
 
 export const defaultSettings: Settings = {
   background: { value: false },
+  pictureInPicture: { value: false },
+  captions: { value: false },
   closedCaption: {
     value: "en-US",
     closedCaptionOptions: {

@@ -95,6 +95,7 @@ class BundlesController {
             permissions: this.permissions.current,
           }}
           handleMuteCallback={this.muteAudio}
+          tableRef={this.tableRef}
         />
       );
 
@@ -196,6 +197,7 @@ class BundlesController {
           handleDisableEnableBtns={this.handleDisableEnableBtns}
           isAudio={this.isAudio}
           setAudioActive={this.setAudioActive}
+          tableRef={this.tableRef}
         />
       );
 

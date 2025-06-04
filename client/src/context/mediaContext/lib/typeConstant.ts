@@ -5,7 +5,6 @@ import CameraMedia from "../../../media/fgVisualMedia/CameraMedia";
 import SnakeGameMedia from "../../../media/games/snakeGame/SnakeGameMedia";
 import ScreenAudioMedia from "../../../media/screenAudio/ScreenAudioMedia";
 import ScreenMedia from "../../../media/fgVisualMedia/ScreenMedia";
-import GamesSignalingMedia from "../../../media/games/GamesSignalingMedia";
 import TableVideoMedia from "../../../media/fgTableVideo/TableVideoMedia";
 import TableImageMedia from "../../../media/fgTableImage/TableImageMedia";
 import TableApplicationMedia from "../../../media/fgTableApplication/TableApplicationMedia";
@@ -29,8 +28,6 @@ import RemoteScreenAudioMedia from "../../../media/fgVisualMedia/RemoteScreenAud
 import RemoteAudioMedia from "../../../media/audio/RemoteAudioMedia";
 
 export type DataStreamTypes = "positionScaleRotation";
-
-export type GameTypes = "snake";
 
 export type UserMediaType = {
   camera: {
@@ -108,7 +105,6 @@ export type StaticContentMediaType = {
       [soundClipId: string]: TableSoundClipMediaInstance;
     };
   };
-  gamesSignaling: GamesSignalingMedia | undefined;
   games: {
     snake?: {
       [gameId: string]: SnakeGameMedia;
