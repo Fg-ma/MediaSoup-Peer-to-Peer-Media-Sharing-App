@@ -51,7 +51,7 @@ class SelectTableLayerController {
 
   handleGroupSignal = (signal: GroupSignals) => {
     switch (signal.type) {
-      case "clearGroup":
+      case "clearGroup": {
         this.selected.current = [];
         this.selectedInfo = [];
 
@@ -62,14 +62,33 @@ class SelectTableLayerController {
 
         this.setRerender((prev) => !prev);
         break;
-      case "groupUpdate":
+      }
+      case "groupUpdate": {
         this.selectables =
           this.tableTopRef.current?.querySelectorAll<HTMLElement>(
             ".selectable",
           );
         this.setRerender((prev) => !prev);
         break;
-      case "groupElementMove":
+      }
+      case "removeGroupElement": {
+        const { removeType, removeId } = signal.data;
+        this.selectables =
+          this.tableTopRef.current?.querySelectorAll<HTMLElement>(
+            ".selectable",
+          );
+        this.selectedInfo = this.selectedInfo?.filter(
+          (info) => info.type !== removeType || info.id !== removeId,
+        );
+        this.selected.current = this.selected.current?.filter((sel) => {
+          const type = sel.getAttribute("data-selectable-type") as ContentTypes;
+          const id = sel.getAttribute("data-selectable-id");
+          return type !== removeType || id !== removeId;
+        });
+        this.setRerender((prev) => !prev);
+        break;
+      }
+      case "groupElementMove": {
         const { contentType, instanceId } = signal.data;
         if (
           this.selectedInfo?.some(
@@ -112,6 +131,7 @@ class SelectTableLayerController {
           this.setRerender((prev) => !prev);
         }
         break;
+      }
       default:
         break;
     }

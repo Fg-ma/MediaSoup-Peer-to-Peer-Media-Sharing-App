@@ -10,6 +10,7 @@ import MonacoController from "./lib/MonacoController";
 import "./lib/monaco.css";
 
 export default function Monaco({
+  height,
   textMediaInstance,
   className,
   isLineNums = false,
@@ -20,6 +21,7 @@ export default function Monaco({
   forceFinishInitialization,
   forceIsReadOnly,
 }: {
+  height?: string;
   textMediaInstance: TableTextMediaInstance;
   className?: string;
   isLineNums?: boolean;
@@ -98,7 +100,9 @@ export default function Monaco({
       );
     }
   }, [
-    staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    JSON.stringify(
+      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
+    ),
   ]);
 
   useEffect(() => {
@@ -124,12 +128,13 @@ export default function Monaco({
   return (
     <div
       ref={textAreaContainerRef}
-      className={`${className} ${forceIsReadOnly || textMediaInstance.isReadOnly ? "readonly" : ""} monaco-container pointer-events-auto flex h-full w-full px-4 py-3`}
+      className={`${className} ${forceIsReadOnly || textMediaInstance.isReadOnly ? "readonly" : ""} monaco-container pointer-events-auto flex w-full px-4 py-3`}
       style={{
         backgroundColor:
           staticContentEffectsStyles.current.text[
             textMediaInstance.textInstanceId
           ].backgroundColor,
+        height: height ? height : "100%",
       }}
       onDoubleClick={() => {
         if (!forceIsReadOnly && textMediaInstance.isReadOnly) {

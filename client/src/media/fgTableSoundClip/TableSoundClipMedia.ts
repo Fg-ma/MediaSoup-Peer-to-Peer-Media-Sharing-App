@@ -1,7 +1,7 @@
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   TableContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
 import Downloader from "../../tools/downloader/Downloader";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
@@ -34,7 +34,7 @@ class TableSoundClipMedia {
   constructor(
     public soundClipId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: TableContentStateTypes[],
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined

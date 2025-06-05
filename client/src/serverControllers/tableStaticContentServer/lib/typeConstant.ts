@@ -1,6 +1,7 @@
 import {
   TableContentStateTypes,
   StaticContentTypes,
+  StaticMimeTypes,
 } from "../../../../../universal/contentTypeConstant";
 import {
   ApplicationEffectStylesType,
@@ -15,16 +16,6 @@ import {
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
 
-export type TableTopStaticMimeType =
-  | "image/jpeg"
-  | "image/png"
-  | "image/webp"
-  | "video/mp4"
-  | "video/mpeg"
-  | "image/gif"
-  | "application/pdf"
-  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
 export type OutGoingTableStaticContentMessages =
   | onJoinTableType
   | onLeaveTableType
@@ -34,6 +25,7 @@ export type OutGoingTableStaticContentMessages =
   | onGetFileChunkType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
+  | onRequestCatchUpEffectsType
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
@@ -145,6 +137,18 @@ type onUpdateContentEffectsType = {
       | ApplicationEffectStylesType
       | SvgEffectStylesType
       | TextEffectStylesType;
+  };
+};
+
+type onRequestCatchUpEffectsType = {
+  type: "requestCatchUpEffects";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+    instanceId: string;
   };
 };
 
@@ -275,6 +279,7 @@ export type IncomingTableStaticContentMessages =
   | onContentDeletedType
   | onContentStateChangedType
   | onUpdatedContentEffectsType
+  | onRespondedCatchUpEffectsType
   | onUpdatedVideoPositionType
   | onRequestedCatchUpVideoPositionType
   | onRespondedCatchUpVideoPositionType
@@ -289,7 +294,7 @@ export type onVideoUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -314,7 +319,7 @@ export type onVideoUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -344,7 +349,7 @@ export type onImageUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -369,7 +374,7 @@ export type onImageUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -389,7 +394,7 @@ export type onSvgUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -414,7 +419,7 @@ export type onSvgUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -434,7 +439,7 @@ export type onTextUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -459,7 +464,7 @@ export type onTextUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -479,7 +484,7 @@ export type onApplicationUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -504,7 +509,7 @@ export type onApplicationUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -524,7 +529,7 @@ export type onSoundClipUploadedToTableType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
     initPositioning:
       | {
@@ -549,7 +554,7 @@ export type onSoundClipUploadedToTabledType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
   };
 };
@@ -796,6 +801,16 @@ export type onUpdatedContentEffectsType = {
       | SvgEffectStylesType
       | TextEffectStylesType;
   };
+};
+
+export type onRespondedCatchUpEffectsType = {
+  type: "respondedCatchUpEffects";
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+    instanceId: string;
+  };
+  data: { effects?: object; effectStyles?: object };
 };
 
 export type onUpdatedVideoPositionType = {

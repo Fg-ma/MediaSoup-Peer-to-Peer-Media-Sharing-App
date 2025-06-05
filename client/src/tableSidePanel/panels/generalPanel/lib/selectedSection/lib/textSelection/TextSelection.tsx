@@ -62,6 +62,7 @@ export default function TextSelection({
           loadingState === "downloaded" ? (
             textInstanceMedia.textMedia.fileSize < 1024 * 1024 * 5 ? (
               <Monaco
+                height="12rem"
                 isLineNums={false}
                 textMediaInstance={textInstanceMedia}
                 forceIsReadOnly={true}

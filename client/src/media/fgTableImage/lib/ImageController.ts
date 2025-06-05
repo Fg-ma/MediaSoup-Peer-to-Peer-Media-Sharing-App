@@ -6,6 +6,7 @@ import {
 } from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
+  onRespondedCatchUpEffectsType,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { ImageListenerTypes } from "../TableImageMedia";
@@ -45,32 +46,58 @@ class ImageController {
     const { effects, effectStyles } = event.data;
 
     if (
-      contentType === "image" &&
-      contentId === this.imageMediaInstance.imageMedia.imageId &&
-      instanceId === this.imageInstanceId
-    ) {
+      !this.imageMediaInstance.settings.synced.value ||
+      contentType !== "image" ||
+      contentId !== this.imageMediaInstance.imageMedia.imageId ||
+      instanceId !== this.imageInstanceId
+    )
+      return;
+
+    this.staticContentEffects.current.image[this.imageInstanceId] = effects as {
+      [effectType in ImageEffectTypes]: boolean;
+    };
+
+    const oldEffectStyle = structuredClone(
+      this.staticContentEffectsStyles.current.image[this.imageInstanceId],
+    );
+
+    if (effectStyles !== undefined) {
+      this.staticContentEffectsStyles.current.image[this.imageInstanceId] =
+        effectStyles as ImageEffectStylesType;
+
+      this.tintColor.current = (
+        effectStyles as ImageEffectStylesType
+      ).tint.color;
+    }
+
+    this.imageMediaInstance.updateAllEffects(oldEffectStyle);
+
+    this.setRerender((prev) => !prev);
+  };
+
+  private onRespondedCatchUpEffects = (
+    event: onRespondedCatchUpEffectsType,
+  ) => {
+    const { contentType, contentId, instanceId } = event.header;
+    const { effects, effectStyles } = event.data;
+
+    if (
+      contentType !== "image" ||
+      contentId !== this.imageMediaInstance.imageMedia.imageId ||
+      instanceId !== this.imageInstanceId
+    )
+      return;
+
+    if (effects)
       this.staticContentEffects.current.image[this.imageInstanceId] =
         effects as {
           [effectType in ImageEffectTypes]: boolean;
         };
+    if (effectStyles)
+      this.staticContentEffectsStyles.current.image[this.imageInstanceId] =
+        effectStyles as ImageEffectStylesType;
 
-      const oldEffectStyle = structuredClone(
-        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
-      );
-
-      if (effectStyles !== undefined) {
-        this.staticContentEffectsStyles.current.image[this.imageInstanceId] =
-          effectStyles as ImageEffectStylesType;
-
-        this.tintColor.current = (
-          effectStyles as ImageEffectStylesType
-        ).tint.color;
-      }
-
-      this.imageMediaInstance.updateAllEffects(oldEffectStyle);
-
-      this.setRerender((prev) => !prev);
-    }
+    this.imageMediaInstance.updateAllEffects();
   };
 
   handleTableStaticContentMessage = (
@@ -79,6 +106,9 @@ class ImageController {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      case "respondedCatchUpEffects":
+        this.onRespondedCatchUpEffects(event);
         break;
       default:
         break;

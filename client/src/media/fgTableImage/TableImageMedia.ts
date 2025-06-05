@@ -1,7 +1,7 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   LoadingStateTypes,
+  StaticMimeTypes,
   TableContentStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
@@ -60,7 +60,7 @@ class TableImageMedia {
   constructor(
     public imageId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,

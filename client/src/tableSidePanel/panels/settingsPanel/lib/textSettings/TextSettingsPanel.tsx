@@ -37,7 +37,7 @@ export default function TextSettingsPanel({
   const { tableStaticContentSocket } = useSocketContext();
   const { staticContentEffectsStyles } = useEffectsContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
 
   const textMediaInstance = useRef(
     staticContentMedia.current.text.tableInstances[instanceId],
@@ -64,6 +64,7 @@ export default function TextSettingsPanel({
     tableStaticContentSocket,
     staticContentEffectsStyles,
     setRerender,
+    sendGroupSignal,
   );
 
   useEffect(() => {

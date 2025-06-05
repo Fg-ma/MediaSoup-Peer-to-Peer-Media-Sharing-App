@@ -1,7 +1,7 @@
-import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import {
   UserContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
 import Downloader from "../../tools/downloader/Downloader";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
@@ -34,7 +34,7 @@ class UserSvgMedia {
   constructor(
     public svgId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: UserContentStateTypes[],
     private userStaticContentSocket: React.MutableRefObject<
       UserStaticContentSocketController | undefined

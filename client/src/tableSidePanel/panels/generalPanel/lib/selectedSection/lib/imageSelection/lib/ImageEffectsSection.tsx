@@ -107,23 +107,27 @@ export default function ImageEffectsSection({
         blockStateChange,
       );
 
-      tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        imageMediaInstance.imageMedia.imageId,
-        imageInstanceId,
-        staticContentEffects.current.image[imageInstanceId],
-        staticContentEffectsStyles.current.image[imageInstanceId],
-      );
+      if (imageMediaInstance.settings.synced.value) {
+        tableStaticContentSocket.current?.updateContentEffects(
+          "image",
+          imageMediaInstance.imageMedia.imageId,
+          imageInstanceId,
+          staticContentEffects.current.image[imageInstanceId],
+          staticContentEffectsStyles.current.image[imageInstanceId],
+        );
+      }
     } else {
       imageMediaInstance.clearAllEffects();
 
-      tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        imageMediaInstance.imageMedia.imageId,
-        imageInstanceId,
-        staticContentEffects.current.image[imageInstanceId],
-        staticContentEffectsStyles.current.image[imageInstanceId],
-      );
+      if (imageMediaInstance.settings.synced.value) {
+        tableStaticContentSocket.current?.updateContentEffects(
+          "image",
+          imageMediaInstance.imageMedia.imageId,
+          imageInstanceId,
+          staticContentEffects.current.image[imageInstanceId],
+          staticContentEffectsStyles.current.image[imageInstanceId],
+        );
+      }
     }
   };
 

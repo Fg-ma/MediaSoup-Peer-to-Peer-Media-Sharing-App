@@ -31,12 +31,10 @@ export default function SvgSelection({
   );
   const [_, setRerender] = useState(false);
   const svgContainerRef = useRef<HTMLDivElement>(null);
-  const svgMirror = useRef<SVGSVGElement | undefined>(undefined);
 
   const svgSelectionController = new SvgSelectionController(
     instanceId,
     svgInstanceMedia,
-    svgMirror,
     svgContainerRef,
     setLoadingState,
     setRerender,
@@ -71,7 +69,7 @@ export default function SvgSelection({
         setLargestDim("height");
       }
 
-      if (svgInstanceMedia.svgMedia.fileSize < 1024 * 1024 * 50)
+      if (svgInstanceMedia.svgMedia.fileSize < 1024 * 1024 * 20)
         svgContainerRef.current?.appendChild(
           svgInstanceMedia.instanceSvg.cloneNode(true)!,
         );
@@ -90,7 +88,7 @@ export default function SvgSelection({
               ref={svgContainerRef}
               className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
             >
-              {svgInstanceMedia.svgMedia.fileSize > 1024 * 1024 * 50 &&
+              {svgInstanceMedia.svgMedia.fileSize > 1024 * 1024 * 20 &&
                 svgInstanceMedia.svgMedia.aspect && (
                   <NoPreviewAvailable
                     className={`${largestDim === "width" ? "w-[12rem]" : "h-[12rem]"}`}

@@ -4,8 +4,9 @@ import {
   StaticContentEffectsStylesType,
 } from "../../../../../../universal/effectsTypeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
-import { downloadRecordingMimeMap, Settings } from "../typeConstant";
+import { downloadRecordingMimeMap } from "../typeConstant";
 import TableImageMediaInstance from "../../TableImageMediaInstance";
+import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
 
 class LowerImageController {
   constructor(
@@ -25,6 +26,7 @@ class LowerImageController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handleImageEffects = () => {
@@ -86,23 +88,27 @@ class LowerImageController {
         blockStateChange,
       );
 
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        this.imageMediaInstance.imageMedia.imageId,
-        this.imageInstanceId,
-        this.staticContentEffects.current.image[this.imageInstanceId],
-        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
-      );
+      if (this.imageMediaInstance.settings.synced.value) {
+        this.tableStaticContentSocket.current?.updateContentEffects(
+          "image",
+          this.imageMediaInstance.imageMedia.imageId,
+          this.imageInstanceId,
+          this.staticContentEffects.current.image[this.imageInstanceId],
+          this.staticContentEffectsStyles.current.image[this.imageInstanceId],
+        );
+      }
     } else {
       this.imageMediaInstance.clearAllEffects();
 
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "image",
-        this.imageMediaInstance.imageMedia.imageId,
-        this.imageInstanceId,
-        this.staticContentEffects.current.image[this.imageInstanceId],
-        this.staticContentEffectsStyles.current.image[this.imageInstanceId],
-      );
+      if (this.imageMediaInstance.settings.synced.value) {
+        this.tableStaticContentSocket.current?.updateContentEffects(
+          "image",
+          this.imageMediaInstance.imageMedia.imageId,
+          this.imageInstanceId,
+          this.staticContentEffects.current.image[this.imageInstanceId],
+          this.staticContentEffectsStyles.current.image[this.imageInstanceId],
+        );
+      }
     }
   };
 
@@ -152,12 +158,29 @@ class LowerImageController {
     this.imageMediaInstance.settings.synced.value =
       !this.imageMediaInstance.settings.synced.value;
 
+    if (this.imageMediaInstance.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "image",
+        this.imageMediaInstance.imageMedia.imageId,
+        this.imageMediaInstance.imageInstanceId,
+      );
+    }
+
     this.setRerender((prev) => !prev);
   };
 
   handleSetAsBackground = () => {
     this.imageMediaInstance.settings.background.value =
       !this.imageMediaInstance.settings.background.value;
+
+    this.setSettingsActive(false);
+
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: { removeType: "image", removeId: this.imageInstanceId },
+      });
+    }, 0);
 
     this.setRerender((prev) => !prev);
   };

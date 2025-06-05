@@ -11,6 +11,7 @@ import FgPortal from "../../../../../elements/fgPortal/FgPortal";
 import MethodSvgEditor from "../../../../../methodSvgEditor/MethodSvgEditor";
 import DownloadOptionsPage from "./lib/DownloadOptionsPage";
 import HoverElement from "../../../../../elements/hoverElement/HoverElement";
+import { useSocketContext } from "../../../../../context/socketContext/SocketContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -32,8 +33,9 @@ export default function SvgSettingsPanel({
 }) {
   const { staticContentMedia } = useMediaContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
   const { uploader } = useToolsContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const svgMediaInstance = useRef(
     staticContentMedia.current.svg.tableInstances[instanceId],
@@ -49,6 +51,8 @@ export default function SvgSettingsPanel({
     setEditing,
     setDownloadOptionsActive,
     setRerender,
+    tableStaticContentSocket,
+    sendGroupSignal,
   );
 
   useEffect(() => {

@@ -26,15 +26,17 @@ export default function ColorsPage({
       textMediaInstance.current.textInstanceId
     ][key] = color;
 
-    tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      textMediaInstance.current.textMedia.textId,
-      textMediaInstance.current.textInstanceId,
-      undefined,
-      staticContentEffectsStyles.current.text[
-        textMediaInstance.current.textInstanceId
-      ],
-    );
+    if (textMediaInstance.current.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.current.textMedia.textId,
+        textMediaInstance.current.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.current.textInstanceId
+        ],
+      );
+    }
 
     setRerender((prev) => !prev);
   };
@@ -50,15 +52,17 @@ export default function ColorsPage({
         textMediaInstance.current.textInstanceId
       ][key] = newColor.startsWith("#") ? newColor : `#${newColor}`;
 
-      tableStaticContentSocket.current?.updateContentEffects(
-        "text",
-        textMediaInstance.current.textMedia.textId,
-        textMediaInstance.current.textInstanceId,
-        undefined,
-        staticContentEffectsStyles.current.text[
-          textMediaInstance.current.textInstanceId
-        ],
-      );
+      if (textMediaInstance.current.settings.synced.value) {
+        tableStaticContentSocket.current?.updateContentEffects(
+          "text",
+          textMediaInstance.current.textMedia.textId,
+          textMediaInstance.current.textInstanceId,
+          undefined,
+          staticContentEffectsStyles.current.text[
+            textMediaInstance.current.textInstanceId
+          ],
+        );
+      }
 
       setRerender((prev) => !prev);
     }

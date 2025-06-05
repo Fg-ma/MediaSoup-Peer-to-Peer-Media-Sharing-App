@@ -124,10 +124,10 @@ export default {
       zIndex: {
         /* table layers before content (99000 - 100000) */
         "grid-overlay": 99200,
+        "background-content": 99250,
         "select-layer": 99300,
         /* table content (101000 - 200000) */
         /* table content formula (111000 + priority + (20000 - last-interaction)) */
-        "background-content": 110000,
         "base-content": 111000,
         /* table layers after content (200001 - 201000) */
         "new-instances-layer": 200700,

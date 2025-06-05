@@ -3,6 +3,7 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useToolsContext } from "../../context/toolsContext/ToolsContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import SvgController from "./lib/SvgController";
 import LowerSvgController from "./lib/lowerSvgControls/LowerSvgController";
 import { ActivePages, defaultActivePages } from "./lib/typeConstant";
@@ -12,8 +13,8 @@ import SvgEffectsSection from "./lib/svgEffectsSection/SvgEffectsSection";
 import SettingsButton from "./lib/lowerSvgControls/settingsButton/SettingsButton";
 import MethodSvgEditor from "../../methodSvgEditor/MethodSvgEditor";
 import FgPortal from "../../elements/fgPortal/FgPortal";
-import "./lib/fgSvgStyles.css";
 import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton";
+import "./lib/fgSvgStyles.css";
 
 export default function FgTableSvg({
   svgInstanceId,
@@ -29,6 +30,7 @@ export default function FgTableSvg({
     useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { uploader } = useToolsContext();
+  const { sendGroupSignal } = useSignalContext();
 
   const [editing, setEditing] = useState(false);
 
@@ -66,6 +68,7 @@ export default function FgTableSvg({
       tableStaticContentSocket,
       setEditing,
       setRerender,
+      sendGroupSignal,
     ),
   );
 

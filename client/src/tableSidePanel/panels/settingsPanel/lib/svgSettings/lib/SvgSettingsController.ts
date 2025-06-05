@@ -1,4 +1,6 @@
+import TableStaticContentSocketController from "../../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import TableSvgMediaInstance from "../../../../../../media/fgTableSvg/TableSvgMediaInstance";
+import { GroupSignals } from "../../../../../../context/signalContext/lib/typeConstant";
 
 class SvgSettingsController {
   constructor(
@@ -8,6 +10,10 @@ class SvgSettingsController {
       React.SetStateAction<boolean>
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handleSetAsBackground = () => {
@@ -16,12 +22,30 @@ class SvgSettingsController {
 
     this.svgMediaInstance.current.settingsChanged();
 
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: {
+          removeType: "svg",
+          removeId: this.svgMediaInstance.current.svgInstanceId,
+        },
+      });
+    }, 0);
+
     this.setRerender((prev) => !prev);
   };
 
   handleSync = () => {
     this.svgMediaInstance.current.settings.synced.value =
       !this.svgMediaInstance.current.settings.synced.value;
+
+    if (this.svgMediaInstance.current.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "svg",
+        this.svgMediaInstance.current.svgMedia.svgId,
+        this.svgMediaInstance.current.svgInstanceId,
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };

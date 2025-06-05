@@ -46,6 +46,9 @@ export default function VideoSelection({
     videoInstanceMedia?.videoMedia.addVideoListener(
       videoSelectionController.handleVideoMessages,
     );
+    videoInstanceMedia?.addVideoInstanceListener(
+      videoSelectionController.handleInstanceEvents,
+    );
 
     addGroupSignalListener(videoSelectionController.handleGroupSignal);
 
@@ -53,7 +56,9 @@ export default function VideoSelection({
       videoInstanceMedia?.videoMedia.removeVideoListener(
         videoSelectionController.handleVideoMessages,
       );
-
+      videoInstanceMedia?.removeVideoInstanceListener(
+        videoSelectionController.handleInstanceEvents,
+      );
       removeGroupSignalListener(videoSelectionController.handleGroupSignal);
     };
   }, []);
@@ -63,7 +68,7 @@ export default function VideoSelection({
       videoSelectionController.drawInstanceCanvas();
     }
   }, [loadingState]);
-
+  console.log(largestDim);
   return (
     videoInstanceMedia && (
       <GeneralMediaSelection

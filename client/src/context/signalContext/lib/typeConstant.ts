@@ -23,6 +23,7 @@ export type GroupSignals =
   | onGroupDragType
   | onGroupDragEndType
   | onGroupDeleteType
+  | onRemoveGroupElementType
   | onGroupChangeType
   | onClearGroupType
   | onGroupUpdateType
@@ -147,6 +148,14 @@ export type onGroupDeleteType = {
       type: ContentTypes;
       id: string;
     }[];
+  };
+};
+
+export type onRemoveGroupElementType = {
+  type: "removeGroupElement";
+  data: {
+    removeType: ContentTypes;
+    removeId: string;
   };
 };
 

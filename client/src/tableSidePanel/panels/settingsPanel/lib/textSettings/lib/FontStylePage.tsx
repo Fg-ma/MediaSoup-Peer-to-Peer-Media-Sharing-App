@@ -23,15 +23,17 @@ export default function FontStylePage({
       textMediaInstance.current.textInstanceId
     ].fontStyle = fontStyle;
 
-    tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      textMediaInstance.current.textMedia.textId,
-      textMediaInstance.current.textInstanceId,
-      undefined,
-      staticContentEffectsStyles.current.text[
-        textMediaInstance.current.textInstanceId
-      ],
-    );
+    if (textMediaInstance.current.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.current.textMedia.textId,
+        textMediaInstance.current.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.current.textInstanceId
+        ],
+      );
+    }
 
     setRerender((prev) => !prev);
   };

@@ -12,6 +12,7 @@ import TableSocketController from "../../../../../serverControllers/tableServer/
 import CameraMedia from "../../../../../media/fgVisualMedia/CameraMedia";
 import ScreenMedia from "../../../../../media/fgVisualMedia/ScreenMedia";
 import RemoteVisualMedia from "../../../../../media/fgVisualMedia/RemoteVisualMedia";
+import { GroupSignals } from "../../../../../context/signalContext/lib/typeConstant";
 
 const fontSizeMap = {
   xsmall: "0.75rem",
@@ -137,6 +138,7 @@ class FgLowerVisualMediaController {
       React.SetStateAction<boolean>
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {
     this.initTime = Date.now();
 
@@ -284,6 +286,22 @@ class FgLowerVisualMediaController {
     }
   };
 
+  handleSetAsBackground = () => {
+    this.visualMedia.settings.background.value =
+      !this.visualMedia.settings.background.value;
+
+    this.setSettingsActive(false);
+
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: { removeType: this.type, removeId: this.visualMediaId },
+      });
+    }, 0);
+
+    this.setRerender((prev) => !prev);
+  };
+
   handleFullScreenChange = () => {
     if (!document.fullscreenElement) {
       this.visualMediaContainerRef.current?.classList.remove("full-screen");
@@ -372,6 +390,9 @@ class FgLowerVisualMediaController {
         break;
       case "arrowdown":
         this.volumeControl(-0.05);
+        break;
+      case "b":
+        this.handleSetAsBackground();
         break;
       case "s":
         this.fgContentAdjustmentController.current?.adjustmentBtnPointerDownFunction(

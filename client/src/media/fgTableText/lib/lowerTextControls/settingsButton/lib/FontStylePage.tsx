@@ -40,13 +40,17 @@ export default function FontStylePage({
       textMediaInstance.textInstanceId
     ].fontStyle = fontStyle;
 
-    tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      textMediaInstance.textMedia.textId,
-      textMediaInstance.textInstanceId,
-      undefined,
-      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
-    );
+    if (textMediaInstance.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.textMedia.textId,
+        textMediaInstance.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.textInstanceId
+        ],
+      );
+    }
 
     setRerender((prev) => !prev);
   };

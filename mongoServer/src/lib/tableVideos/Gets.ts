@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getVideoMetaDataBy_TID_IID = async (tableId: string, videoId: string) => {
+  getVideoMetaDataBy_TID_VID = async (tableId: string, videoId: string) => {
     try {
       const videoData = await this.tableVideosCollection.findOne({
         tid: tableId,

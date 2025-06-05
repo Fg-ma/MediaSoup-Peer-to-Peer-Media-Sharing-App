@@ -2,8 +2,8 @@ import UserStaticContentSocketController from "../../serverControllers/userStati
 import {
   UserContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
-import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import Downloader from "../../tools/downloader/Downloader";
 import {
@@ -38,7 +38,7 @@ class UserTextMedia {
   constructor(
     public textId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: UserContentStateTypes[],
     private userStaticContentSocket: React.MutableRefObject<
       UserStaticContentSocketController | undefined

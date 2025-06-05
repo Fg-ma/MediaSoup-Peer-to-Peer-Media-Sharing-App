@@ -5,6 +5,7 @@ import {
   StaticContentEffectsStylesType,
 } from "../../../../../../../../universal/effectsTypeConstant";
 import { defaultSettings } from "../../../../../../media/fgTableText/lib/typeConstant";
+import { GroupSignals } from "../../../../../../context/signalContext/lib/typeConstant";
 
 class TextSettingsController {
   constructor(
@@ -14,6 +15,7 @@ class TextSettingsController {
     >,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handleDownload = () => {
@@ -26,6 +28,16 @@ class TextSettingsController {
 
     this.textMediaInstance.current.settingsChanged();
 
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: {
+          removeType: "text",
+          removeId: this.textMediaInstance.current.textInstanceId,
+        },
+      });
+    }, 0);
+
     this.setRerender((prev) => !prev);
   };
 
@@ -34,6 +46,14 @@ class TextSettingsController {
       !this.textMediaInstance.current.settings.synced.value;
 
     this.textMediaInstance.current.settingsChanged();
+
+    if (this.textMediaInstance.current.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "text",
+        this.textMediaInstance.current.textMedia.textId,
+        this.textMediaInstance.current.textInstanceId,
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };
@@ -74,15 +94,17 @@ class TextSettingsController {
       effectStyles.fontSize = `${Math.max(1, value)}px`;
     }
 
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      this.textMediaInstance.current.textMedia.textId,
-      this.textMediaInstance.current.textInstanceId,
-      undefined,
-      this.staticContentEffectsStyles.current.text[
-        this.textMediaInstance.current.textInstanceId
-      ],
-    );
+    if (this.textMediaInstance.current.settings.synced.value) {
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        this.textMediaInstance.current.textMedia.textId,
+        this.textMediaInstance.current.textInstanceId,
+        undefined,
+        this.staticContentEffectsStyles.current.text[
+          this.textMediaInstance.current.textInstanceId
+        ],
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };
@@ -105,15 +127,17 @@ class TextSettingsController {
       effectStyles.letterSpacing = Math.min(20, Math.max(-5, value));
     }
 
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      this.textMediaInstance.current.textMedia.textId,
-      this.textMediaInstance.current.textInstanceId,
-      undefined,
-      this.staticContentEffectsStyles.current.text[
-        this.textMediaInstance.current.textInstanceId
-      ],
-    );
+    if (this.textMediaInstance.current.settings.synced.value) {
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        this.textMediaInstance.current.textMedia.textId,
+        this.textMediaInstance.current.textInstanceId,
+        undefined,
+        this.staticContentEffectsStyles.current.text[
+          this.textMediaInstance.current.textInstanceId
+        ],
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };
@@ -127,15 +151,17 @@ class TextSettingsController {
       this.textMediaInstance.current.textInstanceId
     ] = structuredClone(defaultTextEffectsStyles);
 
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      this.textMediaInstance.current.textMedia.textId,
-      this.textMediaInstance.current.textInstanceId,
-      undefined,
-      this.staticContentEffectsStyles.current.text[
-        this.textMediaInstance.current.textInstanceId
-      ],
-    );
+    if (this.textMediaInstance.current.settings.synced.value) {
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        this.textMediaInstance.current.textMedia.textId,
+        this.textMediaInstance.current.textInstanceId,
+        undefined,
+        this.staticContentEffectsStyles.current.text[
+          this.textMediaInstance.current.textInstanceId
+        ],
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };

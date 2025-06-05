@@ -6,6 +6,7 @@ import {
 } from "../../../../../universal/effectsTypeConstant";
 import {
   IncomingTableStaticContentMessages,
+  onRespondedCatchUpEffectsType,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { SvgListenerTypes } from "../TableSvgMedia";
@@ -44,25 +45,53 @@ class SvgController {
     const { effects, effectStyles } = event.data;
 
     if (
-      contentType === "svg" &&
-      contentId === this.svgMediaInstance.svgMedia.svgId &&
-      instanceId === this.svgInstanceId
-    ) {
-      this.svgMediaInstance.clearAllEffects();
+      !this.svgMediaInstance.settings.synced.value ||
+      contentType !== "svg" ||
+      contentId !== this.svgMediaInstance.svgMedia.svgId ||
+      instanceId !== this.svgInstanceId
+    )
+      return;
 
+    this.svgMediaInstance.clearAllEffects();
+
+    this.staticContentEffects.current.svg[this.svgInstanceId] = effects as {
+      [effectType in SvgEffectTypes]: boolean;
+    };
+
+    if (effectStyles !== undefined) {
+      this.staticContentEffectsStyles.current.svg[this.svgInstanceId] =
+        effectStyles as SvgEffectStylesType;
+    }
+
+    this.svgMediaInstance.updateAllEffects();
+
+    this.setRerender((prev) => !prev);
+  };
+
+  private onRespondedCatchUpEffects = (
+    event: onRespondedCatchUpEffectsType,
+  ) => {
+    const { contentType, contentId, instanceId } = event.header;
+    const { effects, effectStyles } = event.data;
+
+    if (
+      contentType !== "svg" ||
+      contentId !== this.svgMediaInstance.svgMedia.svgId ||
+      instanceId !== this.svgInstanceId
+    )
+      return;
+
+    this.svgMediaInstance.clearAllEffects();
+
+    if (effects)
       this.staticContentEffects.current.svg[this.svgInstanceId] = effects as {
         [effectType in SvgEffectTypes]: boolean;
       };
+    if (effectStyles)
+      this.staticContentEffectsStyles.current.svg[this.svgInstanceId] =
+        effectStyles as SvgEffectStylesType;
 
-      if (effectStyles !== undefined) {
-        this.staticContentEffectsStyles.current.svg[this.svgInstanceId] =
-          effectStyles as SvgEffectStylesType;
-      }
-
-      this.svgMediaInstance.updateAllEffects();
-
-      this.setRerender((prev) => !prev);
-    }
+    this.svgMediaInstance.updateAllEffects();
   };
 
   handleTableStaticContentMessage = (
@@ -71,6 +100,9 @@ class SvgController {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      case "respondedCatchUpEffects":
+        this.onRespondedCatchUpEffects(event);
         break;
       default:
         break;

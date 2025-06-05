@@ -1,6 +1,8 @@
 import { VideoListenerTypes } from "../../../../../../../../media/fgTableVideo/TableVideoMedia";
 import { LoadingStateTypes } from "../../../../../../../../../../universal/contentTypeConstant";
-import TableVideoMediaInstance from "../../../../../../../../media/fgTableVideo/TableVideoMediaInstance";
+import TableVideoMediaInstance, {
+  VideoInstanceListenerTypes,
+} from "../../../../../../../../media/fgTableVideo/TableVideoMediaInstance";
 import { GroupSignals } from "../../../../../../../../context/signalContext/lib/typeConstant";
 
 class VideoSelectionController {
@@ -87,6 +89,12 @@ class VideoSelectionController {
         this.setRerender((prev) => !prev);
       }
     } else if (signal.type === "groupDrag") {
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleInstanceEvents = (event: VideoInstanceListenerTypes) => {
+    if (event.type === "effectsChanged") {
       this.setRerender((prev) => !prev);
     }
   };

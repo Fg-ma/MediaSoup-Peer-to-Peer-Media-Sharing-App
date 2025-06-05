@@ -1,5 +1,6 @@
 import {
   IncomingTableStaticContentMessages,
+  onRespondedCatchUpEffectsType,
   onUpdatedContentEffectsType,
 } from "src/serverControllers/tableStaticContentServer/lib/typeConstant";
 import { TextListenerTypes } from "../TableTextMedia";
@@ -70,18 +71,41 @@ class TextController {
     const { effectStyles } = event.data;
 
     if (
-      contentType === "text" &&
-      contentId === this.textMediaInstance.textMedia.textId &&
-      instanceId === this.textMediaInstance.textInstanceId
-    ) {
-      if (effectStyles !== undefined) {
-        this.staticContentEffectsStyles.current.text[
-          this.textMediaInstance.textInstanceId
-        ] = effectStyles as TextEffectStylesType;
-      }
+      !this.textMediaInstance.settings.synced.value ||
+      contentType !== "text" ||
+      contentId !== this.textMediaInstance.textMedia.textId ||
+      instanceId !== this.textMediaInstance.textInstanceId
+    )
+      return;
 
-      this.setRerender((prev) => !prev);
+    if (effectStyles !== undefined) {
+      this.staticContentEffectsStyles.current.text[
+        this.textMediaInstance.textInstanceId
+      ] = effectStyles as TextEffectStylesType;
     }
+
+    this.setRerender((prev) => !prev);
+  };
+
+  private onRespondedCatchUpEffects = (
+    event: onRespondedCatchUpEffectsType,
+  ) => {
+    const { contentType, contentId, instanceId } = event.header;
+    const { effectStyles } = event.data;
+
+    if (
+      contentType !== "text" ||
+      contentId !== this.textMediaInstance.textMedia.textId ||
+      instanceId !== this.textMediaInstance.textInstanceId
+    )
+      return;
+
+    if (effectStyles)
+      this.staticContentEffectsStyles.current.text[
+        this.textMediaInstance.textInstanceId
+      ] = effectStyles as TextEffectStylesType;
+
+    this.textMediaInstance.settingsChanged();
   };
 
   handleTableStaticContentMessage = (
@@ -90,6 +114,9 @@ class TextController {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
+        break;
+      case "respondedCatchUpEffects":
+        this.onRespondedCatchUpEffects(event);
         break;
       default:
         break;

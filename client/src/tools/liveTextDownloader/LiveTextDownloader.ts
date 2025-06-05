@@ -9,7 +9,7 @@ import {
   onDownloadMetaType,
   onOneShotDownloadType,
 } from "../../serverControllers/liveTextEditingServer/lib/typeConstant";
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
+import { StaticMimeTypes } from "../../../../universal/contentTypeConstant";
 
 class LiveTextDownloader {
   private _paused: boolean = false;
@@ -38,7 +38,7 @@ class LiveTextDownloader {
   constructor(
     private contentId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     private liveTextEditingSocket: React.MutableRefObject<
       LiveTextEditingSocketController | undefined
     >,

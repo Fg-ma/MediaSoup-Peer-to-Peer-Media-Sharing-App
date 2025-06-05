@@ -268,6 +268,7 @@ export default function UserVisualMedia({
       tableSocket,
       setReactionsPanelActive,
       setRerender,
+      sendGroupSignal,
     ),
   );
 
@@ -587,7 +588,7 @@ export default function UserVisualMedia({
       </div>
       <div
         ref={subContainerRef}
-        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
+        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
         data-selectable-isuser={true}

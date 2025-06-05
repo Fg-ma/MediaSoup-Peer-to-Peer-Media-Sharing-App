@@ -1,3 +1,5 @@
+import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import TableTextMediaInstance from "../../TableTextMediaInstance";
 
 class LowerTextController {
@@ -10,6 +12,10 @@ class LowerTextController {
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private initializing: React.MutableRefObject<boolean>,
     private forceFinishInitialization: React.MutableRefObject<boolean>,
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -73,12 +79,32 @@ class LowerTextController {
     this.textMediaInstance.settings.background.value =
       !this.textMediaInstance.settings.background.value;
 
+    this.setSettingsActive(false);
+
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: {
+          removeType: "text",
+          removeId: this.textMediaInstance.textInstanceId,
+        },
+      });
+    }, 0);
+
     this.setRerender((prev) => !prev);
   };
 
   handleSync = () => {
     this.textMediaInstance.settings.synced.value =
       !this.textMediaInstance.settings.synced.value;
+
+    if (this.textMediaInstance.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "text",
+        this.textMediaInstance.textMedia.textId,
+        this.textMediaInstance.textInstanceId,
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };

@@ -3,6 +3,7 @@ import {
   onChangeContentStateType,
   onCreateNewInstancesType,
   onDeleteUploadSessionType,
+  onRequestCatchUpEffectsType,
   onRequestCatchUpTableDataType,
   onRequestCatchUpVideoPositionType,
   onResponseCatchUpVideoPositionType,
@@ -44,6 +45,122 @@ class MetadataController {
       data: event.data,
     };
     this.broadcaster.broadcastToTable(tableId, msg);
+  };
+
+  onRequestCatchUpEffects = async (event: onRequestCatchUpEffectsType) => {
+    const { tableId, username, instance, contentType, contentId, instanceId } =
+      event.header;
+
+    let data: { effects?: object; effectStyles?: object } | undefined =
+      undefined;
+
+    switch (contentType) {
+      case "image": {
+        const imageData =
+          await tableTopMongo.tableImages?.gets.getImageMetaDataBy_TID_IID(
+            tableId,
+            contentId
+          );
+        const filtered = imageData?.instances.filter(
+          (instance) => instance.imageInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effects: filtered[0].effects,
+            effectStyles: filtered[0].effectStyles,
+          };
+        break;
+      }
+      case "application": {
+        const applicationData =
+          await tableTopMongo.tableApplications?.gets.getApplicationMetaDataBy_TID_IID(
+            tableId,
+            contentId
+          );
+        const filtered = applicationData?.instances.filter(
+          (instance) => instance.applicationInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effects: filtered[0].effects,
+            effectStyles: filtered[0].effectStyles,
+          };
+        break;
+      }
+      case "soundClip": {
+        const soundClipData =
+          await tableTopMongo.tableSoundClips?.gets.getSoundClipMetaDataBy_TID_SID(
+            tableId,
+            contentId
+          );
+        const filtered = soundClipData?.instances.filter(
+          (instance) => instance.soundClipInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effects: filtered[0].effects,
+          };
+        break;
+      }
+      case "svg": {
+        const svgData =
+          await tableTopMongo.tableSvgs?.gets.getSvgMetaDataBy_TID_SID(
+            tableId,
+            contentId
+          );
+        const filtered = svgData?.instances.filter(
+          (instance) => instance.svgInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effects: filtered[0].effects,
+            effectStyles: filtered[0].effectStyles,
+          };
+        break;
+      }
+      case "text": {
+        const textData =
+          await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
+            tableId,
+            contentId
+          );
+        const filtered = textData?.instances.filter(
+          (instance) => instance.textInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effectStyles: filtered[0].effectStyles,
+          };
+        break;
+      }
+      case "video": {
+        const videoData =
+          await tableTopMongo.tableVideos?.gets.getVideoMetaDataBy_TID_VID(
+            tableId,
+            contentId
+          );
+        const filtered = videoData?.instances.filter(
+          (instance) => instance.videoInstanceId === instanceId
+        );
+        if (filtered)
+          data = {
+            effects: filtered[0].effects,
+            effectStyles: filtered[0].effectStyles,
+          };
+        break;
+      }
+      default:
+        break;
+    }
+
+    if (data === undefined) return;
+
+    const msg = {
+      type: "respondedCatchUpEffects",
+      header: { contentType, contentId, instanceId },
+      data: data,
+    };
+    this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   };
 
   onChangeContentState = (event: onChangeContentStateType) => {

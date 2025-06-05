@@ -18,7 +18,9 @@ import Deadbanding from "../../babylon/Deadbanding";
 import TableVideoMedia, { VideoListenerTypes } from "./TableVideoMedia";
 import { defaultSettings } from "./lib/typeConstant";
 
-export type VideoInstanceListenerTypes = { type: "settingsChanged" };
+export type VideoInstanceListenerTypes =
+  | { type: "settingsChanged" }
+  | { type: "effectsChanged" };
 
 class TableVideoMediaInstance {
   instanceCanvas: HTMLCanvasElement;
@@ -344,6 +346,10 @@ class TableVideoMediaInstance {
       this.videoInstanceId,
       this.effects,
     );
+
+    this.videoInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   updateAllEffects = (oldEffectStyles?: VideoEffectStylesType) => {
@@ -564,6 +570,10 @@ class TableVideoMediaInstance {
       this.videoInstanceId,
       this.effects,
     );
+
+    this.videoInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
   changeEffects = (
@@ -633,9 +643,13 @@ class TableVideoMediaInstance {
         this.effects[effect],
       );
     }
+
+    this.videoInstanceListeners.forEach((listener) => {
+      listener({ type: "effectsChanged" });
+    });
   };
 
-  drawNewEffect = (effect: EffectType) => {
+  private drawNewEffect = (effect: EffectType) => {
     if (!this.babylonScene) return;
 
     const currentStyle =

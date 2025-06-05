@@ -144,7 +144,7 @@ export default function SettingsPanel({
       type="above"
       spacing={4}
       externalRef={settingsButtonRef}
-      className="flex pointer-events-auto absolute z-settings-panel h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
+      className="pointer-events-auto absolute z-settings-panel flex h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
       externalPortalRef={settingsPanelRef}
       content={
         <>
@@ -169,7 +169,7 @@ export default function SettingsPanel({
                     >
                       <FgSVGElement
                         src={backgroundIcon}
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -178,13 +178,9 @@ export default function SettingsPanel({
                       <div className="truncate">Set as background</div>
                     </div>
                   )}
-                  clickFunction={() => {
-                    visualMedia.settings.background.value =
-                      !visualMedia.settings.background.value;
-
-                    setSettingsActive(false);
-                    setRerender((prev) => !prev);
-                  }}
+                  clickFunction={
+                    fgLowerVisualMediaController.current.handleSetAsBackground
+                  }
                   hoverContent={
                     <FgHoverContentStandard
                       content="Set as background (b)"
@@ -260,7 +256,7 @@ export default function SettingsPanel({
                     >
                       <FgSVGElement
                         src={captionsIcon}
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },

@@ -7,7 +7,6 @@ import {
 } from "../../../../../../../universal/contentTypeConstant";
 import TableSocketController from "../../../../../serverControllers/tableServer/TableSocketController";
 import ReactController from "../../../../../elements/reactButton/lib/ReactController";
-import { GroupSignals } from "src/context/signalContext/lib/typeConstant";
 
 class LowerController {
   private moving: boolean = false;

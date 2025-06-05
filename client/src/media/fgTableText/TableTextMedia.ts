@@ -2,8 +2,8 @@ import * as Y from "yjs";
 import {
   TableContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
@@ -39,7 +39,7 @@ class TableTextMedia {
   constructor(
     public textId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: TableContentStateTypes[],
     private liveTextEditingSocket: React.MutableRefObject<
       LiveTextEditingSocketController | undefined

@@ -34,6 +34,9 @@ const handleMessage = (
     case "updateContentPositioning":
       tableTopMongo.onUpdateContentPositioning(event);
       break;
+    case "requestCatchUpEffects":
+      metadataController.onRequestCatchUpEffects(event);
+      break;
     case "changeContentState":
       metadataController.onChangeContentState(event);
       break;

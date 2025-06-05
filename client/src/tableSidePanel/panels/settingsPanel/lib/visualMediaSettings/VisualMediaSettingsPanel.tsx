@@ -37,7 +37,7 @@ export default function VisualMediaSettingsPanel({
   const { userMedia, remoteMedia } = useMediaContext();
   const { mediasoupSocket } = useSocketContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
 
   const visualMedia = useRef(
     isUser
@@ -133,7 +133,7 @@ export default function VisualMediaSettingsPanel({
             hoverTimeoutDuration: 3500,
             hoverType: "above",
           }}
-        />{" "}
+        />
         <HoverElement
           externalRef={filenameRef}
           className="w-full truncate px-2 py-1 font-Josefin text-2xl text-fg-white underline decoration-fg-red-light underline-offset-4"
@@ -191,6 +191,13 @@ export default function VisualMediaSettingsPanel({
               !visualMedia.current.settings.background.value;
 
           visualMedia.current?.settingsChanged();
+
+          setTimeout(() => {
+            sendGroupSignal({
+              type: "removeGroupElement",
+              data: { removeType: contentType, removeId: instanceId },
+            });
+          }, 0);
 
           setRerender((prev) => !prev);
         }}

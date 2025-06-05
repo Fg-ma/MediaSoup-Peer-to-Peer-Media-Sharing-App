@@ -72,13 +72,15 @@ export default function SvgEffectsSection({
   }, []);
 
   const handleAlertSvgEffect = () => {
-    tableStaticContentSocket.current?.updateContentEffects(
-      "svg",
-      svgMediaInstance.svgMedia.svgId,
-      svgInstanceId,
-      staticContentEffects.current.svg[svgInstanceId],
-      staticContentEffectsStyles.current.svg[svgInstanceId],
-    );
+    if (svgMediaInstance.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "svg",
+        svgMediaInstance.svgMedia.svgId,
+        svgInstanceId,
+        staticContentEffects.current.svg[svgInstanceId],
+        staticContentEffectsStyles.current.svg[svgInstanceId],
+      );
+    }
   };
 
   return (

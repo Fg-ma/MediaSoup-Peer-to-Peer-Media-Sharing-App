@@ -58,6 +58,7 @@ class ImageSelectionController {
     if (event.type === "effectsChanged") {
       setTimeout(() => {
         this.drawInstanceCanvas();
+        this.setRerender((prev) => !prev);
       }, 100);
     }
   };

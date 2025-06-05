@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import ImageController from "./lib/ImageController";
 import LowerImageController from "./lib/lowerImageControls/LowerImageController";
 import { ActivePages, defaultActiveSettingsPages } from "./lib/typeConstant";
@@ -26,6 +27,7 @@ export default function FgTableImage({
   const { staticContentEffects, staticContentEffectsStyles } =
     useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
+  const { sendGroupSignal } = useSignalContext();
 
   const imageMediaInstance =
     staticContentMedia.current.image.tableInstances[imageInstanceId];
@@ -70,6 +72,7 @@ export default function FgTableImage({
       downloadRecordingReady,
       setRerender,
       tableStaticContentSocket,
+      sendGroupSignal,
     ),
   );
 

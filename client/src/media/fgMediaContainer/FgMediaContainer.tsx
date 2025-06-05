@@ -347,7 +347,7 @@ export default function FgMediaContainer({
           : "pointer-events-auto"
       } ${
         fullscreen ? "full-screen" : ""
-      } ${backgroundMedia ? "z-background-content" : "z-base-content"} ${className} absolute flex items-center justify-center`}
+      } ${backgroundMedia ? "pointer-events-none z-background-content" : "z-base-content"} ${className} absolute flex items-center justify-center`}
       style={
         backgroundMedia
           ? {
@@ -394,140 +394,147 @@ export default function FgMediaContainer({
         scale: { duration: 0.001 },
       }}
     >
-      {floatingContent &&
-        floatingContent.map((item, index) => (
-          <React.Fragment key={index}>{item}</React.Fragment>
-        ))}
-      <AdjustmentButtons
-        kind={kind}
-        mediaIdRef={mediaIdRef}
-        mediaInstanceId={mediaInstanceId}
-        bundleRef={bundleRef}
-        panBtnRef={panBtnRef}
-        positioning={positioning}
-        fgContentAdjustmentController={fgContentAdjustmentController}
-        tableStaticContentSocket={tableStaticContentSocket}
-        aspectRatio={aspectRatio}
-        mediaContainerOptions={mediaContainerOptions}
-      />
-      {mediaContainerOptions.adjustmentAnimation && adjustingDimensions && (
+      {!backgroundMedia && (
         <>
-          <div className="animated-border-box-glow"></div>
-          <div className="animated-border-box"></div>
+          {floatingContent &&
+            floatingContent.map((item, index) => (
+              <React.Fragment key={index}>{item}</React.Fragment>
+            ))}
+          <AdjustmentButtons
+            kind={kind}
+            mediaIdRef={mediaIdRef}
+            mediaInstanceId={mediaInstanceId}
+            bundleRef={bundleRef}
+            panBtnRef={panBtnRef}
+            positioning={positioning}
+            fgContentAdjustmentController={fgContentAdjustmentController}
+            tableStaticContentSocket={tableStaticContentSocket}
+            aspectRatio={aspectRatio}
+            mediaContainerOptions={mediaContainerOptions}
+          />
+          {mediaContainerOptions.adjustmentAnimation && adjustingDimensions && (
+            <>
+              <div className="animated-border-box-glow"></div>
+              <div className="animated-border-box"></div>
+            </>
+          )}
+          {mediaContainerOptions.controlsPlacement === "outside" &&
+            !fullscreen && (
+              <>
+                <UpperControls
+                  filename={filename}
+                  reactionsPanelActive={reactionsPanelActive}
+                  setReactionsPanelActive={setReactionsPanelActive}
+                  lowerController={lowerController}
+                  leftUpperControls={leftUpperControls}
+                  rightUpperControls={rightUpperControls}
+                  mediaContainerOptions={mediaContainerOptions}
+                  fullscreen={fullscreen}
+                  backgroundMedia={backgroundMedia}
+                  state={state}
+                />
+                <LowerControls
+                  lowerController={lowerController}
+                  externalRightLowerControlsRef={externalRightLowerControlsRef}
+                  leftLowerControls={leftLowerControls}
+                  rightLowerControls={rightLowerControls}
+                  mediaContainerOptions={mediaContainerOptions}
+                  preventLowerLabelsVariables={preventLowerLabelsVariables}
+                  fullscreen={fullscreen}
+                  backgroundMedia={backgroundMedia}
+                />
+              </>
+            )}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
+            <div
+              ref={frontEffectsContainerRef}
+              className="pointer-events-none relative z-[100] h-full w-full"
+            />
+          </div>
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
+            <div
+              ref={behindEffectsContainerRef}
+              className="pointer-events-none relative -z-[100] h-full w-full"
+            />
+          </div>
         </>
       )}
-      {mediaContainerOptions.controlsPlacement === "outside" &&
-        !fullscreen &&
-        !backgroundMedia && (
-          <>
-            <UpperControls
-              filename={filename}
-              reactionsPanelActive={reactionsPanelActive}
-              setReactionsPanelActive={setReactionsPanelActive}
-              lowerController={lowerController}
-              leftUpperControls={leftUpperControls}
-              rightUpperControls={rightUpperControls}
-              mediaContainerOptions={mediaContainerOptions}
-              fullscreen={fullscreen}
-              backgroundMedia={backgroundMedia}
-              state={state}
-            />
-            <LowerControls
-              lowerController={lowerController}
-              externalRightLowerControlsRef={externalRightLowerControlsRef}
-              leftLowerControls={leftLowerControls}
-              rightLowerControls={rightLowerControls}
-              mediaContainerOptions={mediaContainerOptions}
-              preventLowerLabelsVariables={preventLowerLabelsVariables}
-              fullscreen={fullscreen}
-              backgroundMedia={backgroundMedia}
-            />
-          </>
-        )}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
-        <div
-          ref={frontEffectsContainerRef}
-          className="pointer-events-none relative z-[100] h-full w-full"
-        />
-      </div>
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
-        <div
-          ref={behindEffectsContainerRef}
-          className="pointer-events-none relative -z-[100] h-full w-full"
-        />
-      </div>
       <div
         ref={subContainerRef}
-        className="selectable sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
+        className={`${backgroundMedia ? "" : "selectable"} sub-media-container pointer-events-none absolute flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white`}
         data-selectable-type={kind}
         data-selectable-id={mediaInstanceId}
       >
-        <AnimatePresence>
-          {downloadingState === "downloading" && (
-            <motion.div
-              key="loading-element"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
-            >
-              <LoadingElement
-                className="h-full w-full"
-                pauseDownload={pauseDownload}
-                aspectRatio={aspectRatio}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {downloadingState === "failed" && (
-          <DownloadFailed
-            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
-            onClick={retryDownload}
-          />
-        )}
-        {downloadingState === "paused" && (
-          <DownloadPaused
-            className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
-            onClick={resumeDownload}
-          />
-        )}
         {media && media}
-        <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">
-          {popupElements &&
-            popupElements.length > 0 &&
-            popupElements.map((element, index) => (
-              <React.Fragment key={index}>{element}</React.Fragment>
-            ))}
-        </div>
-        {(mediaContainerOptions.controlsPlacement === "inside" ||
-          fullscreen ||
-          backgroundMedia) && (
+        {!backgroundMedia && (
           <>
-            <UpperControls
-              filename={filename}
-              reactionsPanelActive={reactionsPanelActive}
-              setReactionsPanelActive={setReactionsPanelActive}
-              lowerController={lowerController}
-              leftUpperControls={leftUpperControls}
-              rightUpperControls={rightUpperControls}
-              mediaContainerOptions={mediaContainerOptions}
-              fullscreen={fullscreen}
-              backgroundMedia={backgroundMedia}
-              state={state}
-            />
-            <LowerControls
-              lowerController={lowerController}
-              externalRightLowerControlsRef={externalRightLowerControlsRef}
-              leftLowerControls={leftLowerControls}
-              rightLowerControls={rightLowerControls}
-              mediaContainerOptions={mediaContainerOptions}
-              preventLowerLabelsVariables={preventLowerLabelsVariables}
-              fullscreen={fullscreen}
-              backgroundMedia={backgroundMedia}
-            />
+            <AnimatePresence>
+              {downloadingState === "downloading" && (
+                <motion.div
+                  key="loading-element"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+                >
+                  <LoadingElement
+                    className="h-full w-full"
+                    pauseDownload={pauseDownload}
+                    aspectRatio={aspectRatio}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {downloadingState === "failed" && (
+              <DownloadFailed
+                className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+                onClick={retryDownload}
+              />
+            )}
+            {downloadingState === "paused" && (
+              <DownloadPaused
+                className="pointer-events-auto absolute left-0 top-0 z-[100] h-full w-full"
+                onClick={resumeDownload}
+              />
+            )}
+            <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">
+              {popupElements &&
+                popupElements.length > 0 &&
+                popupElements.map((element, index) => (
+                  <React.Fragment key={index}>{element}</React.Fragment>
+                ))}
+            </div>
+            {(mediaContainerOptions.controlsPlacement === "inside" ||
+              fullscreen ||
+              backgroundMedia) && (
+              <>
+                <UpperControls
+                  filename={filename}
+                  reactionsPanelActive={reactionsPanelActive}
+                  setReactionsPanelActive={setReactionsPanelActive}
+                  lowerController={lowerController}
+                  leftUpperControls={leftUpperControls}
+                  rightUpperControls={rightUpperControls}
+                  mediaContainerOptions={mediaContainerOptions}
+                  fullscreen={fullscreen}
+                  backgroundMedia={backgroundMedia}
+                  state={state}
+                />
+                <LowerControls
+                  lowerController={lowerController}
+                  externalRightLowerControlsRef={externalRightLowerControlsRef}
+                  leftLowerControls={leftLowerControls}
+                  rightLowerControls={rightLowerControls}
+                  mediaContainerOptions={mediaContainerOptions}
+                  preventLowerLabelsVariables={preventLowerLabelsVariables}
+                  fullscreen={fullscreen}
+                  backgroundMedia={backgroundMedia}
+                />
+              </>
+            )}
+            {(mediaContainerOptions.gradient || fullscreen) && <Gradient />}
           </>
         )}
-        {(mediaContainerOptions.gradient || fullscreen) && <Gradient />}
       </div>
     </motion.div>
   );

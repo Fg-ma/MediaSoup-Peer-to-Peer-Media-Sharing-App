@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import VideoController from "./lib/VideoController";
 import LowerVideoController from "./lib/lowerVideoControls/LowerVideoController";
 import {
@@ -45,6 +46,7 @@ export default function FgTableVideo({
   const { staticContentEffects, staticContentEffectsStyles } =
     useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
+  const { sendGroupSignal } = useSignalContext();
 
   const videoMediaInstance =
     staticContentMedia.current.video.tableInstances[videoInstanceId];
@@ -116,6 +118,7 @@ export default function FgTableVideo({
       isScrubbing,
       wasPaused,
       tableStaticContentSocket,
+      sendGroupSignal,
     ),
   );
 

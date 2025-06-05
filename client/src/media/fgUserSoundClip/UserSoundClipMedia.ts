@@ -1,7 +1,7 @@
-import { TableTopStaticMimeType } from "../../serverControllers/userStaticContentServer/lib/typeConstant";
 import {
   UserContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
@@ -34,7 +34,7 @@ class UserSoundClipMedia {
   constructor(
     public soundClipId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: UserContentStateTypes[],
     private userStaticContentSocket: React.MutableRefObject<
       UserStaticContentSocketController | undefined

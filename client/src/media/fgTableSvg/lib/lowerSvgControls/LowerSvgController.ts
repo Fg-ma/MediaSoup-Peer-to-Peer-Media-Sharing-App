@@ -1,3 +1,4 @@
+import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
 import {
   StaticContentEffectsType,
   StaticContentEffectsStylesType,
@@ -19,6 +20,7 @@ class LowerSvgController {
     >,
     private setEditing: React.Dispatch<React.SetStateAction<boolean>>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   handleSvgEffects = () => {
@@ -63,13 +65,15 @@ class LowerSvgController {
   };
 
   handleAlertSvgEffect = () => {
-    this.tableStaticContentSocket.current?.updateContentEffects(
-      "svg",
-      this.svgMediaInstance.svgMedia.svgId,
-      this.svgInstanceId,
-      this.staticContentEffects.current.svg[this.svgInstanceId],
-      this.staticContentEffectsStyles.current.svg[this.svgInstanceId],
-    );
+    if (this.svgMediaInstance.settings.synced.value) {
+      this.tableStaticContentSocket.current?.updateContentEffects(
+        "svg",
+        this.svgMediaInstance.svgMedia.svgId,
+        this.svgInstanceId,
+        this.staticContentEffects.current.svg[this.svgInstanceId],
+        this.staticContentEffectsStyles.current.svg[this.svgInstanceId],
+      );
+    }
   };
 
   handleSettings = () => {
@@ -82,12 +86,27 @@ class LowerSvgController {
 
     this.setSettingsActive(false);
 
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: { removeType: "svg", removeId: this.svgInstanceId },
+      });
+    }, 0);
+
     this.setRerender((prev) => !prev);
   };
 
   handleSync = () => {
     this.svgMediaInstance.settings.synced.value =
       !this.svgMediaInstance.settings.synced.value;
+
+    if (this.svgMediaInstance.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "svg",
+        this.svgMediaInstance.svgMedia.svgId,
+        this.svgMediaInstance.svgInstanceId,
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };

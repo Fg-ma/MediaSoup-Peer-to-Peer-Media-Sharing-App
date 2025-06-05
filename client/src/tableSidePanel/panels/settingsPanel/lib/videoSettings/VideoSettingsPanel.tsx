@@ -13,6 +13,7 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import DownloadTypePage from "./lib/DownloadTypePage";
 import VideoSpeedPage from "./lib/VideoSpeedPage";
 import HoverElement from "../../../../../elements/hoverElement/HoverElement";
+import { useSocketContext } from "../../../../..//context/socketContext/SocketContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -33,7 +34,8 @@ export default function VideoSettingsPanel({
 }) {
   const { staticContentMedia } = useMediaContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const videoMediaInstance = useRef(
     staticContentMedia.current.video.tableInstances[instanceId],
@@ -53,6 +55,8 @@ export default function VideoSettingsPanel({
   const videoSettingsController = new VideoSettingsController(
     videoMediaInstance,
     setRerender,
+    tableStaticContentSocket,
+    sendGroupSignal,
   );
 
   useEffect(() => {

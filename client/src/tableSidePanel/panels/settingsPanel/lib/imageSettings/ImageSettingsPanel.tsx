@@ -8,6 +8,7 @@ import FgHoverContentStandard from "../../../../../elements/fgHoverContentStanda
 import ImageSettingsController from "./lib/ImageSettingsController";
 import DownloadTypePage from "./lib/DownloadTypePage";
 import HoverElement from "../../../../../elements/hoverElement/HoverElement";
+import { useSocketContext } from "../../../../../context/socketContext/SocketContext";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -26,7 +27,8 @@ export default function ImageSettingsPanel({
 }) {
   const { staticContentMedia } = useMediaContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
+  const { tableStaticContentSocket } = useSocketContext();
 
   const imageMediaInstance = useRef(
     staticContentMedia.current.image.tableInstances[instanceId],
@@ -40,6 +42,8 @@ export default function ImageSettingsPanel({
     imageMediaInstance,
     setDownloadTypePageActive,
     setRerender,
+    tableStaticContentSocket,
+    sendGroupSignal,
   );
 
   useEffect(() => {

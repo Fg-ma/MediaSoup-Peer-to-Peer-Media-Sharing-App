@@ -1,6 +1,7 @@
 import { VideoOptions } from "./typeConstant";
 import {
   IncomingTableStaticContentMessages,
+  onRespondedCatchUpEffectsType,
   onUpdatedContentEffectsType,
   onUpdatedVideoPositionType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
@@ -56,73 +57,101 @@ class VideoController {
     const { effects, effectStyles } = event.data;
 
     if (
-      contentType === "video" &&
-      contentId === this.videoMediaInstance.videoMedia.videoId &&
-      instanceId === this.videoInstanceId
-    ) {
-      this.staticContentEffects.current.video[this.videoInstanceId].video =
-        effects as {
-          [effectType in VideoEffectTypes]: boolean;
-        };
+      !this.videoMediaInstance.settings.synced.value ||
+      contentType !== "video" ||
+      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      instanceId !== this.videoInstanceId
+    )
+      return;
 
-      const oldEffectStyle = structuredClone(
-        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
-          .video,
-      );
+    this.staticContentEffects.current.video[this.videoInstanceId].video =
+      effects as {
+        [effectType in VideoEffectTypes]: boolean;
+      };
 
-      if (effectStyles !== undefined) {
-        this.staticContentEffectsStyles.current.video[
-          this.videoInstanceId
-        ].video = effectStyles as VideoEffectStylesType;
+    const oldEffectStyle = structuredClone(
+      this.staticContentEffectsStyles.current.video[this.videoInstanceId].video,
+    );
 
-        this.tintColor.current = (
-          effectStyles as VideoEffectStylesType
-        ).tint.color;
-      }
+    if (effectStyles !== undefined) {
+      this.staticContentEffectsStyles.current.video[
+        this.videoInstanceId
+      ].video = effectStyles as VideoEffectStylesType;
 
-      this.videoMediaInstance.updateAllEffects(oldEffectStyle);
-
-      if (
-        this.staticContentEffects.current.video[this.videoInstanceId].video
-          .pause
-      ) {
-        this.paused.current = true;
-        if (
-          this.videoMediaInstance.instanceVideo &&
-          !this.videoMediaInstance.instanceVideo.paused
-        ) {
-          this.videoMediaInstance.instanceVideo.pause();
-        }
-
-        this.setPausedState(true);
-      } else {
-        this.paused.current = false;
-        if (
-          this.videoMediaInstance.instanceVideo &&
-          this.videoMediaInstance.instanceVideo.paused
-        ) {
-          this.videoMediaInstance.instanceVideo.play();
-        }
-
-        this.setPausedState(false);
-      }
-
-      this.setRerender((prev) => !prev);
+      this.tintColor.current = (
+        effectStyles as VideoEffectStylesType
+      ).tint.color;
     }
+
+    this.videoMediaInstance.updateAllEffects(oldEffectStyle);
+
+    if (
+      this.staticContentEffects.current.video[this.videoInstanceId].video.pause
+    ) {
+      this.paused.current = true;
+      if (
+        this.videoMediaInstance.instanceVideo &&
+        !this.videoMediaInstance.instanceVideo.paused
+      ) {
+        this.videoMediaInstance.instanceVideo.pause();
+      }
+
+      this.setPausedState(true);
+    } else {
+      this.paused.current = false;
+      if (
+        this.videoMediaInstance.instanceVideo &&
+        this.videoMediaInstance.instanceVideo.paused
+      ) {
+        this.videoMediaInstance.instanceVideo.play();
+      }
+
+      this.setPausedState(false);
+    }
+
+    this.setRerender((prev) => !prev);
   };
 
   private onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
     const { contentType, contentId, instanceId } = event.header;
 
     if (
-      contentType === "video" &&
-      contentId === this.videoMediaInstance.videoMedia.videoId &&
-      instanceId === this.videoInstanceId
-    ) {
-      this.videoMediaInstance.updateVideoPosition(event.data.videoPosition);
+      !this.videoMediaInstance.settings.synced.value ||
+      contentType !== "video" ||
+      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      instanceId !== this.videoInstanceId
+    )
+      return;
 
-      this.lowerVideoController.current.timeUpdate();
-    }
+    this.videoMediaInstance.updateVideoPosition(event.data.videoPosition);
+
+    this.lowerVideoController.current.timeUpdate();
+  };
+
+  private onRespondedCatchUpEffects = (
+    event: onRespondedCatchUpEffectsType,
+  ) => {
+    const { contentType, contentId, instanceId } = event.header;
+    const { effects, effectStyles } = event.data;
+
+    if (
+      contentType !== "video" ||
+      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      instanceId !== this.videoInstanceId
+    )
+      return;
+
+    if (effects)
+      this.staticContentEffects.current.video[this.videoInstanceId].video =
+        effects as {
+          [effectType in VideoEffectTypes]: boolean;
+        };
+    if (effectStyles)
+      this.staticContentEffectsStyles.current.video[
+        this.videoInstanceId
+      ].video = effectStyles as VideoEffectStylesType;
+
+    this.videoMediaInstance.updateAllEffects();
   };
 
   handleTableStaticContentMessage = (
@@ -134,6 +163,9 @@ class VideoController {
         break;
       case "updatedVideoPosition":
         this.onUpdateVideoPosition(event);
+        break;
+      case "respondedCatchUpEffects":
+        this.onRespondedCatchUpEffects(event);
         break;
       default:
         break;

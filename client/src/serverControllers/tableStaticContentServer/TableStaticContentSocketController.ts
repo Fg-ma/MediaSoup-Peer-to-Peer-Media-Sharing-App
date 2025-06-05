@@ -30,11 +30,11 @@ import {
   onVideoUploadedToTabledType,
   onVideoUploadedToTableType,
   OutGoingTableStaticContentMessages,
-  TableTopStaticMimeType,
 } from "./lib/typeConstant";
 import {
   TableContentStateTypes,
   StaticContentTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
 import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaInstance";
 import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
@@ -358,6 +358,24 @@ class TableStaticContentSocketController {
       },
       data: {
         videoPosition,
+      },
+    });
+  };
+
+  requestCatchUpEffects = (
+    contentType: StaticContentTypes,
+    contentId: string,
+    instanceId: string,
+  ) => {
+    this.sendMessage({
+      type: "requestCatchUpEffects",
+      header: {
+        tableId: this.tableId,
+        username: this.username,
+        instance: this.instance,
+        contentType,
+        contentId,
+        instanceId,
       },
     });
   };
@@ -859,7 +877,7 @@ class TableStaticContentSocketController {
         const newVideoMedia = new TableVideoMedia(
           video.videoId,
           video.filename,
-          video.mimeType as TableTopStaticMimeType,
+          video.mimeType as StaticMimeTypes,
           video.state,
           this.deadbanding,
           this.userDevice,
@@ -922,7 +940,7 @@ class TableStaticContentSocketController {
         const newImageMedia = new TableImageMedia(
           image.imageId,
           image.filename,
-          image.mimeType as TableTopStaticMimeType,
+          image.mimeType as StaticMimeTypes,
           image.state,
           this.deadbanding,
           this.userDevice,
@@ -961,7 +979,7 @@ class TableStaticContentSocketController {
         const newSvgMedia = new TableSvgMedia(
           svg.svgId,
           svg.filename,
-          svg.mimeType as TableTopStaticMimeType,
+          svg.mimeType as StaticMimeTypes,
           svg.state,
           this.tableStaticContentSocket,
           this.sendDownloadSignal,
@@ -994,7 +1012,7 @@ class TableStaticContentSocketController {
         const newTextMedia = new TableTextMedia(
           textItem.textId,
           textItem.filename,
-          textItem.mimeType as TableTopStaticMimeType,
+          textItem.mimeType as StaticMimeTypes,
           textItem.state,
           this.liveTextEditingSocket,
           this.sendDownloadSignal,
@@ -1027,7 +1045,7 @@ class TableStaticContentSocketController {
         const newApplication = new TableApplicationMedia(
           application.applicationId,
           application.filename,
-          application.mimeType as TableTopStaticMimeType,
+          application.mimeType as StaticMimeTypes,
           application.state,
           this.tableStaticContentSocket,
           this.sendDownloadSignal,

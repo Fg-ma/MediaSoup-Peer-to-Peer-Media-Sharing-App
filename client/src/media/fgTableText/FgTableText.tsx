@@ -1,16 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
+import { useSignalContext } from "../../context/signalContext/SignalContext";
 import LowerTextController from "./lib/lowerTextControls/LowerTextController";
 import FgMediaContainer from "../fgMediaContainer/FgMediaContainer";
 import DownloadButton from "./lib/lowerTextControls/downloadButton/DownloadButton";
 import TextController from "./lib/TextController";
 import SettingsButton from "./lib/lowerTextControls/settingsButton/SettingsButton";
-import {
-  ActivePages,
-  defaultActiveSettingsPages,
-  defaultSettings,
-  Settings,
-} from "./lib/typeConstant";
+import { ActivePages, defaultActiveSettingsPages } from "./lib/typeConstant";
 import ExpandLineNumbers from "./lib/ExpandLineNumbers";
 import Monaco from "./lib/monaco/Monaco";
 import CornersDecorator from "../../elements/decorators/CornersDecorator";
@@ -36,6 +32,7 @@ export default function FgTableText({
   const { staticContentEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { staticContentMedia } = useMediaContext();
+  const { sendGroupSignal } = useSignalContext();
 
   const textMediaInstance =
     staticContentMedia.current.text.tableInstances[textInstanceId];
@@ -72,6 +69,8 @@ export default function FgTableText({
       setRerender,
       initializing,
       forceFinishInitialization,
+      tableStaticContentSocket,
+      sendGroupSignal,
     ),
   );
 

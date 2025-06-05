@@ -103,7 +103,7 @@ export default function GeneralMediaSelection({
       }}
     >
       <div
-        className="selected-section-media-container relative mx-2 h-[12rem]"
+        className="selected-section-media-container relative mx-2 max-h-[12rem]"
         style={{ ...selectionContentStyle }}
       >
         {selectionContent}

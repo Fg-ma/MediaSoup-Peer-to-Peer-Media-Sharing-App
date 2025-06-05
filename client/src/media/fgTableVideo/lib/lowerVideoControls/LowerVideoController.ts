@@ -10,10 +10,10 @@ import {
   fontFamilyMap,
   fontSizeMap,
   opacityMap,
-  Settings,
 } from "../typeConstant";
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import TableVideoMediaInstance from "../../TableVideoMediaInstance";
+import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
 
 class LowerVideoController {
   constructor(
@@ -43,6 +43,7 @@ class LowerVideoController {
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
     >,
+    private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
 
   formatDuration = (time: number) => {
@@ -134,8 +135,11 @@ class LowerVideoController {
       case "u":
         this.handleSettings();
         break;
-      case "h":
+      case "j":
         this.handleDownloadRecording();
+        break;
+      case "h":
+        this.handleSync();
         break;
       case "b":
         this.handleSetAsBackground();
@@ -283,25 +287,29 @@ class LowerVideoController {
         blockStateChange,
       );
 
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "video",
-        this.videoMediaInstance.videoMedia.videoId,
-        this.videoInstanceId,
-        this.staticContentEffects.current.video[this.videoInstanceId].video,
-        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
-          .video,
-      );
+      if (this.videoMediaInstance.settings.synced.value) {
+        this.tableStaticContentSocket.current?.updateContentEffects(
+          "video",
+          this.videoMediaInstance.videoMedia.videoId,
+          this.videoInstanceId,
+          this.staticContentEffects.current.video[this.videoInstanceId].video,
+          this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+            .video,
+        );
+      }
     } else {
       this.videoMediaInstance.clearAllEffects();
 
-      this.tableStaticContentSocket.current?.updateContentEffects(
-        "video",
-        this.videoMediaInstance.videoMedia.videoId,
-        this.videoInstanceId,
-        this.staticContentEffects.current.video[this.videoInstanceId].video,
-        this.staticContentEffectsStyles.current.video[this.videoInstanceId]
-          .video,
-      );
+      if (this.videoMediaInstance.settings.synced.value) {
+        this.tableStaticContentSocket.current?.updateContentEffects(
+          "video",
+          this.videoMediaInstance.videoMedia.videoId,
+          this.videoInstanceId,
+          this.staticContentEffects.current.video[this.videoInstanceId].video,
+          this.staticContentEffectsStyles.current.video[this.videoInstanceId]
+            .video,
+        );
+      }
     }
   };
 
@@ -456,12 +464,29 @@ class LowerVideoController {
     this.videoMediaInstance.settings.background.value =
       !this.videoMediaInstance.settings.background.value;
 
+    this.setSettingsActive(false);
+
+    setTimeout(() => {
+      this.sendGroupSignal({
+        type: "removeGroupElement",
+        data: { removeType: "video", removeId: this.videoInstanceId },
+      });
+    }, 0);
+
     this.setRerender((prev) => !prev);
   };
 
   handleSync = () => {
     this.videoMediaInstance.settings.synced.value =
       !this.videoMediaInstance.settings.synced.value;
+
+    if (this.videoMediaInstance.settings.synced.value) {
+      this.tableStaticContentSocket.current?.requestCatchUpEffects(
+        "video",
+        this.videoMediaInstance.videoMedia.videoId,
+        this.videoMediaInstance.videoInstanceId,
+      );
+    }
 
     this.setRerender((prev) => !prev);
   };

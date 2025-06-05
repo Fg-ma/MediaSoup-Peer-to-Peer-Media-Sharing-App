@@ -1,6 +1,6 @@
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   LoadingStateTypes,
+  StaticMimeTypes,
   TableContentStateTypes,
 } from "../../../../universal/contentTypeConstant";
 import Downloader from "../../tools/downloader/Downloader";
@@ -35,7 +35,7 @@ class TableSvgMedia {
   constructor(
     public svgId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: TableContentStateTypes[],
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined

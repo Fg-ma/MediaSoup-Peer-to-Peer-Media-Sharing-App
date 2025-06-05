@@ -154,13 +154,17 @@ export default function SettingsPanel({
       effectStyles.fontSize = `${Math.max(1, value)}px`;
     }
 
-    tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      textMediaInstance.textMedia.textId,
-      textMediaInstance.textInstanceId,
-      undefined,
-      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
-    );
+    if (textMediaInstance.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.textMedia.textId,
+        textMediaInstance.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.textInstanceId
+        ],
+      );
+    }
 
     setRerender((prev) => !prev);
   };
@@ -181,13 +185,17 @@ export default function SettingsPanel({
       effectStyles.letterSpacing = Math.min(20, Math.max(-5, value));
     }
 
-    tableStaticContentSocket.current?.updateContentEffects(
-      "text",
-      textMediaInstance.textMedia.textId,
-      textMediaInstance.textInstanceId,
-      undefined,
-      staticContentEffectsStyles.current.text[textMediaInstance.textInstanceId],
-    );
+    if (textMediaInstance.settings.synced.value) {
+      tableStaticContentSocket.current?.updateContentEffects(
+        "text",
+        textMediaInstance.textMedia.textId,
+        textMediaInstance.textInstanceId,
+        undefined,
+        staticContentEffectsStyles.current.text[
+          textMediaInstance.textInstanceId
+        ],
+      );
+    }
 
     setRerender((prev) => !prev);
   };
@@ -201,7 +209,7 @@ export default function SettingsPanel({
       type="above"
       spacing={4}
       externalRef={settingsButtonRef}
-      className="flex pointer-events-auto z-settings-panel h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
+      className="pointer-events-auto z-settings-panel flex h-max max-h-80 w-64 rounded-md border-2 border-fg-white bg-fg-tone-black-1 p-2 font-K2D text-base text-fg-white shadow-md shadow-fg-tone-black-8"
       externalPortalRef={settingsPanelRef}
       content={
         <>
@@ -230,7 +238,7 @@ export default function SettingsPanel({
                             ? desyncIcon
                             : syncIcon
                         }
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -270,7 +278,7 @@ export default function SettingsPanel({
                     >
                       <FgSVGElement
                         src={backgroundIcon}
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -300,7 +308,7 @@ export default function SettingsPanel({
                     <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                       <FgSVGElement
                         src={editIcon}
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },
@@ -332,7 +340,7 @@ export default function SettingsPanel({
                     <div className="flex h-full w-full items-center justify-start text-nowrap rounded fill-fg-white stroke-fg-white px-2 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1">
                       <FgSVGElement
                         src={mapIcon}
-                        className="flex mr-2 aspect-square h-full items-center justify-center"
+                        className="mr-2 flex aspect-square h-full items-center justify-center"
                         attributes={[
                           { key: "width", value: "80%" },
                           { key: "height", value: "80%" },

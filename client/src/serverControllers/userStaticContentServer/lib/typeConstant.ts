@@ -1,17 +1,8 @@
 import {
   StaticContentTypes,
+  StaticMimeTypes,
   UserContentStateTypes,
 } from "../../../../../universal/contentTypeConstant";
-
-export type TableTopStaticMimeType =
-  | "image/jpeg"
-  | "image/png"
-  | "image/webp"
-  | "video/mp4"
-  | "video/mpeg"
-  | "image/gif"
-  | "application/pdf"
-  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 export type OutGoingUserStaticContentMessages =
   | onConnectType
@@ -127,7 +118,7 @@ export type onVideoUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -139,7 +130,7 @@ export type onImageUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -151,7 +142,7 @@ export type onSvgUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -163,7 +154,7 @@ export type onTextUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -175,7 +166,7 @@ export type onApplicationUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -187,7 +178,7 @@ export type onSoundClipUploadedToUserContentType = {
   };
   data: {
     filename: string;
-    mimeType: TableTopStaticMimeType;
+    mimeType: StaticMimeTypes;
     state: UserContentStateTypes[];
   };
 };
@@ -265,7 +256,7 @@ export type onMuteStylesResponseType = {
       userId: string;
       svgId: string;
       filename: string;
-      mimeType: TableTopStaticMimeType;
+      mimeType: StaticMimeTypes;
       state: UserContentStateTypes[];
     }[];
   };

@@ -9,7 +9,6 @@ class SvgSelectionController {
   constructor(
     private instanceId: string,
     private svgInstanceMedia: TableSvgMediaInstance,
-    private svgMirror: React.MutableRefObject<SVGSVGElement | undefined>,
     private svgContainerRef: React.RefObject<HTMLDivElement>,
     private setLoadingState: React.Dispatch<
       React.SetStateAction<LoadingStateTypes>
@@ -18,22 +17,19 @@ class SvgSelectionController {
   ) {}
 
   handleInstanceEvents = (event: SvgInstanceListenerTypes) => {
-    // if (event.type === "effectsChanged") {
-    //   if (this.svgMirror.current && this.svgMirror.current.parentElement) {
-    //     this.svgMirror.current.parentElement.removeChild(
-    //       this.svgMirror.current,
-    //     );
-    //   }
-    //   if (this.svgInstanceMedia.instanceSvg) {
-    //     this.svgMirror.current = this.svgInstanceMedia.instanceSvg.cloneNode(
-    //       true,
-    //     ) as SVGSVGElement;
-    //     this.svgMirror.current.setAttribute("height", "100%");
-    //     this.svgMirror.current.setAttribute("width", "auto");
-    //     this.svgMirror.current.setAttribute("maxHeight", "12rem");
-    //     this.svgContainerRef.current?.appendChild(this.svgMirror.current);
-    //   }
-    // }
+    if (
+      event.type === "effectsChanged" &&
+      this.svgInstanceMedia.svgMedia.fileSize < 1024 * 1024 * 20 &&
+      this.svgInstanceMedia.instanceSvg
+    ) {
+      this.svgContainerRef.current?.removeChild(
+        this.svgContainerRef.current.getElementsByTagName("svg")[0],
+      );
+      this.svgContainerRef.current?.appendChild(
+        this.svgInstanceMedia.instanceSvg.cloneNode(true)!,
+      );
+      this.setRerender((prev) => !prev);
+    }
   };
 
   handleSvgMessages = (event: SvgListenerTypes) => {

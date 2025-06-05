@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getSoundClipMetaDataBy_TID_AID = async (
+  getSoundClipMetaDataBy_TID_SID = async (
     tableId: string,
     soundClipId: string
   ) => {

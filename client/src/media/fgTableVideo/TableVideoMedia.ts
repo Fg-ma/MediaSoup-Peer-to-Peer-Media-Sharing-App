@@ -1,11 +1,11 @@
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import shaka from "shaka-player";
 import { StaticContentEffectsType } from "../../../../universal/effectsTypeConstant";
-import { TableTopStaticMimeType } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import TableVideoAudioMedia from "./TableVideoAudioMedia";
 import {
   TableContentStateTypes,
   LoadingStateTypes,
+  StaticMimeTypes,
 } from "../../../../universal/contentTypeConstant";
 import FaceLandmarks from "../../babylon/FaceLandmarks";
 import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
@@ -73,7 +73,7 @@ class TableVideoMedia {
   constructor(
     public videoId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     public state: TableContentStateTypes[],
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,

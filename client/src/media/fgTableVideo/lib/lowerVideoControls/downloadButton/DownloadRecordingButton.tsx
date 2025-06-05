@@ -34,7 +34,7 @@ export default function DownloadRecordingButton({
       hoverContent={
         !videoEffectsActive ? (
           <FgHoverContentStandard
-            content="Download recording (h)"
+            content="Download recording (j)"
             style="light"
           />
         ) : undefined

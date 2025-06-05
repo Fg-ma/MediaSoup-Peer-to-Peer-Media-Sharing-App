@@ -65,6 +65,7 @@ export type MessageTypes =
   | onGetFileChunkType
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
+  | onRequestCatchUpEffectsType
   | onUpdateVideoPositionType
   | onRequestCatchUpVideoPositionType
   | onResponseCatchUpVideoPositionType
@@ -189,6 +190,18 @@ export type onUpdateContentEffectsType = {
       | ApplicationEffectStylesType
       | SvgEffectStylesType
       | TextEffectStylesType;
+  };
+};
+
+export type onRequestCatchUpEffectsType = {
+  type: "requestCatchUpEffects";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+    instanceId: string;
   };
 };
 

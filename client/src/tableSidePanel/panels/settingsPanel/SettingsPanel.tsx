@@ -19,21 +19,25 @@ export default function SettingsPanel({
       {currentSettingsActive.current.map((active) =>
         active.contentType === "svg" ? (
           <SvgSettingsPanel
+            key={active.instanceId}
             instanceId={active.instanceId}
             setExternalRerender={setExternalRerender}
           />
         ) : active.contentType === "image" ? (
           <ImageSettingsPanel
+            key={active.instanceId}
             instanceId={active.instanceId}
             setExternalRerender={setExternalRerender}
           />
         ) : active.contentType === "text" ? (
           <TextSettingsPanel
+            key={active.instanceId}
             instanceId={active.instanceId}
             setExternalRerender={setExternalRerender}
           />
         ) : active.contentType === "video" ? (
           <VideoSettingsPanel
+            key={active.instanceId}
             instanceId={active.instanceId}
             setExternalRerender={setExternalRerender}
           />
@@ -41,6 +45,7 @@ export default function SettingsPanel({
           active.contentType === "screen" ? (
           active.visualMediaInfo && (
             <VisualMediaSettingsPanel
+              key={active.instanceId}
               contentType={active.contentType}
               instanceId={active.instanceId}
               isUser={active.visualMediaInfo.isUser}
@@ -52,6 +57,7 @@ export default function SettingsPanel({
         ) : active.contentType === "audio" ? (
           active.visualMediaInfo && (
             <AudioSettingsPanel
+              key={active.instanceId}
               instanceId={active.instanceId}
               isUser={active.visualMediaInfo.isUser}
               username={active.visualMediaInfo.username}

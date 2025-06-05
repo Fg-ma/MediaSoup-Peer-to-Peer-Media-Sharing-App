@@ -5,9 +5,11 @@ import {
   onDownloadErrorType,
   onDownloadMetaType,
   onOneShotDownloadType,
-  TableTopStaticMimeType,
 } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { StaticContentTypes } from "../../../../universal/contentTypeConstant";
+import {
+  StaticContentTypes,
+  StaticMimeTypes,
+} from "../../../../universal/contentTypeConstant";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadListenerTypes } from "./lib/typeConstant";
@@ -38,7 +40,7 @@ class Downloader {
     private contentType: StaticContentTypes,
     private contentId: string,
     public filename: string,
-    public mimeType: TableTopStaticMimeType,
+    public mimeType: StaticMimeTypes,
     private staticContentSocket: React.MutableRefObject<
       | TableStaticContentSocketController
       | UserStaticContentSocketController

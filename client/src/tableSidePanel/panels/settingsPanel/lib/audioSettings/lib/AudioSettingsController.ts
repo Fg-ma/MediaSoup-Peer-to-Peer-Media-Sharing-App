@@ -16,13 +16,6 @@ class AudioSettingsController {
     this.setRerender((prev) => !prev);
   };
 
-  handleSync = () => {
-    this.svgMediaInstance.current.settings.synced.value =
-      !this.svgMediaInstance.current.settings.synced.value;
-
-    this.setRerender((prev) => !prev);
-  };
-
   handleDownload = () => {
     this.svgMediaInstance.current.downloadSvg(
       this.svgMediaInstance.current.settings.downloadOptions.mimeType.value,
