@@ -17,6 +17,6 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "types", "public", "../universal"],
+  "include": ["src", "types", "public", "../universal", "src/TUI"],
   "exclude": ["node_modules"]
 }

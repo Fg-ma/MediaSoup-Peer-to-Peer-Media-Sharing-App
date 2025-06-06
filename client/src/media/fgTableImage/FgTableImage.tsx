@@ -3,6 +3,7 @@ import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import { useSignalContext } from "../../context/signalContext/SignalContext";
+import { useToolsContext } from "../../context/toolsContext/ToolsContext";
 import ImageController from "./lib/ImageController";
 import LowerImageController from "./lib/lowerImageControls/LowerImageController";
 import { ActivePages, defaultActiveSettingsPages } from "./lib/typeConstant";
@@ -12,6 +13,8 @@ import ImageEffectsSection from "./lib/imageEffectsSection/ImageEffectsSection";
 import DownloadButton from "./lib/lowerImageControls/downloadButton/DownloadButton";
 import SettingsButton from "./lib/lowerImageControls/settingsButton/SettingsButton";
 import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/DownloadRecordingButton";
+import FgPortal from "../../elements/fgPortal/FgPortal";
+import TUI from "../../TUI/TUI";
 import "./lib/fgImageStyles.css";
 
 export default function FgTableImage({
@@ -28,11 +31,13 @@ export default function FgTableImage({
     useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
   const { sendGroupSignal } = useSignalContext();
+  const { uploader } = useToolsContext();
 
   const imageMediaInstance =
     staticContentMedia.current.image.tableInstances[imageInstanceId];
 
   const [imageEffectsActive, setImageEffectsActive] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const positioning = useRef<{
     position: { left: number; top: number };
@@ -73,6 +78,7 @@ export default function FgTableImage({
       setRerender,
       tableStaticContentSocket,
       sendGroupSignal,
+      setIsEditing,
     ),
   );
 
@@ -165,87 +171,116 @@ export default function FgTableImage({
   }, [tableStaticContentSocket.current]);
 
   return (
-    <FgMediaContainer
-      filename={imageMediaInstance.imageMedia.filename}
-      pauseDownload={imageMediaInstance.imageMedia.downloader?.pause}
-      resumeDownload={imageMediaInstance.imageMedia.downloader?.resume}
-      retryDownload={imageMediaInstance.imageMedia.retryDownload}
-      downloadingState={imageMediaInstance.imageMedia.loadingState}
-      addDownloadListener={
-        imageMediaInstance.imageMedia.loadingState !== "downloaded"
-          ? imageMediaInstance.imageMedia.addImageListener
-          : undefined
-      }
-      removeDownloadListener={
-        imageMediaInstance.imageMedia.loadingState !== "downloaded"
-          ? imageMediaInstance.imageMedia.removeImageListener
-          : undefined
-      }
-      getAspect={imageMediaInstance.getAspect}
-      setPositioning={imageMediaInstance.setPositioning}
-      mediaId={imageMediaInstance.imageMedia.imageId}
-      mediaInstanceId={imageInstanceId}
-      kind="image"
-      initState={imageMediaInstance.imageMedia.state}
-      bundleRef={bundleRef}
-      backgroundMedia={imageMediaInstance.settings.background.value}
-      className="image-container"
-      popupElements={[
-        imageEffectsActive ? (
-          <ImageEffectsSection
-            imageInstanceId={imageInstanceId}
+    <>
+      <FgMediaContainer
+        filename={imageMediaInstance.imageMedia.filename}
+        pauseDownload={imageMediaInstance.imageMedia.downloader?.pause}
+        resumeDownload={imageMediaInstance.imageMedia.downloader?.resume}
+        retryDownload={imageMediaInstance.imageMedia.retryDownload}
+        downloadingState={imageMediaInstance.imageMedia.loadingState}
+        addDownloadListener={
+          imageMediaInstance.imageMedia.loadingState !== "downloaded"
+            ? imageMediaInstance.imageMedia.addImageListener
+            : undefined
+        }
+        removeDownloadListener={
+          imageMediaInstance.imageMedia.loadingState !== "downloaded"
+            ? imageMediaInstance.imageMedia.removeImageListener
+            : undefined
+        }
+        getAspect={imageMediaInstance.getAspect}
+        setPositioning={imageMediaInstance.setPositioning}
+        mediaId={imageMediaInstance.imageMedia.imageId}
+        mediaInstanceId={imageInstanceId}
+        kind="image"
+        initState={imageMediaInstance.imageMedia.state}
+        bundleRef={bundleRef}
+        backgroundMedia={imageMediaInstance.settings.background.value}
+        className="image-container"
+        popupElements={[
+          imageEffectsActive ? (
+            <ImageEffectsSection
+              imageInstanceId={imageInstanceId}
+              lowerImageController={lowerImageController}
+              tintColor={tintColor}
+              imageMediaInstance={imageMediaInstance}
+              imageContainerRef={imageContainerRef}
+            />
+          ) : null,
+        ]}
+        leftLowerControls={[]}
+        rightLowerControls={[
+          <SettingsButton
+            imageMediaInstance={imageMediaInstance}
+            effectsActive={imageEffectsActive}
+            containerRef={imageContainerRef}
+            settingsActive={settingsActive}
+            setSettingsActive={setSettingsActive}
+            activePages={activePages}
+            setActivePages={setActivePages}
+            scrollingContainerRef={rightLowerImageControlsRef}
             lowerImageController={lowerImageController}
-            tintColor={tintColor}
-            imageMediaInstance={imageMediaInstance}
-            imageContainerRef={imageContainerRef}
-          />
-        ) : null,
-      ]}
-      leftLowerControls={[]}
-      rightLowerControls={[
-        <SettingsButton
-          imageMediaInstance={imageMediaInstance}
-          effectsActive={imageEffectsActive}
-          containerRef={imageContainerRef}
-          settingsActive={settingsActive}
-          setSettingsActive={setSettingsActive}
-          activePages={activePages}
-          setActivePages={setActivePages}
-          scrollingContainerRef={rightLowerImageControlsRef}
-          lowerImageController={lowerImageController}
-        />,
-        imageMediaInstance.imageMedia.loadingState === "downloaded" && (
-          <DownloadButton
-            imageMediaInstance={imageMediaInstance}
-            recording={recording}
+          />,
+          imageMediaInstance.imageMedia.loadingState === "downloaded" && (
+            <DownloadButton
+              imageMediaInstance={imageMediaInstance}
+              recording={recording}
+              lowerImageController={lowerImageController}
+              imageEffectsActive={imageEffectsActive}
+              settingsActive={settingsActive}
+              scrollingContainerRef={rightLowerImageControlsRef}
+            />
+          ),
+          imageMediaInstance.settings.downloadType.value === "record" &&
+          downloadRecordingReady.current ? (
+            <DownloadRecordingButton
+              lowerImageController={lowerImageController}
+              imageEffectsActive={imageEffectsActive}
+              settingsActive={settingsActive}
+              scrollingContainerRef={rightLowerImageControlsRef}
+            />
+          ) : null,
+          <ImageEffectsButton
             lowerImageController={lowerImageController}
             imageEffectsActive={imageEffectsActive}
             settingsActive={settingsActive}
             scrollingContainerRef={rightLowerImageControlsRef}
-          />
-        ),
-        imageMediaInstance.settings.downloadType.value === "record" &&
-        downloadRecordingReady.current ? (
-          <DownloadRecordingButton
-            lowerImageController={lowerImageController}
-            imageEffectsActive={imageEffectsActive}
-            settingsActive={settingsActive}
-            scrollingContainerRef={rightLowerImageControlsRef}
-          />
-        ) : null,
-        <ImageEffectsButton
-          lowerImageController={lowerImageController}
-          imageEffectsActive={imageEffectsActive}
-          settingsActive={settingsActive}
-          scrollingContainerRef={rightLowerImageControlsRef}
-        />,
-      ]}
-      inMediaVariables={[imageEffectsActive, settingsActive]}
-      preventLowerLabelsVariables={[settingsActive, imageEffectsActive]}
-      externalPositioning={positioning}
-      externalMediaContainerRef={imageContainerRef}
-      externalSubContainerRef={subContainerRef}
-      externalRightLowerControlsRef={rightLowerImageControlsRef}
-    />
+          />,
+        ]}
+        inMediaVariables={[imageEffectsActive, settingsActive]}
+        preventLowerLabelsVariables={[settingsActive, imageEffectsActive]}
+        externalPositioning={positioning}
+        externalMediaContainerRef={imageContainerRef}
+        externalSubContainerRef={subContainerRef}
+        externalRightLowerControlsRef={rightLowerImageControlsRef}
+      />
+      {isEditing && imageMediaInstance.imageMedia.blobURL && (
+        <FgPortal
+          type="staticTopDomain"
+          top={0}
+          left={0}
+          zValue={490000}
+          className="h-full w-full"
+          content={
+            <TUI
+              initialUrl={imageMediaInstance.imageMedia.blobURL}
+              initialFilename={imageMediaInstance.imageMedia.filename}
+              closeCallback={() => {
+                setIsEditing(false);
+              }}
+              confirmCallback={(file) => {
+                setIsEditing(false);
+
+                uploader.current?.reuploadTableContent(
+                  file,
+                  imageMediaInstance.imageMedia.imageId,
+                );
+              }}
+            />
+          }
+          options={{ animate: false }}
+        />
+      )}
+    </>
   );
 }

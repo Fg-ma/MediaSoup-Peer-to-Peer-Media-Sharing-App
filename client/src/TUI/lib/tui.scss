@@ -1,0 +1,154 @@
+@use "../../css/scrollbar.scss" as scrollbar;
+
+@media (max-width: 1150px) {
+  .tui-image-editor-main-container .tui-image-editor-header-logo {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tui-image-editor-main-container .tui-image-editor-header-buttons {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.tui-colorpicker-palette-preview {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.tui-image-editor-container .color-picker-control .triangle {
+  left: 87px !important;
+}
+
+.tui-image-editor-wrap {
+  @include scrollbar.small-multidirectional-scroll-bar;
+  overflow: auto !important;
+}
+
+.tui-image-editor-size-wrap {
+  margin: 20px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: max-content !important;
+  height: max-content !important;
+}
+
+.tui-image-editor-main {
+  display: flex !important;
+  flex-direction: column-reverse !important;
+}
+
+.tui-image-editor-wrap {
+  position: relative !important;
+  width: 100% !important;
+  flex-grow: 1 !important;
+  white-space: nowrap !important;
+  display: flex !important;
+}
+
+.tui-image-editor-help-menu.top .tui-image-editor-item.help {
+  padding-bottom: 10px;
+}
+
+.tui-image-editor-submenu {
+  @include scrollbar.small-horizontal-scroll-bar;
+  position: relative !important;
+  overflow-x: auto !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: max-content !important;
+  min-height: max-content !important;
+}
+
+.tui-image-editor-submenu .tui-image-editor-submenu-style,
+.tui-image-editor-submenu .tui-image-editor-menu-crop,
+.tui-image-editor-submenu .tui-image-editor-menu-flip,
+.tui-image-editor-submenu .tui-image-editor-menu-rotate,
+.tui-image-editor-submenu .tui-image-editor-menu-draw,
+.tui-image-editor-submenu .tui-image-editor-menu-shape,
+.tui-image-editor-submenu .tui-image-editor-menu-text,
+.tui-image-editor-submenu .tui-image-editor-menu-filter {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-filter
+  .tui-image-editor-submenu {
+  display: flex !important;
+}
+
+.tui-image-editor {
+  top: 0px !important;
+}
+
+.tui-image-editor-canvas-container {
+  box-shadow:
+    0 10px 30px -5px rgba(105, 105, 105, 0.3),
+    0 20px 60px -10px rgba(105, 105, 105, 0.2);
+}
+
+.tui-colorpicker-clearfix {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tui-colorpicker-clearfix li {
+  width: 20px;
+  height: 20px;
+  padding: 2px !important;
+}
+
+.tui-colorpicker-clearfix li input {
+  width: 100%;
+  height: 100%;
+  margin: 0px !important;
+}
+
+.tui-image-editor-controls {
+  @include scrollbar.small-horizontal-scroll-bar;
+  display: flex !important;
+  width: 100% !important;
+  justify-content: start !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+}
+
+.tui-image-editor-controls ul li::before,
+.tui-image-editor-controls ul li::after {
+  content: none !important;
+  display: none !important;
+}
+
+.tui-image-editor-help-menu.top {
+  @include scrollbar.small-horizontal-scroll-bar;
+  display: flex !important;
+  width: 100% !important;
+  max-width: max-content !important;
+  justify-content: start !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+}
+
+.tui-image-editor-help-menu.top li::before,
+.tui-image-editor-help-menu.top li::after {
+  content: none !important;
+  display: none !important;
+}
+
+.tui-finished-button,
+.tui-close-button {
+  fill: #8a8a8a;
+  stroke: #8a8a8a;
+}
+
+.tui-finished-button:hover,
+.tui-close-button:hover {
+  fill: #f2f2f2;
+  stroke: #f2f2f2;
+}

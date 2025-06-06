@@ -18,7 +18,7 @@ class SnakeGame {
   private gameOver = false;
 
   // Game state
-  private initialFood = Array(4)
+  private initialFood = Array(8)
     .fill(null)
     .map(() => ({
       x: Math.floor(Math.random() * this.gridSize),
@@ -438,7 +438,9 @@ class SnakeGame {
     // Base food count is 2 + 1 food per player, scaled by grid size
     const baseFood = 2;
     const playerFactor = this.playerCount;
-    const gridFactor = Math.floor(this.gridSize / 10);
+    const area = this.gridSize * this.gridSize;
+    const density = 0.025;
+    const gridFactor = Math.floor(area * density);
     return baseFood + playerFactor + gridFactor;
   };
 

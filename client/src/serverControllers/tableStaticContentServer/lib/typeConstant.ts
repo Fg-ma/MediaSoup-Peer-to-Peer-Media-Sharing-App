@@ -253,23 +253,18 @@ export type IncomingTableStaticContentMessages =
   | { type: undefined }
   | onSoundClipUploadedToTableType
   | onSoundClipUploadedToTabledType
-  | onSoundClipReuploadedType
   | onApplicationUploadedToTableType
   | onApplicationUploadedToTabledType
-  | onApplicationReuploadedType
   | onVideoUploadedToTableType
   | onVideoUploadedToTabledType
-  | onVideoReuploadedType
   | onDashVideoReadyType
   | onImageUploadedToTableType
   | onImageUploadedToTabledType
-  | onImageReuploadedType
   | onSvgUploadedToTableType
   | onSvgUploadedToTabledType
-  | onSvgReuploadedType
   | onTextUploadedToTableType
   | onTextUploadedToTabledType
-  | onTextReuploadedType
+  | onContentReuploadedType
   | onChunkType
   | onChunkErrorType
   | onDownloadMetaType
@@ -324,13 +319,6 @@ export type onVideoUploadedToTabledType = {
   };
 };
 
-export type onVideoReuploadedType = {
-  type: "videoReuploaded";
-  header: {
-    contentId: string;
-  };
-};
-
 export type onDashVideoReadyType = {
   type: "dashVideoReady";
   header: {
@@ -379,13 +367,6 @@ export type onImageUploadedToTabledType = {
   };
 };
 
-export type onImageReuploadedType = {
-  type: "imageReuploaded";
-  header: {
-    contentId: string;
-  };
-};
-
 export type onSvgUploadedToTableType = {
   type: "svgUploadedToTable";
   header: {
@@ -424,10 +405,11 @@ export type onSvgUploadedToTabledType = {
   };
 };
 
-export type onSvgReuploadedType = {
-  type: "svgReuploaded";
+export type onContentReuploadedType = {
+  type: "contentReuploaded";
   header: {
     contentId: string;
+    contentType: StaticContentTypes;
   };
 };
 
@@ -469,13 +451,6 @@ export type onTextUploadedToTabledType = {
   };
 };
 
-export type onTextReuploadedType = {
-  type: "textReuploaded";
-  header: {
-    contentId: string;
-  };
-};
-
 export type onApplicationUploadedToTableType = {
   type: "applicationUploadedToTable";
   header: {
@@ -514,13 +489,6 @@ export type onApplicationUploadedToTabledType = {
   };
 };
 
-export type onApplicationReuploadedType = {
-  type: "applicationReuploaded";
-  header: {
-    contentId: string;
-  };
-};
-
 export type onSoundClipUploadedToTableType = {
   type: "soundClipUploadedToTable";
   header: {
@@ -556,13 +524,6 @@ export type onSoundClipUploadedToTabledType = {
     filename: string;
     mimeType: StaticMimeTypes;
     state: TableContentStateTypes[];
-  };
-};
-
-export type onSoundClipReuploadedType = {
-  type: "soundClipReuploaded";
-  header: {
-    contentId: string;
   };
 };
 

@@ -29,7 +29,7 @@ import CleanupController from "./lib/CleanupController";
 import JoinTableSection from "./joinTableSection/JoinTableSection";
 import UserStaticContentSocketController from "./serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import Uploader from "./tools/uploader/Uploader";
-import "./css/scrollbar.css";
+import "./css/scrollbar.scss";
 import "./css/fontStyles.css";
 import "./css/tips.css";
 import CreditPage from "./creditPage/CreditPage";

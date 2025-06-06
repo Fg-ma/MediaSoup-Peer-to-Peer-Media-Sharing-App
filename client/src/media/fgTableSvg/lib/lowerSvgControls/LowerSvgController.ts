@@ -59,6 +59,9 @@ class LowerSvgController {
       case "h":
         this.handleSync();
         break;
+      case "m":
+        this.handleEdit();
+        break;
       default:
         break;
     }

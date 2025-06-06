@@ -58,7 +58,7 @@ class SharedBundleController extends SharedBundleSocket {
       case "svgUploadedToTabled":
         this.setRerender((prev) => !prev);
         break;
-      case "svgReuploaded":
+      case "contentReuploaded":
         this.setRerender((prev) => !prev);
         break;
       case "textUploadedToTable":

@@ -8,6 +8,7 @@ import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import { createRequire } from "module";
+import ReloadTrackerPlugin from "./ReloadTrackerPlugin.js";
 
 const require = createRequire(import.meta.url);
 
@@ -56,9 +57,10 @@ export default {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
     fallback: {
       fs: false,
-      path: false,
+      path: require.resolve("path-browserify"),
       crypto: false,
       buffer: require.resolve("buffer/"),
+      util: false,
     },
   },
   module: {
@@ -134,6 +136,10 @@ export default {
           },
         ],
       },
+      {
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
     ],
   },
   plugins: [
@@ -154,5 +160,6 @@ export default {
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
     }),
+    new ReloadTrackerPlugin(),
   ],
 };

@@ -233,7 +233,7 @@ export default function SvgSettingsPanel({
             )}
             clickFunction={svgSettingsController.handleEdit}
             hoverContent={
-              <FgHoverContentStandard content="Edit (q)" style="light" />
+              <FgHoverContentStandard content="Edit (m)" style="light" />
             }
             options={{
               hoverSpacing: 4,

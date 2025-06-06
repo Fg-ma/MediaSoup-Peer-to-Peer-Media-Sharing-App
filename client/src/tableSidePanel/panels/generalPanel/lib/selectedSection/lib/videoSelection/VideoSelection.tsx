@@ -68,7 +68,7 @@ export default function VideoSelection({
       videoSelectionController.drawInstanceCanvas();
     }
   }, [loadingState]);
-  console.log(largestDim);
+
   return (
     videoInstanceMedia && (
       <GeneralMediaSelection

@@ -149,8 +149,23 @@ class TableImageMediaInstance {
       case "rectifyEffectMeshCount":
         this.rectifyEffectMeshCount();
         break;
+      case "imageReloaded":
+        this.onImageReloaded();
+        break;
       default:
         break;
+    }
+  };
+
+  private onImageReloaded = () => {
+    if (this.instanceImage) {
+      this.instanceImage.src = "";
+      this.instanceImage = undefined;
+    }
+
+    if (this.babylonScene) {
+      this.babylonScene.deconstructor();
+      this.babylonScene = undefined;
     }
   };
 

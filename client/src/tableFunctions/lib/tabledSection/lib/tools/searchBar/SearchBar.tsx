@@ -42,7 +42,6 @@ export default function SearchBar({
   ) => {
     switch (message.type) {
       case "searchTabledContentResponded":
-        console.log(message);
         if (message.data.length === 0) {
           setSearchContent([]);
         } else {

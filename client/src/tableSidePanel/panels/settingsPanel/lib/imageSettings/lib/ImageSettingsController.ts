@@ -13,7 +13,12 @@ class ImageSettingsController {
       TableStaticContentSocketController | undefined
     >,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
+
+  handleEdit = () => {
+    this.setIsEditing((prev) => !prev);
+  };
 
   handleSetAsBackground = () => {
     this.imageMediaInstance.current.settings.background.value =

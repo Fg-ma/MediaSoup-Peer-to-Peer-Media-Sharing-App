@@ -33,6 +33,7 @@ const GameVar: Variants = {
 };
 
 export default function FgGame({
+  externalHideControls,
   gameId,
   gameType,
   gameStarted,
@@ -49,6 +50,7 @@ export default function FgGame({
   initPositioning,
   setPositioning,
 }: {
+  externalHideControls?: boolean;
   gameId: string;
   gameType: GameTypes;
   gameStarted: boolean;
@@ -277,7 +279,11 @@ export default function FgGame({
       className={`fg-game ${
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
-        hideControls && !reactionsPanelActive ? "hide-controls" : ""
+        (externalHideControls === undefined || externalHideControls) &&
+        hideControls &&
+        !reactionsPanelActive
+          ? "hide-controls"
+          : ""
       } pointer-events-auto absolute z-base-content rounded`}
       style={{
         left: `${positioning.current.position.left}%`,

@@ -14,8 +14,7 @@ class FgSoundBoardController {
   seizureBoardEffectInterval = 150;
 
   constructor(
-    private soundEffects: SoundEffects,
-    private setSoundEffects: React.Dispatch<React.SetStateAction<SoundEffects>>,
+    private soundEffects: React.MutableRefObject<SoundEffects>,
     private soundEffectsMetaDataRef: React.MutableRefObject<SoundEffectsMetaData>,
     private boardMode: React.MutableRefObject<BoardModes>,
     private seizureBoardEffectIntevalRef: React.MutableRefObject<
@@ -24,22 +23,20 @@ class FgSoundBoardController {
     private seizureBoardEffectTimeoutRef: React.MutableRefObject<
       NodeJS.Timeout | undefined
     >,
-    private importButton: {
+    private importButton: React.MutableRefObject<{
       pressed: boolean;
       seizureColor: string | undefined;
       classes: string[];
-    },
-    private setImportButton: React.Dispatch<
-      React.SetStateAction<{
-        pressed: boolean;
-        seizureColor: string | undefined;
-        classes: string[];
-      }>
-    >,
+    }>,
     private fileSelectorRef: React.RefObject<HTMLInputElement>,
-    private importedFiles: Record<number, { file: File; path: string }>,
-    private setImportedFiles: React.Dispatch<
-      React.SetStateAction<Record<number, { file: File; path: string }>>
+    private importedFiles: React.MutableRefObject<
+      Record<
+        number,
+        {
+          file: File;
+          path: string;
+        }
+      >
     >,
     private tempImportedFiles: React.MutableRefObject<FileList | undefined>,
     private userMedia: React.MutableRefObject<UserMediaType>,
@@ -50,21 +47,22 @@ class FgSoundBoardController {
   ) {}
 
   toggleButton = (key: number) => {
-    this.setSoundEffects((prevEffects) => ({
-      ...prevEffects,
+    this.soundEffects.current = {
+      ...this.soundEffects.current,
       [key]: {
-        ...prevEffects[key],
-        pressed: !prevEffects[key].pressed,
+        ...this.soundEffects.current[key],
+        pressed: !this.soundEffects.current[key].pressed,
       },
-    }));
+    };
+    this.setRerender((prev) => !prev);
   };
 
   private carzyBoardEffectUpdater = (
     boardEffect: CrazyBoardEffects,
     boardIndex: number,
   ) => {
-    this.setSoundEffects((prevEffects) => {
-      const newEffects = { ...prevEffects };
+    this.soundEffects.current = (() => {
+      const newEffects = { ...this.soundEffects.current };
 
       for (const key in newEffects) {
         const updatedClasses = [...newEffects[key].classes];
@@ -90,24 +88,25 @@ class FgSoundBoardController {
         }
       }
 
-      const updatedClasses = [...this.importButton.classes];
+      const updatedClasses = [...this.importButton.current.classes];
 
       if (
         boardIndex - 1 >= 0 &&
         crazyBoardEffects[boardEffect].sequence[boardIndex - 1].includes(1)
       ) {
-        this.importButton.classes = updatedClasses.filter(
+        this.importButton.current.classes = updatedClasses.filter(
           (cls) => cls !== "active",
         );
       }
 
       if (crazyBoardEffects[boardEffect].sequence[boardIndex].includes(1)) {
         updatedClasses.push("active");
-        this.importButton.classes = updatedClasses;
+        this.importButton.current.classes = updatedClasses;
       }
 
       return newEffects;
-    });
+    })();
+    this.setRerender((prev) => !prev);
   };
 
   private getRandomCrazyBoardEffect = (): CrazyBoardEffects => {
@@ -143,8 +142,8 @@ class FgSoundBoardController {
   };
 
   private seizureBoardEffect = () => {
-    this.setSoundEffects((prevEffects) => {
-      const newEffects = { ...prevEffects };
+    this.soundEffects.current = (() => {
+      const newEffects = { ...this.soundEffects.current };
 
       for (const key in newEffects) {
         let updatedClasses = [...newEffects[key].classes];
@@ -162,27 +161,28 @@ class FgSoundBoardController {
         newEffects[key].seizureColor = seizureColor;
       }
 
-      let updatedClasses = [...this.importButton.classes];
+      let updatedClasses = [...this.importButton.current.classes];
 
-      if (this.importButton.seizureColor) {
+      if (this.importButton.current.seizureColor) {
         updatedClasses = updatedClasses.filter(
-          (cls) => cls !== `active-${this.importButton.seizureColor}`,
+          (cls) => cls !== `active-${this.importButton.current.seizureColor}`,
         );
       }
 
       const seizureColor = this.getRandomColor();
 
       updatedClasses.push(`active-${seizureColor}`);
-      this.importButton.classes = updatedClasses;
-      this.importButton.seizureColor = seizureColor;
+      this.importButton.current.classes = updatedClasses;
+      this.importButton.current.seizureColor = seizureColor;
 
       return newEffects;
-    });
+    })();
+    this.setRerender((prev) => !prev);
   };
 
   private clearSeizureBoardEffect = () => {
-    this.setSoundEffects((prevEffects) => {
-      const newEffects = { ...prevEffects };
+    this.soundEffects.current = (() => {
+      const newEffects = { ...this.soundEffects.current };
 
       for (const key in newEffects) {
         const updatedClasses = [...newEffects[key].classes];
@@ -194,44 +194,29 @@ class FgSoundBoardController {
         }
       }
 
-      const updatedClasses = [...this.importButton.classes];
+      const updatedClasses = [...this.importButton.current.classes];
 
-      if (this.importButton.seizureColor) {
-        this.importButton.classes = updatedClasses.filter(
-          (cls) => cls !== `active-${this.importButton.seizureColor}`,
+      if (this.importButton.current.seizureColor) {
+        this.importButton.current.classes = updatedClasses.filter(
+          (cls) => cls !== `active-${this.importButton.current.seizureColor}`,
         );
       }
 
       return newEffects;
-    });
+    })();
+    this.setRerender((prev) => !prev);
   };
 
-  private startSeizureBoardEffect = (key: number) => {
+  private startSeizureBoardEffect = () => {
     if (this.seizureBoardEffectIntevalRef.current) {
       clearInterval(this.seizureBoardEffectIntevalRef.current);
       this.seizureBoardEffectIntevalRef.current = undefined;
       this.clearSeizureBoardEffect();
     }
-    if (this.seizureBoardEffectTimeoutRef.current) {
-      clearTimeout(this.seizureBoardEffectTimeoutRef.current);
-      this.seizureBoardEffectTimeoutRef.current = undefined;
-    }
 
     this.seizureBoardEffectIntevalRef.current = setInterval(() => {
       this.seizureBoardEffect();
     }, this.seizureBoardEffectInterval);
-
-    if (this.soundEffectsMetaDataRef.current[key].duration !== 0) {
-      this.seizureBoardEffectTimeoutRef.current = setTimeout(() => {
-        if (this.seizureBoardEffectIntevalRef.current) {
-          clearInterval(this.seizureBoardEffectIntevalRef.current);
-          this.seizureBoardEffectIntevalRef.current = undefined;
-          this.clearSeizureBoardEffect();
-        }
-      }, this.soundEffectsMetaDataRef.current[key].duration * 1000);
-    } else {
-      this.soundEffectsMetaDataRef.current[key].timeoutOnMetaLoaded = true;
-    }
   };
 
   private audioEnded = (key: number) => {
@@ -239,21 +224,15 @@ class FgSoundBoardController {
       clearInterval(this.seizureBoardEffectIntevalRef.current);
       this.seizureBoardEffectIntevalRef.current = undefined;
     }
-    if (this.seizureBoardEffectTimeoutRef.current) {
-      clearTimeout(this.seizureBoardEffectTimeoutRef.current);
-      this.seizureBoardEffectTimeoutRef.current = undefined;
-    }
-    this.clearSeizureBoardEffect();
 
-    this.setSoundEffects((prev) => {
-      return {
-        ...prev,
-        [key]: {
-          ...prev[key],
-          playing: false,
-        },
-      };
-    });
+    this.soundEffects.current = {
+      ...this.soundEffects.current,
+      [key]: {
+        ...this.soundEffects.current[key],
+        playing: false,
+      },
+    };
+    this.clearSeizureBoardEffect();
 
     if (this.audioEndTimeouts.current[key]) {
       clearTimeout(this.audioEndTimeouts.current[key]);
@@ -262,7 +241,9 @@ class FgSoundBoardController {
   };
 
   private playAudio = async (key: number, path: string): Promise<boolean> => {
-    const url = this.importedFiles[key] ? this.importedFiles[key].path : path;
+    const url = this.importedFiles.current[key]
+      ? this.importedFiles.current[key].path
+      : path;
 
     // Start playback with Tone.js and load the sound if it hasn't been loaded
     if (
@@ -306,7 +287,7 @@ class FgSoundBoardController {
   private toggleAudio = async (key: number): Promise<boolean> => {
     let succeeded = false;
 
-    const { playing, path } = this.soundEffects[key];
+    const { playing, path } = this.soundEffects.current[key];
     if (playing) {
       // Stop playback
       succeeded =
@@ -319,8 +300,8 @@ class FgSoundBoardController {
     }
 
     if (succeeded) {
-      this.setSoundEffects((prevEffects) => {
-        const soundEffect = prevEffects[key];
+      this.soundEffects.current = (() => {
+        const soundEffect = this.soundEffects.current[key];
         const { playing, classes } = soundEffect;
 
         const newClasses = classes.includes("failed")
@@ -329,7 +310,7 @@ class FgSoundBoardController {
 
         if (playing) {
           return {
-            ...prevEffects,
+            ...this.soundEffects.current,
             [key]: {
               ...soundEffect,
               playing: false,
@@ -338,7 +319,7 @@ class FgSoundBoardController {
           };
         } else {
           return {
-            ...prevEffects,
+            ...this.soundEffects.current,
             [key]: {
               ...soundEffect,
               playing: true,
@@ -346,18 +327,19 @@ class FgSoundBoardController {
             },
           };
         }
-      });
-    } else if (!this.soundEffects[key].classes.includes("failed")) {
-      this.setSoundEffects((prevEffects) => {
-        const soundEffect = prevEffects[key];
-        return {
-          ...prevEffects,
+      })();
+      this.setRerender((prev) => !prev);
+    } else {
+      if (!succeeded) this.clearSeizureBoardEffect();
+      if (!this.soundEffects.current[key].classes.includes("failed")) {
+        this.soundEffects.current = {
+          ...this.soundEffects.current,
           [key]: {
-            ...soundEffect,
-            classes: [...soundEffect.classes, "failed"],
+            ...this.soundEffects.current[key],
+            classes: [...this.soundEffects.current[key].classes, "failed"],
           },
         };
-      });
+      }
     }
 
     return succeeded;
@@ -365,22 +347,18 @@ class FgSoundBoardController {
 
   private toggleSeizureMode = (key: number) => {
     if (
-      !this.soundEffects[key].playing &&
+      !this.soundEffects.current[key].playing &&
       this.boardMode.current === "seizure"
     ) {
       this.startCrazyBoardEffect();
-      this.startSeizureBoardEffect(key);
+      this.startSeizureBoardEffect();
     } else if (
-      this.soundEffects[key].playing &&
+      this.soundEffects.current[key].playing &&
       this.boardMode.current === "seizure"
     ) {
       if (this.seizureBoardEffectIntevalRef.current) {
         clearInterval(this.seizureBoardEffectIntevalRef.current);
         this.seizureBoardEffectIntevalRef.current = undefined;
-      }
-      if (this.seizureBoardEffectTimeoutRef.current) {
-        clearTimeout(this.seizureBoardEffectTimeoutRef.current);
-        this.seizureBoardEffectTimeoutRef.current = undefined;
       }
       this.clearSeizureBoardEffect();
     }
@@ -389,24 +367,22 @@ class FgSoundBoardController {
   clickDown = async (key: number) => {
     if (this.tempImportedFiles.current === undefined) {
       this.toggleButton(key);
+      if (this.boardMode.current === "crazy") {
+        if (!this.soundEffects.current[key].playing)
+          this.startCrazyBoardEffect();
+      } else {
+        this.toggleSeizureMode(key);
+      }
       const succeeded = await this.toggleAudio(key);
 
       if (!succeeded) {
         return;
       }
-
-      if (
-        !this.soundEffects[key].playing &&
-        this.boardMode.current === "crazy"
-      ) {
-        this.startCrazyBoardEffect();
-      }
-      this.toggleSeizureMode(key);
     } else {
       this.toggleButton(key);
 
-      this.setImportedFiles((prev) => {
-        const newImportedFiles = { ...prev };
+      this.importedFiles.current = (() => {
+        const newImportedFiles = { ...this.importedFiles.current };
 
         if (this.tempImportedFiles.current) {
           // Convert FileList to an array and process the first file
@@ -427,7 +403,7 @@ class FgSoundBoardController {
         }
 
         return newImportedFiles;
-      });
+      })();
     }
   };
 
@@ -446,10 +422,11 @@ class FgSoundBoardController {
   };
 
   handleImportEffectClickDown = () => {
-    this.setImportButton((prevEffects) => ({
-      ...prevEffects,
+    this.importButton.current = {
+      ...this.importButton.current,
       pressed: true,
-    }));
+    };
+    this.setRerender((prev) => !prev);
 
     this.fileSelectorRef.current?.click();
 
@@ -457,10 +434,11 @@ class FgSoundBoardController {
   };
 
   handleImportDerivedWindowFocusChange = () => {
-    this.setImportButton((prevEffects) => ({
-      ...prevEffects,
+    this.importButton.current = {
+      ...this.importButton.current,
       pressed: false,
-    }));
+    };
+    this.setRerender((prev) => !prev);
 
     window.removeEventListener(
       "focus",
@@ -469,10 +447,11 @@ class FgSoundBoardController {
   };
 
   handleImportEffectClickUp = () => {
-    this.setImportButton((prevEffects) => ({
-      ...prevEffects,
+    this.importButton.current = {
+      ...this.importButton.current,
       pressed: false,
-    }));
+    };
+    this.setRerender((prev) => !prev);
   };
 
   handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -481,10 +460,11 @@ class FgSoundBoardController {
       this.tempImportedFiles.current = files;
     }
 
-    this.setImportButton((prevEffects) => ({
-      ...prevEffects,
+    this.importButton.current = {
+      ...this.importButton.current,
       pressed: false,
-    }));
+    };
+    this.setRerender((prev) => !prev);
   };
 }
 

@@ -780,46 +780,10 @@ class Posts {
     tableId: string,
     contentId: string
   ) => {
-    switch (staticContentType) {
-      case "video":
-        broadcaster.broadcastToTable(tableId, {
-          type: "videoReupload",
-          header: { contentId },
-        });
-        break;
-      case "image":
-        broadcaster.broadcastToTable(tableId, {
-          type: "imageReupload",
-          header: { contentId },
-        });
-        break;
-      case "svg":
-        broadcaster.broadcastToTable(tableId, {
-          type: "svgReuploaded",
-          header: { contentId },
-        });
-        break;
-      case "soundClip":
-        broadcaster.broadcastToTable(tableId, {
-          type: "soundClipReupload",
-          header: { contentId },
-        });
-        break;
-      case "application":
-        broadcaster.broadcastToTable(tableId, {
-          type: "applicationReupload",
-          header: { contentId },
-        });
-        break;
-      case "text":
-        broadcaster.broadcastToTable(tableId, {
-          type: "textReupload",
-          header: { contentId },
-        });
-        break;
-      default:
-        break;
-    }
+    broadcaster.broadcastToTable(tableId, {
+      type: "contentReuploaded",
+      header: { contentId, contentType: staticContentType },
+    });
   };
 
   private handleToTabled = async (

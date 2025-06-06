@@ -29,12 +29,11 @@ export default function FgSoundBoard({
 }) {
   const { userMedia } = useMediaContext();
 
-  const [soundEffects, setSoundEffects] =
-    useState<SoundEffects>(defaultSoundEffects);
+  const soundEffects = useRef<SoundEffects>(defaultSoundEffects);
   const soundEffectsMetaDataRef = useRef<SoundEffectsMetaData>(
     defaultSoundEffectsMetaData,
   );
-  const [importButton, setImportButton] = useState<{
+  const importButton = useRef<{
     pressed: boolean;
     seizureColor: string | undefined;
     classes: string[];
@@ -48,13 +47,13 @@ export default function FgSoundBoard({
     undefined,
   );
 
-  const [focus, setFocus] = useState(true);
+  const focus = useRef(true);
 
   const fileSelectorRef = useRef<HTMLInputElement>(null);
 
-  const [importedFiles, setImportedFiles] = useState<
-    Record<number, { file: File; path: string }>
-  >({});
+  const importedFiles = useRef<Record<number, { file: File; path: string }>>(
+    {},
+  );
 
   const tempImportedFiles = useRef<FileList | undefined>(undefined);
 
@@ -64,28 +63,27 @@ export default function FgSoundBoard({
 
   const [_, setRerender] = useState(false);
 
-  const fgSoundBoardController = new FgSoundBoardController(
-    soundEffects,
-    setSoundEffects,
-    soundEffectsMetaDataRef,
-    boardMode,
-    seizureBoardEffectIntevalRef,
-    seizureBoardEffectTimeoutRef,
-    importButton,
-    setImportButton,
-    fileSelectorRef,
-    importedFiles,
-    setImportedFiles,
-    tempImportedFiles,
-    userMedia,
-    audioEndTimeouts,
-    setRerender,
+  const fgSoundBoardController = useRef(
+    new FgSoundBoardController(
+      soundEffects,
+      soundEffectsMetaDataRef,
+      boardMode,
+      seizureBoardEffectIntevalRef,
+      seizureBoardEffectTimeoutRef,
+      importButton,
+      fileSelectorRef,
+      importedFiles,
+      tempImportedFiles,
+      userMedia,
+      audioEndTimeouts,
+      setRerender,
+    ),
   );
 
   useEffect(() => {
     if (tempImportedFiles.current === undefined) {
-      setSoundEffects((prevEffects) => {
-        const newEffects = { ...prevEffects };
+      soundEffects.current = (() => {
+        const newEffects = { ...soundEffects.current };
 
         for (const key in newEffects) {
           const updatedClasses = [...newEffects[key].classes];
@@ -96,10 +94,10 @@ export default function FgSoundBoard({
         }
 
         return newEffects;
-      });
+      })();
     } else {
-      setSoundEffects((prevEffects) => {
-        const newEffects = { ...prevEffects };
+      soundEffects.current = (() => {
+        const newEffects = { ...soundEffects.current };
 
         for (const key in newEffects) {
           const updatedClasses = [...newEffects[key].classes];
@@ -111,8 +109,9 @@ export default function FgSoundBoard({
         }
 
         return newEffects;
-      });
+      })();
     }
+    setRerender((prev) => !prev);
   }, [tempImportedFiles.current]);
 
   return (
@@ -124,14 +123,14 @@ export default function FgSoundBoard({
             ref={fileSelectorRef}
             className="hidden"
             type="file"
-            onChange={fgSoundBoardController.handleFileInput}
+            onChange={fgSoundBoardController.current.handleFileInput}
             multiple
           />
           <motion.div
             className="z-[2] flex h-10 min-h-10 w-full items-center justify-between px-4"
             style={{
               // prettier-ignore
-              boxShadow: `0px 10px 5px -5px ${focus ? "#161616" : "#212121"}`,
+              boxShadow: `0px 10px 5px -5px ${focus.current ? "#161616" : "#212121"}`,
             }}
             transition={{
               boxShadow: {
@@ -144,7 +143,9 @@ export default function FgSoundBoard({
               <FgTriToggleButton
                 kind="cycle"
                 initPosition={0}
-                stateChangeFunction={fgSoundBoardController.stateChangeFunction}
+                stateChangeFunction={
+                  fgSoundBoardController.current.stateChangeFunction
+                }
                 btnLabels={["Standard", "Crazy", "Seizure"]}
               />
             </div>
@@ -164,13 +165,13 @@ export default function FgSoundBoard({
             <div className="grid h-full min-h-max w-full min-w-max grid-cols-5 place-items-center items-center justify-center justify-items-center gap-3">
               <FgButton
                 className={`sound-board-btn ${
-                  importButton.pressed ? "pressed" : ""
-                } ${importButton.classes.join(" ")}`}
+                  importButton.current.pressed ? "pressed" : ""
+                } ${importButton.current.classes.join(" ")}`}
                 pointerDownFunction={
-                  fgSoundBoardController.handleImportEffectClickDown
+                  fgSoundBoardController.current.handleImportEffectClickDown
                 }
                 pointerUpFunction={
-                  fgSoundBoardController.handleImportEffectClickUp
+                  fgSoundBoardController.current.handleImportEffectClickUp
                 }
                 contentFunction={() => (
                   <>
@@ -182,11 +183,15 @@ export default function FgSoundBoard({
                           { key: "height", value: "90%" },
                           {
                             key: "fill",
-                            value: importButton.pressed ? "#e80110" : "#cccccc",
+                            value: importButton.current.pressed
+                              ? "#e80110"
+                              : "#cccccc",
                           },
                           {
                             key: "stroke",
-                            value: importButton.pressed ? "#e80110" : "#cccccc",
+                            value: importButton.current.pressed
+                              ? "#e80110"
+                              : "#cccccc",
                           },
                         ]}
                         className="z-[2] flex h-full w-full items-center justify-center"
@@ -197,17 +202,17 @@ export default function FgSoundBoard({
                   </>
                 )}
               />
-              {Object.entries(soundEffects).map(([key, effect]) => (
+              {Object.entries(soundEffects.current).map(([key, effect]) => (
                 <FgButton
                   key={key}
                   className={`sound-board-btn ${
                     effect.pressed ? "pressed" : ""
                   } ${effect.classes.join(" ")}`}
                   pointerDownFunction={() =>
-                    fgSoundBoardController.clickDown(parseInt(key))
+                    fgSoundBoardController.current.clickDown(parseInt(key))
                   }
                   pointerUpFunction={() =>
-                    fgSoundBoardController.clickUp(parseInt(key))
+                    fgSoundBoardController.current.clickUp(parseInt(key))
                   }
                   contentFunction={() => (
                     <>
@@ -234,14 +239,17 @@ export default function FgSoundBoard({
       initWidth="605px"
       shadow={{ left: true, right: false, bottom: false, top: false }}
       closeCallback={() => {
-        fgSoundBoardController.closeSoundBoard();
+        fgSoundBoardController.current.closeSoundBoard();
 
         if (closeCallback) {
           closeCallback();
         }
       }}
       closePosition="topRight"
-      focusCallback={(newFocus: boolean) => setFocus(newFocus)}
+      focusCallback={(newFocus: boolean) => {
+        focus.current = newFocus;
+        setRerender((prev) => !prev);
+      }}
       backgroundColor={"#161616"}
       secondaryBackgroundColor={"#212121"}
     />

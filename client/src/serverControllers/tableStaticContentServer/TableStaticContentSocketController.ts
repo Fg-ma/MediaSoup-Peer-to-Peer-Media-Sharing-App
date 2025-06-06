@@ -15,6 +15,7 @@ import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConst
 import {
   IncomingTableStaticContentMessages,
   onContentDeletedType,
+  onContentReuploadedType,
   onContentStateChangedType,
   onCreatedNewInstancesType,
   onImageUploadedToTabledType,
@@ -22,7 +23,6 @@ import {
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
   onResponsedCatchUpTableDataType,
-  onSvgReuploadedType,
   onSvgUploadedToTabledType,
   onSvgUploadedToTableType,
   onTextUploadedToTabledType,
@@ -500,8 +500,8 @@ class TableStaticContentSocketController {
       case "svgUploadedToTabled":
         this.onSvgUploadedToTabled(message);
         break;
-      case "svgReuploaded":
-        this.onSvgReuploaded(message);
+      case "contentReuploaded":
+        this.onContentReuploaded(message);
         break;
       case "textUploadedToTable":
         this.onTextUploadedToTable(message);
@@ -799,12 +799,6 @@ class TableStaticContentSocketController {
     }
   };
 
-  private onSvgReuploaded = (message: onSvgReuploadedType) => {
-    const { contentId } = message.header;
-
-    this.staticContentMedia.current.svg.table[contentId].reloadContent();
-  };
-
   private onTextUploadedToTable = (message: onTextUploadedToTableType) => {
     const { contentId, instanceId } = message.header;
     const { filename, mimeType, state, initPositioning } = message.data;
@@ -862,6 +856,16 @@ class TableStaticContentSocketController {
           this.addCurrentDownload,
           this.removeCurrentDownload,
         );
+    }
+  };
+
+  private onContentReuploaded = (message: onContentReuploadedType) => {
+    const { contentId, contentType } = message.header;
+
+    if (contentType === "svg" || contentType === "image") {
+      this.staticContentMedia.current[contentType].table[
+        contentId
+      ].reloadContent();
     }
   };
 

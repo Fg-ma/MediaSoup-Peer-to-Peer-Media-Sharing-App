@@ -27,10 +27,16 @@ class LowerImageController {
       TableStaticContentSocketController | undefined
     >,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   handleImageEffects = () => {
     this.setImageEffectsActive((prev) => !prev);
+  };
+
+  handleEdit = () => {
+    this.setIsEditing((prev) => !prev);
+    this.setSettingsActive(false);
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -64,6 +70,9 @@ class LowerImageController {
         break;
       case "h":
         this.handleSync();
+        break;
+      case "m":
+        this.handleEdit();
         break;
       default:
         break;

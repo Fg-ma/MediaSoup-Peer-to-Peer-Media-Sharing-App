@@ -116,6 +116,7 @@ function SnakeGame({
   return (
     <>
       <FgGame
+        externalHideControls={!snakeColorPanelActive && !gridSizePanelActive}
         gameId={snakeGameId}
         gameType="snake"
         gameStarted={started}
@@ -307,6 +308,12 @@ function SnakeGame({
         initPositioning={snakeGame.current.positioning}
         setPositioning={(positioning) => {
           if (snakeGame.current) snakeGame.current.positioning = positioning;
+          if (gridSizePanelActive) {
+            setGridSizePanelActive(false);
+          }
+          if (snakeColorPanelActive) {
+            setSnakeColorPanelActive(false);
+          }
         }}
       />
       {snakeColorPanelActive && (

@@ -23,7 +23,8 @@ export type ImageListenerTypes =
   | { type: "downloadFailed" }
   | { type: "downloadRetry" }
   | { type: "stateChanged" }
-  | { type: "rectifyEffectMeshCount" };
+  | { type: "rectifyEffectMeshCount" }
+  | { type: "imageReloaded" };
 
 class TableImageMedia {
   image: HTMLImageElement | undefined;
@@ -372,6 +373,37 @@ class TableImageMedia {
     this.imageListeners.forEach((listener) => {
       listener({ type: "downloadRetry" });
     });
+  };
+
+  reloadContent = () => {
+    this.imageListeners.forEach((listener) => {
+      listener({ type: "imageReloaded" });
+    });
+
+    this.loadingState = "downloading";
+
+    this.fileSize = 0;
+    this.blobURL && URL.revokeObjectURL(this.blobURL);
+    this.blobURL = undefined;
+
+    this.image = undefined;
+
+    this.aspect = undefined;
+
+    this.babylonRenderLoopWorker = undefined;
+
+    this.downloader = new Downloader(
+      "image",
+      this.imageId,
+      this.filename,
+      this.mimeType,
+      this.tableStaticContentSocket,
+      this.sendDownloadSignal,
+      this.removeCurrentDownload,
+    );
+    this.addCurrentDownload(this.imageId, this.downloader);
+    this.downloader.addDownloadListener(this.handleDownloadMessage);
+    this.downloader.start();
   };
 }
 
