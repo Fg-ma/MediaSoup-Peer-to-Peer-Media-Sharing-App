@@ -19,6 +19,7 @@ class Posts {
           truncated?: boolean;
         })
       | Buffer<ArrayBuffer>
+      | Buffer<ArrayBufferLike>
   ) => {
     try {
       const upload = new Upload({

@@ -40,8 +40,13 @@ export default function DownloadTypePage({
     setActivePages((prev) => {
       const newActivePages = { ...prev };
 
-      newActivePages.downloadType.downloadTypeOptions.active =
-        !newActivePages.downloadType.downloadTypeOptions.active;
+      if (imageMediaInstance.settings.downloadType.value === "record") {
+        newActivePages.downloadType.downloadRecordTypeOptions.active =
+          !newActivePages.downloadType.downloadRecordTypeOptions.active;
+      } else {
+        newActivePages.downloadType.downloadSnapShotTypeOptions.active =
+          !newActivePages.downloadType.downloadSnapShotTypeOptions.active;
+      }
 
       return newActivePages;
     });
@@ -73,7 +78,8 @@ export default function DownloadTypePage({
             Download
           </div>
         </div>
-        {imageMediaInstance.settings.downloadType.value === "record" ? (
+        {imageMediaInstance.settings.downloadType.value === "record" ||
+        imageMediaInstance.settings.downloadType.value === "snapShot" ? (
           <FgButton
             contentFunction={() => (
               <div className="rounded px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">

@@ -31,13 +31,14 @@ import {
   mimeToExtension,
 } from "../../../universal/contentTypeConstant";
 import { ChunkState, UploadSession } from "./lib/typeConstant";
+import Broadcaster from "src/lib/Broadcaster";
 
 const tableStaticContentUtils = new Utils();
 
 class Posts {
   private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
 
-  constructor(app: uWS.TemplatedApp) {
+  constructor(app: uWS.TemplatedApp, private broadcaster: Broadcaster) {
     app.post("/upload-one-shot-file", (res, req) => {
       const bb = busboy({
         headers: this.collectHeaders(req),
@@ -74,8 +75,31 @@ class Posts {
         }
       });
 
-      bb.on("file", (_, file) => {
+      bb.on("file", async (_, file) => {
         if (!metadata || aborted) return;
+
+        if (metadata.direction === "reupload") {
+          const checkReupload = await tableTopRedis.gets.getKey(
+            `TSCRU:${metadata.contentId}`
+          );
+
+          if (checkReupload !== null) {
+            this.sendResponse(
+              res,
+              "409 Conflict",
+              "text/plain",
+              "Reupload already taking place"
+            );
+            aborted = true;
+          } else {
+            await tableTopRedis.posts.post(
+              "TSCRU",
+              metadata.contentId,
+              "",
+              this.REDIS_UPLOAD_LIFE_TIME
+            );
+          }
+        }
 
         file.on("limit", () => {
           this.sendResponse(
@@ -152,6 +176,12 @@ class Posts {
               default:
                 break;
             }
+
+            if (metadata.direction === "reupload") {
+              await tableTopRedis.deletes.delete([
+                { prefix: "TSCRU", id: metadata.contentId },
+              ]);
+            }
           });
 
         file.on("error", (err) => {
@@ -197,7 +227,8 @@ class Posts {
             if (
               tableId === undefined ||
               contentId === undefined ||
-              mimeType === undefined
+              mimeType === undefined ||
+              direction === undefined
             ) {
               this.sendResponse(
                 res,
@@ -206,6 +237,29 @@ class Posts {
                 "Missing fields"
               );
               return;
+            }
+
+            if (direction === "reupload") {
+              const checkReupload = await tableTopRedis.gets.getKey(
+                `TSCRU:${contentId}`
+              );
+
+              if (checkReupload !== null) {
+                this.sendResponse(
+                  res,
+                  "409 Conflict",
+                  "text/plain",
+                  "Reupload already taking place"
+                );
+                return;
+              } else {
+                await tableTopRedis.posts.post(
+                  "TSCRU",
+                  contentId,
+                  "",
+                  this.REDIS_UPLOAD_LIFE_TIME
+                );
+              }
             }
 
             const staticContentType =
@@ -440,6 +494,13 @@ class Posts {
             uploadId,
             this.REDIS_UPLOAD_LIFE_TIME
           );
+          if (session && session.direction === "reupload") {
+            await tableTopRedis.posts.extendLife(
+              "TSCRU",
+              session.contentId,
+              this.REDIS_UPLOAD_LIFE_TIME
+            );
+          }
 
           if (aborted) return;
 
@@ -487,10 +548,15 @@ class Posts {
                 }
 
                 // Cleanup session
-                await tableTopRedis.deletes.delete([
-                  { prefix: "TSCUS", id: uploadId },
-                  { prefix: "TSCCS", id: uploadId },
-                ]);
+                await tableTopRedis.deletes.delete(
+                  [
+                    { prefix: "TSCUS", id: uploadId },
+                    { prefix: "TSCCS", id: uploadId },
+                    session?.direction === "reupload"
+                      ? { prefix: "TSCRU", id: session.contentId }
+                      : undefined,
+                  ].filter((del) => del !== undefined)
+                );
               });
           }
 
@@ -546,15 +612,36 @@ class Posts {
             uploadId
           );
 
-          await tableTopRedis.deletes.delete([
-            { prefix: "TSCUS", id: uploadId },
-            { prefix: "TSCCS", id: uploadId },
-          ]);
+          await tableTopRedis.deletes.delete(
+            [
+              { prefix: "TSCUS", id: uploadId },
+              { prefix: "TSCCS", id: uploadId },
+              session?.direction === "reupload"
+                ? { prefix: "TSCRU", id: session.contentId }
+                : undefined,
+            ].filter((del) => del !== undefined)
+          );
+
+          this.broadcaster.broadcastToTable(session.tableId, {
+            type: "reuploadCancelled",
+            header: {
+              contentType: session.staticContentType,
+              contentId: session.contentId,
+            },
+          });
 
           if (!aborted) {
             this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
           }
         } catch (_) {
+          this.broadcaster.broadcastToTable(session.tableId, {
+            type: "reuploadCancelled",
+            header: {
+              contentType: session.staticContentType,
+              contentId: session.contentId,
+            },
+          });
+
           if (!aborted) {
             this.sendResponse(
               res,

@@ -15,6 +15,7 @@ import SettingsButton from "./lib/lowerImageControls/settingsButton/SettingsButt
 import DownloadRecordingButton from "./lib/lowerImageControls/downloadButton/DownloadRecordingButton";
 import FgPortal from "../../elements/fgPortal/FgPortal";
 import TUI from "../../TUI/TUI";
+import CautionTapeDecorator from "../../elements/decorators/CautionTapeDecorator";
 import "./lib/fgImageStyles.css";
 
 export default function FgTableImage({
@@ -30,7 +31,7 @@ export default function FgTableImage({
   const { staticContentEffects, staticContentEffectsStyles } =
     useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
-  const { sendGroupSignal } = useSignalContext();
+  const { sendGroupSignal, sendGeneralSignal } = useSignalContext();
   const { uploader } = useToolsContext();
 
   const imageMediaInstance =
@@ -78,6 +79,7 @@ export default function FgTableImage({
       setRerender,
       tableStaticContentSocket,
       sendGroupSignal,
+      sendGeneralSignal,
       setIsEditing,
     ),
   );
@@ -188,6 +190,14 @@ export default function FgTableImage({
             ? imageMediaInstance.imageMedia.removeImageListener
             : undefined
         }
+        floatingContent={[
+          imageMediaInstance.imageMedia.loadingState === "reuploading" ? (
+            <CautionTapeDecorator
+              className="z-[100] fill-fg-red-light stroke-fg-red-light"
+              width={4}
+            />
+          ) : null,
+        ]}
         getAspect={imageMediaInstance.getAspect}
         setPositioning={imageMediaInstance.setPositioning}
         mediaId={imageMediaInstance.imageMedia.imageId}
@@ -270,6 +280,11 @@ export default function FgTableImage({
               }}
               confirmCallback={(file) => {
                 setIsEditing(false);
+
+                tableStaticContentSocket.current?.signalReuploadStart(
+                  "image",
+                  imageMediaInstance.imageMedia.imageId,
+                );
 
                 uploader.current?.reuploadTableContent(
                   file,

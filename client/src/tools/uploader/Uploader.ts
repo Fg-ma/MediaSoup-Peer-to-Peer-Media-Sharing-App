@@ -253,12 +253,11 @@ class Uploader {
         tableStaticContentServerBaseUrl,
       );
     } else {
-      const contentId = uuidv4();
-
       const metadata = {
         tableId: this.tableId.current,
         contentId,
         direction: "reupload",
+        mimeType: file.type,
       };
 
       try {
@@ -273,7 +272,18 @@ class Uploader {
           },
         );
 
-        if (!metaRes.ok) return;
+        if (!metaRes.ok) {
+          if (metaRes.status === 409) {
+            this.sendGeneralSignal({
+              type: "tableInfoSignal",
+              data: {
+                message: "File already reuploading",
+                timeout: 2500,
+              },
+            });
+          }
+          return;
+        }
 
         const { uploadId } = await metaRes.json();
 

@@ -56,7 +56,7 @@ export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
 
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
-  cert_file_name: "../certs/tabletop-table-static-content-server.pem",
+  cert_file_name: "../certs/tabletop-video-server.pem",
 };
 
 const app = uWS.SSLApp(sslOptions);
@@ -115,7 +115,7 @@ app
       });
     }
   })
-  .listen(8045, (token) => {
+  .listen(8099, (token) => {
     if (token) {
       console.log("Listening on https://localhost:8045");
     }

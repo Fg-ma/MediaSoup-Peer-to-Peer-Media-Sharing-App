@@ -23,6 +23,7 @@
 .tui-image-editor-wrap {
   @include scrollbar.small-multidirectional-scroll-bar;
   overflow: auto !important;
+  z-index: 10 !important;
 }
 
 .tui-image-editor-size-wrap {
@@ -52,16 +53,15 @@
 }
 
 .tui-image-editor-submenu {
-  @include scrollbar.small-horizontal-scroll-bar;
   position: relative !important;
-  overflow-x: auto !important;
   justify-content: center !important;
   align-items: center !important;
-  height: max-content !important;
-  min-height: max-content !important;
+  overflow: visible !important;
+  height: 150px !important;
+  max-height: 150px !important;
+  z-index: 1 !important;
 }
 
-.tui-image-editor-submenu .tui-image-editor-submenu-style,
 .tui-image-editor-submenu .tui-image-editor-menu-crop,
 .tui-image-editor-submenu .tui-image-editor-menu-flip,
 .tui-image-editor-submenu .tui-image-editor-menu-rotate,
@@ -69,8 +69,77 @@
 .tui-image-editor-submenu .tui-image-editor-menu-shape,
 .tui-image-editor-submenu .tui-image-editor-menu-text,
 .tui-image-editor-submenu .tui-image-editor-menu-filter {
+  @include scrollbar.small-horizontal-scroll-bar;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  overflow-x: auto !important;
+  height: 400px !important;
+  align-items: end !important;
+  justify-content: center !important;
+  position: absolute !important;
+  bottom: 0px !important;
+  width: 100% !important;
+}
+
+.tui-image-editor-submenu-item {
   padding-top: 12px !important;
   padding-bottom: 12px !important;
+}
+
+.tui-image-editor-container .tui-image-editor-controls {
+  z-index: 3 !important;
+}
+
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-crop
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-crop,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-resize
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-resize,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-flip
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-flip,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-rotate
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-rotate,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-shape
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-shape,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-text
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-text,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-mask
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-mask,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-icon
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-icon,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-draw
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-draw,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-filter
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-filter,
+.tui-image-editor-container
+  .tui-image-editor-main.tui-image-editor-menu-zoom
+  .tui-image-editor-submenu
+  > div.tui-image-editor-menu-zoom {
+  display: flex !important
+;
+}
+
+.tui-image-editor-submenu-item {
+  pointer-events: auto;
 }
 
 .tui-image-editor-container

@@ -30,7 +30,8 @@ export default function ImageSettingsPanel({
 }) {
   const { staticContentMedia } = useMediaContext();
   const { currentSettingsActive } = useGeneralContext();
-  const { sendSettingsSignal, sendGroupSignal } = useSignalContext();
+  const { sendSettingsSignal, sendGroupSignal, sendGeneralSignal } =
+    useSignalContext();
   const { tableStaticContentSocket } = useSocketContext();
 
   const imageMediaInstance = useRef(
@@ -48,6 +49,7 @@ export default function ImageSettingsPanel({
     setRerender,
     tableStaticContentSocket,
     sendGroupSignal,
+    sendGeneralSignal,
     setIsEditing,
   );
 

@@ -5,10 +5,8 @@ import { tableColorMap } from "../tableColors";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const alien_960x960 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/alien_960x960.jpg";
-const alien_64x64 =
-  nginxAssetServerBaseUrl + "backgroundImages/space/alien_64x64.jpg";
+const hamster_64x64 =
+  nginxAssetServerBaseUrl + "backgroundImages/pixelArt/hamster_64x64.jpg";
 
 export default function BottomTableSection({
   userData,
@@ -56,8 +54,8 @@ export default function BottomTableSection({
           userData={userData}
           fullDim="height"
           placement="bottom"
-          src={alien_960x960}
-          srcLoading={alien_64x64}
+          src={hamster_64x64}
+          srcLoading={hamster_64x64}
           primaryColor={tableColorMap[user[1].color].primary}
           secondaryColor={tableColorMap[user[1].color].secondary}
         />

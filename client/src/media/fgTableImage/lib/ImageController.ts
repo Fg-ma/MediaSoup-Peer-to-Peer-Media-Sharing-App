@@ -7,6 +7,8 @@ import {
 import {
   IncomingTableStaticContentMessages,
   onRespondedCatchUpEffectsType,
+  onReuploadCancelledType,
+  onReuploadStartedType,
   onUpdatedContentEffectsType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { ImageListenerTypes } from "../TableImageMedia";
@@ -100,6 +102,30 @@ class ImageController {
     this.imageMediaInstance.updateAllEffects();
   };
 
+  private onReuploadStarted = (event: onReuploadStartedType) => {
+    const { contentId, contentType } = event.header;
+
+    if (
+      contentId !== this.imageMediaInstance.imageMedia.imageId ||
+      contentType !== "image"
+    )
+      return;
+
+    this.setRerender((prev) => !prev);
+  };
+
+  private onReuploadCancelled = (event: onReuploadCancelledType) => {
+    const { contentId, contentType } = event.header;
+
+    if (
+      contentId !== this.imageMediaInstance.imageMedia.imageId ||
+      contentType !== "image"
+    )
+      return;
+
+    this.setRerender((prev) => !prev);
+  };
+
   handleTableStaticContentMessage = (
     event: IncomingTableStaticContentMessages,
   ) => {
@@ -109,6 +135,12 @@ class ImageController {
         break;
       case "respondedCatchUpEffects":
         this.onRespondedCatchUpEffects(event);
+        break;
+      case "reuploadStarted":
+        this.onReuploadStarted(event);
+        break;
+      case "reuploadCancelled":
+        this.onReuploadCancelled(event);
         break;
       default:
         break;

@@ -10,7 +10,10 @@ export default function CornersDecorator({
   return (
     <svg
       className={`${className} pointer-events-none absolute left-[-${width}px] top-[-${width}px]`}
-      style={{ width: "calc(100% + 8px)", height: "calc(100% + 8px)" }}
+      style={{
+        width: `calc(100% + ${width * 2}px)`,
+        height: `calc(100% + ${width * 2}px)`,
+      }}
     >
       <g>
         <line

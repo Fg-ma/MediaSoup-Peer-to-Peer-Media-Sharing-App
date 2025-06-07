@@ -27,6 +27,16 @@ class OneShotUploader {
             },
           });
         }
+        if (xhr.status === 409) {
+          this.sendGeneralSignal({
+            type: "tableInfoSignal",
+            data: {
+              message: "File already reuploading",
+              timeout: 2500,
+            },
+          });
+        }
+        return;
       };
 
       xhr.send(formData);

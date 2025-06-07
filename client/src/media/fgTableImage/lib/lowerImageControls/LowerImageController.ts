@@ -6,7 +6,10 @@ import {
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { downloadRecordingMimeMap } from "../typeConstant";
 import TableImageMediaInstance from "../../TableImageMediaInstance";
-import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
+import {
+  GeneralSignals,
+  GroupSignals,
+} from "../../../../context/signalContext/lib/typeConstant";
 
 class LowerImageController {
   constructor(
@@ -27,6 +30,7 @@ class LowerImageController {
       TableStaticContentSocketController | undefined
     >,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
     private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
@@ -35,8 +39,18 @@ class LowerImageController {
   };
 
   handleEdit = () => {
-    this.setIsEditing((prev) => !prev);
-    this.setSettingsActive(false);
+    if (this.imageMediaInstance.imageMedia.loadingState !== "reuploading") {
+      this.setIsEditing((prev) => !prev);
+      this.setSettingsActive(false);
+    } else {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Cannot edit while image is reuploading",
+          timeout: 2500,
+        },
+      });
+    }
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
@@ -123,7 +137,12 @@ class LowerImageController {
 
   handleDownload = () => {
     if (this.imageMediaInstance.settings.downloadType.value === "snapShot") {
-      this.imageMediaInstance.babylonScene?.downloadSnapShot();
+      this.imageMediaInstance.babylonScene?.downloadSnapShot(
+        this.imageMediaInstance.settings.downloadType
+          .downloadSnapShotTypeOptions.mimeType.value,
+        this.imageMediaInstance.settings.downloadType
+          .downloadSnapShotTypeOptions.quality.value,
+      );
     } else if (
       this.imageMediaInstance.settings.downloadType.value === "original"
     ) {
@@ -134,11 +153,11 @@ class LowerImageController {
       if (!this.recording.current) {
         this.imageMediaInstance.babylonScene?.startRecording(
           downloadRecordingMimeMap[
-            this.imageMediaInstance.settings.downloadType.downloadTypeOptions
-              .mimeType.value
+            this.imageMediaInstance.settings.downloadType
+              .downloadRecordTypeOptions.mimeType.value
           ],
           parseInt(
-            this.imageMediaInstance.settings.downloadType.downloadTypeOptions.fps.value.slice(
+            this.imageMediaInstance.settings.downloadType.downloadRecordTypeOptions.fps.value.slice(
               0,
               -4,
             ),

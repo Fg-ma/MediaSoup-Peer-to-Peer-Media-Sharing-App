@@ -1,6 +1,9 @@
 import TableStaticContentSocketController from "../../../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
-import { GroupSignals } from "../../../../../../context/signalContext/lib/typeConstant";
+import {
+  GeneralSignals,
+  GroupSignals,
+} from "../../../../../../context/signalContext/lib/typeConstant";
 
 class ImageSettingsController {
   constructor(
@@ -13,11 +16,24 @@ class ImageSettingsController {
       TableStaticContentSocketController | undefined
     >,
     private sendGroupSignal: (signal: GroupSignals) => void,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
     private setIsEditing: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   handleEdit = () => {
-    this.setIsEditing((prev) => !prev);
+    if (
+      this.imageMediaInstance.current.imageMedia.loadingState !== "reuploading"
+    ) {
+      this.setIsEditing((prev) => !prev);
+    } else {
+      this.sendGeneralSignal({
+        type: "tableInfoSignal",
+        data: {
+          message: "Cannot edit while image is reuploading",
+          timeout: 2500,
+        },
+      });
+    }
   };
 
   handleSetAsBackground = () => {

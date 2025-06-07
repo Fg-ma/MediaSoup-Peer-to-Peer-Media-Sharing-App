@@ -153,6 +153,29 @@ class MediaContainerController {
           }, 0);
         }
         break;
+      case "contentReloaded":
+        if (this.getAspect) {
+          this.aspectRatio.current = this.getAspect();
+
+          if (this.aspectRatio.current) {
+            this.positioning.current.scale.y =
+              this.positioning.current.scale.x / this.aspectRatio.current;
+
+            this.setRerender((prev) => !prev);
+
+            this.tableStaticContentSocket.current?.updateContentPositioning(
+              this.kind,
+              this.mediaIdRef.current,
+              this.mediaInstanceId,
+              { position: this.positioning.current.position },
+            );
+          }
+
+          setTimeout(() => {
+            this.sendGroupSignal({ type: "groupUpdate" });
+          }, 0);
+        }
+        break;
       default:
         break;
     }

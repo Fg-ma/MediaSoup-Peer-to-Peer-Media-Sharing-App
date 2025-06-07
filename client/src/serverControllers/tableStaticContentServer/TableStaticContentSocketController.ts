@@ -23,6 +23,8 @@ import {
   onRequestedCatchUpVideoPositionType,
   onRespondedCatchUpVideoPositionType,
   onResponsedCatchUpTableDataType,
+  onReuploadCancelledType,
+  onReuploadStartedType,
   onSvgUploadedToTabledType,
   onSvgUploadedToTableType,
   onTextUploadedToTabledType,
@@ -456,6 +458,20 @@ class TableStaticContentSocketController {
     });
   };
 
+  signalReuploadStart = (
+    contentType: StaticContentTypes,
+    contentId: string,
+  ) => {
+    this.sendMessage({
+      type: "signalReuploadStart",
+      header: {
+        tableId: this.tableId,
+        contentType,
+        contentId,
+      },
+    });
+  };
+
   private handleMessage = (
     message: { type: undefined } | IncomingTableStaticContentMessages,
   ) => {
@@ -512,9 +528,29 @@ class TableStaticContentSocketController {
       case "createdNewInstances":
         this.onCreatedNewInstances(message);
         break;
+      case "reuploadStarted":
+        this.onReuploadStarted(message);
+        break;
+      case "reuploadCancelled":
+        this.onReuploadCancelled(message);
+        break;
       default:
         break;
     }
+  };
+
+  private onReuploadStarted = (event: onReuploadStartedType) => {
+    const { contentId, contentType } = event.header;
+
+    this.staticContentMedia.current[contentType].table[contentId].loadingState =
+      "reuploading";
+  };
+
+  private onReuploadCancelled = (event: onReuploadCancelledType) => {
+    const { contentId, contentType } = event.header;
+
+    this.staticContentMedia.current[contentType].table[contentId].loadingState =
+      "downloaded";
   };
 
   private onContentDeleted = (event: onContentDeletedType) => {

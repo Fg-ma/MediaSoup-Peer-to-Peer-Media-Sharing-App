@@ -54,11 +54,11 @@ export default function TUI({
       topImageEditorControls.scrollLeft += wheelEvent.deltaY;
     };
 
-    const onSubmenuWheel = (e: Event) => {
+    const onGeneralWheel = (e: Event, elem: HTMLElement) => {
       const wheelEvent = e as WheelEvent;
-      if (!imageEditorSubmenu || wheelEvent.deltaY === 0) return;
+      if (wheelEvent.deltaY === 0) return;
       wheelEvent.preventDefault();
-      imageEditorSubmenu.scrollLeft += wheelEvent.deltaY;
+      elem.scrollLeft += wheelEvent.deltaY;
     };
 
     const onWrapWheel = (e: Event) => {
@@ -133,8 +133,26 @@ export default function TUI({
     const imageEditorWrap = editorRef.current?.querySelector(
       ".tui-image-editor-wrap",
     ) as HTMLElement;
-    const imageEditorSubmenu = editorRef.current?.querySelector(
-      ".tui-image-editor-submenu",
+    const editorMenuCrop = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-crop",
+    ) as HTMLElement;
+    const editorMenuFlip = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-flip",
+    ) as HTMLElement;
+    const editorMenuRotate = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-rotate",
+    ) as HTMLElement;
+    const editorMenuDraw = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-draw",
+    ) as HTMLElement;
+    const editorMenuShape = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-shape",
+    ) as HTMLElement;
+    const editorMenuText = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-text",
+    ) as HTMLElement;
+    const editorMenuFilter = editorRef.current?.querySelector(
+      ".tui-image-editor-menu-filter",
     ) as HTMLElement;
 
     if (imageEditorWrap) {
@@ -154,8 +172,54 @@ export default function TUI({
         false,
       );
     }
-    if (imageEditorSubmenu) {
-      imageEditorSubmenu.addEventListener("wheel", onSubmenuWheel, false);
+    if (editorMenuCrop) {
+      editorMenuCrop.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuCrop),
+        false,
+      );
+    }
+    if (editorMenuFlip) {
+      editorMenuFlip.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuFlip),
+        false,
+      );
+    }
+    if (editorMenuRotate) {
+      editorMenuRotate.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuRotate),
+        false,
+      );
+    }
+    if (editorMenuDraw) {
+      editorMenuDraw.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuDraw),
+        false,
+      );
+    }
+    if (editorMenuShape) {
+      editorMenuShape.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuShape),
+        false,
+      );
+    }
+    if (editorMenuText) {
+      editorMenuText.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuText),
+        false,
+      );
+    }
+    if (editorMenuFilter) {
+      editorMenuFilter.addEventListener(
+        "wheel",
+        (e) => onGeneralWheel(e, editorMenuFilter),
+        false,
+      );
     }
 
     // Divider
@@ -237,8 +301,54 @@ export default function TUI({
           false,
         );
       }
-      if (imageEditorSubmenu) {
-        imageEditorSubmenu.removeEventListener("wheel", onSubmenuWheel, false);
+      if (editorMenuCrop) {
+        editorMenuCrop.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuCrop),
+          false,
+        );
+      }
+      if (editorMenuFlip) {
+        editorMenuFlip.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuFlip),
+          false,
+        );
+      }
+      if (editorMenuRotate) {
+        editorMenuRotate.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuRotate),
+          false,
+        );
+      }
+      if (editorMenuDraw) {
+        editorMenuDraw.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuDraw),
+          false,
+        );
+      }
+      if (editorMenuShape) {
+        editorMenuShape.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuShape),
+          false,
+        );
+      }
+      if (editorMenuText) {
+        editorMenuText.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuText),
+          false,
+        );
+      }
+      if (editorMenuFilter) {
+        editorMenuFilter.removeEventListener(
+          "wheel",
+          (e) => onGeneralWheel(e, editorMenuFilter),
+          false,
+        );
       }
       closeLi.removeEventListener("click", handleClose);
       finishedLi.removeEventListener("click", handleConfirm);

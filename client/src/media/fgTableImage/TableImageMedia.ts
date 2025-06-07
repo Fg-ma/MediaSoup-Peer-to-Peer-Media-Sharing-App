@@ -208,6 +208,25 @@ class TableImageMedia {
   }
 
   private onDownloadFinish = async (message: onDownloadFinishType) => {
+    if (this.loadingState === "reuploading") {
+      this.imageListeners.forEach((listener) => {
+        listener({ type: "imageReloaded" });
+      });
+
+      this.fileSize = 0;
+
+      if (this.blobURL) {
+        URL.revokeObjectURL(this.blobURL);
+        this.blobURL = undefined;
+      }
+
+      this.image = undefined;
+
+      this.aspect = undefined;
+
+      this.babylonRenderLoopWorker = undefined;
+    }
+
     const { blob, fileSize } = message.data;
 
     this.fileSize = fileSize;
@@ -376,22 +395,6 @@ class TableImageMedia {
   };
 
   reloadContent = () => {
-    this.imageListeners.forEach((listener) => {
-      listener({ type: "imageReloaded" });
-    });
-
-    this.loadingState = "downloading";
-
-    this.fileSize = 0;
-    this.blobURL && URL.revokeObjectURL(this.blobURL);
-    this.blobURL = undefined;
-
-    this.image = undefined;
-
-    this.aspect = undefined;
-
-    this.babylonRenderLoopWorker = undefined;
-
     this.downloader = new Downloader(
       "image",
       this.imageId,

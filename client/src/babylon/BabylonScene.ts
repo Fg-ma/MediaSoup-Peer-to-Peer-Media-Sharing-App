@@ -546,7 +546,7 @@ class BabylonScene {
     }
   };
 
-  downloadSnapShot = () => {
+  downloadSnapShot = (mimeType?: string, quality?: number) => {
     if (this.engine) {
       Tools.CreateScreenshot(
         this.engine,
@@ -559,14 +559,16 @@ class BabylonScene {
           // Create a link element for download
           const link = document.createElement("a");
           link.href = dataUrl;
-          link.download = "scene-snapshot.png";
+          link.download = `scene-snapshot${this.mimeTypeExtensionMap[mimeType ?? "image/png"] ?? ".png"}`;
 
           // Simulate a click to download the image
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
         },
-        "image/png",
+        mimeType ?? "image/png",
+        undefined,
+        quality,
       );
     }
   };

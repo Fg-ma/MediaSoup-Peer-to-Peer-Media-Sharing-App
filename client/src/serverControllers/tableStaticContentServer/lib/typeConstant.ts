@@ -32,7 +32,8 @@ export type OutGoingTableStaticContentMessages =
   | onChangeContentStateType
   | onCreateNewInstancesType
   | onSearchTabledContentRequestType
-  | onDeleteUploadSessionType;
+  | onDeleteUploadSessionType
+  | onSignalReuploadStartType;
 
 type onJoinTableType = {
   type: "joinTable";
@@ -249,6 +250,15 @@ type onDeleteUploadSessionType = {
   header: { uploadId: string };
 };
 
+type onSignalReuploadStartType = {
+  type: "signalReuploadStart";
+  header: {
+    tableId: string;
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+};
+
 export type IncomingTableStaticContentMessages =
   | { type: undefined }
   | onSoundClipUploadedToTableType
@@ -279,7 +289,9 @@ export type IncomingTableStaticContentMessages =
   | onRequestedCatchUpVideoPositionType
   | onRespondedCatchUpVideoPositionType
   | onCreatedNewInstancesType
-  | onSearchTabledContentRespondedType;
+  | onSearchTabledContentRespondedType
+  | onReuploadStartedType
+  | onReuploadCancelledType;
 
 export type onVideoUploadedToTableType = {
   type: "videoUploadedToTable";
@@ -836,4 +848,20 @@ export type onCreatedNewInstancesType = {
 export type onSearchTabledContentRespondedType = {
   type: "searchTabledContentResponded";
   data: any;
+};
+
+export type onReuploadStartedType = {
+  type: "reuploadStarted";
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
+};
+
+export type onReuploadCancelledType = {
+  type: "reuploadCancelled";
+  header: {
+    contentType: StaticContentTypes;
+    contentId: string;
+  };
 };

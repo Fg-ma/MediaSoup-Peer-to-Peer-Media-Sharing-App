@@ -4,10 +4,14 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import {
   ActivePages,
   downloadTypeSelections,
-  downloadTypeOptions,
-  DownloadTypeOptionsTypes,
-  downloadTypeOptionsTitles,
-  downloadTypeOptionsArrays,
+  downloadRecordingTypeOptionsArrays,
+  downloadRecordTypeOptionsTitles,
+  downloadSnapShotTypeOptions,
+  DownloadSnapShotTypeOptionsTypes,
+  downloadSnapShotTypeOptionsArrays,
+  downloadSnapShotTypeOptionsTitles,
+  downloadRecordTypeOptions,
+  DownloadRecordTypeOptionsTypes,
 } from "../../../typeConstant";
 import DownloadTypePage from "./DownloadTypePage";
 import DownloadTypeOptionsPage from "./DownloadTypeOptionsPage";
@@ -17,6 +21,7 @@ import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import TableImageMediaInstance from "../../../../../../media/fgTableImage/TableImageMediaInstance";
 import FgPortal from "../../../../../../elements/fgPortal/FgPortal";
+import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -104,7 +109,7 @@ export default function SettingsPanel({
 
   useEffect(() => {
     setRerender((prev) => !prev);
-  }, [activePages]);
+  }, [JSON.stringify(activePages)]);
 
   return (
     <FgPortal
@@ -250,9 +255,9 @@ export default function SettingsPanel({
           </AnimatePresence>
           <AnimatePresence>
             {activePages.downloadType.active &&
-              activePages.downloadType.downloadTypeOptions.active &&
+              activePages.downloadType.downloadRecordTypeOptions.active &&
               !isDescendantActive(
-                activePages.downloadType.downloadTypeOptions,
+                activePages.downloadType.downloadRecordTypeOptions,
               ) && (
                 <motion.div
                   className="w-full"
@@ -263,6 +268,7 @@ export default function SettingsPanel({
                 >
                   <DownloadTypeOptionsPage
                     imageMediaInstance={imageMediaInstance}
+                    activePages={activePages}
                     setActivePages={setActivePages}
                   />
                 </motion.div>
@@ -270,9 +276,9 @@ export default function SettingsPanel({
           </AnimatePresence>
           <AnimatePresence>
             {activePages.downloadType.active &&
-              activePages.downloadType.downloadTypeOptions.active &&
+              activePages.downloadType.downloadRecordTypeOptions.active &&
               isDescendantActive(
-                activePages.downloadType.downloadTypeOptions,
+                activePages.downloadType.downloadRecordTypeOptions,
               ) && (
                 <motion.div
                   className="w-full"
@@ -281,23 +287,23 @@ export default function SettingsPanel({
                   animate="animate"
                   exit="exit"
                 >
-                  {downloadTypeOptions.map((option) => {
+                  {downloadRecordTypeOptions.map((option) => {
                     const activePage =
-                      activePages.downloadType.downloadTypeOptions[
-                        option as DownloadTypeOptionsTypes
+                      activePages.downloadType.downloadRecordTypeOptions[
+                        option as DownloadRecordTypeOptionsTypes
                       ];
                     const activeSetting =
                       imageMediaInstance.settings.downloadType
-                        .downloadTypeOptions[
-                        option as DownloadTypeOptionsTypes
+                        .downloadRecordTypeOptions[
+                        option as DownloadRecordTypeOptionsTypes
                       ];
 
                     return (
                       activePage.active && (
                         <PageTemplate
                           key={option}
-                          content={downloadTypeOptionsArrays[
-                            option as DownloadTypeOptionsTypes
+                          content={downloadRecordingTypeOptionsArrays[
+                            option as DownloadRecordTypeOptionsTypes
                           ].map((type) => (
                             <FgButton
                               key={type}
@@ -312,8 +318,8 @@ export default function SettingsPanel({
                                 </div>
                               )}
                               clickFunction={() => {
-                                imageMediaInstance.settings.downloadType.downloadTypeOptions[
-                                  option as DownloadTypeOptionsTypes
+                                imageMediaInstance.settings.downloadType.downloadRecordTypeOptions[
+                                  option as DownloadRecordTypeOptionsTypes
                                 ].value = type;
 
                                 setRerender((prev) => !prev);
@@ -321,20 +327,154 @@ export default function SettingsPanel({
                             />
                           ))}
                           pageTitle={
-                            downloadTypeOptionsTitles[
-                              option as DownloadTypeOptionsTypes
+                            downloadRecordTypeOptionsTitles[
+                              option as DownloadRecordTypeOptionsTypes
                             ]
                           }
                           backFunction={() => {
                             setActivePages((prev) => {
                               const newActivePages = { ...prev };
 
-                              newActivePages.downloadType.downloadTypeOptions[
-                                option as DownloadTypeOptionsTypes
+                              newActivePages.downloadType.downloadRecordTypeOptions[
+                                option as DownloadRecordTypeOptionsTypes
                               ].active =
                                 !newActivePages.downloadType
-                                  .downloadTypeOptions[
-                                  option as DownloadTypeOptionsTypes
+                                  .downloadRecordTypeOptions[
+                                  option as DownloadRecordTypeOptionsTypes
+                                ].active;
+
+                              return newActivePages;
+                            });
+                          }}
+                        />
+                      )
+                    );
+                  })}
+                </motion.div>
+              )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {activePages.downloadType.active &&
+              activePages.downloadType.downloadSnapShotTypeOptions.active &&
+              !isDescendantActive(
+                activePages.downloadType.downloadSnapShotTypeOptions,
+              ) && (
+                <motion.div
+                  className="w-full"
+                  variants={panelVariants}
+                  initial="init"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <DownloadTypeOptionsPage
+                    imageMediaInstance={imageMediaInstance}
+                    activePages={activePages}
+                    setActivePages={setActivePages}
+                  />
+                </motion.div>
+              )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {activePages.downloadType.active &&
+              activePages.downloadType.downloadSnapShotTypeOptions.active &&
+              isDescendantActive(
+                activePages.downloadType.downloadSnapShotTypeOptions,
+              ) && (
+                <motion.div
+                  className="w-full"
+                  variants={panelVariants}
+                  initial="init"
+                  animate="animate"
+                  exit="exit"
+                >
+                  {downloadSnapShotTypeOptions.map((option) => {
+                    const activePage =
+                      activePages.downloadType.downloadSnapShotTypeOptions[
+                        option as DownloadSnapShotTypeOptionsTypes
+                      ];
+                    const activeSetting =
+                      imageMediaInstance.settings.downloadType
+                        .downloadSnapShotTypeOptions[
+                        option as DownloadSnapShotTypeOptionsTypes
+                      ];
+
+                    return (
+                      activePage.active && (
+                        <PageTemplate
+                          key={option}
+                          content={
+                            <>
+                              {option === "quality" && (
+                                <FgSlider
+                                  className="h-10"
+                                  externalValue={
+                                    imageMediaInstance.settings.downloadType
+                                      .downloadSnapShotTypeOptions.quality.value
+                                  }
+                                  externalStyleValue={
+                                    imageMediaInstance.settings.downloadType
+                                      .downloadSnapShotTypeOptions.quality.value
+                                  }
+                                  onValueChange={(value) => {
+                                    imageMediaInstance.settings.downloadType.downloadSnapShotTypeOptions.quality.value =
+                                      value.value;
+                                    setRerender((prev) => !prev);
+                                  }}
+                                  options={{
+                                    initValue:
+                                      imageMediaInstance.settings.downloadType
+                                        .downloadSnapShotTypeOptions.quality
+                                        .value,
+                                    ticks: 6,
+                                    rangeMax: 1,
+                                    rangeMin: 0,
+                                    orientation: "horizontal",
+                                    tickLabels: false,
+                                    precision: 2,
+                                  }}
+                                />
+                              )}
+                              {downloadSnapShotTypeOptionsArrays[
+                                option as DownloadSnapShotTypeOptionsTypes
+                              ].map((type) => (
+                                <FgButton
+                                  key={type}
+                                  className={`w-full min-w-32 rounded px-2 hover:bg-fg-white hover:text-fg-tone-black-1 ${
+                                    type === activeSetting.value
+                                      ? "bg-fg-white text-fg-tone-black-1"
+                                      : ""
+                                  }`}
+                                  contentFunction={() => (
+                                    <div className="flex items-start justify-start">
+                                      {type}
+                                    </div>
+                                  )}
+                                  clickFunction={() => {
+                                    imageMediaInstance.settings.downloadType.downloadSnapShotTypeOptions[
+                                      option as DownloadSnapShotTypeOptionsTypes
+                                    ].value = type;
+
+                                    setRerender((prev) => !prev);
+                                  }}
+                                />
+                              ))}
+                            </>
+                          }
+                          pageTitle={
+                            downloadSnapShotTypeOptionsTitles[
+                              option as DownloadSnapShotTypeOptionsTypes
+                            ]
+                          }
+                          backFunction={() => {
+                            setActivePages((prev) => {
+                              const newActivePages = { ...prev };
+
+                              newActivePages.downloadType.downloadSnapShotTypeOptions[
+                                option as DownloadSnapShotTypeOptionsTypes
+                              ].active =
+                                !newActivePages.downloadType
+                                  .downloadSnapShotTypeOptions[
+                                  option as DownloadSnapShotTypeOptionsTypes
                                 ].active;
 
                               return newActivePages;
