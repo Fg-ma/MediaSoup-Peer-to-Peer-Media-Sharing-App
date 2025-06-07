@@ -40,8 +40,10 @@ class LowerImageController {
 
   handleEdit = () => {
     if (this.imageMediaInstance.imageMedia.loadingState !== "reuploading") {
-      this.setIsEditing((prev) => !prev);
-      this.setSettingsActive(false);
+      if (this.imageMediaInstance.imageMedia.loadingState === "downloaded") {
+        this.setIsEditing((prev) => !prev);
+        this.setSettingsActive(false);
+      }
     } else {
       this.sendGeneralSignal({
         type: "tableInfoSignal",

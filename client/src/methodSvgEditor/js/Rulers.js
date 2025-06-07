@@ -57,7 +57,7 @@ MD.Rulers = function () {
     const isDark = state.get("darkmode");
     const gray =
       getComputedStyle(document.body).getPropertyValue(
-        isDark ? "--z5" : "--z6"
+        isDark ? "--z5" : "--z6",
       ) || "#999";
     if (!zoom) zoom = svgCanvas.getZoom();
     var limit = 30000;
@@ -72,6 +72,8 @@ MD.Rulers = function () {
       var content_d = c_elem.getAttribute(dim);
 
       var hcanv = document.querySelector("#ruler_" + dim + " canvas");
+
+      if (!hcanv) return;
 
       // Set the canvas size to the width of the container
       var ruler_len =

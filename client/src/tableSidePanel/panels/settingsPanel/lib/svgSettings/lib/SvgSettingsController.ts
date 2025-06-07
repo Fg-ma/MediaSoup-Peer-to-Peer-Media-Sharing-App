@@ -51,7 +51,9 @@ class SvgSettingsController {
   };
 
   handleEdit = () => {
-    this.setEditing((prev) => !prev);
+    if (this.svgMediaInstance.current.svgMedia.loadingState === "downloaded") {
+      this.setEditing((prev) => !prev);
+    }
   };
 
   handleDownload = () => {

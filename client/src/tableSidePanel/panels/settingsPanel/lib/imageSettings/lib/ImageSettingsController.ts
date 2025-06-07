@@ -24,7 +24,11 @@ class ImageSettingsController {
     if (
       this.imageMediaInstance.current.imageMedia.loadingState !== "reuploading"
     ) {
-      this.setIsEditing((prev) => !prev);
+      if (
+        this.imageMediaInstance.current.imageMedia.loadingState === "downloaded"
+      ) {
+        this.setIsEditing((prev) => !prev);
+      }
     } else {
       this.sendGeneralSignal({
         type: "tableInfoSignal",

@@ -115,8 +115,10 @@ class LowerSvgController {
   };
 
   handleEdit = () => {
-    this.setEditing((prev) => !prev);
-    this.setSettingsActive(false);
+    if (this.svgMediaInstance.svgMedia.loadingState === "downloaded") {
+      this.setEditing((prev) => !prev);
+      this.setSettingsActive(false);
+    }
   };
 
   handleDownload = () => {

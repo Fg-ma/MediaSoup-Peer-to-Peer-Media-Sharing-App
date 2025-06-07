@@ -71,6 +71,15 @@ export default function TUI({
       imageEditorWrap.scrollLeft += wheelEvent.deltaY;
     };
 
+    const generalResize = (elem: HTMLElement) => {
+      const isElemOverflowingX = elem.scrollWidth > elem.clientWidth;
+      elem.style.setProperty(
+        "justify-content",
+        isElemOverflowingX ? "start" : "center",
+        "important",
+      );
+    };
+
     const handleResize = () => {
       if (
         !topImageEditorControls ||
@@ -78,6 +87,12 @@ export default function TUI({
         !imageEditorMain
       )
         return;
+
+      imageEditorWrap.style.setProperty(
+        "height",
+        `calc(100% - ${imageEditorSubmenu.clientHeight}px)`,
+        "important",
+      );
 
       const isTopOverflowing =
         topImageEditorControls.scrollWidth > topImageEditorControls.clientWidth;
@@ -101,6 +116,14 @@ export default function TUI({
       imageEditorWrap.style.alignItems = isWrapOverflowingY
         ? "start"
         : "center";
+
+      generalResize(editorMenuCrop);
+      generalResize(editorMenuFlip);
+      generalResize(editorMenuRotate);
+      generalResize(editorMenuDraw);
+      generalResize(editorMenuShape);
+      generalResize(editorMenuText);
+      generalResize(editorMenuFilter);
     };
 
     const handleClose = () => {
@@ -121,6 +144,15 @@ export default function TUI({
       if (confirmCallback) confirmCallback(file);
     };
 
+    const handlePageChange = () => {
+      setTimeout(() => {
+        handleResize();
+      }, 0);
+    };
+
+    const imageEditorSubmenu = editorRef.current?.querySelector(
+      ".tui-image-editor-submenu",
+    ) as HTMLElement;
     const bottomImageEditorControls = editorRef.current?.querySelector(
       ".tui-image-editor-controls",
     ) as HTMLElement;
@@ -153,6 +185,27 @@ export default function TUI({
     ) as HTMLElement;
     const editorMenuFilter = editorRef.current?.querySelector(
       ".tui-image-editor-menu-filter",
+    ) as HTMLElement;
+    const cropBtn = editorRef.current?.querySelector(
+      ".tie-btn-crop",
+    ) as HTMLElement;
+    const flipBtn = editorRef.current?.querySelector(
+      ".tie-btn-flip",
+    ) as HTMLElement;
+    const rotateBtn = editorRef.current?.querySelector(
+      ".tie-btn-rotate",
+    ) as HTMLElement;
+    const drawBtn = editorRef.current?.querySelector(
+      ".tie-btn-draw",
+    ) as HTMLElement;
+    const shapeBtn = editorRef.current?.querySelector(
+      ".tie-btn-shape",
+    ) as HTMLElement;
+    const textBtn = editorRef.current?.querySelector(
+      ".tie-btn-text",
+    ) as HTMLElement;
+    const filterBtn = editorRef.current?.querySelector(
+      ".tie-btn-filter",
     ) as HTMLElement;
 
     if (imageEditorWrap) {
@@ -220,6 +273,27 @@ export default function TUI({
         (e) => onGeneralWheel(e, editorMenuFilter),
         false,
       );
+    }
+    if (cropBtn) {
+      cropBtn.addEventListener("click", handlePageChange);
+    }
+    if (flipBtn) {
+      flipBtn.addEventListener("click", handlePageChange);
+    }
+    if (rotateBtn) {
+      rotateBtn.addEventListener("click", handlePageChange);
+    }
+    if (drawBtn) {
+      drawBtn.addEventListener("click", handlePageChange);
+    }
+    if (shapeBtn) {
+      shapeBtn.addEventListener("click", handlePageChange);
+    }
+    if (textBtn) {
+      textBtn.addEventListener("click", handlePageChange);
+    }
+    if (filterBtn) {
+      filterBtn.addEventListener("click", handlePageChange);
     }
 
     // Divider
@@ -349,6 +423,27 @@ export default function TUI({
           (e) => onGeneralWheel(e, editorMenuFilter),
           false,
         );
+      }
+      if (cropBtn) {
+        cropBtn.removeEventListener("click", handlePageChange);
+      }
+      if (flipBtn) {
+        flipBtn.removeEventListener("click", handlePageChange);
+      }
+      if (rotateBtn) {
+        rotateBtn.removeEventListener("click", handlePageChange);
+      }
+      if (drawBtn) {
+        drawBtn.removeEventListener("click", handlePageChange);
+      }
+      if (shapeBtn) {
+        shapeBtn.removeEventListener("click", handlePageChange);
+      }
+      if (textBtn) {
+        textBtn.removeEventListener("click", handlePageChange);
+      }
+      if (filterBtn) {
+        filterBtn.removeEventListener("click", handlePageChange);
       }
       closeLi.removeEventListener("click", handleClose);
       finishedLi.removeEventListener("click", handleConfirm);
