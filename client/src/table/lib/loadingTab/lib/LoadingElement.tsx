@@ -5,19 +5,20 @@ import ChunkUploader, {
   ChunkedUploadListenerTypes,
 } from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
 import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
+import VideoChunkUploader from "../../../../tools/uploader/lib/videoChunkUploader/VideoChunkUploader";
 
 export default function LoadingElement({
   upload,
   loadingTabRef,
 }: {
-  upload: ChunkUploader | TextChunkUploader;
+  upload: ChunkUploader | TextChunkUploader | VideoChunkUploader;
   loadingTabRef: React.RefObject<HTMLDivElement>;
 }) {
   const [_, setRerender] = useState(false);
 
   const handleUploadListener = (msg: ChunkedUploadListenerTypes) => {
     if (msg.type === "uploadProgress") {
-      setRerender((v) => !v);
+      setRerender((prev) => !prev);
     }
   };
 

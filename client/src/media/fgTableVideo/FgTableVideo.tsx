@@ -142,9 +142,8 @@ export default function FgTableVideo({
   );
 
   useEffect(() => {
-    subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
-    if (videoMediaInstance.instanceCanvas) {
-      subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
+    if (videoMediaInstance.videoMedia.video) {
+      subContainerRef.current?.appendChild(videoMediaInstance.videoMedia.video);
       positioning.current.scale = {
         x: videoMediaInstance.videoMedia.aspect
           ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect

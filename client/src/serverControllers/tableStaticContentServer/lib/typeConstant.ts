@@ -26,9 +26,6 @@ export type OutGoingTableStaticContentMessages =
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
   | onRequestCatchUpEffectsType
-  | onUpdateVideoPositionType
-  | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
   | onCreateNewInstancesType
   | onSearchTabledContentRequestType
@@ -153,46 +150,6 @@ type onRequestCatchUpEffectsType = {
   };
 };
 
-type onUpdateVideoPositionType = {
-  type: "updateVideoPosition";
-  header: {
-    tableId: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    videoPosition: number;
-  };
-};
-
-type onRequestCatchUpVideoPositionType = {
-  type: "requestCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-};
-
-type onResponseCatchUpVideoPositionType = {
-  type: "responseCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    currentVideoPosition: number;
-  };
-};
-
 type onChangeContentStateType = {
   type: "changeContentState";
   header: {
@@ -265,9 +222,6 @@ export type IncomingTableStaticContentMessages =
   | onSoundClipUploadedToTabledType
   | onApplicationUploadedToTableType
   | onApplicationUploadedToTabledType
-  | onVideoUploadedToTableType
-  | onVideoUploadedToTabledType
-  | onDashVideoReadyType
   | onImageUploadedToTableType
   | onImageUploadedToTabledType
   | onSvgUploadedToTableType
@@ -285,61 +239,10 @@ export type IncomingTableStaticContentMessages =
   | onContentStateChangedType
   | onUpdatedContentEffectsType
   | onRespondedCatchUpEffectsType
-  | onUpdatedVideoPositionType
-  | onRequestedCatchUpVideoPositionType
-  | onRespondedCatchUpVideoPositionType
   | onCreatedNewInstancesType
   | onSearchTabledContentRespondedType
   | onReuploadStartedType
   | onReuploadCancelledType;
-
-export type onVideoUploadedToTableType = {
-  type: "videoUploadedToTable";
-  header: {
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    filename: string;
-    mimeType: StaticMimeTypes;
-    state: TableContentStateTypes[];
-    initPositioning:
-      | {
-          position: {
-            top: number;
-            left: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        }
-      | undefined;
-  };
-};
-
-export type onVideoUploadedToTabledType = {
-  type: "videoUploadedToTabled";
-  header: {
-    contentId: string;
-  };
-  data: {
-    filename: string;
-    mimeType: StaticMimeTypes;
-    state: TableContentStateTypes[];
-  };
-};
-
-export type onDashVideoReadyType = {
-  type: "dashVideoReady";
-  header: {
-    videoId: string;
-  };
-  data: {
-    filename: string;
-  };
-};
 
 export type onImageUploadedToTableType = {
   type: "imageUploadedToTable";
@@ -784,41 +687,6 @@ export type onRespondedCatchUpEffectsType = {
     instanceId: string;
   };
   data: { effects?: object; effectStyles?: object };
-};
-
-export type onUpdatedVideoPositionType = {
-  type: "updatedVideoPosition";
-  header: {
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    videoPosition: number;
-  };
-};
-
-export type onRequestedCatchUpVideoPositionType = {
-  type: "requestedCatchUpVideoPosition";
-  header: {
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-};
-
-export type onRespondedCatchUpVideoPositionType = {
-  type: "respondedCatchUpVideoPosition";
-  header: {
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    currentVideoPosition: number;
-  };
 };
 
 export type onCreatedNewInstancesType = {

@@ -11,28 +11,37 @@ import IndexedDB from "../../db/indexedDB/IndexedDB";
 import ReasonableFileSizer from "../reasonableFileSizer.ts/ReasonableFileSizer";
 import TextChunkUploader from "./lib/textChunkUploader/TextChunkUploader";
 import TextOneShotUploader from "./lib/textOneShotUploader/TextOneShotUploader";
+import VideoChunkUploader from "./lib/videoChunkUploader/VideoChunkUploader";
+import VideoSocketController from "../../serverControllers/videoServer/VideoSocketController";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
 const userStaticContentServerBaseUrl =
   process.env.USER_STATIC_CONTENT_SERVER_BASE_URL;
+const videoServerBaseUrl = process.env.VIDEO_SERVER_BASE_URL;
 
 export type TableUploadDirections = "toTable" | "reupload" | "toTabled";
 
 class Uploader {
   private UPLOAD_SIZE_LIMIT = 1024 * 1024 * 1024;
+  private VIDEO_UPLOAD_SIZE_LIMIT = 1024 * 1024 * 100;
   private ONE_SHOT_FILE_SIZE_CUTOFF = 1024 * 1024 * 40;
 
   private oneShotUploader: OneShotUploader;
   private textOneShotUploader: TextOneShotUploader;
 
   constructor(
+    private videoSocket: React.MutableRefObject<
+      VideoSocketController | undefined
+    >,
     private tableId: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
     private userId: React.MutableRefObject<string>,
     private sendUploadSignal: (signal: UploadSignals) => void,
     private addCurrentUpload: (
       id: string,
-      upload: ChunkUploader | TextChunkUploader,
+      upload: ChunkUploader | TextChunkUploader | VideoChunkUploader,
     ) => void,
     private removeCurrentUpload: (id: string) => void,
     private reasonableFileSizer: React.MutableRefObject<ReasonableFileSizer>,
@@ -56,7 +65,11 @@ class Uploader {
     contentId?: string,
     offset = 0,
   ) => {
-    if (file.size > this.UPLOAD_SIZE_LIMIT) {
+    if (
+      file.size > this.UPLOAD_SIZE_LIMIT ||
+      (file.type.startsWith("video/") &&
+        file.size > this.VIDEO_UPLOAD_SIZE_LIMIT)
+    ) {
       this.sendGeneralSignal({
         type: "tableInfoSignal",
         data: {
@@ -141,12 +154,21 @@ class Uploader {
         initPositioning,
       };
 
+      if (file.type.startsWith("video/")) {
+        Object.assign(metadata, {
+          username: this.username.current,
+          instance: this.instance.current,
+        });
+      }
+
       try {
         let finalUploadId = uploadId;
 
         if (uploadId === undefined) {
           const metaRes = await fetch(
-            tableStaticContentServerBaseUrl + "upload-chunk-meta",
+            file.type.startsWith("video/")
+              ? videoServerBaseUrl + "upload-chunk-meta"
+              : tableStaticContentServerBaseUrl + "upload-chunk-meta",
             {
               method: "POST",
               headers: {
@@ -182,9 +204,29 @@ class Uploader {
             }),
           250,
         );
-        let uploader: ChunkUploader | TextChunkUploader;
-        if (!file.type.startsWith("text/")) {
-          uploader = new ChunkUploader(
+
+        let uploader: ChunkUploader | TextChunkUploader | VideoChunkUploader;
+
+        if (file.type.startsWith("text/")) {
+          uploader = new TextChunkUploader(
+            this.tableId,
+            file,
+            finalUploadId,
+            finalContentId,
+            this.removeCurrentUpload,
+            this.sendUploadSignal,
+            this.reasonableFileSizer,
+            this.indexedDBController,
+            "toTable",
+            handle,
+            offset,
+            this.sendGeneralSignal,
+            initPositioning,
+            state,
+          );
+        } else if (file.type.startsWith("video/")) {
+          uploader = new VideoChunkUploader(
+            this.videoSocket,
             this.tableId,
             file,
             finalUploadId,
@@ -201,7 +243,7 @@ class Uploader {
             state,
           );
         } else {
-          uploader = new TextChunkUploader(
+          uploader = new ChunkUploader(
             this.tableId,
             file,
             finalUploadId,

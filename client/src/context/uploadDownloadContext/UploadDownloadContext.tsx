@@ -4,6 +4,7 @@ import { DownloadSignals, UploadSignals } from "./lib/typeConstant";
 import Downloader from "../../tools/downloader/Downloader";
 import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 import TextChunkUploader from "src/tools/uploader/lib/textChunkUploader/TextChunkUploader";
+import VideoChunkUploader from "src/tools/uploader/lib/videoChunkUploader/VideoChunkUploader";
 
 export interface UploadDownloadContextProviderProps {
   children: React.ReactNode;
@@ -17,11 +18,11 @@ export interface UploadDownloadContextType {
   sendUploadSignal: (signal: UploadSignals) => void;
   addCurrentUpload: (
     id: string,
-    upload: ChunkUploader | TextChunkUploader,
+    upload: ChunkUploader | TextChunkUploader | VideoChunkUploader,
   ) => void;
   removeCurrentUpload: (id: string) => void;
   getCurrentUploads: () => {
-    [filename: string]: ChunkUploader | TextChunkUploader;
+    [filename: string]: ChunkUploader | TextChunkUploader | VideoChunkUploader;
   };
   addDownloadSignalListener: (
     listener: (signal: DownloadSignals) => void,
@@ -58,7 +59,7 @@ export function UploadDownloadContextProvider({
   children,
 }: UploadDownloadContextProviderProps) {
   const currentUploads = useRef<{
-    [filename: string]: ChunkUploader | TextChunkUploader;
+    [filename: string]: ChunkUploader | TextChunkUploader | VideoChunkUploader;
   }>({});
   const currentDownloads = useRef<{
     [filename: string]: Downloader | LiveTextDownloader;
@@ -87,7 +88,7 @@ export function UploadDownloadContextProvider({
 
   const addCurrentUpload = (
     id: string,
-    upload: ChunkUploader | TextChunkUploader,
+    upload: ChunkUploader | TextChunkUploader | VideoChunkUploader,
   ) => {
     if (currentUploads.current[id]) return;
 

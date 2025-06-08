@@ -1,17 +1,7 @@
-import {
-  cleanup,
-  gets,
-  metadataController,
-  search,
-  tablesController,
-  tableTopMongo,
-} from "../index";
-import { MessageTypes, TableStaticContentWebSocket } from "../typeConstant";
+import { gets, metadataController, tablesController } from "../index";
+import { MessageTypes, VideoWebSocket } from "../typeConstant";
 
-const handleMessage = (
-  ws: TableStaticContentWebSocket,
-  event: MessageTypes
-) => {
+const handleMessage = (ws: VideoWebSocket, event: MessageTypes) => {
   switch (event.type) {
     case "joinTable":
       tablesController.onJoinTable(ws, event);
@@ -19,29 +9,11 @@ const handleMessage = (
     case "leaveTable":
       tablesController.onLeaveTable(event);
       break;
-    case "requestCatchUpTableData":
-      metadataController.onRequestCatchUpTableData(event);
-      break;
-    case "deleteContent":
-      cleanup.onDeleteContent(event);
-      break;
     case "getDownloadMeta":
       gets.onGetDownloadMeta(event);
       break;
     case "getFileChunk":
       gets.onGetFileChunk(event);
-      break;
-    case "updateContentPositioning":
-      tableTopMongo.onUpdateContentPositioning(event);
-      break;
-    case "requestCatchUpEffects":
-      metadataController.onRequestCatchUpEffects(event);
-      break;
-    case "changeContentState":
-      metadataController.onChangeContentState(event);
-      break;
-    case "updateContentEffects":
-      metadataController.onUpdateContentEffects(event);
       break;
     case "updateVideoPosition":
       metadataController.onUpdateVideoPosition(event);
@@ -51,12 +23,6 @@ const handleMessage = (
       break;
     case "responseCatchUpVideoPosition":
       metadataController.onResponseCatchUpVideoPosition(event);
-      break;
-    case "createNewInstances":
-      metadataController.onCreateNewInstances(event);
-      break;
-    case "searchTabledContentRequest":
-      search.onSearchTabledContentRequest(event);
       break;
     case "deleteUploadSession":
       metadataController.onDeleteUploadSession(event);

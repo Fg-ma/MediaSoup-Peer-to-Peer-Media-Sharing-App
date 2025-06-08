@@ -27,6 +27,7 @@ import UserDevice from "../../tools/userDevice/UserDevice";
 import Downloader from "../../tools/downloader/Downloader";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
+import VideoSocketController from "../../serverControllers/videoServer/VideoSocketController";
 
 class JoinTableSectionController {
   constructor(
@@ -38,6 +39,9 @@ class JoinTableSectionController {
     >,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
+    >,
+    private videoSocket: React.MutableRefObject<
+      VideoSocketController | undefined
     >,
     private mediasoupSocket: React.MutableRefObject<
       MediasoupSocketController | undefined
@@ -154,10 +158,27 @@ class JoinTableSectionController {
           this.staticContentEffectsStyles,
           this.tableStaticContentSocket,
           this.liveTextEditingSocket,
+          this.videoSocket,
           this.sendDownloadSignal,
           this.addCurrentDownload,
           this.removeCurrentDownload,
         );
+
+      this.videoSocket.current = new VideoSocketController(
+        "wss://localhost:8099",
+        this.tableId.current,
+        this.username.current,
+        this.instance.current,
+        this.staticContentMedia,
+        this.deadbanding,
+        this.userDevice,
+        this.staticContentEffects,
+        this.staticContentEffectsStyles,
+        this.videoSocket,
+        this.sendDownloadSignal,
+        this.addCurrentDownload,
+        this.removeCurrentDownload,
+      );
 
       this.gamesSocket.current = new GamesServerController(
         this.tableId.current,
@@ -193,6 +214,12 @@ class JoinTableSectionController {
     this.tableStaticContentSocket.current = undefined;
     this.mediasoupSocket.current?.deconstructor();
     this.mediasoupSocket.current = undefined;
+    this.liveTextEditingSocket.current?.deconstructor();
+    this.liveTextEditingSocket.current = undefined;
+    this.gamesSocket.current?.deconstructor();
+    this.gamesSocket.current = undefined;
+    this.videoSocket.current?.deconstructor();
+    this.videoSocket.current = undefined;
 
     this.unsubscribe();
 

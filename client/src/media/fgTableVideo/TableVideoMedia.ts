@@ -1,5 +1,5 @@
+import Hls from "hls.js";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import shaka from "shaka-player";
 import { StaticContentEffectsType } from "../../../../universal/effectsTypeConstant";
 import TableVideoAudioMedia from "./TableVideoAudioMedia";
 import {
@@ -12,12 +12,14 @@ import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../tools/userDevice/UserDevice";
 import Downloader from "../../tools/downloader/Downloader";
-import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import {
   DownloadListenerTypes,
   onDownloadFinishType,
 } from "../../tools/downloader/lib/typeConstant";
+import VideoSocketController from "src/serverControllers/videoServer/VideoSocketController";
+
+const videoServerBaseUrl = process.env.VIDEO_SERVER_BASE_URL;
 
 export type VideoListenerTypes =
   | { type: "downloadComplete" }
@@ -30,9 +32,6 @@ export type VideoListenerTypes =
 
 class TableVideoMedia {
   video: HTMLVideoElement | undefined;
-  shakaPlayer: shaka.Player;
-  hiddenVideo: HTMLVideoElement | undefined;
-  hiddenShakaPlayer: shaka.Player | undefined;
 
   dashUrl: string | undefined;
 
@@ -78,37 +77,13 @@ class TableVideoMedia {
     private deadbanding: React.MutableRefObject<Deadbanding>,
     private userDevice: React.MutableRefObject<UserDevice>,
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
-    private tableStaticContentSocket: React.MutableRefObject<
-      TableStaticContentSocketController | undefined
+    private videoSocket: React.MutableRefObject<
+      VideoSocketController | undefined
     >,
     private sendDownloadSignal: (signal: DownloadSignals) => void,
     private addCurrentDownload: (id: string, upload: Downloader) => void,
     private removeCurrentDownload: (id: string) => void,
   ) {
-    // this.shakaPlayer = new shaka.Player(this.video);
-
-    // if (this.dashUrl) {
-    //   this.shakaPlayer.load(this.dashUrl).then(() => {
-    //     console.log("Dash video loaded successfully");
-    //   });
-    // } else {
-    //   this.shakaPlayer.load(this.originalVideoURL).then(() => {
-    //     console.log("Original video loaded successfully");
-    //   });
-
-    //   this.hiddenVideo = document.createElement("video");
-    //   this.hiddenVideo.style.position = "absolute";
-    //   this.hiddenVideo.style.top = "0";
-    //   this.hiddenVideo.style.left = "0";
-    //   this.hiddenVideo.style.objectFit = "cover";
-    //   this.hiddenVideo.style.backgroundColor = "#000";
-    //   this.hiddenVideo.style.zIndex = "10";
-    //   this.hiddenVideo.style.display = "none";
-    //   this.hiddenVideo.style.opacity = "0%";
-    //   this.hiddenVideo.muted = true;
-    //   this.hiddenShakaPlayer = new shaka.Player(this.hiddenVideo);
-    // }
-
     this.faceLandmarks = new FaceLandmarks(
       true,
       "video",
@@ -203,18 +178,42 @@ class TableVideoMedia {
       }
     };
 
-    this.downloader = new Downloader(
-      "video",
-      this.videoId,
-      this.filename,
-      this.mimeType,
-      this.tableStaticContentSocket,
-      this.sendDownloadSignal,
-      this.removeCurrentDownload,
-    );
-    this.addCurrentDownload(this.videoId, this.downloader);
-    this.downloader.addDownloadListener(this.handleDownloadMessage);
-    this.downloader.start();
+    this.video = document.createElement("video");
+    const videoSrc = `${videoServerBaseUrl}stream-video/${this.videoId}/index.m3u8`;
+    if (Hls.isSupported()) {
+      console.log("work", videoSrc);
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(this.video);
+    } else if (this.video.canPlayType("application/vnd.apple.mpegurl")) {
+      console.log(
+        "wor2k",
+        `${videoServerBaseUrl}stream-video/${this.videoId}/video.mp4`,
+      );
+      this.video.src = `${videoServerBaseUrl}stream-video/${this.videoId}/video.mp4`;
+    }
+    this.video.style.position = "absolute";
+    this.video.style.top = "0px";
+    this.video.style.zIndex = "600000000";
+    this.video.style.width = "600px";
+    this.video.autoplay = true;
+    this.video.controls = true;
+    this.video.muted = true;
+    this.aspect = this.video.videoWidth / this.video.videoHeight;
+    this.loadingState = "downloaded";
+
+    // this.downloader = new Downloader(
+    //   "video",
+    //   this.videoId,
+    //   this.filename,
+    //   this.mimeType,
+    //   this.videoSocket,
+    //   this.sendDownloadSignal,
+    //   this.removeCurrentDownload,
+    // );
+    // this.addCurrentDownload(this.videoId, this.downloader);
+    // this.downloader.addDownloadListener(this.handleDownloadMessage);
+    // this.downloader.start();
   }
 
   deconstructor() {
@@ -481,7 +480,7 @@ class TableVideoMedia {
       this.videoId,
       this.filename,
       this.mimeType,
-      this.tableStaticContentSocket,
+      this.videoSocket,
       this.sendDownloadSignal,
       this.removeCurrentDownload,
     );

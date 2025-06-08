@@ -66,7 +66,7 @@ class Posts {
 
         if (metadata.direction === "reupload") {
           const checkReupload = await tableTopRedis.gets.getKey(
-            `TSCRU:${metadata.contentId}`
+            `VRU:${metadata.contentId}`
           );
 
           if (checkReupload !== null) {
@@ -79,7 +79,7 @@ class Posts {
             aborted = true;
           } else {
             await tableTopRedis.posts.post(
-              "TSCRU",
+              "VRU",
               metadata.contentId,
               "",
               this.REDIS_UPLOAD_LIFE_TIME
@@ -157,7 +157,7 @@ class Posts {
 
         //     if (metadata.direction === "reupload") {
         //       await tableTopRedis.deletes.delete([
-        //         { prefix: "TSCRU", id: metadata.contentId },
+        //         { prefix: "VRU", id: metadata.contentId },
         //       ]);
         //     }
         //   });
@@ -194,6 +194,8 @@ class Posts {
             const metadata = JSON.parse(buffer);
             const {
               tableId,
+              username,
+              instance,
               contentId,
               instanceId,
               direction,
@@ -204,6 +206,8 @@ class Posts {
 
             if (
               tableId === undefined ||
+              username === undefined ||
+              instance === undefined ||
               contentId === undefined ||
               mimeType === undefined ||
               direction === undefined
@@ -219,7 +223,7 @@ class Posts {
 
             if (direction === "reupload") {
               const checkReupload = await tableTopRedis.gets.getKey(
-                `TSCRU:${contentId}`
+                `VRU:${contentId}`
               );
 
               if (checkReupload !== null) {
@@ -232,7 +236,7 @@ class Posts {
                 return;
               } else {
                 await tableTopRedis.posts.post(
-                  "TSCRU",
+                  "VRU",
                   contentId,
                   "",
                   this.REDIS_UPLOAD_LIFE_TIME
@@ -253,7 +257,7 @@ class Posts {
             }
 
             await tableTopRedis.posts.post(
-              "TSCCS",
+              "VCS",
               uploadId,
               {
                 parts: [],
@@ -263,8 +267,10 @@ class Posts {
             );
 
             const sessionData = {
-              direction,
               tableId,
+              username,
+              instance,
+              direction,
               contentId,
               mimeType,
             };
@@ -276,7 +282,7 @@ class Posts {
             }
 
             await tableTopRedis.posts.post(
-              "TSCUS",
+              "VUS",
               uploadId,
               sessionData,
               this.REDIS_UPLOAD_LIFE_TIME
@@ -333,10 +339,7 @@ class Posts {
         if (name === "chunkIndex") {
           chunkIndex = parseInt(val, 10);
 
-          state = (await tableTopRedis.gets.get(
-            "TSCCS",
-            uploadId
-          )) as ChunkState;
+          state = (await tableTopRedis.gets.get("VCS", uploadId)) as ChunkState;
           if (!state) {
             if (!aborted) {
               this.sendResponse(res, "404 Not Found", "text/plain", "No state");
@@ -346,7 +349,7 @@ class Posts {
           }
 
           const alreadyUploaded = state.parts.some(
-            (part) => part.PartNumber === chunkIndex + 1
+            (part) => part === chunkIndex
           );
           if (alreadyUploaded && !aborted) {
             this.sendResponse(
@@ -379,15 +382,15 @@ class Posts {
           // );
 
           await tableTopRedis.deletes.delete([
-            { prefix: "TSCUS", id: uploadId },
-            { prefix: "TSCCS", id: uploadId },
+            { prefix: "VUS", id: uploadId },
+            { prefix: "VCS", id: uploadId },
           ]);
 
           return;
         });
 
         session = (await tableTopRedis.gets.get(
-          "TSCUS",
+          "VUS",
           uploadId
         )) as UploadSession;
         if (!session) {
@@ -397,10 +400,7 @@ class Posts {
         }
 
         if (!state) {
-          state = (await tableTopRedis.gets.get(
-            "TSCCS",
-            uploadId
-          )) as ChunkState;
+          state = (await tableTopRedis.gets.get("VCS", uploadId)) as ChunkState;
         }
         if (!state) {
           this.sendResponse(res, "404 Not Found", "text/plain", "No state");
@@ -412,14 +412,13 @@ class Posts {
 
         stream.on("end", async () => {
           if (aborted) return;
-
-          const tmpDir = `/tmp/uploads/${uploadId}`;
+          const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
           await fs.promises.mkdir(tmpDir, { recursive: true });
 
           const chunkPath = path.join(tmpDir, `chunk-${chunkIndex}`);
           await fs.promises.writeFile(chunkPath, buffer);
 
-          state!.parts.push({ PartNumber: chunkIndex + 1 });
+          state!.parts.push(chunkIndex);
           state!.currentSize += buffer.byteLength;
 
           if (aborted) return;
@@ -442,8 +441,8 @@ class Posts {
             // );
 
             await tableTopRedis.deletes.delete([
-              { prefix: "TSCUS", id: uploadId },
-              { prefix: "TSCCS", id: uploadId },
+              { prefix: "VUS", id: uploadId },
+              { prefix: "VCS", id: uploadId },
             ]);
 
             return;
@@ -452,19 +451,19 @@ class Posts {
           if (aborted) return;
 
           await tableTopRedis.posts.post(
-            "TSCCS",
+            "VCS",
             uploadId,
             state,
             this.REDIS_UPLOAD_LIFE_TIME
           );
           await tableTopRedis.posts.extendLife(
-            "TSCUS",
+            "VUS",
             uploadId,
             this.REDIS_UPLOAD_LIFE_TIME
           );
           if (session && session.direction === "reupload") {
             await tableTopRedis.posts.extendLife(
-              "TSCRU",
+              "VRU",
               session.contentId,
               this.REDIS_UPLOAD_LIFE_TIME
             );
@@ -474,7 +473,7 @@ class Posts {
 
           // If last chunk
           if (state!.parts.length === totalChunks) {
-            const outputPath = path.join(tmpDir, "input.mp4"); // assuming input is mp4
+            const outputPath = path.join(tmpDir, "input.mp4");
 
             const writeStream = fs.createWriteStream(outputPath);
             for (let i = 0; i < totalChunks; i++) {
@@ -485,13 +484,16 @@ class Posts {
             }
             writeStream.end();
 
-            await videoTranscodeQueue.add(
+            videoTranscodeQueue.add(
               "transcode",
               session?.direction === "toTable"
                 ? {
+                    tableId: session!.tableId,
+                    username: session!.username,
+                    instance: session!.instance,
+                    uploadId,
                     tmpDir,
                     contentId: session!.contentId,
-                    tableId: session!.tableId,
                     filename: session!.filename,
                     direction: session!.direction,
                     mimeType: session!.mimeType,
@@ -500,6 +502,7 @@ class Posts {
                   }
                 : session?.direction === "toTabled"
                 ? {
+                    uploadId,
                     tmpDir,
                     contentId: session!.contentId,
                     tableId: session!.tableId,
@@ -509,6 +512,7 @@ class Posts {
                     state: session!.state,
                   }
                 : {
+                    uploadId,
                     tmpDir,
                     contentId: session!.contentId,
                     tableId: session!.tableId,
@@ -548,7 +552,7 @@ class Posts {
       }
 
       const session = (await tableTopRedis.gets.get(
-        "TSCUS",
+        "VUS",
         uploadId
       )) as UploadSession;
       if (!session) {
@@ -572,10 +576,10 @@ class Posts {
 
           await tableTopRedis.deletes.delete(
             [
-              { prefix: "TSCUS", id: uploadId },
-              { prefix: "TSCCS", id: uploadId },
+              { prefix: "VUS", id: uploadId },
+              { prefix: "VCS", id: uploadId },
               session?.direction === "reupload"
-                ? { prefix: "TSCRU", id: session.contentId }
+                ? { prefix: "VRU", id: session.contentId }
                 : undefined,
             ].filter((del) => del !== undefined)
           );

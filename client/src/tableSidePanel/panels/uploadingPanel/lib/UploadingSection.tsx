@@ -10,6 +10,7 @@ import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
 import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import MoreInfoSection from "./MoreInfoSection";
 import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
+import VideoChunkUploader from "../../../../tools/uploader/lib/videoChunkUploader/VideoChunkUploader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -23,7 +24,7 @@ export default function UploadingSection({
   upload,
   tablePanelRef,
 }: {
-  upload: ChunkUploader | TextChunkUploader;
+  upload: ChunkUploader | TextChunkUploader | VideoChunkUploader;
   tablePanelRef: React.RefObject<HTMLDivElement>;
 }) {
   const [moreInfoSectionActive, setMoreInfoSectionActive] = useState(false);

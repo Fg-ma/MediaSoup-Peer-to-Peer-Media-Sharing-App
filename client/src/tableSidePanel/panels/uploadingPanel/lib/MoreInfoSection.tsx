@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import ChunkUploader from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
 import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
+import VideoChunkUploader from "../../../../tools/uploader/lib/videoChunkUploader/VideoChunkUploader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -56,7 +57,7 @@ function chooseUnit(KB: number) {
 export default function MoreInfoSection({
   upload,
 }: {
-  upload: ChunkUploader | TextChunkUploader;
+  upload: ChunkUploader | TextChunkUploader | VideoChunkUploader;
 }) {
   const { mimeType, fileSize, uploadSpeed, ETA } = upload.getFileInfo();
 

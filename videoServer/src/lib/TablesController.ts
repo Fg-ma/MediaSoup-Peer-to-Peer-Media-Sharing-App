@@ -3,14 +3,14 @@ import {
   onJoinTableType,
   onLeaveTableType,
   tables,
-  TableStaticContentWebSocket,
+  VideoWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
-  onJoinTable = (ws: TableStaticContentWebSocket, event: onJoinTableType) => {
+  onJoinTable = (ws: VideoWebSocket, event: onJoinTableType) => {
     const { tableId, username, instance } = event.header;
 
     ws.id = uuidv4();

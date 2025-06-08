@@ -1,18 +1,17 @@
 import dotenv from "dotenv";
 import path from "path";
 import uWS from "uWebSockets.js";
-import { tables, TableStaticContentWebSocket } from "./typeConstant";
+import { tables, VideoWebSocket } from "./typeConstant";
 import Broadcaster from "./lib/Broadcaster";
 import handleMessage from "./lib/websocketMessages";
 import TablesController from "./lib/TablesController";
 import MetadataController from "./lib/MetadataController";
-import Cleanup from "./lib/Cleanup";
 import Gets from "./gets/Gets";
 import Posts from "./posts/Posts";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
-import Search from "./lib/Search";
+import "./posts/lib/videoTranscodeQueue.worker.ts";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
@@ -23,15 +22,12 @@ export const tableTopRedis = new TableTopRedis();
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
-export const search = new Search(broadcaster);
 export const tablesController = new TablesController(broadcaster);
 export const metadataController = new MetadataController(broadcaster);
-export const gets = new Gets(broadcaster);
-export const cleanup = new Cleanup(broadcaster);
 
 const SOCKET_MAX_PAYLOAD = 16 * 1024 * 1024;
-export const CEPH_CHUNK_MAX_SIZE = 1024 * 1024 * 10;
-export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
+export const CEPH_CHUNK_MAX_SIZE = 1024 * 1024 * 16;
+export const CEPH_MAX_SIZE = 1024 * 1024 * 100;
 
 // tableTopCeph.deletes.emptyBucket("table-svgs");
 // tableTopCeph.deletes.emptyBucket("table-images");
@@ -55,7 +51,7 @@ export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
 // tableTopCeph.gets.listBucketContents("user-text");
 
 const sslOptions = {
-  key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
+  key_file_name: "../certs/tabletop-video-server-key.pem",
   cert_file_name: "../certs/tabletop-video-server.pem",
 };
 
@@ -67,7 +63,7 @@ app
     maxPayloadLength: SOCKET_MAX_PAYLOAD,
     idleTimeout: 60,
     message: (ws, message) => {
-      const tableWS = ws as TableStaticContentWebSocket;
+      const tableWS = ws as VideoWebSocket;
 
       try {
         const msg = JSON.parse(Buffer.from(message).toString());
@@ -78,7 +74,7 @@ app
     },
 
     close: (ws) => {
-      const tableWS = ws as TableStaticContentWebSocket;
+      const tableWS = ws as VideoWebSocket;
       const { tableId, username, instance } = tableWS;
 
       if (
@@ -114,11 +110,13 @@ app
           .end();
       });
     }
-  })
-  .listen(8099, (token) => {
-    if (token) {
-      console.log("Listening on https://localhost:8045");
-    }
   });
 
 export const posts = new Posts(app, broadcaster);
+export const gets = new Gets(app, broadcaster);
+
+app.listen(8099, (token) => {
+  if (token) {
+    console.log("Listening on https://localhost:8099");
+  }
+});

@@ -5,8 +5,10 @@ import {
 
 export type UploadSession =
   | {
-      direction: "toTable";
       tableId: string;
+      username: string;
+      instance: string;
+      direction: "toTable";
       contentId: string;
       instanceId: string;
       state: TableContentStateTypes[];
@@ -14,14 +16,18 @@ export type UploadSession =
       mimeType: StaticMimeTypes;
     }
   | {
-      direction: "reupload";
       tableId: string;
+      username: string;
+      instance: string;
+      direction: "reupload";
       contentId: string;
       mimeType: StaticMimeTypes;
     }
   | {
-      direction: "toTabled";
       tableId: string;
+      username: string;
+      instance: string;
+      direction: "toTabled";
       contentId: string;
       state: TableContentStateTypes[];
       filename: string;
@@ -29,6 +35,6 @@ export type UploadSession =
     };
 
 export interface ChunkState {
-  parts: { PartNumber: number }[];
+  parts: number[];
   currentSize: number;
 }

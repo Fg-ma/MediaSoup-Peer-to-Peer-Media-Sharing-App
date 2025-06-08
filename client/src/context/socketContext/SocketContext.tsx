@@ -5,6 +5,7 @@ import TableStaticContentSocketController from "../../serverControllers/tableSta
 import UserStaticContentSocketController from "../../serverControllers/userStaticContentServer/UserStaticContentSocketController";
 import LiveTextEditingSocketController from "../../serverControllers/liveTextEditingServer/LiveTextEditingSocketController";
 import GamesServerController from "../../serverControllers/gamesServer/GamesServerController";
+import VideoSocketController from "src/serverControllers/videoServer/VideoSocketController";
 
 export interface SocketContextProviderProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ export interface SocketContextType {
   userStaticContentSocket: React.MutableRefObject<
     UserStaticContentSocketController | undefined
   >;
+  videoSocket: React.MutableRefObject<VideoSocketController | undefined>;
   gamesSocket: React.MutableRefObject<GamesServerController | undefined>;
 }
 
@@ -53,6 +55,7 @@ export function SocketContextProvider({
   const userStaticContentSocket = useRef<
     UserStaticContentSocketController | undefined
   >();
+  const videoSocket = useRef<VideoSocketController | undefined>();
   const gamesSocket = useRef<GamesServerController | undefined>();
 
   return (
@@ -63,6 +66,7 @@ export function SocketContextProvider({
         mediasoupSocket,
         tableStaticContentSocket,
         userStaticContentSocket,
+        videoSocket,
         gamesSocket,
       }}
     >

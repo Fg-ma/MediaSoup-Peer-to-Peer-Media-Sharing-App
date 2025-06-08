@@ -38,9 +38,11 @@ class Cleanup {
 
       await tableTopMongo.deleteTableDocument(tableId, contentType, contentId);
 
-      await tableTopRedis.deletes.deleteKeys([
-        `LTE:${tableId}:${contentId}:file`,
-      ]);
+      if (contentType === "text") {
+        await tableTopRedis.deletes.deleteKeys([
+          `LTE:${tableId}:${contentId}:file`,
+        ]);
+      }
     }
   };
 }

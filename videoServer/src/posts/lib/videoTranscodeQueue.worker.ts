@@ -1,9 +1,8 @@
-// @ts-expect-error bullmq types missing
 import { Worker } from "bullmq";
 import path from "path";
 import fs from "fs/promises";
 import { spawn } from "child_process";
-import { broadcaster, tableTopCeph, tableTopMongo } from "src";
+import { broadcaster, tableTopCeph, tableTopMongo, tableTopRedis } from "src";
 import {
   StaticMimeTypes,
   TableContentStateTypes,
@@ -12,6 +11,7 @@ import {
   defaultVideoEffects,
   defaultVideoEffectsStyles,
 } from "../../../../universal/effectsTypeConstant";
+import { redisConnection } from "./queues";
 
 const handleToTable = async (
   tableId: string,
@@ -148,13 +148,43 @@ const handleMongoVideoUploads = async (
   });
 };
 
+const isReencodingNeeded = async (filePath: string): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const probe = spawn("ffprobe", [
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_entries",
+      "stream=codec_name",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      filePath,
+    ]);
+
+    let codec = "";
+    probe.stdout.on("data", (data) => {
+      codec += data.toString();
+    });
+
+    probe.on("close", () => {
+      resolve(codec.trim() !== "h264");
+    });
+
+    probe.on("error", reject);
+  });
+};
+
 new Worker(
   "videoTranscodeQueue",
   async (job: {
     data: {
+      tableId: string;
+      username: string;
+      instance: string;
+      uploadId: string;
       tmpDir: string;
       contentId: string;
-      tableId: string;
       filename: string;
       direction: "toTable" | "reupload" | "toTabled";
       mimeType: StaticMimeTypes;
@@ -162,33 +192,94 @@ new Worker(
       state: [];
     };
   }) => {
-    const { tmpDir, contentId, filename, direction, ...sessionMeta } = job.data;
+    const start = Date.now();
 
-    const outputPath = path.join(tmpDir, "input.mp4");
+    const {
+      tableId,
+      username,
+      instance,
+      uploadId,
+      tmpDir,
+      contentId,
+      filename,
+      direction,
+      ...sessionMeta
+    } = job.data;
+
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0 },
+    });
+
+    const inputPath = path.join(tmpDir, "input.mp4");
     const hlsDir = path.join(tmpDir, "hls");
     const mp4Path = path.join(tmpDir, "output.mp4");
 
     await fs.mkdir(hlsDir);
 
+    const needsEncoding = await isReencodingNeeded(inputPath);
+
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.1 },
+    });
+
+    // Re-encode only if needed
+    if (needsEncoding) {
+      await new Promise((resolve, reject) => {
+        const ffmpeg = spawn("ffmpeg", [
+          "-i",
+          inputPath,
+          "-c:v",
+          "libx264",
+          "-preset",
+          "veryfast",
+          "-crf",
+          "28",
+          "-c:a",
+          "aac",
+          "-b:a",
+          "96k",
+          "-movflags",
+          "+faststart",
+          mp4Path,
+        ]);
+        ffmpeg.on("close", resolve);
+        ffmpeg.on("error", reject);
+      });
+      console.log("Compressed MP4 written");
+    } else {
+      await fs.copyFile(inputPath, mp4Path);
+      console.log("No compression needed, original copied");
+    }
+
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.4 },
+    });
+
     // HLS Transcoding
     await new Promise((resolve, reject) => {
       const ffmpeg = spawn("ffmpeg", [
         "-i",
-        outputPath,
+        mp4Path,
         "-preset",
-        "fast",
+        "veryfast",
+        "-crf",
+        "28",
         "-g",
         "48",
         "-sc_threshold",
         "0",
-        "-map",
-        "0:0",
-        "-map",
-        "0:1",
         "-c:v",
         "libx264",
         "-c:a",
         "aac",
+        "-b:a",
+        "96k",
         "-f",
         "hls",
         "-hls_time",
@@ -201,21 +292,10 @@ new Worker(
       ffmpeg.on("error", reject);
     });
 
-    // MP4 fallback
-    await new Promise((resolve, reject) => {
-      const ffmpeg = spawn("ffmpeg", [
-        "-i",
-        outputPath,
-        "-c:v",
-        "libx264",
-        "-preset",
-        "fast",
-        "-c:a",
-        "aac",
-        mp4Path,
-      ]);
-      ffmpeg.on("close", resolve);
-      ffmpeg.on("error", reject);
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.8 },
     });
 
     // Upload to Ceph
@@ -223,23 +303,35 @@ new Worker(
     for (const file of files) {
       const content = await fs.readFile(path.join(hlsDir, file));
       await tableTopCeph.posts.uploadFile(
-        "adaptive-videos",
+        "table-videos",
         `${contentId}/hls/${file}`,
         content
       );
     }
 
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.9 },
+    });
+
     const mp4Content = await fs.readFile(mp4Path);
     await tableTopCeph.posts.uploadFile(
-      "adaptive-videos",
+      "table-videos",
       `${contentId}/video.mp4`,
       mp4Content
     );
 
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.95 },
+    });
+
     switch (direction) {
       case "toTable":
         await handleToTable(
-          sessionMeta.tableId,
+          tableId,
           contentId,
           sessionMeta.instanceId,
           sessionMeta.mimeType,
@@ -248,11 +340,11 @@ new Worker(
         );
         break;
       case "reupload":
-        handleReupload(sessionMeta.tableId, contentId);
+        handleReupload(tableId, contentId);
         break;
       case "toTabled":
         await handleToTabled(
-          sessionMeta.tableId,
+          tableId,
           contentId,
           sessionMeta.mimeType,
           filename,
@@ -261,7 +353,29 @@ new Worker(
         break;
     }
 
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingProgress",
+      header: { contentId },
+      data: { progress: 0.975 },
+    });
+
     // Cleanup
     await fs.rm(tmpDir, { recursive: true, force: true });
-  }
+
+    await tableTopRedis.deletes.delete(
+      [
+        { prefix: "VUS", id: uploadId },
+        { prefix: "VCS", id: uploadId },
+        direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
+      ].filter((del) => del !== undefined)
+    );
+
+    broadcaster.broadcastToInstance(tableId, username, instance, {
+      type: "processingFinished",
+      header: { contentId },
+    });
+
+    console.log(((start - Date.now()) / 1000).toFixed(2));
+  },
+  { connection: redisConnection }
 );

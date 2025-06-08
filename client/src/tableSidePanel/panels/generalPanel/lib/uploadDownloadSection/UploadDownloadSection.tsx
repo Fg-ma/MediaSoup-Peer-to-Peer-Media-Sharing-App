@@ -11,6 +11,7 @@ import {
 import { useUploadDownloadContext } from "../../../../../context/uploadDownloadContext/UploadDownloadContext";
 import Downloader from "../../../../../tools/downloader/Downloader";
 import LiveTextDownloader from "../../../../../tools/liveTextDownloader/LiveTextDownloader";
+import { ChunkedUploadListenerTypes } from "src/tools/uploader/lib/chunkUploader/ChunkUploader";
 
 // Rounds up to a "nice" number: 1, 2, 5, or 10 × power of 10
 function niceCeil(value: number) {
@@ -165,12 +166,28 @@ export default function MultiDownloadChart() {
     }
   };
 
+  const handleUploadListener = (message: ChunkedUploadListenerTypes) => {
+    switch (message.type) {
+      case "uploadProgress":
+        setRerender((prev) => !prev);
+        break;
+      case "uploadPlay":
+        setRerender((prev) => !prev);
+        break;
+      case "uploadPaused":
+        setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     traffic.forEach((t) => {
       if (t instanceof Downloader || t instanceof LiveTextDownloader) {
         t.addDownloadListener(handleDownloadListener);
       } else {
-        t.addChunkedUploadListener(handleDownloadListener);
+        t.addChunkedUploadListener(handleUploadListener);
       }
     });
 
@@ -179,7 +196,7 @@ export default function MultiDownloadChart() {
         if (t instanceof Downloader || t instanceof LiveTextDownloader) {
           t.removeDownloadListener(handleDownloadListener);
         } else {
-          t.removeChunkedUploadListener(handleDownloadListener);
+          t.removeChunkedUploadListener(handleUploadListener);
         }
       });
     };

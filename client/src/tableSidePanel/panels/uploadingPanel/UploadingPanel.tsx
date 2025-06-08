@@ -46,6 +46,12 @@ export default function UploadingPanel({
       case "uploadFinish":
         setRerender((prev) => !prev);
         break;
+      case "uploadProcessing":
+        setRerender((prev) => !prev);
+        break;
+      case "uploadProcessingFinished":
+        setRerender((prev) => !prev);
+        break;
       default:
         break;
     }

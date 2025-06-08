@@ -1,4 +1,8 @@
-export type UploadSignals = onUploadStartType | onUploadFinishType;
+export type UploadSignals =
+  | onUploadStartType
+  | onUploadFinishType
+  | onUploadProcessingFinishedType
+  | onUploadProcessingType;
 
 export type onUploadStartType = {
   type: "uploadStart";
@@ -6,6 +10,14 @@ export type onUploadStartType = {
 
 export type onUploadFinishType = {
   type: "uploadFinish";
+};
+
+export type onUploadProcessingFinishedType = {
+  type: "uploadProcessingFinished";
+};
+
+export type onUploadProcessingType = {
+  type: "uploadProcessing";
 };
 
 export type DownloadSignals =

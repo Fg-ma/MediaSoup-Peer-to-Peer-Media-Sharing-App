@@ -78,6 +78,7 @@ export default function JoinTableSection({
     mediasoupSocket,
     tableSocket,
     tableStaticContentSocket,
+    videoSocket,
     liveTextEditingSocket,
     gamesSocket,
   } = useSocketContext();
@@ -95,6 +96,7 @@ export default function JoinTableSection({
       tableSocket,
       liveTextEditingSocket,
       tableStaticContentSocket,
+      videoSocket,
       mediasoupSocket,
       gamesSocket,
       tableIdRef,
@@ -151,19 +153,19 @@ export default function JoinTableSection({
   }, [mediasoupSocket.current]);
 
   return (
-    <div className="flex mt-5 justify-center">
+    <div className="mt-5 flex justify-center">
       <input
         ref={tableIdRef}
         id="tableIdyInputField"
         type="text"
-        className="border mr-2 border-gray-400 px-4 py-2"
+        className="mr-2 border border-gray-400 px-4 py-2"
         placeholder="Enter room name"
       />
       <input
         ref={usernameRef}
         id="usernameInputField"
         type="text"
-        className="border mr-2 border-gray-400 px-4 py-2"
+        className="mr-2 border border-gray-400 px-4 py-2"
         placeholder="Enter username"
       />
       <button

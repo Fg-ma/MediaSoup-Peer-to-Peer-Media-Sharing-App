@@ -144,8 +144,9 @@ class TableVideoMediaInstance {
     this.instanceVideo = this.videoMedia.video?.cloneNode(
       true,
     ) as HTMLVideoElement;
-
     this.instanceVideo.autoplay = true;
+    this.instanceVideo.muted = true;
+
     this.instanceVideo.style.backgroundColor = "#000";
 
     this.instanceVideo.onloadedmetadata = () => {
@@ -165,20 +166,20 @@ class TableVideoMediaInstance {
 
     if (!this.instanceVideo) return;
 
-    if (!this.babylonScene)
-      this.babylonScene = new BabylonScene(
-        this.videoMedia.babylonRenderLoopWorker,
-        "video",
-        this.videoMedia.aspect ?? 1,
-        this.instanceCanvas,
-        this.instanceVideo,
-        this.videoMedia.faceLandmarks,
-        this.effects,
-        this.videoMedia.faceMeshResults,
-        this.videoMedia.selfieSegmentationResults,
-        this.userDevice,
-        this.videoMedia.maxFaces,
-      );
+    // if (!this.babylonScene)
+    //   this.babylonScene = new BabylonScene(
+    //     this.videoMedia.babylonRenderLoopWorker,
+    //     "video",
+    //     this.videoMedia.aspect ?? 1,
+    //     this.instanceCanvas,
+    //     this.instanceVideo,
+    //     this.videoMedia.faceLandmarks,
+    //     this.effects,
+    //     this.videoMedia.faceMeshResults,
+    //     this.videoMedia.selfieSegmentationResults,
+    //     this.userDevice,
+    //     this.videoMedia.maxFaces,
+    //   );
 
     this.updateAllEffects();
 
