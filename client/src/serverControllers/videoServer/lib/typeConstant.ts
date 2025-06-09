@@ -9,9 +9,8 @@ export type OutGoingVideoMessages =
   | onLeaveTableType
   | onGetDownloadMetaType
   | onGetFileChunkType
-  | onUpdateVideoPositionType
-  | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType
+  | onUpdateVideoMetadataType
+  | onRequestCatchUpVideoMetadataType
   | onDeleteUploadSessionType
   | onSignalReuploadStartType;
 
@@ -58,43 +57,28 @@ type onGetFileChunkType = {
   };
 };
 
-type onUpdateVideoPositionType = {
-  type: "updateVideoPosition";
+type onUpdateVideoMetadataType = {
+  type: "updateVideoMetadata";
   header: {
     tableId: string;
-    contentType: "video";
     contentId: string;
     instanceId: string;
   };
   data: {
+    isPlaying: boolean;
     videoPosition: number;
+    videoPlaybackSpeed: number;
   };
 };
 
-type onRequestCatchUpVideoPositionType = {
-  type: "requestCatchUpVideoPosition";
+type onRequestCatchUpVideoMetadataType = {
+  type: "requestCatchUpVideoMetadata";
   header: {
     tableId: string;
     username: string;
     instance: string;
-    contentType: "video";
     contentId: string;
     instanceId: string;
-  };
-};
-
-type onResponseCatchUpVideoPositionType = {
-  type: "responseCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    currentVideoPosition: number;
   };
 };
 
@@ -125,9 +109,8 @@ export type IncomingVideoMessages =
   | onDownloadMetaType
   | onOneShotDownloadType
   | onDownloadErrorType
-  | onUpdatedVideoPositionType
-  | onRequestedCatchUpVideoPositionType
-  | onRespondedCatchUpVideoPositionType
+  | onUpdatedVideoMetadataType
+  | onRespondedCatchUpVideoMetadataType
   | onReuploadStartedType
   | onReuploadCancelledType;
 
@@ -245,38 +228,31 @@ export type onDownloadErrorType = {
   header: { contentType: StaticContentTypes; contentId: string };
 };
 
-export type onUpdatedVideoPositionType = {
-  type: "updatedVideoPosition";
+export type onUpdatedVideoMetadataType = {
+  type: "updatedVideoMetadata";
   header: {
-    contentType: "video";
     contentId: string;
     instanceId: string;
   };
   data: {
-    videoPosition: number;
+    isPlaying: boolean;
+    lastKnownPosition: number;
+    videoPlaybackSpeed: number;
+    lastUpdatedAt: number;
   };
 };
 
-export type onRequestedCatchUpVideoPositionType = {
-  type: "requestedCatchUpVideoPosition";
+export type onRespondedCatchUpVideoMetadataType = {
+  type: "respondedCatchUpVideoMetadata";
   header: {
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-};
-
-export type onRespondedCatchUpVideoPositionType = {
-  type: "respondedCatchUpVideoPosition";
-  header: {
-    contentType: "video";
     contentId: string;
     instanceId: string;
   };
   data: {
-    currentVideoPosition: number;
+    isPlaying: boolean;
+    lastKnownPosition: number;
+    videoPlaybackSpeed: number;
+    lastUpdatedAt: number;
   };
 };
 

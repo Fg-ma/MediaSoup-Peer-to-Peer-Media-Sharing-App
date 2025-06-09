@@ -36,7 +36,11 @@ class Encoder {
         [effectType in VideoEffectTypes]: boolean;
       };
       effectStyles: VideoEffectStylesType;
-      videoPosition: number;
+      meta: {
+        isPlaying: boolean;
+        lastKnownPosition: number;
+        videoPlaybackSpeed: number;
+      };
     }[];
   }): {
     tid: string;
@@ -88,7 +92,11 @@ class Encoder {
           s: number;
         };
       };
-      vp: number;
+      m: {
+        ip: boolean;
+        lkp: number;
+        vps: number;
+      };
     }[];
   } {
     const { tableId, videoId, filename, mimeType, state, instances } = data;
@@ -100,13 +108,7 @@ class Encoder {
       m: mimeType,
       s: state.map((ate) => tableStateEncodingMap[ate]),
       i: instances.map(
-        ({
-          videoInstanceId,
-          positioning,
-          effects,
-          effectStyles,
-          videoPosition,
-        }) => ({
+        ({ videoInstanceId, positioning, effects, effectStyles, meta }) => ({
           viid: videoInstanceId,
           p: {
             p: { l: positioning.position.left, t: positioning.position.top },
@@ -153,7 +155,11 @@ class Encoder {
               s: petsEffectEncodingMap[effectStyles.pets.style],
             },
           },
-          vp: videoPosition,
+          m: {
+            ip: meta.isPlaying,
+            lkp: meta.lastKnownPosition,
+            vps: meta.videoPlaybackSpeed,
+          },
         })
       ),
     };

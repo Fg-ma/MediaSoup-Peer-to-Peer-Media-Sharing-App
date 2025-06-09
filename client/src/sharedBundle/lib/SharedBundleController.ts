@@ -1,3 +1,4 @@
+import { IncomingVideoMessages } from "src/serverControllers/videoServer/lib/typeConstant";
 import { IncomingTableStaticContentMessages } from "../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import SharedBundleSocket from "./SharedBundleSocket";
 
@@ -37,15 +38,6 @@ class SharedBundleController extends SharedBundleSocket {
           this.setRerender((prev) => !prev);
         }, 100);
         break;
-      case "videoUploadedToTable":
-        this.setRerender((prev) => !prev);
-        break;
-      case "videoUploadedToTabled":
-        this.setRerender((prev) => !prev);
-        break;
-      case "dashVideoReady":
-        this.setRerender((prev) => !prev);
-        break;
       case "imageUploadedToTable":
         this.setRerender((prev) => !prev);
         break;
@@ -71,6 +63,19 @@ class SharedBundleController extends SharedBundleSocket {
         this.setRerender((prev) => !prev);
         break;
       case "createdNewInstances":
+        this.setRerender((prev) => !prev);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleVideoSocketMessage = (message: IncomingVideoMessages) => {
+    switch (message.type) {
+      case "videoUploadedToTable":
+        this.setRerender((prev) => !prev);
+        break;
+      case "videoUploadedToTabled":
         this.setRerender((prev) => !prev);
         break;
       default:

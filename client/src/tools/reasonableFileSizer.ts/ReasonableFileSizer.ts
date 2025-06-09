@@ -45,12 +45,18 @@ class ReasonableFileSizer {
     return new Promise((resolve) => {
       const video = document.createElement("video");
       video.preload = "metadata";
-      video.src = URL.createObjectURL(file);
+      const objectURL = URL.createObjectURL(file);
+      video.src = objectURL;
       video.muted = true;
       video.playsInline = true;
+      console.log("worked");
+      video.style.position = "abosolute";
+      video.style.top = "0px";
+      video.style.left = "0px";
+      document.body.appendChild(video);
 
       video.onloadedmetadata = () => {
-        video.currentTime = 0;
+        video.currentTime = 0.01;
       };
 
       video.onseeked = () => {
@@ -62,10 +68,18 @@ class ReasonableFileSizer {
         );
         canvas.width = Math.round(video.videoWidth * scale);
         canvas.height = Math.round(video.videoHeight * scale);
+        canvas.style.position = "abosolute";
+        canvas.style.top = "0px";
+        canvas.style.left = "0px";
+        document.body.appendChild(canvas);
 
         const ctx = canvas.getContext("2d");
-        if (!ctx) return resolve(undefined);
+        if (!ctx) {
+          URL.revokeObjectURL(objectURL);
+          return resolve(undefined);
+        }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(objectURL);
         resolve(canvas.toDataURL("image/png"));
       };
 
@@ -76,16 +90,16 @@ class ReasonableFileSizer {
   }
 
   public async getUrl(file: File): Promise<string | undefined> {
-    if (file.size <= this.maxSize) {
-      return URL.createObjectURL(file);
-    }
-
     if (file.type === "image/svg+xml") {
       return undefined;
     }
 
     if (file.type.startsWith("video/")) {
       return this.generateVideoThumbnail(file);
+    }
+
+    if (file.type.startsWith("image/") && file.size <= this.maxSize) {
+      return URL.createObjectURL(file);
     }
 
     return new Promise((resolve) => {

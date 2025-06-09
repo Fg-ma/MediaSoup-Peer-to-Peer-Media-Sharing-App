@@ -752,10 +752,6 @@ class TableStaticContentSocketController {
           this.deadbanding,
           this.userDevice,
           this.staticContentEffects,
-          this.videoSocket,
-          this.sendDownloadSignal,
-          this.addCurrentDownload,
-          this.removeCurrentDownload,
         );
 
         this.staticContentMedia.current.video.table[video.videoId] =
@@ -800,7 +796,7 @@ class TableStaticContentSocketController {
             this.staticContentEffectsStyles,
             this.staticContentEffects,
             instance.positioning,
-            this.videoSocket.current!.requestCatchUpVideoPosition,
+            this.videoSocket,
           );
         }
       }
@@ -1040,7 +1036,7 @@ class TableStaticContentSocketController {
                   this.staticContentEffectsStyles,
                   this.staticContentEffects,
                   ins.positioning,
-                  this.videoSocket.current!.requestCatchUpVideoPosition,
+                  this.videoSocket,
                 );
             });
           }

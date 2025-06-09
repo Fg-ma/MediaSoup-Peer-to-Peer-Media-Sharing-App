@@ -2,6 +2,7 @@ import React from "react";
 import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
+import TableVideoMediaInstance from "../../../../../media/fgTableVideo/TableVideoMediaInstance";
 import LowerVideoController from "../LowerVideoController";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -10,21 +11,23 @@ const playIcon = nginxAssetServerBaseUrl + "svgs/playIcon.svg";
 const pauseIcon = nginxAssetServerBaseUrl + "svgs/pauseIcon.svg";
 
 export default function PlayPauseButton({
+  videoMediaInstance,
   lowerVideoController,
   videoEffectsActive,
   settingsActive,
-  pausedState,
 }: {
+  videoMediaInstance: TableVideoMediaInstance;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
-  pausedState: boolean;
 }) {
   return (
     <FgButton
       clickFunction={lowerVideoController.current.handlePausePlay}
       contentFunction={() => {
-        const iconSrc = pausedState ? playIcon : pauseIcon;
+        const iconSrc = videoMediaInstance.settings.isPlaying.value
+          ? pauseIcon
+          : playIcon;
 
         return (
           <FgSVGElement
@@ -41,7 +44,11 @@ export default function PlayPauseButton({
       hoverContent={
         !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
-            content={pausedState ? "Play (k)" : "Pause (k)"}
+            content={
+              videoMediaInstance.settings.isPlaying.value
+                ? "Pause (k)"
+                : "Play (k)"
+            }
             style="light"
           />
         ) : undefined

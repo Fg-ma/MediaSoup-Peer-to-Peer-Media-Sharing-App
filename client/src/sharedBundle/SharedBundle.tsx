@@ -29,7 +29,7 @@ export default function SharedBundle({
   };
 
   const { staticContentMedia } = useMediaContext();
-  const { tableStaticContentSocket, liveTextEditingSocket, gamesSocket } =
+  const { tableStaticContentSocket, videoSocket, gamesSocket } =
     useSocketContext();
   const { username } = useUserInfoContext();
 
@@ -66,7 +66,19 @@ export default function SharedBundle({
         sharedBundleController.current.handleTableStaticContentMessage,
       );
     };
-  }, [tableStaticContentSocket.current, liveTextEditingSocket.current]);
+  }, [tableStaticContentSocket.current]);
+
+  useEffect(() => {
+    videoSocket.current?.addMessageListener(
+      sharedBundleController.current.handleVideoSocketMessage,
+    );
+
+    return () => {
+      videoSocket.current?.removeMessageListener(
+        sharedBundleController.current.handleVideoSocketMessage,
+      );
+    };
+  }, [videoSocket.current]);
 
   return (
     <div

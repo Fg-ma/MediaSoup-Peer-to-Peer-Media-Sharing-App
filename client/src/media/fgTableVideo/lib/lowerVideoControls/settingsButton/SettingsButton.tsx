@@ -29,6 +29,7 @@ export default function SettingsButton({
   activePages,
   setActivePages,
   scrollingContainerRef,
+  setExternalRerender,
 }: {
   videoMediaInstance: TableVideoMediaInstance;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
@@ -39,6 +40,7 @@ export default function SettingsButton({
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   scrollingContainerRef: React.RefObject<HTMLDivElement>;
+  setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const {
     sendSettingsSignal,
@@ -188,6 +190,7 @@ export default function SettingsButton({
           settingsButtonRef={settingsButtonRef}
           activePages={activePages}
           setActivePages={setActivePages}
+          setExternalRerender={setExternalRerender}
         />
       )}
     </>

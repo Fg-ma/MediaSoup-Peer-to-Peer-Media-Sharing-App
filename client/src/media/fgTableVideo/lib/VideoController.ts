@@ -1,9 +1,9 @@
+import { Events as HlsEvents } from "hls.js";
 import { VideoOptions } from "./typeConstant";
 import {
   IncomingTableStaticContentMessages,
   onRespondedCatchUpEffectsType,
   onUpdatedContentEffectsType,
-  onUpdatedVideoPositionType,
 } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import {
   StaticContentEffectsStylesType,
@@ -16,6 +16,11 @@ import TableVideoMediaInstance, {
   VideoInstanceListenerTypes,
 } from "../TableVideoMediaInstance";
 import { VideoListenerTypes } from "../TableVideoMedia";
+import {
+  IncomingVideoMessages,
+  onRespondedCatchUpVideoMetadataType,
+  onUpdatedVideoMetadataType,
+} from "../../../serverControllers/videoServer/lib/typeConstant";
 
 class VideoController {
   constructor(
@@ -26,8 +31,6 @@ class VideoController {
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
-    private paused: React.MutableRefObject<boolean>,
-    private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
     private lowerVideoController: React.MutableRefObject<LowerVideoController>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
@@ -85,47 +88,7 @@ class VideoController {
 
     this.videoMediaInstance.updateAllEffects(oldEffectStyle);
 
-    if (
-      this.staticContentEffects.current.video[this.videoInstanceId].video.pause
-    ) {
-      this.paused.current = true;
-      if (
-        this.videoMediaInstance.instanceVideo &&
-        !this.videoMediaInstance.instanceVideo.paused
-      ) {
-        this.videoMediaInstance.instanceVideo.pause();
-      }
-
-      this.setPausedState(true);
-    } else {
-      this.paused.current = false;
-      if (
-        this.videoMediaInstance.instanceVideo &&
-        this.videoMediaInstance.instanceVideo.paused
-      ) {
-        this.videoMediaInstance.instanceVideo.play();
-      }
-
-      this.setPausedState(false);
-    }
-
     this.setRerender((prev) => !prev);
-  };
-
-  private onUpdateVideoPosition = (event: onUpdatedVideoPositionType) => {
-    const { contentType, contentId, instanceId } = event.header;
-
-    if (
-      !this.videoMediaInstance.settings.synced.value ||
-      contentType !== "video" ||
-      contentId !== this.videoMediaInstance.videoMedia.videoId ||
-      instanceId !== this.videoInstanceId
-    )
-      return;
-
-    this.videoMediaInstance.updateVideoPosition(event.data.videoPosition);
-
-    this.lowerVideoController.current.timeUpdate();
   };
 
   private onRespondedCatchUpEffects = (
@@ -154,15 +117,97 @@ class VideoController {
     this.videoMediaInstance.updateAllEffects();
   };
 
+  private onUpdateVideoPosition = (event: onUpdatedVideoMetadataType) => {
+    const { contentId, instanceId } = event.header;
+
+    if (
+      !this.videoMediaInstance.settings.synced.value ||
+      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      instanceId !== this.videoInstanceId
+    )
+      return;
+
+    const { isPlaying, lastKnownPosition, videoPlaybackSpeed, lastUpdatedAt } =
+      event.data;
+
+    if (this.videoMediaInstance.instanceVideo) {
+      this.videoMediaInstance.instanceVideo.currentTime =
+        (isPlaying
+          ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
+          : 0) + lastKnownPosition;
+
+      this.videoMediaInstance.instanceVideo.playbackRate = videoPlaybackSpeed;
+
+      if (isPlaying && this.videoMediaInstance.instanceVideo.paused) {
+        this.videoMediaInstance.instanceVideo.play();
+      } else if (!isPlaying && !this.videoMediaInstance.instanceVideo.paused) {
+        this.videoMediaInstance.instanceVideo.pause();
+      }
+    }
+
+    this.videoMediaInstance.settings.isPlaying.value = isPlaying;
+
+    this.lowerVideoController.current.timeUpdate();
+
+    this.setRerender((prev) => !prev);
+  };
+
+  private onRespondedCatchUpVideoMetadata = (
+    event: onRespondedCatchUpVideoMetadataType,
+  ) => {
+    const { contentId, instanceId } = event.header;
+
+    if (
+      !this.videoMediaInstance.settings.synced.value ||
+      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      instanceId !== this.videoInstanceId
+    )
+      return;
+
+    const { isPlaying, lastKnownPosition, videoPlaybackSpeed, lastUpdatedAt } =
+      event.data;
+
+    if (this.videoMediaInstance.instanceVideo) {
+      this.videoMediaInstance.instanceVideo.currentTime =
+        (isPlaying
+          ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
+          : 0) + lastKnownPosition;
+
+      this.videoMediaInstance.instanceVideo.playbackRate = videoPlaybackSpeed;
+
+      if (isPlaying && this.videoMediaInstance.instanceVideo.paused) {
+        this.videoMediaInstance.instanceVideo.play();
+      } else if (!isPlaying && !this.videoMediaInstance.instanceVideo.paused) {
+        this.videoMediaInstance.instanceVideo.pause();
+      }
+    }
+
+    this.videoMediaInstance.settings.isPlaying.value = isPlaying;
+
+    this.lowerVideoController.current.timeUpdate();
+
+    this.setRerender((prev) => !prev);
+  };
+
+  handleVideoSocketMessage = (event: IncomingVideoMessages) => {
+    switch (event.type) {
+      case "updatedVideoMetadata":
+        this.onUpdateVideoPosition(event);
+        break;
+      case "respondedCatchUpVideoMetadata":
+        this.onRespondedCatchUpVideoMetadata(event);
+        break;
+      default:
+        break;
+    }
+  };
+
   handleTableStaticContentMessage = (
     event: IncomingTableStaticContentMessages,
   ) => {
     switch (event.type) {
       case "updatedContentEffects":
         this.onUpdatedContentEffects(event);
-        break;
-      case "updatedVideoPosition":
-        this.onUpdateVideoPosition(event);
         break;
       case "respondedCatchUpEffects":
         this.onRespondedCatchUpEffects(event);
@@ -173,7 +218,10 @@ class VideoController {
   };
 
   private onDownloadComplete = () => {
-    if (this.videoMediaInstance.instanceCanvas) {
+    if (
+      this.videoMediaInstance.instanceVideo &&
+      this.videoMediaInstance.instanceCanvas
+    ) {
       const allCanvas =
         this.subContainerRef.current?.querySelectorAll("canvas");
 
@@ -195,19 +243,24 @@ class VideoController {
         y: this.positioning.current.scale.y,
       };
 
+      this.videoMediaInstance.hls.on(
+        HlsEvents.BUFFER_APPENDED,
+        this.lowerVideoController.current.bufferUpdate,
+      );
+
       // Keep video time
       this.lowerVideoController.current.timeUpdate();
-      this.videoMediaInstance.instanceVideo?.addEventListener(
+      this.videoMediaInstance.instanceVideo.addEventListener(
         "timeupdate",
         this.lowerVideoController.current.timeUpdate,
       );
 
-      this.videoMediaInstance.instanceVideo?.addEventListener(
+      this.videoMediaInstance.instanceVideo.addEventListener(
         "enterpictureinpicture",
         () => this.lowerVideoController.current.handlePictureInPicture("enter"),
       );
 
-      this.videoMediaInstance.instanceVideo?.addEventListener(
+      this.videoMediaInstance.instanceVideo.addEventListener(
         "leavepictureinpicture",
         () => this.lowerVideoController.current.handlePictureInPicture("leave"),
       );

@@ -1,5 +1,4 @@
 import uWS from "uWebSockets.js";
-import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import { StaticContentTypes } from "../../universal/contentTypeConstant";
 
 export interface Tables {
@@ -27,11 +26,8 @@ export interface SocketData {
 export type MessageTypes =
   | onJoinTableType
   | onLeaveTableType
-  | onGetDownloadMetaType
-  | onGetFileChunkType
-  | onUpdateVideoPositionType
-  | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType
+  | onUpdateVideoMetadataType
+  | onRequestCatchUpVideoMetadataType
   | onDeleteUploadSessionType
   | onSignalReuploadStartType;
 
@@ -53,55 +49,28 @@ export type onLeaveTableType = {
   };
 };
 
-export type onGetDownloadMetaType = {
-  type: "getDownloadMeta";
+export type onUpdateVideoMetadataType = {
+  type: "updateVideoMetadata";
   header: {
     tableId: string;
-    username: string;
-    instance: string;
-    contentType: StaticContentTypes;
-    contentId: string;
-  };
-};
-
-export type onGetFileChunkType = {
-  type: "getFileChunk";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: StaticContentTypes;
-    contentId: string;
-  };
-  data: {
-    range: string;
-  };
-};
-
-export type onRequestCatchUpVideoPositionType = {
-  type: "requestCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-};
-
-export type onResponseCatchUpVideoPositionType = {
-  type: "responseCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
     contentId: string;
     instanceId: string;
   };
   data: {
-    currentVideoPosition: number;
+    isPlaying: boolean;
+    videoPosition: number;
+    videoPlaybackSpeed: number;
+  };
+};
+
+export type onRequestCatchUpVideoMetadataType = {
+  type: "requestCatchUpVideoMetadata";
+  header: {
+    tableId: string;
+    username: string;
+    instance: string;
+    contentId: string;
+    instanceId: string;
   };
 };
 

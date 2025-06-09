@@ -57,7 +57,6 @@ export type AudioEffectTypes =
   | "echosOfThePast";
 
 export type VideoEffectTypes =
-  | "pause"
   | "postProcess"
   | "hideBackground"
   | "blur"
@@ -698,7 +697,6 @@ export const defaultScreenEffects: {
 export const defaultVideoEffects: {
   [effect in VideoEffectTypes]: boolean;
 } = Object.freeze({
-  pause: false,
   postProcess: false,
   hideBackground: false,
   blur: false,

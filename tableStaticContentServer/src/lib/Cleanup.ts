@@ -30,11 +30,31 @@ class Cleanup {
       ]);
     }
 
+    if (contentType === "video") {
+      await tableTopRedis.deletes.deleteKeys([
+        `VVM:${tableId}:${contentId}:${instanceId}`,
+      ]);
+    }
+
     if (document && document.i.length === 0 && !document.s.includes(0)) {
-      await tableTopCeph.deletes.deleteFile(
-        contentTypeBucketMap[contentType],
-        contentId
-      );
+      if (contentType === "video") {
+        const listed = await tableTopCeph.gets.listObjects(
+          "table-videos",
+          `${contentId}/`
+        );
+
+        if (!listed || listed.length === 0) return;
+
+        for (const obj of listed) {
+          if (!obj.Key) return;
+          await tableTopCeph.deletes.deleteFile("table-videos", obj.Key);
+        }
+      } else {
+        await tableTopCeph.deletes.deleteFile(
+          contentTypeBucketMap[contentType],
+          contentId
+        );
+      }
 
       await tableTopMongo.deleteTableDocument(tableId, contentType, contentId);
 

@@ -3,6 +3,8 @@ import {
   ListObjectsCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
+  ListObjectsV2CommandInput,
 } from "@aws-sdk/client-s3";
 
 class Gets {
@@ -42,6 +44,21 @@ class Gets {
       return await this.s3Client.send(new HeadObjectCommand(params));
     } catch (_) {
       return;
+    }
+  };
+
+  listObjects = async (bucketName: string, prefix: string) => {
+    const params: ListObjectsV2CommandInput = {
+      Bucket: bucketName,
+      Prefix: prefix,
+    };
+
+    try {
+      const result = await this.s3Client.send(new ListObjectsV2Command(params));
+      return result.Contents || [];
+    } catch (err) {
+      console.error("Error listing objects:", err);
+      return [];
     }
   };
 }

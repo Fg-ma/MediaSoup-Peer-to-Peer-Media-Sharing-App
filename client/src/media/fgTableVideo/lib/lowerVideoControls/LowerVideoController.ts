@@ -14,14 +14,13 @@ import {
 import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import TableVideoMediaInstance from "../../TableVideoMediaInstance";
 import { GroupSignals } from "../../../../context/signalContext/lib/typeConstant";
+import VideoSocketController from "../../../../serverControllers/videoServer/VideoSocketController";
 
 class LowerVideoController {
   constructor(
     private videoInstanceId: string,
     private videoMediaInstance: TableVideoMediaInstance,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
-    private setPausedState: React.Dispatch<React.SetStateAction<boolean>>,
-    private paused: React.MutableRefObject<boolean>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
     private setVideoEffectsActive: React.Dispatch<
@@ -42,6 +41,9 @@ class LowerVideoController {
     private wasPaused: React.MutableRefObject<boolean>,
     private tableStaticContentSocket: React.MutableRefObject<
       TableStaticContentSocketController | undefined
+    >,
+    private videoSocket: React.MutableRefObject<
+      VideoSocketController | undefined
     >,
     private sendGroupSignal: (signal: GroupSignals) => void,
   ) {}
@@ -176,35 +178,40 @@ class LowerVideoController {
       ),
     );
 
-    this.tableStaticContentSocket.current?.updateVideoPosition(
-      "video",
-      this.videoMediaInstance.videoMedia.videoId,
-      this.videoInstanceId,
-      this.videoMediaInstance.instanceVideo.currentTime,
-    );
+    if (this.videoMediaInstance.settings.synced.value) {
+      this.videoSocket.current?.updateVideoMetadata(
+        this.videoMediaInstance.videoMedia.videoId,
+        this.videoInstanceId,
+        this.videoMediaInstance.settings.isPlaying.value,
+        this.videoMediaInstance.instanceVideo.currentTime,
+        this.videoMediaInstance.settings.videoSpeed.value,
+      );
+    }
   };
 
   handlePausePlay = () => {
-    this.handleVideoEffect("pause", false);
-
-    this.paused.current = !this.paused.current;
+    this.videoMediaInstance.settings.isPlaying.value =
+      !this.videoMediaInstance.settings.isPlaying.value;
 
     if (!this.videoMediaInstance.instanceVideo) return;
 
-    if (this.paused.current) {
+    if (!this.videoMediaInstance.settings.isPlaying.value) {
       this.videoMediaInstance.instanceVideo.pause();
     } else {
       this.videoMediaInstance.instanceVideo.play();
     }
 
-    this.setPausedState((prev) => !prev);
+    if (this.videoMediaInstance.settings.synced.value) {
+      this.videoSocket.current?.updateVideoMetadata(
+        this.videoMediaInstance.videoMedia.videoId,
+        this.videoInstanceId,
+        this.videoMediaInstance.settings.isPlaying.value,
+        this.videoMediaInstance.instanceVideo.currentTime,
+        this.videoMediaInstance.settings.videoSpeed.value,
+      );
+    }
 
-    this.tableStaticContentSocket.current?.updateVideoPosition(
-      "video",
-      this.videoMediaInstance.videoMedia.videoId,
-      this.videoInstanceId,
-      this.videoMediaInstance.instanceVideo.currentTime,
-    );
+    this.setRerender((prev) => !prev);
   };
 
   handlePictureInPicture = (action: string) => {
@@ -228,6 +235,26 @@ class LowerVideoController {
         `${percent}`,
       );
     }
+  };
+
+  bufferUpdate = () => {
+    if (!this.videoMediaInstance.instanceVideo) return;
+
+    const buffered = this.videoMediaInstance.instanceVideo.buffered;
+    const duration = this.videoMediaInstance.instanceVideo.duration;
+
+    let maxBuffered = 0;
+
+    for (let i = 0; i < buffered.length; i++) {
+      maxBuffered = Math.max(maxBuffered, buffered.end(i));
+    }
+
+    const percent = maxBuffered / duration;
+
+    this.timelineContainerRef.current?.style.setProperty(
+      "--buffered-position",
+      `${percent}`,
+    );
   };
 
   updateCaptionsStyles = () => {
@@ -404,12 +431,15 @@ class LowerVideoController {
     }
 
     if (this.videoMediaInstance.instanceVideo) {
-      this.tableStaticContentSocket.current?.updateVideoPosition(
-        "video",
-        this.videoMediaInstance.videoMedia.videoId,
-        this.videoInstanceId,
-        this.videoMediaInstance.instanceVideo.currentTime,
-      );
+      if (this.videoMediaInstance.settings.synced.value) {
+        this.videoSocket.current?.updateVideoMetadata(
+          this.videoMediaInstance.videoMedia.videoId,
+          this.videoInstanceId,
+          this.videoMediaInstance.settings.isPlaying.value,
+          this.videoMediaInstance.instanceVideo.currentTime,
+          this.videoMediaInstance.settings.videoSpeed.value,
+        );
+      }
 
       if (!this.wasPaused.current) {
         this.videoMediaInstance.instanceVideo.play();
@@ -456,8 +486,19 @@ class LowerVideoController {
   };
 
   handlePlaybackSpeed = (playbackRate: number) => {
-    if (this.videoMediaInstance.instanceVideo)
+    if (this.videoMediaInstance.instanceVideo) {
       this.videoMediaInstance.instanceVideo.playbackRate = playbackRate;
+
+      if (this.videoMediaInstance.settings.synced.value) {
+        this.videoSocket.current?.updateVideoMetadata(
+          this.videoMediaInstance.videoMedia.videoId,
+          this.videoInstanceId,
+          this.videoMediaInstance.settings.isPlaying.value,
+          this.videoMediaInstance.instanceVideo.currentTime,
+          this.videoMediaInstance.settings.videoSpeed.value,
+        );
+      }
+    }
   };
 
   handleSetAsBackground = () => {

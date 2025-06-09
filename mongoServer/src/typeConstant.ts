@@ -55,17 +55,6 @@ export type onUpdateContentEffectsType = {
   };
 };
 
-export type onUpdateVideoPositionType = {
-  type: "updateVideoPosition";
-  header: {
-    tableId: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: { videoPosition: number };
-};
-
 export type onChangeTableContentStateType = {
   type: "changeContentState";
   header: {

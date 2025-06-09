@@ -96,6 +96,7 @@ export default function SettingsPanel({
   settingsButtonRef,
   activePages,
   setActivePages,
+  setExternalRerender,
 }: {
   videoMediaInstance: TableVideoMediaInstance;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
@@ -103,6 +104,7 @@ export default function SettingsPanel({
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
   activePages: ActivePages;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [_, setRerender] = useState(false);
 
@@ -473,6 +475,7 @@ export default function SettingsPanel({
                   <DownloadTypePage
                     videoMediaInstance={videoMediaInstance}
                     setActivePages={setActivePages}
+                    setRerender={setExternalRerender}
                   />
                 </motion.div>
               )}

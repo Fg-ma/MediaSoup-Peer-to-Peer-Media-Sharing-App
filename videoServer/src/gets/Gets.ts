@@ -1,10 +1,9 @@
 import uWS from "uWebSockets.js";
 import { Readable } from "stream";
 import { clientBaseUrl, tableTopCeph } from "../index";
-import Broadcaster from "../lib/Broadcaster";
 
 class Gets {
-  constructor(app: uWS.TemplatedApp, private broadcaster: Broadcaster) {
+  constructor(app: uWS.TemplatedApp) {
     app.any("/stream-video/:contentId/:file", (res, req) => {
       let isAborted = false;
 
@@ -12,8 +11,8 @@ class Gets {
         isAborted = true;
       });
 
-      const contentId = req.getParameter(0); // :contentId
-      const file = req.getParameter(1); // :file
+      const contentId = req.getParameter(0);
+      const file = req.getParameter(1);
 
       if (!file) return;
 
@@ -53,7 +52,7 @@ class Gets {
             }
 
             const buffer = Buffer.concat(chunks);
-            console.log(buffer);
+
             res.cork(() => {
               res
                 .writeHeader("Content-Type", this.getMimeType(file))
@@ -120,6 +119,61 @@ class Gets {
         }
       })();
     });
+
+    app.any("/download-video/:contentId/:file", (res, req) => {
+      const contentId = req.getParameter(0);
+      const file = req.getParameter(1);
+      const key = `${contentId}/${file}`;
+
+      if (!file || !contentId) {
+        res
+          .writeStatus("404 Not Found")
+          .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+          .end("File not found");
+        return;
+      }
+
+      let isAborted = false;
+      res.onAborted(() => (isAborted = true));
+
+      (async () => {
+        try {
+          const result = await tableTopCeph.gets.getContent(
+            "table-videos",
+            key
+          );
+          console.log(result);
+          if (!result?.Body || !(result.Body instanceof Readable)) {
+            res
+              .writeStatus("404 Not Found")
+              .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+              .end("File not found");
+            return;
+          }
+
+          const chunks: Buffer[] = [];
+          for await (const chunk of result.Body) chunks.push(chunk as Buffer);
+          const buffer = Buffer.concat(chunks);
+
+          res.cork(() => {
+            res
+              .writeHeader("Content-Type", this.getMimeType(file))
+              .writeHeader(
+                "Content-Disposition",
+                `attachment; filename="${file}"`
+              )
+              .writeHeader("Content-Length", buffer.length.toString())
+              .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+              .end(buffer);
+          });
+        } catch (err) {
+          console.error("Download error:", err);
+          if (!isAborted) {
+            res.writeStatus("500 Internal Server Error").end("Download error");
+          }
+        }
+      })();
+    });
   }
 
   private getMimeType = (file: string) => {
@@ -128,147 +182,6 @@ class Gets {
     if (file.endsWith(".mp4")) return "video/mp4";
     return "application/octet-stream";
   };
-
-  // onGetDownloadMeta = async (event: onGetDownloadMetaType) => {
-  //   const { tableId, username, instance, contentType, contentId } =
-  //     event.header;
-
-  //   try {
-  //     const head = await tableTopCeph.gets.getHead(
-  //       contentTypeBucketMap[contentType],
-  //       contentId
-  //     );
-  //     const fileSize = head?.ContentLength ?? 0;
-
-  //     if (fileSize > 1024 * 1024) {
-  //       this.broadcaster.broadcastToInstance(tableId, username, instance, {
-  //         type: "downloadMeta",
-  //         header: { contentType, contentId },
-  //         data: { fileSize },
-  //       });
-  //     } else {
-  //       const data = await tableTopCeph.gets.getContent(
-  //         contentTypeBucketMap[contentType],
-  //         contentId
-  //       );
-
-  //       if (data?.Body instanceof Readable) {
-  //         const stream = data.Body as Readable;
-
-  //         const chunks: Buffer[] = [];
-
-  //         stream
-  //           .on("data", (chunk) => {
-  //             chunks.push(chunk);
-  //           })
-  //           .on("end", () => {
-  //             const fullChunk = Buffer.concat(chunks);
-
-  //             const header = {
-  //               type: "oneShotDownload",
-  //               header: {
-  //                 contentType,
-  //                 contentId,
-  //               },
-  //             };
-  //             const headerJson = JSON.stringify(header);
-  //             const headerBuf = Buffer.from(headerJson, "utf8");
-
-  //             // 2) Prefix with a 4‑byte big‑endian length
-  //             const prefix = Buffer.allocUnsafe(4);
-  //             prefix.writeUInt32BE(headerBuf.length, 0);
-
-  //             // 3) Concatenate: [length][header][fileChunk]
-  //             const payload = Buffer.concat([prefix, headerBuf, fullChunk]);
-
-  //             this.broadcaster.broadcastToInstance(
-  //               tableId,
-  //               username,
-  //               instance,
-  //               payload,
-  //               true
-  //             );
-  //           })
-  //           .on("error", (_err) => {
-  //             this.broadcaster.broadcastToInstance(
-  //               tableId,
-  //               username,
-  //               instance,
-  //               {
-  //                 type: "downloadError",
-  //                 header: { contentType, contentId },
-  //               }
-  //             );
-  //           });
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching file from S3:", err);
-  //   }
-  // };
-
-  // onGetFileChunk = async (event: onGetFileChunkType) => {
-  //   const { tableId, username, instance, contentType, contentId } =
-  //     event.header;
-
-  //   const { range } = event.data;
-
-  //   try {
-  //     const data = await tableTopCeph.gets.getContent(
-  //       contentTypeBucketMap[contentType],
-  //       contentId,
-  //       range
-  //     );
-
-  //     if (data?.Body instanceof Readable) {
-  //       const stream = data.Body as Readable;
-
-  //       const chunks: Buffer[] = [];
-
-  //       stream
-  //         .on("data", (chunk) => {
-  //           chunks.push(chunk);
-  //         })
-  //         .on("end", () => {
-  //           const fullChunk = Buffer.concat(chunks);
-
-  //           const header = {
-  //             type: "chunk",
-  //             header: {
-  //               contentType,
-  //               contentId,
-  //               range,
-  //             },
-  //           };
-  //           const headerJson = JSON.stringify(header);
-  //           const headerBuf = Buffer.from(headerJson, "utf8");
-
-  //           // 2) Prefix with a 4‑byte big‑endian length
-  //           const prefix = Buffer.allocUnsafe(4);
-  //           prefix.writeUInt32BE(headerBuf.length, 0);
-
-  //           // 3) Concatenate: [length][header][fileChunk]
-  //           const payload = Buffer.concat([prefix, headerBuf, fullChunk]);
-
-  //           this.broadcaster.broadcastToInstance(
-  //             tableId,
-  //             username,
-  //             instance,
-  //             payload,
-  //             true
-  //           );
-  //         })
-  //         .on("error", (_err) => {
-  //           this.broadcaster.broadcastToInstance(tableId, username, instance, {
-  //             type: "chunkError",
-  //             header: { contentType, contentId },
-  //           });
-  //         });
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching file from S3:", err);
-  //   }
-  // };
 }
 
 export default Gets;

@@ -12,7 +12,6 @@ import {
   onCreateNewInstancesType,
   onUpdateContentEffectsType,
   onUpdateContentPositioningType,
-  onUpdateVideoPositionType,
 } from "./typeConstant";
 import TablesMeta from "./lib/tableMeta/TablesMeta";
 import { StaticContentTypes } from "../../universal/contentTypeConstant";
@@ -405,22 +404,6 @@ class TableTopMongo {
     }
   };
 
-  onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
-    const { tableId, contentId, instanceId } = event.header;
-
-    this.tableVideos?.uploads.editMetaData(
-      { tableId, videoId: contentId },
-      {
-        instances: [
-          {
-            videoInstanceId: instanceId,
-            videoPosition: event.data.videoPosition,
-          },
-        ],
-      }
-    );
-  };
-
   onChangeTableContentState = async (event: onChangeTableContentStateType) => {
     const { tableId, contentType, contentId } = event.header;
     const { state } = event.data;
@@ -538,7 +521,11 @@ class TableTopMongo {
               positioning: instance.positioning,
               effects: structuredClone(defaultVideoEffects),
               effectStyles: structuredClone(defaultVideoEffectsStyles),
-              videoPosition: 0,
+              meta: {
+                isPlaying: false,
+                lastKnownPosition: 0,
+                videoPlaybackSpeed: 1,
+              },
             }))
           );
           break;

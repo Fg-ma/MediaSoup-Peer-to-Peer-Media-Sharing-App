@@ -43,15 +43,6 @@ const handleMessage = (
     case "updateContentEffects":
       metadataController.onUpdateContentEffects(event);
       break;
-    case "updateVideoPosition":
-      metadataController.onUpdateVideoPosition(event);
-      break;
-    case "requestCatchUpVideoPosition":
-      metadataController.onRequestCatchUpVideoPosition(event);
-      break;
-    case "responseCatchUpVideoPosition":
-      metadataController.onResponseCatchUpVideoPosition(event);
-      break;
     case "createNewInstances":
       metadataController.onCreateNewInstances(event);
       break;

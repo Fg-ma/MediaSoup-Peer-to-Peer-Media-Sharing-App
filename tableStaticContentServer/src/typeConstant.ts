@@ -1,5 +1,4 @@
 import uWS from "uWebSockets.js";
-import { onUpdateVideoPositionType } from "../../mongoServer/src/typeConstant";
 import {
   TableContentStateTypes,
   StaticContentTypes,
@@ -66,9 +65,6 @@ export type MessageTypes =
   | onUpdateContentPositioningType
   | onUpdateContentEffectsType
   | onRequestCatchUpEffectsType
-  | onUpdateVideoPositionType
-  | onRequestCatchUpVideoPositionType
-  | onResponseCatchUpVideoPositionType
   | onChangeContentStateType
   | onCreateNewInstancesType
   | onSearchTabledContentRequestType
@@ -203,33 +199,6 @@ export type onRequestCatchUpEffectsType = {
     contentType: StaticContentTypes;
     contentId: string;
     instanceId: string;
-  };
-};
-
-export type onRequestCatchUpVideoPositionType = {
-  type: "requestCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-};
-
-export type onResponseCatchUpVideoPositionType = {
-  type: "responseCatchUpVideoPosition";
-  header: {
-    tableId: string;
-    username: string;
-    instance: string;
-    contentType: "video";
-    contentId: string;
-    instanceId: string;
-  };
-  data: {
-    currentVideoPosition: number;
   };
 };
 

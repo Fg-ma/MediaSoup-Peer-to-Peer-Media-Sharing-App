@@ -1,3 +1,4 @@
+import { Events as HlsEvents } from "hls.js";
 import React, { useEffect, useRef, useState } from "react";
 import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
@@ -45,7 +46,7 @@ export default function FgTableVideo({
   const { staticContentMedia } = useMediaContext();
   const { staticContentEffects, staticContentEffectsStyles } =
     useEffectsContext();
-  const { tableStaticContentSocket } = useSocketContext();
+  const { tableStaticContentSocket, videoSocket } = useSocketContext();
   const { sendGroupSignal } = useSignalContext();
 
   const videoMediaInstance =
@@ -54,10 +55,6 @@ export default function FgTableVideo({
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
   const rightLowerVideoControlsRef = useRef<HTMLDivElement>(null);
-
-  const [pausedState, setPausedState] = useState(false);
-
-  const paused = useRef(false);
 
   const [videoEffectsActive, setVideoEffectsActive] = useState(false);
 
@@ -101,8 +98,6 @@ export default function FgTableVideo({
       videoInstanceId,
       videoMediaInstance,
       videoContainerRef,
-      setPausedState,
-      paused,
       setCaptionsActive,
       currentTimeRef,
       setVideoEffectsActive,
@@ -118,6 +113,7 @@ export default function FgTableVideo({
       isScrubbing,
       wasPaused,
       tableStaticContentSocket,
+      videoSocket,
       sendGroupSignal,
     ),
   );
@@ -131,8 +127,6 @@ export default function FgTableVideo({
       staticContentEffects,
       staticContentEffectsStyles,
       tintColor,
-      paused,
-      setPausedState,
       lowerVideoController,
       setRerender,
       subContainerRef,
@@ -142,14 +136,23 @@ export default function FgTableVideo({
   );
 
   useEffect(() => {
-    if (videoMediaInstance.videoMedia.video) {
-      subContainerRef.current?.appendChild(videoMediaInstance.videoMedia.video);
+    if (
+      videoMediaInstance.instanceVideo &&
+      videoMediaInstance.instanceCanvas &&
+      videoMediaInstance.videoMedia.loadingState === "downloaded"
+    ) {
+      subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
       positioning.current.scale = {
         x: videoMediaInstance.videoMedia.aspect
           ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect
           : positioning.current.scale.x,
         y: positioning.current.scale.y,
       };
+
+      videoMediaInstance.hls.on(
+        HlsEvents.BUFFER_APPENDED,
+        lowerVideoController.current.bufferUpdate,
+      );
 
       // Keep video time
       lowerVideoController.current.timeUpdate();
@@ -193,6 +196,27 @@ export default function FgTableVideo({
     );
 
     return () => {
+      if (
+        videoMediaInstance.instanceVideo &&
+        videoMediaInstance.instanceCanvas
+      ) {
+        videoMediaInstance.hls.off(
+          HlsEvents.BUFFER_APPENDED,
+          lowerVideoController.current.bufferUpdate,
+        );
+        videoMediaInstance.instanceVideo.removeEventListener(
+          "timeupdate",
+          lowerVideoController.current.timeUpdate,
+        );
+        videoMediaInstance.instanceVideo.removeEventListener(
+          "enterpictureinpicture",
+          () => lowerVideoController.current.handlePictureInPicture("enter"),
+        );
+        videoMediaInstance.instanceVideo.removeEventListener(
+          "leavepictureinpicture",
+          () => lowerVideoController.current.handlePictureInPicture("leave"),
+        );
+      }
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
           removeListener(),
@@ -208,14 +232,6 @@ export default function FgTableVideo({
       document.removeEventListener(
         "keydown",
         lowerVideoController.current.handleKeyDown,
-      );
-      videoMediaInstance.instanceVideo?.removeEventListener(
-        "enterpictureinpicture",
-        () => lowerVideoController.current.handlePictureInPicture("enter"),
-      );
-      videoMediaInstance.instanceVideo?.removeEventListener(
-        "leavepictureinpicture",
-        () => lowerVideoController.current.handlePictureInPicture("leave"),
       );
       tableRef.current?.addEventListener(
         "scroll",
@@ -239,12 +255,20 @@ export default function FgTableVideo({
       );
   }, [tableStaticContentSocket.current]);
 
+  useEffect(() => {
+    videoSocket.current?.addMessageListener(
+      videoController.current.handleVideoSocketMessage,
+    );
+
+    return () =>
+      videoSocket.current?.removeMessageListener(
+        videoController.current.handleVideoSocketMessage,
+      );
+  }, [videoSocket.current]);
+
   return (
     <FgMediaContainer
       filename={videoMediaInstance.videoMedia.filename}
-      pauseDownload={videoMediaInstance.videoMedia.downloader?.pause}
-      resumeDownload={videoMediaInstance.videoMedia.downloader?.resume}
-      retryDownload={videoMediaInstance.videoMedia.retryDownload}
       downloadingState={videoMediaInstance.videoMedia.loadingState}
       addDownloadListener={
         videoMediaInstance.videoMedia.loadingState !== "downloaded"
@@ -282,13 +306,14 @@ export default function FgTableVideo({
           onPointerMove={lowerVideoController.current.handleHoverTimelineUpdate}
         >
           <div className="timeline">
+            <div className="buffered"></div>
             <div className="thumb-indicator"></div>
           </div>
         </div>,
       ]}
       leftLowerControls={[
         <PlayPauseButton
-          pausedState={pausedState}
+          videoMediaInstance={videoMediaInstance}
           lowerVideoController={lowerVideoController}
           videoEffectsActive={videoEffectsActive}
           settingsActive={settingsActive}
@@ -314,6 +339,7 @@ export default function FgTableVideo({
           activePages={activePages}
           setActivePages={setActivePages}
           scrollingContainerRef={rightLowerVideoControlsRef}
+          setExternalRerender={setRerender}
         />,
         videoMediaInstance.videoMedia.loadingState === "downloaded" && (
           <DownloadButton
@@ -376,7 +402,11 @@ export default function FgTableVideo({
         //   }}
         // />,
       ]}
-      inMediaVariables={[videoEffectsActive, pausedState, settingsActive]}
+      inMediaVariables={[
+        videoEffectsActive,
+        !videoMediaInstance.settings.isPlaying.value,
+        settingsActive,
+      ]}
       preventLowerLabelsVariables={[settingsActive, videoEffectsActive]}
       externalPositioning={positioning}
       externalMediaContainerRef={videoContainerRef}

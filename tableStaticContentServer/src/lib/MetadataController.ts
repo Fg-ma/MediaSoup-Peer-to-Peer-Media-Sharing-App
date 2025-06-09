@@ -5,13 +5,10 @@ import {
   onDeleteUploadSessionType,
   onRequestCatchUpEffectsType,
   onRequestCatchUpTableDataType,
-  onRequestCatchUpVideoPositionType,
-  onResponseCatchUpVideoPositionType,
   onSignalReuploadStartType,
   onUpdateContentEffectsType,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { onUpdateVideoPositionType } from "../../../mongoServer/src/typeConstant";
 import { UploadSession } from "src/posts/lib/typeConstant";
 
 class MetadataController {
@@ -176,58 +173,6 @@ class MetadataController {
       data: event.data,
     };
     this.broadcaster.broadcastToTable(tableId, msg);
-  };
-
-  onUpdateVideoPosition = async (event: onUpdateVideoPositionType) => {
-    await tableTopMongo.onUpdateVideoPosition(event);
-
-    const { tableId, contentType, contentId, instanceId } = event.header;
-    const { videoPosition } = event.data;
-
-    const msg = {
-      type: "updatedVideoPosition",
-      header: { contentType, contentId, instanceId },
-      data: { videoPosition },
-    };
-    this.broadcaster.broadcastToTable(tableId, msg);
-  };
-
-  onRequestCatchUpVideoPosition = (
-    event: onRequestCatchUpVideoPositionType
-  ) => {
-    const { tableId, username, instance, contentType, contentId, instanceId } =
-      event.header;
-
-    this.broadcaster.broadcastToFirstFoundInstance(tableId, {
-      type: "requestedCatchUpVideoPosition",
-      header: {
-        username,
-        instance,
-        contentType,
-        contentId,
-        instanceId,
-      },
-    });
-  };
-
-  onResponseCatchUpVideoPosition = (
-    event: onResponseCatchUpVideoPositionType
-  ) => {
-    const { tableId, username, instance, contentType, contentId, instanceId } =
-      event.header;
-    const { currentVideoPosition } = event.data;
-
-    this.broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "respondedCatchUpVideoPosition",
-      header: {
-        contentType,
-        contentId,
-        instanceId,
-      },
-      data: {
-        currentVideoPosition,
-      },
-    });
   };
 
   onCreateNewInstances = (event: onCreateNewInstancesType) => {

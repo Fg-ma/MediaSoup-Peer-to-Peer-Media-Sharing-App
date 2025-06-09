@@ -175,9 +175,6 @@ class JoinTableSectionController {
         this.staticContentEffects,
         this.staticContentEffectsStyles,
         this.videoSocket,
-        this.sendDownloadSignal,
-        this.addCurrentDownload,
-        this.removeCurrentDownload,
       );
 
       this.gamesSocket.current = new GamesServerController(

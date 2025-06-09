@@ -6,8 +6,6 @@ import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConst
 import {
   IncomingVideoMessages,
   onContentReuploadedType,
-  onRequestedCatchUpVideoPositionType,
-  onRespondedCatchUpVideoPositionType,
   onReuploadCancelledType,
   onReuploadStartedType,
   onVideoUploadedToTabledType,
@@ -19,9 +17,6 @@ import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaIns
 import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../tools/userDevice/UserDevice";
-import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
-import Downloader from "../../tools/downloader/Downloader";
-import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 
 class VideoSocketController {
   private ws: WebSocket | undefined;
@@ -41,12 +36,6 @@ class VideoSocketController {
     private videoSocket: React.MutableRefObject<
       VideoSocketController | undefined
     >,
-    private sendDownloadSignal: (signal: DownloadSignals) => void,
-    private addCurrentDownload: (
-      id: string,
-      upload: Downloader | LiveTextDownloader,
-    ) => void,
-    private removeCurrentDownload: (id: string) => void,
   ) {
     this.connect(this.url);
   }
@@ -206,38 +195,31 @@ class VideoSocketController {
     });
   };
 
-  updateVideoPosition = (
-    contentType: "video",
+  updateVideoMetadata = (
     contentId: string,
     instanceId: string,
+    isPlaying: boolean,
     videoPosition: number,
+    videoPlaybackSpeed: number,
   ) => {
     this.sendMessage({
-      type: "updateVideoPosition",
+      type: "updateVideoMetadata",
       header: {
         tableId: this.tableId,
-        contentType,
         contentId,
         instanceId,
       },
-      data: {
-        videoPosition,
-      },
+      data: { isPlaying, videoPosition, videoPlaybackSpeed },
     });
   };
 
-  requestCatchUpVideoPosition = (
-    contentType: "video",
-    contentId: string,
-    instanceId: string,
-  ) => {
+  requestCatchUpVideoPosition = (contentId: string, instanceId: string) => {
     this.sendMessage({
-      type: "requestCatchUpVideoPosition",
+      type: "requestCatchUpVideoMetadata",
       header: {
         tableId: this.tableId,
         username: this.username,
         instance: this.instance,
-        contentType,
         contentId,
         instanceId,
       },
@@ -271,12 +253,6 @@ class VideoSocketController {
     message: { type: undefined } | IncomingVideoMessages,
   ) => {
     switch (message.type) {
-      case "requestedCatchUpVideoPosition":
-        this.onRequestedCatchUpVideoPosition(message);
-        break;
-      case "respondedCatchUpVideoPosition":
-        this.onRespondedCatchUpVideoPosition(message);
-        break;
       case "videoUploadedToTable":
         this.onVideoUploadedToTable(message);
         break;
@@ -318,50 +294,6 @@ class VideoSocketController {
       "downloaded";
   };
 
-  private onRequestedCatchUpVideoPosition = (
-    event: onRequestedCatchUpVideoPositionType,
-  ) => {
-    const { username, instance, contentType, contentId, instanceId } =
-      event.header;
-
-    const currentVideoPosition =
-      this.staticContentMedia.current[contentType].tableInstances[instanceId]
-        ?.instanceVideo?.currentTime;
-
-    if (currentVideoPosition) {
-      this.sendMessage({
-        type: "responseCatchUpVideoPosition",
-        header: {
-          tableId: this.tableId,
-          username,
-          instance,
-          contentType,
-          contentId,
-          instanceId,
-        },
-        data: {
-          currentVideoPosition,
-        },
-      });
-    }
-  };
-
-  private onRespondedCatchUpVideoPosition = (
-    event: onRespondedCatchUpVideoPositionType,
-  ) => {
-    const { contentType, instanceId } = event.header;
-    const { currentVideoPosition } = event.data;
-
-    if (
-      this.staticContentMedia.current[contentType].tableInstances[instanceId] &&
-      this.staticContentMedia.current[contentType].tableInstances[instanceId]
-        .instanceVideo
-    )
-      this.staticContentMedia.current[contentType].tableInstances[
-        instanceId
-      ].instanceVideo.currentTime = currentVideoPosition;
-  };
-
   private onVideoUploadedToTable = (message: onVideoUploadedToTableType) => {
     const { contentId, instanceId } = message.header;
     const { filename, mimeType, state, initPositioning } = message.data;
@@ -375,10 +307,6 @@ class VideoSocketController {
         this.deadbanding,
         this.userDevice,
         this.staticContentEffects,
-        this.videoSocket,
-        this.sendDownloadSignal,
-        this.addCurrentDownload,
-        this.removeCurrentDownload,
       );
 
       this.staticContentMedia.current.video.table[contentId] = newVideoMedia;
@@ -404,7 +332,7 @@ class VideoSocketController {
                 },
                 rotation: 0,
               },
-          this.requestCatchUpVideoPosition,
+          this.videoSocket,
         );
     }
   };
@@ -423,10 +351,6 @@ class VideoSocketController {
           this.deadbanding,
           this.userDevice,
           this.staticContentEffects,
-          this.videoSocket,
-          this.sendDownloadSignal,
-          this.addCurrentDownload,
-          this.removeCurrentDownload,
         );
     }
   };

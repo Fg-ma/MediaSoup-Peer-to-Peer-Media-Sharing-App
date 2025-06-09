@@ -50,7 +50,11 @@ export interface TableVideosType {
         s: number;
       };
     };
-    vp: number;
+    m: {
+      ip: boolean;
+      lkp: number;
+      vps: number;
+    };
   }[];
 }
 
@@ -65,7 +69,6 @@ export const videoEffectEncodingMap: Record<VideoEffectTypes, number> = {
   masks: 7,
   hats: 8,
   pets: 9,
-  pause: 10,
 };
 
 export const videoEffectStylesEncodingMap: Partial<

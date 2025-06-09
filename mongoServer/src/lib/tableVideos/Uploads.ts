@@ -47,7 +47,11 @@ class Uploads {
         [effectType in VideoEffectTypes]: boolean;
       };
       effectStyles: VideoEffectStylesType;
-      videoPosition: number;
+      meta: {
+        isPlaying: boolean;
+        lastKnownPosition: number;
+        videoPlaybackSpeed: number;
+      };
     }[];
   }) => {
     const mongoData = this.encoder.encodeMetaData(data);
@@ -74,7 +78,11 @@ class Uploads {
         };
         effects?: { [effectType in VideoEffectTypes]?: boolean };
         effectStyles?: VideoEffectStylesType;
-        videoPosition?: number;
+        meta?: {
+          isPlaying?: boolean;
+          lastKnownPosition?: number;
+          videoPlaybackSpeed?: number;
+        };
       }[];
     }>
   ) => {
@@ -83,9 +91,11 @@ class Uploads {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bulkOps: any[] = [];
 
     // 1. General metadata update
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const generalSetFields: Record<string, any> = {};
 
     if (updateData.filename !== undefined) {
@@ -118,10 +128,11 @@ class Uploads {
         positioning,
         effects,
         effectStyles,
-        videoPosition,
+        meta,
       } of updateData.instances) {
         if (!videoInstanceId) continue;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const instanceSetFields: Record<string, any> = {};
 
         if (positioning !== undefined) {
@@ -187,8 +198,16 @@ class Uploads {
           };
         }
 
-        if (videoPosition) {
-          instanceSetFields["i.$.vp"] = videoPosition;
+        if (meta !== undefined) {
+          if (meta.isPlaying !== undefined) {
+            instanceSetFields["i.$.m.ip"] = meta.isPlaying;
+          }
+          if (meta.lastKnownPosition !== undefined) {
+            instanceSetFields["i.$.m.lkp"] = meta.lastKnownPosition;
+          }
+          if (meta.videoPlaybackSpeed !== undefined) {
+            instanceSetFields["i.$.m.vps"] = meta.videoPlaybackSpeed;
+          }
         }
 
         if (Object.keys(instanceSetFields).length > 0) {
@@ -228,7 +247,11 @@ class Uploads {
       };
       effects: { [effectType in VideoEffectTypes]: boolean };
       effectStyles: VideoEffectStylesType;
-      videoPosition: number;
+      meta: {
+        isPlaying: boolean;
+        lastKnownPosition: number;
+        videoPlaybackSpeed: number;
+      };
     }[]
   ) => {
     if (!this.tableVideosCollection) {
@@ -238,13 +261,8 @@ class Uploads {
 
     if (updateData && updateData.length > 0) {
       const pushInstances = updateData.map(
-        ({
-          videoInstanceId,
-          positioning,
-          effects,
-          effectStyles,
-          videoPosition,
-        }) => {
+        ({ videoInstanceId, positioning, effects, effectStyles, meta }) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const p: any = {
             p: {
               l: positioning.position.left,
@@ -296,14 +314,18 @@ class Uploads {
             },
           };
 
-          const vp = videoPosition;
+          const m = {
+            ip: meta.isPlaying,
+            lkp: meta.lastKnownPosition,
+            vps: meta.videoPlaybackSpeed,
+          };
 
           return {
             viid: videoInstanceId,
             p,
             e,
             es,
-            vp,
+            m,
           };
         }
       );

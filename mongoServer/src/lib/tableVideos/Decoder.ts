@@ -69,7 +69,11 @@ class Decoder {
           s: number;
         };
       };
-      vp: number;
+      m: {
+        ip: boolean;
+        lkp: number;
+        vps: number;
+      };
     }[];
   }): {
     tableId: string;
@@ -94,7 +98,11 @@ class Decoder {
         [effectType in VideoEffectTypes]: boolean;
       };
       effectStyles: VideoEffectStylesType;
-      videoPosition: number;
+      meta: {
+        isPlaying: boolean;
+        lastKnownPosition: number;
+        videoPlaybackSpeed: number;
+      };
     }[];
   } => {
     const { tid, vid, n, m, s, i } = data;
@@ -105,7 +113,7 @@ class Decoder {
       filename: n,
       mimeType: m,
       state: s.map((ate) => tableStateDecodingMap[ate]),
-      instances: i.map(({ viid, p, e, es, vp }) => ({
+      instances: i.map(({ viid, p, e, es, m }) => ({
         videoInstanceId: viid,
         positioning: {
           position: {
@@ -154,7 +162,11 @@ class Decoder {
             style: petsEffectDecodingMap[es["8"].s],
           },
         },
-        videoPosition: vp,
+        meta: {
+          isPlaying: m.ip,
+          lastKnownPosition: m.lkp,
+          videoPlaybackSpeed: m.vps,
+        },
       })),
     };
   };

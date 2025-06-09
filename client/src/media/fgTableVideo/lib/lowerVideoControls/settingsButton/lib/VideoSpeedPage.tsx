@@ -3,7 +3,6 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import { ActivePages } from "../../../typeConstant";
 import LowerVideoController from "../../LowerVideoController";
-import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 import TableVideoMediaInstance from "src/media/fgTableVideo/TableVideoMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
@@ -83,23 +82,6 @@ export default function VideoSpeedPage({
         ref={scrollingContainerRef}
         className="small-scroll-bar small-vertical-scroll-bar flex h-max max-h-[11.375rem] w-full flex-col space-y-1 overflow-y-auto px-2"
       >
-        <FgSlider
-          className="h-10"
-          externalValue={videoMediaInstance.settings.videoSpeed.value}
-          externalStyleValue={videoMediaInstance.settings.videoSpeed.value}
-          onValueChange={(value) => {
-            setVideoSpeed(value.value);
-          }}
-          options={{
-            initValue: videoMediaInstance.settings.videoSpeed.value,
-            ticks: 6,
-            rangeMax: 5,
-            rangeMin: 0,
-            precision: 2,
-            orientation: "horizontal",
-            tickLabels: false,
-          }}
-        />
         {Object.entries(videoSpeedSelections)
           .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
           .map(([key, speed]) => (

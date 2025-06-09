@@ -1,4 +1,4 @@
-import { gets, metadataController, tablesController } from "../index";
+import { metadataController, tablesController } from "../index";
 import { MessageTypes, VideoWebSocket } from "../typeConstant";
 
 const handleMessage = (ws: VideoWebSocket, event: MessageTypes) => {
@@ -9,20 +9,11 @@ const handleMessage = (ws: VideoWebSocket, event: MessageTypes) => {
     case "leaveTable":
       tablesController.onLeaveTable(event);
       break;
-    case "getDownloadMeta":
-      gets.onGetDownloadMeta(event);
+    case "updateVideoMetadata":
+      metadataController.onUpdateVideoMetadata(event);
       break;
-    case "getFileChunk":
-      gets.onGetFileChunk(event);
-      break;
-    case "updateVideoPosition":
-      metadataController.onUpdateVideoPosition(event);
-      break;
-    case "requestCatchUpVideoPosition":
-      metadataController.onRequestCatchUpVideoPosition(event);
-      break;
-    case "responseCatchUpVideoPosition":
-      metadataController.onResponseCatchUpVideoPosition(event);
+    case "requestCatchUpVideoMetadata":
+      metadataController.onRequestCatchUpVideoMetadata(event);
       break;
     case "deleteUploadSession":
       metadataController.onDeleteUploadSession(event);

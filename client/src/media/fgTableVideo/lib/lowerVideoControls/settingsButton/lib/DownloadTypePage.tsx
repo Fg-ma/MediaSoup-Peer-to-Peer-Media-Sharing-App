@@ -11,12 +11,13 @@ const navigateBackIcon = nginxAssetServerBaseUrl + "svgs/navigateBack.svg";
 export default function DownloadTypePage({
   videoMediaInstance,
   setActivePages,
+  setRerender,
 }: {
   videoMediaInstance: TableVideoMediaInstance;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
+  setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
-  const [_, setRerender] = useState(false);
 
   const setDownloadType = (
     downloadType: keyof typeof downloadTypeSelections,

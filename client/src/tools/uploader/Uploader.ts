@@ -80,7 +80,7 @@ class Uploader {
       return;
     }
 
-    if (!tableStaticContentServerBaseUrl || !this.tableId.current) return;
+    if (!this.tableId.current) return;
 
     if (file.size < this.ONE_SHOT_FILE_SIZE_CUTOFF) {
       this.sendGeneralSignal({
@@ -91,22 +91,7 @@ class Uploader {
         },
       });
 
-      if (!file.type.startsWith("text/")) {
-        this.oneShotUploader.handleOneShotFileUpload(
-          file,
-          {
-            tableId: this.tableId.current,
-            contentId: contentId !== undefined ? contentId : uuidv4(),
-            instanceId: uuidv4(),
-            direction: "toTable",
-            state,
-            initPositioning,
-            mimeType: file.type,
-            filename: file.name,
-          },
-          tableStaticContentServerBaseUrl,
-        );
-      } else {
+      if (file.type.startsWith("text/")) {
         this.textOneShotUploader.handleOneShotFileUpload(
           file,
           {
@@ -119,7 +104,30 @@ class Uploader {
             mimeType: file.type,
             filename: file.name,
           },
-          tableStaticContentServerBaseUrl,
+          tableStaticContentServerBaseUrl!,
+        );
+      } else {
+        this.oneShotUploader.handleOneShotFileUpload(
+          file,
+          {
+            tableId: this.tableId.current,
+            contentId: contentId !== undefined ? contentId : uuidv4(),
+            instanceId: uuidv4(),
+            direction: "toTable",
+            state,
+            initPositioning,
+            mimeType: file.type,
+            filename: file.name,
+            ...(file.type.startsWith("video/")
+              ? {
+                  username: this.username.current,
+                  instance: this.instance.current,
+                }
+              : {}),
+          },
+          file.type.startsWith("video/")
+            ? videoServerBaseUrl!
+            : tableStaticContentServerBaseUrl!,
         );
       }
     } else {

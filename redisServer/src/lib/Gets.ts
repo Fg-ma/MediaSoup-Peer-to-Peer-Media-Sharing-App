@@ -37,6 +37,14 @@ class Gets {
 
     return allKeys;
   };
+
+  mget = async (keys: string[]): Promise<(string | null)[]> => {
+    try {
+      return await this.redis.mget(...keys);
+    } catch {
+      return [];
+    }
+  };
 }
 
 export default Gets;

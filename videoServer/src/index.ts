@@ -73,7 +73,7 @@ app
       }
     },
 
-    close: (ws) => {
+    close: async (ws) => {
       const tableWS = ws as VideoWebSocket;
       const { tableId, username, instance } = tableWS;
 
@@ -89,6 +89,56 @@ app
 
           if (Object.keys(tables[tableId]).length === 0) {
             delete tables[tableId];
+
+            const tableKeys = await tableTopRedis.gets.scanAllKeys(
+              `VVM:${tableId}:*:*`
+            );
+
+            const tableValues = await tableTopRedis.gets.mget(tableKeys);
+
+            const results: Record<string, string | null> = tableKeys.reduce(
+              (acc, key, index) => {
+                acc[key] = tableValues[index];
+                return acc;
+              },
+              {} as Record<string, string | null>
+            );
+
+            await tableTopRedis.deletes.deleteKeys(tableKeys);
+
+            await Promise.all(
+              Object.entries(results).map(async ([key, val]) => {
+                if (!val) return;
+
+                const [, , videoId, instanceId] = key.split(":");
+                const meta = JSON.parse(val) as {
+                  isPlaying: boolean;
+                  lastKnownPosition: number;
+                  videoPlaybackSpeed: number;
+                  lastUpdatedAt: number;
+                };
+
+                await tableTopMongo.tableVideos?.uploads.editMetaData(
+                  { tableId, videoId },
+                  {
+                    instances: [
+                      {
+                        videoInstanceId: instanceId,
+                        meta: {
+                          isPlaying: meta.isPlaying,
+                          lastKnownPosition:
+                            (meta.isPlaying
+                              ? ((Date.now() - meta.lastUpdatedAt) / 1000) *
+                                meta.videoPlaybackSpeed
+                              : 0) + meta.lastKnownPosition,
+                          videoPlaybackSpeed: meta.videoPlaybackSpeed,
+                        },
+                      },
+                    ],
+                  }
+                );
+              })
+            );
           }
         }
       }
@@ -113,7 +163,7 @@ app
   });
 
 export const posts = new Posts(app, broadcaster);
-export const gets = new Gets(app, broadcaster);
+export const gets = new Gets(app);
 
 app.listen(8099, (token) => {
   if (token) {

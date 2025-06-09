@@ -1,6 +1,5 @@
 import React from "react";
 import FgButton from "../../../../../../elements/fgButton/FgButton";
-import FgSlider from "../../../../../../elements/fgSlider/FgSlider";
 import TableVideoMediaInstance from "src/media/fgTableVideo/TableVideoMediaInstance";
 
 export const videoSpeedSelections = [
@@ -35,26 +34,6 @@ export default function VideoSpeedPage({
         className="h-0.5 rounded-full bg-fg-red-light"
         style={{ width: "calc(100% - 1rem)" }}
       ></div>
-      <FgSlider
-        className="h-10"
-        style={{ width: "calc(100% - 1rem)" }}
-        externalValue={videoMediaInstance.current.settings.videoSpeed.value}
-        externalStyleValue={
-          videoMediaInstance.current.settings.videoSpeed.value
-        }
-        onValueChange={(value) => {
-          setVideoSpeed(value.value);
-        }}
-        options={{
-          initValue: videoMediaInstance.current.settings.videoSpeed.value,
-          ticks: 6,
-          rangeMax: 5,
-          rangeMin: 0,
-          precision: 2,
-          orientation: "horizontal",
-          tickLabels: false,
-        }}
-      />
       {Object.entries(videoSpeedSelections)
         .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
         .map(([key, speed]) => (

@@ -141,7 +141,11 @@ const handleMongoVideoUploads = async (
                 },
             effects: structuredClone(defaultVideoEffects),
             effectStyles: structuredClone(defaultVideoEffectsStyles),
-            videoPosition: 0,
+            meta: {
+              isPlaying: false,
+              lastKnownPosition: 0,
+              videoPlaybackSpeed: 1,
+            },
           },
         ]
       : [],
@@ -182,8 +186,9 @@ new Worker(
       tableId: string;
       username: string;
       instance: string;
-      uploadId: string;
+      uploadId: string | undefined;
       tmpDir: string;
+      fileExtension: string;
       contentId: string;
       filename: string;
       direction: "toTable" | "reupload" | "toTabled";
@@ -192,14 +197,13 @@ new Worker(
       state: [];
     };
   }) => {
-    const start = Date.now();
-
     const {
       tableId,
       username,
       instance,
       uploadId,
       tmpDir,
+      fileExtension,
       contentId,
       filename,
       direction,
@@ -212,7 +216,7 @@ new Worker(
       data: { progress: 0 },
     });
 
-    const inputPath = path.join(tmpDir, "input.mp4");
+    const inputPath = path.join(tmpDir, `input${fileExtension}`);
     const hlsDir = path.join(tmpDir, "hls");
     const mp4Path = path.join(tmpDir, "output.mp4");
 
@@ -232,6 +236,8 @@ new Worker(
         const ffmpeg = spawn("ffmpeg", [
           "-i",
           inputPath,
+          "-vf",
+          "scale=trunc(iw/2)*2:trunc(ih/2)*2",
           "-c:v",
           "libx264",
           "-preset",
@@ -246,13 +252,18 @@ new Worker(
           "+faststart",
           mp4Path,
         ]);
-        ffmpeg.on("close", resolve);
-        ffmpeg.on("error", reject);
+        ffmpeg.on("close", (code) => {
+          if (code !== 0) {
+            return reject(new Error(`FFmpeg exited with code ${code}`));
+          }
+          resolve(null);
+        });
+        ffmpeg.on("error", (error) => {
+          return reject(new Error(`FFmpeg exited with error ${error}`));
+        });
       });
-      console.log("Compressed MP4 written");
     } else {
       await fs.copyFile(inputPath, mp4Path);
-      console.log("No compression needed, original copied");
     }
 
     broadcaster.broadcastToInstance(tableId, username, instance, {
@@ -360,22 +371,25 @@ new Worker(
     });
 
     // Cleanup
-    await fs.rm(tmpDir, { recursive: true, force: true });
+    // await fs.rm(tmpDir, { recursive: true, force: true });
 
-    await tableTopRedis.deletes.delete(
-      [
-        { prefix: "VUS", id: uploadId },
-        { prefix: "VCS", id: uploadId },
-        direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
-      ].filter((del) => del !== undefined)
-    );
+    const redisDeletes = [
+      ...(uploadId
+        ? [
+            { prefix: "VUS", id: uploadId },
+            { prefix: "VCS", id: uploadId },
+          ]
+        : []),
+      direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
+    ].filter((del) => del !== undefined);
+    if (redisDeletes.length !== 0) {
+      await tableTopRedis.deletes.delete(redisDeletes);
+    }
 
     broadcaster.broadcastToInstance(tableId, username, instance, {
       type: "processingFinished",
       header: { contentId },
     });
-
-    console.log(((start - Date.now()) / 1000).toFixed(2));
   },
   { connection: redisConnection }
 );

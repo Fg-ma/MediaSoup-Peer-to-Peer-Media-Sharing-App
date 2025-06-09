@@ -9,7 +9,11 @@ class Deletes {
   }
 
   async deleteKeys(deletes: string[]): Promise<number> {
-    return await this.redis.del(...deletes);
+    if (deletes.length !== 0) {
+      return await this.redis.del(...deletes);
+    } else {
+      return 0;
+    }
   }
 }
 

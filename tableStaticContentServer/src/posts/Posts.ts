@@ -19,8 +19,6 @@ import {
   defaultImageEffects,
   defaultSvgEffectsStyles,
   defaultSvgEffects,
-  defaultVideoEffectsStyles,
-  defaultVideoEffects,
   defaultTextEffectsStyles,
 } from "../../../universal/effectsTypeConstant";
 import {
@@ -622,25 +620,29 @@ class Posts {
             ].filter((del) => del !== undefined)
           );
 
-          this.broadcaster.broadcastToTable(session.tableId, {
-            type: "reuploadCancelled",
-            header: {
-              contentType: session.staticContentType,
-              contentId: session.contentId,
-            },
-          });
+          if (session?.direction === "reupload") {
+            this.broadcaster.broadcastToTable(session.tableId, {
+              type: "reuploadCancelled",
+              header: {
+                contentType: session.staticContentType,
+                contentId: session.contentId,
+              },
+            });
+          }
 
           if (!aborted) {
             this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
           }
         } catch (_) {
-          this.broadcaster.broadcastToTable(session.tableId, {
-            type: "reuploadCancelled",
-            header: {
-              contentType: session.staticContentType,
-              contentId: session.contentId,
-            },
-          });
+          if (session?.direction === "reupload") {
+            this.broadcaster.broadcastToTable(session.tableId, {
+              type: "reuploadCancelled",
+              header: {
+                contentType: session.staticContentType,
+                contentId: session.contentId,
+              },
+            });
+          }
 
           if (!aborted) {
             this.sendResponse(
@@ -717,60 +719,6 @@ class Posts {
       | undefined
   ) => {
     switch (staticContentType) {
-      case "video":
-        await this.handleMongoVideoUploads(
-          tableId,
-          contentId,
-          instanceId,
-          mimeType,
-          filename,
-          state,
-          initPositioning
-        );
-
-        broadcaster.broadcastToTable(tableId, {
-          type: "videoUploadedToTable",
-          header: {
-            contentId,
-            instanceId,
-          },
-          data: {
-            filename,
-            mimeType,
-            state,
-            initPositioning,
-          },
-        });
-
-        // Process video into DASH format in the background
-        // try {
-        //   // await processVideoWithABR(saveTo, processedDir, filename);
-
-        //   // Notify clients to switch to the DASH stream
-        //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
-        //     0,
-        //     -4
-        //   )}.mpd`;
-
-        //   tableContentController.setContent(tableId, "video", contentId, [
-        //     { property: "dashURL", value: dashVideoUrl },
-        //   ]);
-
-        //   const dashVideoMessage = {
-        //     type: "dashVideoReady",
-        //     header: {
-        //       videoId: contentId,
-        //     },
-        //     data: {
-        //       filename,
-        //       url: dashVideoUrl,
-        //     },
-        //   };
-        //   broadcaster.broadcastToTable(tableId, dashVideoMessage);
-        // } catch (error) {
-        //   console.error("Error during video processing:", error);
-        // }
-        break;
       case "image":
         await this.handleMongoImageUploads(
           tableId,
@@ -882,57 +830,6 @@ class Posts {
     state: TableContentStateTypes[]
   ) => {
     switch (staticContentType) {
-      case "video":
-        await this.handleMongoVideoUploads(
-          tableId,
-          contentId,
-          undefined,
-          mimeType,
-          completeFilename,
-          state
-        );
-
-        broadcaster.broadcastToTable(tableId, {
-          type: "videoUploadedToTabled",
-          header: {
-            contentId,
-          },
-          data: {
-            filename: completeFilename,
-            mimeType,
-            state,
-          },
-        });
-
-        // Process video into DASH format in the background
-        // try {
-        //   // await processVideoWithABR(saveTo, processedDir, filename);
-
-        //   // Notify clients to switch to the DASH stream
-        //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
-        //     0,
-        //     -4
-        //   )}.mpd`;
-
-        //   tableContentController.setContent(tableId, "video", contentId, [
-        //     { property: "dashURL", value: dashVideoUrl },
-        //   ]);
-
-        //   const dashVideoMessage = {
-        //     type: "dashVideoReady",
-        //     header: {
-        //       videoId: contentId,
-        //     },
-        //     data: {
-        //       filename,
-        //       url: dashVideoUrl,
-        //     },
-        //   };
-        //   broadcaster.broadcastToTable(tableId, dashVideoMessage);
-        // } catch (error) {
-        //   console.error("Error during video processing:", error);
-        // }
-        break;
       case "image":
         await this.handleMongoImageUploads(
           tableId,
@@ -1017,59 +914,6 @@ class Posts {
         console.warn(`Unsupported file type uploaded: ${mimeType}`);
         break;
     }
-  };
-
-  private handleMongoVideoUploads = async (
-    tableId: string,
-    contentId: string,
-    instanceId: string | undefined,
-    mimeType: StaticMimeTypes,
-    filename: string,
-    state: TableContentStateTypes[],
-    initPositioning?:
-      | {
-          position: {
-            top: number;
-            left: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        }
-      | undefined
-  ) => {
-    await tableTopMongo.tableVideos?.uploads.uploadMetaData({
-      tableId,
-      videoId: contentId,
-      filename,
-      mimeType,
-      state,
-      instances: instanceId
-        ? [
-            {
-              videoInstanceId: instanceId,
-              positioning: initPositioning
-                ? initPositioning
-                : {
-                    position: {
-                      left: 32.5,
-                      top: 32.5,
-                    },
-                    scale: {
-                      x: 25,
-                      y: 25,
-                    },
-                    rotation: 0,
-                  },
-              effects: structuredClone(defaultVideoEffects),
-              effectStyles: structuredClone(defaultVideoEffectsStyles),
-              videoPosition: 0,
-            },
-          ]
-        : [],
-    });
   };
 
   private handleMongoImageUploads = async (

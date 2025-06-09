@@ -38,6 +38,8 @@ class Posts {
 
       let metadata: {
         tableId: string;
+        username: string;
+        instance: string;
         contentId: string;
         instanceId: string;
         direction: string;
@@ -107,60 +109,64 @@ class Posts {
         const completeFilename = `${sanitizedFilename}${
           mimeToExtension[sanitizedMimeType as StaticMimeTypes]
         }`;
-        console.log(completeFilename);
 
-        // Save file
-        // tableTopCeph.posts
-        //   .uploadFile(
-        //     contentTypeBucketMap[staticContentType],
-        //     metadata.contentId,
-        //     file
-        //   )
-        //   .then(async () => {
-        //     if (aborted) {
-        //       tableTopCeph.deletes.deleteFile(
-        //         contentTypeBucketMap[staticContentType],
-        //         metadata!.contentId
-        //       );
-        //       return;
-        //     }
+        const tmpDir = `/tmp/tableTopVideoServerUploads/${uuidv4()}`;
+        const outputPath = path.join(
+          tmpDir,
+          `input${mimeToExtension[sanitizedMimeType as StaticMimeTypes]}`
+        );
 
-        //     if (!metadata) return;
+        await fs.promises.mkdir(tmpDir, { recursive: true });
 
-        //     switch (metadata.direction) {
-        //       case "toTable":
-        //         await this.handleToTable(
-        //           metadata.tableId,
-        //           metadata.contentId,
-        //           metadata.instanceId,
-        //           metadata.mimeType,
-        //           completeFilename,
-        //           metadata.state,
-        //           metadata.initPositioning
-        //         );
-        //         break;
-        //       case "reupload":
-        //         this.handleReupload(metadata.tableId, metadata.contentId);
-        //         break;
-        //       case "toTabled":
-        //         await this.handleToTabled(
-        //           metadata.tableId,
-        //           metadata.contentId,
-        //           metadata.mimeType,
-        //           completeFilename,
-        //           metadata.state
-        //         );
-        //         break;
-        //       default:
-        //         break;
-        //     }
+        const writeStream = fs.createWriteStream(outputPath);
+        file.pipe(writeStream);
 
-        //     if (metadata.direction === "reupload") {
-        //       await tableTopRedis.deletes.delete([
-        //         { prefix: "VRU", id: metadata.contentId },
-        //       ]);
-        //     }
-        //   });
+        writeStream.on("finish", () => {
+          if (!metadata || aborted) return;
+
+          videoTranscodeQueue.add(
+            "transcode",
+            metadata.direction === "toTable"
+              ? {
+                  tableId: metadata.tableId,
+                  username: metadata.username,
+                  instance: metadata.instance,
+                  uploadId: undefined,
+                  tmpDir,
+                  fileExtension:
+                    mimeToExtension[sanitizedMimeType as StaticMimeTypes],
+                  contentId: metadata.contentId,
+                  filename: completeFilename,
+                  direction: metadata.direction,
+                  mimeType: metadata.mimeType,
+                  instanceId: metadata.instanceId,
+                  state: metadata.state,
+                }
+              : metadata.direction === "toTabled"
+              ? {
+                  uploadId: undefined,
+                  tmpDir,
+                  fileExtension:
+                    mimeToExtension[sanitizedMimeType as StaticMimeTypes],
+                  contentId: metadata.contentId,
+                  tableId: metadata.tableId,
+                  filename: completeFilename,
+                  direction: metadata.direction,
+                  mimeType: metadata.mimeType,
+                  state: metadata.state,
+                }
+              : {
+                  uploadId: undefined,
+                  tmpDir,
+                  fileExtension:
+                    mimeToExtension[sanitizedMimeType as StaticMimeTypes],
+                  contentId: metadata.contentId,
+                  tableId: metadata.tableId,
+                  direction: metadata.direction,
+                  mimeType: metadata.mimeType,
+                }
+          );
+        });
 
         file.on("error", (err) => {
           console.error(`Error writing file:`, err);
@@ -375,16 +381,18 @@ class Posts {
 
           if (!session) return;
 
-          // await tableTopCeph.posts.abortMultipartUpload(
-          //   contentTypeBucketMap[session.staticContentType],
-          //   session.contentId,
-          //   uploadId
-          // );
+          const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
+          await fs.promises.rm(tmpDir, { recursive: true, force: true });
 
-          await tableTopRedis.deletes.delete([
-            { prefix: "VUS", id: uploadId },
-            { prefix: "VCS", id: uploadId },
-          ]);
+          await tableTopRedis.deletes.delete(
+            [
+              { prefix: "VUS", id: uploadId },
+              { prefix: "VCS", id: uploadId },
+              session?.direction === "reupload"
+                ? { prefix: "VRU", id: session.contentId }
+                : undefined,
+            ].filter((del) => del !== undefined)
+          );
 
           return;
         });
@@ -434,16 +442,17 @@ class Posts {
 
             if (!session) return;
 
-            // await tableTopCeph.posts.abortMultipartUpload(
-            //   contentTypeBucketMap[session.staticContentType],
-            //   session.contentId,
-            //   uploadId
-            // );
+            await fs.promises.rm(tmpDir, { recursive: true, force: true });
 
-            await tableTopRedis.deletes.delete([
-              { prefix: "VUS", id: uploadId },
-              { prefix: "VCS", id: uploadId },
-            ]);
+            await tableTopRedis.deletes.delete(
+              [
+                { prefix: "VUS", id: uploadId },
+                { prefix: "VCS", id: uploadId },
+                session?.direction === "reupload"
+                  ? { prefix: "VRU", id: session.contentId }
+                  : undefined,
+              ].filter((del) => del !== undefined)
+            );
 
             return;
           }
@@ -473,7 +482,10 @@ class Posts {
 
           // If last chunk
           if (state!.parts.length === totalChunks) {
-            const outputPath = path.join(tmpDir, "input.mp4");
+            const outputPath = path.join(
+              tmpDir,
+              `input${mimeToExtension[session!.mimeType]}`
+            );
 
             const writeStream = fs.createWriteStream(outputPath);
             for (let i = 0; i < totalChunks; i++) {
@@ -493,6 +505,7 @@ class Posts {
                     instance: session!.instance,
                     uploadId,
                     tmpDir,
+                    fileExtension: mimeToExtension[session!.mimeType],
                     contentId: session!.contentId,
                     filename: session!.filename,
                     direction: session!.direction,
@@ -504,6 +517,7 @@ class Posts {
                 ? {
                     uploadId,
                     tmpDir,
+                    fileExtension: mimeToExtension[session!.mimeType],
                     contentId: session!.contentId,
                     tableId: session!.tableId,
                     filename: session!.filename,
@@ -514,6 +528,7 @@ class Posts {
                 : {
                     uploadId,
                     tmpDir,
+                    fileExtension: mimeToExtension[session!.mimeType],
                     contentId: session!.contentId,
                     tableId: session!.tableId,
                     direction: session!.direction,
@@ -568,11 +583,8 @@ class Posts {
       // Async work must be done in next tick or promise
       (async () => {
         try {
-          // await tableTopCeph.posts.abortMultipartUpload(
-          //   contentTypeBucketMap[session.staticContentType],
-          //   session.contentId,
-          //   uploadId
-          // );
+          const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
+          await fs.promises.rm(tmpDir, { recursive: true, force: true });
 
           await tableTopRedis.deletes.delete(
             [

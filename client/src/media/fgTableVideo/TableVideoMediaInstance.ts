@@ -1,3 +1,4 @@
+import Hls from "hls.js";
 import {
   defaultVideoEffects,
   defaultAudioEffects,
@@ -17,12 +18,16 @@ import assetMeshes from "../../babylon/meshes";
 import Deadbanding from "../../babylon/Deadbanding";
 import TableVideoMedia, { VideoListenerTypes } from "./TableVideoMedia";
 import { defaultSettings } from "./lib/typeConstant";
+import VideoSocketController from "../../serverControllers/videoServer/VideoSocketController";
 
 export type VideoInstanceListenerTypes =
   | { type: "settingsChanged" }
   | { type: "effectsChanged" };
 
+const videoServerBaseUrl = process.env.VIDEO_SERVER_BASE_URL;
+
 class TableVideoMediaInstance {
+  hls = new Hls();
   instanceCanvas: HTMLCanvasElement;
   instanceVideo: HTMLVideoElement | undefined;
 
@@ -70,11 +75,9 @@ class TableVideoMediaInstance {
       };
       rotation: number;
     },
-    private requestCatchUpVideoPosition: (
-      contentType: "video",
-      contentId: string,
-      instanceId: string,
-    ) => void,
+    private videoSocket: React.MutableRefObject<
+      VideoSocketController | undefined
+    >,
   ) {
     this.positioning = this.initPositioning;
 
@@ -141,13 +144,19 @@ class TableVideoMediaInstance {
   };
 
   private setVideo = () => {
-    this.instanceVideo = this.videoMedia.video?.cloneNode(
-      true,
-    ) as HTMLVideoElement;
+    this.instanceVideo = document.createElement("video");
+    const videoSrc = `${videoServerBaseUrl}stream-video/${this.videoMedia.videoId}/index.m3u8`;
+    if (Hls.isSupported()) {
+      this.hls.loadSource(videoSrc);
+      this.hls.attachMedia(this.instanceVideo);
+    } else if (
+      this.instanceVideo.canPlayType("application/vnd.apple.mpegurl")
+    ) {
+      this.instanceVideo.src = `${videoServerBaseUrl}stream-video/${this.videoMedia.videoId}/video.mp4`;
+    }
     this.instanceVideo.autoplay = true;
+    this.instanceVideo.controls = false;
     this.instanceVideo.muted = true;
-
-    this.instanceVideo.style.backgroundColor = "#000";
 
     this.instanceVideo.onloadedmetadata = () => {
       if (this.instanceVideo) {
@@ -161,37 +170,30 @@ class TableVideoMediaInstance {
           this.instanceCanvas.style.height = "100%";
           this.instanceCanvas.style.width = "auto";
         }
+
+        if (!this.babylonScene)
+          this.babylonScene = new BabylonScene(
+            this.videoMedia.babylonRenderLoopWorker,
+            "video",
+            this.videoMedia.aspect ?? 1,
+            this.instanceCanvas,
+            this.instanceVideo,
+            this.videoMedia.faceLandmarks,
+            this.effects,
+            this.videoMedia.faceMeshResults,
+            this.videoMedia.selfieSegmentationResults,
+            this.userDevice,
+            this.videoMedia.maxFaces,
+          );
+
+        this.updateAllEffects();
+
+        this.videoSocket.current?.requestCatchUpVideoPosition(
+          this.videoMedia.videoId,
+          this.videoInstanceId,
+        );
       }
     };
-
-    if (!this.instanceVideo) return;
-
-    // if (!this.babylonScene)
-    //   this.babylonScene = new BabylonScene(
-    //     this.videoMedia.babylonRenderLoopWorker,
-    //     "video",
-    //     this.videoMedia.aspect ?? 1,
-    //     this.instanceCanvas,
-    //     this.instanceVideo,
-    //     this.videoMedia.faceLandmarks,
-    //     this.effects,
-    //     this.videoMedia.faceMeshResults,
-    //     this.videoMedia.selfieSegmentationResults,
-    //     this.userDevice,
-    //     this.videoMedia.maxFaces,
-    //   );
-
-    this.updateAllEffects();
-
-    this.requestCatchUpVideoPosition(
-      "video",
-      this.videoMedia.videoId,
-      this.videoInstanceId,
-    );
-  };
-
-  updateVideoPosition = async (videoPosition: number) => {
-    if (this.instanceVideo) this.instanceVideo.currentTime = videoPosition;
   };
 
   private rectifyEffectMeshCount = () => {
@@ -326,8 +328,6 @@ class TableVideoMediaInstance {
           this.babylonScene?.toggleTintPlane(false);
         } else if (effect === "blur") {
           this.babylonScene?.toggleBlurEffect(false);
-        } else if (effect === "pause") {
-          this.babylonScene?.togglePauseEffect(false);
         } else if (effect === "hideBackground") {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
@@ -366,8 +366,6 @@ class TableVideoMediaInstance {
           this.babylonScene?.toggleTintPlane(false);
         } else if (effect === "blur") {
           this.babylonScene?.toggleBlurEffect(false);
-        } else if (effect === "pause") {
-          this.babylonScene?.togglePauseEffect(false);
         } else if (effect === "hideBackground") {
           this.babylonScene?.toggleHideBackgroundPlane(false);
         } else if (effect === "postProcess") {
@@ -415,10 +413,6 @@ class TableVideoMediaInstance {
 
         if (effect === "blur") {
           this.babylonScene?.toggleBlurEffect(this.effects[effect] ?? false);
-        }
-
-        if (effect === "pause") {
-          this.babylonScene?.togglePauseEffect(this.effects[effect] ?? false);
         }
 
         if (effect === "hideBackground") {
@@ -631,10 +625,6 @@ class TableVideoMediaInstance {
       this.babylonScene.toggleBlurEffect(this.effects[effect]);
     }
 
-    if (effect === "pause") {
-      this.babylonScene.togglePauseEffect(this.effects[effect]);
-    }
-
     if (effect === "hideBackground") {
       this.babylonScene.toggleHideBackgroundPlane(this.effects[effect]);
     }
@@ -703,10 +693,6 @@ class TableVideoMediaInstance {
 
   setTintColor = (newTintColor: string) => {
     this.babylonScene?.setTintColor(this.hexToNormalizedRgb(newTintColor));
-  };
-
-  getPaused = () => {
-    return this.effects.pause ?? false;
   };
 
   getTimeEllapsed = () => {
