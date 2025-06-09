@@ -371,7 +371,7 @@ new Worker(
     });
 
     // Cleanup
-    // await fs.rm(tmpDir, { recursive: true, force: true });
+    await fs.rm(tmpDir, { recursive: true, force: true });
 
     const redisDeletes = [
       ...(uploadId
