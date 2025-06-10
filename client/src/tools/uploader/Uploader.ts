@@ -13,6 +13,7 @@ import TextChunkUploader from "./lib/textChunkUploader/TextChunkUploader";
 import TextOneShotUploader from "./lib/textOneShotUploader/TextOneShotUploader";
 import VideoChunkUploader from "./lib/videoChunkUploader/VideoChunkUploader";
 import VideoSocketController from "../../serverControllers/videoServer/VideoSocketController";
+import TableStaticContentSocketController from "../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -31,6 +32,9 @@ class Uploader {
   private textOneShotUploader: TextOneShotUploader;
 
   constructor(
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
     private videoSocket: React.MutableRefObject<
       VideoSocketController | undefined
     >,
@@ -217,6 +221,7 @@ class Uploader {
 
         if (file.type.startsWith("text/")) {
           uploader = new TextChunkUploader(
+            this.tableStaticContentSocket,
             this.tableId,
             file,
             finalUploadId,
@@ -236,6 +241,8 @@ class Uploader {
           uploader = new VideoChunkUploader(
             this.videoSocket,
             this.tableId,
+            this.username,
+            this.instance,
             file,
             finalUploadId,
             finalContentId,
@@ -252,6 +259,7 @@ class Uploader {
           );
         } else {
           uploader = new ChunkUploader(
+            this.tableStaticContentSocket,
             this.tableId,
             file,
             finalUploadId,
@@ -347,6 +355,7 @@ class Uploader {
           250,
         );
         const uploader = new ChunkUploader(
+          this.tableStaticContentSocket,
           this.tableId,
           file,
           uploadId,
@@ -439,6 +448,7 @@ class Uploader {
           250,
         );
         const uploader = new ChunkUploader(
+          this.tableStaticContentSocket,
           this.tableId,
           file,
           uploadId,

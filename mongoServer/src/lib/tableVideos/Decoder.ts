@@ -73,6 +73,7 @@ class Decoder {
         ip: boolean;
         lkp: number;
         vps: number;
+        e: boolean;
       };
     }[];
   }): {
@@ -102,6 +103,7 @@ class Decoder {
         isPlaying: boolean;
         lastKnownPosition: number;
         videoPlaybackSpeed: number;
+        ended: boolean;
       };
     }[];
   } => {
@@ -166,6 +168,7 @@ class Decoder {
           isPlaying: m.ip,
           lastKnownPosition: m.lkp,
           videoPlaybackSpeed: m.vps,
+          ended: m.e,
         },
       })),
     };

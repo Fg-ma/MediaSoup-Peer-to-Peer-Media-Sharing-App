@@ -13,6 +13,7 @@ import {
 import Broadcaster from "./Broadcaster";
 import {
   REDIS_INITIAL_CHUNK_SIZE,
+  sanitizationUtils,
   tableTopCeph,
   tableTopMongo,
   tableTopRedis,
@@ -23,7 +24,10 @@ class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = async (ws: TableWebSocket, event: onJoinTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onJoinTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
     ws.tableId = tableId;
@@ -51,7 +55,10 @@ class LiveTextEditingController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onLeaveTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     if (
       tables[tableId] &&
@@ -63,7 +70,11 @@ class LiveTextEditingController {
   };
 
   onGetInitialDocState = async (event: onGetInitialDocStateType) => {
-    const { tableId, username, instance, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onGetInitialDocStateType;
+    const { tableId, username, instance, contentId, instanceId } =
+      safeEvent.header;
 
     const redisOps = await tableTopRedis.gets.lrange(
       `LTE:${tableId}:${contentId}:${instanceId}`
@@ -159,8 +170,12 @@ class LiveTextEditingController {
   };
 
   onDocUpdate = async (event: onDocUpdateType) => {
-    const { tableId, username, instance, contentId, instanceId } = event.header;
-    const { payload } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDocUpdateType;
+    const { tableId, username, instance, contentId, instanceId } =
+      safeEvent.header;
+    const { payload } = safeEvent.data;
 
     // 1) Build the JSON header
     const headerObj = { type: "docUpdated", header: { contentId, instanceId } };
@@ -193,7 +208,11 @@ class LiveTextEditingController {
   };
 
   onGetSavedOps = async (event: onGetSavedOpsType) => {
-    const { tableId, username, instance, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onGetSavedOpsType;
+    const { tableId, username, instance, contentId, instanceId } =
+      safeEvent.header;
 
     const opsRedisKey = `LTE:${tableId}:${contentId}:${instanceId}`;
     const ops = await tableTopRedis.gets.lrange(opsRedisKey);
@@ -211,7 +230,8 @@ class LiveTextEditingController {
   };
 
   onDocSave = async (event: onDocSaveType) => {
-    const { tableId, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(event) as onDocSaveType;
+    const { tableId, contentId, instanceId } = safeEvent.header;
 
     const savingSessionsKey = `LTE:SS:${tableId}:${contentId}:${instanceId}`;
 

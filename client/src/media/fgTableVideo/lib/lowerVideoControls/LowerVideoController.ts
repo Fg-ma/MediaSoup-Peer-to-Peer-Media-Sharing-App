@@ -185,6 +185,7 @@ class LowerVideoController {
         this.videoMediaInstance.settings.isPlaying.value,
         this.videoMediaInstance.instanceVideo.currentTime,
         this.videoMediaInstance.settings.videoSpeed.value,
+        this.videoMediaInstance.settings.ended.value,
       );
     }
   };
@@ -208,6 +209,7 @@ class LowerVideoController {
         this.videoMediaInstance.settings.isPlaying.value,
         this.videoMediaInstance.instanceVideo.currentTime,
         this.videoMediaInstance.settings.videoSpeed.value,
+        this.videoMediaInstance.settings.ended.value,
       );
     }
 
@@ -438,6 +440,7 @@ class LowerVideoController {
           this.videoMediaInstance.settings.isPlaying.value,
           this.videoMediaInstance.instanceVideo.currentTime,
           this.videoMediaInstance.settings.videoSpeed.value,
+          this.videoMediaInstance.settings.ended.value,
         );
       }
 
@@ -496,6 +499,7 @@ class LowerVideoController {
           this.videoMediaInstance.settings.isPlaying.value,
           this.videoMediaInstance.instanceVideo.currentTime,
           this.videoMediaInstance.settings.videoSpeed.value,
+          this.videoMediaInstance.settings.ended.value,
         );
       }
     }

@@ -13,7 +13,7 @@ import {
 } from "../typeConstant";
 import SnakeGame from "../snakeGame/SnakeGame";
 import { SnakeColorsType } from "../snakeGame/lib/typeConstant";
-import { tableTopMongo } from "src";
+import { sanitizationUtils, tableTopMongo } from "src";
 
 class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
@@ -21,8 +21,11 @@ class UniversalGameController {
   onUpdateContentPositioning = async (
     event: onUpdateContentPositioningType
   ) => {
-    const { tableId, gameId } = event.header;
-    const { positioning } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onUpdateContentPositioningType;
+    const { tableId, gameId } = safeEvent.header;
+    const { positioning } = safeEvent.data;
 
     await tableTopMongo.tableGames?.uploads.editMetaData(
       { tableId, gameId },
@@ -33,8 +36,11 @@ class UniversalGameController {
   };
 
   onInitiateGame = async (event: onInitiateGameType) => {
-    const { tableId, gameType, gameId } = event.header;
-    const { initiator } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onInitiateGameType;
+    const { tableId, gameType, gameId } = safeEvent.header;
+    const { initiator } = safeEvent.data;
 
     if (gameType === "snake") {
       if (!snakeGames[tableId]) {
@@ -78,7 +84,10 @@ class UniversalGameController {
   };
 
   onStartGame = (event: onStartGameType) => {
-    const { tableId, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onStartGameType;
+    const { tableId, gameType, gameId } = safeEvent.header;
 
     if (gameType === "snake") {
       snakeGames[tableId][gameId].startGame();
@@ -90,7 +99,10 @@ class UniversalGameController {
   };
 
   onCloseGame = async (event: onCloseGameType) => {
-    const { tableId, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCloseGameType;
+    const { tableId, gameType, gameId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(
       tableId,
@@ -146,8 +158,9 @@ class UniversalGameController {
   };
 
   onJoinGame = (event: onJoinGameType) => {
-    const { tableId, username, instance, gameType, gameId } = event.header;
-    const data = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(event) as onJoinGameType;
+    const { tableId, username, instance, gameType, gameId } = safeEvent.header;
+    const data = safeEvent.data;
 
     switch (gameType) {
       case "snake":
@@ -163,7 +176,10 @@ class UniversalGameController {
   };
 
   onLeaveGame = (event: onLeaveGameType) => {
-    const { tableId, username, instance, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onLeaveGameType;
+    const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     switch (gameType) {
       case "snake":
@@ -175,7 +191,10 @@ class UniversalGameController {
   };
 
   onGetPlayersState = (event: onGetPlayersStateType) => {
-    const { tableId, username, instance, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onGetPlayersStateType;
+    const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let playersState = {};
 
@@ -204,7 +223,10 @@ class UniversalGameController {
   };
 
   onGetIntialGameStates = (event: onGetIntialGameStatesType) => {
-    const { tableId, username, instance, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onGetIntialGameStatesType;
+    const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let initialGameStates = {};
 

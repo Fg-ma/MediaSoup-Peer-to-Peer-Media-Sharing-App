@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { tableTopCeph } from "../index";
+import { tableTopCeph, sanitizationUtils } from "../index";
 import {
   contentTypeBucketMap,
   onGetDownloadMetaType,
@@ -11,8 +11,11 @@ class Gets {
   constructor(private broadcaster: Broadcaster) {}
 
   onGetDownloadMeta = async (event: onGetDownloadMetaType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onGetDownloadMetaType;
     const { tableId, username, instance, contentType, contentId } =
-      event.header;
+      safeEvent.header;
 
     try {
       const head = await tableTopCeph.gets.getHead(
@@ -89,10 +92,12 @@ class Gets {
   };
 
   onGetFileChunk = async (event: onGetFileChunkType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      range: "=",
+    }) as onGetFileChunkType;
     const { tableId, username, instance, contentType, contentId } =
-      event.header;
-
-    const { range } = event.data;
+      safeEvent.header;
+    const { range } = safeEvent.data;
 
     try {
       const data = await tableTopCeph.gets.getContent(

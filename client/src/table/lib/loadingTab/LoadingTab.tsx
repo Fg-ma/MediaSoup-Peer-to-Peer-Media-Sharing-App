@@ -29,7 +29,9 @@ export default function LoadingTab({
         setRerender((prev) => !prev);
         break;
       case "uploadFinish":
-        setRerender((prev) => !prev);
+        setTimeout(() => {
+          setRerender((prev) => !prev);
+        }, 0);
         break;
       case "uploadProcessing":
         setRerender((prev) => !prev);

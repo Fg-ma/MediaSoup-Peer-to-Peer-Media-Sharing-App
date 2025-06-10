@@ -1,4 +1,4 @@
-import { tableTopMongo, tableTopRedis } from "src";
+import { sanitizationUtils, tableTopMongo, tableTopRedis } from "src";
 import {
   onChangeContentStateType,
   onCreateNewInstancesType,
@@ -15,7 +15,10 @@ class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
   onRequestCatchUpTableData = async (event: onRequestCatchUpTableDataType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestCatchUpTableDataType;
+    const { tableId, username, instance } = safeEvent.header;
 
     const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(tableId);
     const svgs = await tableTopMongo.tableSvgs?.gets.getAllBy_TID(tableId);
@@ -34,21 +37,31 @@ class MetadataController {
   };
 
   onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
-    tableTopMongo.onUpdateContentEffects(event);
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event,
+      {
+        color: "#",
+      },
+      ["color"]
+    ) as onUpdateContentEffectsType;
+    tableTopMongo.onUpdateContentEffects(safeEvent);
 
-    const { tableId, contentType, contentId, instanceId } = event.header;
+    const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     const msg = {
       type: "updatedContentEffects",
       header: { contentType, contentId, instanceId },
-      data: event.data,
+      data: safeEvent.data,
     };
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onRequestCatchUpEffects = async (event: onRequestCatchUpEffectsType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestCatchUpEffectsType;
     const { tableId, username, instance, contentType, contentId, instanceId } =
-      event.header;
+      safeEvent.header;
 
     let data: { effects?: object; effectStyles?: object } | undefined =
       undefined;
@@ -163,23 +176,29 @@ class MetadataController {
   };
 
   onChangeContentState = (event: onChangeContentStateType) => {
-    tableTopMongo.onChangeTableContentState(event);
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onChangeContentStateType;
+    tableTopMongo.onChangeTableContentState(safeEvent);
 
-    const { tableId, contentType, contentId } = event.header;
+    const { tableId, contentType, contentId } = safeEvent.header;
 
     const msg = {
       type: "contentStateChanged",
       header: { contentType, contentId },
-      data: event.data,
+      data: safeEvent.data,
     };
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
   onCreateNewInstances = (event: onCreateNewInstancesType) => {
-    tableTopMongo.onCreateNewInstances(event);
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCreateNewInstancesType;
+    tableTopMongo.onCreateNewInstances(safeEvent);
 
-    const { tableId } = event.header;
-    const { updates } = event.data;
+    const { tableId } = safeEvent.header;
+    const { updates } = safeEvent.data;
 
     this.broadcaster.broadcastToTable(tableId, {
       type: "createdNewInstances",
@@ -190,7 +209,10 @@ class MetadataController {
   };
 
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
-    const { uploadId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDeleteUploadSessionType;
+    const { uploadId } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
       "TSCUS",
@@ -209,7 +231,10 @@ class MetadataController {
   };
 
   onSignalReuploadStart = async (event: onSignalReuploadStartType) => {
-    const { tableId, contentId, contentType } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onSignalReuploadStartType;
+    const { tableId, contentId, contentType } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {
       type: "reuploadStarted",

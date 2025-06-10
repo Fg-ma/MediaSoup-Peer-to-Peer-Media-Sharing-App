@@ -10,7 +10,9 @@ import Broadcaster from "./lib/Broadcaster";
 import TablesController from "./lib/TablesController";
 import handleMessage from "./lib/websocketMessages";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
+export const sanitizationUtils = new SanitizationUtils();
 export const tableTopMongo = new TableTopMongo();
 export const broadcaster = new Broadcaster();
 export const tablesController = new TablesController(broadcaster);

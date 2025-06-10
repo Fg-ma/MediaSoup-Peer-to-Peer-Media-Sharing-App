@@ -1,17 +1,21 @@
 import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
-import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
+import {
+  TableContentStateTypes,
+  UploadingStateTypes,
+} from "../../../../../../universal/contentTypeConstant";
 import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
 import { GeneralSignals } from "../../../../context/signalContext/lib/typeConstant";
 import VideoSocketController from "../../../../serverControllers/videoServer/VideoSocketController";
-import { IncomingVideoMessages } from "src/serverControllers/videoServer/lib/typeConstant";
+import { IncomingVideoMessages } from "../../../../serverControllers/videoServer/lib/typeConstant";
 
 const videoServerBaseUrl = process.env.VIDEO_SERVER_BASE_URL;
 
 export type ChunkedUploadListenerTypes =
   | { type: "uploadPaused" }
   | { type: "uploadPlay" }
+  | { type: "uploadFailed" }
   | {
       type: "uploadProgress";
       data: { progress: number };
@@ -19,6 +23,8 @@ export type ChunkedUploadListenerTypes =
 
 class VideoChunkUploader {
   private readonly CHUNK_SIZE = 1024 * 1024 * 12;
+
+  uploadingState: UploadingStateTypes = "uploading";
 
   private offset: number = 0;
 
@@ -43,6 +49,8 @@ class VideoChunkUploader {
       VideoSocketController | undefined
     >,
     private tableId: React.MutableRefObject<string>,
+    private username: React.MutableRefObject<string>,
+    private instance: React.MutableRefObject<string>,
     public file: File,
     private uploadId: string,
     private contentId: string,
@@ -82,8 +90,14 @@ class VideoChunkUploader {
     this.videoSocket.current?.removeMessageListener(
       this.handleVideoSocketMessages,
     );
+    if (this.handle) {
+      await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
+        this.contentId,
+      );
+    }
     if (this.uploadUrl) URL.revokeObjectURL(this.uploadUrl);
     this.removeCurrentUpload(this.contentId);
+    this.sendUploadSignal({ type: "uploadFinish" });
     this.listeners.clear();
   };
 
@@ -92,6 +106,7 @@ class VideoChunkUploader {
 
     if (this.currentChunkAbortController) {
       this.currentChunkAbortController.abort();
+      this.currentChunkAbortController = null;
     }
 
     try {
@@ -181,8 +196,8 @@ class VideoChunkUploader {
             return;
           }
           if (response.status !== 409) {
-            this.chunkErrorRetryUpload();
-            break;
+            this.uploadFailed();
+            return;
           }
         }
 
@@ -227,11 +242,16 @@ class VideoChunkUploader {
       await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
         this.contentId,
       );
+      this.uploadingState = "processing";
       this.sendUploadSignal({ type: "uploadProcessing" });
     }
   };
 
-  private chunkErrorRetryUpload = async () => {
+  private uploadFailed = async () => {
+    this.videoSocket.current?.deleteUploadSession(this.uploadId);
+
+    this.uploadingState = "failed";
+
     this._progress = 0;
     this.offset = 0;
     this.uploadSpeedHistory = [];
@@ -244,10 +264,21 @@ class VideoChunkUploader {
       });
     });
 
-    if (this.handle)
+    if (this.handle) {
       await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
         this.contentId,
       );
+    }
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "uploadFailed",
+      });
+    });
+  };
+
+  retryUpload = async () => {
+    this.uploadingState = "uploading";
 
     if (!videoServerBaseUrl) return;
 
@@ -260,6 +291,8 @@ class VideoChunkUploader {
       filename: this.file.name,
       mimeType: this.file.type,
       initPositioning: this.initPositioning,
+      username: this.username.current,
+      instance: this.instance.current,
     };
 
     try {

@@ -40,6 +40,7 @@ class Encoder {
         isPlaying: boolean;
         lastKnownPosition: number;
         videoPlaybackSpeed: number;
+        ended: boolean;
       };
     }[];
   }): {
@@ -96,6 +97,7 @@ class Encoder {
         ip: boolean;
         lkp: number;
         vps: number;
+        e: boolean;
       };
     }[];
   } {
@@ -159,6 +161,7 @@ class Encoder {
             ip: meta.isPlaying,
             lkp: meta.lastKnownPosition,
             vps: meta.videoPlaybackSpeed,
+            e: meta.ended,
           },
         })
       ),

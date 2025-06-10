@@ -115,38 +115,40 @@ export default function UploadingSection({
           />
         </div>
         <div className="flex h-full w-max items-center justify-center">
-          <FgButton
-            className="flex aspect-square h-full items-center justify-center"
-            contentFunction={() => (
-              <FgSVGElement
-                src={upload.paused ? playIcon : pauseIcon}
-                className="aspect-square h-[90%] fill-fg-white stroke-fg-white"
-                attributes={[
-                  { key: "height", value: "100%" },
-                  { key: "width", value: "100%" },
-                ]}
-              />
-            )}
-            clickFunction={() => {
-              if (upload.paused) {
-                upload.resume();
-              } else {
-                upload.pause();
+          {upload.uploadingState === "uploading" && (
+            <FgButton
+              className="flex aspect-square h-full items-center justify-center"
+              contentFunction={() => (
+                <FgSVGElement
+                  src={upload.paused ? playIcon : pauseIcon}
+                  className="aspect-square h-[90%] fill-fg-white stroke-fg-white"
+                  attributes={[
+                    { key: "height", value: "100%" },
+                    { key: "width", value: "100%" },
+                  ]}
+                />
+              )}
+              clickFunction={() => {
+                if (upload.paused) {
+                  upload.resume();
+                } else {
+                  upload.pause();
+                }
+              }}
+              scrollingContainerRef={tablePanelRef}
+              hoverContent={
+                <FgHoverContentStandard
+                  content={upload.paused ? "Resume upload" : "Pause upload"}
+                  style="light"
+                />
               }
-            }}
-            scrollingContainerRef={tablePanelRef}
-            hoverContent={
-              <FgHoverContentStandard
-                content={upload.paused ? "Resume upload" : "Pause upload"}
-                style="light"
-              />
-            }
-            options={{
-              hoverSpacing: 4,
-              hoverTimeoutDuration: 750,
-              hoverType: "above",
-            }}
-          />
+              options={{
+                hoverSpacing: 4,
+                hoverTimeoutDuration: 750,
+                hoverType: "above",
+              }}
+            />
+          )}
           <FgButton
             className="flex aspect-square h-full items-center justify-center"
             contentFunction={() => (
@@ -173,7 +175,13 @@ export default function UploadingSection({
         </div>
       </div>
       <div className="flex w-full max-w-80 items-center justify-center space-x-2 px-7">
-        <LoadingBar className="h-3 w-full" progress={upload.progress * 100} />
+        <LoadingBar
+          className="h-3 w-full"
+          loadingBarColor={
+            upload.uploadingState === "uploading" ? "bg-fg-red" : "bg-fg-orange"
+          }
+          progress={upload.progress * 100}
+        />
         <FgButton
           className="flex aspect-square h-5 items-center justify-center"
           contentFunction={() => (

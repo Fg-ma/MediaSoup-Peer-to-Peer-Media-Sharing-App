@@ -7,6 +7,7 @@ import { useToolsContext } from "../../../context/toolsContext/ToolsContext";
 import FailedUploadingSection from "./lib/FailedUploadingSection";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { HandleListenerTypes } from "../../../db/indexedDB/lib/uploads/typeConstant";
+import CutOffUploadingSection from "./lib/CutoffUploadingSection";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -44,7 +45,9 @@ export default function UploadingPanel({
         setRerender((prev) => !prev);
         break;
       case "uploadFinish":
-        setRerender((prev) => !prev);
+        setTimeout(() => {
+          setRerender((prev) => !prev);
+        }, 0);
         break;
       case "uploadProcessing":
         setRerender((prev) => !prev);
@@ -111,7 +114,7 @@ export default function UploadingPanel({
         (handle) =>
           !currentUploads.some(([contentId, _]) => contentId === handle.key) &&
           handle.tableId === tableId.current && (
-            <FailedUploadingSection
+            <CutOffUploadingSection
               key={handle.key}
               savedTableId={handle.tableId}
               uploadId={handle.uploadId}
@@ -121,13 +124,17 @@ export default function UploadingPanel({
             />
           ),
       )}
-      {currentUploads.map(([contentId, upload]) => (
-        <UploadingSection
-          key={contentId}
-          upload={upload}
-          tablePanelRef={tablePanelRef}
-        />
-      ))}
+      {currentUploads.map(([contentId, upload]) =>
+        upload.uploadingState !== "failed" ? (
+          <UploadingSection
+            key={contentId}
+            upload={upload}
+            tablePanelRef={tablePanelRef}
+          />
+        ) : (
+          <FailedUploadingSection key={contentId} upload={upload} />
+        ),
+      )}
       {handles.length === 0 && currentUploads.length === 0 && (
         <div className="flex h-full w-full flex-col items-center justify-center">
           <span className="px-2 text-center font-Josefin text-3xl text-fg-white">

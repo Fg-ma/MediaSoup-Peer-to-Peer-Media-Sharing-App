@@ -8,8 +8,8 @@ import {
   CEPH_MAX_SIZE,
   clientBaseUrl,
   tableTopRedis,
+  sanitizationUtils,
 } from "../index";
-import Utils from "./lib/Utils";
 import {
   TableContentStateTypes,
   StaticMimeTypes,
@@ -18,8 +18,6 @@ import {
 import { ChunkState, UploadSession } from "./lib/typeConstant";
 import Broadcaster from "src/lib/Broadcaster";
 import { videoTranscodeQueue } from "./lib/queues";
-
-const tableStaticContentUtils = new Utils();
 
 class Posts {
   private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
@@ -56,7 +54,24 @@ class Posts {
       bb.on("field", (fieldname, val) => {
         if (fieldname === "metadata") {
           try {
-            metadata = JSON.parse(val);
+            metadata = sanitizationUtils.sanitizeObject(JSON.parse(val), {
+              mimeType: "/+-",
+            }) as unknown as {
+              tableId: string;
+              username: string;
+              instance: string;
+              contentId: string;
+              instanceId: string;
+              direction: string;
+              state: TableContentStateTypes[];
+              initPositioning?: {
+                position: { top: number; left: number };
+                scale: { x: number; y: number };
+                rotation: number;
+              };
+              mimeType: StaticMimeTypes;
+              filename: string;
+            };
           } catch (e) {
             console.error("Invalid JSON in metadata field", e);
           }
@@ -72,13 +87,15 @@ class Posts {
           );
 
           if (checkReupload !== null) {
-            this.sendResponse(
-              res,
-              "409 Conflict",
-              "text/plain",
-              "Reupload already taking place"
-            );
-            aborted = true;
+            if (!aborted) {
+              this.sendResponse(
+                res,
+                "409 Conflict",
+                "text/plain",
+                "Reupload already taking place"
+              );
+              aborted = true;
+            }
           } else {
             await tableTopRedis.posts.post(
               "VRU",
@@ -90,20 +107,22 @@ class Posts {
         }
 
         file.on("limit", () => {
-          this.sendResponse(
-            res,
-            "413 Payload Too Large",
-            "text/plain",
-            "File too large"
-          );
-          aborted = true;
+          if (!aborted) {
+            this.sendResponse(
+              res,
+              "413 Payload Too Large",
+              "text/plain",
+              "File too large"
+            );
+            aborted = true;
+          }
           return;
         });
 
-        const sanitizedFilename = tableStaticContentUtils.sanitizeString(
+        const sanitizedFilename = sanitizationUtils.sanitizeString(
           metadata.filename.slice(0, metadata.filename.lastIndexOf("."))
         );
-        const sanitizedMimeType = tableStaticContentUtils.sanitizeMimeType(
+        const sanitizedMimeType = sanitizationUtils.sanitizeMimeType(
           metadata.mimeType
         );
         const completeFilename = `${sanitizedFilename}${
@@ -121,7 +140,7 @@ class Posts {
         const writeStream = fs.createWriteStream(outputPath);
         file.pipe(writeStream);
 
-        writeStream.on("finish", () => {
+        writeStream.on("finish", async () => {
           if (!metadata || aborted) return;
 
           videoTranscodeQueue.add(
@@ -164,7 +183,8 @@ class Posts {
                   tableId: metadata.tableId,
                   direction: metadata.direction,
                   mimeType: metadata.mimeType,
-                }
+                },
+            { removeOnComplete: true, removeOnFail: true }
           );
         });
 
@@ -197,7 +217,12 @@ class Posts {
           if (aborted) return;
 
           try {
-            const metadata = JSON.parse(buffer);
+            const metadata = sanitizationUtils.sanitizeObject(
+              JSON.parse(buffer),
+              {
+                mimeType: "/+-",
+              }
+            );
             const {
               tableId,
               username,
@@ -333,7 +358,17 @@ class Posts {
         aborted = true;
       });
 
-      const uploadId = req.getParameter(0);
+      const dirtyUploadId = req.getParameter(0);
+      if (!dirtyUploadId) {
+        this.sendResponse(
+          res,
+          "400 Bad Request",
+          "text/plain",
+          "Missing upload ID"
+        );
+        return;
+      }
+      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
       if (!uploadId) {
         this.sendResponse(res, "404 Not Found", "text/plain", "No upload id");
         aborted = true;
@@ -341,9 +376,10 @@ class Posts {
       }
 
       bb.on("field", async (name, val) => {
-        if (name === "totalChunks") totalChunks = parseInt(val, 10);
+        if (name === "totalChunks")
+          totalChunks = parseInt(sanitizationUtils.sanitizeString(val), 10);
         if (name === "chunkIndex") {
-          chunkIndex = parseInt(val, 10);
+          chunkIndex = parseInt(sanitizationUtils.sanitizeString(val), 10);
 
           state = (await tableTopRedis.gets.get("VCS", uploadId)) as ChunkState;
           if (!state) {
@@ -371,28 +407,30 @@ class Posts {
 
       bb.on("file", async (_fn, stream) => {
         stream.on("limit", async () => {
+          if (session) {
+            const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
+            await fs.promises.rm(tmpDir, { recursive: true, force: true });
+
+            await tableTopRedis.deletes.delete(
+              [
+                { prefix: "VUS", id: uploadId },
+                { prefix: "VCS", id: uploadId },
+                session?.direction === "reupload"
+                  ? { prefix: "VRU", id: session.contentId }
+                  : undefined,
+              ].filter((del) => del !== undefined)
+            );
+          }
+
+          if (aborted) return;
+
           this.sendResponse(
             res,
             "413 Payload Too Large",
             "text/plain",
-            "Chunk too large"
+            "File upload to large"
           );
           aborted = true;
-
-          if (!session) return;
-
-          const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
-          await fs.promises.rm(tmpDir, { recursive: true, force: true });
-
-          await tableTopRedis.deletes.delete(
-            [
-              { prefix: "VUS", id: uploadId },
-              { prefix: "VCS", id: uploadId },
-              session?.direction === "reupload"
-                ? { prefix: "VRU", id: session.contentId }
-                : undefined,
-            ].filter((del) => del !== undefined)
-          );
 
           return;
         });
@@ -402,6 +440,8 @@ class Posts {
           uploadId
         )) as UploadSession;
         if (!session) {
+          if (aborted) return;
+
           this.sendResponse(res, "404 Not Found", "text/plain", "No session");
           aborted = true;
           return;
@@ -411,6 +451,8 @@ class Posts {
           state = (await tableTopRedis.gets.get("VCS", uploadId)) as ChunkState;
         }
         if (!state) {
+          if (aborted) return;
+
           this.sendResponse(res, "404 Not Found", "text/plain", "No state");
           aborted = true;
           return;
@@ -420,6 +462,7 @@ class Posts {
 
         stream.on("end", async () => {
           if (aborted) return;
+
           const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
           await fs.promises.mkdir(tmpDir, { recursive: true });
 
@@ -496,7 +539,7 @@ class Posts {
             }
             writeStream.end();
 
-            videoTranscodeQueue.add(
+            const job = await videoTranscodeQueue.add(
               "transcode",
               session?.direction === "toTable"
                 ? {
@@ -533,7 +576,15 @@ class Posts {
                     tableId: session!.tableId,
                     direction: session!.direction,
                     mimeType: session!.mimeType,
-                  }
+                  },
+              { removeOnComplete: true, removeOnFail: true }
+            );
+
+            await tableTopRedis.posts.post(
+              "VVJ",
+              session!.contentId,
+              { id: job.id, state: "active" },
+              -1
             );
           }
 
@@ -554,9 +605,8 @@ class Posts {
         aborted = true;
       });
 
-      const uploadId = req.getParameter(0);
-
-      if (!uploadId) {
+      const dirtyUploadId = req.getParameter(0);
+      if (!dirtyUploadId) {
         this.sendResponse(
           res,
           "400 Bad Request",
@@ -565,6 +615,7 @@ class Posts {
         );
         return;
       }
+      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
 
       const session = (await tableTopRedis.gets.get(
         "VUS",
@@ -580,39 +631,56 @@ class Posts {
         return;
       }
 
-      // Async work must be done in next tick or promise
       (async () => {
         try {
-          const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
-          await fs.promises.rm(tmpDir, { recursive: true, force: true });
-
-          await tableTopRedis.deletes.delete(
-            [
-              { prefix: "VUS", id: uploadId },
-              { prefix: "VCS", id: uploadId },
-              session?.direction === "reupload"
-                ? { prefix: "VRU", id: session.contentId }
-                : undefined,
-            ].filter((del) => del !== undefined)
+          const videoJob = await tableTopRedis.gets.getKey(
+            `VVJ:${session.contentId}`
           );
+          if (videoJob) {
+            const { jobId } = videoJob;
 
-          this.broadcaster.broadcastToTable(session.tableId, {
-            type: "reuploadCancelled",
-            header: {
-              contentId: session.contentId,
-            },
-          });
+            await tableTopRedis.posts.post(
+              "VVJ",
+              session.contentId,
+              { id: jobId, state: "cancelled" },
+              -1
+            );
+          } else {
+            const tmpDir = `/tmp/tableTopVideoServerUploads/${uploadId}`;
+            await fs.promises.rm(tmpDir, { recursive: true, force: true });
+
+            await tableTopRedis.deletes.delete(
+              [
+                { prefix: "VUS", id: uploadId },
+                { prefix: "VCS", id: uploadId },
+                session?.direction === "reupload"
+                  ? { prefix: "VRU", id: session.contentId }
+                  : undefined,
+              ].filter((del) => del !== undefined)
+            );
+          }
+
+          if (session?.direction === "reupload") {
+            this.broadcaster.broadcastToTable(session.tableId, {
+              type: "reuploadCancelled",
+              header: {
+                contentId: session.contentId,
+              },
+            });
+          }
 
           if (!aborted) {
             this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
           }
         } catch (_) {
-          this.broadcaster.broadcastToTable(session.tableId, {
-            type: "reuploadCancelled",
-            header: {
-              contentId: session.contentId,
-            },
-          });
+          if (session?.direction === "reupload") {
+            this.broadcaster.broadcastToTable(session.tableId, {
+              type: "reuploadCancelled",
+              header: {
+                contentId: session.contentId,
+              },
+            });
+          }
 
           if (!aborted) {
             this.sendResponse(

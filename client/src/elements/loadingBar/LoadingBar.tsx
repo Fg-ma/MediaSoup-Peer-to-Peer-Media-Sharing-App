@@ -4,9 +4,11 @@ import FgHoverContentStandard from "../fgHoverContentStandard/FgHoverContentStan
 
 export default function LoadingBar({
   className,
+  loadingBarColor = "bg-fg-red",
   progress,
 }: {
   className?: string;
+  loadingBarColor?: string;
   progress: number;
 }) {
   return (
@@ -14,7 +16,7 @@ export default function LoadingBar({
       className={`${className} relative overflow-hidden rounded-full bg-fg-off-white`}
       content={
         <div
-          className="absolute left-0 top-0 h-full rounded-full bg-fg-red"
+          className={`${loadingBarColor} absolute left-0 top-0 h-full rounded-full`}
           style={{ width: `${progress}%` }}
         ></div>
       }

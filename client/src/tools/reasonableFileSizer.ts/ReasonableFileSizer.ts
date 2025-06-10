@@ -45,21 +45,33 @@ class ReasonableFileSizer {
     return new Promise((resolve) => {
       const video = document.createElement("video");
       video.preload = "metadata";
-      const objectURL = URL.createObjectURL(file);
-      video.src = objectURL;
       video.muted = true;
       video.playsInline = true;
-      console.log("worked");
-      video.style.position = "abosolute";
-      video.style.top = "0px";
-      video.style.left = "0px";
-      document.body.appendChild(video);
 
-      video.onloadedmetadata = () => {
+      const objectURL = URL.createObjectURL(file);
+      video.src = objectURL;
+
+      // Centralized cleanup
+      const cleanup = () => {
+        URL.revokeObjectURL(objectURL);
+        video.src = "";
+        video.removeEventListener("loadedmetadata", onLoadedMetadata);
+        video.removeEventListener("seeked", onSeeked);
+        video.removeEventListener("error", onError);
+      };
+
+      // Handler when metadata has loaded
+      const onLoadedMetadata = () => {
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+          cleanup();
+          return resolve(undefined);
+        }
+        // now safe to seek
         video.currentTime = 0.01;
       };
 
-      video.onseeked = () => {
+      // Handler when seeking completes
+      const onSeeked = () => {
         const canvas = document.createElement("canvas");
         const scale = Math.min(
           this.maxDim / video.videoWidth,
@@ -68,24 +80,32 @@ class ReasonableFileSizer {
         );
         canvas.width = Math.round(video.videoWidth * scale);
         canvas.height = Math.round(video.videoHeight * scale);
-        canvas.style.position = "abosolute";
-        canvas.style.top = "0px";
-        canvas.style.left = "0px";
-        document.body.appendChild(canvas);
 
         const ctx = canvas.getContext("2d");
         if (!ctx) {
-          URL.revokeObjectURL(objectURL);
+          cleanup();
           return resolve(undefined);
         }
+
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(objectURL);
-        resolve(canvas.toDataURL("image/png"));
+        const thumbnail = canvas.toDataURL("image/png");
+
+        cleanup();
+        resolve(thumbnail);
       };
 
-      video.onerror = () => {
+      // One-off error handler
+      const onError = () => {
+        cleanup();
         resolve(undefined);
       };
+
+      // Install all listeners with `{ once: true }` so they auto-remove after firing
+      video.addEventListener("loadedmetadata", onLoadedMetadata, {
+        once: true,
+      });
+      video.addEventListener("seeked", onSeeked, { once: true });
+      video.addEventListener("error", onError, { once: true });
     });
   }
 

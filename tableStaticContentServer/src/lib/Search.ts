@@ -2,7 +2,8 @@ import axios from "axios";
 import { onSearchTabledContentRequestType } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import elasticSearch from "../../../elasticSearchServer/src/index";
-import qdrant from "../../../qdrantServer/src/index";
+import { sanitizationUtils } from "src";
+// import qdrant from "../../../qdrantServer/src/index";
 
 class Search {
   private indexMap: Record<string, string> = {
@@ -27,8 +28,11 @@ class Search {
   onSearchTabledContentRequest = async (
     event: onSearchTabledContentRequestType
   ) => {
-    const { tableId, username, instance, contentType } = event.header;
-    const { name } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onSearchTabledContentRequestType;
+    const { tableId, username, instance, contentType } = safeEvent.header;
+    const { name } = safeEvent.data;
 
     let indices: string;
     if (contentType === "all") {
@@ -79,8 +83,11 @@ class Search {
   // onSearchTabledContentRequest = async (
   //   event: onSearchTabledContentRequestType
   // ) => {
-  //   const { tableId, username, instance, contentType } = event.header;
-  //   const { name } = event.data;
+  //   const safeEvent = utils.sanitizeObject(
+  //     event
+  //   ) as onSearchTabledContentRequestType;
+  //   const { tableId, username, instance, contentType } = safeEvent.header;
+  //   const { name } = safeEvent.data;
 
   //   const embeddedVector = await this.embed(name);
 

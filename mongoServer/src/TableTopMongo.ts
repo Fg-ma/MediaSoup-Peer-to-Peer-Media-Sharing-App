@@ -525,6 +525,7 @@ class TableTopMongo {
                 isPlaying: false,
                 lastKnownPosition: 0,
                 videoPlaybackSpeed: 1,
+                ended: true,
               },
             }))
           );

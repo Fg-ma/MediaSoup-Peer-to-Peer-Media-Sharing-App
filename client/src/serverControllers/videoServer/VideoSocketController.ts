@@ -201,6 +201,7 @@ class VideoSocketController {
     isPlaying: boolean,
     videoPosition: number,
     videoPlaybackSpeed: number,
+    ended: boolean,
   ) => {
     this.sendMessage({
       type: "updateVideoMetadata",
@@ -209,11 +210,11 @@ class VideoSocketController {
         contentId,
         instanceId,
       },
-      data: { isPlaying, videoPosition, videoPlaybackSpeed },
+      data: { isPlaying, videoPosition, videoPlaybackSpeed, ended },
     });
   };
 
-  requestCatchUpVideoPosition = (contentId: string, instanceId: string) => {
+  requestCatchUpVideoMetadata = (contentId: string, instanceId: string) => {
     this.sendMessage({
       type: "requestCatchUpVideoMetadata",
       header: {

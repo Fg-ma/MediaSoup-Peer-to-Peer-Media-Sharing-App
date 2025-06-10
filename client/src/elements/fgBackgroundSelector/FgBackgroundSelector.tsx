@@ -56,6 +56,11 @@ export default function FgBackgroundSelector({
         categories[activeBackground.category]?.[
           activeBackground.categorySelection
         ];
+      console.log(
+        background,
+        activeBackground.category,
+        activeBackground.categorySelection,
+      );
 
       backgroundRef.current.style.backgroundImage = background
         ? // prettier-ignore
@@ -115,7 +120,7 @@ export default function FgBackgroundSelector({
             <FgHoverContentStandard content="Background selector" />
           )
         }
-        className="relative flex aspect-square h-full items-center justify-center"
+        className="flex relative aspect-square h-full items-center justify-center"
         options={{
           hoverType: hoverType,
           hoverTimeoutDuration: 750,

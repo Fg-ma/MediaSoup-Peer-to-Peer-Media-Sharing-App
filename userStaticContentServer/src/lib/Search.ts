@@ -1,6 +1,7 @@
 import { onSearchUserContentRequestType } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import elasticSearch from "../../../elasticSearchServer/src/index";
+import { sanitizationUtils } from "src";
 
 class Search {
   private indexMap: Record<string, string> = {
@@ -25,8 +26,11 @@ class Search {
   onSearchUserContentRequest = async (
     event: onSearchUserContentRequestType
   ) => {
-    const { userId, instance, contentType } = event.header;
-    const { name } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onSearchUserContentRequestType;
+    const { userId, instance, contentType } = safeEvent.header;
+    const { name } = safeEvent.data;
 
     // build your list of indices
     let indices: string;

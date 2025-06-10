@@ -266,6 +266,18 @@ export default function FgTableVideo({
       );
   }, [videoSocket.current]);
 
+  useEffect(() => {
+    if (videoMediaInstance.settings.ended) {
+    } else {
+    }
+
+    return () => {
+      if (videoMediaInstance.settings.ended) {
+      } else {
+      }
+    };
+  }, [videoMediaInstance.settings.ended]);
+
   return (
     <FgMediaContainer
       filename={videoMediaInstance.videoMedia.filename}

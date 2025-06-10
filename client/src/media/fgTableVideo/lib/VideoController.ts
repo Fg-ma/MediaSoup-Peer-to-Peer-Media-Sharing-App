@@ -94,11 +94,10 @@ class VideoController {
   private onRespondedCatchUpEffects = (
     event: onRespondedCatchUpEffectsType,
   ) => {
-    const { contentType, contentId, instanceId } = event.header;
+    const { contentId, instanceId } = event.header;
     const { effects, effectStyles } = event.data;
 
     if (
-      contentType !== "video" ||
       contentId !== this.videoMediaInstance.videoMedia.videoId ||
       instanceId !== this.videoInstanceId
     )
@@ -127,8 +126,13 @@ class VideoController {
     )
       return;
 
-    const { isPlaying, lastKnownPosition, videoPlaybackSpeed, lastUpdatedAt } =
-      event.data;
+    const {
+      isPlaying,
+      lastKnownPosition,
+      videoPlaybackSpeed,
+      ended,
+      lastUpdatedAt,
+    } = event.data;
 
     if (this.videoMediaInstance.instanceVideo) {
       this.videoMediaInstance.instanceVideo.currentTime =
@@ -146,6 +150,8 @@ class VideoController {
     }
 
     this.videoMediaInstance.settings.isPlaying.value = isPlaying;
+
+    this.videoMediaInstance.settings.ended.value = ended;
 
     this.lowerVideoController.current.timeUpdate();
 
@@ -164,8 +170,13 @@ class VideoController {
     )
       return;
 
-    const { isPlaying, lastKnownPosition, videoPlaybackSpeed, lastUpdatedAt } =
-      event.data;
+    const {
+      isPlaying,
+      lastKnownPosition,
+      videoPlaybackSpeed,
+      ended,
+      lastUpdatedAt,
+    } = event.data;
 
     if (this.videoMediaInstance.instanceVideo) {
       this.videoMediaInstance.instanceVideo.currentTime =
@@ -183,6 +194,8 @@ class VideoController {
     }
 
     this.videoMediaInstance.settings.isPlaying.value = isPlaying;
+
+    this.videoMediaInstance.settings.ended.value = ended;
 
     this.lowerVideoController.current.timeUpdate();
 

@@ -1,5 +1,4 @@
 import uWS from "uWebSockets.js";
-import { StaticContentTypes } from "../../universal/contentTypeConstant";
 
 export interface Tables {
   [tableId: string]: {
@@ -60,6 +59,7 @@ export type onUpdateVideoMetadataType = {
     isPlaying: boolean;
     videoPosition: number;
     videoPlaybackSpeed: number;
+    ended: boolean;
   };
 };
 
@@ -83,7 +83,6 @@ export type onSignalReuploadStartType = {
   type: "signalReuploadStart";
   header: {
     tableId: string;
-    contentType: StaticContentTypes;
     contentId: string;
   };
 };

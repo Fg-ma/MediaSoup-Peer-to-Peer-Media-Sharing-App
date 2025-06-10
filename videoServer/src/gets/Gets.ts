@@ -1,30 +1,56 @@
 import uWS from "uWebSockets.js";
 import { Readable } from "stream";
-import { clientBaseUrl, tableTopCeph } from "../index";
+import { clientBaseUrl, tableTopCeph, sanitizationUtils } from "../index";
 
 class Gets {
   constructor(app: uWS.TemplatedApp) {
     app.any("/stream-video/:contentId/:file", (res, req) => {
       let isAborted = false;
-
       res.onAborted(() => {
         isAborted = true;
       });
 
-      const contentId = req.getParameter(0);
-      const file = req.getParameter(1);
+      const dirtyContentId = req.getParameter(0);
+      if (!dirtyContentId) {
+        if (!isAborted) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing content id"
+          );
+          isAborted = true;
+        }
+        return;
+      }
+      const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
 
-      if (!file) return;
+      const dirtyFile = req.getParameter(1);
+      if (!dirtyFile) {
+        if (!isAborted) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing file"
+          );
+          isAborted = true;
+        }
+        return;
+      }
+      const file = sanitizationUtils.sanitizeString(dirtyFile);
 
       const isHls = file.endsWith(".m3u8") || file.endsWith(".ts");
       const key = isHls ? `${contentId}/hls/${file}` : `${contentId}/${file}`;
 
       // Headers must be parsed manually
       let rangeHeader: string | undefined;
-
       req.forEach((key, value) => {
-        if (key.toLowerCase() === "range") {
-          rangeHeader = value;
+        const safeKey = sanitizationUtils.sanitizeString(key);
+
+        if (safeKey.toLowerCase() === "range") {
+          const safeValue = sanitizationUtils.sanitizeString(value, "=");
+          rangeHeader = safeValue;
         }
       });
 
@@ -37,12 +63,15 @@ class Gets {
             );
 
             if (!result?.Body || !(result.Body instanceof Readable)) {
-              res.cork(() => {
-                res
-                  .writeStatus("404 Not Found")
-                  .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-                  .end("File not found");
-              });
+              if (!isAborted) {
+                this.sendResponse(
+                  res,
+                  "404 Not Found",
+                  "text/plain",
+                  "File not found"
+                );
+                isAborted = true;
+              }
               return;
             }
 
@@ -53,15 +82,29 @@ class Gets {
 
             const buffer = Buffer.concat(chunks);
 
-            res.cork(() => {
-              res
-                .writeHeader("Content-Type", this.getMimeType(file))
-                .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-                .end(buffer);
-            });
+            if (!isAborted) {
+              res.cork(() => {
+                res
+                  .writeHeader("Content-Type", this.getMimeType(file))
+                  .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+                  .end(buffer);
+              });
+            }
           } else {
             const head = await tableTopCeph.gets.getHead("table-videos", key);
-            const fileSize = head?.ContentLength ?? 0;
+            if (!head) {
+              if (!isAborted) {
+                this.sendResponse(
+                  res,
+                  "404 Not Found",
+                  "text/plain",
+                  "File not found"
+                );
+                isAborted = true;
+              }
+              return;
+            }
+            const fileSize = head.ContentLength ?? 0;
 
             const [startStr, endStr] = rangeHeader
               .replace(/bytes=/, "")
@@ -77,12 +120,15 @@ class Gets {
             );
 
             if (!result?.Body || !(result.Body instanceof Readable)) {
-              res.cork(() => {
-                res
-                  .writeStatus("404 Not Found")
-                  .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-                  .end("File chunk not found");
-              });
+              if (!isAborted) {
+                this.sendResponse(
+                  res,
+                  "404 Not Found",
+                  "text/plain",
+                  "File not found"
+                );
+                isAborted = true;
+              }
               return;
             }
 
@@ -93,48 +139,139 @@ class Gets {
 
             const buffer = Buffer.concat(chunks);
 
+            if (!isAborted) {
+              res.cork(() => {
+                res
+                  .writeStatus("206 Partial Content")
+                  .writeHeader(
+                    "Content-Range",
+                    `bytes ${start}-${end}/${fileSize}`
+                  )
+                  .writeHeader("Accept-Ranges", "bytes")
+                  .writeHeader("Content-Length", chunkSize.toString())
+                  .writeHeader("Content-Type", this.getMimeType(file))
+                  .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+                  .end(buffer);
+              });
+            }
+          }
+        } catch (_) {
+          if (!isAborted) {
+            this.sendResponse(
+              res,
+              "500 Internal Server Error",
+              "text/plain",
+              "Internal Server Error"
+            );
+          }
+        }
+      })();
+    });
+
+    app.any("/stream-video-thumbnail/:contentId", (res, req) => {
+      let isAborted = false;
+      res.onAborted(() => {
+        isAborted = true;
+      });
+
+      const dirtyContentId = req.getParameter(0);
+      if (!dirtyContentId) {
+        if (!isAborted) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing content id"
+          );
+          isAborted = true;
+        }
+        return;
+      }
+      const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
+
+      (async () => {
+        try {
+          const result = await tableTopCeph.gets.getContent(
+            "table-videos",
+            `${contentId}/thumbnail.jpg`
+          );
+
+          if (!result?.Body || !(result.Body instanceof Readable)) {
+            if (!isAborted) {
+              this.sendResponse(
+                res,
+                "404 Not Found",
+                "text/plain",
+                "File not found"
+              );
+              isAborted = true;
+            }
+            return;
+          }
+
+          const chunks: Buffer[] = [];
+          for await (const chunk of result.Body) {
+            chunks.push(chunk as Buffer);
+          }
+
+          const buffer = Buffer.concat(chunks);
+
+          if (!isAborted) {
             res.cork(() => {
               res
-                .writeStatus("206 Partial Content")
-                .writeHeader(
-                  "Content-Range",
-                  `bytes ${start}-${end}/${fileSize}`
-                )
-                .writeHeader("Accept-Ranges", "bytes")
-                .writeHeader("Content-Length", chunkSize.toString())
-                .writeHeader("Content-Type", this.getMimeType(file))
+                .writeHeader("Content-Type", "image/jpg")
                 .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
                 .end(buffer);
             });
           }
-        } catch (err) {
-          console.error("Streaming error:", err);
+        } catch (_) {
           if (!isAborted) {
-            res.cork(() => {
-              res
-                .writeStatus("500 Internal Server Error")
-                .end("Internal Server Error");
-            });
+            this.sendResponse(
+              res,
+              "500 Internal Server Error",
+              "text/plain",
+              "Internal Server Error"
+            );
           }
         }
       })();
     });
 
     app.any("/download-video/:contentId/:file", (res, req) => {
-      const contentId = req.getParameter(0);
-      const file = req.getParameter(1);
-      const key = `${contentId}/${file}`;
-
-      if (!file || !contentId) {
-        res
-          .writeStatus("404 Not Found")
-          .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-          .end("File not found");
-        return;
-      }
-
       let isAborted = false;
       res.onAborted(() => (isAborted = true));
+
+      const dirtyContentId = req.getParameter(0);
+      if (!dirtyContentId) {
+        if (!isAborted) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing content id"
+          );
+          isAborted = true;
+        }
+        return;
+      }
+      const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
+
+      const dirtyFile = req.getParameter(1);
+      if (!dirtyFile) {
+        if (!isAborted) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing file"
+          );
+          isAborted = true;
+        }
+        return;
+      }
+      const file = sanitizationUtils.sanitizeString(dirtyFile);
+
+      const key = `${contentId}/${file}`;
 
       (async () => {
         try {
@@ -142,12 +279,17 @@ class Gets {
             "table-videos",
             key
           );
-          console.log(result);
+
           if (!result?.Body || !(result.Body instanceof Readable)) {
-            res
-              .writeStatus("404 Not Found")
-              .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-              .end("File not found");
+            if (!isAborted) {
+              this.sendResponse(
+                res,
+                "404 Not Found",
+                "text/plain",
+                "File not found"
+              );
+              isAborted = true;
+            }
             return;
           }
 
@@ -155,26 +297,55 @@ class Gets {
           for await (const chunk of result.Body) chunks.push(chunk as Buffer);
           const buffer = Buffer.concat(chunks);
 
-          res.cork(() => {
-            res
-              .writeHeader("Content-Type", this.getMimeType(file))
-              .writeHeader(
-                "Content-Disposition",
-                `attachment; filename="${file}"`
-              )
-              .writeHeader("Content-Length", buffer.length.toString())
-              .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
-              .end(buffer);
-          });
-        } catch (err) {
-          console.error("Download error:", err);
           if (!isAborted) {
-            res.writeStatus("500 Internal Server Error").end("Download error");
+            res.cork(() => {
+              res
+                .writeHeader("Content-Type", this.getMimeType(file))
+                .writeHeader(
+                  "Content-Disposition",
+                  `attachment; filename="${file}"`
+                )
+                .writeHeader("Content-Length", buffer.length.toString())
+                .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+                .end(buffer);
+            });
+          }
+        } catch (_) {
+          if (!isAborted) {
+            this.sendResponse(
+              res,
+              "500 Internal Server Error",
+              "text/plain",
+              "Download error"
+            );
           }
         }
       })();
     });
   }
+
+  private sendResponse = (
+    res: uWS.HttpResponse,
+    status: string,
+    contentType: string,
+    end: string
+  ) => {
+    if (!clientBaseUrl) {
+      res.cork(() => {
+        res.writeStatus("403 Forbidden");
+        res.writeHeader("Content-Type", "text/plain");
+        res.end("Origin header missing - request blocked");
+      });
+    } else {
+      res.cork(() => {
+        res
+          .writeStatus(status)
+          .writeHeader("Content-Type", contentType)
+          .writeHeader("Access-Control-Allow-Origin", clientBaseUrl!)
+          .end(end);
+      });
+    }
+  };
 
   private getMimeType = (file: string) => {
     if (file.endsWith(".m3u8")) return "application/vnd.apple.mpegurl";

@@ -6,12 +6,16 @@ import {
   TableStaticContentWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { sanitizationUtils } from "src";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = (ws: TableStaticContentWebSocket, event: onJoinTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onJoinTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
     ws.tableId = tableId;
@@ -38,7 +42,10 @@ class TablesController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onLeaveTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     if (
       tables[tableId] &&

@@ -7,14 +7,17 @@ import {
   tables,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { tableTopMongo } from "src";
+import { sanitizationUtils, tableTopMongo } from "src";
 import { GameTypes } from "../../../universal/contentTypeConstant";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = async (ws: GameWebSocket, event: onJoinTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onJoinTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     if (!tables[tableId]) {
       tables[tableId] = {};
@@ -51,7 +54,10 @@ class TablesController {
   };
 
   onNewGameSocket = (ws: GameWebSocket, event: onNewGameSocketType) => {
-    const { tableId, username, instance, gameType, gameId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onNewGameSocketType;
+    const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     if (!tables[tableId]) {
       tables[tableId] = {};
@@ -78,8 +84,11 @@ class TablesController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onLeaveTableType;
     const { tableId, username, instance, socketType, gameType, gameId } =
-      event.header;
+      safeEvent.header;
 
     if (socketType === "signaling") {
       if (

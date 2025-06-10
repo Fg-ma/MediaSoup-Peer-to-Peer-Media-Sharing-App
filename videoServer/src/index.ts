@@ -12,12 +12,14 @@ import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
 import "./posts/lib/videoTranscodeQueue.worker.ts";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
 export const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
+export const sanitizationUtils = new SanitizationUtils();
 export const tableTopRedis = new TableTopRedis();
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();
@@ -115,6 +117,7 @@ app
                   isPlaying: boolean;
                   lastKnownPosition: number;
                   videoPlaybackSpeed: number;
+                  ended: boolean;
                   lastUpdatedAt: number;
                 };
 
@@ -125,13 +128,14 @@ app
                       {
                         videoInstanceId: instanceId,
                         meta: {
-                          isPlaying: meta.isPlaying,
+                          isPlaying: false,
                           lastKnownPosition:
                             (meta.isPlaying
                               ? ((Date.now() - meta.lastUpdatedAt) / 1000) *
                                 meta.videoPlaybackSpeed
                               : 0) + meta.lastKnownPosition,
                           videoPlaybackSpeed: meta.videoPlaybackSpeed,
+                          ended: true,
                         },
                       },
                     ],

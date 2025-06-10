@@ -1,9 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
-import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
+import {
+  TableContentStateTypes,
+  UploadingStateTypes,
+} from "../../../../../../universal/contentTypeConstant";
 import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
-import { GeneralSignals } from "src/context/signalContext/lib/typeConstant";
+import { GeneralSignals } from "../../../../context/signalContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -11,6 +15,7 @@ const tableStaticContentServerBaseUrl =
 export type ChunkedUploadListenerTypes =
   | { type: "uploadPaused" }
   | { type: "uploadPlay" }
+  | { type: "uploadFailed" }
   | {
       type: "uploadProgress";
       data: { progress: number };
@@ -18,6 +23,8 @@ export type ChunkedUploadListenerTypes =
 
 class ChunkUploader {
   private readonly CHUNK_SIZE = 1024 * 1024 * 5;
+
+  uploadingState: UploadingStateTypes = "uploading";
 
   private offset: number = 0;
 
@@ -38,6 +45,9 @@ class ChunkUploader {
     new Set();
 
   constructor(
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
     private tableId: React.MutableRefObject<string>,
     public file: File,
     private uploadId: string,
@@ -71,9 +81,11 @@ class ChunkUploader {
   };
 
   deconstructor = async () => {
-    await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
-      this.contentId,
-    );
+    if (this.handle) {
+      await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
+        this.contentId,
+      );
+    }
     if (this.uploadUrl) URL.revokeObjectURL(this.uploadUrl);
     this.removeCurrentUpload(this.contentId);
     this.sendUploadSignal({ type: "uploadFinish" });
@@ -85,6 +97,7 @@ class ChunkUploader {
 
     if (this.currentChunkAbortController) {
       this.currentChunkAbortController.abort();
+      this.currentChunkAbortController = null;
     }
 
     try {
@@ -171,25 +184,23 @@ class ChunkUploader {
             return;
           }
           if (response.status !== 409) {
-            this.chunkErrorRetryUpload();
-            break;
+            this.uploadFailed();
+            return;
           }
         }
 
-        if (response.status !== 409) {
-          const end = Date.now();
-          const durationMs = end - start;
-          const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
+        const end = Date.now();
+        const durationMs = end - start;
+        const speedKBps = this.CHUNK_SIZE / 1024 / (durationMs / 1000);
 
-          this.uploadSpeedHistory.push({
-            time: end - (this.uploadStartTime ?? 0),
-            speedKBps,
-          });
-          this.uploadAbsoluteSpeedHistory.push({
-            time: end,
-            speedKBps,
-          });
-        }
+        this.uploadSpeedHistory.push({
+          time: end - (this.uploadStartTime ?? 0),
+          speedKBps,
+        });
+        this.uploadAbsoluteSpeedHistory.push({
+          time: end,
+          speedKBps,
+        });
 
         this.offset += this.CHUNK_SIZE;
 
@@ -218,7 +229,11 @@ class ChunkUploader {
     }
   };
 
-  private chunkErrorRetryUpload = async () => {
+  private uploadFailed = async () => {
+    this.tableStaticContentSocket.current?.deleteUploadSession(this.uploadId);
+
+    this.uploadingState = "failed";
+
     this._progress = 0;
     this.offset = 0;
     this.uploadSpeedHistory = [];
@@ -231,10 +246,21 @@ class ChunkUploader {
       });
     });
 
-    if (this.handle)
+    if (this.handle) {
       await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
         this.contentId,
       );
+    }
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "uploadFailed",
+      });
+    });
+  };
+
+  retryUpload = async () => {
+    this.uploadingState = "failed";
 
     if (!tableStaticContentServerBaseUrl) return;
 

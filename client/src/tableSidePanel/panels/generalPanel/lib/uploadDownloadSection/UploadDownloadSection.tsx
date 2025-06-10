@@ -81,7 +81,9 @@ export default function MultiDownloadChart() {
   const { getCurrentDownloads, getCurrentUploads } = useUploadDownloadContext();
   const traffic = [
     ...Object.values(getCurrentDownloads()),
-    ...Object.values(getCurrentUploads()),
+    ...Object.values(getCurrentUploads()).filter(
+      (upload) => upload.uploadingState !== "failed",
+    ),
   ];
 
   const [now, setNow] = useState(Date.now());
@@ -89,9 +91,11 @@ export default function MultiDownloadChart() {
 
   // Tick now every second to keep chart moving
   useEffect(() => {
+    if (traffic.length === 0) return;
+
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [traffic.length]);
 
   // Process each download series
   const seriesData: {
@@ -101,23 +105,40 @@ export default function MultiDownloadChart() {
       speed: number;
     }[];
     type: "download" | "upload";
-  }[] = traffic.map((t) => {
-    const absoluteSpeed = t.getAbsoluteSpeedHistory();
+  }[] = traffic
+    .map((t) => {
+      if (
+        !(t instanceof Downloader) &&
+        !(t instanceof LiveTextDownloader) &&
+        t.uploadingState === "failed"
+      ) {
+        return undefined;
+      }
 
-    const data = absoluteSpeed.map((s) => ({
-      time: s.time,
-      speed: s.speedKBps,
-    }));
+      const absoluteSpeed = t.getAbsoluteSpeedHistory();
 
-    return {
-      filename: t.filename,
-      data,
-      type:
-        t instanceof Downloader || t instanceof LiveTextDownloader
-          ? "download"
-          : "upload",
-    };
-  });
+      const data = absoluteSpeed.map((s) => ({
+        time: s.time,
+        speed: s.speedKBps,
+      }));
+
+      return {
+        filename: t.filename,
+        data,
+        type:
+          t instanceof Downloader || t instanceof LiveTextDownloader
+            ? "download"
+            : "upload",
+      };
+    })
+    .filter((data) => data !== undefined) as {
+    filename: string;
+    data: {
+      time: number;
+      speed: number;
+    }[];
+    type: "download" | "upload";
+  }[];
 
   // Define sliding window based on real time
   const domainEnd = now;

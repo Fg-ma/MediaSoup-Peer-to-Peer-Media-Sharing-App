@@ -38,6 +38,19 @@ class Posts {
     }
   };
 
+  set = async (
+    key: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any,
+    ttlSeconds = 1800
+  ): Promise<void> => {
+    if (ttlSeconds !== -1) {
+      await this.redis.set(key, data, "EX", ttlSeconds);
+    } else {
+      await this.redis.set(key, data);
+    }
+  };
+
   extendLife = async (
     prefix: string,
     id: string,

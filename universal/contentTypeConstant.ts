@@ -5,6 +5,8 @@ export type LoadingStateTypes =
   | "paused"
   | "reuploading";
 
+export type UploadingStateTypes = "uploading" | "failed" | "processing";
+
 export type ContentTypes =
   | "video"
   | "image"
@@ -88,6 +90,33 @@ export const mimeTypeContentTypeMap: {
     "application",
   "text/plain": "text",
 };
+
+export const mimeTypeContentTypeSet = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+  "image/tiff",
+  "image/svg+xml",
+  "video/mp4",
+  "video/mpeg",
+  "video/webm",
+  "video/ogg",
+  "video/x-msvideo",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+  "application/pdf",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+]);
 
 export const mimeToExtension: {
   [tableTopStaticMimeType in StaticMimeTypes]: string;

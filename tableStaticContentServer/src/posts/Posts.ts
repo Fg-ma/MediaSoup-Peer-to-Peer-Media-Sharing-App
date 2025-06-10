@@ -8,8 +8,8 @@ import {
   tableTopCeph,
   tableTopMongo,
   tableTopRedis,
+  sanitizationUtils,
 } from "../index";
-import Utils from "./lib/Utils";
 import { contentTypeBucketMap } from "../typeConstant";
 import {
   defaultApplicationEffectsStyles,
@@ -30,8 +30,6 @@ import {
 } from "../../../universal/contentTypeConstant";
 import { ChunkState, UploadSession } from "./lib/typeConstant";
 import Broadcaster from "src/lib/Broadcaster";
-
-const tableStaticContentUtils = new Utils();
 
 class Posts {
   private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
@@ -66,7 +64,22 @@ class Posts {
       bb.on("field", (fieldname, val) => {
         if (fieldname === "metadata") {
           try {
-            metadata = JSON.parse(val);
+            metadata = sanitizationUtils.sanitizeObject(JSON.parse(val), {
+              mimeType: "/+-",
+            }) as unknown as {
+              tableId: string;
+              contentId: string;
+              instanceId: string;
+              direction: string;
+              state: TableContentStateTypes[];
+              initPositioning?: {
+                position: { top: number; left: number };
+                scale: { x: number; y: number };
+                rotation: number;
+              };
+              mimeType: StaticMimeTypes;
+              filename: string;
+            };
           } catch (e) {
             console.error("Invalid JSON in metadata field", e);
           }
@@ -110,10 +123,10 @@ class Posts {
           return;
         });
 
-        const sanitizedFilename = tableStaticContentUtils.sanitizeString(
+        const sanitizedFilename = sanitizationUtils.sanitizeString(
           metadata.filename.slice(0, metadata.filename.lastIndexOf("."))
         );
-        const sanitizedMimeType = tableStaticContentUtils.sanitizeMimeType(
+        const sanitizedMimeType = sanitizationUtils.sanitizeMimeType(
           metadata.mimeType
         );
         const completeFilename = `${sanitizedFilename}${
@@ -211,7 +224,12 @@ class Posts {
           if (aborted) return;
 
           try {
-            const metadata = JSON.parse(buffer);
+            const metadata = sanitizationUtils.sanitizeObject(
+              JSON.parse(buffer),
+              {
+                mimeType: "/+-",
+              }
+            );
             const {
               tableId,
               contentId,
@@ -347,17 +365,23 @@ class Posts {
         aborted = true;
       });
 
-      const uploadId = req.getParameter(0);
-      if (!uploadId) {
-        this.sendResponse(res, "404 Not Found", "text/plain", "No upload id");
-        aborted = true;
+      const dirtyUploadId = req.getParameter(0);
+      if (!dirtyUploadId) {
+        this.sendResponse(
+          res,
+          "400 Bad Request",
+          "text/plain",
+          "Missing upload ID"
+        );
         return;
       }
+      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
 
       bb.on("field", async (name, val) => {
-        if (name === "totalChunks") totalChunks = parseInt(val, 10);
+        if (name === "totalChunks")
+          totalChunks = parseInt(sanitizationUtils.sanitizeString(val), 10);
         if (name === "chunkIndex") {
-          chunkIndex = parseInt(val, 10);
+          chunkIndex = parseInt(sanitizationUtils.sanitizeString(val), 10);
 
           state = (await tableTopRedis.gets.get(
             "TSCCS",
@@ -575,9 +599,8 @@ class Posts {
         aborted = true;
       });
 
-      const uploadId = req.getParameter(0);
-
-      if (!uploadId) {
+      const dirtyUploadId = req.getParameter(0);
+      if (!dirtyUploadId) {
         this.sendResponse(
           res,
           "400 Bad Request",
@@ -586,6 +609,7 @@ class Posts {
         );
         return;
       }
+      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
 
       const session = (await tableTopRedis.gets.get(
         "TSCUS",

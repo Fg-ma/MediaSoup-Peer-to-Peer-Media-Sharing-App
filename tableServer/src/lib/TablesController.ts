@@ -14,12 +14,16 @@ import {
   TableWebSocket,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { sanitizationUtils } from "src";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
   onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onJoinTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
     ws.tableId = tableId;
@@ -57,7 +61,10 @@ class TablesController {
   };
 
   onLeaveTable = (event: onLeaveTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onLeaveTableType;
+    const { tableId, username, instance } = safeEvent.header;
 
     if (
       tables[tableId] &&
@@ -76,8 +83,11 @@ class TablesController {
   };
 
   onChangeTableBackground = (event: onChangeTableBackgroundType) => {
-    const { tableId, username, instance } = event.header;
-    const { background } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onChangeTableBackgroundType;
+    const { tableId, username, instance } = safeEvent.header;
+    const { background } = safeEvent.data;
 
     this.broadcaster.broadcastToTable(
       tableId,
@@ -90,8 +100,11 @@ class TablesController {
   };
 
   onMoveSeats = (event: onMoveSeatsType) => {
-    const { tableId, username } = event.header;
-    const { direction } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onMoveSeatsType;
+    const { tableId, username } = safeEvent.header;
+    const { direction } = safeEvent.data;
 
     // Get the table's user data
     const tableData = tablesUserData[tableId];
@@ -141,7 +154,10 @@ class TablesController {
   };
 
   onSwapSeats = (event: onSwapSeatsType) => {
-    const { tableId, username, targetUsername } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onSwapSeatsType;
+    const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
 
@@ -160,7 +176,10 @@ class TablesController {
   };
 
   onKickFromTable = (event: onKickFromTableType) => {
-    const { tableId, username, targetUsername } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onKickFromTableType;
+    const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
 
@@ -177,7 +196,8 @@ class TablesController {
   };
 
   onReaction = (event: onReactionType) => {
-    const { tableId, contentType, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(event) as onReactionType;
+    const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {
       type: "reactionOccurred",
@@ -186,7 +206,7 @@ class TablesController {
         contentId,
         instanceId,
       },
-      data: event.data,
+      data: safeEvent.data,
     });
   };
 

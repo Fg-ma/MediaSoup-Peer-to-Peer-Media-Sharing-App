@@ -1,4 +1,4 @@
-import { tableTopMongo, tableTopRedis } from "src";
+import { tableTopMongo, tableTopRedis, sanitizationUtils } from "src";
 import {
   onDeleteUploadSessionType,
   onMuteStylesRequestType,
@@ -9,7 +9,10 @@ class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
   onMuteStylesRequest = async (event: onMuteStylesRequestType) => {
-    const { userId, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onMuteStylesRequestType;
+    const { userId, instance } = safeEvent.header;
 
     const userSvgs = await tableTopMongo.userSvgs?.gets.getAllBy_UID(userId);
 
@@ -25,7 +28,10 @@ class MetadataController {
   };
 
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
-    const { uploadId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDeleteUploadSessionType;
+    const { uploadId } = safeEvent.header;
 
     await tableTopRedis.deletes.delete([
       { prefix: "USCUS", id: uploadId },

@@ -68,6 +68,7 @@ type onUpdateVideoMetadataType = {
     isPlaying: boolean;
     videoPosition: number;
     videoPlaybackSpeed: number;
+    ended: boolean;
   };
 };
 
@@ -238,6 +239,7 @@ export type onUpdatedVideoMetadataType = {
     isPlaying: boolean;
     lastKnownPosition: number;
     videoPlaybackSpeed: number;
+    ended: boolean;
     lastUpdatedAt: number;
   };
 };
@@ -252,6 +254,7 @@ export type onRespondedCatchUpVideoMetadataType = {
     isPlaying: boolean;
     lastKnownPosition: number;
     videoPlaybackSpeed: number;
+    ended: boolean;
     lastUpdatedAt: number;
   };
 };

@@ -12,7 +12,9 @@ import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import Gets from "./gets/Gets";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
+export const sanitizationUtils = new SanitizationUtils();
 export const tableTopRedis = new TableTopRedis();
 export const tableTopMongo = new TableTopMongo();
 export const tableTopCeph = new TableTopCeph();

@@ -1,4 +1,4 @@
-import { Worker } from "bullmq";
+import { Worker, Job } from "bullmq";
 import path from "path";
 import fs from "fs/promises";
 import { spawn } from "child_process";
@@ -145,6 +145,7 @@ const handleMongoVideoUploads = async (
               isPlaying: false,
               lastKnownPosition: 0,
               videoPlaybackSpeed: 1,
+              ended: true,
             },
           },
         ]
@@ -179,10 +180,21 @@ const isReencodingNeeded = async (filePath: string): Promise<boolean> => {
   });
 };
 
+enum TranscodeStep {
+  Start = "Start",
+  CheckEncoding = "CheckEncoding",
+  ReEncode = "ReEncode",
+  TranscodeHLS = "TranscodeHLS",
+  GenerateThumbnail = "GenerateThumbnail",
+  UploadHLS = "UploadHLS",
+  UploadMP4 = "UploadMP4",
+  UploadThumbnail = "UploadThumbnail",
+}
+
 new Worker(
   "videoTranscodeQueue",
-  async (job: {
-    data: {
+  async (
+    job: Job<{
       tableId: string;
       username: string;
       instance: string;
@@ -195,8 +207,18 @@ new Worker(
       mimeType: StaticMimeTypes;
       instanceId: string;
       state: [];
+    }>
+  ) => {
+    let currentStep: TranscodeStep = TranscodeStep.Start;
+
+    const checkAbort = async () => {
+      const videoJob = await tableTopRedis.gets.getKey(`VVJ:${contentId}`);
+
+      if (videoJob && videoJob.state === "cancelled") {
+        throw new Error(`Aborted at step: ${currentStep}`);
+      }
     };
-  }) => {
+
     const {
       tableId,
       username,
@@ -219,177 +241,301 @@ new Worker(
     const inputPath = path.join(tmpDir, `input${fileExtension}`);
     const hlsDir = path.join(tmpDir, "hls");
     const mp4Path = path.join(tmpDir, "output.mp4");
+    const thumbnailPath = path.join(tmpDir, "thumbnail.jpg");
 
-    await fs.mkdir(hlsDir);
+    try {
+      await fs.mkdir(hlsDir);
 
-    const needsEncoding = await isReencodingNeeded(inputPath);
+      currentStep = TranscodeStep.CheckEncoding;
+      const needsEncoding = await isReencodingNeeded(inputPath);
+      await checkAbort();
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.1 },
-    });
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.1 },
+      });
 
-    // Re-encode only if needed
-    if (needsEncoding) {
+      // Re-encode only if needed
+      if (needsEncoding) {
+        currentStep = TranscodeStep.ReEncode;
+        await new Promise((resolve, reject) => {
+          const ffmpeg = spawn("ffmpeg", [
+            "-i",
+            inputPath,
+            "-vf",
+            "scale=trunc(iw/2)*2:trunc(ih/2)*2",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "veryfast",
+            "-crf",
+            "28",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "96k",
+            "-movflags",
+            "+faststart",
+            mp4Path,
+          ]);
+          ffmpeg.on("close", (code) => {
+            if (code !== 0) {
+              return reject(new Error(`FFmpeg exited with code ${code}`));
+            }
+            resolve(null);
+          });
+          ffmpeg.on("error", (error) => {
+            return reject(new Error(`FFmpeg exited with error ${error}`));
+          });
+        });
+        await checkAbort();
+      } else {
+        await fs.copyFile(inputPath, mp4Path);
+      }
+
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.4 },
+      });
+
+      currentStep = TranscodeStep.TranscodeHLS;
       await new Promise((resolve, reject) => {
         const ffmpeg = spawn("ffmpeg", [
           "-i",
-          inputPath,
-          "-vf",
-          "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-          "-c:v",
-          "libx264",
+          mp4Path,
           "-preset",
           "veryfast",
           "-crf",
           "28",
+          "-g",
+          "48",
+          "-sc_threshold",
+          "0",
+          "-c:v",
+          "libx264",
           "-c:a",
           "aac",
           "-b:a",
           "96k",
-          "-movflags",
-          "+faststart",
+          "-f",
+          "hls",
+          "-hls_time",
+          "6",
+          "-hls_playlist_type",
+          "vod",
+          path.join(hlsDir, "index.m3u8"),
+        ]);
+        ffmpeg.on("close", resolve);
+        ffmpeg.on("error", reject);
+      });
+      await checkAbort();
+
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.7 },
+      });
+
+      currentStep = TranscodeStep.GenerateThumbnail;
+      await new Promise((resolve, reject) => {
+        const ffmpeg = spawn("ffmpeg", [
+          "-ss",
+          "00:00:01", // 1 second in
+          "-i",
           mp4Path,
+          "-frames:v",
+          "1",
+          "-q:v",
+          "2", // quality
+          thumbnailPath,
         ]);
         ffmpeg.on("close", (code) => {
           if (code !== 0) {
-            return reject(new Error(`FFmpeg exited with code ${code}`));
+            return reject(
+              new Error(`Thumbnail FFmpeg exited with code ${code}`)
+            );
           }
           resolve(null);
         });
         ffmpeg.on("error", (error) => {
-          return reject(new Error(`FFmpeg exited with error ${error}`));
+          return reject(new Error(`Thumbnail FFmpeg error: ${error}`));
         });
       });
-    } else {
-      await fs.copyFile(inputPath, mp4Path);
-    }
+      await checkAbort();
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.4 },
-    });
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.8 },
+      });
 
-    // HLS Transcoding
-    await new Promise((resolve, reject) => {
-      const ffmpeg = spawn("ffmpeg", [
-        "-i",
-        mp4Path,
-        "-preset",
-        "veryfast",
-        "-crf",
-        "28",
-        "-g",
-        "48",
-        "-sc_threshold",
-        "0",
-        "-c:v",
-        "libx264",
-        "-c:a",
-        "aac",
-        "-b:a",
-        "96k",
-        "-f",
-        "hls",
-        "-hls_time",
-        "6",
-        "-hls_playlist_type",
-        "vod",
-        path.join(hlsDir, "index.m3u8"),
-      ]);
-      ffmpeg.on("close", resolve);
-      ffmpeg.on("error", reject);
-    });
+      // Upload to Ceph
+      currentStep = TranscodeStep.UploadHLS;
+      const files = await fs.readdir(hlsDir);
+      for (const file of files) {
+        const content = await fs.readFile(path.join(hlsDir, file));
+        await tableTopCeph.posts.uploadFile(
+          "table-videos",
+          `${contentId}/hls/${file}`,
+          content
+        );
+      }
+      await checkAbort();
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.8 },
-    });
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.9 },
+      });
 
-    // Upload to Ceph
-    const files = await fs.readdir(hlsDir);
-    for (const file of files) {
-      const content = await fs.readFile(path.join(hlsDir, file));
+      currentStep = TranscodeStep.UploadMP4;
+      const mp4Content = await fs.readFile(mp4Path);
       await tableTopCeph.posts.uploadFile(
         "table-videos",
-        `${contentId}/hls/${file}`,
-        content
+        `${contentId}/video.mp4`,
+        mp4Content
       );
-    }
+      await checkAbort();
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.9 },
-    });
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.925 },
+      });
 
-    const mp4Content = await fs.readFile(mp4Path);
-    await tableTopCeph.posts.uploadFile(
-      "table-videos",
-      `${contentId}/video.mp4`,
-      mp4Content
-    );
+      currentStep = TranscodeStep.UploadThumbnail;
+      const thumbBuffer = await fs.readFile(thumbnailPath);
+      await tableTopCeph.posts.uploadFile(
+        "table-videos",
+        `${contentId}/thumbnail.jpg`,
+        thumbBuffer
+      );
+      await checkAbort();
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.95 },
-    });
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.95 },
+      });
 
-    switch (direction) {
-      case "toTable":
-        await handleToTable(
-          tableId,
-          contentId,
-          sessionMeta.instanceId,
-          sessionMeta.mimeType,
-          filename,
-          sessionMeta.state
+      switch (direction) {
+        case "toTable":
+          await handleToTable(
+            tableId,
+            contentId,
+            sessionMeta.instanceId,
+            sessionMeta.mimeType,
+            filename,
+            sessionMeta.state
+          );
+          break;
+        case "reupload":
+          handleReupload(tableId, contentId);
+          break;
+        case "toTabled":
+          await handleToTabled(
+            tableId,
+            contentId,
+            sessionMeta.mimeType,
+            filename,
+            sessionMeta.state
+          );
+          break;
+      }
+
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingProgress",
+        header: { contentId },
+        data: { progress: 0.975 },
+      });
+
+      // Cleanup
+      await fs.rm(tmpDir, { recursive: true, force: true });
+
+      const redisDeletes = [
+        { prefix: "VVJ", id: contentId },
+        ...(uploadId
+          ? [
+              { prefix: "VUS", id: uploadId },
+              { prefix: "VCS", id: uploadId },
+            ]
+          : []),
+        direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
+      ].filter((del) => del !== undefined);
+      await tableTopRedis.deletes.delete(redisDeletes);
+
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "processingFinished",
+        header: { contentId },
+      });
+    } catch {
+      const cleanupHLS = async () => {
+        const files = await fs.readdir(hlsDir);
+        for (const file of files) {
+          await tableTopCeph.deletes.deleteFile(
+            "table-videos",
+            `${contentId}/hls/${file}`
+          );
+        }
+      };
+
+      const cleanupMP4 = async () => {
+        await tableTopCeph.deletes.deleteFile(
+          "table-videos",
+          `${contentId}/video.mp4`
         );
-        break;
-      case "reupload":
-        handleReupload(tableId, contentId);
-        break;
-      case "toTabled":
-        await handleToTabled(
-          tableId,
-          contentId,
-          sessionMeta.mimeType,
-          filename,
-          sessionMeta.state
+      };
+
+      const cleanupThumbnail = async () => {
+        await tableTopCeph.deletes.deleteFile(
+          "table-videos",
+          `${contentId}/thumbnail.jpg`
         );
-        break;
-    }
+      };
 
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingProgress",
-      header: { contentId },
-      data: { progress: 0.975 },
-    });
+      switch (currentStep) {
+        case TranscodeStep.Start:
+          break;
+        case TranscodeStep.CheckEncoding:
+          break;
+        case TranscodeStep.ReEncode:
+          break;
+        case TranscodeStep.TranscodeHLS:
+          break;
+        case TranscodeStep.GenerateThumbnail:
+          break;
+        case TranscodeStep.UploadHLS:
+          await cleanupHLS();
+          break;
+        case TranscodeStep.UploadMP4:
+          await cleanupHLS();
+          await cleanupMP4();
+          break;
+        case TranscodeStep.UploadThumbnail:
+          await cleanupHLS();
+          await cleanupMP4();
+          await cleanupThumbnail();
+          break;
+        default:
+          break;
+      }
 
-    // Cleanup
-    await fs.rm(tmpDir, { recursive: true, force: true });
+      await fs.rm(tmpDir, { recursive: true, force: true });
 
-    const redisDeletes = [
-      ...(uploadId
-        ? [
-            { prefix: "VUS", id: uploadId },
-            { prefix: "VCS", id: uploadId },
-          ]
-        : []),
-      direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
-    ].filter((del) => del !== undefined);
-    if (redisDeletes.length !== 0) {
+      const redisDeletes = [
+        { prefix: "VVJ", id: contentId },
+        ...(uploadId
+          ? [
+              { prefix: "VUS", id: uploadId },
+              { prefix: "VCS", id: uploadId },
+            ]
+          : []),
+        direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
+      ].filter((del) => del !== undefined);
       await tableTopRedis.deletes.delete(redisDeletes);
     }
-
-    broadcaster.broadcastToInstance(tableId, username, instance, {
-      type: "processingFinished",
-      header: { contentId },
-    });
   },
   { connection: redisConnection }
 );

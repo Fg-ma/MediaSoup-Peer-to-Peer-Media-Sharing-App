@@ -2,9 +2,13 @@ import * as Y from "yjs";
 import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
-import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
+import {
+  TableContentStateTypes,
+  UploadingStateTypes,
+} from "../../../../../../universal/contentTypeConstant";
 import ReasonableFileSizer from "../../../reasonableFileSizer.ts/ReasonableFileSizer";
 import { GeneralSignals } from "../../../../context/signalContext/lib/typeConstant";
+import TableStaticContentSocketController from "../../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 
 const tableStaticContentServerBaseUrl =
   process.env.TABLE_STATIC_CONTENT_SERVER_BASE_URL;
@@ -12,6 +16,7 @@ const tableStaticContentServerBaseUrl =
 export type ChunkedUploadListenerTypes =
   | { type: "uploadPaused" }
   | { type: "uploadPlay" }
+  | { type: "uploadFailed" }
   | {
       type: "uploadProgress";
       data: { progress: number };
@@ -19,6 +24,8 @@ export type ChunkedUploadListenerTypes =
 
 class TextChunkUploader {
   private readonly CHUNK_SIZE = 1024 * 1024 * 5;
+
+  uploadingState: UploadingStateTypes = "uploading";
 
   private offset: number = 0;
 
@@ -43,6 +50,9 @@ class TextChunkUploader {
   private fullUpdateUpload: Uint8Array<ArrayBufferLike> | undefined;
 
   constructor(
+    private tableStaticContentSocket: React.MutableRefObject<
+      TableStaticContentSocketController | undefined
+    >,
     private tableId: React.MutableRefObject<string>,
     public file: File,
     private uploadId: string,
@@ -76,9 +86,11 @@ class TextChunkUploader {
   };
 
   deconstructor = async () => {
-    await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
-      this.contentId,
-    );
+    if (this.handle) {
+      await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
+        this.contentId,
+      );
+    }
     if (this.uploadUrl) URL.revokeObjectURL(this.uploadUrl);
     this.removeCurrentUpload(this.contentId);
     this.sendUploadSignal({ type: "uploadFinish" });
@@ -90,6 +102,7 @@ class TextChunkUploader {
 
     if (this.currentChunkAbortController) {
       this.currentChunkAbortController.abort();
+      this.currentChunkAbortController = null;
     }
 
     try {
@@ -201,7 +214,7 @@ class TextChunkUploader {
             return;
           }
           if (response.status !== 409) {
-            this.chunkErrorRetryUpload();
+            this.uploadFailed();
             return;
           }
         }
@@ -247,7 +260,11 @@ class TextChunkUploader {
     }
   };
 
-  private chunkErrorRetryUpload = async () => {
+  private uploadFailed = async () => {
+    this.tableStaticContentSocket.current?.deleteUploadSession(this.uploadId);
+
+    this.uploadingState = "failed";
+
     this._progress = 0;
     this.offset = 0;
     this.uploadSpeedHistory = [];
@@ -260,10 +277,21 @@ class TextChunkUploader {
       });
     });
 
-    if (this.handle)
+    if (this.handle) {
       await this.indexedDBController?.current.uploadDeletes?.deleteFileHandle(
         this.contentId,
       );
+    }
+
+    this.listeners.forEach((listener) => {
+      listener({
+        type: "uploadFailed",
+      });
+    });
+  };
+
+  retryUpload = async () => {
+    this.uploadingState = "uploading";
 
     if (!tableStaticContentServerBaseUrl) return;
 

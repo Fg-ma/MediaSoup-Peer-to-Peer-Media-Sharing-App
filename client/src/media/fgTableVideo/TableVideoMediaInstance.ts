@@ -154,9 +154,11 @@ class TableVideoMediaInstance {
     ) {
       this.instanceVideo.src = `${videoServerBaseUrl}stream-video/${this.videoMedia.videoId}/video.mp4`;
     }
-    this.instanceVideo.autoplay = true;
+
+    this.instanceVideo.autoplay = this.settings.isPlaying.value;
     this.instanceVideo.controls = false;
-    this.instanceVideo.muted = true;
+    this.instanceVideo.muted = this.settings.isPlaying.value;
+    this.instanceVideo.loop = false;
 
     this.instanceVideo.onloadedmetadata = () => {
       if (this.instanceVideo) {
@@ -188,7 +190,7 @@ class TableVideoMediaInstance {
 
         this.updateAllEffects();
 
-        this.videoSocket.current?.requestCatchUpVideoPosition(
+        this.videoSocket.current?.requestCatchUpVideoMetadata(
           this.videoMedia.videoId,
           this.videoInstanceId,
         );

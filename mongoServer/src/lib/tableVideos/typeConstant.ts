@@ -54,6 +54,7 @@ export interface TableVideosType {
       ip: boolean;
       lkp: number;
       vps: number;
+      e: boolean;
     };
   }[];
 }

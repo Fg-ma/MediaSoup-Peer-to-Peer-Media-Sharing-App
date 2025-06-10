@@ -23,6 +23,7 @@ export type DownloadRecordingFPSTypes =
 
 export interface Settings {
   isPlaying: { value: boolean };
+  ended: { value: boolean };
   synced: { value: boolean };
   background: {
     value: boolean;
@@ -268,6 +269,7 @@ export const defaultActivePages: ActivePages = {
 
 export const defaultSettings: Settings = Object.freeze({
   isPlaying: Object.freeze({ value: false }),
+  ended: Object.freeze({ value: true }),
   synced: Object.freeze({ value: true }),
   background: Object.freeze({ value: false }),
   closedCaption: Object.freeze({

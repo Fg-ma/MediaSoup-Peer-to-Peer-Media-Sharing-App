@@ -25,7 +25,8 @@ export type VideoListenerTypes =
 
 class TableVideoMedia {
   hls = new Hls();
-  video: HTMLVideoElement | undefined;
+  video: HTMLVideoElement;
+  thumbnail: HTMLImageElement;
 
   loadingState: LoadingStateTypes = "downloading";
   aspect: number | undefined;
@@ -192,14 +193,15 @@ class TableVideoMedia {
         listener({ type: "downloadComplete" });
       });
     };
+
+    this.thumbnail = document.createElement("img");
+    this.thumbnail.src = `${videoServerBaseUrl}stream-video-thumbnail/${this.videoId}`;
   }
 
   deconstructor() {
-    if (this.video) {
-      this.video.pause();
-      this.video.srcObject = null;
-      this.video = undefined;
-    }
+    this.video.pause();
+    this.video.src = "";
+    this.video.srcObject = null;
 
     this.videoListeners.clear();
 

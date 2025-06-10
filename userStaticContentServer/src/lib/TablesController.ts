@@ -5,12 +5,14 @@ import {
   userConnections,
   UserStaticContentWebSocket,
 } from "../typeConstant";
+import { sanitizationUtils } from "src";
 
 class TablesController {
   constructor() {}
 
   onConnect = (ws: UserStaticContentWebSocket, event: onConnectType) => {
-    const { userId, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(event) as onConnectType;
+    const { userId, instance } = safeEvent.header;
 
     ws.id = uuidv4();
     ws.userId = userId;
@@ -24,7 +26,10 @@ class TablesController {
   };
 
   onDisconnect = (event: onDisconnectType) => {
-    const { userId, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDisconnectType;
+    const { userId, instance } = safeEvent.header;
 
     if (userConnections[userId] && userConnections[userId][instance]) {
       userConnections[userId][instance].close();

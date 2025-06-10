@@ -52,8 +52,12 @@ export default function Main() {
     captureEffectsStyles,
   } = useEffectsContext();
   const { permissions } = usePermissionsContext();
-  const { mediasoupSocket, userStaticContentSocket, videoSocket } =
-    useSocketContext();
+  const {
+    mediasoupSocket,
+    userStaticContentSocket,
+    videoSocket,
+    tableStaticContentSocket,
+  } = useSocketContext();
   const { userId, tableId, username, instance, device } = useUserInfoContext();
   const { uploader, userDevice, indexedDBController, reasonableFileSizer } =
     useToolsContext();
@@ -122,6 +126,7 @@ export default function Main() {
     );
 
     uploader.current = new Uploader(
+      tableStaticContentSocket,
       videoSocket,
       tableId,
       username,

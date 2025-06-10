@@ -1,4 +1,9 @@
-import { tableTopCeph, tableTopMongo, tableTopRedis } from "../index";
+import {
+  sanitizationUtils,
+  tableTopCeph,
+  tableTopMongo,
+  tableTopRedis,
+} from "../index";
 import Broadcaster from "./Broadcaster";
 import { contentTypeBucketMap, onDeleteContentType } from "../typeConstant";
 
@@ -6,7 +11,10 @@ class Cleanup {
   constructor(private broadcaster: Broadcaster) {}
 
   onDeleteContent = async (event: onDeleteContentType) => {
-    const { tableId, contentType, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDeleteContentType;
+    const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     const document = await tableTopMongo.deleteTableDocumentInstance(
       tableId,

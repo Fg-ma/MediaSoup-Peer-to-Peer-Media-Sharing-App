@@ -7,6 +7,9 @@ import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import { useToolsContext } from "../../../../context/toolsContext/ToolsContext";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
+import ChunkUploader from "../../../../tools/uploader/lib/chunkUploader/ChunkUploader";
+import TextChunkUploader from "../../../../tools/uploader/lib/textChunkUploader/TextChunkUploader";
+import VideoChunkUploader from "../../../../tools/uploader/lib/videoChunkUploader/VideoChunkUploader";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -14,69 +17,21 @@ const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const textIcon = nginxAssetServerBaseUrl + "svgs/textIcon.svg";
 
 export default function FailedUploadingSection({
-  savedTableId,
-  uploadId,
-  contentId,
-  offset,
-  failed,
+  upload,
 }: {
-  savedTableId: string;
-  uploadId: string;
-  contentId: string;
-  offset: number;
-  failed: FileSystemFileHandle;
+  upload: ChunkUploader | TextChunkUploader | VideoChunkUploader;
 }) {
-  const { uploader, indexedDBController, reasonableFileSizer } =
-    useToolsContext();
-  const { tableId } = useUserInfoContext();
-  const { tableStaticContentSocket } = useSocketContext();
-
   const [_, setRerender] = useState(false);
   const [hovering, setHovering] = useState(false);
-  const clickState = useRef<"delete" | "start">("delete");
+  const clickState = useRef<"delete" | "retry">("retry");
   const failedUploadingSectionRef = useRef<HTMLDivElement>(null);
   const filenameRef = useRef<HTMLDivElement>(null);
-  const file = useRef<File | undefined>(undefined);
-  const fileUrl = useRef<string | undefined>(undefined);
 
   const clickFunction = async () => {
-    if (savedTableId !== tableId.current) return;
-
-    if (clickState.current === "start") {
-      const perm = await (failed as any).queryPermission({ mode: "read" });
-      if (perm !== "granted") {
-        const request = await (failed as any).requestPermission({
-          mode: "read",
-        });
-        if (request !== "granted") {
-          await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-            contentId,
-          );
-          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
-          return;
-        }
-      }
-
-      const file = (await failed.getFile()) as File;
-
-      await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-        contentId,
-      );
-
-      await uploader.current?.uploadToTable(
-        file,
-        undefined,
-        undefined,
-        failed,
-        uploadId,
-        contentId,
-        offset,
-      );
+    if (clickState.current === "retry") {
+      upload.retryUpload();
     } else {
-      await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-        contentId,
-      );
-      tableStaticContentSocket.current?.deleteUploadSession(uploadId);
+      upload.deconstructor();
     }
   };
 
@@ -96,8 +51,8 @@ export default function FailedUploadingSection({
         setRerender((prev) => !prev);
       }
     } else {
-      if (clickState.current !== "start") {
-        clickState.current = "start";
+      if (clickState.current !== "retry") {
+        clickState.current = "retry";
         setRerender((prev) => !prev);
       }
     }
@@ -106,37 +61,6 @@ export default function FailedUploadingSection({
   const onPointerLeave = () => {
     setHovering(false);
   };
-
-  useEffect(() => {
-    const loadFile = async () => {
-      const perm = await (failed as any).queryPermission({ mode: "read" });
-      if (perm !== "granted") {
-        const request = await (failed as any).requestPermission({
-          mode: "read",
-        });
-        if (request !== "granted") {
-          await indexedDBController.current.uploadDeletes?.deleteFileHandle(
-            contentId,
-          );
-          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
-          return;
-        }
-      }
-
-      file.current = (await failed.getFile()) as File;
-
-      reasonableFileSizer.current.getUrl(file.current).then((url) => {
-        fileUrl.current = url;
-        setRerender((prev) => !prev);
-      });
-    };
-
-    loadFile();
-
-    return () => {
-      if (fileUrl.current) URL.revokeObjectURL(fileUrl.current);
-    };
-  }, []);
 
   useEffect(() => {
     failedUploadingSectionRef.current?.addEventListener(
@@ -166,98 +90,92 @@ export default function FailedUploadingSection({
         onPointerMove,
       );
     };
-  }, [file.current]);
-
-  useEffect(() => {
-    setRerender((prev) => !prev);
-  }, [filenameRef.current]);
+  }, []);
 
   return (
-    file.current && (
-      <div
-        ref={failedUploadingSectionRef}
-        className={`${
-          hovering &&
-          (clickState.current === "delete" || clickState.current === "start")
-            ? "border-y-3 border-fg-off-white"
-            : "border-y-2 border-fg-tone-black-3"
-        } relative flex h-[6rem] w-full cursor-pointer items-center justify-center space-x-2 bg-fg-tone-black-5 px-8 py-4 transition-all`}
-        onClick={clickFunction}
-      >
-        <div className="flex h-16 items-center justify-center">
-          {file.current.type === "image/svg+xml"
-            ? fileUrl.current && (
-                <FgSVGElement
-                  className="aspect-square h-full"
-                  src={fileUrl.current}
-                  attributes={[
-                    { key: "width", value: "100%" },
-                    { key: "height", value: "100%" },
-                  ]}
-                />
-              )
-            : file.current.type.startsWith("image/") ||
-                file.current.type.startsWith("video/")
-              ? fileUrl.current && (
-                  <FgImageElement
-                    className="aspect-square h-full"
-                    imageClassName="object-contain"
-                    src={fileUrl.current}
-                  />
-                )
-              : file.current.type.startsWith("text/") && (
-                  <FgSVGElement
-                    className="aspect-square h-[55%] fill-fg-white"
-                    src={textIcon}
-                    attributes={[
-                      { key: "width", value: "100%" },
-                      { key: "height", value: "100%" },
-                    ]}
-                  />
-                )}
-        </div>
-        <HoverElement
-          externalRef={filenameRef}
-          className={`${
-            hovering &&
-            (clickState.current === "delete" || clickState.current === "start")
-              ? "text-2xl text-fg-red-light"
-              : "text-xl text-fg-white"
-          } h-max grow truncate font-K2D transition-all`}
-          content={<>{file.current.name}</>}
-          hoverContent={
-            (filenameRef.current?.scrollWidth ?? 0) >
-            (filenameRef.current?.clientWidth ?? 0) ? (
-              <FgHoverContentStandard style="light" content={failed.name} />
-            ) : undefined
-          }
-          options={{
-            hoverSpacing: 4,
-            hoverType: "above",
-            hoverTimeoutDuration: 500,
-          }}
-        />
-        <AnimatePresence>
-          {hovering && clickState.current === "delete" && (
-            <motion.div
-              className="flex absolute right-0 top-0 h-full w-12 items-center justify-center rounded-l bg-fg-red"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ type: "tween", ease: "easeOut", duration: 0.2 }}
-            >
+    <div
+      ref={failedUploadingSectionRef}
+      className={`${
+        hovering &&
+        (clickState.current === "delete" || clickState.current === "retry")
+          ? "border-y-3 border-fg-off-white"
+          : "border-y-2 border-fg-tone-black-3"
+      } relative flex h-[6rem] w-full cursor-pointer items-center justify-center space-x-2 bg-fg-tone-black-5 px-8 py-4 transition-all`}
+      onClick={clickFunction}
+    >
+      <div className="flex h-16 items-center justify-center">
+        {upload.file.type === "image/svg+xml"
+          ? upload.uploadUrl && (
               <FgSVGElement
-                src={closeIcon}
-                className="aspect-square h-[35%] fill-fg-white stroke-fg-white"
+                className="aspect-square h-full"
+                src={upload.uploadUrl}
                 attributes={[
                   { key: "width", value: "100%" },
                   { key: "height", value: "100%" },
                 ]}
               />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )
+          : upload.file.type.startsWith("image/") ||
+              upload.file.type.startsWith("video/")
+            ? upload.uploadUrl && (
+                <FgImageElement
+                  className="aspect-square h-full"
+                  imageClassName="object-contain"
+                  src={upload.uploadUrl}
+                />
+              )
+            : upload.file.type.startsWith("text/") && (
+                <FgSVGElement
+                  className="aspect-square h-[70%] fill-fg-white"
+                  src={textIcon}
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                  ]}
+                />
+              )}
       </div>
-    )
+      <HoverElement
+        externalRef={filenameRef}
+        className={`${
+          hovering &&
+          (clickState.current === "delete" || clickState.current === "retry")
+            ? "text-2xl text-fg-red-light"
+            : "text-xl text-fg-white"
+        } h-max grow truncate font-K2D transition-all`}
+        content={<>{upload.filename}</>}
+        hoverContent={
+          (filenameRef.current?.scrollWidth ?? 0) >
+          (filenameRef.current?.clientWidth ?? 0) ? (
+            <FgHoverContentStandard style="light" content={upload.filename} />
+          ) : undefined
+        }
+        options={{
+          hoverSpacing: 4,
+          hoverType: "above",
+          hoverTimeoutDuration: 500,
+        }}
+      />
+      <AnimatePresence>
+        {hovering && clickState.current === "delete" && (
+          <motion.div
+            className="flex absolute right-0 top-0 h-full w-12 items-center justify-center rounded-l bg-fg-red"
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
+            transition={{ type: "tween", ease: "easeOut", duration: 0.2 }}
+          >
+            <FgSVGElement
+              src={closeIcon}
+              className="aspect-square h-[35%] fill-fg-white stroke-fg-white"
+              attributes={[
+                { key: "width", value: "100%" },
+                { key: "height", value: "100%" },
+              ]}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

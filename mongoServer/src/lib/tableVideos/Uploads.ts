@@ -51,6 +51,7 @@ class Uploads {
         isPlaying: boolean;
         lastKnownPosition: number;
         videoPlaybackSpeed: number;
+        ended: boolean;
       };
     }[];
   }) => {
@@ -82,6 +83,7 @@ class Uploads {
           isPlaying?: boolean;
           lastKnownPosition?: number;
           videoPlaybackSpeed?: number;
+          ended?: boolean;
         };
       }[];
     }>
@@ -208,6 +210,9 @@ class Uploads {
           if (meta.videoPlaybackSpeed !== undefined) {
             instanceSetFields["i.$.m.vps"] = meta.videoPlaybackSpeed;
           }
+          if (meta.ended !== undefined) {
+            instanceSetFields["i.$.m.e"] = meta.ended;
+          }
         }
 
         if (Object.keys(instanceSetFields).length > 0) {
@@ -251,6 +256,7 @@ class Uploads {
         isPlaying: boolean;
         lastKnownPosition: number;
         videoPlaybackSpeed: number;
+        ended: boolean;
       };
     }[]
   ) => {
@@ -318,6 +324,7 @@ class Uploads {
             ip: meta.isPlaying,
             lkp: meta.lastKnownPosition,
             vps: meta.videoPlaybackSpeed,
+            e: meta.ended,
           };
 
           return {

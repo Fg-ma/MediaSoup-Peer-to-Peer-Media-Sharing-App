@@ -7,7 +7,9 @@ import UniversalGameController from "./lib/UniversalGameController";
 import SnakeGameController from "./snakeGame/lib/SnakeGameController";
 import handleMessage from "./lib/websocketMessage";
 import TableTopMongo from "../../mongoServer/src/TableTopMongo";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
+export const sanitizationUtils = new SanitizationUtils();
 export const broadcaster = new Broadcaster();
 export const tableTopMongo = new TableTopMongo();
 export const tablesController = new TablesController(broadcaster);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import FgButton from "../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../elements/fgSVGElement/FgSVGElement";
 import MoreTableFunctionsSection from "../moreTableFunctionsSection/MoreTableFunctionsSection";

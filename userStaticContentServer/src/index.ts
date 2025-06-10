@@ -13,12 +13,14 @@ import TableTopMongo from "../../mongoServer/src/TableTopMongo";
 import TableTopCeph from "../../cephServer/src/TableTopCeph";
 import TableTopRedis from "../../redisServer/src/TableTopRedis";
 import Search from "./lib/Search";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
 export const clientBaseUrl = process.env.CLIENT_BASE_URL;
 
+export const sanitizationUtils = new SanitizationUtils();
 export const tableTopRedis = new TableTopRedis();
 export const tableTopCeph = new TableTopCeph();
 export const tableTopMongo = new TableTopMongo();

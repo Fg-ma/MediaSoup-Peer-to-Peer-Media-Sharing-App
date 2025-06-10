@@ -1,4 +1,4 @@
-import { tableTopMongo, tableTopRedis } from "src";
+import { tableTopMongo, tableTopRedis, sanitizationUtils } from "src";
 import {
   onDeleteUploadSessionType,
   onRequestCatchUpVideoMetadataType,
@@ -12,13 +12,18 @@ class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
   onUpdateVideoMetadata = async (event: onUpdateVideoMetadataType) => {
-    const { tableId, contentId, instanceId } = event.header;
-    const { isPlaying, videoPosition, videoPlaybackSpeed } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onUpdateVideoMetadataType;
+    const { tableId, contentId, instanceId } = safeEvent.header;
+    const { isPlaying, videoPosition, videoPlaybackSpeed, ended } =
+      safeEvent.data;
 
     const data = {
       isPlaying,
       lastKnownPosition: videoPosition,
       videoPlaybackSpeed,
+      ended,
       lastUpdatedAt: Date.now(),
     };
 
@@ -40,7 +45,11 @@ class MetadataController {
   onRequestCatchUpVideoMetadata = async (
     event: onRequestCatchUpVideoMetadataType
   ) => {
-    const { tableId, username, instance, contentId, instanceId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestCatchUpVideoMetadataType;
+    const { tableId, username, instance, contentId, instanceId } =
+      safeEvent.header;
 
     const redisData = await tableTopRedis.gets.getKey(
       `VVM:${tableId}:${contentId}:${instanceId}`
@@ -72,6 +81,7 @@ class MetadataController {
             isPlaying: instanceData.meta.isPlaying,
             lastKnownPosition: instanceData.meta.lastKnownPosition,
             videoPlaybackSpeed: instanceData.meta.videoPlaybackSpeed,
+            ended: instanceData.meta.ended,
             lastUpdatedAt: Date.now(),
           };
 
@@ -96,7 +106,10 @@ class MetadataController {
   };
 
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
-    const { uploadId } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onDeleteUploadSessionType;
+    const { uploadId } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
       "VUS",
@@ -115,12 +128,14 @@ class MetadataController {
   };
 
   onSignalReuploadStart = async (event: onSignalReuploadStartType) => {
-    const { tableId, contentId, contentType } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onSignalReuploadStartType;
+    const { tableId, contentId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {
       type: "reuploadStarted",
       header: {
-        contentType: contentType,
         contentId: contentId,
       },
     });
