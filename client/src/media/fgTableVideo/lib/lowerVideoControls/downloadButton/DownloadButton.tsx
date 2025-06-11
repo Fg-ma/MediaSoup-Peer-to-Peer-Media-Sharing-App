@@ -3,7 +3,7 @@ import FgButton from "../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../elements/fgSVGElement/FgSVGElement";
 import FgHoverContentStandard from "../../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 import LowerVideoController from "../LowerVideoController";
-import TableVideoMediaInstance from "src/media/fgTableVideo/TableVideoMediaInstance";
+import TableVideoMediaInstance from "../../../../../media/fgTableVideo/TableVideoMediaInstance";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -19,7 +19,7 @@ export default function DownloadButton({
   videoEffectsActive,
   scrollingContainerRef,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   recording: React.MutableRefObject<boolean>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
@@ -30,9 +30,10 @@ export default function DownloadButton({
       clickFunction={lowerVideoController.current.handleDownload}
       contentFunction={() => {
         const src =
-          videoMediaInstance.settings.downloadType.value === "snapShot"
+          videoMediaInstance.current.settings.downloadType.value === "snapShot"
             ? snapShotIcon
-            : videoMediaInstance.settings.downloadType.value === "original"
+            : videoMediaInstance.current.settings.downloadType.value ===
+                "original"
               ? downloadIcon
               : recording.current
                 ? recordOffIcon
@@ -55,9 +56,11 @@ export default function DownloadButton({
         !videoEffectsActive ? (
           <FgHoverContentStandard
             content={
-              videoMediaInstance.settings.downloadType.value === "snapShot"
+              videoMediaInstance.current.settings.downloadType.value ===
+              "snapShot"
                 ? "Take snap shot (d)"
-                : videoMediaInstance.settings.downloadType.value === "original"
+                : videoMediaInstance.current.settings.downloadType.value ===
+                    "original"
                   ? "Download (d)"
                   : recording.current
                     ? "Stop recording (d)"

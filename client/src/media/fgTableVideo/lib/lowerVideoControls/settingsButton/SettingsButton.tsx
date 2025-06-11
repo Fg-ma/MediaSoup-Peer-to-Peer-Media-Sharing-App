@@ -31,7 +31,7 @@ export default function SettingsButton({
   scrollingContainerRef,
   setExternalRerender,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   videoContainerRef: React.RefObject<HTMLDivElement>;
@@ -148,7 +148,7 @@ export default function SettingsButton({
               type: "toggleSettingsPanel",
               header: {
                 contentType: "video",
-                instanceId: videoMediaInstance.videoInstanceId,
+                instanceId: videoMediaInstance.current.videoInstanceId,
               },
             });
           }
@@ -164,7 +164,8 @@ export default function SettingsButton({
                 currentSettingsActive.current.some(
                   (active) =>
                     active.contentType === "video" &&
-                    active.instanceId === videoMediaInstance.videoInstanceId,
+                    active.instanceId ===
+                      videoMediaInstance.current.videoInstanceId,
                 ))
                 ? "-rotate-[30deg]"
                 : "rotate-0"

@@ -21,7 +21,11 @@ import CaptionButton from "./lib/lowerVideoControls/captionsButton/CaptionButton
 import SettingsButton from "./lib/lowerVideoControls/settingsButton/SettingsButton";
 import DownloadButton from "./lib/lowerVideoControls/downloadButton/DownloadButton";
 import DownloadRecordingButton from "./lib/lowerVideoControls/downloadButton/DownloadRecordingButton";
+import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import "./lib/fgVideoStyles.css";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
+const playIcon = nginxAssetServerBaseUrl + "svgs/playIcon.svg";
 
 export default function FgTableVideo({
   videoInstanceId,
@@ -49,8 +53,9 @@ export default function FgTableVideo({
   const { tableStaticContentSocket, videoSocket } = useSocketContext();
   const { sendGroupSignal } = useSignalContext();
 
-  const videoMediaInstance =
-    staticContentMedia.current.video.tableInstances[videoInstanceId];
+  const videoMediaInstance = useRef(
+    staticContentMedia.current.video.tableInstances[videoInstanceId],
+  );
 
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const subContainerRef = useRef<HTMLDivElement>(null);
@@ -87,7 +92,7 @@ export default function FgTableVideo({
     position: { left: number; top: number };
     scale: { x: number; y: number };
     rotation: number;
-  }>(videoMediaInstance.initPositioning);
+  }>(videoMediaInstance.current.initPositioning);
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const isScrubbing = useRef(false);
@@ -127,61 +132,21 @@ export default function FgTableVideo({
       staticContentEffects,
       staticContentEffectsStyles,
       tintColor,
-      lowerVideoController,
       setRerender,
-      subContainerRef,
-      positioning,
       setSettingsActive,
+      positioning,
+      subContainerRef,
     ),
   );
 
   useEffect(() => {
-    if (
-      videoMediaInstance.instanceVideo &&
-      videoMediaInstance.instanceCanvas &&
-      videoMediaInstance.videoMedia.loadingState === "downloaded"
-    ) {
-      subContainerRef.current?.appendChild(videoMediaInstance.instanceCanvas);
-      positioning.current.scale = {
-        x: videoMediaInstance.videoMedia.aspect
-          ? positioning.current.scale.y * videoMediaInstance.videoMedia.aspect
-          : positioning.current.scale.x,
-        y: positioning.current.scale.y,
-      };
-
-      videoMediaInstance.hls.on(
-        HlsEvents.BUFFER_APPENDED,
-        lowerVideoController.current.bufferUpdate,
-      );
-
-      // Keep video time
-      lowerVideoController.current.timeUpdate();
-      videoMediaInstance.instanceVideo?.addEventListener(
-        "timeupdate",
-        lowerVideoController.current.timeUpdate,
-      );
-
-      videoMediaInstance.instanceVideo?.addEventListener(
-        "enterpictureinpicture",
-        () => lowerVideoController.current.handlePictureInPicture("enter"),
-      );
-
-      videoMediaInstance.instanceVideo?.addEventListener(
-        "leavepictureinpicture",
-        () => lowerVideoController.current.handlePictureInPicture("leave"),
-      );
-
-      setRerender((prev) => !prev);
-    }
-
-    // Set up initial conditions
     videoController.current.init();
 
-    videoMediaInstance.videoMedia.addVideoListener(
+    videoMediaInstance.current.videoMedia.addVideoListener(
       videoController.current.handleVideoMessages,
     );
 
-    videoMediaInstance.addVideoInstanceListener(
+    videoMediaInstance.current.addVideoInstanceListener(
       videoController.current.handleVideoInstanceMessages,
     );
 
@@ -196,37 +161,16 @@ export default function FgTableVideo({
     );
 
     return () => {
-      if (
-        videoMediaInstance.instanceVideo &&
-        videoMediaInstance.instanceCanvas
-      ) {
-        videoMediaInstance.hls.off(
-          HlsEvents.BUFFER_APPENDED,
-          lowerVideoController.current.bufferUpdate,
-        );
-        videoMediaInstance.instanceVideo.removeEventListener(
-          "timeupdate",
-          lowerVideoController.current.timeUpdate,
-        );
-        videoMediaInstance.instanceVideo.removeEventListener(
-          "enterpictureinpicture",
-          () => lowerVideoController.current.handlePictureInPicture("enter"),
-        );
-        videoMediaInstance.instanceVideo.removeEventListener(
-          "leavepictureinpicture",
-          () => lowerVideoController.current.handlePictureInPicture("leave"),
-        );
-      }
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
           removeListener(),
         ),
       );
       positioningListeners.current = {};
-      videoMediaInstance.videoMedia.removeVideoListener(
+      videoMediaInstance.current.videoMedia.removeVideoListener(
         videoController.current.handleVideoMessages,
       );
-      videoMediaInstance.removeVideoInstanceListener(
+      videoMediaInstance.current.removeVideoInstanceListener(
         videoController.current.handleVideoInstanceMessages,
       );
       document.removeEventListener(
@@ -242,7 +186,7 @@ export default function FgTableVideo({
 
   useEffect(() => {
     lowerVideoController.current.updateCaptionsStyles();
-  }, [videoMediaInstance.settings]);
+  }, [videoMediaInstance.current.settings]);
 
   useEffect(() => {
     tableStaticContentSocket.current?.addMessageListener(
@@ -256,84 +200,161 @@ export default function FgTableVideo({
   }, [tableStaticContentSocket.current]);
 
   useEffect(() => {
-    videoSocket.current?.addMessageListener(
-      videoController.current.handleVideoSocketMessage,
-    );
-
-    return () =>
-      videoSocket.current?.removeMessageListener(
-        videoController.current.handleVideoSocketMessage,
-      );
-  }, [videoSocket.current]);
-
-  useEffect(() => {
-    if (videoMediaInstance.settings.ended) {
+    if (videoMediaInstance.current.meta.ended) {
+      if (videoMediaInstance.current.instanceThumbnail) {
+        subContainerRef.current?.appendChild(
+          videoMediaInstance.current.instanceThumbnail,
+        );
+      }
     } else {
+      subContainerRef.current?.appendChild(
+        videoMediaInstance.current.instanceCanvas,
+      );
     }
 
     return () => {
-      if (videoMediaInstance.settings.ended) {
-      } else {
-      }
+      videoMediaInstance.current.instanceThumbnail?.remove();
+      videoMediaInstance.current.instanceCanvas.remove();
     };
-  }, [videoMediaInstance.settings.ended]);
+  }, [videoMediaInstance.current.meta.ended]);
+
+  useEffect(() => {
+    if (videoMediaInstance.current.instanceVideo === undefined) return;
+
+    positioning.current.scale = {
+      x: videoMediaInstance.current.videoMedia.aspect
+        ? positioning.current.scale.y *
+          videoMediaInstance.current.videoMedia.aspect
+        : positioning.current.scale.x,
+      y: positioning.current.scale.y,
+    };
+
+    videoMediaInstance.current.hls.on(
+      HlsEvents.BUFFER_APPENDED,
+      lowerVideoController.current.bufferUpdate,
+    );
+
+    // Keep video time
+    lowerVideoController.current.timeUpdate();
+    videoMediaInstance.current.instanceVideo?.addEventListener(
+      "timeupdate",
+      lowerVideoController.current.timeUpdate,
+    );
+
+    videoMediaInstance.current.instanceVideo?.addEventListener(
+      "enterpictureinpicture",
+      () => lowerVideoController.current.handlePictureInPicture("enter"),
+    );
+
+    videoMediaInstance.current.instanceVideo?.addEventListener(
+      "leavepictureinpicture",
+      () => lowerVideoController.current.handlePictureInPicture("leave"),
+    );
+
+    setRerender((prev) => !prev);
+
+    return () => {
+      videoMediaInstance.current.hls.off(
+        HlsEvents.BUFFER_APPENDED,
+        lowerVideoController.current.bufferUpdate,
+      );
+      videoMediaInstance.current.instanceVideo?.removeEventListener(
+        "timeupdate",
+        lowerVideoController.current.timeUpdate,
+      );
+      videoMediaInstance.current.instanceVideo?.removeEventListener(
+        "enterpictureinpicture",
+        () => lowerVideoController.current.handlePictureInPicture("enter"),
+      );
+      videoMediaInstance.current.instanceVideo?.removeEventListener(
+        "leavepictureinpicture",
+        () => lowerVideoController.current.handlePictureInPicture("leave"),
+      );
+    };
+  }, [videoMediaInstance.current.instanceVideoSetUp]);
 
   return (
     <FgMediaContainer
-      filename={videoMediaInstance.videoMedia.filename}
-      downloadingState={videoMediaInstance.videoMedia.loadingState}
+      filename={videoMediaInstance.current.videoMedia.filename}
+      downloadingState={videoMediaInstance.current.videoMedia.loadingState}
       addDownloadListener={
-        videoMediaInstance.videoMedia.loadingState !== "downloaded"
-          ? videoMediaInstance.videoMedia.addVideoListener
+        videoMediaInstance.current.videoMedia.loadingState !== "downloaded"
+          ? videoMediaInstance.current.videoMedia.addVideoListener
           : undefined
       }
       removeDownloadListener={
-        videoMediaInstance.videoMedia.loadingState !== "downloaded"
-          ? videoMediaInstance.videoMedia.removeVideoListener
+        videoMediaInstance.current.videoMedia.loadingState !== "downloaded"
+          ? videoMediaInstance.current.videoMedia.removeVideoListener
           : undefined
       }
-      getAspect={videoMediaInstance.getAspect}
-      setPositioning={videoMediaInstance.setPositioning}
-      mediaId={videoMediaInstance.videoMedia.videoId}
+      getAspect={videoMediaInstance.current.getAspect}
+      setPositioning={videoMediaInstance.current.setPositioning}
+      mediaId={videoMediaInstance.current.videoMedia.videoId}
       mediaInstanceId={videoInstanceId}
       kind="video"
-      initState={videoMediaInstance.videoMedia.state}
+      initState={videoMediaInstance.current.videoMedia.state}
       bundleRef={bundleRef}
-      backgroundMedia={videoMediaInstance.settings.background.value}
+      backgroundMedia={videoMediaInstance.current.settings.background.value}
       className="video-container"
-      popupElements={[
-        videoEffectsActive ? (
-          <VideoEffectsSection
-            videoInstanceId={videoInstanceId}
-            lowerVideoController={lowerVideoController}
-            tintColor={tintColor}
-            videoMediaInstance={videoMediaInstance}
-            videoContainerRef={videoContainerRef}
-          />
-        ) : null,
-        <div
-          ref={timelineContainerRef}
-          className="timeline-container pointer-events-auto"
-          onPointerDown={lowerVideoController.current.handleStartScrubbing}
-          onPointerMove={lowerVideoController.current.handleHoverTimelineUpdate}
-        >
-          <div className="timeline">
-            <div className="buffered"></div>
-            <div className="thumb-indicator"></div>
-          </div>
-        </div>,
-      ]}
-      leftLowerControls={[
-        <PlayPauseButton
-          videoMediaInstance={videoMediaInstance}
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          settingsActive={settingsActive}
-        />,
-        <div className="flex select-none items-center gap-1 px-1">
-          <div ref={currentTimeRef} className="font-K2D text-lg"></div>
-        </div>,
-      ]}
+      popupElements={
+        !videoMediaInstance.current.meta.ended
+          ? [
+              videoEffectsActive ? (
+                <VideoEffectsSection
+                  videoInstanceId={videoInstanceId}
+                  lowerVideoController={lowerVideoController}
+                  tintColor={tintColor}
+                  videoMediaInstance={videoMediaInstance}
+                  videoContainerRef={videoContainerRef}
+                />
+              ) : null,
+              <div
+                ref={timelineContainerRef}
+                className="timeline-container pointer-events-auto"
+                onPointerDown={
+                  lowerVideoController.current.handleStartScrubbing
+                }
+                onPointerMove={
+                  lowerVideoController.current.handleHoverTimelineUpdate
+                }
+              >
+                <div className="timeline">
+                  <div className="buffered"></div>
+                  <div className="thumb-indicator"></div>
+                </div>
+              </div>,
+            ]
+          : [
+              <div
+                className="pointer-events-auto absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-20"
+                onClick={lowerVideoController.current.handlePausePlay}
+              >
+                <FgSVGElement
+                  src={playIcon}
+                  className={`aspect-square fill-fg-white stroke-fg-white ${(videoMediaInstance.current.videoMedia.aspect ?? 1) > 1 ? "h-[50%]" : "w-[50%]"}`}
+                  attributes={[
+                    { key: "width", value: "100%" },
+                    { key: "height", value: "100%" },
+                  ]}
+                />
+              </div>,
+            ]
+      }
+      leftLowerControls={
+        !videoMediaInstance.current.meta.ended
+          ? [
+              <PlayPauseButton
+                videoMediaInstance={videoMediaInstance}
+                lowerVideoController={lowerVideoController}
+                videoEffectsActive={videoEffectsActive}
+                settingsActive={settingsActive}
+              />,
+              <div className="flex select-none items-center gap-1 px-1">
+                <div ref={currentTimeRef} className="font-K2D text-lg"></div>
+              </div>,
+            ]
+          : []
+      }
       rightLowerControls={[
         <PictureInPictureButton
           lowerVideoController={lowerVideoController}
@@ -341,82 +362,88 @@ export default function FgTableVideo({
           settingsActive={settingsActive}
           scrollingContainerRef={rightLowerVideoControlsRef}
         />,
-        <SettingsButton
-          videoMediaInstance={videoMediaInstance}
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          videoContainerRef={videoContainerRef}
-          settingsActive={settingsActive}
-          setSettingsActive={setSettingsActive}
-          activePages={activePages}
-          setActivePages={setActivePages}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-          setExternalRerender={setRerender}
-        />,
-        videoMediaInstance.videoMedia.loadingState === "downloaded" && (
-          <DownloadButton
-            videoMediaInstance={videoMediaInstance}
-            recording={recording}
-            lowerVideoController={lowerVideoController}
-            videoEffectsActive={videoEffectsActive}
-            scrollingContainerRef={rightLowerVideoControlsRef}
-          />
-        ),
-        videoMediaInstance.settings.downloadType.value === "record" &&
-        downloadRecordingReady.current ? (
-          <DownloadRecordingButton
-            lowerVideoController={lowerVideoController}
-            videoEffectsActive={videoEffectsActive}
-            scrollingContainerRef={rightLowerVideoControlsRef}
-          />
-        ) : null,
-        <CaptionButton
-          videoMediaInstance={videoMediaInstance}
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          settingsActive={settingsActive}
-          audioStream={videoMediaInstance.getAudioTrack()!}
-          videoContainerRef={videoContainerRef}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-          containerRef={subContainerRef}
-        />,
-        <VideoEffectsButton
-          lowerVideoController={lowerVideoController}
-          videoEffectsActive={videoEffectsActive}
-          scrollingContainerRef={rightLowerVideoControlsRef}
-          settingsActive={settingsActive}
-        />,
-        // <AudioEffectsButton
-        //   tableId={tableId.current}
-        //   username={username.current}
-        //   instance={instance.current}
-        //   isUser={false}
-        //   permissions={undefined}
-        //   producerType={"video"}
-        //   producerId={videoInstanceId}
-        //   audioEffectsActive={audioEffectsActive}
-        //   setAudioEffectsActive={setAudioEffectsActive}
-        //   visualMediaContainerRef={videoContainerRef}
-        //   handleAudioEffectChange={handleAudioEffectChange}
-        //   handleMute={handleMute}
-        //   videoContentMute={videoContentMute}
-        //   closeLabelElement={
-        //     <FgHoverContentStandard content='Close (x)' style='dark' />
-        //   }
-        //   hoverLabelElement={
-        //     <FgHoverContentStandard content='Audio effects (a)' style='dark' />
-        //   }
-        //   scrollingContainerRef={rightLowerVideoControlsRef}
-        //   style={{ transform: "scaleX(-1)" }}
-        //   options={{
-        //     backgroundColor: "rgba(10, 10, 10, 1)",
-        //     secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
-        //   }}
-        // />,
+        ...(!videoMediaInstance.current.meta.ended
+          ? [
+              <SettingsButton
+                videoMediaInstance={videoMediaInstance}
+                lowerVideoController={lowerVideoController}
+                videoEffectsActive={videoEffectsActive}
+                videoContainerRef={videoContainerRef}
+                settingsActive={settingsActive}
+                setSettingsActive={setSettingsActive}
+                activePages={activePages}
+                setActivePages={setActivePages}
+                scrollingContainerRef={rightLowerVideoControlsRef}
+                setExternalRerender={setRerender}
+              />,
+              videoMediaInstance.current.videoMedia.loadingState ===
+                "downloaded" && (
+                <DownloadButton
+                  videoMediaInstance={videoMediaInstance}
+                  recording={recording}
+                  lowerVideoController={lowerVideoController}
+                  videoEffectsActive={videoEffectsActive}
+                  scrollingContainerRef={rightLowerVideoControlsRef}
+                />
+              ),
+              videoMediaInstance.current.settings.downloadType.value ===
+                "record" && downloadRecordingReady.current ? (
+                <DownloadRecordingButton
+                  lowerVideoController={lowerVideoController}
+                  videoEffectsActive={videoEffectsActive}
+                  scrollingContainerRef={rightLowerVideoControlsRef}
+                />
+              ) : null,
+              <CaptionButton
+                videoMediaInstance={videoMediaInstance}
+                lowerVideoController={lowerVideoController}
+                videoEffectsActive={videoEffectsActive}
+                settingsActive={settingsActive}
+                audioStream={videoMediaInstance.current.getAudioTrack()!}
+                videoContainerRef={videoContainerRef}
+                scrollingContainerRef={rightLowerVideoControlsRef}
+                containerRef={subContainerRef}
+              />,
+              <VideoEffectsButton
+                lowerVideoController={lowerVideoController}
+                videoEffectsActive={videoEffectsActive}
+                scrollingContainerRef={rightLowerVideoControlsRef}
+                settingsActive={settingsActive}
+              />,
+              // <AudioEffectsButton
+              //   tableId={tableId.current}
+              //   username={username.current}
+              //   instance={instance.current}
+              //   isUser={false}
+              //   permissions={undefined}
+              //   producerType={"video"}
+              //   producerId={videoInstanceId}
+              //   audioEffectsActive={audioEffectsActive}
+              //   setAudioEffectsActive={setAudioEffectsActive}
+              //   visualMediaContainerRef={videoContainerRef}
+              //   handleAudioEffectChange={handleAudioEffectChange}
+              //   handleMute={handleMute}
+              //   videoContentMute={videoContentMute}
+              //   closeLabelElement={
+              //     <FgHoverContentStandard content='Close (x)' style='dark' />
+              //   }
+              //   hoverLabelElement={
+              //     <FgHoverContentStandard content='Audio effects (a)' style='dark' />
+              //   }
+              //   scrollingContainerRef={rightLowerVideoControlsRef}
+              //   style={{ transform: "scaleX(-1)" }}
+              //   options={{
+              //     backgroundColor: "rgba(10, 10, 10, 1)",
+              //     secondaryBackgroundColor: "rgba(35, 35, 35, 1)",
+              //   }}
+              // />,
+            ]
+          : []),
       ]}
       inMediaVariables={[
         videoEffectsActive,
-        !videoMediaInstance.settings.isPlaying.value,
+        !videoMediaInstance.current.meta.ended &&
+          !videoMediaInstance.current.meta.isPlaying,
         settingsActive,
       ]}
       preventLowerLabelsVariables={[settingsActive, videoEffectsActive]}

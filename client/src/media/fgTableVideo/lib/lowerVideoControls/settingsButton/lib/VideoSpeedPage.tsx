@@ -24,7 +24,7 @@ export default function VideoSpeedPage({
   lowerVideoController,
   setActivePages,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
@@ -32,7 +32,7 @@ export default function VideoSpeedPage({
   const [_, setRerender] = useState(false);
 
   const setVideoSpeed = (videoSpeed: number) => {
-    videoMediaInstance.settings.videoSpeed.value = videoSpeed;
+    videoMediaInstance.current.meta.videoSpeed = videoSpeed;
 
     lowerVideoController.current.handlePlaybackSpeed(videoSpeed);
 
@@ -88,8 +88,7 @@ export default function VideoSpeedPage({
             <div
               key={key}
               className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-                parseFloat(speed) ===
-                videoMediaInstance.settings.videoSpeed.value
+                parseFloat(speed) === videoMediaInstance.current.meta.videoSpeed
                   ? "bg-fg-white text-fg-tone-black-1"
                   : ""
               }`}

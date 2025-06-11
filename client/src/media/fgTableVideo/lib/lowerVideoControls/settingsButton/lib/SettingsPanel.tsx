@@ -98,7 +98,7 @@ export default function SettingsPanel({
   setActivePages,
   setExternalRerender,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   settingsPanelRef: React.RefObject<HTMLDivElement>;
   settingsButtonRef: React.RefObject<HTMLButtonElement>;
@@ -191,14 +191,14 @@ export default function SettingsPanel({
                   contentFunction={() => (
                     <div
                       className={`${
-                        videoMediaInstance.settings.synced.value
+                        videoMediaInstance.current.settings.synced.value
                           ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                           : "fill-fg-white stroke-fg-white"
                       } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
                     >
                       <FgSVGElement
                         src={
-                          videoMediaInstance.settings.synced.value
+                          videoMediaInstance.current.settings.synced.value
                             ? desyncIcon
                             : syncIcon
                         }
@@ -208,7 +208,7 @@ export default function SettingsPanel({
                           { key: "height", value: "80%" },
                         ]}
                       />
-                      {videoMediaInstance.settings.synced.value
+                      {videoMediaInstance.current.settings.synced.value
                         ? "Desync"
                         : "Sync"}
                     </div>
@@ -217,7 +217,7 @@ export default function SettingsPanel({
                   hoverContent={
                     <FgHoverContentStandard
                       content={
-                        videoMediaInstance.settings.synced.value
+                        videoMediaInstance.current.settings.synced.value
                           ? "Desync (h)"
                           : "Sync (h)"
                       }
@@ -235,7 +235,7 @@ export default function SettingsPanel({
                   contentFunction={() => (
                     <div
                       className={`${
-                        videoMediaInstance.settings.background.value
+                        videoMediaInstance.current.settings.background.value
                           ? "bg-fg-white fill-fg-tone-black-1 stroke-fg-tone-black-1 text-fg-tone-black-1"
                           : "fill-fg-white stroke-fg-white"
                       } flex h-full w-full items-center justify-start text-nowrap rounded px-1 text-lg hover:bg-fg-white hover:fill-fg-tone-black-1 hover:stroke-fg-tone-black-1 hover:text-fg-tone-black-1`}
@@ -284,7 +284,8 @@ export default function SettingsPanel({
                       <div className="flex space-x-1">
                         {
                           downloadTypeSelections[
-                            videoMediaInstance.settings.downloadType.value
+                            videoMediaInstance.current.settings.downloadType
+                              .value
                           ]
                         }
                         <FgSVGElement
@@ -306,9 +307,7 @@ export default function SettingsPanel({
                       <div>Video speed</div>
                       <div className="flex space-x-1">
                         {`${parseFloat(
-                          videoMediaInstance.settings.videoSpeed.value.toFixed(
-                            2,
-                          ),
+                          videoMediaInstance.current.meta.videoSpeed.toFixed(2),
                         )}x`}
                         <FgSVGElement
                           src={navigateForwardIcon}
@@ -330,7 +329,8 @@ export default function SettingsPanel({
                       <div className="flex space-x-1">
                         {
                           closedCaptionsSelections[
-                            videoMediaInstance.settings.closedCaption.value
+                            videoMediaInstance.current.settings.closedCaption
+                              .value
                           ]
                         }
                         <FgSVGElement
@@ -404,7 +404,7 @@ export default function SettingsPanel({
                         option as ClosedCaptionOptions
                       ];
                     const activeSetting =
-                      videoMediaInstance.settings.closedCaption
+                      videoMediaInstance.current.settings.closedCaption
                         .closedCaptionOptions[option as ClosedCaptionOptions];
 
                     return (
@@ -427,7 +427,7 @@ export default function SettingsPanel({
                                 </div>
                               )}
                               clickFunction={() => {
-                                videoMediaInstance.settings.closedCaption.closedCaptionOptions[
+                                videoMediaInstance.current.settings.closedCaption.closedCaptionOptions[
                                   option as ClosedCaptionOptions
                                 ].value = type;
 
@@ -519,7 +519,7 @@ export default function SettingsPanel({
                         option as DownloadTypeOptionsTypes
                       ];
                     const activeSetting =
-                      videoMediaInstance.settings.downloadType
+                      videoMediaInstance.current.settings.downloadType
                         .downloadTypeOptions[
                         option as DownloadTypeOptionsTypes
                       ];
@@ -544,7 +544,7 @@ export default function SettingsPanel({
                                 </div>
                               )}
                               clickFunction={() => {
-                                videoMediaInstance.settings.downloadType.downloadTypeOptions[
+                                videoMediaInstance.current.settings.downloadType.downloadTypeOptions[
                                   option as DownloadTypeOptionsTypes
                                 ].value = type;
 

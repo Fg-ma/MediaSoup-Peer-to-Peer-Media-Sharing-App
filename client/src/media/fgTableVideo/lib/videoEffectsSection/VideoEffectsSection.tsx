@@ -64,7 +64,7 @@ export default function VideoEffectsSection({
   videoInstanceId: string;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   tintColor: React.MutableRefObject<string>;
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   videoContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const { staticContentEffectsStyles, staticContentEffects } =
@@ -78,7 +78,7 @@ export default function VideoEffectsSection({
   const overflow = useRef(false);
 
   const faceDetectedCount = useRef(
-    videoMediaInstance.videoMedia.maxFacesDetected,
+    videoMediaInstance.current.videoMedia.maxFacesDetected,
   );
 
   const [_, setRerender] = useState(false);
@@ -102,7 +102,7 @@ export default function VideoEffectsSection({
 
   useEffect(() => {
     if (faceDetectedCount.current === 0) {
-      videoMediaInstance.videoMedia.addFaceCountChangeListener(
+      videoMediaInstance.current.videoMedia.addFaceCountChangeListener(
         handleFaceDetectedCountChange,
       );
     }
@@ -110,7 +110,7 @@ export default function VideoEffectsSection({
 
     return () => {
       if (faceDetectedCount.current === 0) {
-        videoMediaInstance.videoMedia.removeFaceCountChangeListener(
+        videoMediaInstance.current.videoMedia.removeFaceCountChangeListener(
           handleFaceDetectedCountChange,
         );
       }
@@ -201,7 +201,7 @@ export default function VideoEffectsSection({
               .postProcess
           }
           clickFunctionCallback={async () => {
-            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            videoMediaInstance.current.babylonScene?.babylonShaderController.swapPostProcessEffects(
               staticContentEffectsStyles.current.video[videoInstanceId].video
                 .postProcess.style,
             );
@@ -216,7 +216,7 @@ export default function VideoEffectsSection({
               videoInstanceId
             ].video.postProcess.style = effectType;
 
-            videoMediaInstance.babylonScene?.babylonShaderController.swapPostProcessEffects(
+            videoMediaInstance.current.babylonScene?.babylonShaderController.swapPostProcessEffects(
               staticContentEffectsStyles.current.video[videoInstanceId].video
                 .postProcess.style,
             );
@@ -247,7 +247,7 @@ export default function VideoEffectsSection({
                   staticContentEffectsStyles.current.video[videoInstanceId]
                     .video.hideBackground;
 
-                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMediaInstance.current.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectsStyles.style,
                 );
 
@@ -265,7 +265,7 @@ export default function VideoEffectsSection({
                     .hideBackground;
 
                 effectsStyles.style = effectType;
-                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
+                videoMediaInstance.current.babylonScene?.babylonRenderLoop.swapHideBackgroundEffectImage(
                   effectType,
                 );
 
@@ -282,7 +282,7 @@ export default function VideoEffectsSection({
                   staticContentEffects.current.video[videoInstanceId].video
                     .hideBackground;
 
-                videoMediaInstance.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
+                videoMediaInstance.current.babylonScene?.babylonRenderLoop.swapHideBackgroundContextFillColor(
                   color,
                 );
 

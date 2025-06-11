@@ -16,7 +16,7 @@ export default function PlayPauseButton({
   videoEffectsActive,
   settingsActive,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
@@ -25,7 +25,7 @@ export default function PlayPauseButton({
     <FgButton
       clickFunction={lowerVideoController.current.handlePausePlay}
       contentFunction={() => {
-        const iconSrc = videoMediaInstance.settings.isPlaying.value
+        const iconSrc = videoMediaInstance.current.meta.isPlaying
           ? pauseIcon
           : playIcon;
 
@@ -45,7 +45,7 @@ export default function PlayPauseButton({
         !videoEffectsActive && !settingsActive ? (
           <FgHoverContentStandard
             content={
-              videoMediaInstance.settings.isPlaying.value
+              videoMediaInstance.current.meta.isPlaying
                 ? "Pause (k)"
                 : "Play (k)"
             }

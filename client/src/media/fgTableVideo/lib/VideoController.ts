@@ -1,4 +1,3 @@
-import { Events as HlsEvents } from "hls.js";
 import { VideoOptions } from "./typeConstant";
 import {
   IncomingTableStaticContentMessages,
@@ -11,29 +10,22 @@ import {
   VideoEffectStylesType,
   VideoEffectTypes,
 } from "../../../../../universal/effectsTypeConstant";
-import LowerVideoController from "./lowerVideoControls/LowerVideoController";
 import TableVideoMediaInstance, {
   VideoInstanceListenerTypes,
 } from "../TableVideoMediaInstance";
 import { VideoListenerTypes } from "../TableVideoMedia";
-import {
-  IncomingVideoMessages,
-  onRespondedCatchUpVideoMetadataType,
-  onUpdatedVideoMetadataType,
-} from "../../../serverControllers/videoServer/lib/typeConstant";
 
 class VideoController {
   constructor(
     private videoInstanceId: string,
-    private videoMediaInstance: TableVideoMediaInstance,
+    private videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private videoOptions: VideoOptions,
     private staticContentEffects: React.MutableRefObject<StaticContentEffectsType>,
     private staticContentEffectsStyles: React.MutableRefObject<StaticContentEffectsStylesType>,
     private tintColor: React.MutableRefObject<string>,
-    private lowerVideoController: React.MutableRefObject<LowerVideoController>,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
-    private subContainerRef: React.RefObject<HTMLDivElement>,
+    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private positioning: React.MutableRefObject<{
       position: {
         left: number;
@@ -45,7 +37,7 @@ class VideoController {
       };
       rotation: number;
     }>,
-    private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private subContainerRef: React.RefObject<HTMLDivElement>,
   ) {}
 
   init = () => {
@@ -53,6 +45,19 @@ class VideoController {
       "--primary-video-color",
       `${this.videoOptions.primaryVideoColor}`,
     );
+
+    if (
+      this.videoMediaInstance.current.videoMedia.loadingState === "downloaded"
+    ) {
+      this.positioning.current.scale = {
+        x: this.videoMediaInstance.current.videoMedia.aspect
+          ? this.positioning.current.scale.y *
+            this.videoMediaInstance.current.videoMedia.aspect
+          : this.positioning.current.scale.x,
+        y: this.positioning.current.scale.y,
+      };
+      this.setRerender((prev) => !prev);
+    }
   };
 
   private onUpdatedContentEffects = (event: onUpdatedContentEffectsType) => {
@@ -60,9 +65,9 @@ class VideoController {
     const { effects, effectStyles } = event.data;
 
     if (
-      !this.videoMediaInstance.settings.synced.value ||
+      !this.videoMediaInstance.current.settings.synced.value ||
       contentType !== "video" ||
-      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      contentId !== this.videoMediaInstance.current.videoMedia.videoId ||
       instanceId !== this.videoInstanceId
     )
       return;
@@ -86,7 +91,7 @@ class VideoController {
       ).tint.color;
     }
 
-    this.videoMediaInstance.updateAllEffects(oldEffectStyle);
+    this.videoMediaInstance.current.updateAllEffects(oldEffectStyle);
 
     this.setRerender((prev) => !prev);
   };
@@ -98,7 +103,7 @@ class VideoController {
     const { effects, effectStyles } = event.data;
 
     if (
-      contentId !== this.videoMediaInstance.videoMedia.videoId ||
+      contentId !== this.videoMediaInstance.current.videoMedia.videoId ||
       instanceId !== this.videoInstanceId
     )
       return;
@@ -113,106 +118,7 @@ class VideoController {
         this.videoInstanceId
       ].video = effectStyles as VideoEffectStylesType;
 
-    this.videoMediaInstance.updateAllEffects();
-  };
-
-  private onUpdateVideoPosition = (event: onUpdatedVideoMetadataType) => {
-    const { contentId, instanceId } = event.header;
-
-    if (
-      !this.videoMediaInstance.settings.synced.value ||
-      contentId !== this.videoMediaInstance.videoMedia.videoId ||
-      instanceId !== this.videoInstanceId
-    )
-      return;
-
-    const {
-      isPlaying,
-      lastKnownPosition,
-      videoPlaybackSpeed,
-      ended,
-      lastUpdatedAt,
-    } = event.data;
-
-    if (this.videoMediaInstance.instanceVideo) {
-      this.videoMediaInstance.instanceVideo.currentTime =
-        (isPlaying
-          ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
-          : 0) + lastKnownPosition;
-
-      this.videoMediaInstance.instanceVideo.playbackRate = videoPlaybackSpeed;
-
-      if (isPlaying && this.videoMediaInstance.instanceVideo.paused) {
-        this.videoMediaInstance.instanceVideo.play();
-      } else if (!isPlaying && !this.videoMediaInstance.instanceVideo.paused) {
-        this.videoMediaInstance.instanceVideo.pause();
-      }
-    }
-
-    this.videoMediaInstance.settings.isPlaying.value = isPlaying;
-
-    this.videoMediaInstance.settings.ended.value = ended;
-
-    this.lowerVideoController.current.timeUpdate();
-
-    this.setRerender((prev) => !prev);
-  };
-
-  private onRespondedCatchUpVideoMetadata = (
-    event: onRespondedCatchUpVideoMetadataType,
-  ) => {
-    const { contentId, instanceId } = event.header;
-
-    if (
-      !this.videoMediaInstance.settings.synced.value ||
-      contentId !== this.videoMediaInstance.videoMedia.videoId ||
-      instanceId !== this.videoInstanceId
-    )
-      return;
-
-    const {
-      isPlaying,
-      lastKnownPosition,
-      videoPlaybackSpeed,
-      ended,
-      lastUpdatedAt,
-    } = event.data;
-
-    if (this.videoMediaInstance.instanceVideo) {
-      this.videoMediaInstance.instanceVideo.currentTime =
-        (isPlaying
-          ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
-          : 0) + lastKnownPosition;
-
-      this.videoMediaInstance.instanceVideo.playbackRate = videoPlaybackSpeed;
-
-      if (isPlaying && this.videoMediaInstance.instanceVideo.paused) {
-        this.videoMediaInstance.instanceVideo.play();
-      } else if (!isPlaying && !this.videoMediaInstance.instanceVideo.paused) {
-        this.videoMediaInstance.instanceVideo.pause();
-      }
-    }
-
-    this.videoMediaInstance.settings.isPlaying.value = isPlaying;
-
-    this.videoMediaInstance.settings.ended.value = ended;
-
-    this.lowerVideoController.current.timeUpdate();
-
-    this.setRerender((prev) => !prev);
-  };
-
-  handleVideoSocketMessage = (event: IncomingVideoMessages) => {
-    switch (event.type) {
-      case "updatedVideoMetadata":
-        this.onUpdateVideoPosition(event);
-        break;
-      case "respondedCatchUpVideoMetadata":
-        this.onRespondedCatchUpVideoMetadata(event);
-        break;
-      default:
-        break;
-    }
+    this.videoMediaInstance.current.updateAllEffects();
   };
 
   handleTableStaticContentMessage = (
@@ -230,76 +136,32 @@ class VideoController {
     }
   };
 
-  private onDownloadComplete = () => {
-    if (
-      this.videoMediaInstance.instanceVideo &&
-      this.videoMediaInstance.instanceCanvas
-    ) {
-      const allCanvas =
-        this.subContainerRef.current?.querySelectorAll("canvas");
-
-      if (allCanvas) {
-        allCanvas.forEach((canvasElement) => {
-          canvasElement.remove();
-        });
-      }
-
-      this.subContainerRef.current?.appendChild(
-        this.videoMediaInstance.instanceCanvas,
-      );
-
-      this.positioning.current.scale = {
-        x: this.videoMediaInstance.videoMedia.aspect
-          ? this.positioning.current.scale.y *
-            this.videoMediaInstance.videoMedia.aspect
-          : this.positioning.current.scale.x,
-        y: this.positioning.current.scale.y,
-      };
-
-      this.videoMediaInstance.hls.on(
-        HlsEvents.BUFFER_APPENDED,
-        this.lowerVideoController.current.bufferUpdate,
-      );
-
-      // Keep video time
-      this.lowerVideoController.current.timeUpdate();
-      this.videoMediaInstance.instanceVideo.addEventListener(
-        "timeupdate",
-        this.lowerVideoController.current.timeUpdate,
-      );
-
-      this.videoMediaInstance.instanceVideo.addEventListener(
-        "enterpictureinpicture",
-        () => this.lowerVideoController.current.handlePictureInPicture("enter"),
-      );
-
-      this.videoMediaInstance.instanceVideo.addEventListener(
-        "leavepictureinpicture",
-        () => this.lowerVideoController.current.handlePictureInPicture("leave"),
-      );
-
-      this.setRerender((prev) => !prev);
-    }
-  };
-
   handleVideoMessages = (event: VideoListenerTypes) => {
     switch (event.type) {
       case "downloadComplete":
-        this.onDownloadComplete();
+        setTimeout(() => {
+          if (
+            this.videoMediaInstance.current.meta.ended &&
+            this.videoMediaInstance.current.instanceThumbnail
+          ) {
+            this.videoMediaInstance.current.instanceThumbnail?.remove();
+            this.videoMediaInstance.current.instanceCanvas.remove();
+
+            this.subContainerRef.current?.appendChild(
+              this.videoMediaInstance.current.instanceThumbnail,
+            );
+          }
+          this.positioning.current.scale = {
+            x: this.videoMediaInstance.current.videoMedia.aspect
+              ? this.positioning.current.scale.y *
+                this.videoMediaInstance.current.videoMedia.aspect
+              : this.positioning.current.scale.x,
+            y: this.positioning.current.scale.y,
+          };
+          this.setRerender((prev) => !prev);
+        }, 0);
         break;
       case "stateChanged":
-        this.setRerender((prev) => !prev);
-        break;
-      case "downloadFailed":
-        this.setRerender((prev) => !prev);
-        break;
-      case "downloadPaused":
-        this.setRerender((prev) => !prev);
-        break;
-      case "downloadResumed":
-        this.setRerender((prev) => !prev);
-        break;
-      case "downloadRetry":
         this.setRerender((prev) => !prev);
         break;
       default:
@@ -310,6 +172,9 @@ class VideoController {
   handleVideoInstanceMessages = (event: VideoInstanceListenerTypes) => {
     switch (event.type) {
       case "settingsChanged":
+        this.setRerender((prev) => !prev);
+        break;
+      case "metaChanged":
         this.setRerender((prev) => !prev);
         break;
       default:

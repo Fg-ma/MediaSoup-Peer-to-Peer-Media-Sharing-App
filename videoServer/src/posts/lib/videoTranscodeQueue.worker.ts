@@ -345,6 +345,8 @@ new Worker(
           "00:00:01", // 1 second in
           "-i",
           mp4Path,
+          "-vf",
+          "scale=iw*sar:ih",
           "-frames:v",
           "1",
           "-q:v",

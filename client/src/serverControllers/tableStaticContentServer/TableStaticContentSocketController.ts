@@ -749,8 +749,6 @@ class TableStaticContentSocketController {
           video.filename,
           video.mimeType as StaticMimeTypes,
           video.state,
-          this.deadbanding,
-          this.userDevice,
           this.staticContentEffects,
         );
 

@@ -22,8 +22,6 @@ export type DownloadRecordingFPSTypes =
   | "60 fps";
 
 export interface Settings {
-  isPlaying: { value: boolean };
-  ended: { value: boolean };
   synced: { value: boolean };
   background: {
     value: boolean;
@@ -53,9 +51,13 @@ export interface Settings {
       };
     };
   };
-  videoSpeed: {
-    value: number;
-  };
+}
+
+export interface VideoMeta {
+  currentTime: number;
+  videoSpeed: number;
+  isPlaying: boolean;
+  ended: boolean;
 }
 
 export const defaultVideoOptions: {
@@ -268,8 +270,6 @@ export const defaultActivePages: ActivePages = {
 };
 
 export const defaultSettings: Settings = Object.freeze({
-  isPlaying: Object.freeze({ value: false }),
-  ended: Object.freeze({ value: true }),
   synced: Object.freeze({ value: true }),
   background: Object.freeze({ value: false }),
   closedCaption: Object.freeze({
@@ -297,7 +297,11 @@ export const defaultSettings: Settings = Object.freeze({
       }),
     }),
   }),
-  videoSpeed: {
-    value: 1.0,
-  },
+});
+
+export const defaultMeta: VideoMeta = Object.freeze({
+  currentTime: 0,
+  videoSpeed: 1,
+  isPlaying: false,
+  ended: true,
 });

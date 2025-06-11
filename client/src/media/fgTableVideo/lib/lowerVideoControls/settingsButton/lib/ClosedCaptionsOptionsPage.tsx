@@ -79,7 +79,7 @@ export default function ClosedCaptionsOptionsPage({
   videoMediaInstance,
   setActivePages,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
   const handleClosedCaptionOptionsActive = () => {
@@ -154,7 +154,7 @@ export default function ClosedCaptionsOptionsPage({
                 <div className="flex items-center justify-center space-x-1">
                   <div>
                     {
-                      videoMediaInstance.settings.closedCaption
+                      videoMediaInstance.current.settings.closedCaption
                         .closedCaptionOptions[
                         option as keyof typeof closedCaptionsOptionsArrays
                       ].value

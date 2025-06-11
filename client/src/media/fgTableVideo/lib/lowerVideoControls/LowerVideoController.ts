@@ -19,7 +19,7 @@ import VideoSocketController from "../../../../serverControllers/videoServer/Vid
 class LowerVideoController {
   constructor(
     private videoInstanceId: string,
-    private videoMediaInstance: TableVideoMediaInstance,
+    private videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>,
     private videoContainerRef: React.RefObject<HTMLDivElement>,
     private setCaptionsActive: React.Dispatch<React.SetStateAction<boolean>>,
     private currentTimeRef: React.RefObject<HTMLDivElement>,
@@ -159,7 +159,7 @@ class LowerVideoController {
         console.error("Failed to exit picture in picture:", error);
       });
     } else {
-      this.videoMediaInstance.instanceVideo
+      this.videoMediaInstance.current.instanceVideo
         ?.requestPictureInPicture()
         .catch((error) => {
           console.error("Failed to request picture in picture:", error);
@@ -168,48 +168,48 @@ class LowerVideoController {
   };
 
   skipInVideo = (amount: number) => {
-    if (!this.videoMediaInstance.instanceVideo) return;
+    if (this.videoMediaInstance.current.instanceVideo) {
+      this.videoMediaInstance.current.instanceVideo.currentTime = Math.max(
+        0,
+        Math.min(
+          this.videoMediaInstance.current.instanceVideo.currentTime + amount,
+          this.videoMediaInstance.current.instanceVideo.duration,
+        ),
+      );
+    }
 
-    this.videoMediaInstance.instanceVideo.currentTime = Math.max(
-      0,
-      Math.min(
-        this.videoMediaInstance.instanceVideo.currentTime + amount,
-        this.videoMediaInstance.instanceVideo.duration,
-      ),
-    );
-
-    if (this.videoMediaInstance.settings.synced.value) {
+    if (this.videoMediaInstance.current.settings.synced.value) {
       this.videoSocket.current?.updateVideoMetadata(
-        this.videoMediaInstance.videoMedia.videoId,
+        this.videoMediaInstance.current.videoMedia.videoId,
         this.videoInstanceId,
-        this.videoMediaInstance.settings.isPlaying.value,
-        this.videoMediaInstance.instanceVideo.currentTime,
-        this.videoMediaInstance.settings.videoSpeed.value,
-        this.videoMediaInstance.settings.ended.value,
+        this.videoMediaInstance.current.meta.isPlaying,
+        this.videoMediaInstance.current.meta.currentTime,
+        this.videoMediaInstance.current.meta.videoSpeed,
+        false,
       );
     }
   };
 
   handlePausePlay = () => {
-    this.videoMediaInstance.settings.isPlaying.value =
-      !this.videoMediaInstance.settings.isPlaying.value;
+    this.videoMediaInstance.current.meta.isPlaying =
+      !this.videoMediaInstance.current.meta.isPlaying;
 
-    if (!this.videoMediaInstance.instanceVideo) return;
-
-    if (!this.videoMediaInstance.settings.isPlaying.value) {
-      this.videoMediaInstance.instanceVideo.pause();
-    } else {
-      this.videoMediaInstance.instanceVideo.play();
+    if (this.videoMediaInstance.current.instanceVideo) {
+      if (!this.videoMediaInstance.current.meta.isPlaying) {
+        this.videoMediaInstance.current.instanceVideo.pause();
+      } else {
+        this.videoMediaInstance.current.instanceVideo.play();
+      }
     }
 
-    if (this.videoMediaInstance.settings.synced.value) {
+    if (this.videoMediaInstance.current.settings.synced.value) {
       this.videoSocket.current?.updateVideoMetadata(
-        this.videoMediaInstance.videoMedia.videoId,
+        this.videoMediaInstance.current.videoMedia.videoId,
         this.videoInstanceId,
-        this.videoMediaInstance.settings.isPlaying.value,
-        this.videoMediaInstance.instanceVideo.currentTime,
-        this.videoMediaInstance.settings.videoSpeed.value,
-        this.videoMediaInstance.settings.ended.value,
+        this.videoMediaInstance.current.meta.isPlaying,
+        this.videoMediaInstance.current.meta.currentTime,
+        this.videoMediaInstance.current.meta.videoSpeed,
+        false,
       );
     }
 
@@ -225,10 +225,17 @@ class LowerVideoController {
   };
 
   timeUpdate = () => {
-    if (this.currentTimeRef.current && this.videoMediaInstance.instanceVideo) {
-      const currentTime = this.videoMediaInstance.instanceVideo.currentTime;
+    if (
+      this.currentTimeRef.current &&
+      this.videoMediaInstance.current.instanceVideo
+    ) {
+      this.videoMediaInstance.current.meta.currentTime =
+        this.videoMediaInstance.current.instanceVideo.currentTime;
+
+      const currentTime =
+        this.videoMediaInstance.current.instanceVideo.currentTime;
       const percent =
-        currentTime / this.videoMediaInstance.instanceVideo.duration;
+        currentTime / this.videoMediaInstance.current.instanceVideo.duration;
 
       this.currentTimeRef.current.textContent =
         this.formatDuration(currentTime);
@@ -236,14 +243,32 @@ class LowerVideoController {
         "--progress-position",
         `${percent}`,
       );
+
+      if (
+        this.videoMediaInstance.current.instanceVideo.currentTime >=
+        this.videoMediaInstance.current.instanceVideo.duration - 0.5
+      ) {
+        if (this.videoMediaInstance.current.instanceVideo) {
+          this.videoMediaInstance.current.instanceVideo.pause();
+          this.videoMediaInstance.current.instanceVideo.currentTime = 0;
+          this.videoSocket.current?.updateVideoMetadata(
+            this.videoMediaInstance.current.videoMedia.videoId,
+            this.videoInstanceId,
+            false,
+            this.videoMediaInstance.current.instanceVideo.currentTime,
+            this.videoMediaInstance.current.meta.videoSpeed,
+            true,
+          );
+        }
+      }
     }
   };
 
   bufferUpdate = () => {
-    if (!this.videoMediaInstance.instanceVideo) return;
+    if (!this.videoMediaInstance.current.instanceVideo) return;
 
-    const buffered = this.videoMediaInstance.instanceVideo.buffered;
-    const duration = this.videoMediaInstance.instanceVideo.duration;
+    const buffered = this.videoMediaInstance.current.instanceVideo.buffered;
+    const duration = this.videoMediaInstance.current.instanceVideo.duration;
 
     let maxBuffered = 0;
 
@@ -266,7 +291,8 @@ class LowerVideoController {
 
     const style = this.videoContainerRef.current.style;
     const captionOptions =
-      this.videoMediaInstance.settings.closedCaption.closedCaptionOptions;
+      this.videoMediaInstance.current.settings.closedCaption
+        .closedCaptionOptions;
 
     style.setProperty(
       "--closed-captions-font-family",
@@ -310,16 +336,16 @@ class LowerVideoController {
           ];
       }
 
-      this.videoMediaInstance.changeEffects(
+      this.videoMediaInstance.current.changeEffects(
         effect,
         this.tintColor.current,
         blockStateChange,
       );
 
-      if (this.videoMediaInstance.settings.synced.value) {
+      if (this.videoMediaInstance.current.settings.synced.value) {
         this.tableStaticContentSocket.current?.updateContentEffects(
           "video",
-          this.videoMediaInstance.videoMedia.videoId,
+          this.videoMediaInstance.current.videoMedia.videoId,
           this.videoInstanceId,
           this.staticContentEffects.current.video[this.videoInstanceId].video,
           this.staticContentEffectsStyles.current.video[this.videoInstanceId]
@@ -327,12 +353,12 @@ class LowerVideoController {
         );
       }
     } else {
-      this.videoMediaInstance.clearAllEffects();
+      this.videoMediaInstance.current.clearAllEffects();
 
-      if (this.videoMediaInstance.settings.synced.value) {
+      if (this.videoMediaInstance.current.settings.synced.value) {
         this.tableStaticContentSocket.current?.updateContentEffects(
           "video",
-          this.videoMediaInstance.videoMedia.videoId,
+          this.videoMediaInstance.current.videoMedia.videoId,
           this.videoInstanceId,
           this.staticContentEffects.current.video[this.videoInstanceId].video,
           this.staticContentEffectsStyles.current.video[this.videoInstanceId]
@@ -343,23 +369,25 @@ class LowerVideoController {
   };
 
   handleDownload = () => {
-    if (this.videoMediaInstance.settings.downloadType.value === "snapShot") {
-      this.videoMediaInstance.babylonScene?.downloadSnapShot();
-    } else if (
-      this.videoMediaInstance.settings.downloadType.value === "original"
+    if (
+      this.videoMediaInstance.current.settings.downloadType.value === "snapShot"
     ) {
-      this.videoMediaInstance.videoMedia.downloadVideo();
+      this.videoMediaInstance.current.babylonScene?.downloadSnapShot();
     } else if (
-      this.videoMediaInstance.settings.downloadType.value === "record"
+      this.videoMediaInstance.current.settings.downloadType.value === "original"
+    ) {
+      this.videoMediaInstance.current.videoMedia.downloadVideo();
+    } else if (
+      this.videoMediaInstance.current.settings.downloadType.value === "record"
     ) {
       if (!this.recording.current) {
-        this.videoMediaInstance.babylonScene?.startRecording(
+        this.videoMediaInstance.current.babylonScene?.startRecording(
           downloadRecordingMimeMap[
-            this.videoMediaInstance.settings.downloadType.downloadTypeOptions
-              .mimeType.value
+            this.videoMediaInstance.current.settings.downloadType
+              .downloadTypeOptions.mimeType.value
           ],
           parseInt(
-            this.videoMediaInstance.settings.downloadType.downloadTypeOptions.fps.value.slice(
+            this.videoMediaInstance.current.settings.downloadType.downloadTypeOptions.fps.value.slice(
               0,
               -4,
             ),
@@ -367,7 +395,7 @@ class LowerVideoController {
         );
         this.downloadRecordingReady.current = false;
       } else {
-        this.videoMediaInstance.babylonScene?.stopRecording();
+        this.videoMediaInstance.current.babylonScene?.stopRecording();
         this.downloadRecordingReady.current = true;
       }
 
@@ -377,7 +405,7 @@ class LowerVideoController {
   };
 
   handleDownloadRecording = () => {
-    this.videoMediaInstance.babylonScene?.downloadRecording();
+    this.videoMediaInstance.current.babylonScene?.downloadRecording();
   };
 
   handleSettings = () => {
@@ -401,9 +429,10 @@ class LowerVideoController {
     this.isScrubbing.current = true;
     if (this.isScrubbing.current) {
       this.videoContainerRef.current?.classList.add("scrubbing");
-      if (this.videoMediaInstance.instanceVideo) {
-        this.wasPaused.current = this.videoMediaInstance.instanceVideo.paused;
-        this.videoMediaInstance.instanceVideo.pause();
+      if (this.videoMediaInstance.current.instanceVideo) {
+        this.wasPaused.current =
+          this.videoMediaInstance.current.instanceVideo.paused;
+        this.videoMediaInstance.current.instanceVideo.pause();
       }
     }
 
@@ -427,25 +456,25 @@ class LowerVideoController {
     this.isScrubbing.current = false;
 
     this.videoContainerRef.current?.classList.remove("scrubbing");
-    if (this.videoMediaInstance.instanceVideo) {
-      this.videoMediaInstance.instanceVideo.currentTime =
-        percent * this.videoMediaInstance.instanceVideo.duration;
+    if (this.videoMediaInstance.current.instanceVideo) {
+      this.videoMediaInstance.current.instanceVideo.currentTime =
+        percent * this.videoMediaInstance.current.instanceVideo.duration;
     }
 
-    if (this.videoMediaInstance.instanceVideo) {
-      if (this.videoMediaInstance.settings.synced.value) {
+    if (this.videoMediaInstance.current.instanceVideo) {
+      if (this.videoMediaInstance.current.settings.synced.value) {
         this.videoSocket.current?.updateVideoMetadata(
-          this.videoMediaInstance.videoMedia.videoId,
+          this.videoMediaInstance.current.videoMedia.videoId,
           this.videoInstanceId,
-          this.videoMediaInstance.settings.isPlaying.value,
-          this.videoMediaInstance.instanceVideo.currentTime,
-          this.videoMediaInstance.settings.videoSpeed.value,
-          this.videoMediaInstance.settings.ended.value,
+          this.videoMediaInstance.current.meta.isPlaying,
+          this.videoMediaInstance.current.instanceVideo.currentTime,
+          this.videoMediaInstance.current.meta.videoSpeed,
+          false,
         );
       }
 
       if (!this.wasPaused.current) {
-        this.videoMediaInstance.instanceVideo.play();
+        this.videoMediaInstance.current.instanceVideo.play();
       }
     }
 
@@ -469,9 +498,12 @@ class LowerVideoController {
         `${percent}`,
       );
 
-      if (this.videoMediaInstance.instanceVideo && this.currentTimeRef.current)
+      if (
+        this.videoMediaInstance.current.instanceVideo &&
+        this.currentTimeRef.current
+      )
         this.currentTimeRef.current.textContent = this.formatDuration(
-          percent * this.videoMediaInstance.instanceVideo.duration,
+          percent * this.videoMediaInstance.current.instanceVideo.duration,
         );
     }
   };
@@ -489,25 +521,25 @@ class LowerVideoController {
   };
 
   handlePlaybackSpeed = (playbackRate: number) => {
-    if (this.videoMediaInstance.instanceVideo) {
-      this.videoMediaInstance.instanceVideo.playbackRate = playbackRate;
+    if (this.videoMediaInstance.current.instanceVideo) {
+      this.videoMediaInstance.current.instanceVideo.playbackRate = playbackRate;
 
-      if (this.videoMediaInstance.settings.synced.value) {
+      if (this.videoMediaInstance.current.settings.synced.value) {
         this.videoSocket.current?.updateVideoMetadata(
-          this.videoMediaInstance.videoMedia.videoId,
+          this.videoMediaInstance.current.videoMedia.videoId,
           this.videoInstanceId,
-          this.videoMediaInstance.settings.isPlaying.value,
-          this.videoMediaInstance.instanceVideo.currentTime,
-          this.videoMediaInstance.settings.videoSpeed.value,
-          this.videoMediaInstance.settings.ended.value,
+          this.videoMediaInstance.current.meta.isPlaying,
+          this.videoMediaInstance.current.instanceVideo.currentTime,
+          this.videoMediaInstance.current.meta.videoSpeed,
+          false,
         );
       }
     }
   };
 
   handleSetAsBackground = () => {
-    this.videoMediaInstance.settings.background.value =
-      !this.videoMediaInstance.settings.background.value;
+    this.videoMediaInstance.current.settings.background.value =
+      !this.videoMediaInstance.current.settings.background.value;
 
     this.setSettingsActive(false);
 
@@ -522,14 +554,14 @@ class LowerVideoController {
   };
 
   handleSync = () => {
-    this.videoMediaInstance.settings.synced.value =
-      !this.videoMediaInstance.settings.synced.value;
+    this.videoMediaInstance.current.settings.synced.value =
+      !this.videoMediaInstance.current.settings.synced.value;
 
-    if (this.videoMediaInstance.settings.synced.value) {
+    if (this.videoMediaInstance.current.settings.synced.value) {
       this.tableStaticContentSocket.current?.requestCatchUpEffects(
         "video",
-        this.videoMediaInstance.videoMedia.videoId,
-        this.videoMediaInstance.videoInstanceId,
+        this.videoMediaInstance.current.videoMedia.videoId,
+        this.videoMediaInstance.current.videoInstanceId,
       );
     }
 

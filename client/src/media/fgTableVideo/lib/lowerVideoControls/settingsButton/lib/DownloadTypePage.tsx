@@ -13,7 +13,7 @@ export default function DownloadTypePage({
   setActivePages,
   setRerender,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -22,7 +22,7 @@ export default function DownloadTypePage({
   const setDownloadType = (
     downloadType: keyof typeof downloadTypeSelections,
   ) => {
-    videoMediaInstance.settings.downloadType.value = downloadType;
+    videoMediaInstance.current.settings.downloadType.value = downloadType;
 
     setRerender((prev) => !prev);
   };
@@ -74,7 +74,7 @@ export default function DownloadTypePage({
             Download
           </div>
         </div>
-        {videoMediaInstance.settings.downloadType.value === "record" ? (
+        {videoMediaInstance.current.settings.downloadType.value === "record" ? (
           <FgButton
             contentFunction={() => (
               <div className="rounded px-2 pt-0.5 font-Josefin text-lg font-bold hover:bg-fg-white hover:text-fg-tone-black-1">
@@ -96,7 +96,7 @@ export default function DownloadTypePage({
           <div
             key={key}
             className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              key === videoMediaInstance.settings.downloadType.value
+              key === videoMediaInstance.current.settings.downloadType.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}

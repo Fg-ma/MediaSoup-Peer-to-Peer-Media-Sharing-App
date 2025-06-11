@@ -18,7 +18,7 @@ export default function DownloadTypeOptionsPage({
   videoMediaInstance,
   setActivePages,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
   const handleDownloadTypeOptionsActive = () => {
@@ -93,7 +93,7 @@ export default function DownloadTypeOptionsPage({
                 <div className="flex items-center justify-center space-x-1">
                   <div>
                     {
-                      videoMediaInstance.settings.downloadType
+                      videoMediaInstance.current.settings.downloadType
                         .downloadTypeOptions[
                         option as keyof typeof downloadTypeOptionsArrays
                       ].value

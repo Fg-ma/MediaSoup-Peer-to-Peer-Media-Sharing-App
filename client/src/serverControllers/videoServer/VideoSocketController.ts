@@ -305,8 +305,6 @@ class VideoSocketController {
         filename,
         mimeType,
         state,
-        this.deadbanding,
-        this.userDevice,
         this.staticContentEffects,
       );
 
@@ -349,8 +347,6 @@ class VideoSocketController {
           filename,
           mimeType,
           state,
-          this.deadbanding,
-          this.userDevice,
           this.staticContentEffects,
         );
     }

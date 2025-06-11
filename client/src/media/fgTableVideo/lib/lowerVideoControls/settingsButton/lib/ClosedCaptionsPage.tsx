@@ -45,7 +45,7 @@ export default function ClosedCaptionsPage({
   videoMediaInstance,
   setActivePages,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   setActivePages: React.Dispatch<React.SetStateAction<ActivePages>>;
 }) {
   const scrollingContainerRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export default function ClosedCaptionsPage({
   const setClosedCaptionsLang = (
     newLang: keyof typeof closedCaptionsSelections,
   ) => {
-    videoMediaInstance.settings.closedCaption.value = newLang;
+    videoMediaInstance.current.settings.closedCaption.value = newLang;
 
     setRerender((prev) => !prev);
   };
@@ -125,7 +125,7 @@ export default function ClosedCaptionsPage({
           <div
             key={key}
             className={`flex w-full items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              key === videoMediaInstance.settings.closedCaption.value
+              key === videoMediaInstance.current.settings.closedCaption.value
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}

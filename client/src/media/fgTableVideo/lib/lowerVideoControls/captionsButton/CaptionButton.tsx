@@ -54,7 +54,7 @@ export default function CaptionButton({
   scrollingContainerRef,
   containerRef,
 }: {
-  videoMediaInstance: TableVideoMediaInstance;
+  videoMediaInstance: React.MutableRefObject<TableVideoMediaInstance>;
   lowerVideoController: React.MutableRefObject<LowerVideoController>;
   videoEffectsActive: boolean;
   settingsActive: boolean;
@@ -96,9 +96,9 @@ export default function CaptionButton({
     }
 
     captionsController.current.loadVoskModel(
-      voskModels[videoMediaInstance.settings.closedCaption.value],
+      voskModels[videoMediaInstance.current.settings.closedCaption.value],
     );
-  }, [videoMediaInstance.settings.closedCaption.value]);
+  }, [videoMediaInstance.current.settings.closedCaption.value]);
 
   return (
     <>
@@ -106,7 +106,9 @@ export default function CaptionButton({
         clickFunction={() => {
           if (!active) {
             captionsController.current.loadVoskModel(
-              voskModels[videoMediaInstance.settings.closedCaption.value],
+              voskModels[
+                videoMediaInstance.current.settings.closedCaption.value
+              ],
             );
           }
 
