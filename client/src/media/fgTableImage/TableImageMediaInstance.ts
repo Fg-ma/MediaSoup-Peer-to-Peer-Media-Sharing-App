@@ -29,6 +29,14 @@ class TableImageMediaInstance {
   private effects: {
     [imageEffect in ImageEffectTypes]?: boolean;
   } = {};
+  private effectsNeedingFaceDetection = [
+    "glasses",
+    "beards",
+    "mustaches",
+    "masks",
+    "hats",
+    "pets",
+  ];
 
   private positioning: {
     position: {
@@ -296,11 +304,15 @@ class TableImageMediaInstance {
 
     if (
       Object.entries(this.effects).some(
-        ([key, val]) => val && key !== "hideBackground",
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
       )
     ) {
       this.imageMedia.babylonRenderLoopWorker?.addNeed(
         "faceDetection",
+        this.imageInstanceId,
+      );
+      this.imageMedia.babylonRenderLoopWorker?.addNeed(
+        "faceMesh",
         this.imageInstanceId,
       );
     }

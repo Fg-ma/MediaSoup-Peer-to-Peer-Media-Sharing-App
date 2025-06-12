@@ -99,8 +99,7 @@ export default function UserVisualMedia({
     ...options,
   };
 
-  const { userMedia, remoteMedia, userDataStreams, remoteDataStreams } =
-    useMediaContext();
+  const { userMedia, userDataStreams, remoteDataStreams } = useMediaContext();
   const { userEffectsStyles, remoteEffectsStyles, userEffects, remoteEffects } =
     useEffectsContext();
   const { mediasoupSocket, tableSocket } = useSocketContext();

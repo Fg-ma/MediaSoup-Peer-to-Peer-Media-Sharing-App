@@ -8,6 +8,7 @@ import FailedUploadingSection from "./lib/FailedUploadingSection";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { HandleListenerTypes } from "../../../db/indexedDB/lib/uploads/typeConstant";
 import CutOffUploadingSection from "./lib/CutoffUploadingSection";
+import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -33,6 +34,7 @@ export default function UploadingPanel({
       key: string;
       tableId: string;
       uploadId: string;
+      staticContentType: StaticContentTypes;
       offset: number;
       handle: FileSystemFileHandle;
     }[]
@@ -119,6 +121,7 @@ export default function UploadingPanel({
               savedTableId={handle.tableId}
               uploadId={handle.uploadId}
               contentId={handle.key}
+              staticContentType={handle.staticContentType}
               offset={handle.offset}
               failed={handle.handle}
             />

@@ -77,9 +77,7 @@ export default function VideoEffectsSection({
 
   const overflow = useRef(false);
 
-  const faceDetectedCount = useRef(
-    videoMediaInstance.current.videoMedia.maxFacesDetected,
-  );
+  const faceDetectedCount = useRef(videoMediaInstance.current.maxFacesDetected);
 
   const [_, setRerender] = useState(false);
 
@@ -102,7 +100,7 @@ export default function VideoEffectsSection({
 
   useEffect(() => {
     if (faceDetectedCount.current === 0) {
-      videoMediaInstance.current.videoMedia.addFaceCountChangeListener(
+      videoMediaInstance.current.addFaceCountChangeListener(
         handleFaceDetectedCountChange,
       );
     }
@@ -110,7 +108,7 @@ export default function VideoEffectsSection({
 
     return () => {
       if (faceDetectedCount.current === 0) {
-        videoMediaInstance.current.videoMedia.removeFaceCountChangeListener(
+        videoMediaInstance.current.removeFaceCountChangeListener(
           handleFaceDetectedCountChange,
         );
       }

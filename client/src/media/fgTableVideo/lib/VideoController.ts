@@ -38,6 +38,7 @@ class VideoController {
       rotation: number;
     }>,
     private subContainerRef: React.RefObject<HTMLDivElement>,
+    private setIsEnded: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
   init = () => {
@@ -172,9 +173,14 @@ class VideoController {
   handleVideoInstanceMessages = (event: VideoInstanceListenerTypes) => {
     switch (event.type) {
       case "settingsChanged":
+        this.setIsEnded(this.videoMediaInstance.current.meta.ended);
         this.setRerender((prev) => !prev);
         break;
       case "metaChanged":
+        this.setIsEnded(this.videoMediaInstance.current.meta.ended);
+        this.setRerender((prev) => !prev);
+        break;
+      case "thumbnailLoaded":
         this.setRerender((prev) => !prev);
         break;
       default:

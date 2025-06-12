@@ -17,7 +17,6 @@ const handleToTable = async (
   tableId: string,
   contentId: string,
   instanceId: string,
-  mimeType: StaticMimeTypes,
   filename: string,
   state: TableContentStateTypes[],
   initPositioning?:
@@ -38,7 +37,6 @@ const handleToTable = async (
     tableId,
     contentId,
     instanceId,
-    mimeType,
     filename,
     state,
     initPositioning
@@ -52,7 +50,7 @@ const handleToTable = async (
     },
     data: {
       filename,
-      mimeType,
+      mimeType: "video/mp4",
       state,
       initPositioning,
     },
@@ -69,18 +67,10 @@ const handleReupload = (tableId: string, contentId: string) => {
 const handleToTabled = async (
   tableId: string,
   contentId: string,
-  mimeType: StaticMimeTypes,
-  completeFilename: string,
+  filename: string,
   state: TableContentStateTypes[]
 ) => {
-  await handleMongoVideoUploads(
-    tableId,
-    contentId,
-    undefined,
-    mimeType,
-    completeFilename,
-    state
-  );
+  await handleMongoVideoUploads(tableId, contentId, undefined, filename, state);
 
   broadcaster.broadcastToTable(tableId, {
     type: "videoUploadedToTabled",
@@ -88,8 +78,8 @@ const handleToTabled = async (
       contentId,
     },
     data: {
-      filename: completeFilename,
-      mimeType,
+      filename,
+      mimeType: "video/mp4",
       state,
     },
   });
@@ -99,7 +89,6 @@ const handleMongoVideoUploads = async (
   tableId: string,
   contentId: string,
   instanceId: string | undefined,
-  mimeType: StaticMimeTypes,
   filename: string,
   state: TableContentStateTypes[],
   initPositioning?:
@@ -120,7 +109,7 @@ const handleMongoVideoUploads = async (
     tableId,
     videoId: contentId,
     filename,
-    mimeType,
+    mimeType: "video/mp4",
     state,
     instances: instanceId
       ? [
@@ -172,11 +161,16 @@ const isReencodingNeeded = async (filePath: string): Promise<boolean> => {
       codec += data.toString();
     });
 
-    probe.on("close", () => {
+    probe.on("close", (code) => {
+      if (code !== 0) {
+        return reject(new Error(`FFmpeg exited with code ${code}`));
+      }
       resolve(codec.trim() !== "h264");
     });
 
-    probe.on("error", reject);
+    probe.on("error", (error) => {
+      return reject(new Error(`FFmpeg exited with error ${error}`));
+    });
   });
 };
 
@@ -207,6 +201,7 @@ new Worker(
       mimeType: StaticMimeTypes;
       instanceId: string;
       state: [];
+      oneShot: boolean;
     }>
   ) => {
     let currentStep: TranscodeStep = TranscodeStep.Start;
@@ -229,6 +224,7 @@ new Worker(
       contentId,
       filename,
       direction,
+      oneShot,
       ...sessionMeta
     } = job.data;
 
@@ -327,8 +323,15 @@ new Worker(
           "vod",
           path.join(hlsDir, "index.m3u8"),
         ]);
-        ffmpeg.on("close", resolve);
-        ffmpeg.on("error", reject);
+        ffmpeg.on("close", (code) => {
+          if (code !== 0) {
+            return reject(new Error(`FFmpeg exited with code ${code}`));
+          }
+          resolve(null);
+        });
+        ffmpeg.on("error", (error) => {
+          return reject(new Error(`FFmpeg exited with error ${error}`));
+        });
       });
       await checkAbort();
 
@@ -428,8 +431,7 @@ new Worker(
             tableId,
             contentId,
             sessionMeta.instanceId,
-            sessionMeta.mimeType,
-            filename,
+            filename.slice(0, filename.lastIndexOf(".")) + ".mp4",
             sessionMeta.state
           );
           break;
@@ -440,8 +442,7 @@ new Worker(
           await handleToTabled(
             tableId,
             contentId,
-            sessionMeta.mimeType,
-            filename,
+            filename.slice(0, filename.lastIndexOf(".")) + ".mp4",
             sessionMeta.state
           );
           break;
@@ -460,7 +461,7 @@ new Worker(
         { prefix: "VVJ", id: contentId },
         ...(uploadId
           ? [
-              { prefix: "VUS", id: uploadId },
+              { prefix: "VUS", id: `${contentId}:${uploadId}` },
               { prefix: "VCS", id: uploadId },
             ]
           : []),
@@ -470,7 +471,7 @@ new Worker(
 
       broadcaster.broadcastToInstance(tableId, username, instance, {
         type: "processingFinished",
-        header: { contentId },
+        header: { contentId, oneShot, filename },
       });
     } catch {
       const cleanupHLS = async () => {
@@ -530,13 +531,18 @@ new Worker(
         { prefix: "VVJ", id: contentId },
         ...(uploadId
           ? [
-              { prefix: "VUS", id: uploadId },
+              { prefix: "VUS", id: `${contentId}:${uploadId}` },
               { prefix: "VCS", id: uploadId },
             ]
           : []),
         direction === "reupload" ? { prefix: "VRU", id: contentId } : undefined,
       ].filter((del) => del !== undefined);
       await tableTopRedis.deletes.delete(redisDeletes);
+
+      broadcaster.broadcastToInstance(tableId, username, instance, {
+        type: "videoFailedUpload",
+        header: { contentId, filename },
+      });
     }
   },
   { connection: redisConnection }

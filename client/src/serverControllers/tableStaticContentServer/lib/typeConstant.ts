@@ -204,7 +204,11 @@ type onSearchTabledContentRequestType = {
 
 type onDeleteUploadSessionType = {
   type: "deleteUploadSession";
-  header: { uploadId: string };
+  header: {
+    uploadId: string;
+    contentId: string;
+    contentType: StaticContentTypes;
+  };
 };
 
 type onSignalReuploadStartType = {

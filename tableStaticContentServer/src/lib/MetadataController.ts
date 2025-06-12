@@ -1,5 +1,7 @@
 import { sanitizationUtils, tableTopMongo, tableTopRedis } from "src";
 import {
+  contentTypeBucketMap,
+  encodedCephBucketMap,
   onChangeContentStateType,
   onCreateNewInstancesType,
   onDeleteUploadSessionType,
@@ -212,19 +214,26 @@ class MetadataController {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDeleteUploadSessionType;
-    const { uploadId } = safeEvent.header;
+    const { uploadId, contentId, contentType } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
       "TSCUS",
-      uploadId
+      `${
+        encodedCephBucketMap[contentTypeBucketMap[contentType]]
+      }:${contentId}:${uploadId}`
     )) as UploadSession;
 
     await tableTopRedis.deletes.delete(
       [
-        { prefix: "TSCUS", id: uploadId },
+        {
+          prefix: "TSCUS",
+          id: `${
+            encodedCephBucketMap[contentTypeBucketMap[contentType]]
+          }:${contentId}:${uploadId}`,
+        },
         { prefix: "TSCCS", id: uploadId },
         session?.direction === "reupload"
-          ? { prefix: "TSCRU", id: session.contentId }
+          ? { prefix: "TSCRU", id: contentId }
           : undefined,
       ].filter((del) => del !== undefined)
     );

@@ -3,7 +3,6 @@ import FgButton from "../../../../../../elements/fgButton/FgButton";
 import FgSVGElement from "../../../../../../elements/fgSVGElement/FgSVGElement";
 import TableVideoMediaInstance from "../../../../../../media/fgTableVideo/TableVideoMediaInstance";
 import {
-  ActivePages,
   BackgroundColors,
   BackgroundOpacities,
   CharacterEdgeStyles,

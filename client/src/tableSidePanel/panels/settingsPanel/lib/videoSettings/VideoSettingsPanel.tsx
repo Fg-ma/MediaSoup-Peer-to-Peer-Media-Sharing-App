@@ -290,9 +290,7 @@ export default function VideoSettingsPanel({
                   style={{ width: "calc(100% - 1.25rem)" }}
                 >
                   {`${parseFloat(
-                    videoMediaInstance.current.settings.videoSpeed.value.toFixed(
-                      2,
-                    ),
+                    videoMediaInstance.current.meta.videoSpeed.toFixed(2),
                   )}x`}
                 </div>
                 <FgSVGElement

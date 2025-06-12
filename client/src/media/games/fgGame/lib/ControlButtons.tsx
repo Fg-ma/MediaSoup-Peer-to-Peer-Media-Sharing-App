@@ -3,20 +3,36 @@ import FgGameButton from "../../../../elements/fgGameButton/FgGameButton";
 import FgHoverContentStandard from "../../../../elements/fgHoverContentStandard/FgHoverContentStandard";
 
 export default function ControlButtons({
+  tableTopRef,
   startGameFunction,
   joinGameFunction,
   leaveGameFunction,
   userPlaying,
   playerCount,
+  positioning,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   startGameFunction?: () => void;
   joinGameFunction?: () => void;
   leaveGameFunction?: () => void;
   userPlaying: boolean;
   playerCount: number;
+  positioning: React.MutableRefObject<{
+    position: {
+      left: number;
+      top: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
+  }>;
 }) {
   return (
-    <div className="flex h-full w-max items-center justify-center space-x-2 py-2">
+    <div
+      className={`${(positioning.current.scale.x / 100) * (tableTopRef.current?.clientWidth ?? 1) <= 140 ? "bg-red-500" : ""} flex h-full w-max items-center justify-center space-x-2 py-2`}
+    >
       <FgGameButton
         className="aspect-square h-full"
         clickFunction={startGameFunction}

@@ -120,6 +120,8 @@ class BabylonScene {
 
   private forceFaceDetectEndListeners: Set<() => void> = new Set();
 
+  private running = true;
+
   constructor(
     private babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined,
     private type:
@@ -128,7 +130,6 @@ class BabylonScene {
       | "image"
       | "video"
       | "application"
-      | "text"
       | "capture",
     private aspect: number,
     private canvas: HTMLCanvasElement,
@@ -141,7 +142,10 @@ class BabylonScene {
     private selfieSegmentationResults: ImageData[] | undefined,
     private userDevice: React.MutableRefObject<UserDevice>,
     private maxFaces: [number],
+    initRunning?: boolean,
   ) {
+    if (initRunning !== undefined) this.running = initRunning;
+
     this.flip = this.type === "camera" || this.type === "capture";
 
     this.engine = new Engine(this.canvas, true);
@@ -172,6 +176,7 @@ class BabylonScene {
       this.threeDimMeshesZCoord,
     );
 
+    this.engine.resize();
     this.babylonRenderLoop = new BabylonRenderLoop(
       this.flip,
       this.scene,
@@ -195,7 +200,9 @@ class BabylonScene {
     );
 
     // Render loop
-    this.engine.runRenderLoop(this.engineRenderLoop);
+    if (this.running) {
+      this.engine.runRenderLoop(this.engineRenderLoop);
+    }
   }
 
   deconstructor = () => {
@@ -298,8 +305,14 @@ class BabylonScene {
     this.hideBackgroundTexture = new DynamicTexture(
       "hideBackgroundTexture",
       {
-        width: this.canvas.width,
-        height: this.canvas.height,
+        width:
+          this.backgroundMedia instanceof HTMLVideoElement
+            ? this.backgroundMedia.videoWidth
+            : this.backgroundMedia.naturalWidth,
+        height:
+          this.backgroundMedia instanceof HTMLVideoElement
+            ? this.backgroundMedia.videoHeight
+            : this.backgroundMedia.naturalHeight,
       },
       this.scene,
     );
@@ -417,6 +430,21 @@ class BabylonScene {
         initRotation,
       );
     }
+  };
+
+  setRunning = (run: boolean) => {
+    if (this.running !== run) {
+      if (run) {
+        this.engine.runRenderLoop(this.engineRenderLoop);
+      } else {
+        this.engine.stopRenderLoop();
+      }
+      this.running = run;
+    }
+  };
+
+  forceEngineRenderLoop = () => {
+    this.engineRenderLoop();
   };
 
   deleteMesh = (type: MeshTypes, meshLabel: string) => {
@@ -552,8 +580,14 @@ class BabylonScene {
         this.engine,
         this.camera,
         {
-          width: this.canvas.width,
-          height: this.canvas.height,
+          width:
+            this.backgroundMedia instanceof HTMLVideoElement
+              ? this.backgroundMedia.videoWidth
+              : this.backgroundMedia.naturalWidth,
+          height:
+            this.backgroundMedia instanceof HTMLVideoElement
+              ? this.backgroundMedia.videoHeight
+              : this.backgroundMedia.naturalHeight,
         },
         (dataUrl) => {
           // Create a link element for download
@@ -580,8 +614,14 @@ class BabylonScene {
           this.engine,
           this.camera,
           {
-            width: this.canvas.width,
-            height: this.canvas.height,
+            width:
+              this.backgroundMedia instanceof HTMLVideoElement
+                ? this.backgroundMedia.videoWidth
+                : this.backgroundMedia.naturalWidth,
+            height:
+              this.backgroundMedia instanceof HTMLVideoElement
+                ? this.backgroundMedia.videoHeight
+                : this.backgroundMedia.naturalHeight,
             precision: 1,
           },
           (dataUrl) => {
@@ -600,8 +640,14 @@ class BabylonScene {
         this.engine,
         this.camera,
         {
-          width: this.canvas.width,
-          height: this.canvas.height,
+          width:
+            this.backgroundMedia instanceof HTMLVideoElement
+              ? this.backgroundMedia.videoWidth
+              : this.backgroundMedia.naturalWidth,
+          height:
+            this.backgroundMedia instanceof HTMLVideoElement
+              ? this.backgroundMedia.videoHeight
+              : this.backgroundMedia.naturalHeight,
         },
         (dataUrl) => {
           this.snapShotURL = dataUrl;
@@ -726,7 +772,16 @@ class BabylonScene {
   };
 
   getReadPixels = () => {
-    return this.engine.readPixels(0, 0, this.canvas.width, this.canvas.height);
+    return this.engine.readPixels(
+      0,
+      0,
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? this.backgroundMedia.videoWidth
+        : this.backgroundMedia.naturalWidth,
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? this.backgroundMedia.videoHeight
+        : this.backgroundMedia.naturalHeight,
+    );
   };
 }
 

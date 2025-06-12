@@ -261,7 +261,6 @@ class TableImageMedia {
       if (this.image)
         this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
           false,
-          this.faceLandmarks,
           this.aspect,
           this.image,
           this.faceMeshWorker,

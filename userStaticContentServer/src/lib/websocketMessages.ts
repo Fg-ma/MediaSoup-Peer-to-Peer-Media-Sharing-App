@@ -34,6 +34,9 @@ const handleMessage = (ws: UserStaticContentWebSocket, event: MessageTypes) => {
     case "muteStylesRequest":
       metadataController.onMuteStylesRequest(event);
       break;
+    case "deleteUploadSession":
+      metadataController.onDeleteUploadSession(event);
+      break;
     default:
       break;
   }

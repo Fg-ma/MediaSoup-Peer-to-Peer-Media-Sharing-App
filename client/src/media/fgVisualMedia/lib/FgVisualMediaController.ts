@@ -765,7 +765,7 @@ class FgVisualMediaController {
   };
 
   handleTableScroll = () => {
-    this.setSettingsActive((prev) => !prev);
+    this.setSettingsActive(false);
   };
 }
 

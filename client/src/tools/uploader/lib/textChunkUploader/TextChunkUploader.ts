@@ -107,7 +107,7 @@ class TextChunkUploader {
 
     try {
       await fetch(
-        `${tableStaticContentServerBaseUrl}cancel-upload/${this.uploadId}`,
+        `${tableStaticContentServerBaseUrl}cancel-upload/${this.uploadId}/${this.contentId}/text`,
         {
           method: "POST",
         },
@@ -192,7 +192,7 @@ class TextChunkUploader {
       try {
         this.currentChunkAbortController = new AbortController();
         const response = await fetch(
-          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
+          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}/${this.contentId}/text`,
           {
             method: "POST",
             body: formData,
@@ -261,7 +261,11 @@ class TextChunkUploader {
   };
 
   private uploadFailed = async () => {
-    this.tableStaticContentSocket.current?.deleteUploadSession(this.uploadId);
+    this.tableStaticContentSocket.current?.deleteUploadSession(
+      this.uploadId,
+      this.contentId,
+      "text",
+    );
 
     this.uploadingState = "failed";
 
@@ -337,6 +341,7 @@ class TextChunkUploader {
           this.contentId,
           this.tableId.current,
           this.uploadId,
+          "text",
           this.handle,
           0,
         );

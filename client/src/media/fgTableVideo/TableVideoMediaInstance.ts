@@ -1,3 +1,4 @@
+import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
 import Hls from "hls.js";
 import {
   defaultVideoEffects,
@@ -24,14 +25,14 @@ import {
   onRespondedCatchUpVideoMetadataType,
   onUpdatedVideoMetadataType,
 } from "../../serverControllers/videoServer/lib/typeConstant";
-import BabylonRenderLoopWorker from "src/babylon/BabylonRenderLoopWorker";
-import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
-import FaceLandmarks from "src/babylon/FaceLandmarks";
+import BabylonRenderLoopWorker from "../../babylon/BabylonRenderLoopWorker";
+import FaceLandmarks from "../../babylon/FaceLandmarks";
 
 export type VideoInstanceListenerTypes =
   | { type: "settingsChanged" }
   | { type: "effectsChanged" }
-  | { type: "metaChanged" };
+  | { type: "metaChanged" }
+  | { type: "thumbnailLoaded" };
 
 const videoServerBaseUrl = process.env.VIDEO_SERVER_BASE_URL;
 
@@ -42,12 +43,21 @@ class TableVideoMediaInstance {
   instanceThumbnail: HTMLImageElement | undefined;
 
   instanceVideoSetUp = false;
+  instanceThumbnailSetUp = false;
 
   private creationTime = Date.now();
 
   private effects: {
     [videoEffect in VideoEffectTypes]?: boolean;
   } = {};
+  private effectsNeedingFaceDetection = [
+    "glasses",
+    "beards",
+    "mustaches",
+    "masks",
+    "hats",
+    "pets",
+  ];
 
   private positioning: {
     position: {
@@ -68,7 +78,7 @@ class TableVideoMediaInstance {
     (message: VideoInstanceListenerTypes) => void
   > = new Set();
 
-  maxFaces: [number] = [1];
+  maxFaces: [number] = [0];
   detectedFaces: [number] = [0];
   maxFacesDetected = 0;
 
@@ -136,7 +146,7 @@ class TableVideoMediaInstance {
     this.faceLandmarks = new FaceLandmarks(
       true,
       "video",
-      this.videoId,
+      this.videoInstanceId,
       this.deadbanding,
     );
 
@@ -177,7 +187,6 @@ class TableVideoMediaInstance {
           const detectedFaces = event.data.numFacesDetected;
           this.detectedFaces[0] =
             detectedFaces === undefined ? 0 : detectedFaces;
-
           if (this.detectedFaces[0] > this.maxFacesDetected) {
             this.maxFacesDetected = this.detectedFaces[0];
           }
@@ -236,6 +245,10 @@ class TableVideoMediaInstance {
     this.videoSocket.current?.addMessageListener(this.handleVideoSocketMessage);
 
     this.videoMedia.addVideoListener(this.handleVideoMessages);
+
+    if (this.videoMedia.loadingState === "downloaded") {
+      this.createInstanceThumbnail();
+    }
   }
 
   deconstructor() {
@@ -273,12 +286,31 @@ class TableVideoMediaInstance {
     this.videoMedia.removeVideoListener(this.handleVideoMessages);
   }
 
+  private createInstanceThumbnail = () => {
+    this.instanceThumbnail = this.videoMedia.thumbnail.cloneNode(
+      true,
+    ) as HTMLImageElement;
+    if (
+      this.videoMedia.thumbnail.naturalWidth >
+      this.videoMedia.thumbnail.naturalHeight
+    ) {
+      this.instanceThumbnail.style.height = "auto";
+      this.instanceThumbnail.style.width = "100%";
+    } else {
+      this.instanceThumbnail.style.height = "100%";
+      this.instanceThumbnail.style.width = "auto";
+    }
+
+    this.instanceThumbnailSetUp = true;
+    this.videoInstanceListeners.forEach((listener) => {
+      listener({ type: "thumbnailLoaded" });
+    });
+  };
+
   private handleVideoMessages = (event: VideoListenerTypes) => {
     switch (event.type) {
       case "downloadComplete":
-        this.instanceThumbnail = this.videoMedia.thumbnail.cloneNode(
-          true,
-        ) as HTMLImageElement;
+        this.createInstanceThumbnail();
         break;
       default:
         break;
@@ -303,14 +335,23 @@ class TableVideoMediaInstance {
       lastUpdatedAt,
     } = event.data;
 
-    if (!ended && !this.instanceVideo) {
-      await this.setVideo();
-    }
-
     const calculatedCurrentTime =
       (isPlaying
         ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
         : 0) + lastKnownPosition;
+
+    this.meta.videoSpeed = videoPlaybackSpeed;
+    this.meta.currentTime = calculatedCurrentTime;
+    this.meta.isPlaying = isPlaying;
+    this.meta.ended = ended;
+
+    if (!ended && !this.instanceVideo) {
+      await this.setVideo();
+    }
+
+    if (this.babylonScene) {
+      this.babylonScene.setRunning(!ended && isPlaying);
+    }
 
     if (this.instanceVideo) {
       this.instanceVideo.currentTime = calculatedCurrentTime;
@@ -324,10 +365,11 @@ class TableVideoMediaInstance {
       }
     }
 
-    this.meta.videoSpeed = videoPlaybackSpeed;
-    this.meta.currentTime = calculatedCurrentTime;
-    this.meta.isPlaying = isPlaying;
-    this.meta.ended = ended;
+    if (!isPlaying) {
+      setTimeout(() => {
+        this.babylonScene?.forceEngineRenderLoop();
+      }, 100);
+    }
 
     this.videoInstanceListeners.forEach((listener) => {
       listener({ type: "metaChanged" });
@@ -354,14 +396,23 @@ class TableVideoMediaInstance {
       lastUpdatedAt,
     } = event.data;
 
-    if (!ended && !this.instanceVideo) {
-      await this.setVideo();
-    }
-
     const calculatedCurrentTime =
       (isPlaying
         ? ((Date.now() - lastUpdatedAt) / 1000) * videoPlaybackSpeed
         : 0) + lastKnownPosition;
+
+    this.meta.videoSpeed = videoPlaybackSpeed;
+    this.meta.currentTime = calculatedCurrentTime;
+    this.meta.isPlaying = isPlaying;
+    this.meta.ended = ended;
+
+    if (!ended && !this.instanceVideo) {
+      await this.setVideo();
+    }
+
+    if (this.babylonScene) {
+      this.babylonScene.setRunning(!ended && isPlaying);
+    }
 
     if (this.instanceVideo) {
       this.instanceVideo.currentTime = calculatedCurrentTime;
@@ -375,10 +426,11 @@ class TableVideoMediaInstance {
       }
     }
 
-    this.meta.videoSpeed = videoPlaybackSpeed;
-    this.meta.currentTime = calculatedCurrentTime;
-    this.meta.isPlaying = isPlaying;
-    this.meta.ended = ended;
+    if (!isPlaying) {
+      setTimeout(() => {
+        this.babylonScene?.forceEngineRenderLoop();
+      }, 100);
+    }
 
     this.videoInstanceListeners.forEach((listener) => {
       listener({ type: "metaChanged" });
@@ -439,7 +491,6 @@ class TableVideoMediaInstance {
           if (!this.babylonRenderLoopWorker) {
             this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
               false,
-              this.faceLandmarks,
               this.instanceVideo.videoWidth / this.instanceVideo.videoHeight,
               this.instanceVideo,
               this.faceMeshWorker,
@@ -465,6 +516,7 @@ class TableVideoMediaInstance {
               this.selfieSegmentationResults,
               this.userDevice,
               this.maxFaces,
+              this.meta.ended,
             );
           }
 
@@ -551,14 +603,22 @@ class TableVideoMediaInstance {
     this.babylonRenderLoopWorker?.removeAllNeed(this.videoInstanceId);
 
     if (
+      this.maxFaces[0] === 0 ||
       Object.entries(this.effects).some(
-        ([key, val]) => val && key !== "hideBackground",
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
       )
     ) {
       this.babylonRenderLoopWorker?.addNeed(
         "faceDetection",
         this.videoInstanceId,
       );
+    }
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
+      )
+    ) {
+      this.babylonRenderLoopWorker?.addNeed("faceMesh", this.videoInstanceId);
     }
     if (this.effects.hideBackground) {
       this.babylonRenderLoopWorker?.addNeed(

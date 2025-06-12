@@ -110,9 +110,12 @@ class VideoChunkUploader {
     }
 
     try {
-      await fetch(`${videoServerBaseUrl}cancel-upload/${this.uploadId}`, {
-        method: "POST",
-      });
+      await fetch(
+        `${videoServerBaseUrl}cancel-upload/${this.uploadId}/${this.contentId}`,
+        {
+          method: "POST",
+        },
+      );
     } catch (e) {
       console.warn("Failed to notify server of cancellation:", e);
     }
@@ -174,7 +177,7 @@ class VideoChunkUploader {
       try {
         this.currentChunkAbortController = new AbortController();
         const response = await fetch(
-          `${videoServerBaseUrl}upload-chunk/${this.uploadId}`,
+          `${videoServerBaseUrl}upload-chunk/${this.uploadId}/${this.contentId}`,
           {
             method: "POST",
             body: formData,
@@ -248,7 +251,10 @@ class VideoChunkUploader {
   };
 
   private uploadFailed = async () => {
-    this.videoSocket.current?.deleteUploadSession(this.uploadId);
+    this.videoSocket.current?.deleteUploadSession(
+      this.uploadId,
+      this.contentId,
+    );
 
     this.uploadingState = "failed";
 
@@ -323,6 +329,7 @@ class VideoChunkUploader {
           this.contentId,
           this.tableId.current,
           this.uploadId,
+          "video",
           this.handle,
           0,
         );
@@ -379,6 +386,21 @@ class VideoChunkUploader {
         if (contentId === this.contentId) {
           this.sendUploadSignal({
             type: "uploadProcessingFinished",
+          });
+          this.deconstructor();
+        }
+        break;
+      }
+      case "videoFailedUpload": {
+        const { contentId, filename } = message.header;
+
+        if (this.contentId === contentId) {
+          this.sendGeneralSignal({
+            type: "tableInfoSignal",
+            data: {
+              message: `${filename} failed to upload`,
+              timeout: 2500,
+            },
           });
           this.deconstructor();
         }

@@ -34,8 +34,16 @@ class CaptureMedia {
   private effects: {
     [captureEffect in CaptureEffectTypes]?: boolean;
   } = {};
+  private effectsNeedingFaceDetection = [
+    "glasses",
+    "beards",
+    "mustaches",
+    "masks",
+    "hats",
+    "pets",
+  ];
 
-  private maxFaces: [number] = [1];
+  private maxFaces: [number] = [0];
   maxFacesDetected = 0;
 
   babylonScene: BabylonScene | undefined;
@@ -151,7 +159,6 @@ class CaptureMedia {
 
       this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
         true,
-        this.faceLandmarks,
         this.aspect ?? 1,
         this.video,
         this.faceMeshWorker,
@@ -177,26 +184,6 @@ class CaptureMedia {
         this.maxFaces,
       );
     };
-
-    // this.babylonScene = new BabylonScene(
-    //   "capture",
-    //   this.canvas,
-    //   this.video,
-    //   this.faceLandmarks,
-    //   this.effects,
-    //   this.captureEffectsStyles.current,
-    //   this.faceMeshWorker,
-    //   this.faceMeshResults,
-    //   this.faceMeshProcessing,
-    //   this.faceDetectionWorker,
-    //   this.faceDetectionProcessing,
-    //   this.selfieSegmentationWorker,
-    //   this.selfieSegmentationResults,
-    //   this.selfieSegmentationProcessing,
-    //   this.userDevice,
-    //   this.maxFaces,
-    //   undefined,
-    // );
   }
 
   deconstructor() {
@@ -313,12 +300,21 @@ class CaptureMedia {
 
   private updateNeed = () => {
     this.babylonRenderLoopWorker?.removeAllNeed(this.captureId);
+
     if (
+      this.maxFaces[0] === 0 ||
       Object.entries(this.effects).some(
-        ([key, val]) => val && key !== "hideBackground",
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
       )
     ) {
       this.babylonRenderLoopWorker?.addNeed("faceDetection", this.captureId);
+    }
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
+      )
+    ) {
+      this.babylonRenderLoopWorker?.addNeed("faceMesh", this.captureId);
     }
     if (this.effects.hideBackground) {
       this.babylonRenderLoopWorker?.addNeed(

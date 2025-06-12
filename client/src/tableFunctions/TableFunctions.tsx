@@ -13,10 +13,10 @@ import { FgBackground } from "../elements/fgBackgroundSelector/lib/typeConstant"
 import UploadMediaButton from "./lib/uploadMediaButton/UploadMediaButton";
 import MoreTableFunctionsButton from "./lib/moreTableFunctionsButton/MoreTableFunctionsButton";
 import MessageTableSection from "./lib/messageTableSection/MessageTableSection";
-import CaptureMediaPortal from "./lib/captureMediaPortal/CaptureMediaPortal";
+import CaptureMediaPortal from "../elements/captureMediaPortal/CaptureMediaPortal";
 import CaptureMedia from "../media/capture/CaptureMedia";
 import Deadbanding from "../babylon/Deadbanding";
-import TabledPortal from "./lib/tabledSection/TabledPortal";
+import TabledPortal from "../elements/tabledPortal/TabledPortal";
 
 export default function TableFunctions({
   tableFunctionsRef,

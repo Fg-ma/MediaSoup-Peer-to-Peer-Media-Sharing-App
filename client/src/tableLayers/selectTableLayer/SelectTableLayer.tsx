@@ -14,7 +14,7 @@ export default function SelectTableLayer({
 }) {
   const { sendGroupSignal, addGroupSignalListener, removeGroupSignalListener } =
     useSignalContext();
-  const { tableStaticContentSocket } = useSocketContext();
+  const { tableStaticContentSocket, mediasoupSocket } = useSocketContext();
 
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef<{ x: number; y: number } | undefined>(undefined);
@@ -102,6 +102,18 @@ export default function SelectTableLayer({
       );
     };
   }, [tableStaticContentSocket.current]);
+
+  useEffect(() => {
+    mediasoupSocket.current?.addMessageListener(
+      selectTableLayerController.current.handleMediasoupMessage,
+    );
+
+    return () => {
+      mediasoupSocket.current?.removeMessageListener(
+        selectTableLayerController.current.handleMediasoupMessage,
+      );
+    };
+  }, [mediasoupSocket.current]);
 
   let boxStyle = {};
   if (dragStart.current && dragEnd.current) {

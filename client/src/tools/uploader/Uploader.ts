@@ -4,6 +4,8 @@ import { UploadSignals } from "../../context/uploadDownloadContext/lib/typeConst
 import OneShotUploader from "./lib/oneShotUploader/OneShotUploader";
 import ChunkUploader from "./lib/chunkUploader/ChunkUploader";
 import {
+  mimeTypeContentTypeMap,
+  StaticMimeTypes,
   TableContentStateTypes,
   UserContentStateTypes,
 } from "../../../../universal/contentTypeConstant";
@@ -132,6 +134,7 @@ class Uploader {
           file.type.startsWith("video/")
             ? videoServerBaseUrl!
             : tableStaticContentServerBaseUrl!,
+          file.type.startsWith("video/") ? false : true,
         );
       }
     } else {
@@ -204,6 +207,7 @@ class Uploader {
             finalContentId,
             this.tableId.current,
             finalUploadId,
+            mimeTypeContentTypeMap[file.type as StaticMimeTypes],
             handle,
             offset,
           );

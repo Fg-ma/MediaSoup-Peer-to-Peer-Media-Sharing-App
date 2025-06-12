@@ -44,8 +44,16 @@ class CameraMedia {
   private effects: {
     [cameraEffect in CameraEffectTypes]?: boolean;
   };
+  private effectsNeedingFaceDetection = [
+    "glasses",
+    "beards",
+    "mustaches",
+    "masks",
+    "hats",
+    "pets",
+  ];
 
-  private maxFaces: [number] = [1];
+  private maxFaces: [number] = [0];
 
   babylonRenderLoopWorker: BabylonRenderLoopWorker | undefined;
   babylonScene: BabylonScene | undefined;
@@ -176,7 +184,6 @@ class CameraMedia {
 
       this.babylonRenderLoopWorker = new BabylonRenderLoopWorker(
         true,
-        this.faceLandmarks,
         this.aspectRatio ?? 1,
         this.video,
         this.faceMeshWorker,
@@ -321,11 +328,19 @@ class CameraMedia {
     this.babylonRenderLoopWorker?.removeAllNeed(this.cameraId);
 
     if (
+      this.maxFaces[0] === 0 ||
       Object.entries(this.effects).some(
-        ([key, val]) => val && key !== "hideBackground",
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
       )
     ) {
       this.babylonRenderLoopWorker?.addNeed("faceDetection", this.cameraId);
+    }
+    if (
+      Object.entries(this.effects).some(
+        ([key, val]) => val && this.effectsNeedingFaceDetection.includes(key),
+      )
+    ) {
+      this.babylonRenderLoopWorker?.addNeed("faceMesh", this.cameraId);
     }
     if (this.effects.hideBackground) {
       this.babylonRenderLoopWorker?.addNeed(

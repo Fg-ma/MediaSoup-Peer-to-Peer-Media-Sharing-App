@@ -411,11 +411,17 @@ class TableStaticContentSocketController {
     });
   };
 
-  deleteUploadSession = (uploadId: string) => {
+  deleteUploadSession = (
+    uploadId: string,
+    contentId: string,
+    contentType: StaticContentTypes,
+  ) => {
     this.sendMessage({
       type: "deleteUploadSession",
       header: {
         uploadId,
+        contentId,
+        contentType,
       },
     });
   };

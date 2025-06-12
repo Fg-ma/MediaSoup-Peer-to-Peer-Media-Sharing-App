@@ -29,9 +29,11 @@ const gridOffIcon =
   nginxAssetServerBaseUrl + "svgs/games/snake/gridOffIcon.svg";
 
 function SnakeGame({
+  tableTopRef,
   snakeGameId,
   sharedBundleRef,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   snakeGameId: string;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
 }) {
@@ -116,6 +118,7 @@ function SnakeGame({
   return (
     <>
       <FgGame
+        tableTopRef={tableTopRef}
         externalHideControls={!snakeColorPanelActive && !gridSizePanelActive}
         gameId={snakeGameId}
         gameType="snake"
@@ -124,14 +127,14 @@ function SnakeGame({
         content={
           <div
             ref={boardRef}
-            className="selectable snake-game-board relative flex aspect-square w-full flex-col overflow-hidden rounded"
+            className="flex selectable snake-game-board relative aspect-square w-full flex-col overflow-hidden rounded"
             data-selectable-type="game"
             data-selectable-id={snakeGameId}
           >
             {snakeGameController.renderBoard()}
             {gameOver && (
               <div
-                className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
+                className="flex absolute left-0 top-0 h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
                 <div
@@ -142,7 +145,7 @@ function SnakeGame({
             )}
             {!started && !gameOver && (
               <div
-                className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
+                className="flex absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
                 <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 text-center font-K2D text-2xl">

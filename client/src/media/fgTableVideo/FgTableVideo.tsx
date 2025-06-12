@@ -98,6 +98,8 @@ export default function FgTableVideo({
   const isScrubbing = useRef(false);
   const wasPaused = useRef(false);
 
+  const [isEnded, setIsEnded] = useState(videoMediaInstance.current.meta.ended);
+
   const lowerVideoController = useRef(
     new LowerVideoController(
       videoInstanceId,
@@ -136,6 +138,7 @@ export default function FgTableVideo({
       setSettingsActive,
       positioning,
       subContainerRef,
+      setIsEnded,
     ),
   );
 
@@ -200,6 +203,10 @@ export default function FgTableVideo({
   }, [tableStaticContentSocket.current]);
 
   useEffect(() => {
+    console.log(
+      videoMediaInstance.current.meta.ended,
+      videoMediaInstance.current.instanceThumbnail,
+    );
     if (videoMediaInstance.current.meta.ended) {
       if (videoMediaInstance.current.instanceThumbnail) {
         subContainerRef.current?.appendChild(
@@ -216,7 +223,7 @@ export default function FgTableVideo({
       videoMediaInstance.current.instanceThumbnail?.remove();
       videoMediaInstance.current.instanceCanvas.remove();
     };
-  }, [videoMediaInstance.current.meta.ended]);
+  }, [isEnded, videoMediaInstance.current.instanceThumbnailSetUp]);
 
   useEffect(() => {
     if (videoMediaInstance.current.instanceVideo === undefined) return;

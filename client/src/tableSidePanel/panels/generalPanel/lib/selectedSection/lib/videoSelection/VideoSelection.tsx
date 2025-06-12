@@ -29,25 +29,17 @@ export default function VideoSelection({
     videoInstanceMedia?.videoMedia.loadingState,
   );
   const [_, setRerender] = useState(false);
-  const mirrorCanvasRef = useRef<HTMLCanvasElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const videoSelectionController = new VideoSelectionController(
     instanceId,
-    videoInstanceMedia,
     setLoadingState,
-    setLargestDim,
-    mirrorCanvasRef,
     setRerender,
   );
 
   useEffect(() => {
-    videoSelectionController.drawInstanceCanvas();
-
     videoInstanceMedia?.videoMedia.addVideoListener(
       videoSelectionController.handleVideoMessages,
-    );
-    videoInstanceMedia?.addVideoInstanceListener(
-      videoSelectionController.handleInstanceEvents,
     );
 
     addGroupSignalListener(videoSelectionController.handleGroupSignal);
@@ -56,17 +48,31 @@ export default function VideoSelection({
       videoInstanceMedia?.videoMedia.removeVideoListener(
         videoSelectionController.handleVideoMessages,
       );
-      videoInstanceMedia?.removeVideoInstanceListener(
-        videoSelectionController.handleInstanceEvents,
-      );
       removeGroupSignalListener(videoSelectionController.handleGroupSignal);
     };
   }, []);
 
   useEffect(() => {
-    if (loadingState === "downloaded") {
-      videoSelectionController.drawInstanceCanvas();
+    if (loadingState !== "downloaded" || !imageContainerRef.current) return;
+
+    if ((videoInstanceMedia.videoMedia.aspect ?? 0) > 1) {
+      setLargestDim("width");
+    } else {
+      setLargestDim("height");
     }
+
+    const thumbnailClone = videoInstanceMedia.videoMedia.thumbnail.cloneNode(
+      true,
+    ) as HTMLImageElement;
+
+    const container = imageContainerRef.current;
+    container.appendChild(thumbnailClone);
+
+    return () => {
+      if (thumbnailClone && container.contains(thumbnailClone)) {
+        container.removeChild(thumbnailClone);
+      }
+    };
   }, [loadingState]);
 
   return (
@@ -77,25 +83,12 @@ export default function VideoSelection({
         contentType="video"
         selectionContent={
           loadingState === "downloaded" ? (
-            <canvas
-              ref={mirrorCanvasRef}
-              className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} overflow-hidden rounded-md`}
-            ></canvas>
+            <div
+              ref={imageContainerRef}
+              className={`${largestDim === "width" ? "w-full max-w-[12rem]" : "h-full max-h-[12rem]"} !w-auto overflow-hidden rounded-md object-contain`}
+            ></div>
           ) : loadingState === "downloading" ? (
-            <LoadingElement
-              className="h-[12rem] w-full rounded-md"
-              pauseDownload={videoInstanceMedia.videoMedia.downloader?.pause}
-            />
-          ) : loadingState === "failed" ? (
-            <DownloadFailed
-              className="h-[12rem] w-full rounded-md"
-              onClick={videoInstanceMedia.videoMedia.retryDownload}
-            />
-          ) : loadingState === "paused" ? (
-            <DownloadPaused
-              className="h-[12rem] w-full rounded-md"
-              onClick={videoInstanceMedia.videoMedia.downloader?.resume}
-            />
+            <LoadingElement className="h-[12rem] w-full rounded-md" />
           ) : (
             <></>
           )
@@ -113,7 +106,6 @@ export default function VideoSelection({
         }
         filename={videoInstanceMedia.videoMedia.filename}
         mimeType={videoInstanceMedia.videoMedia.mimeType}
-        fileSize={videoInstanceMedia.videoMedia.getFileSize()}
         tablePanelRef={tablePanelRef}
         positioning={positioning}
       />

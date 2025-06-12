@@ -10,7 +10,7 @@ import {
   tableTopRedis,
   sanitizationUtils,
 } from "../index";
-import { contentTypeBucketMap } from "../typeConstant";
+import { contentTypeBucketMap, encodedCephBucketMap } from "../typeConstant";
 import {
   mimeToExtension,
   mimeTypeContentTypeMap,
@@ -21,7 +21,7 @@ import {
 import { ChunkState, UploadSession } from "./lib/typeConstant";
 
 class Posts {
-  private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
+  private readonly REDIS_UPLOAD_LIFE_TIME = 300;
 
   constructor(app: uWS.TemplatedApp) {
     app.post("/upload-one-shot-file", (res, req) => {
@@ -225,7 +225,9 @@ class Posts {
 
             await tableTopRedis.posts.post(
               "USCUS",
-              uploadId,
+              `${
+                encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+              }:${contentId}:${uploadId}`,
               sessionData,
               this.REDIS_UPLOAD_LIFE_TIME
             );
@@ -252,142 +254,102 @@ class Posts {
       });
     });
 
-    app.post("/upload-chunk/:uploadId", (res, req) => {
-      const bb = busboy({
-        headers: this.collectHeaders(req),
-        limits: { fileSize: CEPH_CHUNK_MAX_SIZE },
-      });
-      let chunkIndex = -1,
-        totalChunks = -1;
-      let buffer = Buffer.alloc(0);
+    app.post(
+      "/upload-chunk/:uploadId/:contentId/:staticContentType",
+      (res, req) => {
+        const bb = busboy({
+          headers: this.collectHeaders(req),
+          limits: { fileSize: CEPH_CHUNK_MAX_SIZE },
+        });
+        let chunkIndex = -1,
+          totalChunks = -1;
+        let buffer = Buffer.alloc(0);
 
-      let aborted = false;
-      let state: ChunkState | undefined;
-      let session: UploadSession | undefined;
+        let aborted = false;
+        let state: ChunkState | undefined;
+        let session: UploadSession | undefined;
 
-      res.onAborted(() => {
-        aborted = true;
-      });
-
-      const dirtyUploadId = req.getParameter(0);
-      if (!dirtyUploadId) {
-        this.sendResponse(
-          res,
-          "400 Bad Request",
-          "text/plain",
-          "Missing upload ID"
-        );
-        return;
-      }
-      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
-
-      bb.on("field", async (name, val) => {
-        if (name === "totalChunks")
-          totalChunks = parseInt(sanitizationUtils.sanitizeString(val), 10);
-        if (name === "chunkIndex") {
-          chunkIndex = parseInt(sanitizationUtils.sanitizeString(val), 10);
-
-          state = (await tableTopRedis.gets.get(
-            "USCCS",
-            uploadId
-          )) as ChunkState;
-          if (!state) {
-            this.sendResponse(res, "404 Not Found", "text/plain", "No state");
-            aborted = true;
-            return;
-          }
-
-          const alreadyUploaded = state.parts.some(
-            (part) => part.PartNumber === chunkIndex + 1
-          );
-          if (alreadyUploaded) {
-            this.sendResponse(
-              res,
-              "409 Conflict",
-              "text/plain",
-              "Chunk already exists"
-            );
-            aborted = true;
-          }
-        }
-      });
-
-      bb.on("file", async (_fn, stream, info) => {
-        stream.on("limit", async () => {
-          this.sendResponse(
-            res,
-            "413 Payload Too Large",
-            "text/plain",
-            "Chunk too large"
-          );
+        res.onAborted(() => {
           aborted = true;
-
-          if (!session) return;
-
-          await tableTopCeph.posts.abortMultipartUpload(
-            contentTypeBucketMap[session.staticContentType],
-            session.contentId,
-            uploadId
-          );
-
-          await tableTopRedis.deletes.delete([
-            { prefix: "USCUS", id: uploadId },
-            { prefix: "USCCS", id: uploadId },
-          ]);
-
-          return;
         });
 
-        session = (await tableTopRedis.gets.get(
-          "USCUS",
-          uploadId
-        )) as UploadSession;
-        if (!session) {
-          this.sendResponse(res, "404 Not Found", "text/plain", "No session");
-          aborted = true;
-          return;
-        }
-
-        if (!state) {
-          state = (await tableTopRedis.gets.get(
-            "USCCS",
-            uploadId
-          )) as ChunkState;
-        }
-        if (!state) {
-          this.sendResponse(res, "404 Not Found", "text/plain", "No state");
-          aborted = true;
-          return;
-        }
-
-        const { mimeType } = info;
-
-        stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
-
-        stream.on("end", async () => {
-          if (aborted) return;
-
-          // upload this part
-          const ETag = await tableTopCeph.posts.uploadPart(
-            contentTypeBucketMap[session!.staticContentType],
-            session!.contentId,
-            chunkIndex + 1,
-            uploadId,
-            buffer
+        const dirtyUploadId = req.getParameter(0);
+        if (!dirtyUploadId) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing upload ID"
           );
-          if (!ETag) return;
+          return;
+        }
+        const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
 
-          state!.parts.push({ PartNumber: chunkIndex + 1, ETag });
-          state!.currentSize += buffer.byteLength;
+        const dirtyContentId = req.getParameter(1);
+        if (!dirtyContentId) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing content id"
+          );
+          return;
+        }
+        const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
 
-          if (aborted) return;
+        const dirtyStaticContentType = req.getParameter(2);
+        if (!dirtyStaticContentType) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing static content type"
+          );
+          return;
+        }
+        const staticContentType = sanitizationUtils.sanitizeString(
+          dirtyStaticContentType,
+          "/+-"
+        ) as StaticContentTypes;
 
-          if (state!.currentSize > CEPH_MAX_SIZE) {
+        bb.on("field", async (name, val) => {
+          if (name === "totalChunks")
+            totalChunks = parseInt(sanitizationUtils.sanitizeString(val), 10);
+          if (name === "chunkIndex") {
+            chunkIndex = parseInt(sanitizationUtils.sanitizeString(val), 10);
+
+            state = (await tableTopRedis.gets.get(
+              "USCCS",
+              uploadId
+            )) as ChunkState;
+            if (!state) {
+              this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+              aborted = true;
+              return;
+            }
+
+            const alreadyUploaded = state.parts.some(
+              (part) => part.PartNumber === chunkIndex + 1
+            );
+            if (alreadyUploaded) {
+              this.sendResponse(
+                res,
+                "409 Conflict",
+                "text/plain",
+                "Chunk already exists"
+              );
+              aborted = true;
+            }
+          }
+        });
+
+        bb.on("file", async (_fn, stream, info) => {
+          stream.on("limit", async () => {
             this.sendResponse(
               res,
               "413 Payload Too Large",
               "text/plain",
-              "File upload to large"
+              "Chunk too large"
             );
             aborted = true;
 
@@ -400,143 +362,278 @@ class Posts {
             );
 
             await tableTopRedis.deletes.delete([
-              { prefix: "USCUS", id: uploadId },
+              {
+                prefix: "USCUS",
+                id: `${
+                  encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+                }:${contentId}:${uploadId}`,
+              },
               { prefix: "USCCS", id: uploadId },
             ]);
 
             return;
-          }
+          });
 
-          if (aborted) return;
-
-          await tableTopRedis.posts.post(
-            "USCCS",
-            uploadId,
-            state,
-            this.REDIS_UPLOAD_LIFE_TIME
-          );
-          await tableTopRedis.posts.extendLife(
+          session = (await tableTopRedis.gets.get(
             "USCUS",
-            uploadId,
-            this.REDIS_UPLOAD_LIFE_TIME
-          );
-
-          if (aborted) return;
-
-          // If last chunk
-          if (state!.parts.length === totalChunks) {
-            tableTopCeph.posts
-              .completeMultipartUpload(
-                contentTypeBucketMap[session!.staticContentType],
-                session!.contentId,
-                uploadId,
-                state!.parts
-              )
-              .then(async () => {
-                switch (session!.direction) {
-                  case "toMuteStyle":
-                    await this.handleToMuteStyle(
-                      session!.userId,
-                      session!.contentId,
-                      mimeType as StaticMimeTypes,
-                      session!.filename,
-                      session!.state
-                    );
-                    break;
-                  case "toUserContent":
-                    this.handleToUserContent(
-                      session!.staticContentType,
-                      session!.userId,
-                      session!.contentId,
-                      mimeType as StaticMimeTypes,
-                      session!.filename,
-                      session!.state
-                    );
-                    break;
-                  default:
-                    break;
-                }
-
-                // Cleanup session
-                await tableTopRedis.deletes.delete([
-                  { prefix: "USCUS", id: uploadId },
-                  { prefix: "USCCS", id: uploadId },
-                ]);
-              });
+            `${
+              encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+            }:${contentId}:${uploadId}`
+          )) as UploadSession;
+          if (!session) {
+            this.sendResponse(res, "404 Not Found", "text/plain", "No session");
+            aborted = true;
+            return;
           }
 
-          if (aborted) return;
-
-          this.sendResponse(res, "200 OK", "text/plain", "Chunk received");
-        });
-      });
-
-      if (!aborted) {
-        this.pipeReqToBusboy(res, bb);
-      }
-    });
-
-    app.post("/cancel-upload/:uploadId", async (res, req) => {
-      let aborted = false;
-      res.onAborted(() => {
-        aborted = true;
-      });
-
-      const dirtyUploadId = req.getParameter(0);
-      if (!dirtyUploadId) {
-        this.sendResponse(
-          res,
-          "400 Bad Request",
-          "text/plain",
-          "Missing upload ID"
-        );
-        return;
-      }
-      const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
-
-      const session = (await tableTopRedis.gets.get(
-        "USCUS",
-        uploadId
-      )) as UploadSession;
-      if (!session) {
-        this.sendResponse(
-          res,
-          "404 Not Found",
-          "text/plain",
-          "Missing session"
-        );
-        return;
-      }
-
-      // Async work must be done in next tick or promise
-      (async () => {
-        try {
-          await tableTopCeph.posts.abortMultipartUpload(
-            contentTypeBucketMap[session.staticContentType],
-            session.contentId,
-            uploadId
-          );
-
-          await tableTopRedis.deletes.delete([
-            { prefix: "USCUS", id: uploadId },
-            { prefix: "USCCS", id: uploadId },
-          ]);
-
-          if (!aborted) {
-            this.sendResponse(res, "200 OK", "text/plain", "Upload cancelled");
+          if (!state) {
+            state = (await tableTopRedis.gets.get(
+              "USCCS",
+              uploadId
+            )) as ChunkState;
           }
-        } catch (_) {
-          if (!aborted) {
-            this.sendResponse(
-              res,
-              "500 Internal Server Error",
-              "text/plain",
-              "Cancel failed"
+          if (!state) {
+            this.sendResponse(res, "404 Not Found", "text/plain", "No state");
+            aborted = true;
+            return;
+          }
+
+          const { mimeType } = info;
+
+          stream.on("data", (d) => (buffer = Buffer.concat([buffer, d])));
+
+          stream.on("end", async () => {
+            if (aborted) return;
+
+            // upload this part
+            const ETag = await tableTopCeph.posts.uploadPart(
+              contentTypeBucketMap[session!.staticContentType],
+              session!.contentId,
+              chunkIndex + 1,
+              uploadId,
+              buffer
             );
-          }
+            if (!ETag) return;
+
+            state!.parts.push({ PartNumber: chunkIndex + 1, ETag });
+            state!.currentSize += buffer.byteLength;
+
+            if (aborted) return;
+
+            if (state!.currentSize > CEPH_MAX_SIZE) {
+              this.sendResponse(
+                res,
+                "413 Payload Too Large",
+                "text/plain",
+                "File upload to large"
+              );
+              aborted = true;
+
+              if (!session) return;
+
+              await tableTopCeph.posts.abortMultipartUpload(
+                contentTypeBucketMap[session.staticContentType],
+                session.contentId,
+                uploadId
+              );
+
+              await tableTopRedis.deletes.delete([
+                {
+                  prefix: "USCUS",
+                  id: `${
+                    encodedCephBucketMap[
+                      contentTypeBucketMap[staticContentType]
+                    ]
+                  }:${contentId}:${uploadId}`,
+                },
+                { prefix: "USCCS", id: uploadId },
+              ]);
+
+              return;
+            }
+
+            if (aborted) return;
+
+            await tableTopRedis.posts.post(
+              "USCCS",
+              uploadId,
+              state,
+              this.REDIS_UPLOAD_LIFE_TIME
+            );
+            await tableTopRedis.posts.extendLife(
+              "USCUS",
+              `${
+                encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+              }:${contentId}:${uploadId}`,
+              this.REDIS_UPLOAD_LIFE_TIME
+            );
+
+            if (aborted) return;
+
+            // If last chunk
+            if (state!.parts.length === totalChunks) {
+              tableTopCeph.posts
+                .completeMultipartUpload(
+                  contentTypeBucketMap[session!.staticContentType],
+                  session!.contentId,
+                  uploadId,
+                  state!.parts
+                )
+                .then(async () => {
+                  switch (session!.direction) {
+                    case "toMuteStyle":
+                      await this.handleToMuteStyle(
+                        session!.userId,
+                        session!.contentId,
+                        mimeType as StaticMimeTypes,
+                        session!.filename,
+                        session!.state
+                      );
+                      break;
+                    case "toUserContent":
+                      this.handleToUserContent(
+                        session!.staticContentType,
+                        session!.userId,
+                        session!.contentId,
+                        mimeType as StaticMimeTypes,
+                        session!.filename,
+                        session!.state
+                      );
+                      break;
+                    default:
+                      break;
+                  }
+
+                  // Cleanup session
+                  await tableTopRedis.deletes.delete([
+                    {
+                      prefix: "USCUS",
+                      id: `${
+                        encodedCephBucketMap[
+                          contentTypeBucketMap[staticContentType]
+                        ]
+                      }:${contentId}:${uploadId}`,
+                    },
+                    { prefix: "USCCS", id: uploadId },
+                  ]);
+                });
+            }
+
+            if (aborted) return;
+
+            this.sendResponse(res, "200 OK", "text/plain", "Chunk received");
+          });
+        });
+
+        if (!aborted) {
+          this.pipeReqToBusboy(res, bb);
         }
-      })();
-    });
+      }
+    );
+
+    app.post(
+      "/cancel-upload/:uploadId/:contentId/:staticContentType",
+      async (res, req) => {
+        let aborted = false;
+        res.onAborted(() => {
+          aborted = true;
+        });
+
+        const dirtyUploadId = req.getParameter(0);
+        if (!dirtyUploadId) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing upload ID"
+          );
+          return;
+        }
+        const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
+
+        const dirtyContentId = req.getParameter(1);
+        if (!dirtyContentId) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing content id"
+          );
+          return;
+        }
+        const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
+
+        const dirtyStaticContentType = req.getParameter(2);
+        if (!dirtyStaticContentType) {
+          this.sendResponse(
+            res,
+            "400 Bad Request",
+            "text/plain",
+            "Missing static content type"
+          );
+          return;
+        }
+        const staticContentType = sanitizationUtils.sanitizeString(
+          dirtyStaticContentType,
+          "/+-"
+        ) as StaticContentTypes;
+
+        const session = (await tableTopRedis.gets.get(
+          "USCUS",
+          `${
+            encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+          }:${contentId}:${uploadId}`
+        )) as UploadSession;
+        if (!session) {
+          this.sendResponse(
+            res,
+            "404 Not Found",
+            "text/plain",
+            "Missing session"
+          );
+          return;
+        }
+
+        // Async work must be done in next tick or promise
+        (async () => {
+          try {
+            await tableTopCeph.posts.abortMultipartUpload(
+              contentTypeBucketMap[session.staticContentType],
+              session.contentId,
+              uploadId
+            );
+
+            await tableTopRedis.deletes.delete([
+              {
+                prefix: "USCUS",
+                id: `${
+                  encodedCephBucketMap[contentTypeBucketMap[staticContentType]]
+                }:${contentId}:${uploadId}`,
+              },
+              { prefix: "USCCS", id: uploadId },
+            ]);
+
+            if (!aborted) {
+              this.sendResponse(
+                res,
+                "200 OK",
+                "text/plain",
+                "Upload cancelled"
+              );
+            }
+          } catch (_) {
+            if (!aborted) {
+              this.sendResponse(
+                res,
+                "500 Internal Server Error",
+                "text/plain",
+                "Cancel failed"
+              );
+            }
+          }
+        })();
+      }
+    );
   }
 
   private sendResponse = (

@@ -28,6 +28,7 @@ import Downloader from "../../tools/downloader/Downloader";
 import { DownloadSignals } from "../../context/uploadDownloadContext/lib/typeConstant";
 import LiveTextDownloader from "../../tools/liveTextDownloader/LiveTextDownloader";
 import VideoSocketController from "../../serverControllers/videoServer/VideoSocketController";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class JoinTableSectionController {
   constructor(
@@ -98,6 +99,7 @@ class JoinTableSectionController {
       upload: Downloader | LiveTextDownloader,
     ) => void,
     private removeCurrentDownload: (id: string) => void,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
   ) {}
 
   joinTable = () => {
@@ -175,6 +177,7 @@ class JoinTableSectionController {
         this.staticContentEffects,
         this.staticContentEffectsStyles,
         this.videoSocket,
+        this.sendGeneralSignal,
       );
 
       this.gamesSocket.current = new GamesServerController(

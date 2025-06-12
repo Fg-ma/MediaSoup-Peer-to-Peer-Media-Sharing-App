@@ -1,5 +1,6 @@
 import { IDBPDatabase } from "idb";
 import { HandleListenerTypes, UploadDBSchema } from "./typeConstant";
+import { StaticContentTypes } from "../../../../../../universal/contentTypeConstant";
 
 class Posts {
   constructor(
@@ -13,21 +14,23 @@ class Posts {
     key: string,
     tableId: string,
     uploadId: string,
+    staticContentType: StaticContentTypes,
     handle: FileSystemFileHandle,
     offset: number,
   ) => {
     await this.uploadDB?.put(
       "handles",
-      { tableId, uploadId, handle, offset },
+      { tableId, uploadId, staticContentType, handle, offset },
       key,
     );
     this.handleListeners.forEach((listener) => {
       listener({
         type: "handleAdded",
         header: {
+          key,
           tableId,
           uploadId,
-          key,
+          staticContentType,
           offset,
         },
         data: {

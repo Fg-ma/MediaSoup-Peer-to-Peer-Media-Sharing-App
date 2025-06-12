@@ -76,7 +76,10 @@ export type onRequestCatchUpVideoMetadataType = {
 
 export type onDeleteUploadSessionType = {
   type: "deleteUploadSession";
-  header: { uploadId: string };
+  header: {
+    uploadId: string;
+    contentId: string;
+  };
 };
 
 export type onSignalReuploadStartType = {

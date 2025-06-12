@@ -5,6 +5,7 @@ import { useMediaContext } from "../context/mediaContext/MediaContext";
 import { useEffectsContext } from "../context/effectsContext/EffectsContext";
 import { useUserInfoContext } from "../context/userInfoContext/UserInfoContext";
 import { useToolsContext } from "../context/toolsContext/ToolsContext";
+import { useSignalContext } from "../context/signalContext/SignalContext";
 import { useUploadDownloadContext } from "../context/uploadDownloadContext/UploadDownloadContext";
 import JoinTableSectionController from "./lib/JoinTableSectionController";
 import ProducersController from "../lib/ProducersController";
@@ -86,6 +87,7 @@ export default function JoinTableSection({
   const { userDevice } = useToolsContext();
   const { sendDownloadSignal, addCurrentDownload, removeCurrentDownload } =
     useUploadDownloadContext();
+  const { sendGeneralSignal } = useSignalContext();
 
   const [isInTable, setIsInTable] = useState(false);
   const tableIdRef = useRef<HTMLInputElement>(null);
@@ -137,6 +139,7 @@ export default function JoinTableSection({
       sendDownloadSignal,
       addCurrentDownload,
       removeCurrentDownload,
+      sendGeneralSignal,
     ),
   );
 

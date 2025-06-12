@@ -3,6 +3,8 @@ import {
   ListObjectsCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
+  ListMultipartUploadsCommand,
+  AbortMultipartUploadCommand,
 } from "@aws-sdk/client-s3";
 
 class Deletes {
@@ -46,6 +48,38 @@ class Deletes {
       }
     } catch (error) {
       console.error("Error emptying bucket:", error);
+    }
+  };
+
+  abortAllMultipartUploads = async (bucketName: string) => {
+    let isTruncated = true;
+    let keyMarker: string | undefined;
+    let uploadIdMarker: string | undefined;
+
+    while (isTruncated) {
+      const listResp = await this.s3Client.send(
+        new ListMultipartUploadsCommand({
+          Bucket: bucketName,
+          KeyMarker: keyMarker,
+          UploadIdMarker: uploadIdMarker,
+        })
+      );
+
+      const uploads = listResp.Uploads || [];
+
+      for (const upload of uploads) {
+        await this.s3Client.send(
+          new AbortMultipartUploadCommand({
+            Bucket: bucketName,
+            Key: upload.Key!,
+            UploadId: upload.UploadId!,
+          })
+        );
+      }
+
+      isTruncated = listResp.IsTruncated ?? false;
+      keyMarker = listResp.NextKeyMarker;
+      uploadIdMarker = listResp.NextUploadIdMarker;
     }
   };
 }

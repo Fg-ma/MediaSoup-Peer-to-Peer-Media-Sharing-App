@@ -245,21 +245,21 @@ class LowerVideoController {
       );
 
       if (
+        !this.isScrubbing.current &&
         this.videoMediaInstance.current.instanceVideo.currentTime >=
-        this.videoMediaInstance.current.instanceVideo.duration - 0.5
+          this.videoMediaInstance.current.instanceVideo.duration - 0.5 &&
+        this.videoMediaInstance.current.instanceVideo
       ) {
-        if (this.videoMediaInstance.current.instanceVideo) {
-          this.videoMediaInstance.current.instanceVideo.pause();
-          this.videoMediaInstance.current.instanceVideo.currentTime = 0;
-          this.videoSocket.current?.updateVideoMetadata(
-            this.videoMediaInstance.current.videoMedia.videoId,
-            this.videoInstanceId,
-            false,
-            this.videoMediaInstance.current.instanceVideo.currentTime,
-            this.videoMediaInstance.current.meta.videoSpeed,
-            true,
-          );
-        }
+        this.videoMediaInstance.current.instanceVideo.pause();
+        this.videoMediaInstance.current.instanceVideo.currentTime = 0;
+        this.videoSocket.current?.updateVideoMetadata(
+          this.videoMediaInstance.current.videoMedia.videoId,
+          this.videoInstanceId,
+          false,
+          this.videoMediaInstance.current.instanceVideo.currentTime,
+          this.videoMediaInstance.current.meta.videoSpeed,
+          true,
+        );
       }
     }
   };
@@ -420,6 +420,9 @@ class LowerVideoController {
     )
       return;
 
+    event.preventDefault();
+    event.stopPropagation();
+
     document.addEventListener(
       "pointermove",
       this.handleScrubbingTimelineUpdate,
@@ -440,14 +443,14 @@ class LowerVideoController {
   };
 
   handleStopScrubbing = (event: PointerEvent) => {
-    if (!this.timelineContainerRef.current || !this.currentTimeRef.current)
-      return;
-
     document.removeEventListener(
       "pointermove",
       this.handleScrubbingTimelineUpdate,
     );
     document.removeEventListener("pointerup", this.handleStopScrubbing);
+
+    if (!this.timelineContainerRef.current || !this.currentTimeRef.current)
+      return;
 
     const rect = this.timelineContainerRef.current.getBoundingClientRect();
     const percent =
@@ -459,9 +462,7 @@ class LowerVideoController {
     if (this.videoMediaInstance.current.instanceVideo) {
       this.videoMediaInstance.current.instanceVideo.currentTime =
         percent * this.videoMediaInstance.current.instanceVideo.duration;
-    }
 
-    if (this.videoMediaInstance.current.instanceVideo) {
       if (this.videoMediaInstance.current.settings.synced.value) {
         this.videoSocket.current?.updateVideoMetadata(
           this.videoMediaInstance.current.videoMedia.videoId,
@@ -498,15 +499,38 @@ class LowerVideoController {
         `${percent}`,
       );
 
-      if (
-        this.videoMediaInstance.current.instanceVideo &&
-        this.currentTimeRef.current
-      )
-        this.currentTimeRef.current.textContent = this.formatDuration(
-          percent * this.videoMediaInstance.current.instanceVideo.duration,
-        );
+      if (this.videoMediaInstance.current.instanceVideo) {
+        if (this.currentTimeRef.current) {
+          this.currentTimeRef.current.textContent = this.formatDuration(
+            percent * this.videoMediaInstance.current.instanceVideo.duration,
+          );
+        }
+
+        this.videoMediaInstance.current.instanceVideo.currentTime =
+          percent * this.videoMediaInstance.current.instanceVideo.duration;
+      }
+
+      if (!this.videoMediaInstance.current.meta.isPlaying) {
+        this.throttledForceRenderLoop(percent);
+      }
     }
   };
+
+  throttle<T extends (...args: any[]) => void>(func: T, limit: number): T {
+    let lastCall = 0;
+
+    return ((...args: Parameters<T>) => {
+      const now = Date.now();
+      if (now - lastCall >= limit) {
+        lastCall = now;
+        func(...args);
+      }
+    }) as T;
+  }
+
+  throttledForceRenderLoop = this.throttle((percent: number) => {
+    this.videoMediaInstance.current.babylonScene?.forceEngineRenderLoop();
+  }, 150);
 
   handleHoverTimelineUpdate = (event: React.PointerEvent) => {
     if (!this.timelineContainerRef.current) return;

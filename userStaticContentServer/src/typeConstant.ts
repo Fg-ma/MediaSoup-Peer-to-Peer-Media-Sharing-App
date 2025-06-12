@@ -22,6 +22,21 @@ export const contentTypeBucketMap: {
   soundClip: "user-sound-clips",
 };
 
+export const encodedCephBucketMap: { [bucket: string]: string } = {
+  "table-applications": "ta",
+  "table-images": "ti",
+  "table-sound-clips": "tsc",
+  "table-svgs": "ts",
+  "table-text": "tt",
+  "table-videos": "tv",
+  "user-applications": "ua",
+  "user-images": "ui",
+  "user-sound-clips": "usc",
+  "user-svgs": "us",
+  "user-text": "ut",
+  "user-videos": "uv",
+};
+
 export const contentTypeQdrantMap: {
   [staticContentType in StaticContentTypes]: string;
 } = {
@@ -169,7 +184,11 @@ export type onGetFileChunkType = {
 
 export type onDeleteUploadSessionType = {
   type: "deleteUploadSession";
-  header: { uploadId: string };
+  header: {
+    uploadId: string;
+    contentId: string;
+    contentType: StaticContentTypes;
+  };
 };
 
 export const userConnections: UserConnections = {};

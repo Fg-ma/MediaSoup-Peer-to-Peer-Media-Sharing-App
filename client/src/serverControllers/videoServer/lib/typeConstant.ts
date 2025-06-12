@@ -85,7 +85,10 @@ type onRequestCatchUpVideoMetadataType = {
 
 type onDeleteUploadSessionType = {
   type: "deleteUploadSession";
-  header: { uploadId: string };
+  header: {
+    uploadId: string;
+    contentId: string;
+  };
 };
 
 type onSignalReuploadStartType = {
@@ -99,6 +102,7 @@ type onSignalReuploadStartType = {
 
 export type IncomingVideoMessages =
   | { type: undefined }
+  | onVideoFailedUploadType
   | onProcessingProgressType
   | onProcessingFinishedType
   | onVideoUploadedToTableType
@@ -115,6 +119,11 @@ export type IncomingVideoMessages =
   | onReuploadStartedType
   | onReuploadCancelledType;
 
+export type onVideoFailedUploadType = {
+  type: "videoFailedUpload";
+  header: { contentId: string; filename: string };
+};
+
 export type onProcessingProgressType = {
   type: "processingProgress";
   header: { contentId: string };
@@ -123,7 +132,7 @@ export type onProcessingProgressType = {
 
 export type onProcessingFinishedType = {
   type: "processingFinished";
-  header: { contentId: string };
+  header: { contentId: string; oneShot: boolean; filename: string };
 };
 
 export type onVideoUploadedToTableType = {

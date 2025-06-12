@@ -20,7 +20,7 @@ import Broadcaster from "src/lib/Broadcaster";
 import { videoTranscodeQueue } from "./lib/queues";
 
 class Posts {
-  private readonly REDIS_UPLOAD_LIFE_TIME = 1800;
+  private readonly REDIS_UPLOAD_LIFE_TIME = 300;
 
   constructor(app: uWS.TemplatedApp, private broadcaster: Broadcaster) {
     app.post("/upload-one-shot-file", (res, req) => {
@@ -160,6 +160,7 @@ class Posts {
                   mimeType: metadata.mimeType,
                   instanceId: metadata.instanceId,
                   state: metadata.state,
+                  oneShot: true,
                 }
               : metadata.direction === "toTabled"
               ? {
@@ -173,6 +174,7 @@ class Posts {
                   direction: metadata.direction,
                   mimeType: metadata.mimeType,
                   state: metadata.state,
+                  oneShot: true,
                 }
               : {
                   uploadId: undefined,
@@ -183,6 +185,7 @@ class Posts {
                   tableId: metadata.tableId,
                   direction: metadata.direction,
                   mimeType: metadata.mimeType,
+                  oneShot: true,
                 },
             { removeOnComplete: true, removeOnFail: true }
           );
@@ -314,7 +317,7 @@ class Posts {
 
             await tableTopRedis.posts.post(
               "VUS",
-              uploadId,
+              `${contentId}:${uploadId}`,
               sessionData,
               this.REDIS_UPLOAD_LIFE_TIME
             );
@@ -341,7 +344,7 @@ class Posts {
       });
     });
 
-    app.post("/upload-chunk/:uploadId", (res, req) => {
+    app.post("/upload-chunk/:uploadId/:contentId", (res, req) => {
       const bb = busboy({
         headers: this.collectHeaders(req),
         limits: { fileSize: CEPH_CHUNK_MAX_SIZE },
@@ -364,16 +367,23 @@ class Posts {
           res,
           "400 Bad Request",
           "text/plain",
-          "Missing upload ID"
+          "Missing upload id"
         );
         return;
       }
       const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
-      if (!uploadId) {
-        this.sendResponse(res, "404 Not Found", "text/plain", "No upload id");
-        aborted = true;
+
+      const dirtyContentId = req.getParameter(1);
+      if (!dirtyContentId) {
+        this.sendResponse(
+          res,
+          "400 Bad Request",
+          "text/plain",
+          "Missing content id"
+        );
         return;
       }
+      const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
 
       bb.on("field", async (name, val) => {
         if (name === "totalChunks")
@@ -413,7 +423,7 @@ class Posts {
 
             await tableTopRedis.deletes.delete(
               [
-                { prefix: "VUS", id: uploadId },
+                { prefix: "VUS", id: `${contentId}:${uploadId}` },
                 { prefix: "VCS", id: uploadId },
                 session?.direction === "reupload"
                   ? { prefix: "VRU", id: session.contentId }
@@ -437,7 +447,7 @@ class Posts {
 
         session = (await tableTopRedis.gets.get(
           "VUS",
-          uploadId
+          `${contentId}:${uploadId}`
         )) as UploadSession;
         if (!session) {
           if (aborted) return;
@@ -489,7 +499,7 @@ class Posts {
 
             await tableTopRedis.deletes.delete(
               [
-                { prefix: "VUS", id: uploadId },
+                { prefix: "VUS", id: `${contentId}:${uploadId}` },
                 { prefix: "VCS", id: uploadId },
                 session?.direction === "reupload"
                   ? { prefix: "VRU", id: session.contentId }
@@ -510,7 +520,7 @@ class Posts {
           );
           await tableTopRedis.posts.extendLife(
             "VUS",
-            uploadId,
+            `${contentId}:${uploadId}`,
             this.REDIS_UPLOAD_LIFE_TIME
           );
           if (session && session.direction === "reupload") {
@@ -555,6 +565,7 @@ class Posts {
                     mimeType: session!.mimeType,
                     instanceId: session!.instanceId,
                     state: session!.state,
+                    oneShot: false,
                   }
                 : session?.direction === "toTabled"
                 ? {
@@ -567,6 +578,7 @@ class Posts {
                     direction: session!.direction,
                     mimeType: session!.mimeType,
                     state: session!.state,
+                    oneShot: false,
                   }
                 : {
                     uploadId,
@@ -576,6 +588,7 @@ class Posts {
                     tableId: session!.tableId,
                     direction: session!.direction,
                     mimeType: session!.mimeType,
+                    oneShot: false,
                   },
               { removeOnComplete: true, removeOnFail: true }
             );
@@ -599,7 +612,7 @@ class Posts {
       }
     });
 
-    app.post("/cancel-upload/:uploadId", async (res, req) => {
+    app.post("/cancel-upload/:uploadId/:contentId", async (res, req) => {
       let aborted = false;
       res.onAborted(() => {
         aborted = true;
@@ -611,15 +624,27 @@ class Posts {
           res,
           "400 Bad Request",
           "text/plain",
-          "Missing upload ID"
+          "Missing upload id"
         );
         return;
       }
       const uploadId = sanitizationUtils.sanitizeString(dirtyUploadId, "~");
 
+      const dirtyContentId = req.getParameter(1);
+      if (!dirtyContentId) {
+        this.sendResponse(
+          res,
+          "400 Bad Request",
+          "text/plain",
+          "Missing content id"
+        );
+        return;
+      }
+      const contentId = sanitizationUtils.sanitizeString(dirtyContentId);
+
       const session = (await tableTopRedis.gets.get(
         "VUS",
-        uploadId
+        `${contentId}:${uploadId}`
       )) as UploadSession;
       if (!session) {
         this.sendResponse(
@@ -651,7 +676,7 @@ class Posts {
 
             await tableTopRedis.deletes.delete(
               [
-                { prefix: "VUS", id: uploadId },
+                { prefix: "VUS", id: `${contentId}:${uploadId}` },
                 { prefix: "VCS", id: uploadId },
                 session?.direction === "reupload"
                   ? { prefix: "VRU", id: session.contentId }

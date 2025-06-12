@@ -1,4 +1,5 @@
 import { DBSchema } from "idb";
+import { StaticContentTypes } from "../../../../../../universal/contentTypeConstant";
 
 export interface UploadDBSchema extends DBSchema {
   handles: {
@@ -6,8 +7,9 @@ export interface UploadDBSchema extends DBSchema {
     value: {
       tableId: string;
       uploadId: string;
-      handle: FileSystemFileHandle;
+      staticContentType: StaticContentTypes;
       offset: number;
+      handle: FileSystemFileHandle;
     };
   };
 }
@@ -18,6 +20,7 @@ export type HandleListenerTypes =
       header: {
         tableId: string;
         uploadId: string;
+        staticContentType: StaticContentTypes;
         key: string;
         offset: number;
       };

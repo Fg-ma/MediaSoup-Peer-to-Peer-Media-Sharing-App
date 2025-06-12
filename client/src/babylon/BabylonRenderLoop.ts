@@ -33,7 +33,6 @@ class BabylonRenderLoop {
 
   private _tempNosePos = { x: 0, y: 0 };
   private _tempShift = { x: 0, y: 0 };
-  private canvasAspectRatio: number;
   private tan: number;
 
   constructor(
@@ -53,19 +52,25 @@ class BabylonRenderLoop {
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private babylonMeshes: BabylonMeshes,
   ) {
-    this.canvasAspectRatio = this.canvas.width / this.canvas.height;
     this.tan = Math.tan(this.camera.fov / 2);
 
     this.FACE_MESH_DETECTION_INTERVAL =
       this.userDevice.current.getFaceMeshDetectionInterval();
-    (this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
-      this.userDevice.current.getSelfieSegmentationDetectionInterval()),
-      (this.hideBackgroundEffectImage = new Image());
+    this.SELFIE_SEGMENTATION_DETECTION_INTERVAL =
+      this.userDevice.current.getSelfieSegmentationDetectionInterval();
+    this.hideBackgroundEffectImage = new Image();
     this.hideBackgroundEffectImage.crossOrigin = "anonymous";
 
     this.hideBackgroundCanvas = document.createElement("canvas");
-    this.hideBackgroundCanvas.width = this.canvas.width;
-    this.hideBackgroundCanvas.height = this.canvas.height;
+
+    this.hideBackgroundCanvas.width =
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? this.backgroundMedia.videoWidth
+        : this.backgroundMedia.naturalWidth;
+    this.hideBackgroundCanvas.height =
+      this.backgroundMedia instanceof HTMLVideoElement
+        ? this.backgroundMedia.videoHeight
+        : this.backgroundMedia.naturalHeight;
 
     this.hideBackgroundCtx = this.hideBackgroundCanvas.getContext("2d", {
       alpha: true,
@@ -189,8 +194,30 @@ class BabylonRenderLoop {
     // Step 3: Draw background media/image behind the person
     this.hideBackgroundCtx.globalCompositeOperation = "destination-over";
     if (this.hidebackgroundType === "image") {
+      const canvasAspect = width / height;
+      const imageAspect =
+        this.hideBackgroundEffectImage.naturalWidth /
+        this.hideBackgroundEffectImage.naturalHeight;
+
+      let sx = 0,
+        sy = 0,
+        sWidth = this.hideBackgroundEffectImage.naturalWidth,
+        sHeight = this.hideBackgroundEffectImage.naturalHeight;
+
+      if (imageAspect > canvasAspect) {
+        sWidth = this.hideBackgroundEffectImage.naturalHeight * canvasAspect;
+        sx = (this.hideBackgroundEffectImage.naturalWidth - sWidth) / 2;
+      } else {
+        sHeight = this.hideBackgroundEffectImage.naturalWidth / canvasAspect;
+        sy = (this.hideBackgroundEffectImage.naturalHeight - sHeight) / 2;
+      }
+
       this.hideBackgroundCtx.drawImage(
         this.hideBackgroundEffectImage,
+        sx,
+        sy,
+        sWidth,
+        sHeight,
         0,
         0,
         width,
@@ -251,7 +278,7 @@ class BabylonRenderLoop {
 
     // Calculate the vertical and horizontal extents at the current zPosition
     const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
+    const horizontalExtent = verticalExtent * this.aspect;
 
     // Convert normalized screen coordinates to world coordinates
     return [
@@ -268,7 +295,7 @@ class BabylonRenderLoop {
 
     // Calculate the vertical and horizontal extents at the current zPosition
     const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
+    const horizontalExtent = verticalExtent * this.aspect;
 
     // Reverse the conversion from world coordinates to normalized screen coordinates
     const screenX = (mesh.position.x / horizontalExtent) * -1;
@@ -285,7 +312,7 @@ class BabylonRenderLoop {
 
     // Calculate the vertical and horizontal extents at the current zPosition
     const verticalExtent = this.tan * (Math.abs(zPosition) + 1);
-    const horizontalExtent = verticalExtent * this.canvasAspectRatio;
+    const horizontalExtent = verticalExtent * this.aspect;
 
     // Convert normalized screen coordinates to world coordinates
     return scale * Math.max(verticalExtent, horizontalExtent);

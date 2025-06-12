@@ -20,7 +20,7 @@ export default function VideoSpeedPage({
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const setVideoSpeed = (videoSpeed: number) => {
-    videoMediaInstance.current.settings.videoSpeed.value = videoSpeed;
+    videoMediaInstance.current.meta.videoSpeed = videoSpeed;
 
     if (videoMediaInstance.current.instanceVideo)
       videoMediaInstance.current.instanceVideo.playbackRate = videoSpeed;
@@ -40,8 +40,7 @@ export default function VideoSpeedPage({
           <FgButton
             key={key}
             className={`flex items-center justify-center text-nowrap rounded hover:bg-fg-white hover:text-fg-tone-black-1 ${
-              parseFloat(speed) ===
-              videoMediaInstance.current.settings.videoSpeed.value
+              parseFloat(speed) === videoMediaInstance.current.meta.videoSpeed
                 ? "bg-fg-white text-fg-tone-black-1"
                 : ""
             }`}

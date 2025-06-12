@@ -92,6 +92,7 @@ export default function SharedBundle({
           (snakeGameId) => (
             <Suspense key={snakeGameId} fallback={<div>Loading...</div>}>
               <SnakeGame
+                tableTopRef={tableTopRef}
                 snakeGameId={snakeGameId}
                 sharedBundleRef={sharedBundleRef}
               />

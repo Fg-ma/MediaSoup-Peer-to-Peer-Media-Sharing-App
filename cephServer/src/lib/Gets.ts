@@ -5,6 +5,8 @@ import {
   HeadObjectCommand,
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
+  ListMultipartUploadsCommand,
+  ListMultipartUploadsCommandOutput,
 } from "@aws-sdk/client-s3";
 
 class Gets {
@@ -60,6 +62,35 @@ class Gets {
       console.error("Error listing objects:", err);
       return [];
     }
+  };
+
+  listAllMultipartUploads = async (bucketName: string) => {
+    const uploads: ListMultipartUploadsCommandOutput["Uploads"] = [];
+    let keyMarker: string | undefined;
+    let uploadIdMarker: string | undefined;
+
+    while (true) {
+      const command = new ListMultipartUploadsCommand({
+        Bucket: bucketName,
+        KeyMarker: keyMarker,
+        UploadIdMarker: uploadIdMarker,
+      });
+
+      const result = await this.s3Client.send(command);
+
+      if (result.Uploads) {
+        uploads.push(...result.Uploads);
+      }
+
+      if (result.IsTruncated) {
+        keyMarker = result.NextKeyMarker;
+        uploadIdMarker = result.NextUploadIdMarker;
+      } else {
+        break;
+      }
+    }
+
+    console.log(uploads);
   };
 }
 

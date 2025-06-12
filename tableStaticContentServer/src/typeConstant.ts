@@ -30,6 +30,21 @@ export const contentTypeBucketMap: {
   soundClip: "table-sound-clips",
 };
 
+export const encodedCephBucketMap: { [bucket: string]: string } = {
+  "table-applications": "ta",
+  "table-images": "ti",
+  "table-sound-clips": "tsc",
+  "table-svgs": "ts",
+  "table-text": "tt",
+  "table-videos": "tv",
+  "user-applications": "ua",
+  "user-images": "ui",
+  "user-sound-clips": "usc",
+  "user-svgs": "us",
+  "user-text": "ut",
+  "user-videos": "uv",
+};
+
 export const contentTypeQdrantMap: {
   [staticContentType in StaticContentTypes]: string;
 } = {
@@ -243,7 +258,11 @@ export type onCreateNewInstancesType = {
 
 export type onDeleteUploadSessionType = {
   type: "deleteUploadSession";
-  header: { uploadId: string };
+  header: {
+    uploadId: string;
+    contentId: string;
+    contentType: StaticContentTypes;
+  };
 };
 
 export type onSignalReuploadStartType = {

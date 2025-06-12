@@ -33,6 +33,7 @@ const GameVar: Variants = {
 };
 
 export default function FgGame({
+  tableTopRef,
   externalHideControls,
   gameId,
   gameType,
@@ -50,6 +51,7 @@ export default function FgGame({
   initPositioning,
   setPositioning,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   externalHideControls?: boolean;
   gameId: string;
   gameType: GameTypes;
@@ -323,6 +325,7 @@ export default function FgGame({
       </div>
       <div className="fg-game-top-controls-section hide-scroll-bar absolute bottom-full left-0 flex h-[15%] max-h-16 min-h-10 w-full items-center justify-between space-x-2 overflow-x-auto">
         <ControlButtons
+          tableTopRef={tableTopRef}
           startGameFunction={startGameFunction}
           joinGameFunction={joinGameFunction}
           leaveGameFunction={leaveGameFunction}
@@ -331,6 +334,7 @@ export default function FgGame({
             (players?.players.length ?? 0) +
             (players?.user === undefined ? 0 : 1)
           }
+          positioning={positioning}
         />
         <div className="flex h-full w-max items-end justify-center">
           <div className="aspect-square h-[75%] pb-1">

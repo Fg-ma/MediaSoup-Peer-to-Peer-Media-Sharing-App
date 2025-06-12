@@ -1,6 +1,7 @@
 import { IncomingTableStaticContentMessages } from "../../../serverControllers/tableStaticContentServer/lib/typeConstant";
 import { ContentTypes } from "../../../../../universal/contentTypeConstant";
 import { GroupSignals } from "../../../context/signalContext/lib/typeConstant";
+import { IncomingMediasoupMessages } from "../../../serverControllers/mediasoupServer/lib/typeConstant";
 
 class SelectTableLayerController {
   queryInterval: NodeJS.Timeout | undefined;
@@ -442,26 +443,67 @@ class SelectTableLayerController {
 
   handleTableStaticMessage = (event: IncomingTableStaticContentMessages) => {
     if (event.type === "contentDeleted") {
+      const { contentType, instanceId } = event.header;
       this.selectables =
         this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
 
-      this.selectedInfo = [];
+      this.selected.current = this.selected.current?.filter((sel) => {
+        const type = sel.getAttribute("data-selectable-type") as ContentTypes;
+        const id = sel.getAttribute("data-selectable-id");
+        return type !== contentType || id !== instanceId;
+      });
 
-      for (const sel of this.selected.current) {
+      if (this.selectedInfo) {
+        this.selectedInfo = this.selectedInfo.filter((sel) => {
+          return sel.type !== contentType || sel.id !== instanceId;
+        });
+      } else {
+        this.selectedInfo = [];
+      }
+
+      this.sendGroupSignal({
+        type: "groupChange",
+        data: { selected: this.selectedInfo },
+      });
+
+      this.setRerender((prev) => !prev);
+    }
+  };
+
+  handleMediasoupMessage = (event: IncomingMediasoupMessages) => {
+    if (event.type === "producerDisconnected") {
+      const { producerUsername, producerInstance, producerType, producerId } =
+        event.header;
+      if (producerType === "json" || producerType === "screenAudio") return;
+
+      this.selectables =
+        this.tableTopRef.current?.querySelectorAll<HTMLElement>(".selectable");
+
+      this.selected.current = this.selected.current?.filter((sel) => {
         const type = sel.getAttribute("data-selectable-type") as ContentTypes;
         const id = sel.getAttribute("data-selectable-id");
         const username = sel.getAttribute("data-selectable-username");
         const instance = sel.getAttribute("data-selectable-instance");
-        const isUser = sel.getAttribute("data-selectable-isuser");
 
-        if (type && id)
-          this.selectedInfo.push({
-            type,
-            id,
-            username: username ?? undefined,
-            instance: instance ?? undefined,
-            isUser: isUser !== null ? isUser === "true" : undefined,
-          });
+        return (
+          type !== producerType ||
+          id !== producerId ||
+          username !== producerUsername ||
+          instance !== producerInstance
+        );
+      });
+
+      if (this.selectedInfo) {
+        this.selectedInfo = this.selectedInfo.filter((sel) => {
+          return (
+            sel.type !== producerType ||
+            sel.id !== producerId ||
+            sel.username !== producerUsername ||
+            sel.instance !== producerInstance
+          );
+        });
+      } else {
+        this.selectedInfo = [];
       }
 
       this.sendGroupSignal({

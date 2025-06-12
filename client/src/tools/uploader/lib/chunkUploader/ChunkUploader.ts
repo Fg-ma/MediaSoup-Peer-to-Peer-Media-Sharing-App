@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import IndexedDB from "../../../../db/indexedDB/IndexedDB";
 import { UploadSignals } from "../../../../context/uploadDownloadContext/lib/typeConstant";
 import {
+  mimeTypeContentTypeMap,
+  StaticMimeTypes,
   TableContentStateTypes,
   UploadingStateTypes,
 } from "../../../../../../universal/contentTypeConstant";
@@ -102,7 +104,9 @@ class ChunkUploader {
 
     try {
       await fetch(
-        `${tableStaticContentServerBaseUrl}cancel-upload/${this.uploadId}`,
+        `${tableStaticContentServerBaseUrl}cancel-upload/${this.uploadId}/${this.contentId}/${
+          mimeTypeContentTypeMap[this.file.type as StaticMimeTypes]
+        }`,
         {
           method: "POST",
         },
@@ -162,7 +166,9 @@ class ChunkUploader {
       try {
         this.currentChunkAbortController = new AbortController();
         const response = await fetch(
-          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}`,
+          `${tableStaticContentServerBaseUrl}upload-chunk/${this.uploadId}/${this.contentId}/${
+            mimeTypeContentTypeMap[this.file.type as StaticMimeTypes]
+          }`,
           {
             method: "POST",
             body: formData,
@@ -230,7 +236,11 @@ class ChunkUploader {
   };
 
   private uploadFailed = async () => {
-    this.tableStaticContentSocket.current?.deleteUploadSession(this.uploadId);
+    this.tableStaticContentSocket.current?.deleteUploadSession(
+      this.uploadId,
+      this.contentId,
+      mimeTypeContentTypeMap[this.file.type as StaticMimeTypes],
+    );
 
     this.uploadingState = "failed";
 
@@ -260,7 +270,7 @@ class ChunkUploader {
   };
 
   retryUpload = async () => {
-    this.uploadingState = "failed";
+    this.uploadingState = "uploading";
 
     if (!tableStaticContentServerBaseUrl) return;
 
@@ -306,6 +316,7 @@ class ChunkUploader {
           this.contentId,
           this.tableId.current,
           this.uploadId,
+          mimeTypeContentTypeMap[this.file.type as StaticMimeTypes],
           this.handle,
           0,
         );

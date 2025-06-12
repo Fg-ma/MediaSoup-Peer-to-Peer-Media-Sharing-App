@@ -1,11 +1,15 @@
 import UserDevice from "../tools/userDevice/UserDevice";
-import FaceLandmarks from "./FaceLandmarks";
 
-type Needs = "selfieSegmentation" | "faceDetection" | "smoothFaceLandmarks";
+type Needs =
+  | "selfieSegmentation"
+  | "faceMesh"
+  | "faceDetection"
+  | "smoothFaceLandmarks";
 
 class BabylonRenderLoopWorker {
   private needs: { [need in Needs]: string[] } = {
     selfieSegmentation: [],
+    faceMesh: [],
     faceDetection: [],
     smoothFaceLandmarks: [],
   };
@@ -27,7 +31,6 @@ class BabylonRenderLoopWorker {
 
   constructor(
     private flip: boolean,
-    private faceLandmarks: FaceLandmarks | undefined,
     private aspect: number,
     private backgroundMedia: HTMLVideoElement | HTMLImageElement,
     private faceMeshWorker: Worker | undefined,
@@ -100,11 +103,12 @@ class BabylonRenderLoopWorker {
     const doHide =
       this.needs.selfieSegmentation.length !== 0 &&
       this.frameCounter % this.SELFIE_SEGMENTATION_DETECTION_INTERVAL === 0;
-    const doDetect =
-      this.needs.faceDetection.length !== 0 &&
+    const doMesh =
+      this.needs.faceMesh.length !== 0 &&
       this.frameCounter % this.FACE_MESH_DETECTION_INTERVAL === 0;
+    const doDetect = this.needs.faceDetection.length !== 0;
 
-    if ((!doHide && !doDetect) || !this.offscreenContext) return;
+    if ((!doHide && !doMesh && !doDetect) || !this.offscreenContext) return;
 
     // Clear the offscreen canvas before drawing
     this.offscreenContext.clearRect(
@@ -144,7 +148,7 @@ class BabylonRenderLoopWorker {
       }
     }
 
-    if (doDetect) {
+    if (doMesh) {
       const canMesh = this.faceMeshProcessing && !this.faceMeshProcessing[0];
 
       if (canMesh) {
@@ -163,7 +167,9 @@ class BabylonRenderLoopWorker {
           }),
         );
       }
+    }
 
+    if (doDetect) {
       const canDetect =
         performance.now() - this.lastFaceCountCheck > this.detectFacesTimeout &&
         this.faceDetectionProcessing &&

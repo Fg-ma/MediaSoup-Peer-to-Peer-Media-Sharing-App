@@ -7,6 +7,7 @@ class OneShotUploader {
     file: File,
     metadata: Object,
     baseUrl: string,
+    uploadSignal = true,
   ) => {
     try {
       const formData = new FormData();
@@ -32,6 +33,15 @@ class OneShotUploader {
             type: "tableInfoSignal",
             data: {
               message: "File already reuploading",
+              timeout: 2500,
+            },
+          });
+        }
+        if (uploadSignal && xhr.status === 200) {
+          this.sendGeneralSignal({
+            type: "tableInfoSignal",
+            data: {
+              message: `Completed ${file.name} upload`,
               timeout: 2500,
             },
           });

@@ -7,6 +7,7 @@ import HoverElement from "../../../../elements/hoverElement/HoverElement";
 import { useToolsContext } from "../../../../context/toolsContext/ToolsContext";
 import FgSVGElement from "../../../../elements/fgSVGElement/FgSVGElement";
 import FgImageElement from "../../../../elements/fgImageElement/FgImageElement";
+import { StaticContentTypes } from "../../../../../../universal/contentTypeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -17,12 +18,14 @@ export default function CutOffUploadingSection({
   savedTableId,
   uploadId,
   contentId,
+  staticContentType,
   offset,
   failed,
 }: {
   savedTableId: string;
   uploadId: string;
   contentId: string;
+  staticContentType: StaticContentTypes;
   offset: number;
   failed: FileSystemFileHandle;
 }) {
@@ -52,7 +55,11 @@ export default function CutOffUploadingSection({
           await indexedDBController.current.uploadDeletes?.deleteFileHandle(
             contentId,
           );
-          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
+          tableStaticContentSocket.current?.deleteUploadSession(
+            uploadId,
+            contentId,
+            staticContentType,
+          );
           return;
         }
       }
@@ -76,7 +83,11 @@ export default function CutOffUploadingSection({
       await indexedDBController.current.uploadDeletes?.deleteFileHandle(
         contentId,
       );
-      tableStaticContentSocket.current?.deleteUploadSession(uploadId);
+      tableStaticContentSocket.current?.deleteUploadSession(
+        uploadId,
+        contentId,
+        staticContentType,
+      );
     }
   };
 
@@ -118,12 +129,17 @@ export default function CutOffUploadingSection({
           await indexedDBController.current.uploadDeletes?.deleteFileHandle(
             contentId,
           );
-          tableStaticContentSocket.current?.deleteUploadSession(uploadId);
+          tableStaticContentSocket.current?.deleteUploadSession(
+            uploadId,
+            contentId,
+            staticContentType,
+          );
           return;
         }
       }
 
       file.current = (await failed.getFile()) as File;
+      setRerender((prev) => !prev);
 
       reasonableFileSizer.current.getUrl(file.current).then((url) => {
         fileUrl.current = url;

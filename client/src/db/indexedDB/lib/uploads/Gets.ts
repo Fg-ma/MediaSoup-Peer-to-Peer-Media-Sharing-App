@@ -1,5 +1,6 @@
 import { IDBPDatabase } from "idb";
 import { UploadDBSchema } from "./typeConstant";
+import { StaticContentTypes } from "../../../../../../universal/contentTypeConstant";
 
 class Gets {
   constructor(private uploadDB: IDBPDatabase<UploadDBSchema>) {}
@@ -10,6 +11,7 @@ class Gets {
     | {
         tableId: string;
         uploadId: string;
+        staticContentType: StaticContentTypes;
         offset: number;
         handle: FileSystemFileHandle;
       }
@@ -23,6 +25,7 @@ class Gets {
       key: string;
       tableId: string;
       uploadId: string;
+      staticContentType: StaticContentTypes;
       offset: number;
       handle: FileSystemFileHandle;
     }[]
@@ -34,6 +37,7 @@ class Gets {
       key: string;
       tableId: string;
       uploadId: string;
+      staticContentType: StaticContentTypes;
       offset: number;
       handle: FileSystemFileHandle;
     }[] = [];

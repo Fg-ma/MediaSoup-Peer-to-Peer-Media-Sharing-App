@@ -109,16 +109,16 @@ class MetadataController {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDeleteUploadSessionType;
-    const { uploadId } = safeEvent.header;
+    const { uploadId, contentId } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
       "VUS",
-      uploadId
+      `${contentId}:${uploadId}`
     )) as UploadSession;
 
     await tableTopRedis.deletes.delete(
       [
-        { prefix: "VUS", id: uploadId },
+        { prefix: "VUS", id: `${contentId}:${uploadId}` },
         { prefix: "VCS", id: uploadId },
         session?.direction === "reupload"
           ? { prefix: "VRU", id: session.contentId }

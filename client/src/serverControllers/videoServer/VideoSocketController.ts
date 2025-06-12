@@ -6,8 +6,10 @@ import { StaticContentMediaType } from "../../context/mediaContext/lib/typeConst
 import {
   IncomingVideoMessages,
   onContentReuploadedType,
+  onProcessingFinishedType,
   onReuploadCancelledType,
   onReuploadStartedType,
+  onVideoFailedUploadType,
   onVideoUploadedToTabledType,
   onVideoUploadedToTableType,
   OutGoingVideoMessages,
@@ -17,6 +19,7 @@ import TableVideoMediaInstance from "../../media/fgTableVideo/TableVideoMediaIns
 import TableVideoMedia from "../../media/fgTableVideo/TableVideoMedia";
 import Deadbanding from "../../babylon/Deadbanding";
 import UserDevice from "../../tools/userDevice/UserDevice";
+import { GeneralSignals } from "../../context/signalContext/lib/typeConstant";
 
 class VideoSocketController {
   private ws: WebSocket | undefined;
@@ -36,6 +39,7 @@ class VideoSocketController {
     private videoSocket: React.MutableRefObject<
       VideoSocketController | undefined
     >,
+    private sendGeneralSignal: (signal: GeneralSignals) => void,
   ) {
     this.connect(this.url);
   }
@@ -227,11 +231,12 @@ class VideoSocketController {
     });
   };
 
-  deleteUploadSession = (uploadId: string) => {
+  deleteUploadSession = (uploadId: string, contentId: string) => {
     this.sendMessage({
       type: "deleteUploadSession",
       header: {
         uploadId,
+        contentId,
       },
     });
   };
@@ -276,9 +281,26 @@ class VideoSocketController {
       case "reuploadCancelled":
         this.onReuploadCancelled(message);
         break;
+      case "processingFinished":
+        this.onProcessingFinished(message);
+        break;
       default:
         break;
     }
+  };
+
+  private onProcessingFinished = (event: onProcessingFinishedType) => {
+    const { contentId, filename, oneShot } = event.header;
+
+    if (!oneShot) return;
+
+    this.sendGeneralSignal({
+      type: "tableInfoSignal",
+      data: {
+        message: `Completed ${filename} upload`,
+        timeout: 2500,
+      },
+    });
   };
 
   private onReuploadStarted = (event: onReuploadStartedType) => {

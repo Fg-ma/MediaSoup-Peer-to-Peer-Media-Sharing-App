@@ -97,7 +97,7 @@ export default function GeneralMediaSelection({
 
   return (
     <div
-      className="relative mx-6 flex h-max flex-col items-center justify-center space-y-2 rounded-md border-2 border-fg-tone-black-3 bg-fg-tone-black-5 py-4"
+      className="flex relative mx-6 h-max flex-col items-center justify-center space-y-2 overflow-hidden rounded-md border-2 border-fg-tone-black-3 bg-fg-tone-black-5 py-4"
       style={{
         width: "calc(100% - 3rem)",
       }}
@@ -110,7 +110,7 @@ export default function GeneralMediaSelection({
         {generalMediaSelectionOptions.downloadType === "cover" &&
           downloadFunction && (
             <div
-              className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-40"
+              className="selected-section-media-container-download absolute left-0 top-0 h-full w-full items-center justify-center overflow-hidden rounded-md bg-fg-tone-black-1 bg-opacity-40"
               onClick={downloadFunction}
             >
               <FgSVGElement
