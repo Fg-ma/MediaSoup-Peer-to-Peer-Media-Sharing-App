@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.video-container .captions {
+  font-family: var(--closed-captions-font-family);
+  color: var(--closed-captions-font-color);
+  font-size: var(--closed-captions-font-size);
+  line-height: calc(var(--closed-captions-font-size) + 0.5rem);
+  opacity: var(--closed-captions-background-opacity);
+  text-shadow: var(--closed-captions-character-edge-style);
+  transition: line-height 150ms ease-in-out;
+  transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  padding-right: 0.625rem;
+  padding-left: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 1rem;
+}
+
+.video-container.in-video .captions,
+.video-container.in-effects .captions,
+.video-container.in-settings .captions,
+.video-container.in-audio-effects .captions {
+  bottom: 4rem;
+}
+
+.video-container .caption-text {
+  background-color: var(--closed-captions-background-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  whitespace: normal;
+  border-radius: 0.125rem;
+}
+
+.main-video {
+  transform: scaleX(var(--flip-video));
+}
+
+.video-container.mini-player .main-video {
+  transform: scaleX(1);
+}
+
+.video-container {
+  --timeline-background-color: rgba(150, 150, 150, 0.5);
+  --timeline-primary-background-color: #f56114;
+  --timeline-secondary-background-color: rgb(150, 150, 150);
+  --primary-video-color: #f56114;
+  --flip-video: "1";
+  --closed-captions-font-family: "K2D";
+  --closed-captions-font-color: white;
+  --closed-captions-font-size: 2rem;
+  --closed-captions-background-color: black;
+  --closed-captions-background-opacity: 75%;
+  --closed-captions-character-edge-style: none;
+}
+
+.video-container .video-controls-container,
+.video-container .video-navigation-container,
+.video-container .controls-gradient {
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.video-controls-container {
+  pointer-events: none;
+}
+
+.video-controls {
+  pointer-events: auto;
+  padding-inline: 1rem;
+  margin-bottom: 0.375rem;
+}
+
+.video-navigation-container {
+  padding-left: 1.25rem;
+  padding-right: 0.25rem;
+  margin-top: 0.375rem;
+}
+
+.video-container.in-video .video-controls-container,
+.video-container.in-video .video-navigation-container,
+.video-container.in-video .controls-gradient,
+.video-container.in-effects .video-controls-container,
+.video-container.in-effects .video-navigation-container,
+.video-container.in-effects .controls-gradient,
+.video-container.in-settings .video-controls-container,
+.video-container.in-settings .video-navigation-container,
+.video-container.in-settings .controls-gradient,
+.video-container.in-audio-effects .video-controls-container,
+.video-container.in-audio-effects .video-navigation-container,
+.video-container.in-audio-effects .controls-gradient {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* theater */
+.video-container.theater {
+  max-width: initial;
+  width: 100vw;
+  max-height: 90vh;
+}
+
+/* full-screen */
+.video-container.full-screen {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+.video-container.full-screen .video-controls {
+  padding-inline: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.video-container.full-screen .video-navigation-container {
+  padding-left: 2.5rem;
+  padding-right: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+/* mini-player */
+.video-container.mini-player {
+  max-width: initial;
+  width: 100%;
+  max-height: 100vh;
+}
+
+/* closed captions */
+.video-container.captions .caption-button-underline {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--primary-video-color);
+}
+
+/* play back speed */
+.video-container .playback-speed-button.wide-button {
+  width: 50px;
+}
+
+/* timeline */
+.timeline-container {
+  opacity: 0;
+  height: 6px;
+  width: calc(100% - 1.5rem);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 2.75rem;
+  position: absolute;
+}
+
+.timeline {
+  width: 100%;
+  background-color: var(--timeline-background-color);
+  height: 3px;
+  transition: height 150ms ease-in-out;
+  border-radius: 0.125rem;
+  position: relative;
+}
+
+/* .video-container.paused .timeline-container, */
+.video-container.in-video .timeline-container,
+.video-container.in-effects .timeline-container,
+.video-container.in-settings .timeline-container,
+.video-container.in-audio-effects .timeline-container {
+  opacity: 1;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: calc(100% - var(--preview-position) * 100%);
+  background-color: var(--timeline-secondary-background-color);
+  border-radius: 0.125rem;
+  display: none;
+}
+
+.timeline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: calc(100% - var(--progress-position) * 100%);
+  border-radius: 0.125rem;
+  background-color: var(--timeline-primary-background-color);
+}
+
+.timeline .thumb-indicator {
+  --scale: 0;
+  position: absolute;
+  transform: translateX(-50%) scale(var(--scale));
+  height: 200%;
+  top: -50%;
+  left: calc(var(--progress-position) * 100%);
+  background-color: var(--timeline-primary-background-color);
+  border-radius: 50%;
+  transition: transform 150ms ease-in-out;
+  aspect-ratio: 1 / 1;
+}
+
+.timeline .preview-img {
+  position: absolute;
+  height: 80px;
+  aspect-ratio: 16 / 9;
+  top: -1rem;
+  transform: translate(-50%, -100%);
+  left: calc(var(--preview-position) * 100%);
+  border-radius: 0.25rem;
+  border: 2px solid white;
+  display: none;
+}
+
+.thumbnail-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.video-container.scrubbing .thumbnail-img {
+  display: block;
+}
+
+.video-container.scrubbing .preview-img,
+.timeline-container:hover .preview-img {
+  display: block;
+}
+
+.video-container.scrubbing .timeline,
+.timeline-container:hover .timeline {
+  height: 6px;
+  border-radius: 0.25rem;
+}
+
+.video-container.scrubbing .timeline::before,
+.video-container.scrubbing .timeline::after,
+.timeline-container:hover .timeline::before,
+.timeline-container:hover .timeline::after {
+  border-radius: 0.25rem;
+}
+
+.video-container.scrubbing .thumb-indicator,
+.timeline-container:hover .thumb-indicator {
+  --scale: 1;
+}
+
+.timeline-container:hover .timeline::before {
+  display: block;
+}

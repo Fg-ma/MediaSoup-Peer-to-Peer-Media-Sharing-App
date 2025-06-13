@@ -1,0 +1,22 @@
+.spinner-container {
+  --angle: 0;
+  --spin-progress: 0;
+  --pause-progress: 0;
+  --tail-length: 1;
+}
+
+.spinner-container .spinner-segment-container {
+  --i: 0;
+  /* prettier-ignore */
+  transform: rotate(
+    calc(
+      (
+        var(--angle)
+        - (var(--i) * 2.5)
+        - ((var(--spin-progress) / var(--tail-length)) * 50 * var(--i))
+        + ((var(--pause-progress) / var(--tail-length)) * 50 * var(--i)
+        + (var(--i) * 2.5 * var(--pause-progress)))
+      ) * 1deg
+    )
+  );
+}

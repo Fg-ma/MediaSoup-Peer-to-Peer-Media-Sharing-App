@@ -1,0 +1,23 @@
+python -m notebook
+
+git reset HEAD~1
+
+mkcert
+	mkcert -cert-file /path/to/custom-cert.pem -key-file /path/to/custom-key.pem localhost
+	openssl dhparam -out dhparam.pem 2048
+	
+mongo
+	mongodump --uri="urlString" --db=tableTopMongo --out="$HOME/Desktop/mongoBackup"
+
+
+./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s reload &&
+./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s reload
+
+./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s quit &&
+./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s quit &&
+./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf &&
+./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf
+
+
+
+

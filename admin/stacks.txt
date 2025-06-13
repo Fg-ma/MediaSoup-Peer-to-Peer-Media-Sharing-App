@@ -1,0 +1,80 @@
+TableTop
+
+Front end:
+	Programming Language:
+		JavaScript
+		TypeScript***
+	UI Framework:
+		React***
+	State Management:
+		Redux***
+		Recoil
+		MOBX
+		XState
+		HookState
+		Akita
+	css:
+		tailwindcss***
+	css preprocessor:
+		Sass***		
+	post css:	
+		PostCSS***
+	Module Bundler:
+		WebPack***
+
+***OWASP***
+
+Backend:
+	OS:
+		Debian***
+		CentOS
+	Database(primary):
+		mongoDB
+		Cloud Firestore
+		MySQL
+		Graph Database: Neo4j (Community Edition)
+		Graph Database: Dgraph (Community Edition)***
+		NoSQL Database: MongoDB (Community Edition)***
+		Object Storage: 
+			Ceph***
+			MinIO
+		Meta data: Elasticsearch***
+	Database(cache):
+		Redis
+	Server:
+		Flask(py)
+		DJango(py)
+		Ruby on Rails
+		Spring(Java)
+		NodeJS(JS)***
+		NextJS(JS)(serve side web application stuff)***
+	Object Relational Mapper:
+		TypeORM***
+	Web Server:
+		NGINX
+		Apachee***
+	Containerizer:
+		Docker***
+		Kubernetes
+	Cloud Providers:
+		Amazon(Terraform)
+		Google***
+	Source Code Hosting:
+		GitHub***
+	Messaging:
+		socket.io
+
+
+
+API:
+	GraphQL***
+	Apollo***
+	Stripe(Payment)
+	// Auth0(User ID)***Keycloak
+	supertoken(authentication)
+	AWS Rekognition(Stop Inappropriate)***
+	Twilio(Text Messages)
+	meiliSearch or zinc(search engines)
+	NocoDB(modern db)
+
+*look into webworkers
