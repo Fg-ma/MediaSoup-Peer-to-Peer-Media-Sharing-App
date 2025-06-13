@@ -6,14 +6,19 @@
 >
   <circle
     style="fill:#d40213;stroke:none"
-    transform="translate(1152.5,1152.5)" 
+    transform="translate(1152.5,1152.5)"
     cx="-1102.5"
     cy="-1102.5"
     r="47.497623"
 	/>
-  <path
-    d="m -1109.6098,-1121.0634 v 4.8991 h -10.5152 v 34.0549 h -5.1381 v -34.0549 h -10.2762 v -4.9051 c 12.6307,0 12.8501,0.01 25.9295,0.01 z m 14.2194,0 h 25.9296 v 4.8991 h -10.5152 v 34.0549 h -5.1381 v -34.0549 h -10.2763 z"
-    style="fill:#f2f2f2;stroke:none"
-    transform="translate(1152.5,1152.5)" 
-	/>
+  <text
+    xml:space="preserve"
+    style="font-size:62.2231px;font-family:'Josefin Sans';-inkscape-font-specification:'Josefin Sans';fill:#f2f2f2;stroke:none;stroke-width:5.83342;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"
+    x="13.831428"
+    y="74.978828"
+    transform="scale(0.99971748,1.0002826)"><tspan
+      id="tspan392"
+      style="fill:#f2f2f2;stroke:none;stroke-width:5.83342"
+      x="13.831428"
+      y="74.978828">TT</tspan></text>
 </svg>

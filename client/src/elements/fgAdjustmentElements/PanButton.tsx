@@ -14,6 +14,8 @@ export default function PanButton({
   bundleRef,
   pointerDownFunction,
   pointerUpFunction,
+  onPointerEnter,
+  onPointerLeave,
 }: {
   externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
@@ -22,6 +24,8 @@ export default function PanButton({
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
   pointerUpFunction: () => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }) {
   return (
     <FgButton
@@ -45,6 +49,8 @@ export default function PanButton({
           />
         );
       }}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     />
   );
 }

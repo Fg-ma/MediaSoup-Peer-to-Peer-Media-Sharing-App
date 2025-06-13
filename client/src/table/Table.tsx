@@ -15,9 +15,7 @@ import BottomTableSection from "./lib/sideSections/BottomTableSection";
 import { TableColors } from "../serverControllers/tableServer/lib/typeConstant";
 import TableInfoPopup from "./lib/tableInfoPopup/TableInfoPopup";
 import LoadingTab from "./lib/loadingTab/LoadingTab";
-import TableSidePanel, {
-  TableSidePanels,
-} from "../tableSidePanel/TableSidePanel";
+import TableSidePanel from "../tableSidePanel/TableSidePanel";
 import "./lib/fgTable.css";
 
 export default function Table({

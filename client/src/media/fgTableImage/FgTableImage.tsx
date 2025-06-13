@@ -19,10 +19,12 @@ import CautionTapeDecorator from "../../elements/decorators/CautionTapeDecorator
 import "./lib/fgImageStyles.css";
 
 export default function FgTableImage({
+  tableTopRef,
   imageInstanceId,
   bundleRef,
   tableRef,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   imageInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -175,6 +177,8 @@ export default function FgTableImage({
   return (
     <>
       <FgMediaContainer
+        tableRef={tableRef}
+        tableTopRef={tableTopRef}
         filename={imageMediaInstance.imageMedia.filename}
         pauseDownload={imageMediaInstance.imageMedia.downloader?.pause}
         resumeDownload={imageMediaInstance.imageMedia.downloader?.resume}

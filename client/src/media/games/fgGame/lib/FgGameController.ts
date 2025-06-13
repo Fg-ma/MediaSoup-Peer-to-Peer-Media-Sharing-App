@@ -21,18 +21,22 @@ class FgGameController {
   groupStartDragPosition: { x: number; y: number } | undefined;
   savedMediaPosition: { top: number; left: number } | undefined;
 
+  hoveringOver = {
+    main: false,
+    pan: false,
+    scale: false,
+    rotate: false,
+    popup: false,
+  };
+
   constructor(
     private tableId: React.MutableRefObject<string>,
     private gameId: string,
     private hideControls: boolean,
     private gameStarted: boolean,
     private setHideControls: React.Dispatch<React.SetStateAction<boolean>>,
-    private pointerLeaveHideControlsTimeout: React.MutableRefObject<
-      NodeJS.Timeout | undefined
-    >,
-    private pointerStillHideControlsTimeout: React.MutableRefObject<
-      NodeJS.Timeout | undefined
-    >,
+    private leaveTimer: React.MutableRefObject<NodeJS.Timeout | undefined>,
+    private movementTimeout: React.MutableRefObject<NodeJS.Timeout | undefined>,
     private gameRef: React.RefObject<HTMLDivElement>,
     private closeGameFunction: (() => void) | undefined,
     private startGameFunction: (() => void) | undefined,
@@ -65,6 +69,7 @@ class FgGameController {
     private tableSocket: React.MutableRefObject<
       TableSocketController | undefined
     >,
+    private adjustmentButtonsActive: React.MutableRefObject<boolean>,
   ) {
     this.reactController = new ReactController(
       this.gameId,
@@ -298,85 +303,111 @@ class FgGameController {
     }
   };
 
-  handlePointerLeave = () => {
-    if (!this.pointerLeaveHideControlsTimeout.current) {
-      this.pointerLeaveHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.pointerLeaveHideControlsTimeout.current);
-        this.pointerLeaveHideControlsTimeout.current = undefined;
+  handlePointerLeave = (
+    type: "main" | "scale" | "pan" | "rotate" | "popup",
+    ref: React.RefObject<HTMLDivElement | HTMLElement | HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = false;
 
-        this.setHideControls(true);
+    ref.current?.removeEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
+    );
 
-        if (this.popupRefs) {
-          this.popupRefs.map((ref) => {
-            if (!ref.current?.classList.contains("hide-controls"))
-              ref.current?.classList.add("hide-controls");
-          });
-        }
-      }, 1250);
+    if (this.movementTimeout.current) {
+      clearTimeout(this.movementTimeout.current);
+      this.movementTimeout.current = undefined;
     }
-
-    if (this.pointerStillHideControlsTimeout.current) {
-      clearTimeout(this.pointerStillHideControlsTimeout.current);
-      this.pointerStillHideControlsTimeout.current = undefined;
-    }
-  };
-
-  handlePointerEnter = () => {
-    this.setHideControls(false);
-
-    if (this.popupRefs) {
-      this.popupRefs.map((ref) =>
-        ref.current?.classList.remove("hide-controls"),
-      );
-    }
-
-    if (this.pointerLeaveHideControlsTimeout.current) {
-      clearTimeout(this.pointerLeaveHideControlsTimeout.current);
-      this.pointerLeaveHideControlsTimeout.current = undefined;
-    }
-
-    if (this.gameStarted) {
-      this.pointerStillHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.pointerStillHideControlsTimeout.current);
-        this.pointerStillHideControlsTimeout.current = undefined;
-
-        this.setHideControls(true);
-
-        if (this.popupRefs) {
-          this.popupRefs.map((ref) => {
-            if (!ref.current?.classList.contains("hide-controls"))
-              ref.current?.classList.add("hide-controls");
-          });
-        }
-      }, 1250);
-    }
-  };
-
-  handlePointerMove = (event: React.PointerEvent) => {
-    this.setHideControls(false);
-    if (this.popupRefs) {
-      this.popupRefs.map((ref) =>
-        ref.current?.classList.remove("hide-controls"),
-      );
-    }
-
-    if (this.pointerStillHideControlsTimeout.current) {
-      clearTimeout(this.pointerStillHideControlsTimeout.current);
-      this.pointerStillHideControlsTimeout.current = undefined;
-    }
-
-    const target = event.target;
 
     if (
-      (this.gameStarted &&
-        target &&
-        this.gameRef.current?.contains(target as Node)) ||
-      (this.popupRefs &&
-        this.popupRefs.some((ref) => ref.current?.contains(target as Node)))
+      !Object.values(this.hoveringOver).some((val) => val) &&
+      !this.leaveTimer.current
     ) {
-      this.pointerStillHideControlsTimeout.current = setTimeout(() => {
-        clearTimeout(this.pointerStillHideControlsTimeout.current);
-        this.pointerStillHideControlsTimeout.current = undefined;
+      this.leaveTimer.current = setTimeout(() => {
+        clearTimeout(this.leaveTimer.current);
+        this.leaveTimer.current = undefined;
+
+        this.setHideControls(true);
+
+        if (this.popupRefs) {
+          this.popupRefs.map((ref) => {
+            if (!ref.current?.classList.contains("hide-controls"))
+              ref.current?.classList.add("hide-controls");
+          });
+        }
+      }, 1250);
+    }
+  };
+
+  handlePointerEnter = (
+    type: "main" | "scale" | "pan" | "rotate" | "popup",
+    ref: React.RefObject<HTMLDivElement | HTMLElement | HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = true;
+
+    this.setHideControls(false);
+
+    ref.current?.addEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
+    );
+
+    if (this.popupRefs) {
+      this.popupRefs.map((ref) =>
+        ref.current?.classList.remove("hide-controls"),
+      );
+    }
+
+    if (this.leaveTimer.current) {
+      clearTimeout(this.leaveTimer.current);
+      this.leaveTimer.current = undefined;
+    }
+  };
+
+  handlePointerMove = (
+    e: Event,
+    type: "main" | "scale" | "pan" | "rotate" | "popup",
+  ) => {
+    const event = e as PointerEvent;
+
+    this.setHideControls(false);
+
+    const container = this.gameRef.current;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const mouseX = event.clientX;
+      const rightEdge = rect.left + rect.width;
+      const right10Threshold = rightEdge - rect.width * 0.1;
+
+      const isInRight10Percent = mouseX >= right10Threshold;
+
+      if (isInRight10Percent && !this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = true;
+        this.setRerender((prev) => !prev);
+      } else if (!isInRight10Percent && this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = false;
+        this.setRerender((prev) => !prev);
+      }
+    }
+
+    if (this.popupRefs) {
+      this.popupRefs.map((ref) =>
+        ref.current?.classList.remove("hide-controls"),
+      );
+    }
+
+    if (this.movementTimeout.current) {
+      clearTimeout(this.movementTimeout.current);
+      this.movementTimeout.current = undefined;
+    }
+
+    if (
+      type === "main" &&
+      (Object.values(this.hoveringOver).filter((val) => val).length === 1 ||
+        this.gameStarted) &&
+      !this.movementTimeout.current
+    ) {
+      this.movementTimeout.current = setTimeout(() => {
+        clearTimeout(this.movementTimeout.current);
+        this.movementTimeout.current = undefined;
 
         this.setHideControls(true);
 

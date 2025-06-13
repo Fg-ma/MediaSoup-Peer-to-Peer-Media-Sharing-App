@@ -5,19 +5,23 @@ import ScaleButton from "../../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import { useSocketContext } from "../../../../context/socketContext/SocketContext";
 import { GameTypes } from "../../../../../../universal/contentTypeConstant";
+import FgGameController from "./FgGameController";
 
 export default function FgGameAdjustmentButtons({
+  fgGameController,
   gameId,
   gameType,
   sharedBundleRef,
-  panBtnRef,
   fgContentAdjustmentController,
   positioning,
+  rotationBtnRef,
+  panBtnRef,
+  scaleBtnRef,
 }: {
+  fgGameController: FgGameController;
   gameId: string;
   gameType: GameTypes;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
-  panBtnRef: React.RefObject<HTMLButtonElement>;
   fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>;
   positioning: React.MutableRefObject<{
     position: {
@@ -30,12 +34,16 @@ export default function FgGameAdjustmentButtons({
     };
     rotation: number;
   }>;
+  rotationBtnRef: React.RefObject<HTMLButtonElement>;
+  panBtnRef: React.RefObject<HTMLButtonElement>;
+  scaleBtnRef: React.RefObject<HTMLButtonElement>;
 }) {
   const { gamesSocket } = useSocketContext();
 
   return (
     <>
       <RotateButton
+        externalRef={rotationBtnRef}
         className="rotate-btn absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-14"
         dragFunction={(_displacement, event) => {
           if (!sharedBundleRef.current) {
@@ -66,6 +74,12 @@ export default function FgGameAdjustmentButtons({
             rotation: positioning.current.rotation,
           });
         }}
+        onPointerEnter={() =>
+          fgGameController.handlePointerEnter("rotate", rotationBtnRef)
+        }
+        onPointerLeave={() =>
+          fgGameController.handlePointerLeave("rotate", rotationBtnRef)
+        }
       />
       <PanButton
         externalRef={panBtnRef}
@@ -125,8 +139,15 @@ export default function FgGameAdjustmentButtons({
             position: positioning.current.position,
           });
         }}
+        onPointerEnter={() =>
+          fgGameController.handlePointerEnter("pan", panBtnRef)
+        }
+        onPointerLeave={() =>
+          fgGameController.handlePointerLeave("pan", panBtnRef)
+        }
       />
       <ScaleButton
+        externalRef={scaleBtnRef}
         className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-12 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!sharedBundleRef.current) {
@@ -160,6 +181,12 @@ export default function FgGameAdjustmentButtons({
             scale: positioning.current.scale,
           });
         }}
+        onPointerEnter={() =>
+          fgGameController.handlePointerEnter("scale", scaleBtnRef)
+        }
+        onPointerLeave={() =>
+          fgGameController.handlePointerLeave("scale", scaleBtnRef)
+        }
       />
     </>
   );

@@ -22,6 +22,7 @@ export default function VisualEffectsButton({
 }) {
   return (
     <FgButton
+      className="pointer-events-auto relative flex aspect-square h-full scale-x-[-1] items-center justify-center"
       clickFunction={() => {
         fgLowerVisualMediaController.current.handleVisualEffects();
       }}
@@ -47,7 +48,6 @@ export default function VisualEffectsButton({
         ) : undefined
       }
       scrollingContainerRef={scrollingContainerRef}
-      className="pointer-events-auto relative flex aspect-square h-10 scale-x-[-1] items-center justify-center"
     />
   );
 }

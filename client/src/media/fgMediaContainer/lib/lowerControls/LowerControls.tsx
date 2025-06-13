@@ -4,6 +4,7 @@ import FullScreenButton from "./lib/fullScreenButton/FullScreenButton";
 import LowerController from "./lib/LowerController";
 
 export default function LowerControls({
+  lowerControlsRef,
   lowerController,
   externalRightLowerControlsRef,
   leftLowerControls,
@@ -13,6 +14,7 @@ export default function LowerControls({
   fullscreen,
   backgroundMedia,
 }: {
+  lowerControlsRef: React.RefObject<HTMLDivElement>;
   lowerController: React.MutableRefObject<LowerController>;
   externalRightLowerControlsRef?: React.RefObject<HTMLDivElement>;
   leftLowerControls?: (React.ReactNode | null)[];
@@ -49,16 +51,17 @@ export default function LowerControls({
 
   return (
     <div
+      ref={lowerControlsRef}
       className={`media-lower-controls ${
         mediaContainerOptions.controlsPlacement === "inside" ||
         fullscreen ||
         backgroundMedia
           ? "bottom-0"
           : "top-full mt-1"
-      } pointer-events-none absolute z-20 h-[12%] max-h-12 min-h-6 w-full flex-col items-end justify-center`}
+      } !pointer-events-none absolute z-20 h-[12%] max-h-12 min-h-6 w-full flex-col items-end justify-center`}
     >
-      <div className="flex h-full w-full justify-between">
-        <div className="z-20 flex h-full w-max items-center space-x-2">
+      <div className="!pointer-events-none flex h-full w-full justify-between">
+        <div className="!pointer-events-none z-20 flex h-full w-max items-center space-x-2">
           {leftLowerControls &&
             leftLowerControls.length > 0 &&
             leftLowerControls.map((control, index) => (
@@ -67,7 +70,7 @@ export default function LowerControls({
         </div>
         <div
           ref={rightControlsRef}
-          className="hide-scroll-bar z-10 flex h-full w-max scale-x-[-1] items-center space-x-2 overflow-x-auto pr-2"
+          className="hide-scroll-bar !pointer-events-none z-10 flex h-full w-max scale-x-[-1] items-center space-x-2 overflow-x-auto pr-2"
         >
           <FullScreenButton
             lowerController={lowerController}

@@ -7,13 +7,17 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const rotateIcon = nginxAssetServerBaseUrl + "svgs/rotateIcon.svg";
 
 export default function RotateButton({
+  externalRef,
   className,
   style,
   dragFunction,
   bundleRef,
   pointerDownFunction,
   pointerUpFunction,
+  onPointerEnter,
+  onPointerLeave,
 }: {
+  externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
   style?: CSSProperties;
   dragFunction: (
@@ -26,9 +30,12 @@ export default function RotateButton({
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
   pointerUpFunction: () => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }) {
   return (
     <FgButton
+      externalRef={externalRef}
       className={className}
       style={style}
       startDragFunction={pointerDownFunction}
@@ -48,6 +55,8 @@ export default function RotateButton({
           />
         );
       }}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     />
   );
 }

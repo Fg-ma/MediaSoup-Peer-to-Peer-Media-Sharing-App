@@ -21,11 +21,13 @@ import DownloadRecordingButton from "./lib/lowerApplicationControls/downloadButt
 import "./lib/fgApplicationStyles.css";
 
 export default function FgTableApplication({
+  tableTopRef,
   applicationInstanceId,
   bundleRef,
   tableRef,
   options,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   applicationInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -171,6 +173,8 @@ export default function FgTableApplication({
 
   return (
     <FgMediaContainer
+      tableRef={tableRef}
+      tableTopRef={tableTopRef}
       filename={applicationMediaInstance.applicationMedia.filename}
       pauseDownload={
         applicationMediaInstance.applicationMedia.downloader?.pause

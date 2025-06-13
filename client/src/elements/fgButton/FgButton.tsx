@@ -61,6 +61,8 @@ export default function FgButton({
   clickFunction,
   pointerDownFunction,
   pointerUpFunction,
+  onPointerEnter,
+  onPointerLeave,
   holdFunction,
   contentFunction,
   doubleClickFunction,
@@ -90,6 +92,8 @@ export default function FgButton({
   clickFunction?: (event: React.MouseEvent) => void;
   pointerDownFunction?: (event: React.PointerEvent) => void;
   pointerUpFunction?: (event: PointerEvent) => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
   holdFunction?: (event: PointerEvent) => void;
   contentFunction?: () => React.ReactElement | undefined;
   doubleClickFunction?: (event: React.MouseEvent) => void;
@@ -267,7 +271,11 @@ export default function FgButton({
         style={style}
         onPointerDown={fgButtonController.current.handlePointerDown}
         onDoubleClick={fgButtonController.current.handleDoubleClick}
-        onPointerEnter={fgButtonController.current.handlePointerEnter}
+        onPointerEnter={() => {
+          fgButtonController.current.handlePointerEnter();
+          if (onPointerEnter) onPointerEnter();
+        }}
+        onPointerLeave={onPointerLeave}
         onFocus={focusFunction}
         onBlur={blurFunction}
         draggable={

@@ -19,15 +19,15 @@ import { useSocketContext } from "../../context/socketContext/SocketContext";
 import "./lib/fgTextStyles.css";
 
 export default function FgTableText({
+  tableTopRef,
   textInstanceId,
   bundleRef,
   tableRef,
-  tableTopRef,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   textInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
-  tableTopRef: React.RefObject<HTMLDivElement>;
 }) {
   const { staticContentEffectsStyles } = useEffectsContext();
   const { tableStaticContentSocket } = useSocketContext();
@@ -150,6 +150,8 @@ export default function FgTableText({
 
   return (
     <FgMediaContainer
+      tableRef={tableRef}
+      tableTopRef={tableTopRef}
       filename={textMediaInstance.textMedia.filename}
       pauseDownload={textMediaInstance.textMedia.liveTextDownloader?.pause}
       resumeDownload={textMediaInstance.textMedia.liveTextDownloader?.resume}
@@ -192,6 +194,7 @@ export default function FgTableText({
           <CornersDecorator className="z-[100] stroke-fg-red-light" width={4} />
         ) : null,
       ]}
+      hideSelectedIndicator={!textMediaInstance.isReadOnly}
       bundleRef={bundleRef}
       backgroundMedia={textMediaInstance.settings.background.value}
       className="text-container"

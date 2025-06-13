@@ -16,6 +16,7 @@ class BundlesController {
     private userMedia: React.MutableRefObject<UserMediaType>,
 
     private tableRef: React.RefObject<HTMLDivElement>,
+    private tableTopRef: React.RefObject<HTMLDivElement>,
 
     private isCamera: React.MutableRefObject<boolean>,
     private isScreen: React.MutableRefObject<boolean>,
@@ -96,6 +97,7 @@ class BundlesController {
           }}
           handleMuteCallback={this.muteAudio}
           tableRef={this.tableRef}
+          tableTopRef={this.tableTopRef}
         />
       );
 
@@ -198,6 +200,7 @@ class BundlesController {
           isAudio={this.isAudio}
           setAudioActive={this.setAudioActive}
           tableRef={this.tableRef}
+          tableTopRef={this.tableTopRef}
         />
       );
 

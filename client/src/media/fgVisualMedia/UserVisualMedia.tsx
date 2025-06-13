@@ -20,6 +20,7 @@ import {
 } from "./lib/typeConstant";
 import VisualMediaGradient from "./lib/VisualMediaGradient";
 import VisualEffectsSection from "./lib/visualEffectsSection/VisualEffectsSection";
+import FourCornersDecorator from "../../elements/decorators/FourCornersDecorator";
 import "./lib/fgVisualMediaStyles.css";
 
 const VisualMediaAdjustmentButtons = React.lazy(
@@ -27,6 +28,7 @@ const VisualMediaAdjustmentButtons = React.lazy(
 );
 
 export default function UserVisualMedia({
+  tableTopRef,
   tableId,
   visualMediaId,
   username,
@@ -48,7 +50,9 @@ export default function UserVisualMedia({
   handleVolumeSliderCallback,
   tracksColorSetterCallback,
   tableRef,
+  hideSelectedIndicator,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   visualMediaId: string;
   tableId: string;
   username: string;
@@ -93,6 +97,7 @@ export default function UserVisualMedia({
     producerId: string | undefined,
   ) => void;
   tableRef: React.RefObject<HTMLDivElement>;
+  hideSelectedIndicator?: boolean;
 }) {
   const fgVisualMediaOptions = {
     ...defaultFgVisualMediaOptions,
@@ -119,6 +124,10 @@ export default function UserVisualMedia({
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(document.createElement("video"));
   const panBtnRef = useRef<HTMLButtonElement>(null);
+  const rotationBtnRef = useRef<HTMLButtonElement>(null);
+  const scaleBtnRef = useRef<HTMLButtonElement>(null);
+  const lowerControlsRef = useRef<HTMLDivElement>(null);
+  const upperControlsRef = useRef<HTMLDivElement>(null);
 
   const [inVisualMedia, setInVisualMedia] = useState(false);
 
@@ -171,6 +180,10 @@ export default function UserVisualMedia({
   });
 
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
+
+  const [selected, setSelected] = useState(false);
+
+  const adjustmentButtonsActive = useRef(false);
 
   const handleVisualEffectChange = async (
     effect: CameraEffectTypes | ScreenEffectTypes | "clearAll",
@@ -305,6 +318,8 @@ export default function UserVisualMedia({
       sendGroupSignal,
       userDataStreams,
       setSettingsActive,
+      setReactionsPanelActive,
+      adjustmentButtonsActive,
     ),
   );
 
@@ -493,6 +508,31 @@ export default function UserVisualMedia({
     }
   }, [fgVisualMediaOptions.permissions]);
 
+  useEffect(() => {
+    if (!selected) return;
+
+    const handleTableClick = (e: MouseEvent) => {
+      if (
+        tableTopRef.current?.contains(e.target as Node) &&
+        !subContainerRef.current?.contains(e.target as Node) &&
+        !rotationBtnRef.current?.contains(e.target as Node) &&
+        !panBtnRef.current?.contains(e.target as Node) &&
+        !scaleBtnRef.current?.contains(e.target as Node) &&
+        !upperControlsRef.current?.contains(e.target as Node) &&
+        !lowerControlsRef.current?.contains(e.target as Node) &&
+        !visualMediaContainerRef.current?.contains(e.target as Node)
+      ) {
+        setSelected(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleTableClick);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleTableClick);
+    };
+  }, [selected]);
+
   return (
     <motion.div
       ref={visualMediaContainerRef}
@@ -501,7 +541,11 @@ export default function UserVisualMedia({
         fgVisualMediaOptions.autoPlay ? "" : "paused"
       } ${visualEffectsActive ? "in-effects" : ""} ${
         audioEffectsActive ? "in-effects" : ""
-      } ${inVisualMedia ? "in-visual-media" : ""} ${
+      } ${
+        inVisualMedia || selected || reactionsPanelActive
+          ? "in-visual-media"
+          : ""
+      } ${
         adjustingDimensions
           ? "adjusting-dimensions pointer-events-none"
           : "pointer-events-auto"
@@ -525,8 +569,18 @@ export default function UserVisualMedia({
               transformOrigin: "0% 0%",
             }
       }
-      onPointerEnter={fgVisualMediaController.current.handlePointerEnter}
-      onPointerLeave={fgVisualMediaController.current.handlePointerLeave}
+      onPointerEnter={() =>
+        fgVisualMediaController.current.handlePointerEnter(
+          "main",
+          visualMediaContainerRef,
+        )
+      }
+      onPointerLeave={() =>
+        fgVisualMediaController.current.handlePointerLeave(
+          "main",
+          visualMediaContainerRef,
+        )
+      }
       data-positioning={JSON.stringify(positioning.current)}
       variants={{
         init: {
@@ -555,114 +609,140 @@ export default function UserVisualMedia({
         scale: { duration: 0.001 },
       }}
     >
-      {fgVisualMediaOptions.permissions
-        .acceptsPositionScaleRotationManipulation && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <VisualMediaAdjustmentButtons
-            bundleRef={bundleRef}
-            panBtnRef={panBtnRef}
-            positioning={positioning}
-            fgContentAdjustmentController={fgContentAdjustmentController}
-            aspectRatio={aspectRatio}
-          />
-        </Suspense>
-      )}
-      {adjustingDimensions && (
+      {!visualMedia.settings.background.value && (
         <>
-          <div className="animated-border-box-glow"></div>
-          <div className="animated-border-box"></div>
+          {selected && !hideSelectedIndicator && (
+            <FourCornersDecorator
+              className="z-[100] stroke-fg-red-light"
+              width={4}
+            />
+          )}
+          {(selected || adjustmentButtonsActive.current) &&
+            fgVisualMediaOptions.permissions
+              .acceptsPositionScaleRotationManipulation && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <VisualMediaAdjustmentButtons
+                  fgVisualMediaController={fgVisualMediaController}
+                  bundleRef={bundleRef}
+                  positioning={positioning}
+                  fgContentAdjustmentController={fgContentAdjustmentController}
+                  aspectRatio={aspectRatio}
+                  rotationBtnRef={rotationBtnRef}
+                  panBtnRef={panBtnRef}
+                  scaleBtnRef={scaleBtnRef}
+                />
+              </Suspense>
+            )}
+          {adjustingDimensions && (
+            <>
+              <div className="animated-border-box-glow"></div>
+              <div className="animated-border-box"></div>
+            </>
+          )}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
+            <div
+              ref={frontEffectsContainerRef}
+              className="pointer-events-none relative z-[100] h-full w-full"
+            />
+          </div>
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
+            <div
+              ref={behindEffectsContainerRef}
+              className="pointer-events-none relative -z-[100] h-full w-full"
+            />
+          </div>
         </>
       )}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
-        <div
-          ref={frontEffectsContainerRef}
-          className="pointer-events-none relative z-[100] h-full w-full"
-        />
-      </div>
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full">
-        <div
-          ref={behindEffectsContainerRef}
-          className="pointer-events-none relative -z-[100] h-full w-full"
-        />
-      </div>
       <div
         ref={subContainerRef}
-        className="selectable relative flex h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
+        className="flex selectable relative h-full w-full items-center justify-center overflow-hidden rounded-md font-K2D text-fg-white"
         data-selectable-type={type}
         data-selectable-id={visualMediaId}
         data-selectable-isuser={true}
         data-selectable-username={username}
         data-selectable-instance={instance}
       >
-        <AnimatePresence>
-          {visualEffectsActive && (
-            <Suspense fallback={<div>Loading...</div>}>
-              <VisualEffectsSection
-                username={username}
-                instance={instance}
-                type={type}
-                visualMediaId={visualMediaId}
-                isUser={
-                  fgVisualMediaOptions.isUser ??
-                  defaultFgVisualMediaOptions.isUser
-                }
-                acceptsVisualEffects={
-                  type === "camera"
-                    ? (fgVisualMediaOptions.permissions?.acceptsCameraEffects ??
-                      defaultFgVisualMediaOptions.permissions
-                        .acceptsCameraEffects)
-                    : (fgVisualMediaOptions.permissions?.acceptsScreenEffects ??
-                      defaultFgVisualMediaOptions.permissions
-                        .acceptsScreenEffects)
-                }
-                handleVisualEffectChange={handleVisualEffectChange}
-                tintColor={tintColor}
-                visualMediaContainerRef={visualMediaContainerRef}
-              />
-            </Suspense>
-          )}
-        </AnimatePresence>
-        <FgUpperVisualMediaControls
-          name={name}
-          username={username}
-          fgVisualMediaOptions={fgVisualMediaOptions}
-          fgLowerVisualMediaController={fgLowerVisualMediaController}
-          reactionsPanelActive={reactionsPanelActive}
-          setReactionsPanelActive={setReactionsPanelActive}
-        />
-        <FgLowerVisualMediaControls
-          visualMedia={visualMedia}
-          tableId={tableId}
-          username={username}
-          instance={instance}
-          type={type}
-          visualMediaId={visualMediaId}
-          fgLowerVisualMediaController={fgLowerVisualMediaController}
-          pausedState={pausedState}
-          clientMute={clientMute}
-          screenAudioClientMute={screenAudioClientMute}
-          localMute={localMute}
-          screenAudioLocalMute={screenAudioLocalMute}
-          visualMediaContainerRef={visualMediaContainerRef}
-          audioStream={audioStream}
-          screenAudioStream={screenAudioStream}
-          audioRef={audioRef}
-          subContainerRef={subContainerRef}
-          currentTimeRef={currentTimeRef}
-          visualEffectsActive={visualEffectsActive}
-          audioEffectsActive={audioEffectsActive}
-          setAudioEffectsActive={setAudioEffectsActive}
-          fgVisualMediaOptions={fgVisualMediaOptions}
-          handleVisualEffectChange={handleVisualEffectChange}
-          handleAudioEffectChange={handleAudioEffectChange}
-          handleMuteCallback={handleMuteCallback}
-          handleVolumeSliderCallback={handleVolumeSliderCallback}
-          tracksColorSetterCallback={tracksColorSetterCallback}
-          settingsActive={settingsActive}
-          setSettingsActive={setSettingsActive}
-          setRerender={setRerender}
-        />
-        <VisualMediaGradient />
+        {!visualMedia.settings.background.value && (
+          <>
+            <AnimatePresence>
+              {visualEffectsActive && (
+                <Suspense fallback={<div>Loading...</div>}>
+                  <VisualEffectsSection
+                    username={username}
+                    instance={instance}
+                    type={type}
+                    visualMediaId={visualMediaId}
+                    isUser={
+                      fgVisualMediaOptions.isUser ??
+                      defaultFgVisualMediaOptions.isUser
+                    }
+                    acceptsVisualEffects={
+                      type === "camera"
+                        ? (fgVisualMediaOptions.permissions
+                            ?.acceptsCameraEffects ??
+                          defaultFgVisualMediaOptions.permissions
+                            .acceptsCameraEffects)
+                        : (fgVisualMediaOptions.permissions
+                            ?.acceptsScreenEffects ??
+                          defaultFgVisualMediaOptions.permissions
+                            .acceptsScreenEffects)
+                    }
+                    handleVisualEffectChange={handleVisualEffectChange}
+                    tintColor={tintColor}
+                    visualMediaContainerRef={visualMediaContainerRef}
+                  />
+                </Suspense>
+              )}
+            </AnimatePresence>
+            <FgUpperVisualMediaControls
+              name={name}
+              username={username}
+              fgVisualMediaOptions={fgVisualMediaOptions}
+              fgLowerVisualMediaController={fgLowerVisualMediaController}
+              reactionsPanelActive={reactionsPanelActive}
+              setReactionsPanelActive={setReactionsPanelActive}
+            />
+            <FgLowerVisualMediaControls
+              visualMedia={visualMedia}
+              tableId={tableId}
+              username={username}
+              instance={instance}
+              type={type}
+              visualMediaId={visualMediaId}
+              fgLowerVisualMediaController={fgLowerVisualMediaController}
+              pausedState={pausedState}
+              clientMute={clientMute}
+              screenAudioClientMute={screenAudioClientMute}
+              localMute={localMute}
+              screenAudioLocalMute={screenAudioLocalMute}
+              visualMediaContainerRef={visualMediaContainerRef}
+              audioStream={audioStream}
+              screenAudioStream={screenAudioStream}
+              audioRef={audioRef}
+              subContainerRef={subContainerRef}
+              currentTimeRef={currentTimeRef}
+              visualEffectsActive={visualEffectsActive}
+              audioEffectsActive={audioEffectsActive}
+              setAudioEffectsActive={setAudioEffectsActive}
+              fgVisualMediaOptions={fgVisualMediaOptions}
+              handleVisualEffectChange={handleVisualEffectChange}
+              handleAudioEffectChange={handleAudioEffectChange}
+              handleMuteCallback={handleMuteCallback}
+              handleVolumeSliderCallback={handleVolumeSliderCallback}
+              tracksColorSetterCallback={tracksColorSetterCallback}
+              settingsActive={settingsActive}
+              setSettingsActive={setSettingsActive}
+              setRerender={setRerender}
+            />
+            <VisualMediaGradient />
+            {!selected && (
+              <div
+                className="pointer-events-auto absolute inset-0 bg-opacity-15"
+                onClick={() => setSelected(true)}
+              ></div>
+            )}
+          </>
+        )}
       </div>
     </motion.div>
   );

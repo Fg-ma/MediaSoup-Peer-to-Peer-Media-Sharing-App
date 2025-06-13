@@ -149,7 +149,7 @@ class JoinTableSectionController {
 
       this.tableStaticContentSocket.current =
         new TableStaticContentSocketController(
-          "wss://localhost:8045",
+          "https://localhost:7889",
           this.tableId.current,
           this.username.current,
           this.instance.current,

@@ -22,11 +22,14 @@ import {
 import DownloadFailed from "../../elements/downloadFailed/DownloadFailed";
 import DownloadPaused from "../../elements/downloadPaused/DownloadPaused";
 import LoadingElement from "../../elements/loadingElement/LoadingElement";
+import FourCornersDecorator from "../../elements/decorators/FourCornersDecorator";
 import "./lib/mediaContainerStyles.css";
 
 const AdjustmentButtons = React.lazy(() => import("./lib/AdjustmentButtons"));
 
 export default function FgMediaContainer({
+  tableRef,
+  tableTopRef,
   filename,
   pauseDownload,
   resumeDownload,
@@ -44,6 +47,7 @@ export default function FgMediaContainer({
   backgroundMedia,
   media,
   floatingContent,
+  hideSelectedIndicator,
   className,
   popupElements,
   leftLowerControls,
@@ -58,6 +62,8 @@ export default function FgMediaContainer({
   externalRightLowerControlsRef,
   options,
 }: {
+  tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
   filename?: string;
   pauseDownload?: () => void;
   resumeDownload?: () => void;
@@ -93,6 +99,7 @@ export default function FgMediaContainer({
   backgroundMedia: boolean;
   media?: React.ReactNode;
   floatingContent?: React.ReactNode[];
+  hideSelectedIndicator?: boolean;
   className?: string;
   popupElements?: (React.ReactNode | null)[];
   leftLowerControls?: (React.ReactNode | null)[];
@@ -143,6 +150,10 @@ export default function FgMediaContainer({
   const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
+  const rotationBtnRef = useRef<HTMLButtonElement>(null);
+  const scaleBtnRef = useRef<HTMLButtonElement>(null);
+  const lowerControlsRef = useRef<HTMLDivElement>(null);
+  const upperControlsRef = useRef<HTMLDivElement>(null);
 
   const [inMedia, setInMedia] = useState(false);
   const [fullscreen, setFullScreen] = useState(false);
@@ -177,6 +188,10 @@ export default function FgMediaContainer({
     });
 
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
+
+  const [selected, setSelected] = useState(false);
+
+  const adjustmentButtonsActive = useRef(false);
 
   const fgContentAdjustmentController = useRef<FgContentAdjustmentController>(
     new FgContentAdjustmentController(
@@ -234,6 +249,8 @@ export default function FgMediaContainer({
       bundleRef,
       sendGroupSignal,
       userDataStreams,
+      adjustmentButtonsActive,
+      setReactionsPanelActive,
     ),
   );
 
@@ -279,6 +296,11 @@ export default function FgMediaContainer({
       lowerController.current.handleFullScreenChange,
     );
 
+    tableRef.current?.addEventListener(
+      "scroll",
+      mediaContainerController.current.handleTableScroll,
+    );
+
     return () => {
       Object.values(positioningListeners.current).forEach((userListners) =>
         Object.values(userListners).forEach((removeListener) =>
@@ -312,6 +334,10 @@ export default function FgMediaContainer({
         "fullscreenchange",
         lowerController.current.handleFullScreenChange,
       );
+      tableRef.current?.removeEventListener(
+        "scroll",
+        mediaContainerController.current.handleTableScroll,
+      );
     };
   }, []);
 
@@ -333,12 +359,40 @@ export default function FgMediaContainer({
     }
   }, [positioning.current]);
 
+  useEffect(() => {
+    if (!selected) return;
+
+    const handleTableClick = (e: MouseEvent) => {
+      if (
+        tableTopRef.current?.contains(e.target as Node) &&
+        !subContainerRef.current?.contains(e.target as Node) &&
+        !rotationBtnRef.current?.contains(e.target as Node) &&
+        !panBtnRef.current?.contains(e.target as Node) &&
+        !scaleBtnRef.current?.contains(e.target as Node) &&
+        !upperControlsRef.current?.contains(e.target as Node) &&
+        !lowerControlsRef.current?.contains(e.target as Node) &&
+        !mediaContainerRef.current?.contains(e.target as Node)
+      ) {
+        setSelected(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleTableClick);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleTableClick);
+    };
+  }, [selected]);
+
   return (
     <motion.div
       ref={mediaContainerRef}
       id={`${mediaInstanceId}_media_container`}
       className={`media-container ${
-        inMedia || reactionsPanelActive || inMediaVariables?.some(Boolean)
+        inMedia ||
+        selected ||
+        reactionsPanelActive ||
+        inMediaVariables?.some(Boolean)
           ? "in-media"
           : ""
       } ${
@@ -368,8 +422,18 @@ export default function FgMediaContainer({
               transformOrigin: "0% 0%",
             }
       }
-      onPointerEnter={mediaContainerController.current.handlePointerEnter}
-      onPointerLeave={mediaContainerController.current.handlePointerLeave}
+      onPointerEnter={() =>
+        mediaContainerController.current.handlePointerEnter(
+          "main",
+          mediaContainerRef,
+        )
+      }
+      onPointerLeave={() =>
+        mediaContainerController.current.handlePointerLeave(
+          "main",
+          mediaContainerRef,
+        )
+      }
       data-positioning={JSON.stringify(positioning.current)}
       variants={{
         init: {
@@ -400,18 +464,29 @@ export default function FgMediaContainer({
             floatingContent.map((item, index) => (
               <React.Fragment key={index}>{item}</React.Fragment>
             ))}
-          <AdjustmentButtons
-            kind={kind}
-            mediaIdRef={mediaIdRef}
-            mediaInstanceId={mediaInstanceId}
-            bundleRef={bundleRef}
-            panBtnRef={panBtnRef}
-            positioning={positioning}
-            fgContentAdjustmentController={fgContentAdjustmentController}
-            tableStaticContentSocket={tableStaticContentSocket}
-            aspectRatio={aspectRatio}
-            mediaContainerOptions={mediaContainerOptions}
-          />
+          {selected && !hideSelectedIndicator && (
+            <FourCornersDecorator
+              className="z-[100] stroke-fg-red-light"
+              width={4}
+            />
+          )}
+          {(selected || adjustmentButtonsActive.current) && (
+            <AdjustmentButtons
+              mediaContainerController={mediaContainerController}
+              kind={kind}
+              mediaIdRef={mediaIdRef}
+              mediaInstanceId={mediaInstanceId}
+              bundleRef={bundleRef}
+              positioning={positioning}
+              fgContentAdjustmentController={fgContentAdjustmentController}
+              tableStaticContentSocket={tableStaticContentSocket}
+              aspectRatio={aspectRatio}
+              mediaContainerOptions={mediaContainerOptions}
+              rotationBtnRef={rotationBtnRef}
+              panBtnRef={panBtnRef}
+              scaleBtnRef={scaleBtnRef}
+            />
+          )}
           {mediaContainerOptions.adjustmentAnimation && adjustingDimensions && (
             <>
               <div className="animated-border-box-glow"></div>
@@ -422,6 +497,7 @@ export default function FgMediaContainer({
             !fullscreen && (
               <>
                 <UpperControls
+                  upperControlsRef={upperControlsRef}
                   filename={filename}
                   reactionsPanelActive={reactionsPanelActive}
                   setReactionsPanelActive={setReactionsPanelActive}
@@ -434,6 +510,7 @@ export default function FgMediaContainer({
                   state={state}
                 />
                 <LowerControls
+                  lowerControlsRef={lowerControlsRef}
                   lowerController={lowerController}
                   externalRightLowerControlsRef={externalRightLowerControlsRef}
                   leftLowerControls={leftLowerControls}
@@ -497,18 +574,17 @@ export default function FgMediaContainer({
                 onClick={resumeDownload}
               />
             )}
-            <div className="media-lower-controls !pointer-events-none absolute left-0 top-0 h-full w-full">
-              {popupElements &&
-                popupElements.length > 0 &&
-                popupElements.map((element, index) => (
-                  <React.Fragment key={index}>{element}</React.Fragment>
-                ))}
-            </div>
+            {popupElements &&
+              popupElements.length > 0 &&
+              popupElements.map((element, index) => (
+                <React.Fragment key={index}>{element}</React.Fragment>
+              ))}
             {(mediaContainerOptions.controlsPlacement === "inside" ||
               fullscreen ||
               backgroundMedia) && (
               <>
                 <UpperControls
+                  upperControlsRef={upperControlsRef}
                   filename={filename}
                   reactionsPanelActive={reactionsPanelActive}
                   setReactionsPanelActive={setReactionsPanelActive}
@@ -521,6 +597,7 @@ export default function FgMediaContainer({
                   state={state}
                 />
                 <LowerControls
+                  lowerControlsRef={lowerControlsRef}
                   lowerController={lowerController}
                   externalRightLowerControlsRef={externalRightLowerControlsRef}
                   leftLowerControls={leftLowerControls}
@@ -533,6 +610,12 @@ export default function FgMediaContainer({
               </>
             )}
             {(mediaContainerOptions.gradient || fullscreen) && <Gradient />}
+            {!selected && (
+              <div
+                className="pointer-events-auto absolute inset-0 bg-opacity-15"
+                onClick={() => setSelected(true)}
+              ></div>
+            )}
           </>
         )}
       </div>

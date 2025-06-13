@@ -9,8 +9,8 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const tableTopReducedIcon =
   nginxAssetServerBaseUrl + "svgs/tableTopReducedIcon.svg";
-const tableTopReducedTippedIcon =
-  nginxAssetServerBaseUrl + "svgs/tableTopReducedTippedIcon.svg";
+const tableTopReducedShrunkIcon =
+  nginxAssetServerBaseUrl + "svgs/tableTopReducedShrunkIcon.svg";
 
 export default function TabledButton({
   state,
@@ -28,7 +28,7 @@ export default function TabledButton({
           <FgSVGElement
             src={
               state.current.includes("tabled")
-                ? tableTopReducedTippedIcon
+                ? tableTopReducedShrunkIcon
                 : tableTopReducedIcon
             }
             attributes={[

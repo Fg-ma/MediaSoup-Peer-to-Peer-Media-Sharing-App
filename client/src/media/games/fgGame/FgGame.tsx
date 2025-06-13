@@ -4,14 +4,15 @@ import { useMediaContext } from "../../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../../context/socketContext/SocketContext";
 import { useUserInfoContext } from "../../../context/userInfoContext/UserInfoContext";
 import { useSignalContext } from "../../../context/signalContext/SignalContext";
+import FourCornersDecorator from "../../../elements/decorators/FourCornersDecorator";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
 import FgGameController from "./lib/FgGameController";
 import FgGameAdjustmentButtons from "./lib/FgGameAdjustmentButtons";
 import ControlButtons from "./lib/ControlButtons";
-import PlayersSection from "./lib/playersSection/PlayersSection";
 import EndGameButton from "./lib/EndGameButton";
 import ReactButton from "../../../elements/reactButton/ReactButton";
 import { GameTypes } from "../../../../../universal/contentTypeConstant";
+import GameFunctions from "./lib/GameFunctions";
 import "./lib/fgGame.css";
 
 const GameTransition: Transition = {
@@ -58,7 +59,7 @@ export default function FgGame({
   gameStarted: boolean;
   sharedBundleRef: React.RefObject<HTMLDivElement>;
   content?: React.ReactNode;
-  gameFunctionsSection?: React.ReactNode;
+  gameFunctionsSection?: React.ReactNode[];
   players?: {
     user?: {
       primaryColor?: string;
@@ -119,19 +120,21 @@ export default function FgGame({
   const [reactionsPanelActive, setReactionsPanelActive] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
   const panBtnRef = useRef<HTMLButtonElement>(null);
+  const rotationBtnRef = useRef<HTMLButtonElement>(null);
+  const scaleBtnRef = useRef<HTMLButtonElement>(null);
   const isResizing = useRef(false);
   const resizingDirection = useRef<"se" | "sw" | "nw" | "ne" | undefined>(
     undefined,
   );
-  const pointerLeaveHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
-    undefined,
-  );
-  const pointerStillHideControlsTimeout = useRef<NodeJS.Timeout | undefined>(
-    undefined,
-  );
+  const leaveTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const movementTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const behindEffectsContainerRef = useRef<HTMLDivElement>(null);
   const frontEffectsContainerRef = useRef<HTMLDivElement>(null);
+
+  const [selected, setSelected] = useState(false);
+
+  const adjustmentButtonsActive = useRef(false);
 
   const fgContentAdjustmentController = useRef(
     new FgContentAdjustmentController(
@@ -148,8 +151,8 @@ export default function FgGame({
     hideControls,
     gameStarted,
     setHideControls,
-    pointerLeaveHideControlsTimeout,
-    pointerStillHideControlsTimeout,
+    leaveTimer,
+    movementTimeout,
     gameRef,
     closeGameFunction,
     startGameFunction,
@@ -166,6 +169,7 @@ export default function FgGame({
     behindEffectsContainerRef,
     frontEffectsContainerRef,
     tableSocket,
+    adjustmentButtonsActive,
   );
 
   useEffect(() => {
@@ -224,13 +228,11 @@ export default function FgGame({
           continue;
         }
 
-        ref.current.addEventListener(
-          "pointerenter",
-          fgGameController.handlePointerEnter,
+        ref.current.addEventListener("pointerenter", () =>
+          fgGameController.handlePointerEnter("popup", ref),
         );
-        ref.current.addEventListener(
-          "pointerleave",
-          fgGameController.handlePointerLeave,
+        ref.current.addEventListener("pointerleave", () =>
+          fgGameController.handlePointerLeave("popup", ref),
         );
       }
     }
@@ -242,13 +244,11 @@ export default function FgGame({
             continue;
           }
 
-          ref.current.removeEventListener(
-            "pointerenter",
-            fgGameController.handlePointerEnter,
+          ref.current.removeEventListener("pointerenter", () =>
+            fgGameController.handlePointerEnter("popup", ref),
           );
-          ref.current.removeEventListener(
-            "pointerleave",
-            fgGameController.handlePointerLeave,
+          ref.current.removeEventListener("pointerleave", () =>
+            fgGameController.handlePointerLeave("popup", ref),
           );
         }
       }
@@ -272,18 +272,45 @@ export default function FgGame({
     if (setPositioning) setPositioning(positioning.current);
   }, [positioning.current]);
 
+  useEffect(() => {
+    if (!selected) return;
+
+    const handleTableClick = (e: MouseEvent) => {
+      if (
+        tableTopRef.current?.contains(e.target as Node) &&
+        !rotationBtnRef.current?.contains(e.target as Node) &&
+        !panBtnRef.current?.contains(e.target as Node) &&
+        !scaleBtnRef.current?.contains(e.target as Node) &&
+        !gameRef.current?.contains(e.target as Node)
+      ) {
+        setSelected(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleTableClick);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleTableClick);
+    };
+  }, [selected]);
+
   return (
     <motion.div
       ref={gameRef}
-      onPointerEnter={fgGameController.handlePointerEnter}
-      onPointerLeave={fgGameController.handlePointerLeave}
-      onPointerMove={fgGameController.handlePointerMove}
+      onPointerEnter={() =>
+        fgGameController.handlePointerEnter("main", gameRef)
+      }
+      onPointerLeave={() =>
+        fgGameController.handlePointerLeave("main", gameRef)
+      }
       className={`fg-game ${
         hideControls && !reactionsPanelActive ? "z-[5] cursor-none" : "z-[49]"
       } ${
         (externalHideControls === undefined || externalHideControls) &&
         hideControls &&
-        !reactionsPanelActive
+        !reactionsPanelActive &&
+        !adjustingDimensions &&
+        (!selected || gameStarted)
           ? "hide-controls"
           : ""
       } pointer-events-auto absolute z-base-content rounded`}
@@ -319,11 +346,15 @@ export default function FgGame({
           className="pointer-events-none relative -z-[100] h-full w-full"
         />
       </div>
-      <div className="fg-game-left-controls-section absolute bottom-0 right-full flex h-full w-[15%] min-w-14 max-w-24 flex-col items-end justify-between">
-        <div className="z-20 h-max w-full">{gameFunctionsSection}</div>
-        <PlayersSection players={players} />
-      </div>
-      <div className="fg-game-top-controls-section hide-scroll-bar absolute bottom-full left-0 flex h-[15%] max-h-16 min-h-10 w-full items-center justify-between space-x-2 overflow-x-auto">
+      <GameFunctions
+        tableTopRef={tableTopRef}
+        gameFunctionsSection={gameFunctionsSection}
+        players={players}
+        positioning={positioning}
+      />
+      <div
+        className={`${(positioning.current.scale.x / 100) * (tableTopRef.current?.clientWidth ?? 1) <= 140 ? "justify-end" : "justify-between overflow-x-auto"} fg-game-top-controls-section hide-scroll-bar absolute bottom-full left-0 flex h-[15%] max-h-16 min-h-10 w-full items-center space-x-2`}
+      >
         <ControlButtons
           tableTopRef={tableTopRef}
           startGameFunction={startGameFunction}
@@ -336,27 +367,50 @@ export default function FgGame({
           }
           positioning={positioning}
         />
-        <div className="flex h-full w-max items-end justify-center">
-          <div className="aspect-square h-[75%] pb-1">
-            <ReactButton
-              reactionsPanelActive={reactionsPanelActive}
-              setReactionsPanelActive={setReactionsPanelActive}
-              clickFunction={() => setReactionsPanelActive((prev) => !prev)}
-              reactionFunction={fgGameController.reactController.handleReaction}
-            />
+        {(positioning.current.scale.x / 100) *
+          (tableTopRef.current?.clientWidth ?? 1) >
+          94 && (
+          <div className="flex h-full w-max items-end justify-center">
+            <div className="aspect-square h-[75%] pb-1">
+              <ReactButton
+                reactionsPanelActive={reactionsPanelActive}
+                setReactionsPanelActive={setReactionsPanelActive}
+                clickFunction={() => setReactionsPanelActive((prev) => !prev)}
+                reactionFunction={
+                  fgGameController.reactController.handleReaction
+                }
+              />
+            </div>
+            <EndGameButton closeGameFunction={closeGameFunction} />
           </div>
-          <EndGameButton closeGameFunction={closeGameFunction} />
-        </div>
+        )}
       </div>
       {content}
-      <FgGameAdjustmentButtons
-        gameId={gameId}
-        gameType={gameType}
-        sharedBundleRef={sharedBundleRef}
-        panBtnRef={panBtnRef}
-        fgContentAdjustmentController={fgContentAdjustmentController}
-        positioning={positioning}
-      />
+      {selected && !gameStarted && (
+        <FourCornersDecorator
+          className="!-left-1 !-top-1 z-[100] stroke-fg-red-light"
+          width={4}
+        />
+      )}
+      {(selected || adjustmentButtonsActive.current) && (
+        <FgGameAdjustmentButtons
+          fgGameController={fgGameController}
+          gameId={gameId}
+          gameType={gameType}
+          sharedBundleRef={sharedBundleRef}
+          fgContentAdjustmentController={fgContentAdjustmentController}
+          positioning={positioning}
+          rotationBtnRef={rotationBtnRef}
+          panBtnRef={panBtnRef}
+          scaleBtnRef={scaleBtnRef}
+        />
+      )}
+      {!selected && (
+        <div
+          className="pointer-events-auto absolute inset-0 bg-opacity-15"
+          onClick={() => setSelected(true)}
+        ></div>
+      )}
     </motion.div>
   );
 }

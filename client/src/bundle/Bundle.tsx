@@ -34,6 +34,7 @@ export default function Bundle({
   onRendered,
   onNewConsumerWasCreatedCallback,
   tableRef,
+  tableTopRef,
 }: {
   tableId: string;
   username: string;
@@ -54,6 +55,7 @@ export default function Bundle({
   onRendered?: () => void;
   onNewConsumerWasCreatedCallback?: () => void;
   tableRef: React.RefObject<HTMLDivElement>;
+  tableTopRef: React.RefObject<HTMLDivElement>;
 }) {
   const bundleOptions = {
     ...defaultBundleOptions,
@@ -205,6 +207,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 visualMediaId={key}
+                tableTopRef={tableTopRef}
                 tableId={tableId}
                 username={username}
                 instance={instance}
@@ -250,6 +253,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 visualMediaId={key}
+                tableTopRef={tableTopRef}
                 tableId={tableId}
                 username={username}
                 instance={instance}
@@ -303,6 +307,7 @@ export default function Bundle({
             {bundleOptions.isUser ? (
               <UserVisualMedia
                 visualMediaId={key}
+                tableTopRef={tableTopRef}
                 tableId={tableId}
                 username={username}
                 instance={instance}
@@ -356,6 +361,7 @@ export default function Bundle({
             ) : (
               <RemoteVisualMedia
                 visualMediaId={key}
+                tableTopRef={tableTopRef}
                 tableId={tableId}
                 username={username}
                 instance={instance}

@@ -726,35 +726,6 @@ class Posts {
             state,
           },
         });
-
-        // Process video into DASH format in the background
-        // try {
-        //   // await processVideoWithABR(saveTo, processedDir, filename);
-
-        //   // Notify clients to switch to the DASH stream
-        //   const dashVideoUrl = `https://localhost:8045/processed/${filename.slice(
-        //     0,
-        //     -4
-        //   )}.mpd`;
-
-        //   tableContentController.setContent(tableId, "video", contentId, [
-        //     { property: "dashURL", value: dashVideoUrl },
-        //   ]);
-
-        //   const dashVideoMessage = {
-        //     type: "dashVideoReady",
-        //     header: {
-        //       videoId: contentId,
-        //     },
-        //     data: {
-        //       filename,
-        //       url: dashVideoUrl,
-        //     },
-        //   };
-        //   broadcaster.broadcastToTable(tableId, dashVideoMessage);
-        // } catch (error) {
-        //   console.error("Error during video processing:", error);
-        // }
         break;
       case "image":
         await this.handleMongoImageUploads(

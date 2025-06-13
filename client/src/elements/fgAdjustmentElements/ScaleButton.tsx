@@ -7,22 +7,29 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const scaleIcon = nginxAssetServerBaseUrl + "svgs/scaleIcon.svg";
 
 export default function ScaleButton({
+  externalRef,
   className,
   style,
   dragFunction,
   bundleRef,
   pointerDownFunction,
   pointerUpFunction,
+  onPointerEnter,
+  onPointerLeave,
 }: {
+  externalRef?: React.RefObject<HTMLButtonElement>;
   className?: string;
   style?: CSSProperties;
   dragFunction: (displacement: { x: number; y: number }) => void;
   bundleRef: React.RefObject<HTMLDivElement>;
   pointerDownFunction: () => void;
   pointerUpFunction: () => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }) {
   return (
     <FgButton
+      externalRef={externalRef}
       className={className}
       style={style}
       startDragFunction={pointerDownFunction}
@@ -42,6 +49,8 @@ export default function ScaleButton({
           />
         );
       }}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     />
   );
 }

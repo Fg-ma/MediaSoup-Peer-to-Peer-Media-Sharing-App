@@ -28,12 +28,14 @@ const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 const playIcon = nginxAssetServerBaseUrl + "svgs/playIcon.svg";
 
 export default function FgTableVideo({
+  tableTopRef,
   videoInstanceId,
   bundleRef,
   tableRef,
   videoContentMute,
   options,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   videoInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -180,7 +182,7 @@ export default function FgTableVideo({
         "keydown",
         lowerVideoController.current.handleKeyDown,
       );
-      tableRef.current?.addEventListener(
+      tableRef.current?.removeEventListener(
         "scroll",
         videoController.current.handleTableScroll,
       );
@@ -282,6 +284,8 @@ export default function FgTableVideo({
 
   return (
     <FgMediaContainer
+      tableRef={tableRef}
+      tableTopRef={tableTopRef}
       filename={videoMediaInstance.current.videoMedia.filename}
       downloadingState={videoMediaInstance.current.videoMedia.loadingState}
       addDownloadListener={
@@ -333,7 +337,7 @@ export default function FgTableVideo({
             ]
           : [
               <div
-                className="pointer-events-auto absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-20"
+                className="flex pointer-events-auto absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-20"
                 onClick={lowerVideoController.current.handlePausePlay}
               >
                 <FgSVGElement

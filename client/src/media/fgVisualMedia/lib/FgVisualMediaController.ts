@@ -48,6 +48,13 @@ class FgVisualMediaController {
   groupStartDragPosition: { x: number; y: number } | undefined;
   savedMediaPosition: { top: number; left: number } | undefined;
 
+  hoveringOver = {
+    main: false,
+    pan: false,
+    scale: false,
+    rotate: false,
+  };
+
   constructor(
     private visualMedia: CameraMedia | ScreenMedia | RemoteVisualMedia,
     private tableId: string,
@@ -104,6 +111,10 @@ class FgVisualMediaController {
     private sendGroupSignal: (signal: GroupSignals) => void,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
     private setSettingsActive: React.Dispatch<React.SetStateAction<boolean>>,
+    private setReactionsPanelActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
+    private adjustmentButtonsActive: React.MutableRefObject<boolean>,
   ) {}
 
   init = () => {
@@ -382,25 +393,60 @@ class FgVisualMediaController {
     }
   };
 
-  handlePointerMove = () => {
+  handlePointerMove = (e: Event, type: "main" | "scale" | "pan" | "rotate") => {
+    const event = e as PointerEvent;
+
     this.setInVisualMedia(true);
 
-    if (this.visualMediaContainerRef.current) {
+    const container = this.visualMediaContainerRef.current;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const mouseX = event.clientX;
+      const rightEdge = rect.left + rect.width;
+      const right10Threshold = rightEdge - rect.width * 0.1;
+
+      const isInRight10Percent = mouseX >= right10Threshold;
+
+      if (isInRight10Percent && !this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = true;
+        this.setRerender((prev) => !prev);
+      } else if (!isInRight10Percent && this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = false;
+        this.setRerender((prev) => !prev);
+      }
+    }
+
+    if (this.visualMediaMovementTimeout.current) {
       clearTimeout(this.visualMediaMovementTimeout.current);
       this.visualMediaMovementTimeout.current = undefined;
     }
 
-    this.visualMediaMovementTimeout.current = setTimeout(() => {
-      this.setInVisualMedia(false);
-    }, 3500);
+    if (
+      type === "main" &&
+      Object.values(this.hoveringOver).filter((val) => val).length === 1 &&
+      !this.visualMediaMovementTimeout.current
+    ) {
+      this.visualMediaMovementTimeout.current = setTimeout(() => {
+        this.setInVisualMedia(false);
+
+        if (this.visualMediaMovementTimeout.current) {
+          clearTimeout(this.visualMediaMovementTimeout.current);
+          this.visualMediaMovementTimeout.current = undefined;
+        }
+      }, 3500);
+    }
   };
 
-  handlePointerEnter = () => {
+  handlePointerEnter = (
+    type: "main" | "scale" | "pan" | "rotate",
+    ref: React.RefObject<HTMLDivElement> | React.RefObject<HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = true;
+
     this.setInVisualMedia(true);
 
-    this.visualMediaContainerRef.current?.addEventListener(
-      "pointermove",
-      this.handlePointerMove,
+    ref.current?.addEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
     );
 
     if (this.leaveVisualMediaTimer.current) {
@@ -409,22 +455,34 @@ class FgVisualMediaController {
     }
   };
 
-  handlePointerLeave = () => {
-    this.visualMediaContainerRef.current?.removeEventListener(
-      "pointermove",
-      this.handlePointerMove,
+  handlePointerLeave = (
+    type: "main" | "scale" | "pan" | "rotate",
+    ref: React.RefObject<HTMLDivElement> | React.RefObject<HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = false;
+
+    ref.current?.removeEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
     );
 
-    if (this.visualMediaContainerRef.current) {
+    if (this.visualMediaMovementTimeout.current) {
       clearTimeout(this.visualMediaMovementTimeout.current);
       this.visualMediaMovementTimeout.current = undefined;
     }
 
-    this.leaveVisualMediaTimer.current = setTimeout(() => {
-      this.setInVisualMedia(false);
-      clearTimeout(this.leaveVisualMediaTimer.current);
-      this.leaveVisualMediaTimer.current = undefined;
-    }, this.fgVisualMediaOptions.controlsVanishTime);
+    if (
+      !Object.values(this.hoveringOver).some((val) => val) &&
+      !this.leaveVisualMediaTimer.current
+    ) {
+      this.leaveVisualMediaTimer.current = setTimeout(() => {
+        this.setInVisualMedia(false);
+
+        if (this.leaveVisualMediaTimer.current) {
+          clearTimeout(this.leaveVisualMediaTimer.current);
+          this.leaveVisualMediaTimer.current = undefined;
+        }
+      }, this.fgVisualMediaOptions.controlsVanishTime);
+    }
   };
 
   attachPositioningListeners = (permissions?: Permissions) => {
@@ -766,6 +824,7 @@ class FgVisualMediaController {
 
   handleTableScroll = () => {
     this.setSettingsActive(false);
+    this.setReactionsPanelActive(false);
   };
 }
 

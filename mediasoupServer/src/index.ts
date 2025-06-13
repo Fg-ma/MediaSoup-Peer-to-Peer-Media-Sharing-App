@@ -34,6 +34,9 @@ export const metadataController = new MetadataController(broadcaster);
 const sslOptions = {
   key_file_name: "../certs/tabletop-mediasoup-server-key.pem",
   cert_file_name: "../certs/tabletop-mediasoup-server.pem",
+  dh_params_file_name: "../certs/tabletop-mediasoup-server-dhparam.pem",
+  ssl_prefer_server_ciphers: true,
+  ssl_options: ["NO_SSLv3", "NO_TLSv1", "NO_TLSv1_1"],
 };
 
 const main = async () => {

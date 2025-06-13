@@ -3,16 +3,20 @@ import PanButton from "../../../elements/fgAdjustmentElements/PanButton";
 import RotateButton from "../../../elements/fgAdjustmentElements/RotateButton";
 import ScaleButton from "../../../elements/fgAdjustmentElements/ScaleButton";
 import FgContentAdjustmentController from "../../../elements/fgAdjustmentElements/lib/FgContentAdjustmentControls";
+import FgVisualMediaController from "./FgVisualMediaController";
 
 export default function VisualMediaAdjustmentButtons({
+  fgVisualMediaController,
   bundleRef,
-  panBtnRef,
   positioning,
   fgContentAdjustmentController,
   aspectRatio,
+  rotationBtnRef,
+  panBtnRef,
+  scaleBtnRef,
 }: {
+  fgVisualMediaController: React.MutableRefObject<FgVisualMediaController>;
   bundleRef: React.RefObject<HTMLDivElement>;
-  panBtnRef: React.RefObject<HTMLButtonElement>;
   positioning: React.MutableRefObject<{
     position: {
       left: number;
@@ -26,10 +30,14 @@ export default function VisualMediaAdjustmentButtons({
   }>;
   fgContentAdjustmentController: React.MutableRefObject<FgContentAdjustmentController | null>;
   aspectRatio: React.MutableRefObject<number>;
+  rotationBtnRef: React.RefObject<HTMLButtonElement>;
+  panBtnRef: React.RefObject<HTMLButtonElement>;
+  scaleBtnRef: React.RefObject<HTMLButtonElement>;
 }) {
   return (
     <>
       <RotateButton
+        externalRef={rotationBtnRef}
         className="rotate-btn pointer-events-auto absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
@@ -55,6 +63,18 @@ export default function VisualMediaAdjustmentButtons({
         }
         pointerUpFunction={() =>
           fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
+        }
+        onPointerEnter={() =>
+          fgVisualMediaController.current.handlePointerEnter(
+            "rotate",
+            rotationBtnRef,
+          )
+        }
+        onPointerLeave={() =>
+          fgVisualMediaController.current.handlePointerLeave(
+            "rotate",
+            rotationBtnRef,
+          )
         }
       />
       <PanButton
@@ -111,8 +131,15 @@ export default function VisualMediaAdjustmentButtons({
         pointerUpFunction={() =>
           fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
         }
+        onPointerEnter={() =>
+          fgVisualMediaController.current.handlePointerEnter("pan", panBtnRef)
+        }
+        onPointerLeave={() =>
+          fgVisualMediaController.current.handlePointerLeave("pan", panBtnRef)
+        }
       />
       <ScaleButton
+        externalRef={scaleBtnRef}
         className="scale-btn pointer-events-auto absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -142,6 +169,18 @@ export default function VisualMediaAdjustmentButtons({
         }
         pointerUpFunction={() =>
           fgContentAdjustmentController.current?.adjustmentBtnPointerUpFunction()
+        }
+        onPointerEnter={() =>
+          fgVisualMediaController.current.handlePointerEnter(
+            "scale",
+            scaleBtnRef,
+          )
+        }
+        onPointerLeave={() =>
+          fgVisualMediaController.current.handlePointerLeave(
+            "scale",
+            scaleBtnRef,
+          )
         }
       />
     </>

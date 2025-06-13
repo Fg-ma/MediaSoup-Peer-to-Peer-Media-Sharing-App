@@ -27,6 +27,9 @@ export const liveTextEditingController = new LiveTextEditingController(
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-server-key.pem",
   cert_file_name: "../certs/tabletop-table-server.pem",
+  dh_params_file_name: "../certs/tabletop-table-server-dhparam.pem",
+  ssl_prefer_server_ciphers: true,
+  ssl_options: ["NO_SSLv3", "NO_TLSv1", "NO_TLSv1_1"],
 };
 
 export const DEAD_TEXT_TTL = 60 * 5;

@@ -285,6 +285,7 @@ export default function Main() {
       instance,
       userMedia,
       tableRef,
+      tableTopRef,
       isCamera,
       isScreen,
       isAudio,

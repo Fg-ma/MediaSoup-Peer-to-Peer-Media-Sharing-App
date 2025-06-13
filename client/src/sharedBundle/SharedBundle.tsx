@@ -105,6 +105,7 @@ export default function SharedBundle({
           (videoInstanceId) => (
             <Suspense key={videoInstanceId} fallback={<div>Loading...</div>}>
               <FgTableVideo
+                tableTopRef={tableTopRef}
                 videoInstanceId={videoInstanceId}
                 bundleRef={sharedBundleRef}
                 tableRef={tableRef}
@@ -119,6 +120,7 @@ export default function SharedBundle({
           (imageInstanceId) => (
             <Suspense key={imageInstanceId} fallback={<div>Loading...</div>}>
               <FgTableImage
+                tableTopRef={tableTopRef}
                 imageInstanceId={imageInstanceId}
                 bundleRef={sharedBundleRef}
                 tableRef={tableRef}
@@ -132,6 +134,7 @@ export default function SharedBundle({
           (svgInstanceId) => (
             <Suspense key={svgInstanceId} fallback={<div>Loading...</div>}>
               <FgTableSvg
+                tableTopRef={tableTopRef}
                 svgInstanceId={svgInstanceId}
                 bundleRef={sharedBundleRef}
                 tableRef={tableRef}
@@ -148,6 +151,7 @@ export default function SharedBundle({
               fallback={<div>Loading...</div>}
             >
               <FgTableApplication
+                tableTopRef={tableTopRef}
                 applicationInstanceId={applicationInstanceId}
                 bundleRef={sharedBundleRef}
                 tableRef={tableRef}

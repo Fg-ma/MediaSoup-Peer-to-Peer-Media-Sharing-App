@@ -28,6 +28,13 @@ class MediaContainerController {
   groupStartDragPosition: { x: number; y: number } | undefined;
   savedMediaPosition: { top: number; left: number } | undefined;
 
+  hoveringOver = {
+    main: false,
+    pan: false,
+    scale: false,
+    rotate: false,
+  };
+
   constructor(
     private tableId: React.MutableRefObject<string>,
     private mediaIdRef: React.MutableRefObject<string>,
@@ -79,27 +86,66 @@ class MediaContainerController {
     private bundleRef: React.RefObject<HTMLDivElement>,
     private sendGroupSignal: (signal: GroupSignals) => void,
     private userDataStreams: React.MutableRefObject<UserDataStreamsType>,
+    private adjustmentButtonsActive: React.MutableRefObject<boolean>,
+    private setReactionsPanelActive: React.Dispatch<
+      React.SetStateAction<boolean>
+    >,
   ) {}
 
-  handlePointerMove = () => {
+  handlePointerMove = (e: Event, type: "main" | "scale" | "pan" | "rotate") => {
+    const event = e as PointerEvent;
+
     this.setInMedia(true);
 
-    if (this.mediaContainerRef.current) {
+    const container = this.mediaContainerRef.current;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const mouseX = event.clientX;
+      const rightEdge = rect.left + rect.width;
+      const right10Threshold = rightEdge - rect.width * 0.1;
+
+      const isInRight10Percent = mouseX >= right10Threshold;
+
+      if (isInRight10Percent && !this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = true;
+        this.setRerender((prev) => !prev);
+      } else if (!isInRight10Percent && this.adjustmentButtonsActive.current) {
+        this.adjustmentButtonsActive.current = false;
+        this.setRerender((prev) => !prev);
+      }
+    }
+
+    if (this.movementTimeout.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }
 
-    this.movementTimeout.current = setTimeout(() => {
-      this.setInMedia(false);
-    }, 3500);
+    if (
+      type === "main" &&
+      Object.values(this.hoveringOver).filter((val) => val).length === 1 &&
+      !this.movementTimeout.current
+    ) {
+      this.movementTimeout.current = setTimeout(() => {
+        this.setInMedia(false);
+
+        if (this.movementTimeout.current) {
+          clearTimeout(this.movementTimeout.current);
+          this.movementTimeout.current = undefined;
+        }
+      }, 3500);
+    }
   };
 
-  handlePointerEnter = () => {
+  handlePointerEnter = (
+    type: "main" | "scale" | "pan" | "rotate",
+    ref: React.RefObject<HTMLDivElement> | React.RefObject<HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = true;
+
     this.setInMedia(true);
 
-    this.mediaContainerRef.current?.addEventListener(
-      "pointermove",
-      this.handlePointerMove,
+    ref.current?.addEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
     );
 
     if (this.leaveTimer.current) {
@@ -108,22 +154,38 @@ class MediaContainerController {
     }
   };
 
-  handlePointerLeave = () => {
-    this.mediaContainerRef.current?.removeEventListener(
-      "pointermove",
-      this.handlePointerMove,
+  handlePointerLeave = (
+    type: "main" | "scale" | "pan" | "rotate",
+    ref: React.RefObject<HTMLDivElement> | React.RefObject<HTMLButtonElement>,
+  ) => {
+    this.hoveringOver[type] = false;
+
+    ref.current?.removeEventListener("pointermove", (e) =>
+      this.handlePointerMove(e, type),
     );
 
-    if (this.mediaContainerRef.current) {
+    if (this.movementTimeout.current) {
       clearTimeout(this.movementTimeout.current);
       this.movementTimeout.current = undefined;
     }
 
-    this.leaveTimer.current = setTimeout(() => {
-      this.setInMedia(false);
-      clearTimeout(this.leaveTimer.current);
-      this.leaveTimer.current = undefined;
-    }, this.mediaContainerOptions.controlsVanishTime);
+    if (
+      !Object.values(this.hoveringOver).some((val) => val) &&
+      !this.leaveTimer.current
+    ) {
+      this.leaveTimer.current = setTimeout(() => {
+        this.setInMedia(false);
+
+        if (this.leaveTimer.current) {
+          clearTimeout(this.leaveTimer.current);
+          this.leaveTimer.current = undefined;
+        }
+      }, this.mediaContainerOptions.controlsVanishTime);
+    }
+  };
+
+  handleTableScroll = () => {
+    this.setReactionsPanelActive(false);
   };
 
   downloadListener = (

@@ -31,7 +31,7 @@ export const metadataController = new MetadataController(broadcaster);
 export const gets = new Gets(broadcaster);
 export const cleanup = new Cleanup(broadcaster);
 
-const SOCKET_MAX_PAYLOAD = 16 * 1024 * 1024;
+const SOCKET_MAX_PAYLOAD = 10 * 1024 * 1024;
 export const CEPH_CHUNK_MAX_SIZE = 1024 * 1024 * 10;
 export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
 
@@ -69,6 +69,10 @@ export const CEPH_MAX_SIZE = 1024 * 1024 * 1024;
 const sslOptions = {
   key_file_name: "../certs/tabletop-table-static-content-server-key.pem",
   cert_file_name: "../certs/tabletop-table-static-content-server.pem",
+  dh_params_file_name:
+    "../certs/tabletop-table-static-content-server-dhparam.pem",
+  ssl_prefer_server_ciphers: true,
+  ssl_options: ["NO_SSLv3", "NO_TLSv1", "NO_TLSv1_1"],
 };
 
 const app = uWS.SSLApp(sslOptions);
@@ -77,6 +81,7 @@ app
   .ws("/*", {
     compression: uWS.SHARED_COMPRESSOR,
     maxPayloadLength: SOCKET_MAX_PAYLOAD,
+    maxBackpressure: 1e6,
     idleTimeout: 60,
     message: (ws, message) => {
       const tableWS = ws as TableStaticContentWebSocket;

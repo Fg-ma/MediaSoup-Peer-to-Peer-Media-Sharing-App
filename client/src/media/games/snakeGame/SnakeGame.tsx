@@ -127,14 +127,14 @@ function SnakeGame({
         content={
           <div
             ref={boardRef}
-            className="flex selectable snake-game-board relative aspect-square w-full flex-col overflow-hidden rounded"
+            className="selectable snake-game-board relative flex aspect-square w-full flex-col overflow-hidden rounded"
             data-selectable-type="game"
             data-selectable-id={snakeGameId}
           >
             {snakeGameController.renderBoard()}
             {gameOver && (
               <div
-                className="flex absolute left-0 top-0 h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
+                className="absolute left-0 top-0 flex h-full w-full cursor-pointer items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
                 <div
@@ -145,106 +145,103 @@ function SnakeGame({
             )}
             {!started && !gameOver && (
               <div
-                className="flex absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
+                className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-30"
                 onClick={snakeGameController.startGameClick}
               >
-                <div className="flex h-3/5 w-4/5 select-none items-center justify-center rounded-lg bg-fg-white-95 text-center font-K2D text-2xl">
-                  Press any key to start
+                <div className="flex h-3/5 w-4/5 select-none items-center justify-center overflow-hidden rounded-lg bg-fg-white-95 text-center font-K2D text-2xl">
+                  <p className="line-clamp-2 px-2">Press any key to start</p>
                 </div>
               </div>
             )}
           </div>
         }
-        gameFunctionsSection={
-          <div
-            className={`flex h-max w-full flex-col items-center justify-center space-y-2 px-2`}
-          >
-            {playersState.current[username.current] &&
-              playersState.current[username.current][instance.current] && (
-                <>
-                  <FgButton
-                    className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-fg-white"
-                    clickFunction={() =>
-                      setSnakeColorPanelActive((prev) => !prev)
-                    }
-                    contentFunction={() => {
-                      const { primary, secondary } =
-                        playersState.current[username.current][instance.current]
-                          .snakeColor;
+        gameFunctionsSection={[
+          ...(playersState.current[username.current] &&
+          playersState.current[username.current][instance.current]
+            ? [
+                <FgButton
+                  key="snakeColor"
+                  className="aspect-square w-full overflow-hidden rounded-xl border-2 border-gray-300 bg-fg-white"
+                  clickFunction={() =>
+                    setSnakeColorPanelActive((prev) => !prev)
+                  }
+                  contentFunction={() => {
+                    const { primary, secondary } =
+                      playersState.current[username.current][instance.current]
+                        .snakeColor;
 
-                      return (
-                        <FgImageElement
-                          // @ts-expect-error: can't correlate primary with secondary color
-                          src={snakeColorIconMap[primary][secondary]}
-                          style={{ width: "100%", height: "100%" }}
-                          alt={`Snake color option: ${primary} ${secondary}`}
-                        />
-                      );
-                    }}
-                  />
-                  <FgButton
-                    externalRef={snakeColorPickerButtonRef}
-                    className="aspect-square w-full"
-                    clickFunction={() =>
-                      setSnakeColorPanelActive((prev) => !prev)
-                    }
-                    contentFunction={() => (
+                    return (
+                      <FgImageElement
+                        // @ts-expect-error: can't correlate primary with secondary color
+                        src={snakeColorIconMap[primary][secondary]}
+                        style={{ width: "100%", height: "100%" }}
+                        alt={`Snake color option: ${primary} ${secondary}`}
+                      />
+                    );
+                  }}
+                />,
+                <FgButton
+                  key="snakeColorPicker"
+                  externalRef={snakeColorPickerButtonRef}
+                  className="aspect-square w-full"
+                  clickFunction={() =>
+                    setSnakeColorPanelActive((prev) => !prev)
+                  }
+                  contentFunction={() => (
+                    <FgSVGElement
+                      src={snakeColorChangeIcon}
+                      attributes={[
+                        { key: "width", value: "100%" },
+                        { key: "height", value: "100%" },
+                        { key: "fill", value: "#f2f2f2" },
+                        { key: "stroke", value: "#f2f2f2" },
+                        ...(snakeColorPanelActive
+                          ? [
+                              {
+                                key: "stroke",
+                                value: "#3cf599",
+                                id: "circle1",
+                              },
+                              {
+                                key: "stroke",
+                                value: "#3991ff",
+                                id: "circle2",
+                              },
+                              {
+                                key: "stroke",
+                                value: "#fd473c",
+                                id: "circle3",
+                              },
+                            ]
+                          : []),
+                      ]}
+                    />
+                  )}
+                />,
+                <FgButton
+                  key="snakeGridSize"
+                  externalRef={snakeGridSizeButtonRef}
+                  className="aspect-square w-full"
+                  clickFunction={() => setGridSizePanelActive((prev) => !prev)}
+                  contentFunction={() => {
+                    const src = gridSizePanelActive ? gridOffIcon : gridIcon;
+
+                    return (
                       <FgSVGElement
-                        src={snakeColorChangeIcon}
+                        src={src}
                         attributes={[
                           { key: "width", value: "100%" },
                           { key: "height", value: "100%" },
                           { key: "fill", value: "#f2f2f2" },
                           { key: "stroke", value: "#f2f2f2" },
-                          ...(snakeColorPanelActive
-                            ? [
-                                {
-                                  key: "stroke",
-                                  value: "#3cf599",
-                                  id: "circle1",
-                                },
-                                {
-                                  key: "stroke",
-                                  value: "#3991ff",
-                                  id: "circle2",
-                                },
-                                {
-                                  key: "stroke",
-                                  value: "#fd473c",
-                                  id: "circle3",
-                                },
-                              ]
-                            : []),
                         ]}
                       />
-                    )}
-                  />
-                  <FgButton
-                    externalRef={snakeGridSizeButtonRef}
-                    className="aspect-square w-full"
-                    clickFunction={() =>
-                      setGridSizePanelActive((prev) => !prev)
-                    }
-                    contentFunction={() => {
-                      const src = gridSizePanelActive ? gridOffIcon : gridIcon;
-
-                      return (
-                        <FgSVGElement
-                          src={src}
-                          attributes={[
-                            { key: "width", value: "100%" },
-                            { key: "height", value: "100%" },
-                            { key: "fill", value: "#f2f2f2" },
-                            { key: "stroke", value: "#f2f2f2" },
-                          ]}
-                        />
-                      );
-                    }}
-                  />
-                </>
-              )}
-          </div>
-        }
+                    );
+                  }}
+                />,
+              ]
+            : []),
+        ]}
         players={{
           user:
             playersState.current[username.current] &&

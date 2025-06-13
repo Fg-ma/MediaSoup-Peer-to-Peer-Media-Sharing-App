@@ -7,6 +7,7 @@ import TabledButton from "./lib/tabledButton/TabledButton";
 import { TableContentStateTypes } from "../../../../../../universal/contentTypeConstant";
 
 export default function UpperControls({
+  upperControlsRef,
   filename,
   reactionsPanelActive,
   setReactionsPanelActive,
@@ -18,6 +19,7 @@ export default function UpperControls({
   backgroundMedia,
   state,
 }: {
+  upperControlsRef: React.RefObject<HTMLDivElement>;
   filename?: string;
   reactionsPanelActive: boolean;
   setReactionsPanelActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -54,17 +56,18 @@ export default function UpperControls({
 
   return (
     <div
+      ref={upperControlsRef}
       className={`media-upper-controls flex ${
         mediaContainerOptions.controlsPlacement === "inside" ||
         fullscreen ||
         backgroundMedia
           ? "top-0"
           : "bottom-full mb-1.5"
-      } pointer-events-none absolute z-20 h-[10%] max-h-10 min-h-6 w-full items-center justify-between`}
+      } !pointer-events-none absolute z-20 h-[10%] max-h-10 min-h-6 w-full items-center justify-between`}
     >
       <div
         ref={leftControlsRef}
-        className="hide-scroll-bar flex h-full w-max items-center justify-start space-x-2 overflow-x-auto"
+        className="hide-scroll-bar !pointer-events-none flex h-full w-max items-center justify-start space-x-2 overflow-x-auto"
       >
         <TabledButton state={state} lowerController={lowerController} />
         {leftUpperControls && leftUpperControls.length > 0 && leftUpperControls}
@@ -74,7 +77,7 @@ export default function UpperControls({
           </div>
         )}
       </div>
-      <div className="flex h-full w-max items-center justify-end space-x-2">
+      <div className="!pointer-events-none flex h-full w-max items-center justify-end space-x-2">
         {rightUpperControls &&
           rightUpperControls.length > 0 &&
           rightUpperControls}

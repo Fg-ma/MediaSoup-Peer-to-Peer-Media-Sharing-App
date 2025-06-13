@@ -6,24 +6,28 @@ import FgContentAdjustmentController from "../../../elements/fgAdjustmentElement
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { MediaContainerOptions } from "./typeConstant";
 import { StaticContentTypes } from "../../../../../universal/contentTypeConstant";
+import MediaContainerController from "./MediaContainerController";
 
 export default function AdjustmentButtons({
+  mediaContainerController,
   kind,
   mediaIdRef,
   mediaInstanceId,
   bundleRef,
-  panBtnRef,
   positioning,
   fgContentAdjustmentController,
   tableStaticContentSocket,
   aspectRatio,
   mediaContainerOptions,
+  rotationBtnRef,
+  panBtnRef,
+  scaleBtnRef,
 }: {
+  mediaContainerController: React.MutableRefObject<MediaContainerController>;
   kind: StaticContentTypes;
   mediaIdRef: React.MutableRefObject<string>;
   mediaInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
-  panBtnRef: React.RefObject<HTMLButtonElement>;
   positioning: React.MutableRefObject<{
     position: {
       left: number;
@@ -41,10 +45,14 @@ export default function AdjustmentButtons({
   >;
   aspectRatio: React.MutableRefObject<number | undefined>;
   mediaContainerOptions: MediaContainerOptions;
+  rotationBtnRef: React.RefObject<HTMLButtonElement>;
+  panBtnRef: React.RefObject<HTMLButtonElement>;
+  scaleBtnRef: React.RefObject<HTMLButtonElement>;
 }) {
   return (
     <>
       <RotateButton
+        externalRef={rotationBtnRef}
         className="rotate-btn absolute bottom-full left-full z-10 aspect-square w-[10%] min-w-8 max-w-12"
         dragFunction={(_displacement, event) => {
           if (!bundleRef.current) {
@@ -78,6 +86,18 @@ export default function AdjustmentButtons({
             { rotation: positioning.current.rotation },
           );
         }}
+        onPointerEnter={() =>
+          mediaContainerController.current.handlePointerEnter(
+            "rotate",
+            rotationBtnRef,
+          )
+        }
+        onPointerLeave={() =>
+          mediaContainerController.current.handlePointerLeave(
+            "rotate",
+            rotationBtnRef,
+          )
+        }
       />
       <PanButton
         externalRef={panBtnRef}
@@ -140,8 +160,15 @@ export default function AdjustmentButtons({
             { position: positioning.current.position },
           );
         }}
+        onPointerEnter={() =>
+          mediaContainerController.current.handlePointerEnter("pan", panBtnRef)
+        }
+        onPointerLeave={() =>
+          mediaContainerController.current.handlePointerLeave("pan", panBtnRef)
+        }
       />
       <ScaleButton
+        externalRef={scaleBtnRef}
         className="scale-btn absolute left-full top-full z-10 aspect-square w-[10%] min-w-6 max-w-10 pl-1 pt-1"
         dragFunction={(displacement) => {
           if (!bundleRef.current) {
@@ -179,6 +206,18 @@ export default function AdjustmentButtons({
             { scale: positioning.current.scale },
           );
         }}
+        onPointerEnter={() =>
+          mediaContainerController.current.handlePointerEnter(
+            "scale",
+            scaleBtnRef,
+          )
+        }
+        onPointerLeave={() =>
+          mediaContainerController.current.handlePointerLeave(
+            "scale",
+            scaleBtnRef,
+          )
+        }
       />
     </>
   );

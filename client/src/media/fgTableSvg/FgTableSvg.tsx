@@ -17,10 +17,12 @@ import DownloadButton from "./lib/lowerSvgControls/downloadButton/DownloadButton
 import "./lib/fgSvgStyles.css";
 
 export default function FgTableSvg({
+  tableTopRef,
   svgInstanceId,
   bundleRef,
   tableRef,
 }: {
+  tableTopRef: React.RefObject<HTMLDivElement>;
   svgInstanceId: string;
   bundleRef: React.RefObject<HTMLDivElement>;
   tableRef: React.RefObject<HTMLDivElement>;
@@ -150,6 +152,8 @@ export default function FgTableSvg({
   return (
     <>
       <FgMediaContainer
+        tableRef={tableRef}
+        tableTopRef={tableTopRef}
         filename={svgMediaInstance.svgMedia.filename}
         pauseDownload={svgMediaInstance.svgMedia.downloader?.pause}
         resumeDownload={svgMediaInstance.svgMedia.downloader?.resume}
