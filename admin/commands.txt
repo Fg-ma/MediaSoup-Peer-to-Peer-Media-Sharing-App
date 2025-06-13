@@ -9,14 +9,21 @@ mkcert
 mongo
 	mongodump --uri="urlString" --db=tableTopMongo --out="$HOME/Desktop/mongoBackup"
 
+nginx
+	./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s reload &&
+	./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s reload
 
-./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s reload &&
-./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s reload
+	./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s quit &&
+	./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s quit &&
+	./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf &&
+	./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf
 
-./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf -s quit &&
-./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf -s quit &&
-./nginx-1.27.3/sbin/nginx -p ./nginxAssetsServer -c nginx.conf &&
-./nginx-1.27.3/sbin/nginx -p ./tableStaticContentServer/nginx -c nginx.conf
+fail2ban
+	sudo fail2ban-client status nginx-custom
+	sudo fail2ban-client status nginx-403-404
+	sudo cat /etc/fail2ban/jail.local
+	sudo fail2ban-client set <jail_name> unbanip <ip_address>
+
 
 
 
