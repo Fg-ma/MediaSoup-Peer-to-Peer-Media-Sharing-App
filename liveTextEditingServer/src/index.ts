@@ -25,9 +25,9 @@ export const liveTextEditingController = new LiveTextEditingController(
 );
 
 const sslOptions = {
-  key_file_name: "../certs/tabletop-table-server-key.pem",
-  cert_file_name: "../certs/tabletop-table-server.pem",
-  dh_params_file_name: "../certs/tabletop-table-server-dhparam.pem",
+  key_file_name: "../certs/tabletop-live-text-editing-server-key.pem",
+  cert_file_name: "../certs/tabletop-live-text-editing-server.pem",
+  dh_params_file_name: "../certs/tabletop-live-text-editing-server-dhparam.pem",
   ssl_prefer_server_ciphers: true,
   ssl_options: ["NO_SSLv3", "NO_TLSv1", "NO_TLSv1_1"],
 };
@@ -120,7 +120,7 @@ uWS
       }
     },
   })
-  .listen(8093, (token) => {
+  .listen("127.0.0.1", 8093, (token) => {
     if (token) {
       console.log(
         "uWebSockets.js live text editing server listening on port 8093"

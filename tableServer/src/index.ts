@@ -68,7 +68,7 @@ uWS
       }
     },
   })
-  .listen(8043, (token) => {
+  .listen("127.0.0.1", 8043, (token) => {
     if (token) {
       console.log("uWebSockets.js table server listening on port 8043");
     } else {

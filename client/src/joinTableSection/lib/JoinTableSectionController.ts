@@ -129,14 +129,14 @@ class JoinTableSectionController {
       }
 
       this.tableSocket.current = new TableSocketController(
-        "wss://localhost:8043",
+        "wss://localhost:7778",
         this.tableId.current,
         this.username.current,
         this.instance.current,
       );
 
       this.liveTextEditingSocket.current = new LiveTextEditingSocketController(
-        "wss://localhost:8093",
+        "wss://localhost:7334",
         this.tableId.current,
         this.username.current,
         this.instance.current,
@@ -149,7 +149,7 @@ class JoinTableSectionController {
 
       this.tableStaticContentSocket.current =
         new TableStaticContentSocketController(
-          "https://localhost:7889",
+          "wss://localhost:7889",
           this.tableId.current,
           this.username.current,
           this.instance.current,
@@ -167,7 +167,7 @@ class JoinTableSectionController {
         );
 
       this.videoSocket.current = new VideoSocketController(
-        "wss://localhost:8099",
+        "wss://localhost:7556",
         this.tableId.current,
         this.username.current,
         this.instance.current,
@@ -184,13 +184,13 @@ class JoinTableSectionController {
         this.tableId.current,
         this.username.current,
         this.instance.current,
-        "wss://localhost:8042",
+        "wss://localhost:7223",
         this.staticContentMedia,
         this.bundlesController,
       );
 
       this.mediasoupSocket.current = new MediasoupSocketController(
-        "wss://localhost:8000",
+        "wss://localhost:7445",
         this.tableId.current,
         this.username.current,
         this.instance.current,

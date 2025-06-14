@@ -128,7 +128,7 @@ function SnakeGame({
           <div
             ref={boardRef}
             className="selectable snake-game-board relative flex aspect-square w-full flex-col overflow-hidden rounded"
-            data-selectable-type="game"
+            data-selectable-type="games"
             data-selectable-id={snakeGameId}
           >
             {snakeGameController.renderBoard()}

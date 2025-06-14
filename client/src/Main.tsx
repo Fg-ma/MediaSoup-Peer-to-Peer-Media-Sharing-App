@@ -115,7 +115,7 @@ export default function Main() {
     userId.current = signedInUserId;
 
     userStaticContentSocket.current = new UserStaticContentSocketController(
-      "wss://localhost:8049",
+      "wss://localhost:7667",
       userId.current,
       instance.current,
       staticContentMedia,

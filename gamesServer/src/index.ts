@@ -126,7 +126,7 @@ uWS
       }
     },
   })
-  .listen(8042, (token) => {
+  .listen("127.0.0.1", 8042, (token) => {
     if (token) {
       console.log("uWebSockets.js Game Server listening on port 8042");
     } else {

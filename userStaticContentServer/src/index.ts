@@ -96,7 +96,7 @@ app
       });
     }
   })
-  .listen(8049, (token) => {
+  .listen("127.0.0.1", 8049, (token) => {
     if (token) {
       console.log("Listening on https://localhost:8049");
     }

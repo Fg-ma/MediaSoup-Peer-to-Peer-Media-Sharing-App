@@ -5,7 +5,8 @@ node_modules
 certs
 
 nginx-1.27.3
-nginx-1.27.3-2
+
+tableTopSecrets
 
 60fps.mp4
 disney.mp4

@@ -102,7 +102,7 @@ class GamesServerController {
           this.username,
           this.instance,
           gameId,
-          "https://localhost:8042",
+          "https://localhost:7223",
           initiator.username === this.username &&
             initiator.instance === this.instance,
         );
@@ -156,7 +156,7 @@ class GamesServerController {
             this.username,
             this.instance,
             activeGame.gameId,
-            "https://localhost:8042",
+            "https://localhost:7223",
             false,
             activeGame.positioning,
           );

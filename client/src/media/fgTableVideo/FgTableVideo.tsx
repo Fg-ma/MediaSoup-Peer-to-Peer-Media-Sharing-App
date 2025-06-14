@@ -205,10 +205,6 @@ export default function FgTableVideo({
   }, [tableStaticContentSocket.current]);
 
   useEffect(() => {
-    console.log(
-      videoMediaInstance.current.meta.ended,
-      videoMediaInstance.current.instanceThumbnail,
-    );
     if (videoMediaInstance.current.meta.ended) {
       if (videoMediaInstance.current.instanceThumbnail) {
         subContainerRef.current?.appendChild(
@@ -337,7 +333,7 @@ export default function FgTableVideo({
             ]
           : [
               <div
-                className="flex pointer-events-auto absolute left-0 top-0 h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-20"
+                className="pointer-events-auto absolute left-0 top-0 flex h-full w-full items-center justify-center bg-fg-tone-black-1 bg-opacity-20"
                 onClick={lowerVideoController.current.handlePausePlay}
               >
                 <FgSVGElement

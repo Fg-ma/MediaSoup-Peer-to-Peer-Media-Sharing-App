@@ -58,7 +58,7 @@ const main = async () => {
         tables.leaveTable(tableId, username, instance);
       },
     })
-    .listen(8000, (token) => {
+    .listen("127.0.0.1", 8000, (token) => {
       if (token) {
         console.log("Server started on port 8000");
       } else {
