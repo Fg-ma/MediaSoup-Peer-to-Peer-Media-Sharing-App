@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { sanitizationUtils, tableTopMongo, tableTopRedis } from "src";
 import {
   contentTypeBucketMap,
@@ -11,15 +12,37 @@ import {
   onUpdateContentEffectsType,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { UploadSession } from "src/posts/lib/typeConstant";
+import { UploadSession } from "../posts/lib/typeConstant";
+import {
+  StaticContentTypesArray,
+  TableContentStateTypesArray,
+} from "../../../universal/contentTypeConstant";
+import {
+  videoEffectStylesSchema,
+  imageEffectStylesSchema,
+  applicationEffectStylesSchema,
+  svgEffectStylesSchema,
+  textEffectStylesSchema,
+} from "../../../universal/effectsTypeConstant";
 
 class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
+
+  private requestCatchUpTableDataSchema = z.object({
+    type: z.literal("requestCatchUpTableData"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
 
   onRequestCatchUpTableData = async (event: onRequestCatchUpTableDataType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onRequestCatchUpTableDataType;
+    const validation = this.requestCatchUpTableDataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(tableId);
@@ -38,6 +61,28 @@ class MetadataController {
     });
   };
 
+  private updateContentEffectsSchema = z.object({
+    type: z.literal("updateContentEffects"),
+    header: z.object({
+      tableId: z.string(),
+      contentType: z.enum(StaticContentTypesArray),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+    data: z.object({
+      effects: z.record(z.boolean()).optional(),
+      effectStyles: z
+        .union([
+          videoEffectStylesSchema,
+          imageEffectStylesSchema,
+          applicationEffectStylesSchema,
+          svgEffectStylesSchema,
+          textEffectStylesSchema,
+        ])
+        .optional(),
+    }),
+  });
+
   onUpdateContentEffects = (event: onUpdateContentEffectsType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event,
@@ -46,6 +91,8 @@ class MetadataController {
       },
       ["color"]
     ) as onUpdateContentEffectsType;
+    const validation = this.updateContentEffectsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     tableTopMongo.onUpdateContentEffects(safeEvent);
 
     const { tableId, contentType, contentId, instanceId } = safeEvent.header;
@@ -58,10 +105,24 @@ class MetadataController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private requestCatchUpEffectsSchema = z.object({
+    type: z.literal("requestCatchUpEffects"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentType: z.enum(StaticContentTypesArray),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+  });
+
   onRequestCatchUpEffects = async (event: onRequestCatchUpEffectsType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onRequestCatchUpEffectsType;
+    const validation = this.requestCatchUpEffectsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentType, contentId, instanceId } =
       safeEvent.header;
 
@@ -177,10 +238,24 @@ class MetadataController {
     this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   };
 
+  private changeContentStateSchema = z.object({
+    type: z.literal("changeContentState"),
+    header: z.object({
+      tableId: z.string(),
+      contentType: z.enum(StaticContentTypesArray),
+      contentId: z.string(),
+    }),
+    data: z.object({
+      state: z.array(z.enum(TableContentStateTypesArray)),
+    }),
+  });
+
   onChangeContentState = (event: onChangeContentStateType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onChangeContentStateType;
+    const validation = this.changeContentStateSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     tableTopMongo.onChangeTableContentState(safeEvent);
 
     const { tableId, contentType, contentId } = safeEvent.header;
@@ -193,10 +268,43 @@ class MetadataController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private createNewInstancesSchema = z.object({
+    type: z.literal("createNewInstances"),
+    header: z.object({
+      tableId: z.string(),
+    }),
+    data: z.object({
+      updates: z.array(
+        z.object({
+          contentType: z.enum(StaticContentTypesArray),
+          contentId: z.string(),
+          instances: z.array(
+            z.object({
+              instanceId: z.string(),
+              positioning: z.object({
+                position: z.object({
+                  left: z.number(),
+                  top: z.number(),
+                }),
+                scale: z.object({
+                  x: z.number(),
+                  y: z.number(),
+                }),
+                rotation: z.number(),
+              }),
+            })
+          ),
+        })
+      ),
+    }),
+  });
+
   onCreateNewInstances = (event: onCreateNewInstancesType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onCreateNewInstancesType;
+    const validation = this.createNewInstancesSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     tableTopMongo.onCreateNewInstances(safeEvent);
 
     const { tableId } = safeEvent.header;
@@ -210,10 +318,21 @@ class MetadataController {
     });
   };
 
+  private deleteUploadSessionSchema = z.object({
+    type: z.literal("deleteUploadSession"),
+    header: z.object({
+      uploadId: z.string(),
+      contentId: z.string(),
+      contentType: z.enum(StaticContentTypesArray),
+    }),
+  });
+
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDeleteUploadSessionType;
+    const validation = this.deleteUploadSessionSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { uploadId, contentId, contentType } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
@@ -239,10 +358,21 @@ class MetadataController {
     );
   };
 
+  private signalReuploadStartSchema = z.object({
+    type: z.literal("signalReuploadStart"),
+    header: z.object({
+      tableId: z.string(),
+      contentType: z.enum(StaticContentTypesArray),
+      contentId: z.string(),
+    }),
+  });
+
   onSignalReuploadStart = async (event: onSignalReuploadStartType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onSignalReuploadStartType;
+    const validation = this.signalReuploadStartSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, contentId, contentType } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

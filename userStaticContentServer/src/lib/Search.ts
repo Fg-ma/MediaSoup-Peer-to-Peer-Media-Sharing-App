@@ -1,7 +1,9 @@
+import { z } from "zod";
 import { onSearchUserContentRequestType } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import elasticSearch from "../../../elasticSearchServer/src/index";
 import { sanitizationUtils } from "src";
+import { StaticContentTypesArray } from "../../../universal/contentTypeConstant";
 
 class Search {
   private indexMap: Record<string, string> = {
@@ -23,12 +25,26 @@ class Search {
 
   constructor(private broadcaster: Broadcaster) {}
 
+  private searchUserContentRequestSchema = z.object({
+    type: z.literal("searchUserContentRequest"),
+    header: z.object({
+      userId: z.string(),
+      instance: z.string(),
+      contentType: z.enum(StaticContentTypesArray).or(z.literal("all")),
+    }),
+    data: z.object({
+      name: z.string(),
+    }),
+  });
+
   onSearchUserContentRequest = async (
     event: onSearchUserContentRequestType
   ) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onSearchUserContentRequestType;
+    const validation = this.searchUserContentRequestSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { userId, instance, contentType } = safeEvent.header;
     const { name } = safeEvent.data;
 

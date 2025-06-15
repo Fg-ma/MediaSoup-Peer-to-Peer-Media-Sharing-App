@@ -4,6 +4,7 @@ import { SnakeColorsType } from "./snakeGame/lib/typeConstant";
 import { GameTypes } from "../../universal/contentTypeConstant";
 
 export type SocketTypes = "signaling" | "games";
+export const SocketTypesArray = ["signaling", "games"] as const;
 
 export interface Tables {
   [tableId: string]: {
@@ -49,7 +50,7 @@ export type MessageTypes =
   | onStartGameType
   | onCloseGameType
   | onGetPlayersStateType
-  | onGetIntialGameStatesType
+  | onGetInitialGameStatesType
   | onSnakeDirectionChangeType
   | onChangeGridSizeType
   | onChangeSnakeColorType;
@@ -147,7 +148,7 @@ export type onJoinGameType = {
     gameType: GameTypes;
     gameId: string;
   };
-  data: object;
+  data: { snakeColor?: SnakeColorsType };
 };
 
 export type onLeaveGameType = {
@@ -172,8 +173,8 @@ export type onGetPlayersStateType = {
   };
 };
 
-export type onGetIntialGameStatesType = {
-  type: "getIntialGameStates";
+export type onGetInitialGameStatesType = {
+  type: "getInitialGameStates";
   header: {
     tableId: string;
     username: string;

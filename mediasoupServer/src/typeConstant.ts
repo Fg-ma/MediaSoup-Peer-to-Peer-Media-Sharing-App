@@ -15,6 +15,7 @@ import {
   SctpStreamParameters,
 } from "mediasoup/node/lib/types";
 import uWS from "uWebSockets.js";
+import { AudioMixEffectsType } from "../../universal/effectsTypeConstant";
 
 interface MediasoupWorker {
   worker: Worker;
@@ -152,8 +153,16 @@ export type ProducerTypes =
   | "screenAudio"
   | "audio"
   | "json";
+export const ProducerTypesArray = [
+  "camera",
+  "screen",
+  "screenAudio",
+  "audio",
+  "json",
+] as const;
 
 export type DataStreamTypes = "positionScaleRotation";
+export const DataStreamTypesArray = ["positionScaleRotation"] as const;
 
 export type Permissions = {
   acceptsCameraEffects: boolean;
@@ -161,26 +170,6 @@ export type Permissions = {
   acceptsAudioEffects: boolean;
   acceptsPositionScaleRotationManipulation: boolean;
 };
-
-export type AudioMixEffectsType =
-  | "autoFilter"
-  | "autoPanner"
-  | "autoWah"
-  | "bitCrusher"
-  | "chebyshev"
-  | "chorus"
-  | "distortion"
-  | "EQ"
-  | "feedbackDelay"
-  | "freeverb"
-  | "JCReverb"
-  | "phaser"
-  | "pingPongDelay"
-  | "pitchShift"
-  | "reverb"
-  | "stereoWidener"
-  | "tremolo"
-  | "vibrato";
 
 export type MediasoupSocketEvents =
   | onJoinTableType
@@ -538,21 +527,6 @@ export type onResponseCatchUpDataType = {
     inquiredProducerId?: string;
   };
   data:
-    | {
-        paused: boolean;
-        timeEllapsed: number;
-        positioning: {
-          position: {
-            left: number;
-            top: number;
-          };
-          scale: {
-            x: number;
-            y: number;
-          };
-          rotation: number;
-        };
-      }
     | {
         paused: boolean;
         timeEllapsed: number;

@@ -1,10 +1,25 @@
-import { Router } from "mediasoup/node/lib/Router";
+import { z } from "zod";
+import { Router } from "mediasoup/node/lib/types";
 import { getNextWorker, getWorkerByIdx } from "./workerManager";
 import { workersMap, onGetRouterRtpCapabilitiesType } from "../typeConstant";
-import { broadcaster } from "../index";
+import { broadcaster, sanitizationUtils } from "../index";
+
+const getRouterRtpCapabilitiesSchema = z.object({
+  type: z.literal("getRouterRtpCapabilities"),
+  header: z.object({
+    tableId: z.string(),
+    username: z.string(),
+    instance: z.string(),
+  }),
+});
 
 const onGetRouterRtpCapabilities = (event: onGetRouterRtpCapabilitiesType) => {
-  const { tableId, username, instance } = event.header;
+  const safeEvent = sanitizationUtils.sanitizeObject(
+    event
+  ) as onGetRouterRtpCapabilitiesType;
+  const validation = getRouterRtpCapabilitiesSchema.safeParse(safeEvent);
+  if (!validation.success) return;
+  const { tableId, username, instance } = safeEvent.header;
 
   // Get the next available worker and router if one doesn't already exist
   let mediasoupRouter: Router;

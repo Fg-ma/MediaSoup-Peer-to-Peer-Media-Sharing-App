@@ -1,7 +1,9 @@
+import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import Broadcaster from "./Broadcaster";
 import MediasoupCleanup from "./MediasoupCleanup";
 import { MediasoupWebSocket, onJoinTableType, tables } from "../typeConstant";
+import { sanitizationUtils } from "src";
 
 class Tables {
   constructor(
@@ -9,8 +11,22 @@ class Tables {
     private mediasoupCleanup: MediasoupCleanup
   ) {}
 
+  private joinTableSchema = z.object({
+    type: z.literal("joinTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   joinTable = (mediasoupWS: MediasoupWebSocket, event: onJoinTableType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onJoinTableType;
+    const validation = this.joinTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
 
     mediasoupWS.id = uuidv4();
     mediasoupWS.tableId = tableId;

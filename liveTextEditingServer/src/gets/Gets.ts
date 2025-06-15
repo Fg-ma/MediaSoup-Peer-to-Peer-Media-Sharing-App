@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { Readable } from "stream";
 import { sanitizationUtils, tableTopCeph } from "../index";
 import { onGetDownloadMetaType, onGetFileChunkType } from "../typeConstant";
@@ -6,10 +7,22 @@ import Broadcaster from "../lib/Broadcaster";
 class Gets {
   constructor(private broadcaster: Broadcaster) {}
 
+  private getDownloadMetaSchema = z.object({
+    type: z.literal("getDownloadMeta"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+    }),
+  });
+
   onGetDownloadMeta = async (event: onGetDownloadMetaType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onGetDownloadMetaType;
+    const validation = this.getDownloadMetaSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId } = safeEvent.header;
 
     try {
@@ -88,10 +101,25 @@ class Gets {
     }
   };
 
+  private getFileChunkSchema = z.object({
+    type: z.literal("getFileChunk"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+    }),
+    data: z.object({
+      range: z.string(),
+    }),
+  });
+
   onGetFileChunk = async (event: onGetFileChunkType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event, {
       range: "=",
     }) as onGetFileChunkType;
+    const validation = this.getFileChunkSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId } = safeEvent.header;
     const { range } = safeEvent.data;
 

@@ -551,7 +551,7 @@ class SnakeGame {
     return this.playersState;
   };
 
-  getIntialGameStates = () => {
+  getInitialGameStates = () => {
     return {
       started: this.started,
       gameOver: this.gameOver,

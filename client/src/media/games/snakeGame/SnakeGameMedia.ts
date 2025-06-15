@@ -169,7 +169,7 @@ class SnakeGameMedia extends GameMediaUniversalFunctions {
 
     this.ws.onopen = () => {
       this.newGameSocket();
-      this.getIntialGameStates();
+      this.getInitialGameStates();
     };
   };
 

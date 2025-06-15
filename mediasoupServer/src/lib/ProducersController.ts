@@ -1,8 +1,11 @@
+import { z } from "zod";
 import createWebRtcTransport from "./createWebRtcTransport";
 import { getNextWorker, getWorkerByIdx } from "./workerManager";
 import MediasoupCleanup from "./MediasoupCleanup";
 import Broadcaster from "./Broadcaster";
 import {
+  DataStreamTypesArray,
+  ProducerTypesArray,
   onConnectProducerTransportType,
   onCreateNewJSONProducerType,
   onCreateNewProducerType,
@@ -14,15 +17,29 @@ import {
   tableProducers,
   workersMap,
 } from "../typeConstant";
-
+import { sanitizationUtils } from "src";
 class ProducersController {
   constructor(
     private broadcaster: Broadcaster,
     private mediasoupCleanup: MediasoupCleanup
   ) {}
 
+  private createProducerTransportSchema = z.object({
+    type: z.literal("createProducerTransport"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onCreateProducerTransport = async (event: onCreateProducerTransportType) => {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCreateProducerTransportType;
+    const validation = this.createProducerTransportSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
 
     // Get the next available worker and router if one doesn't already exist
     let mediasoupRouter;
@@ -65,11 +82,44 @@ class ProducersController {
     }
   };
 
+  private dtlsParametersSchema = z.object({
+    role: z.enum(["auto", "client", "server"]).optional(),
+    fingerprints: z.array(
+      z.object({
+        algorithm: z.enum([
+          "sha-1",
+          "sha-224",
+          "sha-256",
+          "sha-384",
+          "sha-512",
+        ]),
+        value: z.string(),
+      })
+    ),
+  });
+
+  private connectProducerTransportSchema = z.object({
+    type: z.literal("connectProducerTransport"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      dtlsParameters: this.dtlsParametersSchema,
+    }),
+  });
+
   onConnectProducerTransport = async (
     event: onConnectProducerTransportType
   ) => {
-    const { tableId, username, instance } = event.header;
-    const { dtlsParameters } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onConnectProducerTransportType;
+    const validation = this.connectProducerTransportSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
+    const { dtlsParameters } = safeEvent.data;
 
     if (
       !tableProducerTransports[tableId] ||
@@ -94,10 +144,99 @@ class ProducersController {
     });
   };
 
+  private rtpParametersSchema = z.object({
+    mid: z.string().optional(),
+    codecs: z.array(
+      z.object({
+        mimeType: z.string(),
+        payloadType: z.number(),
+        clockRate: z.number(),
+        channels: z.number().optional(),
+        parameters: z.any().optional(),
+        rtcpFeedback: z
+          .array(
+            z.object({
+              type: z.string(),
+              parameter: z.string().optional(),
+            })
+          )
+          .optional(),
+      })
+    ),
+    headerExtensions: z
+      .array(
+        z.object({
+          uri: z.enum([
+            "urn:ietf:params:rtp-hdrext:sdes:mid",
+            "urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id",
+            "urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id",
+            "http://tools.ietf.org/html/draft-ietf-avtext-framemarking-07",
+            "urn:ietf:params:rtp-hdrext:framemarking",
+            "urn:ietf:params:rtp-hdrext:ssrc-audio-level",
+            "urn:3gpp:video-orientation",
+            "urn:ietf:params:rtp-hdrext:toffset",
+            "http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01",
+            "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
+            "http://www.webrtc.org/experiments/rtp-hdrext/abs-capture-time",
+            "http://www.webrtc.org/experiments/rtp-hdrext/playout-delay",
+          ]),
+          id: z.number(),
+          encrypt: z.boolean().optional(),
+          parameters: z.any().optional(),
+        })
+      )
+      .optional(),
+    encodings: z
+      .array(
+        z.object({
+          ssrc: z.number().optional(),
+          rid: z.string().optional(),
+          codecPayloadType: z.number().optional(),
+          rtx: z
+            .object({
+              ssrc: z.number(),
+            })
+            .optional(),
+          dtx: z.boolean().optional(),
+          scalabilityMode: z.string().optional(),
+          scaleResolutionDownBy: z.number().optional(),
+          maxBitrate: z.number().optional(),
+        })
+      )
+      .optional(),
+    rtcp: z
+      .object({
+        cname: z.string().optional(),
+        reducedSize: z.boolean().optional(),
+      })
+      .optional(),
+  });
+
+  private createNewProducerSchema = z.object({
+    type: z.literal("createNewProducer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+    data: z.object({
+      transportId: z.string(),
+      kind: z.enum(["audio", "video"]),
+      rtpParameters: this.rtpParametersSchema,
+    }),
+  });
+
   onCreateNewProducer = async (event: onCreateNewProducerType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCreateNewProducerType;
+    const validation = this.createNewProducerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
-    const { kind, rtpParameters } = event.data;
+      safeEvent.header;
+    const { kind, rtpParameters } = safeEvent.data;
 
     if (
       !tableProducerTransports[tableId] ||
@@ -177,10 +316,40 @@ class ProducersController {
     });
   };
 
+  private sctpParametersSchema = z.object({
+    port: z.number(),
+    OS: z.number(),
+    MIS: z.number(),
+    maxMessageSize: z.number(),
+  });
+
+  private createNewJSONProducerSchema = z.object({
+    type: z.literal("createNewJSONProducer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.literal("json"),
+      producerId: z.string(),
+      dataStreamType: z.enum(DataStreamTypesArray),
+    }),
+    data: z.object({
+      transportId: z.string(),
+      label: z.string(),
+      protocol: z.literal("json"),
+      sctpStreamParameters: this.sctpParametersSchema,
+    }),
+  });
+
   onCreateNewJSONProducer = async (event: onCreateNewJSONProducerType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCreateNewJSONProducerType;
+    const validation = this.createNewJSONProducerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerId, dataStreamType } =
-      event.header;
-    const { label, protocol, sctpStreamParameters } = event.data;
+      safeEvent.header;
+    const { label, protocol, sctpStreamParameters } = safeEvent.data;
 
     // Validate that the transport and producer type are correctly set up
     if (
@@ -256,9 +425,25 @@ class ProducersController {
     }
   };
 
+  private newProducerCreatedSchema = z.object({
+    type: z.literal("newProducerCreated"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+  });
+
   onNewProducerCreated = (event: onNewProducerCreatedType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onNewProducerCreatedType;
+    const validation = this.newProducerCreatedSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
+      safeEvent.header;
 
     const msg = {
       type: "newProducerWasCreated",
@@ -271,7 +456,24 @@ class ProducersController {
     this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   };
 
+  private removeProducerSchema = z.object({
+    type: z.literal("removeProducer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+      dataStreamType: z.enum(DataStreamTypesArray),
+    }),
+  });
+
   onRemoveProducer = (event: onRemoveProducerType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRemoveProducerType;
+    const validation = this.removeProducerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       username,
@@ -279,7 +481,7 @@ class ProducersController {
       producerType,
       producerId,
       dataStreamType,
-    } = event.header;
+    } = safeEvent.header;
 
     try {
       this.mediasoupCleanup.removeProducer(
@@ -320,9 +522,25 @@ class ProducersController {
     }
   };
 
+  private requestRemoveProducerSchema = z.object({
+    type: z.literal("requestRemoveProducer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+  });
+
   onRequestRemoveProducer = (event: onRequestRemoveProducerType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestRemoveProducerType;
+    const validation = this.requestRemoveProducerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
+      safeEvent.header;
 
     const msg = {
       type: "removeProducerRequested",

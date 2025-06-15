@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type Directions = "up" | "down" | "left" | "right";
 
 export type Snake = {
@@ -115,6 +117,108 @@ export type SnakeColorsType =
       primary: "white";
       secondary: "yellow";
     };
+export const SnakeColorsSchema = z.union([
+  z.object({
+    primary: z.literal("black"),
+    secondary: z.literal("pink"),
+  }),
+  z.object({
+    primary: z.literal("black"),
+    secondary: z.literal("yellow"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("blue"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("green"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("orange"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("purple"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("red"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("white"),
+  }),
+  z.object({
+    primary: z.literal("blue"),
+    secondary: z.literal("yellow"),
+  }),
+  z.object({
+    primary: z.literal("green"),
+    secondary: z.literal("green"),
+  }),
+  z.object({
+    primary: z.literal("green"),
+    secondary: z.literal("purple"),
+  }),
+  z.object({
+    primary: z.literal("green"),
+    secondary: z.literal("white"),
+  }),
+  z.object({
+    primary: z.literal("green"),
+    secondary: z.literal("yellow"),
+  }),
+  z.object({
+    primary: z.literal("orange"),
+    secondary: z.literal("blue"),
+  }),
+  z.object({
+    primary: z.literal("orange"),
+    secondary: z.literal("pink"),
+  }),
+  z.object({
+    primary: z.literal("orange"),
+    secondary: z.literal("purple"),
+  }),
+  z.object({
+    primary: z.literal("orange"),
+    secondary: z.literal("red"),
+  }),
+  z.object({
+    primary: z.literal("pink"),
+    secondary: z.literal("green"),
+  }),
+  z.object({
+    primary: z.literal("pink"),
+    secondary: z.literal("orange"),
+  }),
+  z.object({
+    primary: z.literal("pink"),
+    secondary: z.literal("purple"),
+  }),
+  z.object({
+    primary: z.literal("red"),
+    secondary: z.literal("black"),
+  }),
+  z.object({
+    primary: z.literal("red"),
+    secondary: z.literal("yellow"),
+  }),
+  z.object({
+    primary: z.literal("white"),
+    secondary: z.literal("aqua"),
+  }),
+  z.object({
+    primary: z.literal("white"),
+    secondary: z.literal("red"),
+  }),
+  z.object({
+    primary: z.literal("white"),
+    secondary: z.literal("yellow"),
+  }),
+]);
 
 export const foodClasses = [
   "snake-game-apple",

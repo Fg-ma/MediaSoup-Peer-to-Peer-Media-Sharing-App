@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type CameraEffectTypes =
   | "pause"
   | "postProcess"
@@ -262,6 +264,24 @@ export type PostProcessEffectTypes =
   | "sharpen"
   | "tiltShift"
   | "cartoon";
+export const PostProcessEffectTypesArray = [
+  "prismaColors",
+  "blackAndWhite",
+  "bubbleChromatic",
+  "fisheye",
+  "nightVision",
+  "vintageTV",
+  "motionblur",
+  "pixelation",
+  "old",
+  "chromaticAberration",
+  "colorSplash",
+  "tonemap",
+  "rays",
+  "sharpen",
+  "tiltShift",
+  "cartoon",
+] as const;
 export type HideBackgroundEffectTypes =
   | "color"
   | "beach"
@@ -288,10 +308,42 @@ export type HideBackgroundEffectTypes =
   | "sunset"
   | "trees"
   | "windingRoad";
+export const HideBackgroundEffectTypesArray = [
+  "color",
+  "beach",
+  "brickWall",
+  "butterflies",
+  "cafe",
+  "chalkBoard",
+  "citySkyline",
+  "cliffPalace",
+  "eveningMcDonaldLake",
+  "forest",
+  "halfDomeAppleOrchard",
+  "lake",
+  "library",
+  "milkyWay",
+  "mountains",
+  "ocean",
+  "oldFaithfulGeyser",
+  "railroad",
+  "rollingHills",
+  "seaSideHouses",
+  "snowCoveredMoutains",
+  "sunflowers",
+  "sunset",
+  "trees",
+  "windingRoad",
+] as const;
 export type BeardsEffectTypes =
   | "classicalCurlyBeard"
   | "chinBeard"
   | "fullBeard";
+export const BeardsEffectTypesArray = [
+  "classicalCurlyBeard",
+  "chinBeard",
+  "fullBeard",
+] as const;
 export type GlassesEffectTypes =
   | "defaultGlasses"
   | "aviatorGoggles"
@@ -310,6 +362,25 @@ export type GlassesEffectTypes =
   | "threeDGlasses"
   | "toyGlasses"
   | "VRGlasses";
+export const GlassesEffectTypesArray = [
+  "defaultGlasses",
+  "aviatorGoggles",
+  "bloodyGlasses",
+  "eyeProtectionGlasses",
+  "glasses1",
+  "glasses2",
+  "glasses3",
+  "glasses4",
+  "glasses5",
+  "glasses6",
+  "memeGlasses",
+  "militaryTacticalGlasses",
+  "shades",
+  "steampunkGlasses",
+  "threeDGlasses",
+  "toyGlasses",
+  "VRGlasses",
+] as const;
 export type MustachesEffectTypes =
   | "disguiseMustache"
   | "fullMustache"
@@ -322,6 +393,19 @@ export type MustachesEffectTypes =
   | "spongebobMustache"
   | "tinyMustache"
   | "wingedMustache";
+export const MustachesEffectTypesArray = [
+  "disguiseMustache",
+  "fullMustache",
+  "mustache1",
+  "mustache2",
+  "mustache3",
+  "mustache4",
+  "nicodemusMustache",
+  "pencilMustache",
+  "spongebobMustache",
+  "tinyMustache",
+  "wingedMustache",
+] as const;
 export type MasksEffectTypes =
   | "baseMask"
   | "alienMask"
@@ -345,6 +429,30 @@ export type MasksEffectTypes =
   | "woodlandMask"
   | "woodPaintedMask"
   | "zombieMask";
+export const MasksEffectTypesArray = [
+  "baseMask",
+  "alienMask",
+  "clownMask",
+  "creatureMask",
+  "cyberMask",
+  "darkKnightMask",
+  "demonMask",
+  "gasMask1",
+  "gasMask2",
+  "gasMask3",
+  "gasMask4",
+  "masqueradeMask",
+  "metalManMask",
+  "oniMask",
+  "plagueDoctorMask",
+  "sixEyesMask",
+  "tenguMask",
+  "threeFaceMask",
+  "weldingMask",
+  "woodlandMask",
+  "woodPaintedMask",
+  "zombieMask",
+] as const;
 export type HatsEffectTypes =
   | "AsianConicalHat"
   | "aviatorHelmet"
@@ -365,6 +473,27 @@ export type HatsEffectTypes =
   | "stylishHat"
   | "ushankaHat"
   | "vikingHelmet";
+export const HatsEffectTypesArray = [
+  "AsianConicalHat",
+  "aviatorHelmet",
+  "bicornHat",
+  "bicycleHelmet",
+  "captainsHat",
+  "chefHat",
+  "chickenHat",
+  "deadManHat",
+  "dogEars",
+  "flatCap",
+  "hardHat",
+  "hopliteHelmet",
+  "militaryHat",
+  "rabbitEars",
+  "santaHat",
+  "seamanHat",
+  "stylishHat",
+  "ushankaHat",
+  "vikingHelmet",
+] as const;
 export type PetsEffectTypes =
   | "angryHamster"
   | "axolotl"
@@ -391,6 +520,33 @@ export type PetsEffectTypes =
   | "snail"
   | "spinosaurus"
   | "TRex";
+export const PetsEffectTypesArray = [
+  "angryHamster",
+  "axolotl",
+  "babyDragon",
+  "beardedDragon",
+  "bird1",
+  "bird2",
+  "boxer",
+  "brain",
+  "buddyHamster",
+  "cat1",
+  "cat2",
+  "dodoBird",
+  "happyHamster",
+  "mechanicalGrasshopper",
+  "panda1",
+  "panda2",
+  "petRock",
+  "pig",
+  "redFox1",
+  "redFox2",
+  "roboDog",
+  "skeletonTRex",
+  "snail",
+  "spinosaurus",
+  "TRex",
+] as const;
 
 export interface ScreenEffectStylesType {
   tint: {
@@ -400,6 +556,14 @@ export interface ScreenEffectStylesType {
     style: PostProcessEffectTypes;
   };
 }
+export const screenEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+});
 
 export type AudioEffectStylesType = object;
 
@@ -433,6 +597,36 @@ export type VideoEffectStylesType = {
     style: PetsEffectTypes;
   };
 };
+export const videoEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+  hideBackground: z.object({
+    style: z.enum(HideBackgroundEffectTypesArray),
+    color: z.string(),
+  }),
+  glasses: z.object({
+    style: z.enum(GlassesEffectTypesArray),
+  }),
+  beards: z.object({
+    style: z.enum(BeardsEffectTypesArray),
+  }),
+  mustaches: z.object({
+    style: z.enum(MustachesEffectTypesArray),
+  }),
+  masks: z.object({
+    style: z.enum(MasksEffectTypesArray),
+  }),
+  hats: z.object({
+    style: z.enum(HatsEffectTypesArray),
+  }),
+  pets: z.object({
+    style: z.enum(PetsEffectTypesArray),
+  }),
+});
 
 export type ImageEffectStylesType = {
   tint: {
@@ -464,6 +658,36 @@ export type ImageEffectStylesType = {
     style: PetsEffectTypes;
   };
 };
+export const imageEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+  hideBackground: z.object({
+    style: z.enum(HideBackgroundEffectTypesArray),
+    color: z.string(),
+  }),
+  glasses: z.object({
+    style: z.enum(GlassesEffectTypesArray),
+  }),
+  beards: z.object({
+    style: z.enum(BeardsEffectTypesArray),
+  }),
+  mustaches: z.object({
+    style: z.enum(MustachesEffectTypesArray),
+  }),
+  masks: z.object({
+    style: z.enum(MasksEffectTypesArray),
+  }),
+  hats: z.object({
+    style: z.enum(HatsEffectTypesArray),
+  }),
+  pets: z.object({
+    style: z.enum(PetsEffectTypesArray),
+  }),
+});
 
 export type SvgEffectStylesType = {
   shadow: {
@@ -497,6 +721,38 @@ export type SvgEffectStylesType = {
     neonColor: string;
   };
 };
+export const svgEffectStylesSchema = z.object({
+  shadow: z.object({
+    shadowColor: z.string(),
+    strength: z.number(),
+    offsetX: z.number(),
+    offsetY: z.number(),
+  }),
+  blur: z.object({
+    strength: z.number(),
+  }),
+  grayscale: z.object({
+    scale: z.number(),
+  }),
+  saturate: z.object({
+    saturation: z.number(),
+  }),
+  colorOverlay: z.object({
+    overlayColor: z.string(),
+  }),
+  waveDistortion: z.object({
+    frequency: z.number(),
+    strength: z.number(),
+  }),
+  crackedGlass: z.object({
+    density: z.number(),
+    detail: z.number(),
+    strength: z.number(),
+  }),
+  neonGlow: z.object({
+    neonColor: z.string(),
+  }),
+});
 
 export type ApplicationEffectStylesType = {
   tint: {
@@ -506,6 +762,14 @@ export type ApplicationEffectStylesType = {
     style: PostProcessEffectTypes;
   };
 };
+export const applicationEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+});
 
 export type CaptureEffectStylesType = {
   tint: {
@@ -537,6 +801,36 @@ export type CaptureEffectStylesType = {
     style: PetsEffectTypes;
   };
 };
+export const captureEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+  hideBackground: z.object({
+    style: z.enum(HideBackgroundEffectTypesArray),
+    color: z.string(),
+  }),
+  glasses: z.object({
+    style: z.enum(GlassesEffectTypesArray),
+  }),
+  beards: z.object({
+    style: z.enum(BeardsEffectTypesArray),
+  }),
+  mustaches: z.object({
+    style: z.enum(MustachesEffectTypesArray),
+  }),
+  masks: z.object({
+    style: z.enum(MasksEffectTypesArray),
+  }),
+  hats: z.object({
+    style: z.enum(HatsEffectTypesArray),
+  }),
+  pets: z.object({
+    style: z.enum(PetsEffectTypesArray),
+  }),
+});
 
 export type TextEffectStylesType = {
   backgroundColor: string;
@@ -546,6 +840,14 @@ export type TextEffectStylesType = {
   fontStyle: string;
   letterSpacing: number;
 };
+export const textEffectStylesSchema = z.object({
+  backgroundColor: z.string(),
+  textColor: z.string(),
+  indexColor: z.string(),
+  fontSize: z.string(),
+  fontStyle: z.string(),
+  letterSpacing: z.number(),
+});
 
 export type BackgroundMusicTypes =
   | "adventureTime"
@@ -579,6 +881,46 @@ export type BackgroundMusicTypes =
   | "stompingRock"
   | "ukulele"
   | "wacky";
+
+export type AudioMixEffectsType =
+  | "autoFilter"
+  | "autoPanner"
+  | "autoWah"
+  | "bitCrusher"
+  | "chebyshev"
+  | "chorus"
+  | "distortion"
+  | "EQ"
+  | "feedbackDelay"
+  | "freeverb"
+  | "JCReverb"
+  | "phaser"
+  | "pingPongDelay"
+  | "pitchShift"
+  | "reverb"
+  | "stereoWidener"
+  | "tremolo"
+  | "vibrato";
+export const AudioMixEffectsTypeArray = [
+  "autoFilter",
+  "autoPanner",
+  "autoWah",
+  "bitCrusher",
+  "chebyshev",
+  "chorus",
+  "distortion",
+  "EQ",
+  "feedbackDelay",
+  "freeverb",
+  "JCReverb",
+  "phaser",
+  "pingPongDelay",
+  "pitchShift",
+  "reverb",
+  "stereoWidener",
+  "tremolo",
+  "vibrato",
+] as const;
 
 export type UserEffectsStylesType = {
   camera: {

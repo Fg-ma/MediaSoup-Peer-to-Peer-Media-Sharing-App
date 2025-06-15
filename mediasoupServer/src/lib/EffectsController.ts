@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { sanitizationUtils } from "src";
 import {
   onClientClearEffectsType,
   onClientEffectChangeType,
@@ -7,20 +9,46 @@ import {
   onRequestEffectChangeType,
   onRequestMixEffectActivityChangeType,
   onRequestMixEffectValueChangeType,
+  ProducerTypesArray,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { AudioMixEffectsTypeArray } from "../../../universal/effectsTypeConstant";
 
 class EffectsController {
   constructor(private broadcaster: Broadcaster) {}
 
+  private requestEffectChangeSchema = z.object({
+    type: z.literal("requestEffectChange"),
+    header: z.object({
+      tableId: z.string(),
+      requestedUsername: z.string(),
+      requestedInstance: z.string(),
+      requestedProducerType: z.enum(ProducerTypesArray),
+      requestedProducerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.string(),
+      blockStateChange: z.boolean(),
+      style: z.string().optional(),
+      hideBackgroundStyle: z.string().optional(),
+      hideBackgroundColor: z.string().optional(),
+      postProcessStyle: z.string().optional(),
+    }),
+  });
+
   onRequestEffectChange = (event: onRequestEffectChangeType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestEffectChangeType;
+    const validation = this.requestEffectChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-    } = event.header;
+    } = safeEvent.header;
     const {
       effect,
       blockStateChange,
@@ -28,7 +56,7 @@ class EffectsController {
       hideBackgroundStyle,
       hideBackgroundColor,
       postProcessStyle,
-    } = event.data;
+    } = safeEvent.data;
 
     const msg = {
       type: "effectChangeRequested",
@@ -54,10 +82,31 @@ class EffectsController {
     );
   };
 
+  private clientEffectChangeSchema = z.object({
+    type: z.literal("clientEffectChange"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.string(),
+      effectStyle: z.string().optional(),
+      blockStateChange: z.boolean(),
+    }),
+  });
+
   onClientEffectChange = (event: onClientEffectChangeType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onClientEffectChangeType;
+    const validation = this.clientEffectChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
-    const { effect, effectStyle, blockStateChange } = event.data;
+      safeEvent.header;
+    const { effect, effectStyle, blockStateChange } = safeEvent.data;
 
     const msg = {
       type: "clientEffectChanged",
@@ -77,12 +126,33 @@ class EffectsController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private clientMixEffectActivityChangeSchema = z.object({
+    type: z.literal("clientMixEffectActivityChange"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(["audio", "screenAudio"]),
+      producerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.enum(AudioMixEffectsTypeArray),
+      active: z.boolean(),
+    }),
+  });
+
   onClientMixEffectActivityChange = (
     event: onClientMixEffectActivityChangeType
   ) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onClientMixEffectActivityChangeType;
+    const validation =
+      this.clientMixEffectActivityChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
-    const { effect, active } = event.data;
+      safeEvent.header;
+    const { effect, active } = safeEvent.data;
 
     const msg = {
       type: "clientMixEffectActivityChanged",
@@ -101,17 +171,38 @@ class EffectsController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private requestMixEffectActivityChangeSchema = z.object({
+    type: z.literal("requestMixEffectActivityChange"),
+    header: z.object({
+      tableId: z.string(),
+      requestedUsername: z.string(),
+      requestedInstance: z.string(),
+      requestedProducerType: z.enum(["audio", "screenAudio"]),
+      requestedProducerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.enum(AudioMixEffectsTypeArray),
+      active: z.boolean(),
+    }),
+  });
+
   onRequestMixEffectActivityChange = (
     event: onRequestMixEffectActivityChangeType
   ) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestMixEffectActivityChangeType;
+    const validation =
+      this.requestMixEffectActivityChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-    } = event.header;
-    const { effect, active } = event.data;
+    } = safeEvent.header;
+    const { effect, active } = safeEvent.data;
 
     const msg = {
       type: "mixEffectActivityChangeRequested",
@@ -133,10 +224,33 @@ class EffectsController {
     );
   };
 
+  private clientMixEffectValueChangeSchema = z.object({
+    type: z.literal("clientMixEffectValueChange"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(["audio", "screenAudio"]),
+      producerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.enum(AudioMixEffectsTypeArray),
+      option: z.string(),
+      value: z.number(),
+      styleValue: z.number(),
+    }),
+  });
+
   onClientMixEffectValueChange = (event: onClientMixEffectValueChangeType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onClientMixEffectValueChangeType;
+    const validation =
+      this.clientMixEffectValueChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
-    const { effect, option, value, styleValue } = event.data;
+      safeEvent.header;
+    const { effect, option, value, styleValue } = safeEvent.data;
 
     const msg = {
       type: "clientMixEffectValueChanged",
@@ -157,17 +271,40 @@ class EffectsController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private requestMixEffectValueChangeSchema = z.object({
+    type: z.literal("requestMixEffectValueChange"),
+    header: z.object({
+      tableId: z.string(),
+      requestedUsername: z.string(),
+      requestedInstance: z.string(),
+      requestedProducerType: z.enum(["audio", "screenAudio"]),
+      requestedProducerId: z.string().optional(),
+    }),
+    data: z.object({
+      effect: z.enum(AudioMixEffectsTypeArray),
+      option: z.string(),
+      value: z.number(),
+      styleValue: z.number(),
+    }),
+  });
+
   onRequestMixEffectValueChange = (
     event: onRequestMixEffectValueChangeType
   ) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestMixEffectValueChangeType;
+    const validation =
+      this.requestMixEffectValueChangeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-    } = event.header;
-    const { effect, option, value, styleValue } = event.data;
+    } = safeEvent.header;
+    const { effect, option, value, styleValue } = safeEvent.data;
 
     const msg = {
       type: "mixEffectValueChangeRequested",
@@ -191,14 +328,30 @@ class EffectsController {
     );
   };
 
+  private requestClearEffectsSchema = z.object({
+    type: z.literal("requestClearEffects"),
+    header: z.object({
+      tableId: z.string(),
+      requestedUsername: z.string(),
+      requestedInstance: z.string(),
+      requestedProducerType: z.enum(ProducerTypesArray),
+      requestedProducerId: z.string().optional(),
+    }),
+  });
+
   onRequestClearEffects = (event: onRequestClearEffectsType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestClearEffectsType;
+    const validation = this.requestClearEffectsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       requestedUsername,
       requestedInstance,
       requestedProducerType,
       requestedProducerId,
-    } = event.header;
+    } = safeEvent.header;
 
     const msg = {
       type: "requestedClearEffects",
@@ -216,9 +369,25 @@ class EffectsController {
     );
   };
 
+  private clientClearEffectsSchema = z.object({
+    type: z.literal("clientClearEffects"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+  });
+
   onClientClearEffects = (event: onClientClearEffectsType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onClientClearEffectsType;
+    const validation = this.clientClearEffectsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, producerType, producerId } =
-      event.header;
+      safeEvent.header;
 
     const msg = {
       type: "clientClearedEffects",

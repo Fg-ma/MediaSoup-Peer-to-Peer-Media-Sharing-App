@@ -1,22 +1,41 @@
+import { z } from "zod";
 import {
   onBundleMetadataResponseType,
   onRequestBundleMetadataType,
   onRequestCatchUpDataType,
   onResponseCatchUpDataType,
+  ProducerTypesArray,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
+import { sanitizationUtils } from "src";
 
 class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
+  private requestBundleMetadataSchema = z.object({
+    type: z.literal("requestBundleMetadata"),
+    header: z.object({
+      tableId: z.string(),
+      inquiringUsername: z.string(),
+      inquiringInstance: z.string(),
+      inquiredUsername: z.string(),
+      inquiredInstance: z.string(),
+    }),
+  });
+
   onRequestBundleMetadata = (event: onRequestBundleMetadataType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestBundleMetadataType;
+    const validation = this.requestBundleMetadataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-    } = event.header;
+    } = safeEvent.header;
 
     const msg = {
       type: "bundleMetadataRequested",
@@ -34,15 +53,36 @@ class MetadataController {
     );
   };
 
+  private bundleMetadataResponseSchema = z.object({
+    type: z.literal("bundleMetadataResponse"),
+    header: z.object({
+      tableId: z.string(),
+      inquiringUsername: z.string(),
+      inquiringInstance: z.string(),
+      inquiredUsername: z.string(),
+      inquiredInstance: z.string(),
+    }),
+    data: z.object({
+      clientMute: z.boolean(),
+      streamEffects: z.string(),
+      userEffectsStyles: z.string(),
+    }),
+  });
+
   onBundleMetadataResponse = (event: onBundleMetadataResponseType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onBundleMetadataResponseType;
+    const validation = this.bundleMetadataResponseSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       inquiringUsername,
       inquiringInstance,
       inquiredUsername,
       inquiredInstance,
-    } = event.header;
-    const { clientMute, streamEffects, userEffectsStyles } = event.data;
+    } = safeEvent.header;
+    const { clientMute, streamEffects, userEffectsStyles } = safeEvent.data;
 
     const msg = {
       type: "bundleMetadataResponsed",
@@ -65,7 +105,25 @@ class MetadataController {
     );
   };
 
+  private requestCatchUpDataSchema = z.object({
+    type: z.literal("requestCatchUpData"),
+    header: z.object({
+      tableId: z.string(),
+      inquiringUsername: z.string(),
+      inquiringInstance: z.string(),
+      inquiredUsername: z.string(),
+      inquiredInstance: z.string(),
+      inquiredType: z.enum(ProducerTypesArray),
+      inquiredProducerId: z.string().optional(),
+    }),
+  });
+
   onRequestCatchUpData = (event: onRequestCatchUpDataType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onRequestCatchUpDataType;
+    const validation = this.requestCatchUpDataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       inquiringUsername,
@@ -74,7 +132,7 @@ class MetadataController {
       inquiredInstance,
       inquiredType,
       inquiredProducerId,
-    } = event.header;
+    } = safeEvent.header;
 
     const msg = {
       type: "requestedCatchUpData",
@@ -94,7 +152,57 @@ class MetadataController {
     );
   };
 
+  private responseCatchUpDataSchema = z.object({
+    type: z.literal("responseCatchUpData"),
+    header: z.object({
+      tableId: z.string(),
+      inquiringUsername: z.string(),
+      inquiringInstance: z.string(),
+      inquiredUsername: z.string(),
+      inquiredInstance: z.string(),
+      inquiredType: z.enum(ProducerTypesArray),
+      inquiredProducerId: z.string().optional(),
+    }),
+    data: z
+      .object({
+        paused: z.boolean(),
+        timeEllapsed: z.number(),
+        positioning: z.object({
+          position: z.object({
+            left: z.number(),
+            top: z.number(),
+          }),
+          scale: z.object({
+            x: z.number(),
+            y: z.number(),
+          }),
+          rotation: z.number(),
+        }),
+      })
+      .or(
+        z.object({
+          positioning: z.object({
+            position: z.object({
+              left: z.number(),
+              top: z.number(),
+            }),
+            scale: z.object({
+              x: z.number(),
+              y: z.number(),
+            }),
+            rotation: z.number(),
+          }),
+        })
+      )
+      .optional(),
+  });
+
   onResponseCatchUpData = (event: onResponseCatchUpDataType) => {
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onResponseCatchUpDataType;
+    const validation = this.responseCatchUpDataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const {
       tableId,
       inquiringUsername,
@@ -103,7 +211,7 @@ class MetadataController {
       inquiredInstance,
       inquiredType,
       inquiredProducerId,
-    } = event.header;
+    } = safeEvent.header;
 
     const msg = {
       type: "responsedCatchUpData",
@@ -113,7 +221,7 @@ class MetadataController {
         inquiredType,
         inquiredProducerId,
       },
-      data: event.data,
+      data: safeEvent.data,
     };
 
     this.broadcaster.broadcastToInstance(

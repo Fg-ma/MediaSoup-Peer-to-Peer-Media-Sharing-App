@@ -1,8 +1,22 @@
+import { z } from "zod";
 import Broadcaster from "./Broadcaster";
 import { onResumeType, tableConsumers } from "../typeConstant";
+import { sanitizationUtils } from "src";
+
+const resumeSchema = z.object({
+  type: z.literal("resume"),
+  header: z.object({
+    tableId: z.string(),
+    username: z.string(),
+    instance: z.string(),
+  }),
+});
 
 const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
-  const { tableId, username, instance } = event.header;
+  const safeEvent = sanitizationUtils.sanitizeObject(event) as onResumeType;
+  const validation = resumeSchema.safeParse(safeEvent);
+  if (!validation.success) return;
+  const { tableId, username, instance } = safeEvent.header;
 
   for (const producerUsername in tableConsumers[tableId][username][instance]) {
     for (const producerInstance in tableConsumers[tableId][username][instance][

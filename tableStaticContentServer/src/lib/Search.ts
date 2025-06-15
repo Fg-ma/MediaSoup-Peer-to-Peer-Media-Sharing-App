@@ -1,8 +1,10 @@
+import { z } from "zod";
 import axios from "axios";
 import { onSearchTabledContentRequestType } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import elasticSearch from "../../../elasticSearchServer/src/index";
 import { sanitizationUtils } from "src";
+import { StaticContentTypesArray } from "../../../universal/contentTypeConstant";
 // import qdrant from "../../../qdrantServer/src/index";
 
 class Search {
@@ -25,12 +27,28 @@ class Search {
 
   constructor(private broadcaster: Broadcaster) {}
 
+  private searchTabledContentRequestSchema = z.object({
+    type: z.literal("searchTabledContentRequest"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentType: z.enum(StaticContentTypesArray).or(z.literal("all")),
+    }),
+    data: z.object({
+      name: z.string(),
+    }),
+  });
+
   onSearchTabledContentRequest = async (
     event: onSearchTabledContentRequestType
   ) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onSearchTabledContentRequestType;
+    const validation =
+      this.searchTabledContentRequestSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentType } = safeEvent.header;
     const { name } = safeEvent.data;
 
@@ -86,6 +104,9 @@ class Search {
   //   const safeEvent = utils.sanitizeObject(
   //     event
   //   ) as onSearchTabledContentRequestType;
+  //   const validation =
+  //   this.searchTabledContentRequestSchema.safeParse(safeEvent);
+  //   if (!validation.success) return;
   //   const { tableId, username, instance, contentType } = safeEvent.header;
   //   const { name } = safeEvent.data;
 

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import {
   onJoinTableType,
@@ -11,10 +12,21 @@ import { sanitizationUtils } from "src";
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
 
+  private joinTableSchema = z.object({
+    type: z.literal("joinTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onJoinTable = (ws: TableStaticContentWebSocket, event: onJoinTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onJoinTableType;
+    const validation = this.joinTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -41,10 +53,21 @@ class TablesController {
     });
   };
 
+  private leaveTableSchema = z.object({
+    type: z.literal("leaveTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onLeaveTable = (event: onLeaveTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onLeaveTableType;
+    const validation = this.leaveTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     if (

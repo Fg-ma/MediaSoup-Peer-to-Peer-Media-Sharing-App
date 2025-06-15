@@ -37,8 +37,8 @@ const handleMessage = (ws: GameWebSocket, event: MessageTypes) => {
     case "getPlayersState":
       universalGameController.onGetPlayersState(event);
       break;
-    case "getIntialGameStates":
-      universalGameController.onGetIntialGameStates(event);
+    case "getInitialGameStates":
+      universalGameController.onGetInitialGameStates(event);
       break;
     case "snakeDirectionChange":
       snakeGameController.onSnakeDirectionChange(event);

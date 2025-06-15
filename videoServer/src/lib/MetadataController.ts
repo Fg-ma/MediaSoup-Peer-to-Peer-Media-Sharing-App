@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { tableTopMongo, tableTopRedis, sanitizationUtils } from "src";
 import {
   onDeleteUploadSessionType,
@@ -11,10 +12,27 @@ import { UploadSession } from "../posts/lib/typeConstant";
 class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
 
+  private updateVideoMetadataSchema = z.object({
+    type: z.literal("updateVideoMetadata"),
+    header: z.object({
+      tableId: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+    data: z.object({
+      isPlaying: z.boolean(),
+      videoPosition: z.number(),
+      videoPlaybackSpeed: z.number(),
+      ended: z.boolean(),
+    }),
+  });
+
   onUpdateVideoMetadata = async (event: onUpdateVideoMetadataType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onUpdateVideoMetadataType;
+    const validation = this.updateVideoMetadataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, contentId, instanceId } = safeEvent.header;
     const { isPlaying, videoPosition, videoPlaybackSpeed, ended } =
       safeEvent.data;
@@ -42,12 +60,26 @@ class MetadataController {
     this.broadcaster.broadcastToTable(tableId, msg);
   };
 
+  private requestCatchUpVideoMetadataSchema = z.object({
+    type: z.literal("requestCatchUpVideoMetadata"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+  });
+
   onRequestCatchUpVideoMetadata = async (
     event: onRequestCatchUpVideoMetadataType
   ) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onRequestCatchUpVideoMetadataType;
+    const validation =
+      this.requestCatchUpVideoMetadataSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -105,10 +137,20 @@ class MetadataController {
     }
   };
 
+  private deleteUploadSessionSchema = z.object({
+    type: z.literal("deleteUploadSession"),
+    header: z.object({
+      uploadId: z.string(),
+      contentId: z.string(),
+    }),
+  });
+
   onDeleteUploadSession = async (event: onDeleteUploadSessionType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDeleteUploadSessionType;
+    const validation = this.deleteUploadSessionSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { uploadId, contentId } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
@@ -127,10 +169,20 @@ class MetadataController {
     );
   };
 
+  private signalReuploadStartSchema = z.object({
+    type: z.literal("signalReuploadStart"),
+    header: z.object({
+      tableId: z.string(),
+      contentId: z.string(),
+    }),
+  });
+
   onSignalReuploadStart = async (event: onSignalReuploadStartType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onSignalReuploadStartType;
+    const validation = this.signalReuploadStartSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, contentId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

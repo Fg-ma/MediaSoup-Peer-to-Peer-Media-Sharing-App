@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   DataConsumer,
   Consumer,
@@ -22,7 +23,10 @@ import {
   onNewConsumerType,
   onNewJSONConsumerType,
   onUnsubscribeType,
+  DataStreamTypesArray,
+  ProducerTypesArray,
 } from "../typeConstant";
+import { sanitizationUtils } from "src";
 
 class ConsumersController {
   constructor(
@@ -30,8 +34,22 @@ class ConsumersController {
     private mediasoupCleanup: MediasoupCleanup
   ) {}
 
+  private createConsumerTransportSchema = z.object({
+    type: z.literal("createConsumerTransport"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   async onCreateConsumerTransport(event: onCreateConsumerTransportType) {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onCreateConsumerTransportType;
+    const validation = this.createConsumerTransportSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
 
     // Get the next available worker and router if one doesn't already exist
     let mediasoupRouter;
@@ -66,9 +84,41 @@ class ConsumersController {
     });
   }
 
+  private connectConsumerTransportSchema = z.object({
+    type: z.literal("connectConsumerTransport"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      transportId: z.string(),
+      dtlsParameters: z.object({
+        role: z.enum(["auto", "client", "server"]).optional(),
+        fingerprints: z.array(
+          z.object({
+            algorithm: z.enum([
+              "sha-1",
+              "sha-224",
+              "sha-256",
+              "sha-384",
+              "sha-512",
+            ]),
+            value: z.string(),
+          })
+        ),
+      }),
+    }),
+  });
+
   async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
-    const { tableId, username, instance } = event.header;
-    const { dtlsParameters } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onConnectConsumerTransportType;
+    const validation = this.connectConsumerTransportSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
+    const { dtlsParameters } = safeEvent.data;
 
     if (
       !tableConsumerTransports[tableId] ||
@@ -93,9 +143,67 @@ class ConsumersController {
     });
   }
 
+  private rtcpFeedbackSchema = z.object({
+    type: z.string(),
+    parameter: z.string().optional(),
+  });
+
+  private codecSchema = z.object({
+    kind: z.enum(["audio", "video"]),
+    mimeType: z.string(),
+    preferredPayloadType: z.number().optional(),
+    clockRate: z.number(),
+    channels: z.number().optional(),
+    parameters: z.any().optional(),
+    rtcpFeedback: z.array(this.rtcpFeedbackSchema).optional(),
+  });
+
+  private headerExtensionSchema = z.object({
+    kind: z.enum(["audio", "video"]),
+    uri: z.enum([
+      "urn:ietf:params:rtp-hdrext:sdes:mid",
+      "urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id",
+      "urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id",
+      "http://tools.ietf.org/html/draft-ietf-avtext-framemarking-07",
+      "urn:ietf:params:rtp-hdrext:framemarking",
+      "urn:ietf:params:rtp-hdrext:ssrc-audio-level",
+      "urn:3gpp:video-orientation",
+      "urn:ietf:params:rtp-hdrext:toffset",
+      "http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01",
+      "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
+      "http://www.webrtc.org/experiments/rtp-hdrext/abs-capture-time",
+      "http://www.webrtc.org/experiments/rtp-hdrext/playout-delay",
+    ]),
+    preferredId: z.number(),
+    preferredEncrypt: z.boolean().optional(),
+    direction: z
+      .enum(["sendrecv", "sendonly", "recvonly", "inactive"])
+      .optional(),
+  });
+
+  private rtpCapabilitiesSchema = z.object({
+    codecs: z.array(this.codecSchema).optional(),
+    headerExtensions: z.array(this.headerExtensionSchema).optional(),
+  });
+
+  private consumeSchema = z.object({
+    type: z.literal("consume"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      rtpCapabilities: this.rtpCapabilitiesSchema,
+    }),
+  });
+
   async onConsume(event: onConsumeType) {
-    const { tableId, username, instance } = event.header;
-    const { rtpCapabilities } = event.data;
+    const safeEvent = sanitizationUtils.sanitizeObject(event) as onConsumeType;
+    const validation = this.consumeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
+    const { rtpCapabilities } = safeEvent.data;
 
     // Get the next available worker and router
     const { router: mediasoupRouter } = getWorkerByIdx(workersMap[tableId]);
@@ -359,15 +467,36 @@ class ConsumersController {
     });
   }
 
+  private newConsumerSchema = z.object({
+    type: z.literal("newConsumer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      rtpCapabilities: this.rtpCapabilitiesSchema,
+      producerUsername: z.string(),
+      producerInstance: z.string(),
+      producerType: z.enum(["camera", "screen", "screenAudio", "audio"]),
+      producerId: z.string().optional(),
+    }),
+  });
+
   async onNewConsumer(event: onNewConsumerType) {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onNewConsumerType;
+    const validation = this.newConsumerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
     const {
       producerType,
       producerId,
       producerUsername,
       producerInstance,
       rtpCapabilities,
-    } = event.data;
+    } = safeEvent.data;
 
     let newConsumer: {
       consumer: Consumer;
@@ -495,15 +624,44 @@ class ConsumersController {
     this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
+  private sctpCapabilitiesSchema = z.object({
+    numStreams: z.object({
+      OS: z.number(),
+      MIS: z.number(),
+    }),
+  });
+
+  private newJSONConsumerSchema = z.object({
+    type: z.literal("newJSONConsumer"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      sctpCapabilities: this.sctpCapabilitiesSchema,
+      producerUsername: z.string(),
+      producerInstance: z.string(),
+      producerType: z.literal("json"),
+      incomingProducerId: z.string(),
+      dataStreamType: z.enum(DataStreamTypesArray),
+    }),
+  });
+
   async onNewJSONConsumer(event: onNewJSONConsumerType) {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onNewJSONConsumerType;
+    const validation = this.newJSONConsumerSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
     const {
       producerUsername,
       producerInstance,
       producerType,
       incomingProducerId,
       dataStreamType,
-    } = event.data;
+    } = safeEvent.data;
 
     let newConsumer: {
       consumer: DataConsumer;
@@ -608,10 +766,30 @@ class ConsumersController {
     this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
+  private newConsumerCreatedSchema = z.object({
+    type: z.literal("newConsumerCreated"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      producerUsername: z.string(),
+      producerInstance: z.string(),
+      producerType: z.enum(ProducerTypesArray),
+      producerId: z.string().optional(),
+    }),
+  });
+
   onNewConsumerCreated(event: onNewConsumerCreatedType) {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onNewConsumerCreatedType;
+    const validation = this.newConsumerCreatedSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
     const { producerUsername, producerInstance, producerType, producerId } =
-      event.data;
+      safeEvent.data;
 
     const msg = {
       type: "newConsumerWasCreated",
@@ -626,8 +804,22 @@ class ConsumersController {
     this.broadcaster.broadcastToInstance(tableId, username, instance, msg);
   }
 
+  private unsubscribeSchema = z.object({
+    type: z.literal("unsubscribe"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onUnsubscribe(event: onUnsubscribeType) {
-    const { tableId, username, instance } = event.header;
+    const safeEvent = sanitizationUtils.sanitizeObject(
+      event
+    ) as onUnsubscribeType;
+    const validation = this.unsubscribeSchema.safeParse(safeEvent);
+    if (!validation.success) return;
+    const { tableId, username, instance } = safeEvent.header;
 
     this.mediasoupCleanup.deleteConsumerTransport(tableId, username, instance);
 

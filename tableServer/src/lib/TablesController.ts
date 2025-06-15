@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 import {
   onChangeTableBackgroundType,
   onJoinTableType,
@@ -15,14 +16,30 @@ import {
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import { sanitizationUtils } from "src";
+import { contentTypesArray } from "../../../universal/contentTypeConstant";
+import {
+  TableReactionsArray,
+  TableReactionStylesArray,
+} from "../../../universal/reactionsTypeConstant";
 
 class TablesController {
   constructor(private broadcaster: Broadcaster) {}
+
+  private joinTableSchema = z.object({
+    type: z.literal("joinTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
 
   onJoinTable = (ws: TableWebSocket, event: onJoinTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onJoinTableType;
+    const validation = this.joinTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -60,10 +77,21 @@ class TablesController {
     });
   };
 
+  private leaveTableSchema = z.object({
+    type: z.literal("leaveTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onLeaveTable = (event: onLeaveTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onLeaveTableType;
+    const validation = this.leaveTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     if (
@@ -82,10 +110,27 @@ class TablesController {
     });
   };
 
+  private changeTableBackgroundSchema = z.object({
+    type: z.literal("changeTableBackground"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+    data: z.object({
+      background: z.object({
+        category: z.string(),
+        categorySelection: z.string(),
+      }),
+    }),
+  });
+
   onChangeTableBackground = (event: onChangeTableBackgroundType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onChangeTableBackgroundType;
+    const validation = this.changeTableBackgroundSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
     const { background } = safeEvent.data;
 
@@ -99,10 +144,23 @@ class TablesController {
     );
   };
 
+  private moveSeatsSchema = z.object({
+    type: z.literal("moveSeats"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+    }),
+    data: z.object({
+      direction: z.enum(["left", "right"]),
+    }),
+  });
+
   onMoveSeats = (event: onMoveSeatsType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onMoveSeatsType;
+    const validation = this.moveSeatsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username } = safeEvent.header;
     const { direction } = safeEvent.data;
 
@@ -153,10 +211,21 @@ class TablesController {
     });
   };
 
+  private swapSeatsSchema = z.object({
+    type: z.literal("swapSeats"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      targetUsername: z.string(),
+    }),
+  });
+
   onSwapSeats = (event: onSwapSeatsType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onSwapSeatsType;
+    const validation = this.swapSeatsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
@@ -175,10 +244,21 @@ class TablesController {
     });
   };
 
+  private kickFromTableSchema = z.object({
+    type: z.literal("kickFromTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      targetUsername: z.string(),
+    }),
+  });
+
   onKickFromTable = (event: onKickFromTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onKickFromTableType;
+    const validation = this.kickFromTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
@@ -195,8 +275,24 @@ class TablesController {
     });
   };
 
+  private reactionSchema = z.object({
+    type: z.literal("reaction"),
+    header: z.object({
+      tableId: z.string(),
+      contentType: z.enum(contentTypesArray),
+      contentId: z.string().optional(),
+      instanceId: z.string().optional(),
+    }),
+    data: z.object({
+      reaction: z.enum(TableReactionsArray),
+      reactionStyle: z.enum(TableReactionStylesArray),
+    }),
+  });
+
   onReaction = (event: onReactionType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onReactionType;
+    const validation = this.reactionSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

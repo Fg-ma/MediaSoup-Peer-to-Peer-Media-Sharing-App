@@ -12,7 +12,9 @@ import StatesPermissionsController from "./lib/StatesPermissionsController";
 import MetadataController from "./lib/MetadataController";
 import Broadcaster from "./lib/Broadcaster";
 import MediasoupCleanup from "./lib/MediasoupCleanup";
+import SanitizationUtils from "../../universal/SanitizationUtils";
 
+export const sanitizationUtils = new SanitizationUtils();
 export const broadcaster = new Broadcaster();
 export const mediasoupCleanup = new MediasoupCleanup();
 export const tables = new Tables(broadcaster, mediasoupCleanup);

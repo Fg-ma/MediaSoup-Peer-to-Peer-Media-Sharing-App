@@ -23,7 +23,8 @@
     "socket.io": "^4.8.1",
     "typescript": "^5.7.2",
     "uuid": "^11.0.4",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.50.0"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.50.0",
+    "zod": "^3.25.64"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

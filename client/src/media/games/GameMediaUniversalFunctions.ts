@@ -1,4 +1,5 @@
 import { GameTypes } from "../../../../universal/contentTypeConstant";
+import { SnakeColorsType } from "./snakeGame/lib/typeConstant";
 
 type OutGoingUniversalMessages =
   | {
@@ -47,7 +48,7 @@ type OutGoingUniversalMessages =
         gameType: GameTypes;
         gameId: string;
       };
-      data: object;
+      data: { snakeColor?: SnakeColorsType };
     }
   | {
       type: "leaveGame";
@@ -70,7 +71,7 @@ type OutGoingUniversalMessages =
       };
     }
   | {
-      type: "getIntialGameStates";
+      type: "getInitialGameStates";
       header: {
         tableId: string;
         username: string;
@@ -146,7 +147,7 @@ class GameMediaUniversalFunctions {
     });
   };
 
-  joinGame = (data: object) => {
+  joinGame = (data: { snakeColor?: SnakeColorsType }) => {
     this.sendUniversalMessage({
       type: "joinGame",
       header: {
@@ -186,9 +187,9 @@ class GameMediaUniversalFunctions {
     });
   };
 
-  getIntialGameStates = () => {
+  getInitialGameStates = () => {
     this.sendUniversalMessage({
-      type: "getIntialGameStates",
+      type: "getInitialGameStates",
       header: {
         tableId: this.tableId,
         username: this.username,

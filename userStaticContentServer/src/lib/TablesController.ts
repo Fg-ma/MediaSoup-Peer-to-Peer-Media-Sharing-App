@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import {
   onConnectType,
@@ -10,8 +11,18 @@ import { sanitizationUtils } from "src";
 class TablesController {
   constructor() {}
 
+  private connectSchema = z.object({
+    type: z.literal("connect"),
+    header: z.object({
+      userId: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onConnect = (ws: UserStaticContentWebSocket, event: onConnectType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onConnectType;
+    const validation = this.connectSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { userId, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -25,10 +36,20 @@ class TablesController {
     userConnections[userId][instance] = ws;
   };
 
+  private disconnectSchema = z.object({
+    type: z.literal("disconnect"),
+    header: z.object({
+      userId: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onDisconnect = (event: onDisconnectType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDisconnectType;
+    const validation = this.disconnectSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { userId, instance } = safeEvent.header;
 
     if (userConnections[userId] && userConnections[userId][instance]) {

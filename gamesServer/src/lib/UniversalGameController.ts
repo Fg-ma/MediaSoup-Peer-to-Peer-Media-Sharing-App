@@ -1,3 +1,4 @@
+import { z } from "zod";
 import Broadcaster from "./Broadcaster";
 import {
   onStartGameType,
@@ -8,15 +9,44 @@ import {
   onJoinGameType,
   onLeaveGameType,
   onGetPlayersStateType,
-  onGetIntialGameStatesType,
+  onGetInitialGameStatesType,
   onUpdateContentPositioningType,
 } from "../typeConstant";
 import SnakeGame from "../snakeGame/SnakeGame";
-import { SnakeColorsType } from "../snakeGame/lib/typeConstant";
+import {
+  SnakeColorsSchema,
+  SnakeColorsType,
+} from "../snakeGame/lib/typeConstant";
 import { sanitizationUtils, tableTopMongo } from "src";
+import { GameTypesArray } from "../../../universal/contentTypeConstant";
 
 class UniversalGameController {
   constructor(private broadcaster: Broadcaster) {}
+
+  private updateContentPositioningSchema = z.object({
+    type: z.literal("updateContentPositioning"),
+    header: z.object({
+      tableId: z.string(),
+      gameId: z.string(),
+    }),
+    data: z.object({
+      positioning: z.object({
+        position: z
+          .object({
+            left: z.number(),
+            top: z.number(),
+          })
+          .optional(),
+        scale: z
+          .object({
+            x: z.number(),
+            y: z.number(),
+          })
+          .optional(),
+        rotation: z.number().optional(),
+      }),
+    }),
+  });
 
   onUpdateContentPositioning = async (
     event: onUpdateContentPositioningType
@@ -24,6 +54,8 @@ class UniversalGameController {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onUpdateContentPositioningType;
+    const validation = this.updateContentPositioningSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, gameId } = safeEvent.header;
     const { positioning } = safeEvent.data;
 
@@ -35,10 +67,27 @@ class UniversalGameController {
     );
   };
 
+  private initiateGameSchema = z.object({
+    type: z.literal("initiateGame"),
+    header: z.object({
+      tableId: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+    data: z.object({
+      initiator: z.object({
+        username: z.string(),
+        instance: z.string(),
+      }),
+    }),
+  });
+
   onInitiateGame = async (event: onInitiateGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onInitiateGameType;
+    const validation = this.initiateGameSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, gameType, gameId } = safeEvent.header;
     const { initiator } = safeEvent.data;
 
@@ -83,10 +132,21 @@ class UniversalGameController {
     );
   };
 
+  private startGameSchema = z.object({
+    type: z.literal("startGame"),
+    header: z.object({
+      tableId: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+  });
+
   onStartGame = (event: onStartGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onStartGameType;
+    const validation = this.startGameSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, gameType, gameId } = safeEvent.header;
 
     if (gameType === "snake") {
@@ -98,10 +158,21 @@ class UniversalGameController {
     });
   };
 
+  private closeGameSchema = z.object({
+    type: z.literal("closeGame"),
+    header: z.object({
+      tableId: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+  });
+
   onCloseGame = async (event: onCloseGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onCloseGameType;
+    const validation = this.closeGameSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, gameType, gameId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(
@@ -157,8 +228,22 @@ class UniversalGameController {
     }
   };
 
+  private joinGameSchema = z.object({
+    type: z.literal("joinGame"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+    data: z.object({ snakeColor: SnakeColorsSchema.optional() }),
+  });
+
   onJoinGame = (event: onJoinGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onJoinGameType;
+    const validation = this.joinGameSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
     const data = safeEvent.data;
 
@@ -175,10 +260,23 @@ class UniversalGameController {
     }
   };
 
+  private leaveGameSchema = z.object({
+    type: z.literal("leaveGame"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+  });
+
   onLeaveGame = (event: onLeaveGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onLeaveGameType;
+    const validation = this.leaveGameSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     switch (gameType) {
@@ -190,10 +288,23 @@ class UniversalGameController {
     }
   };
 
+  private getPlayersStateSchema = z.object({
+    type: z.literal("getPlayersState"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+  });
+
   onGetPlayersState = (event: onGetPlayersStateType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onGetPlayersStateType;
+    const validation = this.getPlayersStateSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let playersState = {};
@@ -222,17 +333,30 @@ class UniversalGameController {
     );
   };
 
-  onGetIntialGameStates = (event: onGetIntialGameStatesType) => {
+  private getInitialGameStatesSchema = z.object({
+    type: z.literal("getInitialGameStates"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      gameType: z.enum(GameTypesArray),
+      gameId: z.string(),
+    }),
+  });
+
+  onGetInitialGameStates = (event: onGetInitialGameStatesType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
-    ) as onGetIntialGameStatesType;
+    ) as onGetInitialGameStatesType;
+    const validation = this.getInitialGameStatesSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let initialGameStates = {};
 
     switch (gameType) {
       case "snake":
-        initialGameStates = snakeGames[tableId][gameId].getIntialGameStates();
+        initialGameStates = snakeGames[tableId][gameId].getInitialGameStates();
         break;
       default:
         break;

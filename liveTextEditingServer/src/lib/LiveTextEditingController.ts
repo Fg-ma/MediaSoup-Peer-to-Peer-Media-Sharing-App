@@ -1,3 +1,4 @@
+import { z } from "zod";
 import * as Y from "yjs";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -23,10 +24,21 @@ import { Readable } from "stream";
 class LiveTextEditingController {
   constructor(private broadcaster: Broadcaster) {}
 
+  private joinTableSchema = z.object({
+    type: z.literal("joinTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onJoinTable = async (ws: TableWebSocket, event: onJoinTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onJoinTableType;
+    const validation = this.joinTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -54,10 +66,21 @@ class LiveTextEditingController {
     tables[tableId][username][instance] = ws;
   };
 
+  private leaveTableSchema = z.object({
+    type: z.literal("leaveTable"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+    }),
+  });
+
   onLeaveTable = (event: onLeaveTableType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onLeaveTableType;
+    const validation = this.leaveTableSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance } = safeEvent.header;
 
     if (
@@ -69,10 +92,23 @@ class LiveTextEditingController {
     }
   };
 
+  private getInitialDocStateSchema = z.object({
+    type: z.literal("getInitialDocState"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+  });
+
   onGetInitialDocState = async (event: onGetInitialDocStateType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onGetInitialDocStateType;
+    const validation = this.getInitialDocStateSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -169,10 +205,26 @@ class LiveTextEditingController {
     }
   };
 
+  private docUpdateSchema = z.object({
+    type: z.literal("docUpdate"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+    data: z.object({
+      payload: z.instanceof(Uint8Array),
+    }),
+  });
+
   onDocUpdate = async (event: onDocUpdateType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onDocUpdateType;
+    const validation = this.docUpdateSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
     const { payload } = safeEvent.data;
@@ -207,10 +259,23 @@ class LiveTextEditingController {
     );
   };
 
+  private getSavedOpsSchema = z.object({
+    type: z.literal("getSavedOps"),
+    header: z.object({
+      tableId: z.string(),
+      username: z.string(),
+      instance: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+  });
+
   onGetSavedOps = async (event: onGetSavedOpsType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(
       event
     ) as onGetSavedOpsType;
+    const validation = this.getSavedOpsSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -229,8 +294,19 @@ class LiveTextEditingController {
       );
   };
 
+  private docSaveSchema = z.object({
+    type: z.literal("docSave"),
+    header: z.object({
+      tableId: z.string(),
+      contentId: z.string(),
+      instanceId: z.string(),
+    }),
+  });
+
   onDocSave = async (event: onDocSaveType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onDocSaveType;
+    const validation = this.docSaveSchema.safeParse(safeEvent);
+    if (!validation.success) return;
     const { tableId, contentId, instanceId } = safeEvent.header;
 
     const savingSessionsKey = `LTE:SS:${tableId}:${contentId}:${instanceId}`;

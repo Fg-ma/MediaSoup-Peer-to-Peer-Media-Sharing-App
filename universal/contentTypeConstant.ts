@@ -19,6 +19,19 @@ export type ContentTypes =
   | "games"
   | "svg";
 
+export const contentTypesArray = [
+  "video",
+  "image",
+  "camera",
+  "application",
+  "screen",
+  "text",
+  "soundClip",
+  "audio",
+  "games",
+  "svg",
+] as const;
+
 export type StaticContentTypes =
   | "video"
   | "image"
@@ -27,7 +40,17 @@ export type StaticContentTypes =
   | "text"
   | "soundClip";
 
+export const StaticContentTypesArray = [
+  "video",
+  "image",
+  "svg",
+  "application",
+  "text",
+  "soundClip",
+] as const;
+
 export type TableContentStateTypes = "tabled";
+export const TableContentStateTypesArray = ["tabled"] as const;
 
 export type UserContentStateTypes = "muteStyle";
 
@@ -58,6 +81,7 @@ export type StaticMimeTypes =
   | "text/plain";
 
 export type GameTypes = "snake";
+export const GameTypesArray = ["snake"] as const;
 
 export const mimeTypeContentTypeMap: {
   [tableTopStaticMimeType in StaticMimeTypes]: StaticContentTypes;
