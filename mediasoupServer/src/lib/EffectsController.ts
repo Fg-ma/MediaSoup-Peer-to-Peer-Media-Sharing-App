@@ -12,7 +12,14 @@ import {
   ProducerTypesArray,
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
-import { AudioMixEffectsTypeArray } from "../../../universal/effectsTypeConstant";
+import {
+  audioEffectStylesSchema,
+  AudioMixEffectsTypeArray,
+  cameraEffectStylesSchema,
+  HideBackgroundEffectTypesArray,
+  PostProcessEffectTypesArray,
+  screenEffectStylesSchema,
+} from "../../../universal/effectsTypeConstant";
 
 class EffectsController {
   constructor(private broadcaster: Broadcaster) {}
@@ -29,19 +36,29 @@ class EffectsController {
     data: z.object({
       effect: z.string(),
       blockStateChange: z.boolean(),
-      style: z.string().optional(),
-      hideBackgroundStyle: z.string().optional(),
+      style: z
+        .union([
+          cameraEffectStylesSchema,
+          screenEffectStylesSchema,
+          audioEffectStylesSchema,
+        ])
+        .optional(),
+      hideBackgroundStyle: z.enum(HideBackgroundEffectTypesArray).optional(),
       hideBackgroundColor: z.string().optional(),
-      postProcessStyle: z.string().optional(),
+      postProcessStyle: z.enum(PostProcessEffectTypesArray).optional(),
     }),
   });
 
   onRequestEffectChange = (event: onRequestEffectChangeType) => {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onRequestEffectChangeType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, undefined, [
+      "hideBackgroundColor",
+      "color",
+    ]) as onRequestEffectChangeType;
     const validation = this.requestEffectChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       requestedUsername,
@@ -93,17 +110,26 @@ class EffectsController {
     }),
     data: z.object({
       effect: z.string(),
-      effectStyle: z.string().optional(),
+      effectStyle: z
+        .union([
+          cameraEffectStylesSchema,
+          screenEffectStylesSchema,
+          audioEffectStylesSchema,
+        ])
+        .optional(),
       blockStateChange: z.boolean(),
     }),
   });
 
   onClientEffectChange = (event: onClientEffectChangeType) => {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onClientEffectChangeType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, undefined, [
+      "color",
+    ]) as onClientEffectChangeType;
     const validation = this.clientEffectChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
     const { effect, effectStyle, blockStateChange } = safeEvent.data;
@@ -149,7 +175,10 @@ class EffectsController {
     ) as onClientMixEffectActivityChangeType;
     const validation =
       this.clientMixEffectActivityChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
     const { effect, active } = safeEvent.data;
@@ -194,7 +223,10 @@ class EffectsController {
     ) as onRequestMixEffectActivityChangeType;
     const validation =
       this.requestMixEffectActivityChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       requestedUsername,
@@ -247,7 +279,10 @@ class EffectsController {
     ) as onClientMixEffectValueChangeType;
     const validation =
       this.clientMixEffectValueChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
     const { effect, option, value, styleValue } = safeEvent.data;
@@ -296,7 +331,10 @@ class EffectsController {
     ) as onRequestMixEffectValueChangeType;
     const validation =
       this.requestMixEffectValueChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       requestedUsername,
@@ -344,7 +382,10 @@ class EffectsController {
       event
     ) as onRequestClearEffectsType;
     const validation = this.requestClearEffectsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       requestedUsername,
@@ -385,7 +426,10 @@ class EffectsController {
       event
     ) as onClientClearEffectsType;
     const validation = this.clientClearEffectsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
 

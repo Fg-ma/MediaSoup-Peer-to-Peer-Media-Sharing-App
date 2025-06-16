@@ -15,7 +15,16 @@ import {
   SctpStreamParameters,
 } from "mediasoup/node/lib/types";
 import uWS from "uWebSockets.js";
-import { AudioMixEffectsType } from "../../universal/effectsTypeConstant";
+import {
+  AudioEffectStylesType,
+  AudioMixEffectsType,
+  CameraEffectStylesType,
+  HideBackgroundEffectTypes,
+  PostProcessEffectTypes,
+  ScreenEffectStylesType,
+  UserEffectsStylesType,
+  UserEffectsType,
+} from "../../universal/effectsTypeConstant";
 
 interface MediasoupWorker {
   worker: Worker;
@@ -428,9 +437,9 @@ export type onRequestEffectChangeType = {
     effect: string;
     blockStateChange: boolean;
     style?: string;
-    hideBackgroundStyle?: string;
+    hideBackgroundStyle?: HideBackgroundEffectTypes;
     hideBackgroundColor?: string;
-    postProcessStyle?: string;
+    postProcessStyle?: PostProcessEffectTypes;
   };
 };
 
@@ -445,7 +454,10 @@ export type onClientEffectChangeType = {
   };
   data: {
     effect: string;
-    effectStyle?: string;
+    effectStyle?:
+      | CameraEffectStylesType
+      | ScreenEffectStylesType
+      | AudioEffectStylesType;
     blockStateChange: boolean;
   };
 };
@@ -497,8 +509,8 @@ export type onBundleMetadataResponseType = {
   };
   data: {
     clientMute: boolean;
-    streamEffects: string;
-    userEffectsStyles: string;
+    streamEffects: UserEffectsType;
+    userEffectsStyles: UserEffectsStylesType;
   };
 };
 

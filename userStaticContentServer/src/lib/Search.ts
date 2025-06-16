@@ -44,7 +44,10 @@ class Search {
       event
     ) as onSearchUserContentRequestType;
     const validation = this.searchUserContentRequestSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { userId, instance, contentType } = safeEvent.header;
     const { name } = safeEvent.data;
 

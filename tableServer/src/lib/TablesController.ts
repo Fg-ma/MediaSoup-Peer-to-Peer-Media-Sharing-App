@@ -39,7 +39,10 @@ class TablesController {
       event
     ) as onJoinTableType;
     const validation = this.joinTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -91,7 +94,10 @@ class TablesController {
       event
     ) as onLeaveTableType;
     const validation = this.leaveTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     if (
@@ -130,7 +136,10 @@ class TablesController {
       event
     ) as onChangeTableBackgroundType;
     const validation = this.changeTableBackgroundSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const { background } = safeEvent.data;
 
@@ -160,7 +169,10 @@ class TablesController {
       event
     ) as onMoveSeatsType;
     const validation = this.moveSeatsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username } = safeEvent.header;
     const { direction } = safeEvent.data;
 
@@ -225,7 +237,10 @@ class TablesController {
       event
     ) as onSwapSeatsType;
     const validation = this.swapSeatsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
@@ -258,7 +273,10 @@ class TablesController {
       event
     ) as onKickFromTableType;
     const validation = this.kickFromTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, targetUsername } = safeEvent.header;
 
     if (targetUsername === username) return;
@@ -292,7 +310,10 @@ class TablesController {
   onReaction = (event: onReactionType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onReactionType;
     const validation = this.reactionSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

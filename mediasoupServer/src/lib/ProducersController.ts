@@ -18,6 +18,7 @@ import {
   workersMap,
 } from "../typeConstant";
 import { sanitizationUtils } from "src";
+
 class ProducersController {
   constructor(
     private broadcaster: Broadcaster,
@@ -38,7 +39,10 @@ class ProducersController {
       event
     ) as onCreateProducerTransportType;
     const validation = this.createProducerTransportSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     // Get the next available worker and router if one doesn't already exist
@@ -113,11 +117,14 @@ class ProducersController {
   onConnectProducerTransport = async (
     event: onConnectProducerTransportType
   ) => {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onConnectProducerTransportType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      value: ":",
+    }) as onConnectProducerTransportType;
     const validation = this.connectProducerTransportSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const { dtlsParameters } = safeEvent.data;
 
@@ -229,11 +236,16 @@ class ProducersController {
   });
 
   onCreateNewProducer = async (event: onCreateNewProducerType) => {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onCreateNewProducerType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      uri: ":/",
+      mimeType: "/+",
+      parameters: ":/.+=-",
+    }) as onCreateNewProducerType;
     const validation = this.createNewProducerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
     const { kind, rtpParameters } = safeEvent.data;
@@ -317,10 +329,12 @@ class ProducersController {
   };
 
   private sctpParametersSchema = z.object({
-    port: z.number(),
-    OS: z.number(),
-    MIS: z.number(),
-    maxMessageSize: z.number(),
+    port: z.number().optional(),
+    OS: z.number().optional(),
+    MIS: z.number().optional(),
+    maxMessageSize: z.number().optional(),
+    streamId: z.number().optional(),
+    ordered: z.boolean().optional(),
   });
 
   private createNewJSONProducerSchema = z.object({
@@ -346,7 +360,10 @@ class ProducersController {
       event
     ) as onCreateNewJSONProducerType;
     const validation = this.createNewJSONProducerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerId, dataStreamType } =
       safeEvent.header;
     const { label, protocol, sctpStreamParameters } = safeEvent.data;
@@ -441,7 +458,10 @@ class ProducersController {
       event
     ) as onNewProducerCreatedType;
     const validation = this.newProducerCreatedSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
 
@@ -464,7 +484,7 @@ class ProducersController {
       instance: z.string(),
       producerType: z.enum(ProducerTypesArray),
       producerId: z.string().optional(),
-      dataStreamType: z.enum(DataStreamTypesArray),
+      dataStreamType: z.enum(DataStreamTypesArray).optional(),
     }),
   });
 
@@ -473,7 +493,10 @@ class ProducersController {
       event
     ) as onRemoveProducerType;
     const validation = this.removeProducerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       username,
@@ -538,7 +561,10 @@ class ProducersController {
       event
     ) as onRequestRemoveProducerType;
     const validation = this.requestRemoveProducerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
 

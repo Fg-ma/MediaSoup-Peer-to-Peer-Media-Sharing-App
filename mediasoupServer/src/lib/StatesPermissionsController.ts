@@ -25,7 +25,10 @@ class StatesPermissionsController {
       event
     ) as onRequestPermissionsType;
     const validation = this.requestPermissionsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,
@@ -74,7 +77,10 @@ class StatesPermissionsController {
       event
     ) as onPermissionsResponseType;
     const validation = this.permissionsResponseSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,

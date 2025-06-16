@@ -18,7 +18,10 @@ const onGetRouterRtpCapabilities = (event: onGetRouterRtpCapabilitiesType) => {
     event
   ) as onGetRouterRtpCapabilitiesType;
   const validation = getRouterRtpCapabilitiesSchema.safeParse(safeEvent);
-  if (!validation.success) return;
+  if (!validation.success) {
+    console.log("Warning, ", event.type, " failed to validate event");
+    return;
+  }
   const { tableId, username, instance } = safeEvent.header;
 
   // Get the next available worker and router if one doesn't already exist

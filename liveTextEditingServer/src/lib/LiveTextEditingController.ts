@@ -38,7 +38,10 @@ class LiveTextEditingController {
       event
     ) as onJoinTableType;
     const validation = this.joinTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -80,7 +83,10 @@ class LiveTextEditingController {
       event
     ) as onLeaveTableType;
     const validation = this.leaveTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     if (
@@ -108,7 +114,10 @@ class LiveTextEditingController {
       event
     ) as onGetInitialDocStateType;
     const validation = this.getInitialDocStateSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -224,7 +233,10 @@ class LiveTextEditingController {
       event
     ) as onDocUpdateType;
     const validation = this.docUpdateSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
     const { payload } = safeEvent.data;
@@ -275,7 +287,10 @@ class LiveTextEditingController {
       event
     ) as onGetSavedOpsType;
     const validation = this.getSavedOpsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -306,7 +321,10 @@ class LiveTextEditingController {
   onDocSave = async (event: onDocSaveType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onDocSaveType;
     const validation = this.docSaveSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentId, instanceId } = safeEvent.header;
 
     const savingSessionsKey = `LTE:SS:${tableId}:${contentId}:${instanceId}`;

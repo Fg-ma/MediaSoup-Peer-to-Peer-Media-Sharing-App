@@ -25,7 +25,10 @@ class MetadataController {
       event
     ) as onMuteStylesRequestType;
     const validation = this.muteStylesRequestSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { userId, instance } = safeEvent.header;
     const userSvgs = await tableTopMongo.userSvgs?.gets.getAllBy_UID(userId);
 
@@ -54,7 +57,10 @@ class MetadataController {
       event
     ) as onDeleteUploadSessionType;
     const validation = this.deleteUploadSessionSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { uploadId, contentId, contentType } = safeEvent.header;
 
     await tableTopRedis.deletes.delete([

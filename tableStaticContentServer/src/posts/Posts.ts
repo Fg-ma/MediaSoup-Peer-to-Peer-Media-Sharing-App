@@ -65,7 +65,7 @@ class Posts {
         if (fieldname === "metadata") {
           try {
             metadata = sanitizationUtils.sanitizeObject(JSON.parse(val), {
-              mimeType: "/+-",
+              mimeType: "/+",
             }) as unknown as {
               tableId: string;
               contentId: string;
@@ -227,7 +227,7 @@ class Posts {
             const metadata = sanitizationUtils.sanitizeObject(
               JSON.parse(buffer),
               {
-                mimeType: "/+-",
+                mimeType: "/+",
               }
             );
             const {

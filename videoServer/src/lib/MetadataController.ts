@@ -32,7 +32,10 @@ class MetadataController {
       event
     ) as onUpdateVideoMetadataType;
     const validation = this.updateVideoMetadataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentId, instanceId } = safeEvent.header;
     const { isPlaying, videoPosition, videoPlaybackSpeed, ended } =
       safeEvent.data;
@@ -79,7 +82,10 @@ class MetadataController {
     ) as onRequestCatchUpVideoMetadataType;
     const validation =
       this.requestCatchUpVideoMetadataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId, instanceId } =
       safeEvent.header;
 
@@ -150,7 +156,10 @@ class MetadataController {
       event
     ) as onDeleteUploadSessionType;
     const validation = this.deleteUploadSessionSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { uploadId, contentId } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
@@ -182,7 +191,10 @@ class MetadataController {
       event
     ) as onSignalReuploadStartType;
     const validation = this.signalReuploadStartSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

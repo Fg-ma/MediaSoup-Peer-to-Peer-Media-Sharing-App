@@ -23,7 +23,10 @@ class Cleanup {
       event
     ) as onDeleteContentType;
     const validation = this.deleteContentSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { userId, contentType, contentId } = safeEvent.header;
 
     await tableTopCeph.deletes.deleteFile(

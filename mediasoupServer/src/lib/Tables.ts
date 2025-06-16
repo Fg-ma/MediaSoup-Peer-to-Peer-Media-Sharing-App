@@ -25,7 +25,10 @@ class Tables {
       event
     ) as onJoinTableType;
     const validation = this.joinTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     mediasoupWS.id = uuidv4();

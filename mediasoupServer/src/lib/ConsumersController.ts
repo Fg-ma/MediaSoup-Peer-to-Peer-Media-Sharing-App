@@ -48,7 +48,10 @@ class ConsumersController {
       event
     ) as onCreateConsumerTransportType;
     const validation = this.createConsumerTransportSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     // Get the next available worker and router if one doesn't already exist
@@ -112,11 +115,14 @@ class ConsumersController {
   });
 
   async onConnectConsumerTransport(event: onConnectConsumerTransportType) {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onConnectConsumerTransportType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      value: ":",
+    }) as onConnectConsumerTransportType;
     const validation = this.connectConsumerTransportSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const { dtlsParameters } = safeEvent.data;
 
@@ -199,9 +205,16 @@ class ConsumersController {
   });
 
   async onConsume(event: onConsumeType) {
-    const safeEvent = sanitizationUtils.sanitizeObject(event) as onConsumeType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      uri: ":/",
+      mimeType: "/+",
+      parameters: ":/.+=-",
+    }) as onConsumeType;
     const validation = this.consumeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const { rtpCapabilities } = safeEvent.data;
 
@@ -484,11 +497,15 @@ class ConsumersController {
   });
 
   async onNewConsumer(event: onNewConsumerType) {
-    const safeEvent = sanitizationUtils.sanitizeObject(
-      event
-    ) as onNewConsumerType;
+    const safeEvent = sanitizationUtils.sanitizeObject(event, {
+      uri: ":/",
+      mimeType: "/+",
+    }) as onNewConsumerType;
     const validation = this.newConsumerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const {
       producerType,
@@ -653,7 +670,10 @@ class ConsumersController {
       event
     ) as onNewJSONConsumerType;
     const validation = this.newJSONConsumerSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const {
       producerUsername,
@@ -786,7 +806,10 @@ class ConsumersController {
       event
     ) as onNewConsumerCreatedType;
     const validation = this.newConsumerCreatedSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
     const { producerUsername, producerInstance, producerType, producerId } =
       safeEvent.data;
@@ -818,7 +841,10 @@ class ConsumersController {
       event
     ) as onUnsubscribeType;
     const validation = this.unsubscribeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     this.mediasoupCleanup.deleteConsumerTransport(tableId, username, instance);

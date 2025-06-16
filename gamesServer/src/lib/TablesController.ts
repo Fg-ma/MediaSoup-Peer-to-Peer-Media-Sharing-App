@@ -32,7 +32,10 @@ class TablesController {
       event
     ) as onJoinTableType;
     const validation = this.joinTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     if (!tables[tableId]) {
@@ -85,7 +88,10 @@ class TablesController {
       event
     ) as onNewGameSocketType;
     const validation = this.newGameSocketSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     if (!tables[tableId]) {
@@ -129,7 +135,10 @@ class TablesController {
       event
     ) as onLeaveTableType;
     const validation = this.leaveTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, socketType, gameType, gameId } =
       safeEvent.header;
 

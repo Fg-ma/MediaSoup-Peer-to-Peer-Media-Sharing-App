@@ -48,7 +48,10 @@ class Search {
     ) as onSearchTabledContentRequestType;
     const validation =
       this.searchTabledContentRequestSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentType } = safeEvent.header;
     const { name } = safeEvent.data;
 
@@ -106,7 +109,8 @@ class Search {
   //   ) as onSearchTabledContentRequestType;
   //   const validation =
   //   this.searchTabledContentRequestSchema.safeParse(safeEvent);
-  //   if (!validation.success) return;
+  //
+  //   if (!validation.success) {console.log("Warning, ", event.type, " failed to validate event"); return};
   //   const { tableId, username, instance, contentType } = safeEvent.header;
   //   const { name } = safeEvent.data;
 

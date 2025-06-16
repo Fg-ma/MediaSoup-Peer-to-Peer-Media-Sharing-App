@@ -26,7 +26,10 @@ class TablesController {
       event
     ) as onJoinTableType;
     const validation = this.joinTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -67,7 +70,10 @@ class TablesController {
       event
     ) as onLeaveTableType;
     const validation = this.leaveTableSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     if (

@@ -22,7 +22,10 @@ class TablesController {
   onConnect = (ws: UserStaticContentWebSocket, event: onConnectType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onConnectType;
     const validation = this.connectSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { userId, instance } = safeEvent.header;
 
     ws.id = uuidv4();
@@ -49,7 +52,10 @@ class TablesController {
       event
     ) as onDisconnectType;
     const validation = this.disconnectSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { userId, instance } = safeEvent.header;
 
     if (userConnections[userId] && userConnections[userId][instance]) {

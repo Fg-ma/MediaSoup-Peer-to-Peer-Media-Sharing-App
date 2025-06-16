@@ -159,10 +159,6 @@ export default function AudioEffectsButton({
             visualMediaContainerRef={visualMediaContainerRef}
             closeLabelElement={closeLabelElement}
             closeCallback={() => setAudioEffectsActive(false)}
-            backgroundColor={audioEffectsButtonOptions.backgroundColor}
-            secondaryBackgroundColor={
-              audioEffectsButtonOptions.secondaryBackgroundColor
-            }
           />
         </Suspense>
       )}

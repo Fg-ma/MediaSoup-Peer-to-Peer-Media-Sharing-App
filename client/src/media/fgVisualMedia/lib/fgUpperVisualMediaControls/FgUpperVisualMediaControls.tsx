@@ -25,8 +25,9 @@ export default function FgUpperVisualMediaControls({
       <div className="grow cursor-default select-none text-lg">
         {name ? name : username}
       </div>
-      <div className="flex h-full space-x-2">
+      <div className="flex h-full items-center justify-center space-x-2">
         <ReactButton
+          className="!h-[80%]"
           reactionsPanelActive={reactionsPanelActive}
           setReactionsPanelActive={setReactionsPanelActive}
           clickFunction={fgLowerVisualMediaController.current.handleReact}

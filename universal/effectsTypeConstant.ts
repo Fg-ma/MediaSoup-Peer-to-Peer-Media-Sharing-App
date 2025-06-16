@@ -12,8 +12,27 @@ export type CameraEffectTypes =
   | "masks"
   | "hats"
   | "pets";
+export const CameraEffectTypesArray = [
+  "pause",
+  "postProcess",
+  "hideBackground",
+  "blur",
+  "tint",
+  "glasses",
+  "beards",
+  "mustaches",
+  "masks",
+  "hats",
+  "pets",
+] as const;
 
 export type ScreenEffectTypes = "pause" | "postProcess" | "blur" | "tint";
+export const ScreenEffectTypesArray = [
+  "pause",
+  "postProcess",
+  "blur",
+  "tint",
+] as const;
 
 export type AudioEffectTypes =
   | "robot"
@@ -57,6 +76,49 @@ export type AudioEffectTypes =
   | "bubbly"
   | "thunder"
   | "echosOfThePast";
+export const AudioEffectTypesArray = [
+  "robot",
+  "echo",
+  "alien",
+  "underwater",
+  "telephone",
+  "space",
+  "distortion",
+  "vintage",
+  "psychedelic",
+  "deepBass",
+  "highEnergy",
+  "ambient",
+  "glitch",
+  "muffled",
+  "crystal",
+  "heavyMetal",
+  "dreamy",
+  "horror",
+  "sciFi",
+  "dystopian",
+  "retroGame",
+  "ghostly",
+  "metallic",
+  "hypnotic",
+  "cyberpunk",
+  "windy",
+  "radio",
+  "explosion",
+  "whisper",
+  "submarine",
+  "windTunnel",
+  "crushedBass",
+  "ethereal",
+  "electroSting",
+  "heartbeat",
+  "underworld",
+  "sizzling",
+  "staticNoise",
+  "bubbly",
+  "thunder",
+  "echosOfThePast",
+] as const;
 
 export type VideoEffectTypes =
   | "postProcess"
@@ -165,6 +227,12 @@ export type UserEffectsType = {
     [effectType in AudioEffectTypes]: boolean;
   };
 };
+export const UserEffectsSchema = z.object({
+  camera: z.record(z.record(z.enum(CameraEffectTypesArray), z.boolean())),
+  screen: z.record(z.record(z.enum(ScreenEffectTypesArray), z.boolean())),
+  screenAudio: z.record(z.record(z.enum(AudioEffectTypesArray), z.boolean())),
+  audio: z.record(z.enum(AudioEffectTypesArray), z.boolean()),
+});
 
 export type RemoteEffectsType = {
   [username: string]: {
@@ -214,37 +282,6 @@ export type StaticContentEffectsType = {
 
 export type CaptureEffectsType = {
   [effectType in CaptureEffectTypes]: boolean;
-};
-
-export type CameraEffectStylesType = {
-  tint: {
-    color: string;
-  };
-  postProcess: {
-    style: PostProcessEffectTypes;
-  };
-  hideBackground: {
-    style: HideBackgroundEffectTypes;
-    color: string;
-  };
-  glasses: {
-    style: GlassesEffectTypes;
-  };
-  beards: {
-    style: BeardsEffectTypes;
-  };
-  mustaches: {
-    style: MustachesEffectTypes;
-  };
-  masks: {
-    style: MasksEffectTypes;
-  };
-  hats: {
-    style: HatsEffectTypes;
-  };
-  pets: {
-    style: PetsEffectTypes;
-  };
 };
 
 export type PostProcessEffectTypes =
@@ -548,6 +585,67 @@ export const PetsEffectTypesArray = [
   "TRex",
 ] as const;
 
+export type CameraEffectStylesType = {
+  tint: {
+    color: string;
+  };
+  postProcess: {
+    style: PostProcessEffectTypes;
+  };
+  hideBackground: {
+    style: HideBackgroundEffectTypes;
+    color: string;
+  };
+  glasses: {
+    style: GlassesEffectTypes;
+  };
+  beards: {
+    style: BeardsEffectTypes;
+  };
+  mustaches: {
+    style: MustachesEffectTypes;
+  };
+  masks: {
+    style: MasksEffectTypes;
+  };
+  hats: {
+    style: HatsEffectTypes;
+  };
+  pets: {
+    style: PetsEffectTypes;
+  };
+};
+export const cameraEffectStylesSchema = z.object({
+  tint: z.object({
+    color: z.string(),
+  }),
+  postProcess: z.object({
+    style: z.enum(PostProcessEffectTypesArray),
+  }),
+  hideBackground: z.object({
+    style: z.enum(HideBackgroundEffectTypesArray),
+    color: z.string(),
+  }),
+  glasses: z.object({
+    style: z.enum(GlassesEffectTypesArray),
+  }),
+  beards: z.object({
+    style: z.enum(BeardsEffectTypesArray),
+  }),
+  mustaches: z.object({
+    style: z.enum(MustachesEffectTypesArray),
+  }),
+  masks: z.object({
+    style: z.enum(MasksEffectTypesArray),
+  }),
+  hats: z.object({
+    style: z.enum(HatsEffectTypesArray),
+  }),
+  pets: z.object({
+    style: z.enum(PetsEffectTypesArray),
+  }),
+});
+
 export interface ScreenEffectStylesType {
   tint: {
     color: string;
@@ -566,6 +664,7 @@ export const screenEffectStylesSchema = z.object({
 });
 
 export type AudioEffectStylesType = object;
+export const audioEffectStylesSchema = z.object({});
 
 export type VideoEffectStylesType = {
   tint: {
@@ -934,6 +1033,12 @@ export type UserEffectsStylesType = {
   };
   audio: AudioEffectStylesType;
 };
+export const UserEffectsStylesSchema = z.object({
+  camera: z.record(cameraEffectStylesSchema),
+  screen: z.record(screenEffectStylesSchema),
+  screenAudio: z.record(audioEffectStylesSchema),
+  audio: audioEffectStylesSchema,
+});
 
 export type RemoteEffectStylesType = {
   [username: string]: {

@@ -22,7 +22,10 @@ class Gets {
       event
     ) as onGetDownloadMetaType;
     const validation = this.getDownloadMetaSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId } = safeEvent.header;
 
     try {
@@ -119,7 +122,10 @@ class Gets {
       range: "=",
     }) as onGetFileChunkType;
     const validation = this.getFileChunkSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentId } = safeEvent.header;
     const { range } = safeEvent.data;
 

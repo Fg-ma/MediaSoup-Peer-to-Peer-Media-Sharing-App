@@ -29,7 +29,10 @@ class SnakeGameController {
       event
     ) as onSnakeDirectionChangeType;
     const validation = this.snakeDirectionChangeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameId } = safeEvent.header;
     const { direction } = safeEvent.data;
 
@@ -56,7 +59,10 @@ class SnakeGameController {
       event
     ) as onChangeGridSizeType;
     const validation = this.changeGridSizeSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, gameId } = safeEvent.header;
     const { gridSize } = safeEvent.data;
 
@@ -81,7 +87,10 @@ class SnakeGameController {
       event
     ) as onChangeSnakeColorType;
     const validation = this.changeSnakeColorSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameId } = safeEvent.header;
     const { newSnakeColor } = safeEvent.data;
 

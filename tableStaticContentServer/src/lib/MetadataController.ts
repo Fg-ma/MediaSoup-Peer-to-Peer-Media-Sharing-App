@@ -42,7 +42,10 @@ class MetadataController {
       event
     ) as onRequestCatchUpTableDataType;
     const validation = this.requestCatchUpTableDataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance } = safeEvent.header;
 
     const images = await tableTopMongo.tableImages?.gets.getAllBy_TID(tableId);
@@ -92,7 +95,10 @@ class MetadataController {
       ["color"]
     ) as onUpdateContentEffectsType;
     const validation = this.updateContentEffectsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     tableTopMongo.onUpdateContentEffects(safeEvent);
 
     const { tableId, contentType, contentId, instanceId } = safeEvent.header;
@@ -122,7 +128,10 @@ class MetadataController {
       event
     ) as onRequestCatchUpEffectsType;
     const validation = this.requestCatchUpEffectsSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, contentType, contentId, instanceId } =
       safeEvent.header;
 
@@ -255,7 +264,10 @@ class MetadataController {
       event
     ) as onChangeContentStateType;
     const validation = this.changeContentStateSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     tableTopMongo.onChangeTableContentState(safeEvent);
 
     const { tableId, contentType, contentId } = safeEvent.header;
@@ -304,7 +316,10 @@ class MetadataController {
       event
     ) as onCreateNewInstancesType;
     const validation = this.createNewInstancesSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     tableTopMongo.onCreateNewInstances(safeEvent);
 
     const { tableId } = safeEvent.header;
@@ -332,7 +347,10 @@ class MetadataController {
       event
     ) as onDeleteUploadSessionType;
     const validation = this.deleteUploadSessionSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { uploadId, contentId, contentType } = safeEvent.header;
 
     const session = (await tableTopRedis.gets.get(
@@ -372,7 +390,10 @@ class MetadataController {
       event
     ) as onSignalReuploadStartType;
     const validation = this.signalReuploadStartSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentId, contentType } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(tableId, {

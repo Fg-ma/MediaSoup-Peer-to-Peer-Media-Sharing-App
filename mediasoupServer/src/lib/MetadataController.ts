@@ -8,6 +8,10 @@ import {
 } from "../typeConstant";
 import Broadcaster from "./Broadcaster";
 import { sanitizationUtils } from "src";
+import {
+  UserEffectsSchema,
+  UserEffectsStylesSchema,
+} from "../../../universal/effectsTypeConstant";
 
 class MetadataController {
   constructor(private broadcaster: Broadcaster) {}
@@ -28,7 +32,10 @@ class MetadataController {
       event
     ) as onRequestBundleMetadataType;
     const validation = this.requestBundleMetadataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,
@@ -64,8 +71,8 @@ class MetadataController {
     }),
     data: z.object({
       clientMute: z.boolean(),
-      streamEffects: z.string(),
-      userEffectsStyles: z.string(),
+      streamEffects: UserEffectsSchema,
+      userEffectsStyles: UserEffectsStylesSchema,
     }),
   });
 
@@ -74,7 +81,10 @@ class MetadataController {
       event
     ) as onBundleMetadataResponseType;
     const validation = this.bundleMetadataResponseSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,
@@ -123,7 +133,10 @@ class MetadataController {
       event
     ) as onRequestCatchUpDataType;
     const validation = this.requestCatchUpDataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,
@@ -168,29 +181,37 @@ class MetadataController {
         paused: z.boolean(),
         timeEllapsed: z.number(),
         positioning: z.object({
-          position: z.object({
-            left: z.number(),
-            top: z.number(),
-          }),
-          scale: z.object({
-            x: z.number(),
-            y: z.number(),
-          }),
-          rotation: z.number(),
+          position: z
+            .object({
+              left: z.number(),
+              top: z.number(),
+            })
+            .optional(),
+          scale: z
+            .object({
+              x: z.number(),
+              y: z.number(),
+            })
+            .optional(),
+          rotation: z.number().optional(),
         }),
       })
       .or(
         z.object({
           positioning: z.object({
-            position: z.object({
-              left: z.number(),
-              top: z.number(),
-            }),
-            scale: z.object({
-              x: z.number(),
-              y: z.number(),
-            }),
-            rotation: z.number(),
+            position: z
+              .object({
+                left: z.number(),
+                top: z.number(),
+              })
+              .optional(),
+            scale: z
+              .object({
+                x: z.number(),
+                y: z.number(),
+              })
+              .optional(),
+            rotation: z.number().optional(),
           }),
         })
       )
@@ -202,7 +223,10 @@ class MetadataController {
       event
     ) as onResponseCatchUpDataType;
     const validation = this.responseCatchUpDataSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const {
       tableId,
       inquiringUsername,

@@ -55,7 +55,10 @@ class UniversalGameController {
       event
     ) as onUpdateContentPositioningType;
     const validation = this.updateContentPositioningSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, gameId } = safeEvent.header;
     const { positioning } = safeEvent.data;
 
@@ -87,7 +90,10 @@ class UniversalGameController {
       event
     ) as onInitiateGameType;
     const validation = this.initiateGameSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, gameType, gameId } = safeEvent.header;
     const { initiator } = safeEvent.data;
 
@@ -146,7 +152,10 @@ class UniversalGameController {
       event
     ) as onStartGameType;
     const validation = this.startGameSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, gameType, gameId } = safeEvent.header;
 
     if (gameType === "snake") {
@@ -172,7 +181,10 @@ class UniversalGameController {
       event
     ) as onCloseGameType;
     const validation = this.closeGameSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, gameType, gameId } = safeEvent.header;
 
     this.broadcaster.broadcastToTable(
@@ -243,7 +255,10 @@ class UniversalGameController {
   onJoinGame = (event: onJoinGameType) => {
     const safeEvent = sanitizationUtils.sanitizeObject(event) as onJoinGameType;
     const validation = this.joinGameSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
     const data = safeEvent.data;
 
@@ -276,7 +291,10 @@ class UniversalGameController {
       event
     ) as onLeaveGameType;
     const validation = this.leaveGameSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     switch (gameType) {
@@ -304,7 +322,10 @@ class UniversalGameController {
       event
     ) as onGetPlayersStateType;
     const validation = this.getPlayersStateSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let playersState = {};
@@ -349,7 +370,10 @@ class UniversalGameController {
       event
     ) as onGetInitialGameStatesType;
     const validation = this.getInitialGameStatesSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, gameType, gameId } = safeEvent.header;
 
     let initialGameStates = {};

@@ -64,8 +64,6 @@ export default function AudioEffectsSection({
   visualMediaContainerRef,
   closeLabelElement,
   closeCallback,
-  backgroundColor,
-  secondaryBackgroundColor,
   items,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
@@ -103,8 +101,6 @@ export default function AudioEffectsSection({
   visualMediaContainerRef?: React.RefObject<HTMLDivElement>;
   closeLabelElement?: React.ReactElement;
   closeCallback?: () => void;
-  backgroundColor?: string;
-  secondaryBackgroundColor?: string;
   items?: React.ReactElement[];
 }) {
   const { mediasoupSocket } = useSocketContext();

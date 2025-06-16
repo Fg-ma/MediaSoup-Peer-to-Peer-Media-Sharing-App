@@ -27,7 +27,10 @@ class Cleanup {
       event
     ) as onDeleteContentType;
     const validation = this.deleteContentSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, contentType, contentId, instanceId } = safeEvent.header;
 
     const document = await tableTopMongo.deleteTableDocumentInstance(

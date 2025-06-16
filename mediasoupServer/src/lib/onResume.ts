@@ -15,7 +15,10 @@ const resumeSchema = z.object({
 const onResume = async (broadcaster: Broadcaster, event: onResumeType) => {
   const safeEvent = sanitizationUtils.sanitizeObject(event) as onResumeType;
   const validation = resumeSchema.safeParse(safeEvent);
-  if (!validation.success) return;
+  if (!validation.success) {
+    console.log("Warning, ", event.type, " failed to validate event");
+    return;
+  }
   const { tableId, username, instance } = safeEvent.header;
 
   for (const producerUsername in tableConsumers[tableId][username][instance]) {

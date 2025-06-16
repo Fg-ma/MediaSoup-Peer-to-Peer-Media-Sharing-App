@@ -25,7 +25,10 @@ class MuteController {
       event
     ) as onClientMuteType;
     const validation = this.clientMuteSchema.safeParse(safeEvent);
-    if (!validation.success) return;
+    if (!validation.success) {
+      console.log("Warning, ", event.type, " failed to validate event");
+      return;
+    }
     const { tableId, username, instance, producerType, producerId } =
       safeEvent.header;
     const { clientMute } = safeEvent.data;
