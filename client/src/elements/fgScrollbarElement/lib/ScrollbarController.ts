@@ -340,11 +340,10 @@ class ScrollbarController {
     this.setRerender((prev) => !prev);
   };
 
-  hideTableScrollBar = (event: PointerEvent) => {
+  pointerMove = (event: PointerEvent) => {
     if (!this.scrollbarElementRef.current || this.dragging.current) return;
 
     const rect = this.scrollbarElementRef.current.getBoundingClientRect();
-
     if (this.directionRef.current === "vertical") {
       // Check if the pointer is within 40px of the right edge of the container
       if (rect.right - event.clientX <= 40) {
@@ -353,17 +352,19 @@ class ScrollbarController {
             "hide-fg-scrollbar",
           )
         ) {
-          this.delayScrollBarTimeout.current = setTimeout(() => {
-            this.scrollbarElementRef.current?.classList.remove(
-              "hide-fg-scrollbar",
-            );
-            this.updateScrollbar();
+          if (!this.delayScrollBarTimeout.current) {
+            this.delayScrollBarTimeout.current = setTimeout(() => {
+              this.scrollbarElementRef.current?.classList.remove(
+                "hide-fg-scrollbar",
+              );
+              this.updateScrollbar();
 
-            if (this.delayScrollBarTimeout.current) {
-              clearTimeout(this.delayScrollBarTimeout.current);
-              this.delayScrollBarTimeout.current = undefined;
-            }
-          }, this.scrollbarDelay);
+              if (this.delayScrollBarTimeout.current) {
+                clearTimeout(this.delayScrollBarTimeout.current);
+                this.delayScrollBarTimeout.current = undefined;
+              }
+            }, this.scrollbarDelay);
+          }
         }
       } else {
         if (this.delayScrollBarTimeout.current) {
@@ -399,17 +400,19 @@ class ScrollbarController {
             "hide-fg-scrollbar",
           )
         ) {
-          this.delayScrollBarTimeout.current = setTimeout(() => {
-            this.scrollbarElementRef.current?.classList.remove(
-              "hide-fg-scrollbar",
-            );
-            this.updateScrollbar();
+          if (!this.delayScrollBarTimeout.current) {
+            this.delayScrollBarTimeout.current = setTimeout(() => {
+              this.scrollbarElementRef.current?.classList.remove(
+                "hide-fg-scrollbar",
+              );
+              this.updateScrollbar();
 
-            if (this.delayScrollBarTimeout.current) {
-              clearTimeout(this.delayScrollBarTimeout.current);
-              this.delayScrollBarTimeout.current = undefined;
-            }
-          }, this.scrollbarDelay);
+              if (this.delayScrollBarTimeout.current) {
+                clearTimeout(this.delayScrollBarTimeout.current);
+                this.delayScrollBarTimeout.current = undefined;
+              }
+            }, this.scrollbarDelay);
+          }
         }
       } else {
         if (this.delayScrollBarTimeout.current) {

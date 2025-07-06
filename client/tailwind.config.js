@@ -120,6 +120,7 @@ export default {
         "grid-overlay": 99200,
         "background-content": 99250,
         "select-layer": 99300,
+        "little-buddies-layer": 99400,
         /* table content (101000 - 200000) */
         /* table content formula (111000 + priority + (20000 - last-interaction)) */
         "base-content": 111000,

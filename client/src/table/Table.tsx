@@ -7,6 +7,7 @@ import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../tableLayers/newInstancesLayer/NewInstancesLayer";
 import SelectTableLayer from "../tableLayers/selectTableLayer/SelectTableLayer";
+import LittleBuddiesLayer from "../tableLayers/littleBuddiesLayer/LittleBuddiesLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
 import LeftTableSection from "./lib/sideSections/LeftTableSection";
 import RightTableSection from "./lib/sideSections/RightTableSection";
@@ -150,7 +151,7 @@ export default function Table({
       />
       <div
         ref={tableContainerRef}
-        className="table-container flex h-full flex-col"
+        className="flex table-container h-full flex-col"
         style={
           {
             "--dynamic-width": `calc(100%${tableSidePanelActive ? ` - ${Math.max(200, tableSidePanelWidth)}px - 1.75rem` : ""})`,
@@ -210,6 +211,7 @@ export default function Table({
                 />
                 <UploadTableLayer tableTopRef={tableTopRef} />
                 <NewInstancesLayer tableRef={tableRef} />
+                <LittleBuddiesLayer />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}

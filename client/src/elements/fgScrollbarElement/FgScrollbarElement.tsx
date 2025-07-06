@@ -37,7 +37,7 @@ export default function FgScrollbarElement({
   return (
     <div
       ref={scrollbarElementRef}
-      className={`${className} relative`}
+      className={`${className} hide-fg-scrollbar relative`}
       style={style}
     >
       <Scrollbar

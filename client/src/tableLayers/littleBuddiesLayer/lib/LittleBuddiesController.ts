@@ -11,7 +11,7 @@ import {
   SpriteType,
 } from "./typeConstant";
 
-class TableLittleBuddiesController {
+class LittleBuddiesController {
   private activeDirs = new Set<"up" | "down" | "left" | "right">();
   private sprinting = false;
   private prevDir:
@@ -29,7 +29,7 @@ class TableLittleBuddiesController {
 
   constructor(
     private littleBuddy: LittleBuddiesTypes,
-    private tableLittleBuddiesContainer: React.RefObject<HTMLDivElement>,
+    private littleBuddiesContainer: React.RefObject<HTMLDivElement>,
     private canvasRef: React.MutableRefObject<HTMLCanvasElement | null>,
     private spriteSheet: React.MutableRefObject<SpriteSheet | null>,
     private lastTimeRef: React.MutableRefObject<number>,
@@ -68,7 +68,7 @@ class TableLittleBuddiesController {
   };
 
   init = async () => {
-    if (!this.tableLittleBuddiesContainer.current) return;
+    if (!this.littleBuddiesContainer.current) return;
 
     const meta = spirteSheetsMeta[this.littleBuddy];
 
@@ -76,12 +76,11 @@ class TableLittleBuddiesController {
       position: { top: 50, left: 50 },
       scale: {
         x:
-          (meta.frameWidth /
-            this.tableLittleBuddiesContainer.current.clientWidth) *
+          (meta.frameWidth / this.littleBuddiesContainer.current.clientWidth) *
           100,
         y:
           (meta.frameHeight /
-            this.tableLittleBuddiesContainer.current.clientHeight) *
+            this.littleBuddiesContainer.current.clientHeight) *
           100,
       },
       rotation: 0,
@@ -112,6 +111,7 @@ class TableLittleBuddiesController {
       flipTextures: meta.flipTextures,
       positioning,
       animations,
+      active: false,
     };
 
     if (meta.pixelated && this.canvasRef.current) {
@@ -331,8 +331,14 @@ class TableLittleBuddiesController {
 
     const pos = this.sprite.current.positioning.position;
     this.sprite.current.positioning.position = {
-      top: pos.top + dy,
-      left: pos.left + dx,
+      top: Math.max(
+        0,
+        Math.min(100 - this.sprite.current.positioning.scale.y, pos.top + dy),
+      ),
+      left: Math.max(
+        0,
+        Math.min(100 - this.sprite.current.positioning.scale.x, pos.left + dx),
+      ),
     };
 
     this.canvasRef.current.style.width = `${this.sprite.current.positioning.scale.x}%`;
@@ -393,7 +399,10 @@ class TableLittleBuddiesController {
   };
 
   handleKeyDown = (event: KeyboardEvent) => {
-    if (event.repeat) return;
+    if (event.repeat || !this.sprite.current?.active) return;
+
+    event.stopPropagation();
+    event.preventDefault();
 
     const key = event.key.toLowerCase();
 
@@ -440,6 +449,11 @@ class TableLittleBuddiesController {
   };
 
   handleKeyUp = (event: KeyboardEvent) => {
+    if (!this.sprite.current?.active) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
     const key = event.key.toLowerCase();
 
     this.sprinting = event.shiftKey;
@@ -483,4 +497,4 @@ class TableLittleBuddiesController {
   };
 }
 
-export default TableLittleBuddiesController;
+export default LittleBuddiesController;

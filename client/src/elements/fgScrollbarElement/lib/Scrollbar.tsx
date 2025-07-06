@@ -118,7 +118,7 @@ export default function Scrollbar({
         scrollbarController.current.updateHorizontalScrollbar;
       }
 
-      scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
+      // scrollbarElementRef.current?.classList.remove("hide-fg-scrollbar");
 
       if (scrollTimeout.current) {
         clearTimeout(scrollTimeout.current);
@@ -142,7 +142,7 @@ export default function Scrollbar({
 
     scrollbarElementRef.current?.addEventListener(
       "pointermove",
-      scrollbarController.current.hideTableScrollBar,
+      scrollbarController.current.pointerMove,
     );
     scrollbarElementRef.current?.addEventListener(
       "pointerleave",
@@ -152,7 +152,7 @@ export default function Scrollbar({
     return () => {
       scrollbarElementRef.current?.removeEventListener(
         "pointermove",
-        scrollbarController.current.hideTableScrollBar,
+        scrollbarController.current.pointerMove,
       );
       scrollbarElementRef.current?.removeEventListener(
         "pointerleave",
@@ -162,8 +162,6 @@ export default function Scrollbar({
   }, []);
 
   useLayoutEffect(() => {
-    if (!contentContainerRef.current) return;
-
     setTimeout(() => {
       scrollbarVisible.current =
         direction === "vertical"
@@ -177,6 +175,8 @@ export default function Scrollbar({
             : false;
       setRerender((prev) => !prev);
     }, 100);
+
+    if (!contentContainerRef.current) return;
 
     const resizeObserver = new ResizeObserver(() => {
       scrollbarVisible.current =

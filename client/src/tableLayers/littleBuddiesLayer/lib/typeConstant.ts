@@ -68,6 +68,7 @@ export type SpriteType = {
     flip: boolean;
   };
   animations: SpriteAnimations;
+  active: boolean;
 };
 
 export type LittleBuddiesTypes =
