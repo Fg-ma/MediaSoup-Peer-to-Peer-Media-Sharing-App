@@ -119,6 +119,7 @@ export default {
         /* table layers before content (99000 - 100000) */
         "grid-overlay": 99200,
         "background-content": 99250,
+        "table-babylon": 99275,
         "select-layer": 99300,
         "little-buddies-layer": 99400,
         /* table content (101000 - 200000) */

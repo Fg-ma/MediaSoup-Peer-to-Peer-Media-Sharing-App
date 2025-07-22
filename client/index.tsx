@@ -9,6 +9,7 @@ import { PermissionsContextProvider } from "./src/context/permissionsContext/Per
 import { SocketContextProvider } from "./src/context/socketContext/SocketContext";
 import { UserInfoContextProvider } from "./src/context/userInfoContext/UserInfoContext";
 import { GeneralContextProvider } from "./src/context/generalContext/GeneralContext";
+import { TableContextProvider } from "./src/context/tableContext/TableContext";
 import Main from "./src/Main";
 import "./index.css";
 
@@ -28,7 +29,9 @@ function App() {
                 <UserInfoContextProvider>
                   <UploadDownloadContextProvider>
                     <ToolsContextProvider>
-                      <Main />
+                      <TableContextProvider>
+                        <Main />
+                      </TableContextProvider>
                     </ToolsContextProvider>
                   </UploadDownloadContextProvider>
                 </UserInfoContextProvider>

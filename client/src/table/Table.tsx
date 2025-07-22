@@ -8,6 +8,7 @@ import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../tableLayers/newInstancesLayer/NewInstancesLayer";
 import SelectTableLayer from "../tableLayers/selectTableLayer/SelectTableLayer";
 import LittleBuddiesLayer from "../tableLayers/littleBuddiesLayer/LittleBuddiesLayer";
+import BabylonLayer from "../tableLayers/babylonLayer/BabylonLayer";
 import SharedBundle from "../sharedBundle/SharedBundle";
 import LeftTableSection from "./lib/sideSections/LeftTableSection";
 import RightTableSection from "./lib/sideSections/RightTableSection";
@@ -204,6 +205,7 @@ export default function Table({
                     : { height: "100%" }),
                 }}
               >
+                <BabylonLayer />
                 <SelectTableLayer
                   innerTableContainerRef={innerTableContainerRef}
                   tableRef={tableRef}

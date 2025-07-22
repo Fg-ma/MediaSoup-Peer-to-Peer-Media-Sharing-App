@@ -9,13 +9,12 @@ import {
   PointerDragBehavior,
   KeyboardEventTypes,
   HemisphericLight,
-  UniversalCamera,
   IAxisDragGizmo,
 } from "@babylonjs/core";
 import MeshLoaders from "./MeshLoaders";
 import { GizmoStateTypes, MeshTypes } from "./typeContant";
 
-class BabylonMeshes {
+class TableBabylonMeshes {
   meshes: {
     "2D": { [mesh: string]: AbstractMesh };
     "3D": { [mesh: string]: AbstractMesh | AbstractMesh[] };
@@ -307,18 +306,6 @@ class BabylonMeshes {
         const nextState = this.getNextGizmoState(meshMetaData.gizmoState);
         this.selectedMesh.metadata.gizmoState = nextState;
 
-        if (
-          meshMetaData &&
-          meshMetaData.positionStyle !== undefined &&
-          meshMetaData.manuallyTransformed !== undefined
-        ) {
-          if (nextState === "none" && !meshMetaData.manuallyTransformed) {
-            meshMetaData.positionStyle = "faceTrack";
-          } else {
-            meshMetaData.positionStyle = "free";
-          }
-        }
-
         // Toggle gizmo state
         if (parentMesh) {
           this.disableGizmo(parentMesh);
@@ -343,13 +330,11 @@ class BabylonMeshes {
         const meshMetaData = parentMesh ? parentMesh.metadata : mesh.metadata;
         if (
           meshMetaData &&
-          meshMetaData.positionStyle !== undefined &&
           meshMetaData.manuallyTransformed !== undefined &&
           meshMetaData.gizmoState !== "position"
         ) {
           holdTimeout = setTimeout(() => {
             meshMetaData.gizmoState = "none";
-            meshMetaData.positionStyle = "faceTrack";
             meshMetaData.manuallyTransformed = false;
             this.disableGizmo(parentMesh ? parentMesh : mesh);
           }, 2000);
@@ -796,4 +781,4 @@ class BabylonMeshes {
   };
 }
 
-export default BabylonMeshes;
+export default TableBabylonMeshes;
