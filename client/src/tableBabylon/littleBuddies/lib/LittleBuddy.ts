@@ -7,6 +7,8 @@ import {
   DynamicTexture,
   SubMesh,
   Mesh,
+  Material,
+  Texture,
 } from "@babylonjs/core";
 import Animation from "./Animation";
 import SpriteSheet from "./SpriteSheet";
@@ -18,11 +20,14 @@ import {
   spirteSheetsMeta,
   SpriteAnimations,
   SpriteAnimationsTypes,
+  SpriteMetaData,
   SpriteType,
 } from "./typeConstant";
 
 class LittleBuddy {
   sprite: SpriteType | undefined;
+  meta: SpriteMetaData;
+
   spriteSheet: SpriteSheet | undefined;
   canvas: HTMLCanvasElement;
   lastTimeRef = 0;
@@ -53,25 +58,34 @@ class LittleBuddy {
   ) {
     this.canvas = document.createElement("canvas");
 
+    this.meta = spirteSheetsMeta[this.littleBuddy];
+
     this.init();
   }
 
   private init = async () => {
-    const meta = spirteSheetsMeta[this.littleBuddy];
+    const aspect = this.meta.frameWidth / this.meta.frameHeight;
 
     const positioning = {
       position: { top: 50, left: 50 },
       scale: {
         x: 8,
-        y: 8,
+        y: 8 / aspect,
       },
       rotation: 0,
       flip: false,
     };
 
-    const img = await this.loadImage(meta.url);
+    this.canvas.width = this.meta.frameWidth;
+    this.canvas.height = this.meta.frameHeight;
 
-    const sheet = new SpriteSheet(img, meta.frameWidth, meta.frameHeight);
+    const img = await this.loadImage(this.meta.url);
+
+    const sheet = new SpriteSheet(
+      img,
+      this.meta.frameWidth,
+      this.meta.frameHeight,
+    );
     this.spriteSheet = sheet;
 
     const animations: SpriteAnimations = {
@@ -81,22 +95,23 @@ class LittleBuddy {
       altAnimations: {},
     };
 
-    for (const core in meta.animations.core) {
+    for (const core in this.meta.animations.core) {
       this.newAnimation(animations, "core", core as SpriteAnimationsTypes);
     }
-    for (const alt in meta.animations.alt) {
+    for (const alt in this.meta.animations.alt) {
       this.newAnimation(animations, "alt", alt as SpriteAnimationsTypes);
     }
 
     this.sprite = {
-      rotatable: meta.rotatable,
-      flipTextures: meta.flipTextures,
+      rotatable: this.meta.rotatable,
+      flipTextures: this.meta.flipTextures,
       positioning,
       animations,
       active: false,
+      aspect,
     };
 
-    if (meta.pixelated) {
+    if (this.meta.pixelated) {
       this.canvas.style.imageRendering = "pixelated";
     }
 
@@ -110,20 +125,33 @@ class LittleBuddy {
     this.mesh = MeshBuilder.CreateBox(
       this.littleBuddyId + "-mesh",
       {
-        width: 1, // X-axis
-        height: 2, // Y-axis
-        depth: 0.5, // Z-axis
+        width: 0.5, // X-axis
+        height: 0.5, // Y-axis
+        depth: 0.001, // Z-axis
       },
       this.scene,
     );
+
+    const forward = this.scene.activeCamera!.getForwardRay().direction;
+    this.mesh.position = this.scene.activeCamera!.position.add(
+      forward.scale(2),
+    );
+
+    const sampling = this.meta.pixelated
+      ? Texture.NEAREST_SAMPLINGMODE
+      : Texture.TRILINEAR_SAMPLINGMODE;
 
     // Dynamic texture from the canvas
     const frontTexture = new DynamicTexture(
       this.littleBuddyId + "-texture",
       this.canvas,
       this.scene,
-      false,
+      !this.meta.pixelated,
+      sampling,
     );
+
+    frontTexture.wrapU = Texture.CLAMP_ADDRESSMODE;
+    frontTexture.wrapV = Texture.CLAMP_ADDRESSMODE;
 
     // Material for the front face (Z+)
     this.mat = new StandardMaterial(
@@ -134,16 +162,19 @@ class LittleBuddy {
     this.mat.emissiveColor = new Color3(1, 1, 1);
     this.mat.backFaceCulling = false;
 
+    this.mat.diffuseTexture.hasAlpha = true;
+    this.mat.useAlphaFromDiffuseTexture = true;
+    this.mat.transparencyMode = Material.MATERIAL_ALPHABLEND;
+
     // Create a multi-material for the mesh
     this.multiMat = new MultiMaterial(
       this.littleBuddyId + "-multiMaterial",
       this.scene,
     );
 
-    // Materials for each face (Z+ is face index 2)
     for (let i = 0; i < 6; i++) {
       let mat: StandardMaterial;
-      if (i === 2) {
+      if (i === 1) {
         mat = this.mat;
       } else {
         mat = new StandardMaterial(
@@ -151,7 +182,7 @@ class LittleBuddy {
           this.scene,
         );
         mat.alpha = 0.2;
-        mat.diffuseColor = new Color3(1, 1, 1);
+        mat.diffuseColor = new Color3(1, 1, 0);
         mat.backFaceCulling = false;
       }
       this.multiMat.subMaterials.push(mat);
@@ -177,6 +208,7 @@ class LittleBuddy {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve(img);
+      img.crossOrigin = "anonymous";
       img.src = src;
     });
   };

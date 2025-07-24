@@ -69,6 +69,7 @@ export type SpriteType = {
   };
   animations: SpriteAnimations;
   active: boolean;
+  aspect: number;
 };
 
 export type LittleBuddiesTypes =
@@ -109,29 +110,31 @@ export type MetaAnimation = {
   };
 };
 
-export const spirteSheetsMeta: {
-  [tableLittleBuddy in LittleBuddiesTypes]: {
-    url: string;
-    frameHeight: number;
-    frameWidth: number;
-    walkSpeed: number;
-    runSpeed: number;
-    rotatable: boolean;
-    flipTextures: boolean;
-    pixelated: boolean;
-    animations: {
-      core: {
-        idle: MetaAnimation;
-        walk: MetaAnimation;
-      };
-      alt: {
-        run?: MetaAnimation;
-        death?: MetaAnimation;
-        speak?: MetaAnimation;
-        jump?: MetaAnimation;
-      };
+export type SpriteMetaData = {
+  url: string;
+  frameHeight: number;
+  frameWidth: number;
+  walkSpeed: number;
+  runSpeed: number;
+  rotatable: boolean;
+  flipTextures: boolean;
+  pixelated: boolean;
+  animations: {
+    core: {
+      idle: MetaAnimation;
+      walk: MetaAnimation;
+    };
+    alt: {
+      run?: MetaAnimation;
+      death?: MetaAnimation;
+      speak?: MetaAnimation;
+      jump?: MetaAnimation;
     };
   };
+};
+
+export const spirteSheetsMeta: {
+  [tableLittleBuddy in LittleBuddiesTypes]: SpriteMetaData;
 } = {
   horse: {
     url: horseSheet,
@@ -241,7 +244,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
