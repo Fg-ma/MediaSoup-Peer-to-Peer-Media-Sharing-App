@@ -5,7 +5,7 @@ import {
 } from "@mediapipe/face_mesh";
 import Deadbanding, { DeadbandingMediaTypes } from "./Deadbanding";
 import SmoothLandmarksUtils from "./SmoothLandmarksUtils";
-import { Point2D } from "./typeContant";
+import { Point2D } from "../../../universal/babylonTypeContant";
 
 export type LandmarkTypes =
   | "headRotationAngles"

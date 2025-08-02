@@ -141,7 +141,7 @@ class MetadataController {
     switch (contentType) {
       case "image": {
         const imageData =
-          await tableTopMongo.tableImages?.gets.getImageMetaDataBy_TID_IID(
+          await tableTopMongo.tableImages?.gets.getImageMetadataBy_TID_IID(
             tableId,
             contentId
           );
@@ -157,7 +157,7 @@ class MetadataController {
       }
       case "application": {
         const applicationData =
-          await tableTopMongo.tableApplications?.gets.getApplicationMetaDataBy_TID_IID(
+          await tableTopMongo.tableApplications?.gets.getApplicationMetadataBy_TID_IID(
             tableId,
             contentId
           );
@@ -173,7 +173,7 @@ class MetadataController {
       }
       case "soundClip": {
         const soundClipData =
-          await tableTopMongo.tableSoundClips?.gets.getSoundClipMetaDataBy_TID_SID(
+          await tableTopMongo.tableSoundClips?.gets.getSoundClipMetadataBy_TID_SID(
             tableId,
             contentId
           );
@@ -188,7 +188,7 @@ class MetadataController {
       }
       case "svg": {
         const svgData =
-          await tableTopMongo.tableSvgs?.gets.getSvgMetaDataBy_TID_SID(
+          await tableTopMongo.tableSvgs?.gets.getSvgMetadataBy_TID_SID(
             tableId,
             contentId
           );
@@ -204,7 +204,7 @@ class MetadataController {
       }
       case "text": {
         const textData =
-          await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
+          await tableTopMongo.tableText?.gets.getTextMetadataBy_TID_XID(
             tableId,
             contentId
           );
@@ -219,7 +219,7 @@ class MetadataController {
       }
       case "video": {
         const videoData =
-          await tableTopMongo.tableVideos?.gets.getVideoMetaDataBy_TID_VID(
+          await tableTopMongo.tableVideos?.gets.getVideoMetadataBy_TID_VID(
             tableId,
             contentId
           );

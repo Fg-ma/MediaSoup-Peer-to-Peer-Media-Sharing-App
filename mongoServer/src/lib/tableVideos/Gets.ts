@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getVideoMetaDataBy_TID_VID = async (tableId: string, videoId: string) => {
+  getVideoMetadataBy_TID_VID = async (tableId: string, videoId: string) => {
     try {
       const videoData = await this.tableVideosCollection.findOne({
         tid: tableId,
@@ -19,7 +19,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(videoData);
+      return this.decoder.decodeMetadata(videoData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
       return null;
@@ -37,7 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return videoData.map((data) => this.decoder.decodeMetaData(data));
+      return videoData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

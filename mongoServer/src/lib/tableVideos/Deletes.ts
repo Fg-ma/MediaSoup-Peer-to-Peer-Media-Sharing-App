@@ -4,7 +4,7 @@ import { TableVideosType } from "./typeConstant";
 class Deletes {
   constructor(private tableVideosCollection: Collection<TableVideosType>) {}
 
-  deleteMetaDataBy_TID_VID = async (tableId: string, videoId: string) => {
+  deleteMetadataBy_TID_VID = async (tableId: string, videoId: string) => {
     try {
       await this.tableVideosCollection.deleteOne({
         tid: tableId,

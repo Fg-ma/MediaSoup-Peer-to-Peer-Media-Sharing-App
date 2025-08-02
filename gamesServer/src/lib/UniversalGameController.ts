@@ -62,7 +62,7 @@ class UniversalGameController {
     const { tableId, gameId } = safeEvent.header;
     const { positioning } = safeEvent.data;
 
-    await tableTopMongo.tableGames?.uploads.editMetaData(
+    await tableTopMongo.tableGames?.uploads.editMetadata(
       { tableId, gameId },
       {
         positioning,
@@ -108,7 +108,7 @@ class UniversalGameController {
         gameId
       );
 
-      await tableTopMongo.tableGames?.uploads.uploadMetaData({
+      await tableTopMongo.tableGames?.uploads.uploadMetadata({
         tableId,
         gameId,
         gameType,
@@ -201,7 +201,7 @@ class UniversalGameController {
       }
     );
 
-    await tableTopMongo.tableGames?.deletes.deleteMetaDataBy_TID_GID(
+    await tableTopMongo.tableGames?.deletes.deleteMetadataBy_TID_GID(
       tableId,
       gameId
     );

@@ -12,7 +12,7 @@ import { applicationEffectEncodingMap } from "./typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     aid: string;
     n: string;

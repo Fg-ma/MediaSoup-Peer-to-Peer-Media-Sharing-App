@@ -9,7 +9,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     gameId: string;
     gameType: GameTypes;
@@ -25,7 +25,7 @@ class Uploads {
       rotation: number;
     };
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tableGamesCollection?.insertOne(mongoData);
@@ -34,7 +34,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string; gameId: string },
     updateData: Partial<{
       positioning?: {

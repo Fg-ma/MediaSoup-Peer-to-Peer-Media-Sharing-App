@@ -19,7 +19,7 @@ import { imageEffectEncodingMap } from "./typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     imageId: string;
     filename: string;

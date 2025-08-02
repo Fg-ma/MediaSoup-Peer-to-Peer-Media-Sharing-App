@@ -4,7 +4,7 @@ import { tableStateDecodingMap } from "../typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     xid: string;
     n: string;

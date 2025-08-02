@@ -114,7 +114,7 @@ uWS
                       break;
                   }
 
-                  await tableTopMongo.tableGames?.deletes.deleteMetaDataBy_TID_GID(
+                  await tableTopMongo.tableGames?.deletes.deleteMetadataBy_TID_GID(
                     tableId,
                     gameId
                   );

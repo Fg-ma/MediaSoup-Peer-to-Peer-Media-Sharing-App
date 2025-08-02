@@ -1,8 +1,5 @@
 import {
-  Engine,
-  Scene,
   Vector3,
-  UniversalCamera,
   Vector2,
   MotionBlurPostProcess,
   BlackAndWhitePostProcess,
@@ -13,7 +10,8 @@ import {
   Effect,
   PostProcess,
 } from "@babylonjs/core";
-import { PostProcessEffectTypes } from "../../../universal/effectsTypeConstant";
+import { PostProcessEffectTypes } from "../../../../universal/effectsTypeConstant";
+import TableBabylonScene from "../TableBabylonScene";
 
 class BabylonShaderController {
   private time = 0;
@@ -64,11 +62,7 @@ class BabylonShaderController {
     cartoon: false,
   };
 
-  constructor(
-    private engine: Engine,
-    private camera: UniversalCamera,
-    private scene: Scene,
-  ) {}
+  constructor(private tableBabylonScene: TableBabylonScene) {}
 
   private loadShader = async (url: string) => {
     const response = await fetch(url);
@@ -136,7 +130,7 @@ class BabylonShaderController {
                 null,
                 ["time"],
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -147,9 +141,9 @@ class BabylonShaderController {
           this.blackAndWhitePostProcess = new BlackAndWhitePostProcess(
             "blackAndWhite",
             1.0,
-            this.camera,
+            this.tableBabylonScene.camera,
             undefined,
-            this.engine,
+            this.tableBabylonScene.engine,
             false,
           );
         }
@@ -167,7 +161,7 @@ class BabylonShaderController {
               ["time"],
               null,
               1.0,
-              this.camera,
+              this.tableBabylonScene.camera,
             );
           });
         }
@@ -184,7 +178,7 @@ class BabylonShaderController {
                 null,
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -202,7 +196,7 @@ class BabylonShaderController {
                 ["time"],
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -220,7 +214,7 @@ class BabylonShaderController {
                 ["time", "aspectRatio", "glitchActive"],
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -232,9 +226,9 @@ class BabylonShaderController {
         if (this.motionblurPostProcess === undefined) {
           this.motionblurPostProcess = new MotionBlurPostProcess(
             "motionBlur",
-            this.scene,
+            this.tableBabylonScene.scene,
             1.0,
-            this.camera,
+            this.tableBabylonScene.camera,
           );
         }
         break;
@@ -250,7 +244,7 @@ class BabylonShaderController {
                 ["pixelSize", "resolution"],
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
 
               this.pixelationPostProcess.onApply = (effect) => {
@@ -258,8 +252,8 @@ class BabylonShaderController {
                 effect.setVector2(
                   "resolution",
                   new Vector2(
-                    this.engine.getRenderWidth(),
-                    this.engine.getRenderHeight(),
+                    this.tableBabylonScene.engine.getRenderWidth(),
+                    this.tableBabylonScene.engine.getRenderHeight(),
                   ),
                 );
               };
@@ -279,7 +273,7 @@ class BabylonShaderController {
                 null,
                 ["resolution", "time"],
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -290,12 +284,12 @@ class BabylonShaderController {
           this.chromaticAberrationPostProcess =
             new ChromaticAberrationPostProcess(
               "chromaticAberration",
-              this.engine.getRenderWidth(),
-              this.engine.getRenderHeight(),
+              this.tableBabylonScene.engine.getRenderWidth(),
+              this.tableBabylonScene.engine.getRenderHeight(),
               1,
-              this.camera,
+              this.tableBabylonScene.camera,
               undefined,
-              this.engine,
+              this.tableBabylonScene.engine,
               false,
             );
         }
@@ -312,15 +306,15 @@ class BabylonShaderController {
                 null,
                 ["resolution", "targetColor"],
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
 
               this.colorSplashPostProcess.onApply = (effect) => {
                 effect.setVector2(
                   "resolution",
                   new Vector2(
-                    this.engine.getRenderWidth(),
-                    this.engine.getRenderHeight(),
+                    this.tableBabylonScene.engine.getRenderWidth(),
+                    this.tableBabylonScene.engine.getRenderHeight(),
                   ),
                 );
                 effect.setVector3("targetColor", new Vector3(1, 0, 0));
@@ -335,7 +329,7 @@ class BabylonShaderController {
             "tonemap",
             TonemappingOperator.HejiDawson,
             1.0,
-            this.camera,
+            this.tableBabylonScene.camera,
           );
         }
         break;
@@ -358,15 +352,15 @@ class BabylonShaderController {
                   "weight",
                 ],
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
 
               this.raysPostProcess.onApply = (effect) => {
                 effect.setVector2(
                   "resolution",
                   new Vector2(
-                    this.engine.getRenderWidth(),
-                    this.engine.getRenderHeight(),
+                    this.tableBabylonScene.engine.getRenderWidth(),
+                    this.tableBabylonScene.engine.getRenderHeight(),
                   ),
                 );
                 effect.setVector2(
@@ -387,9 +381,9 @@ class BabylonShaderController {
           this.sharpenPostProcess = new SharpenPostProcess(
             "sharpen",
             1,
-            this.camera,
+            this.tableBabylonScene.camera,
             undefined,
-            this.engine,
+            this.tableBabylonScene.engine,
             false,
           );
         }
@@ -406,7 +400,7 @@ class BabylonShaderController {
                 ["focusHeight", "focusWidth", "blurStrength"],
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
 
               this.tiltShiftPostProcess.onApply = (effect) => {
@@ -416,8 +410,8 @@ class BabylonShaderController {
                 effect.setVector2(
                   "resolution",
                   new Vector2(
-                    this.engine.getRenderWidth(),
-                    this.engine.getRenderHeight(),
+                    this.tableBabylonScene.engine.getRenderWidth(),
+                    this.tableBabylonScene.engine.getRenderHeight(),
                   ),
                 );
               };
@@ -437,7 +431,7 @@ class BabylonShaderController {
                 null,
                 null,
                 1.0,
-                this.camera,
+                this.tableBabylonScene.camera,
               );
             },
           );
@@ -576,7 +570,12 @@ class BabylonShaderController {
     if (this.activeShaders.vintageTV && this.vintageTVPostProcess) {
       this.vintageTVPostProcess.onApply = (effect) => {
         effect.setFloat("time", this.time);
-        effect.setFloat("aspectRatio", this.engine.getAspectRatio(this.camera));
+        effect.setFloat(
+          "aspectRatio",
+          this.tableBabylonScene.engine.getAspectRatio(
+            this.tableBabylonScene.camera,
+          ),
+        );
         effect.setBool("glitchActive", this.glitchActive);
       };
     }
@@ -587,8 +586,8 @@ class BabylonShaderController {
         effect.setVector2(
           "resolution",
           new Vector2(
-            this.engine.getRenderWidth(),
-            this.engine.getRenderHeight(),
+            this.tableBabylonScene.engine.getRenderWidth(),
+            this.tableBabylonScene.engine.getRenderHeight(),
           ),
         );
       };
@@ -596,7 +595,7 @@ class BabylonShaderController {
   };
 
   renderLoop = () => {
-    this.time += this.engine.getDeltaTime() * 0.001;
+    this.time += this.tableBabylonScene.engine.getDeltaTime() * 0.001;
 
     this.updateUniforms();
   };

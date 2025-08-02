@@ -25,9 +25,9 @@ import BabylonMeshes from "./BabylonMeshes";
 import BabylonRenderLoop from "./BabylonRenderLoop";
 import UserDevice from "../tools/userDevice/UserDevice";
 import BabylonShaderController from "./BabylonShaderController";
-import { MeshTypes } from "./typeContant";
 import FaceLandmarks from "./FaceLandmarks";
 import BabylonRenderLoopWorker from "./BabylonRenderLoopWorker";
+import { MeshTypes } from "../../../universal/babylonTypeContant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -163,7 +163,7 @@ class BabylonScene {
 
     this.initCamera();
     this.initLighting();
-    this.initBackgroundMediaPlane();
+    this.initBackgroundMediaLayer();
     this.initHideBackgroundPlane();
     this.initTintPlane();
 
@@ -282,7 +282,7 @@ class BabylonScene {
     this.ambientLightTwoDimMeshes.includedOnlyMeshes.push(dummyMesh3D);
   };
 
-  private initBackgroundMediaPlane = () => {
+  private initBackgroundMediaLayer = () => {
     this.backgroundMediaTexture =
       this.backgroundMedia instanceof HTMLVideoElement
         ? new VideoTexture(
@@ -469,8 +469,8 @@ class BabylonScene {
 
     // First, collect meshes to be deleted
     for (const mesh of this.scene.meshes) {
-      const meshMetaData = mesh.metadata;
-      if (meshMetaData && meshMetaData.effectType === effect) {
+      const meshMetadata = mesh.metadata;
+      if (meshMetadata && meshMetadata.effectType === effect) {
         meshesToDelete.push(mesh);
       }
     }

@@ -11,7 +11,7 @@ export type SoundEffects = Record<
   }
 >;
 
-export type SoundEffectsMetaData = Record<
+export type SoundEffectsMetadata = Record<
   number,
   { duration: number; timeoutOnMetaLoaded: boolean }
 >;
@@ -241,7 +241,7 @@ export const defaultSoundEffects: SoundEffects = {
   },
 };
 
-export const defaultSoundEffectsMetaData: SoundEffectsMetaData = {
+export const defaultSoundEffectsMetadata: SoundEffectsMetadata = {
   1: { duration: 0, timeoutOnMetaLoaded: false },
   2: { duration: 0, timeoutOnMetaLoaded: false },
   3: { duration: 0, timeoutOnMetaLoaded: false },

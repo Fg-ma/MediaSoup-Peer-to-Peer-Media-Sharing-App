@@ -20,7 +20,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     applicationId: string;
     filename: string;
@@ -45,7 +45,7 @@ class Uploads {
       effectStyles: ApplicationEffectStylesType;
     }[];
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tableApplicationsCollection?.insertOne(mongoData);
@@ -54,7 +54,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string; applicationId: string },
     updateData: Partial<{
       state?: TableContentStateTypes[];

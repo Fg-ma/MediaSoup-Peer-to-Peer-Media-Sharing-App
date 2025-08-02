@@ -4,7 +4,7 @@ import { tableStateEncodingMap } from "../typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     textId: string;
     filename: string;

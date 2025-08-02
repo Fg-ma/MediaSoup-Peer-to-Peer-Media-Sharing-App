@@ -19,7 +19,7 @@ import { imageEffectEncodingMap } from "./typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     iid: string;
     n: string;

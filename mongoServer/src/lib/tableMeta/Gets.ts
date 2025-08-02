@@ -9,16 +9,16 @@ class Gets {
 
   getTableMetaBy_TID = async (tableId: string) => {
     try {
-      const tableMetaData = await this.tablesMetaCollection.findOne({
+      const tableMetadata = await this.tablesMetaCollection.findOne({
         tid: tableId,
       });
 
-      if (!tableMetaData) {
+      if (!tableMetadata) {
         return null;
       }
 
       // @ts-expect-error: mongo doesn't have typing
-      return this.decoder.decodeMetaData(tableMetaData);
+      return this.decoder.decodeMetadata(tableMetadata);
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return null;

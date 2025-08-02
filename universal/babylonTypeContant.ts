@@ -5,7 +5,7 @@ import {
   MasksEffectTypes,
   MustachesEffectTypes,
   PetsEffectTypes,
-} from "../../../universal/effectsTypeConstant";
+} from "./effectsTypeConstant";
 
 export interface MeshJSON {
   vertex_faces: number[];
@@ -24,9 +24,35 @@ export interface Point3D {
   z: number;
 }
 
-export type MeshTypes = "2D" | "3D" | "gltf";
+export type MeshTypes = "2D" | "3D" | "gltf" | "littleBuddy";
 
 export type GizmoStateTypes = "position" | "scale" | "rotation" | "none";
+
+export type MeshMetadata = {
+  type: MeshTypes;
+  userId: string;
+  meshLabel: string;
+  flags: {
+    gizmo: boolean;
+    moveable: boolean;
+    scaleable: boolean;
+    rotateable: boolean;
+    audio: boolean;
+    animation: boolean;
+  };
+  gizmo?: {
+    isGizmoEnabled: boolean;
+    gizmoState: GizmoStateTypes;
+  };
+  audio?: {
+    audioURL: string;
+    audioLoaded: boolean;
+  };
+  positioning: {
+    initScale: number;
+    manuallyTransformed: boolean;
+  };
+};
 
 export type meshData = {
   defaultMeshPlacement: "forehead" | "eyesCenter" | "nose" | "chin";

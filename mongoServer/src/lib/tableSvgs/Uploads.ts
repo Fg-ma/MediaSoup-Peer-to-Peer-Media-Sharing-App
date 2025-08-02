@@ -14,7 +14,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     svgId: string;
     filename: string;
@@ -39,7 +39,7 @@ class Uploads {
       effectStyles: SvgEffectStylesType;
     }[];
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tableSvgsCollection?.insertOne(mongoData);
@@ -48,7 +48,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string; svgId: string },
     updateData: Partial<{
       state?: TableContentStateTypes[];

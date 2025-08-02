@@ -3,7 +3,7 @@ import { GameTypes } from "../../../../universal/contentTypeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     gid: string;
     gty: string;

@@ -6,7 +6,7 @@ class Deletes {
     private userApplicationsCollection: Collection<UserApplicationsType>
   ) {}
 
-  deleteMetaDataBy_UID_AID = async (userId: string, applicationId: string) => {
+  deleteMetadataBy_UID_AID = async (userId: string, applicationId: string) => {
     try {
       await this.userApplicationsCollection.deleteOne({
         uid: userId,

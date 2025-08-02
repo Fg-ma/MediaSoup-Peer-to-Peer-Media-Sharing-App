@@ -4,7 +4,7 @@ import { TableTextType } from "./typeConstant";
 class Deletes {
   constructor(private tableTextCollection: Collection<TableTextType>) {}
 
-  deleteMetaDataBy_TID_XID = async (tableId: string, textId: string) => {
+  deleteMetadataBy_TID_XID = async (tableId: string, textId: string) => {
     try {
       await this.tableTextCollection.deleteOne({
         tid: tableId,

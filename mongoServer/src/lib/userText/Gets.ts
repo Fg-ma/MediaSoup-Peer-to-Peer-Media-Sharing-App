@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getTextMetaDataBy_UID_XID = async (userId: string, textId: string) => {
+  getTextMetadataBy_UID_XID = async (userId: string, textId: string) => {
     try {
       const textData = await this.userTextCollection.findOne({
         uid: userId,
@@ -19,7 +19,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(textData);
+      return this.decoder.decodeMetadata(textData);
     } catch (err) {
       console.error("Error retrieving text data:", err);
       return null;
@@ -37,7 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return textData.map((data) => this.decoder.decodeMetaData(data));
+      return textData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

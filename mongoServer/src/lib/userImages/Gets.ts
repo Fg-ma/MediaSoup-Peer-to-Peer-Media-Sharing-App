@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getImageMetaDataBy_UID_IID = async (userId: string, imageId: string) => {
+  getImageMetadataBy_UID_IID = async (userId: string, imageId: string) => {
     try {
       const imageData = await this.userImagesCollection.findOne({
         uid: userId,
@@ -19,7 +19,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(imageData);
+      return this.decoder.decodeMetadata(imageData);
     } catch (err) {
       console.error("Error retrieving image data:", err);
       return null;
@@ -37,7 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return imageData.map((data) => this.decoder.decodeMetaData(data));
+      return imageData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

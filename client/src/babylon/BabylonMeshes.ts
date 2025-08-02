@@ -25,7 +25,12 @@ import {
   PositionStyle,
 } from "./BabylonScene";
 import { baseMaskData } from "./meshes";
-import { GizmoStateTypes, MeshJSON, MeshTypes, Point3D } from "./typeContant";
+import {
+  GizmoStateTypes,
+  MeshJSON,
+  MeshTypes,
+  Point3D,
+} from "../../../universal/babylonTypeContant";
 
 class BabylonMeshes {
   meshes: {
@@ -316,21 +321,21 @@ class BabylonMeshes {
           }
         }
 
-        const meshMetaData = this.selectedMesh.metadata;
+        const meshMetadata = this.selectedMesh.metadata;
 
         // Handle gizmo toggle on double click
-        const nextState = this.getNextGizmoState(meshMetaData.gizmoState);
+        const nextState = this.getNextGizmoState(meshMetadata.gizmoState);
         this.selectedMesh.metadata.gizmoState = nextState;
 
         if (
-          meshMetaData &&
-          meshMetaData.positionStyle !== undefined &&
-          meshMetaData.manuallyTransformed !== undefined
+          meshMetadata &&
+          meshMetadata.positionStyle !== undefined &&
+          meshMetadata.manuallyTransformed !== undefined
         ) {
-          if (nextState === "none" && !meshMetaData.manuallyTransformed) {
-            meshMetaData.positionStyle = "faceTrack";
+          if (nextState === "none" && !meshMetadata.manuallyTransformed) {
+            meshMetadata.positionStyle = "faceTrack";
           } else {
-            meshMetaData.positionStyle = "free";
+            meshMetadata.positionStyle = "free";
           }
         }
 
@@ -355,17 +360,17 @@ class BabylonMeshes {
     // Handle hold event (3 seconds)
     mesh.actionManager.registerAction(
       new ExecuteCodeAction(ActionManager.OnPickDownTrigger, () => {
-        const meshMetaData = parentMesh ? parentMesh.metadata : mesh.metadata;
+        const meshMetadata = parentMesh ? parentMesh.metadata : mesh.metadata;
         if (
-          meshMetaData &&
-          meshMetaData.positionStyle !== undefined &&
-          meshMetaData.manuallyTransformed !== undefined &&
-          meshMetaData.gizmoState !== "position"
+          meshMetadata &&
+          meshMetadata.positionStyle !== undefined &&
+          meshMetadata.manuallyTransformed !== undefined &&
+          meshMetadata.gizmoState !== "position"
         ) {
           holdTimeout = setTimeout(() => {
-            meshMetaData.gizmoState = "none";
-            meshMetaData.positionStyle = "faceTrack";
-            meshMetaData.manuallyTransformed = false;
+            meshMetadata.gizmoState = "none";
+            meshMetadata.positionStyle = "faceTrack";
+            meshMetadata.manuallyTransformed = false;
             this.disableGizmo(parentMesh ? parentMesh : mesh);
           }, 2000);
         }
@@ -401,17 +406,17 @@ class BabylonMeshes {
   };
 
   private togglePlayAudioOnMesh = (mesh: AbstractMesh) => {
-    const meshMetaData = mesh.metadata;
+    const meshMetadata = mesh.metadata;
 
-    if (meshMetaData.audioURL === undefined) {
+    if (meshMetadata.audioURL === undefined) {
       return;
     }
   };
 
   private escapeMesh = (mesh: AbstractMesh) => {
-    const meshMetaData = mesh.metadata;
+    const meshMetadata = mesh.metadata;
 
-    if (!meshMetaData) {
+    if (!meshMetadata) {
       return;
     }
 
@@ -419,8 +424,8 @@ class BabylonMeshes {
     this.disableGizmo(mesh);
 
     // Reset gizmo state
-    meshMetaData.gizmoState = "none";
-    const meshLabel = meshMetaData.meshLabel;
+    meshMetadata.gizmoState = "none";
+    const meshLabel = meshMetadata.meshLabel;
 
     // Stop animations associated with the mesh
     const animationGroups = this.scene.animationGroups;
@@ -467,21 +472,21 @@ class BabylonMeshes {
     gizmo: IAxisDragGizmo,
   ) => {
     gizmo.dragBehavior?.onDragObservable.add(() => {
-      const meshMetaData = mesh.metadata;
+      const meshMetadata = mesh.metadata;
 
       if (
-        meshMetaData &&
-        !meshMetaData.manuallyTransformed &&
-        meshMetaData.manuallyTransformed !== undefined
+        meshMetadata &&
+        !meshMetadata.manuallyTransformed &&
+        meshMetadata.manuallyTransformed !== undefined
       ) {
-        meshMetaData.manuallyTransformed = true;
+        meshMetadata.manuallyTransformed = true;
       }
     });
   };
 
   // Function to enable the position gizmo for a mesh
   private enableGizmo = (gizmoType: GizmoStateTypes, mesh: AbstractMesh) => {
-    const meshMetaData = mesh.metadata;
+    const meshMetadata = mesh.metadata;
 
     // Create a GizmoManager to manage gizmos in the scene
     const gizmoManager = new GizmoManager(this.scene);
@@ -509,9 +514,9 @@ class BabylonMeshes {
           ); // Blue for Z axis
 
           if (
-            meshMetaData &&
-            !meshMetaData.manuallyTransformed &&
-            meshMetaData.manuallyTransformed !== undefined
+            meshMetadata &&
+            !meshMetadata.manuallyTransformed &&
+            meshMetadata.manuallyTransformed !== undefined
           ) {
             this.registerGizmoInteraction(mesh, positionGizmo.xGizmo);
             this.registerGizmoInteraction(mesh, positionGizmo.yGizmo);
@@ -533,7 +538,7 @@ class BabylonMeshes {
         mesh.addBehavior(dragBehavior);
 
         // Store the drag behavior in the mesh's metadata for later access
-        meshMetaData.dragBehavior = dragBehavior;
+        meshMetadata.dragBehavior = dragBehavior;
         break;
       }
       case "rotation": {
@@ -558,9 +563,9 @@ class BabylonMeshes {
           ); // Blue for Z axis
 
           if (
-            meshMetaData &&
-            !meshMetaData.manuallyTransformed &&
-            meshMetaData.manuallyTransformed !== undefined
+            meshMetadata &&
+            !meshMetadata.manuallyTransformed &&
+            meshMetadata.manuallyTransformed !== undefined
           ) {
             this.registerGizmoInteraction(mesh, rotationGizmo.xGizmo);
             this.registerGizmoInteraction(mesh, rotationGizmo.yGizmo);
@@ -596,9 +601,9 @@ class BabylonMeshes {
           ); // Blue for Z axis
 
           if (
-            meshMetaData &&
-            !meshMetaData.manuallyTransformed &&
-            meshMetaData.manuallyTransformed !== undefined
+            meshMetadata &&
+            !meshMetadata.manuallyTransformed &&
+            meshMetadata.manuallyTransformed !== undefined
           ) {
             this.registerGizmoInteraction(mesh, scaleGizmo.xGizmo);
             this.registerGizmoInteraction(mesh, scaleGizmo.yGizmo);
@@ -618,24 +623,24 @@ class BabylonMeshes {
 
   // Function to disable the position gizmo for a mesh
   private disableGizmo = (mesh: AbstractMesh) => {
-    const meshMetaData = mesh.metadata;
+    const meshMetadata = mesh.metadata;
 
-    if (!meshMetaData) {
+    if (!meshMetadata) {
       return;
     }
 
     // Remove the drag behavior
-    const dragBehavior = meshMetaData.dragBehavior;
+    const dragBehavior = meshMetadata.dragBehavior;
     if (dragBehavior) {
       mesh.removeBehavior(dragBehavior);
     }
 
-    const gizmoManager = meshMetaData.gizmoManager;
+    const gizmoManager = meshMetadata.gizmoManager;
 
     const gizmos = ["xGizmo", "yGizmo", "zGizmo"];
     for (const gizmo of gizmos) {
       const currentGizmo =
-        meshMetaData?.gizmoManager?.gizmos?.positionGizmo?.[gizmo];
+        meshMetadata?.gizmoManager?.gizmos?.positionGizmo?.[gizmo];
       if (currentGizmo) {
         currentGizmo.dragBehavior?.onDragObservable.clear();
         currentGizmo.dragBehavior?.onDragStartObservable.clear();
@@ -650,8 +655,8 @@ class BabylonMeshes {
     }
 
     // Remove gizmo metadata to avoid memory leaks
-    meshMetaData.gizmoManager = undefined;
-    meshMetaData.dragBehavior = undefined;
+    meshMetadata.gizmoManager = undefined;
+    meshMetadata.dragBehavior = undefined;
   };
 
   loader = async (
@@ -776,17 +781,17 @@ class BabylonMeshes {
   };
 
   deleteMesh = (mesh: AbstractMesh) => {
-    const meshMetaData = mesh.metadata;
+    const meshMetadata = mesh.metadata;
 
-    if (!meshMetaData || !mesh) {
+    if (!meshMetadata || !mesh) {
       return;
     }
 
     this.disableGizmo(mesh);
 
     // Remove the mesh from the collection
-    if (meshMetaData) {
-      const meshLabel = meshMetaData.meshLabel;
+    if (meshMetadata) {
+      const meshLabel = meshMetadata.meshLabel;
       if (meshLabel in this.meshes["3D"]) {
         delete this.meshes["3D"][meshLabel];
       } else if (meshLabel in this.meshes["2D"]) {
@@ -800,8 +805,8 @@ class BabylonMeshes {
       animGroup.targetedAnimations.forEach((targetedAnim) => {
         if (
           targetedAnim.target.metadata &&
-          meshMetaData.meshLabel !== undefined &&
-          meshMetaData.meshLabel === targetedAnim.target.metadata.meshLabel
+          meshMetadata.meshLabel !== undefined &&
+          meshMetadata.meshLabel === targetedAnim.target.metadata.meshLabel
         ) {
           animGroup.stop(); // Stop the animation before removing the mesh
         }

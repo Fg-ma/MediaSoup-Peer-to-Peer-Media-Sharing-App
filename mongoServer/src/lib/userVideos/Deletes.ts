@@ -4,7 +4,7 @@ import { UserVideosType } from "./typeConstant";
 class Deletes {
   constructor(private userVideosCollection: Collection<UserVideosType>) {}
 
-  deleteMetaDataBy_UID_VID = async (userId: string, videoId: string) => {
+  deleteMetadataBy_UID_VID = async (userId: string, videoId: string) => {
     try {
       await this.userVideosCollection.deleteOne({
         uid: userId,

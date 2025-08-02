@@ -6,7 +6,7 @@ class Deletes {
     private userSoundClipsCollection: Collection<UserSoundClipsType>
   ) {}
 
-  deleteMetaDataBy_UID_AID = async (userId: string, soundClipId: string) => {
+  deleteMetadataBy_UID_AID = async (userId: string, soundClipId: string) => {
     try {
       await this.userSoundClipsCollection.deleteOne({
         uid: userId,

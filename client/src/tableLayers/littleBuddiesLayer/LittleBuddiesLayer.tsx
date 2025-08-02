@@ -92,11 +92,11 @@ export default function LittleBuddiesLayer({
   littleBuddy?: LittleBuddiesTypes;
 }) {
   const { tableBabylonScene } = useTableContext();
-  const { username } = useUserInfoContext();
+  const { userId } = useUserInfoContext();
 
   useEffect(() => {
-    tableBabylonScene.current?.littleBuddies.createLittleBuddy(
-      username.current,
+    tableBabylonScene.current?.tableLittleBuddies.createLittleBuddy(
+      userId.current,
       uuidv4(),
       littleBuddy,
     );

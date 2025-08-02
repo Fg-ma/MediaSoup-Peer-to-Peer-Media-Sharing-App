@@ -9,8 +9,9 @@ import {
   Mesh,
   Material,
   Texture,
+  UniversalCamera,
+  Engine,
 } from "@babylonjs/core";
-import Animation from "./Animation";
 import SpriteSheet from "./SpriteSheet";
 import {
   AltSpriteAnimationsTypes,
@@ -20,45 +21,50 @@ import {
   spirteSheetsMeta,
   SpriteAnimations,
   SpriteAnimationsTypes,
-  SpriteMetaData,
+  SpriteMetadata,
   SpriteType,
 } from "./typeConstant";
+import { MeshMetadata } from "../../../../../universal/babylonTypeContant";
+import LittleBuddyAnimations from "./LittleBuddyAnimations";
+import LittleBuddyMovement from "./LittleBuddyMovement";
+import TableBabylonMouse from "../../../tableBabylon/mouse/TableBabylonMouse";
+import TableBabylonScene from "src/tableBabylon/TableBabylonScene";
 
 class LittleBuddy {
   sprite: SpriteType | undefined;
-  meta: SpriteMetaData;
+  meta: SpriteMetadata;
 
   spriteSheet: SpriteSheet | undefined;
   canvas: HTMLCanvasElement;
   lastTimeRef = 0;
 
-  private activeDirs = new Set<"up" | "down" | "left" | "right">();
-  private sprinting = false;
-  private prevDir:
-    | "left"
-    | "right"
-    | "up"
-    | "down"
-    | "leftUp"
-    | "leftDown"
-    | "rightUp"
-    | "rightDown"
-    | undefined = undefined;
+  idleTimeout: undefined | NodeJS.Timeout;
 
-  private idleTimeout: undefined | NodeJS.Timeout;
-
-  private mesh: Mesh | undefined;
+  mesh: Mesh | undefined;
+  texture: DynamicTexture | undefined;
   private mat: StandardMaterial | undefined;
   private multiMat: MultiMaterial | undefined;
 
+  contentZIndex = 99;
+
+  littleBuddyAnimations: LittleBuddyAnimations;
+  littleBuddyMovement: LittleBuddyMovement;
+
   constructor(
+    private userId: string,
     private littleBuddyId: string,
-    private littleBuddy: LittleBuddiesTypes,
-    private scene: Scene,
+    public littleBuddy: LittleBuddiesTypes,
+    private tableBabylonScene: TableBabylonScene,
   ) {
     this.canvas = document.createElement("canvas");
 
     this.meta = spirteSheetsMeta[this.littleBuddy];
+
+    this.littleBuddyAnimations = new LittleBuddyAnimations(this);
+    this.littleBuddyMovement = new LittleBuddyMovement(
+      this.tableBabylonScene,
+      this,
+    );
 
     this.init();
   }
@@ -67,10 +73,10 @@ class LittleBuddy {
     const aspect = this.meta.frameWidth / this.meta.frameHeight;
 
     const positioning = {
-      position: { top: 50, left: 50 },
+      position: { y: 50, x: 50 },
       scale: {
-        x: 8,
-        y: 8 / aspect,
+        x: 10,
+        y: 10 / aspect,
       },
       rotation: 0,
       flip: false,
@@ -96,10 +102,18 @@ class LittleBuddy {
     };
 
     for (const core in this.meta.animations.core) {
-      this.newAnimation(animations, "core", core as SpriteAnimationsTypes);
+      this.littleBuddyAnimations.newAnimation(
+        animations,
+        "core",
+        core as SpriteAnimationsTypes,
+      );
     }
     for (const alt in this.meta.animations.alt) {
-      this.newAnimation(animations, "alt", alt as SpriteAnimationsTypes);
+      this.littleBuddyAnimations.newAnimation(
+        animations,
+        "alt",
+        alt as SpriteAnimationsTypes,
+      );
     }
 
     this.sprite = {
@@ -109,6 +123,7 @@ class LittleBuddy {
       animations,
       active: false,
       aspect,
+      selected: false,
     };
 
     if (this.meta.pixelated) {
@@ -125,40 +140,56 @@ class LittleBuddy {
     this.mesh = MeshBuilder.CreateBox(
       this.littleBuddyId + "-mesh",
       {
-        width: 0.5, // X-axis
-        height: 0.5, // Y-axis
+        width: 1, // X-axis
+        height: 1, // Y-axis
         depth: 0.001, // Z-axis
       },
-      this.scene,
+      this.tableBabylonScene.scene,
     );
 
-    const forward = this.scene.activeCamera!.getForwardRay().direction;
-    this.mesh.position = this.scene.activeCamera!.position.add(
-      forward.scale(2),
-    );
+    this.mesh.metadata = {
+      type: "littleBuddy",
+      userId: this.userId,
+      meshLabel: this.littleBuddyId,
+      flags: {
+        gizmo: false,
+        moveable: true,
+        scaleable: false,
+        rotateable: false,
+        audio: false,
+      },
+      positioning: {
+        initScale: 1,
+        manuallyTransformed: true,
+      },
+    } as MeshMetadata;
+
+    this.tableBabylonScene.tableBabylonMouse.applyMouseActions(this.mesh);
+
+    this.littleBuddyMovement.updateBuddyPosition();
 
     const sampling = this.meta.pixelated
       ? Texture.NEAREST_SAMPLINGMODE
       : Texture.TRILINEAR_SAMPLINGMODE;
 
     // Dynamic texture from the canvas
-    const frontTexture = new DynamicTexture(
+    this.texture = new DynamicTexture(
       this.littleBuddyId + "-texture",
       this.canvas,
-      this.scene,
+      this.tableBabylonScene.scene,
       !this.meta.pixelated,
       sampling,
     );
 
-    frontTexture.wrapU = Texture.CLAMP_ADDRESSMODE;
-    frontTexture.wrapV = Texture.CLAMP_ADDRESSMODE;
+    this.texture.wrapU = Texture.CLAMP_ADDRESSMODE;
+    this.texture.wrapV = Texture.CLAMP_ADDRESSMODE;
 
     // Material for the front face (Z+)
     this.mat = new StandardMaterial(
       this.littleBuddyId + "-material",
-      this.scene,
+      this.tableBabylonScene.scene,
     );
-    this.mat.diffuseTexture = frontTexture;
+    this.mat.diffuseTexture = this.texture;
     this.mat.emissiveColor = new Color3(1, 1, 1);
     this.mat.backFaceCulling = false;
 
@@ -169,7 +200,7 @@ class LittleBuddy {
     // Create a multi-material for the mesh
     this.multiMat = new MultiMaterial(
       this.littleBuddyId + "-multiMaterial",
-      this.scene,
+      this.tableBabylonScene.scene,
     );
 
     for (let i = 0; i < 6; i++) {
@@ -179,7 +210,7 @@ class LittleBuddy {
       } else {
         mat = new StandardMaterial(
           `${this.littleBuddyId}-transMat_${i}`,
-          this.scene,
+          this.tableBabylonScene.scene,
         );
         mat.alpha = 0.2;
         mat.diffuseColor = new Color3(1, 1, 0);
@@ -199,8 +230,8 @@ class LittleBuddy {
     }
 
     // Live update texture from canvas on each frame
-    this.scene.onBeforeRenderObservable.add(() => {
-      frontTexture.update();
+    this.tableBabylonScene.scene.onBeforeRenderObservable.add(() => {
+      this.texture?.update();
     });
   };
 
@@ -260,14 +291,18 @@ class LittleBuddy {
     const frameIndex = currentAnimation.getCurrentFrame();
     this.spriteSheet.drawFrame(ctx, frameIndex, 0, 0);
 
+    if (this.sprite.selected) {
+      this.drawSelectedOutline(ctx);
+    }
+
     if (
       this.sprite.animations.currentAnimation.core === "run" ||
       this.sprite.animations.currentAnimation.core === "walk"
     ) {
-      this.move();
+      this.littleBuddyMovement.move();
     }
     if (this.sprite.animations.currentAnimation.core === "idle") {
-      this.idle();
+      this.littleBuddyAnimations.idle();
     } else {
       if (this.idleTimeout) {
         clearTimeout(this.idleTimeout);
@@ -278,319 +313,46 @@ class LittleBuddy {
     requestAnimationFrame(this.animationLoop);
   };
 
-  private newAnimation = (
-    animations: SpriteAnimations,
-    type: "core" | "alt",
-    name: SpriteAnimationsTypes,
-  ) => {
-    // @ts-expect-error: trust me I know what i'm doing
-    const meta = spirteSheetsMeta[this.littleBuddy].animations[type][name];
-    const newCoreAnimation = new Animation(meta.core, meta.speed);
+  private drawSelectedOutline(ctx: CanvasRenderingContext2D) {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
 
-    const altMeta = meta.alt;
-    const newAltAnimations: { [alt: string]: Animation } = {};
-    if (altMeta) {
-      for (const alt in altMeta) {
-        const newAltAnimation = new Animation(
-          altMeta[alt].animation,
-          altMeta[alt].speed !== undefined ? altMeta[alt].speed : meta.speed,
-          altMeta[alt].loop,
-        );
-        if (!altMeta[alt].loop)
-          newAltAnimation.addAnimationListener(this.idleAltAnimationFinished);
-        newAltAnimations[alt] = newAltAnimation;
+    // 1. Copy the current sprite image to an offscreen canvas
+    const offscreen = document.createElement("canvas");
+    offscreen.width = w;
+    offscreen.height = h;
+    const offCtx = offscreen.getContext("2d")!;
+    offCtx.drawImage(this.canvas, 0, 0);
+
+    // 2. Draw a red version slightly enlarged underneath to act as outline
+    ctx.save();
+
+    const outlineSize = 0.5; // in pixels
+
+    // draw multiple copies slightly offset to simulate stroke
+    for (let dx = -outlineSize; dx <= outlineSize; dx++) {
+      for (let dy = -outlineSize; dy <= outlineSize; dy++) {
+        // skip center
+        if (dx === 0 && dy === 0) continue;
+        ctx.drawImage(offscreen, dx, dy);
       }
     }
 
-    // @ts-expect-error: trust me I know what i'm doing
-    animations[type === "core" ? "coreAnimations" : "altAnimations"][name] = {
-      core: newCoreAnimation,
-      ...(altMeta ? { alt: newAltAnimations } : {}),
-    };
-  };
+    // Apply red tint over the outline copies
+    ctx.globalCompositeOperation = "source-in";
+    ctx.fillStyle = "#e62833";
+    ctx.fillRect(0, 0, w, h);
 
-  private updateMovement() {
-    if (!this.sprite) return;
+    // 3. Restore composite and draw original sprite on top
+    ctx.globalCompositeOperation = "source-over";
+    ctx.drawImage(offscreen, 0, 0);
 
-    if (this.activeDirs.size === 0) {
-      if (this.sprite.animations.currentAnimation.core !== "idle") {
-        this.sprite.animations.currentAnimation.core = "idle";
-        this.sprite.animations.currentAnimation.alt = undefined;
-        this.sprite.animations.coreAnimations.idle.core.reset();
-      }
-      return;
-    }
-
-    // choose run vs walk animation
-    const animations = this.sprite.animations;
-    const animationType = this.sprinting
-      ? animations.altAnimations.run
-        ? "run"
-        : "walk"
-      : "walk";
-    const isCore = animationType === "walk";
-    if (animations.currentAnimation.core !== animationType) {
-      animations.currentAnimation.core = animationType;
-      const animation = isCore
-        ? animations.coreAnimations.walk.core
-        : animations.altAnimations.run!.core;
-      this.sprite.animations.currentAnimation.alt = undefined;
-      animation.reset();
-    }
+    ctx.restore();
   }
 
-  private move = () => {
-    if (!this.canvas || !this.sprite) return;
-
-    // movement step
-    const meta = spirteSheetsMeta[this.littleBuddy];
-    const speed = this.sprinting ? meta.runSpeed : meta.walkSpeed;
-
-    const moveCount = this.activeDirs.size;
-    const norm = moveCount > 1 ? Math.SQRT1_2 : 1;
-
-    let dx = 0;
-    let dy = 0;
-    if (this.activeDirs.has("up")) dy -= speed * norm;
-    if (this.activeDirs.has("down")) dy += speed * norm;
-    if (this.activeDirs.has("left")) dx -= speed * norm;
-    if (this.activeDirs.has("right")) dx += speed * norm;
-
-    const currentDir = this.prevDir;
-
-    if (this.sprite.rotatable) {
-      if (dx > 0 && dy > 0) {
-        this.sprite.positioning.rotation = 45;
-        this.sprite.positioning.flip = true;
-        this.prevDir = "leftDown";
-      } else if (dx > 0 && dy < 0) {
-        this.sprite.positioning.rotation = -45;
-        this.sprite.positioning.flip = true;
-        this.prevDir = "leftUp";
-      } else if (dx < 0 && dy > 0) {
-        this.sprite.positioning.rotation = -45;
-        this.sprite.positioning.flip = false;
-        this.prevDir = "rightDown";
-      } else if (dx < 0 && dy < 0) {
-        this.sprite.positioning.rotation = 45;
-        this.sprite.positioning.flip = false;
-        this.prevDir = "rightUp";
-      } else if (dx === 0 && dy > 0) {
-        if (this.prevDir !== "down") {
-          this.sprite.positioning.rotation =
-            this.prevDir === "right" ||
-            this.prevDir === "rightDown" ||
-            this.prevDir === "rightUp"
-              ? 90
-              : -90;
-          this.sprite.positioning.flip =
-            this.prevDir === "right" ||
-            this.prevDir === "rightDown" ||
-            this.prevDir === "rightUp";
-          this.prevDir = "down";
-        }
-      } else if (dx === 0 && dy < 0) {
-        if (this.prevDir !== "up") {
-          this.sprite.positioning.rotation =
-            this.prevDir === "right" ||
-            this.prevDir === "rightDown" ||
-            this.prevDir === "rightUp"
-              ? -90
-              : 90;
-          this.sprite.positioning.flip =
-            this.prevDir === "right" ||
-            this.prevDir === "rightDown" ||
-            this.prevDir === "rightUp";
-          this.prevDir = "up";
-        }
-      } else if (dx > 0 && dy === 0) {
-        this.sprite.positioning.rotation = 0;
-        this.sprite.positioning.flip = true;
-        this.prevDir = "right";
-      } else if (dx < 0 && dy === 0) {
-        this.sprite.positioning.rotation = 0;
-        this.sprite.positioning.flip = false;
-        this.prevDir = "left";
-      }
-    } else {
-      if (dx > 0) {
-        if (this.prevDir !== "right") {
-          this.sprite.positioning.flip = true;
-          this.prevDir = "right";
-        }
-      } else if (dx < 0) {
-        if (this.prevDir !== "left") {
-          this.sprite.positioning.flip = false;
-          this.prevDir = "left";
-        }
-      }
-    }
-
-    if (currentDir !== this.prevDir) {
-      if (meta.flipTextures) {
-        this.sprite.positioning.flip = !this.sprite.positioning.flip;
-      }
-    }
-
-    const pos = this.sprite.positioning.position;
-    this.sprite.positioning.position = {
-      top: Math.max(
-        0,
-        Math.min(100 - this.sprite.positioning.scale.y, pos.top + dy),
-      ),
-      left: Math.max(
-        0,
-        Math.min(100 - this.sprite.positioning.scale.x, pos.left + dx),
-      ),
-    };
-
-    this.canvas.style.width = `${this.sprite.positioning.scale.x}%`;
-    this.canvas.style.height = `${this.sprite.positioning.scale.y}%`;
-    this.canvas.style.top = `${this.sprite.positioning.position.top}%`;
-    this.canvas.style.left = `${this.sprite.positioning.position.left}%`;
-    this.canvas.style.transform = `rotate(${this.sprite.positioning.rotation}deg) scaleX(${this.sprite.positioning.flip ? "-1" : "1"})`;
-  };
-
-  private idle = () => {
-    if (!this.idleTimeout && this.sprite?.animations.coreAnimations.idle.alt) {
-      this.idleTimeout = setTimeout(
-        () => {
-          const idleAlt = this.sprite?.animations.coreAnimations.idle.alt;
-          if (
-            this.sprite &&
-            this.sprite.animations.currentAnimation.core === "idle" &&
-            idleAlt
-          ) {
-            const idleKeys = Object.keys(idleAlt);
-            const randomKey =
-              idleKeys[Math.round(Math.random() * (idleKeys.length - 1))];
-
-            this.sprite.animations.currentAnimation.alt = randomKey;
-            this.sprite.animations.coreAnimations.idle.alt?.[randomKey].reset();
-          }
-
-          if (this.idleTimeout) {
-            clearTimeout(this.idleTimeout);
-            this.idleTimeout = undefined;
-          }
-        },
-        Math.random() * 9000 + 7000,
-      );
-    }
-  };
-
-  private idleAltAnimationFinished = () => {
-    if (
-      this.sprite &&
-      this.sprite.animations.currentAnimation.core !== "idle"
-    ) {
-      this.sprite.animations.currentAnimation.alt = undefined;
-      this.sprite.animations.currentAnimation.core = "idle";
-      this.sprite.animations.coreAnimations.idle.core.reset();
-
-      if (this.idleTimeout) {
-        clearTimeout(this.idleTimeout);
-        this.idleTimeout = undefined;
-      }
-    }
-  };
-
-  handleKeyDown = (event: KeyboardEvent) => {
-    if (event.repeat || !this.sprite?.active) return;
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    const key = event.key.toLowerCase();
-
-    this.sprinting = event.shiftKey;
-
-    switch (key) {
-      case "w":
-        this.activeDirs.add("up");
-        this.updateMovement();
-        break;
-      case "a":
-        this.activeDirs.add("left");
-        this.updateMovement();
-        break;
-      case "d":
-        this.activeDirs.add("right");
-        this.updateMovement();
-        break;
-      case "s":
-        this.activeDirs.add("down");
-        this.updateMovement();
-        break;
-      case "arrowup":
-        this.activeDirs.add("up");
-        this.updateMovement();
-        break;
-      case "arrowleft":
-        this.activeDirs.add("left");
-        this.updateMovement();
-        break;
-      case "arrowdown":
-        this.activeDirs.add("down");
-        this.updateMovement();
-        break;
-      case "arrowright":
-        this.activeDirs.add("right");
-        this.updateMovement();
-        break;
-      default:
-        break;
-    }
-
-    this.updateMovement();
-  };
-
-  handleKeyUp = (event: KeyboardEvent) => {
-    if (!this.sprite?.active) return;
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    const key = event.key.toLowerCase();
-
-    this.sprinting = event.shiftKey;
-
-    switch (key) {
-      case "w":
-        this.activeDirs.delete("up");
-        this.updateMovement();
-        break;
-      case "a":
-        this.activeDirs.delete("left");
-        this.updateMovement();
-        break;
-      case "d":
-        this.activeDirs.delete("right");
-        this.updateMovement();
-        break;
-      case "s":
-        this.activeDirs.delete("down");
-        this.updateMovement();
-        break;
-      case "arrowup":
-        this.activeDirs.delete("up");
-        this.updateMovement();
-        break;
-      case "arrowleft":
-        this.activeDirs.delete("left");
-        this.updateMovement();
-        break;
-      case "arrowdown":
-        this.activeDirs.delete("down");
-        this.updateMovement();
-        break;
-      case "arrowright":
-        this.activeDirs.delete("right");
-        this.updateMovement();
-        break;
-      default:
-        break;
-    }
+  setSelected = (flag: boolean) => {
+    if (!this.sprite) return;
+    this.sprite.selected = flag;
   };
 }
 

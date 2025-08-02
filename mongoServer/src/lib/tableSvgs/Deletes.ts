@@ -4,7 +4,7 @@ import { TableSvgsType } from "./typeConstant";
 class Deletes {
   constructor(private tableSvgsCollection: Collection<TableSvgsType>) {}
 
-  deleteMetaDataBy_TID_SID = async (tableId: string, svgId: string) => {
+  deleteMetadataBy_TID_SID = async (tableId: string, svgId: string) => {
     try {
       await this.tableSvgsCollection.deleteOne({
         tid: tableId,

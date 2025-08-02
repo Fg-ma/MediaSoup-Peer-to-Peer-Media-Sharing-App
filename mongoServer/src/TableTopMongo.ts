@@ -113,32 +113,32 @@ class TableTopMongo {
     contentId: string
   ) => {
     if (contentType === "image") {
-      await this.tableImages?.deletes.deleteMetaDataBy_TID_IID(
+      await this.tableImages?.deletes.deleteMetadataBy_TID_IID(
         tableId,
         contentId
       );
     } else if (contentType === "svg") {
-      await this.tableSvgs?.deletes.deleteMetaDataBy_TID_SID(
+      await this.tableSvgs?.deletes.deleteMetadataBy_TID_SID(
         tableId,
         contentId
       );
     } else if (contentType === "video") {
-      await this.tableVideos?.deletes.deleteMetaDataBy_TID_VID(
+      await this.tableVideos?.deletes.deleteMetadataBy_TID_VID(
         tableId,
         contentId
       );
     } else if (contentType === "application") {
-      await this.tableApplications?.deletes.deleteMetaDataBy_TID_AID(
+      await this.tableApplications?.deletes.deleteMetadataBy_TID_AID(
         tableId,
         contentId
       );
     } else if (contentType === "text") {
-      await this.tableText?.deletes.deleteMetaDataBy_TID_XID(
+      await this.tableText?.deletes.deleteMetadataBy_TID_XID(
         tableId,
         contentId
       );
     } else if (contentType === "soundClip") {
-      await this.tableSoundClips?.deletes.deleteMetaDataBy_TID_SID(
+      await this.tableSoundClips?.deletes.deleteMetadataBy_TID_SID(
         tableId,
         contentId
       );
@@ -196,29 +196,29 @@ class TableTopMongo {
     contentId: string
   ) => {
     if (contentType === "image") {
-      await this.userImages?.deletes.deleteMetaDataBy_UID_IID(
+      await this.userImages?.deletes.deleteMetadataBy_UID_IID(
         userId,
         contentId
       );
     } else if (contentType === "video") {
-      await this.userVideos?.deletes.deleteMetaDataBy_UID_VID(
+      await this.userVideos?.deletes.deleteMetadataBy_UID_VID(
         userId,
         contentId
       );
     } else if (contentType === "application") {
-      await this.userApplications?.deletes.deleteMetaDataBy_UID_AID(
+      await this.userApplications?.deletes.deleteMetadataBy_UID_AID(
         userId,
         contentId
       );
     } else if (contentType === "text") {
-      await this.userText?.deletes.deleteMetaDataBy_UID_XID(userId, contentId);
+      await this.userText?.deletes.deleteMetadataBy_UID_XID(userId, contentId);
     } else if (contentType === "soundClip") {
-      await this.userSoundClips?.deletes.deleteMetaDataBy_UID_AID(
+      await this.userSoundClips?.deletes.deleteMetadataBy_UID_AID(
         userId,
         contentId
       );
     } else if (contentType === "svg") {
-      await this.userSvgs?.deletes.deleteMetaDataBy_UID_SID(userId, contentId);
+      await this.userSvgs?.deletes.deleteMetadataBy_UID_SID(userId, contentId);
     }
   };
 
@@ -230,7 +230,7 @@ class TableTopMongo {
 
     switch (contentType) {
       case "image":
-        this.tableImages?.uploads.editMetaData(
+        this.tableImages?.uploads.editMetadata(
           { tableId, imageId: contentId },
           {
             instances: [
@@ -243,7 +243,7 @@ class TableTopMongo {
         );
         break;
       case "svg":
-        this.tableSvgs?.uploads.editMetaData(
+        this.tableSvgs?.uploads.editMetadata(
           { tableId, svgId: contentId },
           {
             instances: [
@@ -256,7 +256,7 @@ class TableTopMongo {
         );
         break;
       case "video":
-        this.tableVideos?.uploads.editMetaData(
+        this.tableVideos?.uploads.editMetadata(
           { tableId, videoId: contentId },
           {
             instances: [
@@ -269,7 +269,7 @@ class TableTopMongo {
         );
         break;
       case "text":
-        this.tableText?.uploads.editMetaData(
+        this.tableText?.uploads.editMetadata(
           { tableId, textId: contentId },
           {
             instances: [
@@ -282,7 +282,7 @@ class TableTopMongo {
         );
         break;
       case "soundClip":
-        this.tableSoundClips?.uploads.editMetaData(
+        this.tableSoundClips?.uploads.editMetadata(
           { tableId, soundClipId: contentId },
           {
             instances: [
@@ -295,7 +295,7 @@ class TableTopMongo {
         );
         break;
       case "application":
-        this.tableApplications?.uploads.editMetaData(
+        this.tableApplications?.uploads.editMetadata(
           { tableId, applicationId: contentId },
           {
             instances: [
@@ -318,7 +318,7 @@ class TableTopMongo {
 
     switch (contentType) {
       case "image":
-        this.tableImages?.uploads.editMetaData(
+        this.tableImages?.uploads.editMetadata(
           { tableId, imageId: contentId },
           {
             instances: [
@@ -332,7 +332,7 @@ class TableTopMongo {
         );
         break;
       case "video":
-        this.tableVideos?.uploads.editMetaData(
+        this.tableVideos?.uploads.editMetadata(
           { tableId, videoId: contentId },
           {
             instances: [
@@ -346,7 +346,7 @@ class TableTopMongo {
         );
         break;
       case "text":
-        this.tableText?.uploads.editMetaData(
+        this.tableText?.uploads.editMetadata(
           { tableId, textId: contentId },
           {
             instances: [
@@ -359,7 +359,7 @@ class TableTopMongo {
         );
         break;
       case "soundClip":
-        this.tableSoundClips?.uploads.editMetaData(
+        this.tableSoundClips?.uploads.editMetadata(
           { tableId, soundClipId: contentId },
           {
             instances: [
@@ -372,7 +372,7 @@ class TableTopMongo {
         );
         break;
       case "application":
-        this.tableApplications?.uploads.editMetaData(
+        this.tableApplications?.uploads.editMetadata(
           { tableId, applicationId: contentId },
           {
             instances: [
@@ -386,7 +386,7 @@ class TableTopMongo {
         );
         break;
       case "svg":
-        this.tableSvgs?.uploads.editMetaData(
+        this.tableSvgs?.uploads.editMetadata(
           { tableId, svgId: contentId },
           {
             instances: [
@@ -410,37 +410,37 @@ class TableTopMongo {
 
     switch (contentType) {
       case "image":
-        this.tableImages?.uploads.editMetaData(
+        this.tableImages?.uploads.editMetadata(
           { tableId, imageId: contentId },
           { state }
         );
         break;
       case "video":
-        this.tableVideos?.uploads.editMetaData(
+        this.tableVideos?.uploads.editMetadata(
           { tableId, videoId: contentId },
           { state }
         );
         break;
       case "text":
-        this.tableText?.uploads.editMetaData(
+        this.tableText?.uploads.editMetadata(
           { tableId, textId: contentId },
           { state }
         );
         break;
       case "soundClip":
-        this.tableSoundClips?.uploads.editMetaData(
+        this.tableSoundClips?.uploads.editMetadata(
           { tableId, soundClipId: contentId },
           { state }
         );
         break;
       case "application":
-        this.tableApplications?.uploads.editMetaData(
+        this.tableApplications?.uploads.editMetadata(
           { tableId, applicationId: contentId },
           { state }
         );
         break;
       case "svg":
-        this.tableSvgs?.uploads.editMetaData(
+        this.tableSvgs?.uploads.editMetadata(
           { tableId, svgId: contentId },
           { state }
         );
@@ -456,37 +456,37 @@ class TableTopMongo {
 
     switch (contentType) {
       case "image":
-        this.userImages?.uploads.editMetaData(
+        this.userImages?.uploads.editMetadata(
           { userId, imageId: contentId },
           { state }
         );
         break;
       case "video":
-        this.userVideos?.uploads.editMetaData(
+        this.userVideos?.uploads.editMetadata(
           { userId, videoId: contentId },
           { state }
         );
         break;
       case "text":
-        this.userVideos?.uploads.editMetaData(
+        this.userVideos?.uploads.editMetadata(
           { userId, videoId: contentId },
           { state }
         );
         break;
       case "soundClip":
-        this.userSoundClips?.uploads.editMetaData(
+        this.userSoundClips?.uploads.editMetadata(
           { userId, soundClipId: contentId },
           { state }
         );
         break;
       case "application":
-        this.userApplications?.uploads.editMetaData(
+        this.userApplications?.uploads.editMetadata(
           { userId, applicationId: contentId },
           { state }
         );
         break;
       case "svg":
-        this.userSvgs?.uploads.editMetaData(
+        this.userSvgs?.uploads.editMetadata(
           { userId, svgId: contentId },
           { state }
         );

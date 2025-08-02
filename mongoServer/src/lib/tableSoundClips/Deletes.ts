@@ -6,7 +6,7 @@ class Deletes {
     private tableSoundClipsCollection: Collection<TableSoundClipsType>
   ) {}
 
-  deleteMetaDataBy_TID_SID = async (tableId: string, soundClipId: string) => {
+  deleteMetadataBy_TID_SID = async (tableId: string, soundClipId: string) => {
     try {
       await this.tableSoundClipsCollection.deleteOne({
         tid: tableId,

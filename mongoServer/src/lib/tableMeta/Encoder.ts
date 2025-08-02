@@ -3,7 +3,7 @@ import { tableColorEncodingMap, TableColors } from "../typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData = (data: {
+  encodeMetadata = (data: {
     tableId: string;
     tableName: string;
     owner: string;

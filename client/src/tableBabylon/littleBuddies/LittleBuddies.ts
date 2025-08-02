@@ -1,39 +1,39 @@
-import { Scene } from "@babylonjs/core";
+import TableBabylonScene from "../TableBabylonScene";
 import LittleBuddy from "./lib/LittleBuddy";
 import { LittleBuddiesTypes } from "./lib/typeConstant";
 
 class LittleBuddies {
-  littleBuddies: {
-    [username: string]: { [littleBuddyId: string]: LittleBuddy };
-  } = {};
-
-  constructor(private scene: Scene) {}
+  constructor(private tableBabylonScene: TableBabylonScene) {}
 
   createLittleBuddy = (
-    username: string,
+    userId: string,
     littleBuddyId: string,
     littleBuddy: LittleBuddiesTypes,
   ) => {
-    if (!this.littleBuddies[username]) {
-      this.littleBuddies[username] = {};
+    if (!this.tableBabylonScene.littleBuddies[userId]) {
+      this.tableBabylonScene.littleBuddies[userId] = {};
     }
 
-    this.littleBuddies[username][littleBuddyId] = new LittleBuddy(
-      littleBuddyId,
-      littleBuddy,
-      this.scene,
-    );
+    this.tableBabylonScene.littleBuddies[userId][littleBuddyId] =
+      new LittleBuddy(
+        userId,
+        littleBuddyId,
+        littleBuddy,
+        this.tableBabylonScene,
+      );
   };
 
-  destroyLittleBuddy = (username: string, littleBuddyId: string) => {
+  destroyLittleBuddy = (userId: string, littleBuddyId: string) => {
     if (
-      this.littleBuddies[username] &&
-      this.littleBuddies[username][littleBuddyId]
+      this.tableBabylonScene.littleBuddies[userId] &&
+      this.tableBabylonScene.littleBuddies[userId][littleBuddyId]
     ) {
-      delete this.littleBuddies[username][littleBuddyId];
+      delete this.tableBabylonScene.littleBuddies[userId][littleBuddyId];
 
-      if (Object.keys(this.littleBuddies[username]).length === 0) {
-        delete this.littleBuddies[username];
+      if (
+        Object.keys(this.tableBabylonScene.littleBuddies[userId]).length === 0
+      ) {
+        delete this.tableBabylonScene.littleBuddies[userId];
       }
     }
   };

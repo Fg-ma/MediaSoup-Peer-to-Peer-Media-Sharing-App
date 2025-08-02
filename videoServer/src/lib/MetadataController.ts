@@ -104,7 +104,7 @@ class MetadataController {
       });
     } else {
       const mongoData =
-        await tableTopMongo.tableVideos?.gets.getVideoMetaDataBy_TID_VID(
+        await tableTopMongo.tableVideos?.gets.getVideoMetadataBy_TID_VID(
           tableId,
           contentId
         );

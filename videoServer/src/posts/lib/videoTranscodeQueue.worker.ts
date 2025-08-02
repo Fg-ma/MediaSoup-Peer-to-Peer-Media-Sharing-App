@@ -105,7 +105,7 @@ const handleMongoVideoUploads = async (
       }
     | undefined
 ) => {
-  await tableTopMongo.tableVideos?.uploads.uploadMetaData({
+  await tableTopMongo.tableVideos?.uploads.uploadMetadata({
     tableId,
     videoId: contentId,
     filename,

@@ -4,7 +4,7 @@ import { userStateEncodingMap } from "../typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData = (data: {
+  encodeMetadata = (data: {
     userId: string;
     applicationId: string;
     filename: string;

@@ -394,7 +394,7 @@ class LiveTextEditingController {
           const fullUpdate = Y.encodeStateAsUpdate(ydoc);
 
           const mongo =
-            await tableTopMongo.tableText?.gets.getTextMetaDataBy_TID_XID(
+            await tableTopMongo.tableText?.gets.getTextMetadataBy_TID_XID(
               tableId,
               contentId
             );
@@ -412,7 +412,7 @@ class LiveTextEditingController {
               (instance) => instance.textInstanceId === instanceId
             );
             if (instance) {
-              tableTopMongo.tableText?.uploads.uploadMetaData({
+              tableTopMongo.tableText?.uploads.uploadMetadata({
                 tableId,
                 textId: newContentId,
                 filename: mongo.filename,

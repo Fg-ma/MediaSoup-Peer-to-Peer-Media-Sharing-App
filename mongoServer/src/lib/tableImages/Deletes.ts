@@ -4,7 +4,7 @@ import { TableImagesType } from "./typeConstant";
 class Deletes {
   constructor(private tableImagesCollection: Collection<TableImagesType>) {}
 
-  deleteMetaDataBy_TID_IID = async (tableId: string, imageId: string) => {
+  deleteMetadataBy_TID_IID = async (tableId: string, imageId: string) => {
     try {
       await this.tableImagesCollection.deleteOne({
         tid: tableId,

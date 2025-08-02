@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getSvgMetaDataBy_TID_SID = async (tableId: string, svgId: string) => {
+  getSvgMetadataBy_TID_SID = async (tableId: string, svgId: string) => {
     try {
       const svgData = await this.tableSvgsCollection.findOne({
         tid: tableId,
@@ -19,7 +19,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(svgData);
+      return this.decoder.decodeMetadata(svgData);
     } catch (err) {
       console.error("Error retrieving svg data:", err);
       return null;
@@ -37,7 +37,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return svgData.map((data) => this.decoder.decodeMetaData(data));
+      return svgData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

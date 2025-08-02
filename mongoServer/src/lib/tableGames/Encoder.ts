@@ -3,7 +3,7 @@ import { GameTypes } from "../../../../universal/contentTypeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     gameId: string;
     gameType: GameTypes;

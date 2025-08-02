@@ -6,7 +6,7 @@ import { soundClipEffectEncodingMap } from "./typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     sid: string;
     n: string;

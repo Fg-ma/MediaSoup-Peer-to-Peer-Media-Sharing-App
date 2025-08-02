@@ -3,7 +3,7 @@ import { tableColorDecodingMap, TableColors } from "../typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     tn: string;
     ow: string;

@@ -24,7 +24,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     videoId: string;
     filename: string;
@@ -55,7 +55,7 @@ class Uploads {
       };
     }[];
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tableVideosCollection?.insertOne(mongoData);
@@ -64,7 +64,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string; videoId: string },
     updateData: Partial<{
       state?: TableContentStateTypes[];

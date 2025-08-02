@@ -19,7 +19,7 @@ import { videoEffectEncodingMap } from "./typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     tid: string;
     vid: string;
     n: string;

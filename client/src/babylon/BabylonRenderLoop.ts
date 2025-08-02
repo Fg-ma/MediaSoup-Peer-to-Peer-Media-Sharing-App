@@ -3,7 +3,6 @@ import {
   Scene,
   UniversalCamera,
   Vector3,
-  StandardMaterial,
   DynamicTexture,
 } from "@babylonjs/core";
 import { NormalizedLandmarkListList } from "@mediapipe/face_mesh";
@@ -358,12 +357,12 @@ class BabylonRenderLoop {
     };
 
     for (const mesh of this.scene.meshes) {
-      const meshMetadata = mesh.metadata;
+      const MeshMetadata = mesh.metadata;
 
       if (
-        meshMetadata === null ||
-        (meshMetadata.positionStyle !== "faceTrack" &&
-          meshMetadata.positionStyle !== "landmarks")
+        MeshMetadata === null ||
+        (MeshMetadata.positionStyle !== "faceTrack" &&
+          MeshMetadata.positionStyle !== "landmarks")
       ) {
         continue;
       }
@@ -385,7 +384,7 @@ class BabylonRenderLoop {
         );
         if (
           // @ts-expect-error: no types enforce in mesh metadata
-          !usedTrackers[meshMetadata.effectType].includes(faceId) &&
+          !usedTrackers[MeshMetadata.effectType].includes(faceId) &&
           distance < closestDistance
         ) {
           closestDistance = distance;
@@ -398,12 +397,12 @@ class BabylonRenderLoop {
       }
 
       // @ts-expect-error: no types enforce in mesh metadata
-      usedTrackers[meshMetadata.effectType].push(closestTrackerId);
+      usedTrackers[MeshMetadata.effectType].push(closestTrackerId);
 
-      if (meshMetadata.positionStyle === "faceTrack") {
+      if (MeshMetadata.positionStyle === "faceTrack") {
         let position: [number, number, number] | undefined;
 
-        switch (meshMetadata.defaultMeshPlacement) {
+        switch (MeshMetadata.defaultMeshPlacement) {
           case "forehead":
             position = this.positionsScreenSpaceToSceneSpace(
               mesh,
@@ -441,8 +440,8 @@ class BabylonRenderLoop {
           calculatedLandmarks.interocularDistances[closestTrackerId] * 5;
 
         const offset = this.directionalShift(
-          meshMetadata.shiftX * interocularScaleShift,
-          meshMetadata.shiftY * interocularScaleShift,
+          MeshMetadata.shiftX * interocularScaleShift,
+          MeshMetadata.shiftY * interocularScaleShift,
           calculatedLandmarks.headRotationAngles[closestTrackerId],
         );
         position = [
@@ -469,7 +468,7 @@ class BabylonRenderLoop {
           mesh.metadata.initScale[1] * interocularDistance,
           mesh.metadata.initScale[2] * interocularDistance,
         );
-      } else if (meshMetadata.positionStyle === "landmarks") {
+      } else if (MeshMetadata.positionStyle === "landmarks") {
         const faceLandmarkPairs = this.faceLandmarks.getFaceIdLandmarksPairs();
 
         this.babylonMeshes.updateFaceMesh(
@@ -480,15 +479,15 @@ class BabylonRenderLoop {
     }
 
     for (const mesh of this.scene.meshes) {
-      const meshMetadata = mesh.metadata;
+      const MeshMetadata = mesh.metadata;
 
-      if (meshMetadata === null || meshMetadata.positionStyle !== "faceTrack") {
+      if (MeshMetadata === null || MeshMetadata.positionStyle !== "faceTrack") {
         continue;
       }
 
       if (
         // @ts-expect-error: no types enforce in mesh metadata
-        !usedTrackers[meshMetadata.effectType].includes(meshMetadata.faceId)
+        !usedTrackers[MeshMetadata.effectType].includes(MeshMetadata.faceId)
       ) {
         mesh.scaling = new Vector3(0, 0, 0);
       }

@@ -4,7 +4,7 @@ import { userStateDecodingMap } from "../typeConstant";
 class Decoder {
   constructor() {}
 
-  decodeMetaData = (data: {
+  decodeMetadata = (data: {
     uid: string;
     iid: string;
     n: string;

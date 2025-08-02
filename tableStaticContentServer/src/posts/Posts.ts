@@ -1065,7 +1065,7 @@ class Posts {
         }
       | undefined
   ) => {
-    await tableTopMongo.tableImages?.uploads.uploadMetaData({
+    await tableTopMongo.tableImages?.uploads.uploadMetadata({
       tableId,
       imageId: contentId,
       filename,
@@ -1117,7 +1117,7 @@ class Posts {
         }
       | undefined
   ) => {
-    await tableTopMongo.tableSvgs?.uploads.uploadMetaData({
+    await tableTopMongo.tableSvgs?.uploads.uploadMetadata({
       tableId,
       svgId: contentId,
       filename,
@@ -1169,7 +1169,7 @@ class Posts {
         }
       | undefined
   ) => {
-    await tableTopMongo.tableSoundClips?.uploads.uploadMetaData({
+    await tableTopMongo.tableSoundClips?.uploads.uploadMetadata({
       tableId,
       soundClipId: contentId,
       filename,
@@ -1220,7 +1220,7 @@ class Posts {
         }
       | undefined
   ) => {
-    await tableTopMongo.tableApplications?.uploads.uploadMetaData({
+    await tableTopMongo.tableApplications?.uploads.uploadMetadata({
       tableId,
       applicationId: contentId,
       filename,
@@ -1272,7 +1272,7 @@ class Posts {
         }
       | undefined
   ) => {
-    await tableTopMongo.tableText?.uploads.uploadMetaData({
+    await tableTopMongo.tableText?.uploads.uploadMetadata({
       tableId,
       textId: contentId,
       filename,

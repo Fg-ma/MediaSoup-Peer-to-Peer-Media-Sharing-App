@@ -24,7 +24,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     imageId: string;
     filename: string;
@@ -49,7 +49,7 @@ class Uploads {
       effectStyles: ImageEffectStylesType;
     }[];
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tableImagesCollection?.insertOne(mongoData);
@@ -58,7 +58,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string; imageId: string },
     updateData: Partial<{
       state?: TableContentStateTypes[];

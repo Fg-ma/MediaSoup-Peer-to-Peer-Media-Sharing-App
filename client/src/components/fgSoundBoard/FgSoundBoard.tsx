@@ -8,9 +8,9 @@ import {
   BoardModes,
   defaultImportButton,
   defaultSoundEffects,
-  defaultSoundEffectsMetaData,
+  defaultSoundEffectsMetadata,
   SoundEffects,
-  SoundEffectsMetaData,
+  SoundEffectsMetadata,
 } from "./lib/typeConstant";
 import FgSVGElement from "../../elements/fgSVGElement/FgSVGElement";
 import FgTriToggleButton from "../../elements/fgTriToggleButton/FgTriToggleButton";
@@ -30,8 +30,8 @@ export default function FgSoundBoard({
   const { userMedia } = useMediaContext();
 
   const soundEffects = useRef<SoundEffects>(defaultSoundEffects);
-  const soundEffectsMetaDataRef = useRef<SoundEffectsMetaData>(
-    defaultSoundEffectsMetaData,
+  const soundEffectsMetadataRef = useRef<SoundEffectsMetadata>(
+    defaultSoundEffectsMetadata,
   );
   const importButton = useRef<{
     pressed: boolean;
@@ -66,7 +66,7 @@ export default function FgSoundBoard({
   const fgSoundBoardController = useRef(
     new FgSoundBoardController(
       soundEffects,
-      soundEffectsMetaDataRef,
+      soundEffectsMetadataRef,
       boardMode,
       seizureBoardEffectIntevalRef,
       seizureBoardEffectTimeoutRef,

@@ -134,7 +134,7 @@ app
                   lastUpdatedAt: number;
                 };
 
-                await tableTopMongo.tableVideos?.uploads.editMetaData(
+                await tableTopMongo.tableVideos?.uploads.editMetadata(
                   { tableId, videoId },
                   {
                     instances: [

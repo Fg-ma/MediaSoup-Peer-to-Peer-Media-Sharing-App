@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getSoundClipMetaDataBy_UID_AID = async (
+  getSoundClipMetadataBy_UID_AID = async (
     userId: string,
     soundClipId: string
   ) => {
@@ -22,7 +22,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(soundClipData);
+      return this.decoder.decodeMetadata(soundClipData);
     } catch (err) {
       console.error("Error retrieving sound clip data:", err);
       return null;
@@ -40,7 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return soundClipsData.map((data) => this.decoder.decodeMetaData(data));
+      return soundClipsData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by UID:", err);
       return [];

@@ -6,7 +6,7 @@ class Deletes {
     private tableApplicationsCollection: Collection<TableApplicationsType>
   ) {}
 
-  deleteMetaDataBy_TID_AID = async (tableId: string, applicationId: string) => {
+  deleteMetadataBy_TID_AID = async (tableId: string, applicationId: string) => {
     try {
       await this.tableApplicationsCollection.deleteOne({
         tid: tableId,

@@ -4,7 +4,7 @@ import { UserSvgsType } from "./typeConstant";
 class Deletes {
   constructor(private userSvgsCollection: Collection<UserSvgsType>) {}
 
-  deleteMetaDataBy_UID_SID = async (userId: string, svgId: string) => {
+  deleteMetadataBy_UID_SID = async (userId: string, svgId: string) => {
     try {
       await this.userSvgsCollection.deleteOne({
         uid: userId,

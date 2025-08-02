@@ -8,7 +8,7 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     tableId: string;
     tableName: string;
     owner: string;
@@ -28,7 +28,7 @@ class Uploads {
     backgroundMedia: string | null;
     backgroundImage: string | null;
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.tablesMetaCollection?.insertOne(mongoData);
@@ -37,7 +37,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { tableId: string },
     updateData: Partial<{
       tableName?: string;

@@ -8,7 +8,7 @@ class Gets {
     private decoder: Decoder
   ) {}
 
-  getApplicationMetaDataBy_TID_IID = async (
+  getApplicationMetadataBy_TID_IID = async (
     tableId: string,
     applicationId: string
   ) => {
@@ -22,7 +22,7 @@ class Gets {
         return null;
       }
 
-      return this.decoder.decodeMetaData(applicationData);
+      return this.decoder.decodeMetadata(applicationData);
     } catch (err) {
       console.error("Error retrieving vidoe data:", err);
       return null;
@@ -40,7 +40,7 @@ class Gets {
       }
 
       // Decode metadata for all documents
-      return applicationData.map((data) => this.decoder.decodeMetaData(data));
+      return applicationData.map((data) => this.decoder.decodeMetadata(data));
     } catch (err) {
       console.error("Error retrieving data by TID:", err);
       return [];

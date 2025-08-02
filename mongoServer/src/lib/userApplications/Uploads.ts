@@ -10,14 +10,14 @@ class Uploads {
     private encoder: Encoder
   ) {}
 
-  uploadMetaData = async (data: {
+  uploadMetadata = async (data: {
     userId: string;
     applicationId: string;
     filename: string;
     mimeType: string;
     state: UserContentStateTypes[];
   }) => {
-    const mongoData = this.encoder.encodeMetaData(data);
+    const mongoData = this.encoder.encodeMetadata(data);
 
     try {
       await this.userApplicationsCollection?.insertOne(mongoData);
@@ -26,7 +26,7 @@ class Uploads {
     }
   };
 
-  editMetaData = async (
+  editMetadata = async (
     filter: { userId: string; applicationId: string },
     updateData: Partial<{
       filename?: string;

@@ -62,7 +62,7 @@ export type SpriteType = {
   rotatable: boolean;
   flipTextures: boolean;
   positioning: {
-    position: { top: number; left: number };
+    position: { y: number; x: number };
     scale: { x: number; y: number };
     rotation: number;
     flip: boolean;
@@ -70,6 +70,7 @@ export type SpriteType = {
   animations: SpriteAnimations;
   active: boolean;
   aspect: number;
+  selected: boolean;
 };
 
 export type LittleBuddiesTypes =
@@ -110,7 +111,7 @@ export type MetaAnimation = {
   };
 };
 
-export type SpriteMetaData = {
+export type SpriteMetadata = {
   url: string;
   frameHeight: number;
   frameWidth: number;
@@ -134,7 +135,7 @@ export type SpriteMetaData = {
 };
 
 export const spirteSheetsMeta: {
-  [tableLittleBuddy in LittleBuddiesTypes]: SpriteMetaData;
+  [tableLittleBuddy in LittleBuddiesTypes]: SpriteMetadata;
 } = {
   horse: {
     url: horseSheet,
@@ -249,7 +250,7 @@ export const spirteSheetsMeta: {
       core: {
         idle: {
           core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-          speed: 0.2,
+          speed: 0.15,
         },
         walk: { core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], speed: 0.2 },
       },

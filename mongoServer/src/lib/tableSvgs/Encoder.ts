@@ -9,7 +9,7 @@ import { svgEffectEncodingMap } from "./typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     svgId: string;
     filename: string;

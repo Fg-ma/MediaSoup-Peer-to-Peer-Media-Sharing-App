@@ -5,7 +5,7 @@ import {
   crazyBoardEffects,
   CrazyBoardEffects,
   SoundEffects,
-  SoundEffectsMetaData,
+  SoundEffectsMetadata,
 } from "./typeConstant";
 import { UserMediaType } from "../../../context/mediaContext/lib/typeConstant";
 
@@ -15,7 +15,7 @@ class FgSoundBoardController {
 
   constructor(
     private soundEffects: React.MutableRefObject<SoundEffects>,
-    private soundEffectsMetaDataRef: React.MutableRefObject<SoundEffectsMetaData>,
+    private soundEffectsMetadataRef: React.MutableRefObject<SoundEffectsMetadata>,
     private boardMode: React.MutableRefObject<BoardModes>,
     private seizureBoardEffectIntevalRef: React.MutableRefObject<
       NodeJS.Timeout | undefined

@@ -6,7 +6,7 @@ import { soundClipEffectEncodingMap } from "./typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     soundClipId: string;
     filename: string;

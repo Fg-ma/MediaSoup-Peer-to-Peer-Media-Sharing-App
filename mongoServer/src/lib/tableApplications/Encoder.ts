@@ -12,7 +12,7 @@ import { applicationEffectEncodingMap } from "./typeConstant";
 class Encoder {
   constructor() {}
 
-  encodeMetaData(data: {
+  encodeMetadata(data: {
     tableId: string;
     applicationId: string;
     filename: string;

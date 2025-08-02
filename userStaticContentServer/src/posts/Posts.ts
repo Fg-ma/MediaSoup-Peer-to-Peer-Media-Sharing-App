@@ -815,7 +815,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userVideos?.uploads.uploadMetaData({
+    await tableTopMongo.userVideos?.uploads.uploadMetadata({
       userId,
       videoId: contentId,
       filename,
@@ -831,7 +831,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userImages?.uploads.uploadMetaData({
+    await tableTopMongo.userImages?.uploads.uploadMetadata({
       userId,
       imageId: contentId,
       filename,
@@ -847,7 +847,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userSvgs?.uploads.uploadMetaData({
+    await tableTopMongo.userSvgs?.uploads.uploadMetadata({
       userId,
       svgId: contentId,
       filename,
@@ -863,7 +863,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userSoundClips?.uploads.uploadMetaData({
+    await tableTopMongo.userSoundClips?.uploads.uploadMetadata({
       userId,
       soundClipId: contentId,
       filename,
@@ -879,7 +879,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userApplications?.uploads.uploadMetaData({
+    await tableTopMongo.userApplications?.uploads.uploadMetadata({
       userId,
       applicationId: contentId,
       filename,
@@ -895,7 +895,7 @@ class Posts {
     filename: string,
     state: UserContentStateTypes[]
   ) => {
-    await tableTopMongo.userText?.uploads.uploadMetaData({
+    await tableTopMongo.userText?.uploads.uploadMetadata({
       userId,
       textId: contentId,
       filename,
