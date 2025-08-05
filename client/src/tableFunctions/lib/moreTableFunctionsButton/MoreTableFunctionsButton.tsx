@@ -28,6 +28,8 @@ export default function MoreTableFunctionsButton({
   setCaptureMediaActive,
   tabledActive,
   setTabledActive,
+  littleBuddyActive,
+  setLittleBuddyActive,
   tableSidePanelActive,
   setTableSidePanelActive,
   sidePanelPosition,
@@ -59,6 +61,8 @@ export default function MoreTableFunctionsButton({
   setCaptureMediaActive: React.Dispatch<React.SetStateAction<boolean>>;
   tabledActive: boolean;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
+  littleBuddyActive: boolean;
+  setLittleBuddyActive: React.Dispatch<React.SetStateAction<boolean>>;
   tableSidePanelActive: boolean;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   sidePanelPosition: "left" | "right";
@@ -156,6 +160,8 @@ export default function MoreTableFunctionsButton({
           tableBackgroundSectionRef={tableBackgroundSectionRef}
           tabledActive={tabledActive}
           setTabledActive={setTabledActive}
+          littleBuddyActive={littleBuddyActive}
+          setLittleBuddyActive={setLittleBuddyActive}
           gridSizeSectionRef={gridSizeSectionRef}
           tableSidePanelActive={tableSidePanelActive}
           setTableSidePanelActive={setTableSidePanelActive}

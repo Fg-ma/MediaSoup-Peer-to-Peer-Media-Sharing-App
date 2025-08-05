@@ -2,38 +2,84 @@ import Animation from "./Animation";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
-const horseSheet = nginxAssetServerBaseUrl + "spriteSheets/horse/horse.png";
+const horse = nginxAssetServerBaseUrl + "spriteSheets/horse/horse.png";
+const horseIcon = nginxAssetServerBaseUrl + "spriteSheets/horse/horseIcon.png";
 const poring = nginxAssetServerBaseUrl + "spriteSheets/poring/poring.png";
+const poringIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/poring/poringIcon.png";
 const toucan =
   nginxAssetServerBaseUrl + "spriteSheets/openPixelProject/toucan/toucan.png";
+const toucanIcon =
+  nginxAssetServerBaseUrl +
+  "spriteSheets/openPixelProject/toucan/toucanIcon.png";
 const wasp =
   nginxAssetServerBaseUrl + "spriteSheets/openPixelProject/wasp/wasp.png";
+const waspIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/openPixelProject/wasp/waspIcon.png";
 const leafBug =
   nginxAssetServerBaseUrl + "spriteSheets/openPixelProject/leafBug/leafBug.png";
+const leafBugIcon =
+  nginxAssetServerBaseUrl +
+  "spriteSheets/openPixelProject/leafBug/leafBugIcon.png";
 const skeleton =
   nginxAssetServerBaseUrl +
   "spriteSheets/openPixelProject/skeleton/skeleton.png";
+const skeletonIcon =
+  nginxAssetServerBaseUrl +
+  "spriteSheets/openPixelProject/skeleton/skeletonIcon.png";
 const blueBird = nginxAssetServerBaseUrl + "spriteSheets/birds/blueBird.png";
+const blueBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/blueBirdIcon.png";
 const greenBird = nginxAssetServerBaseUrl + "spriteSheets/birds/greenBird.png";
+const greenBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/greenBirdIcon.png";
 const whiteBird = nginxAssetServerBaseUrl + "spriteSheets/birds/whiteBird.png";
+const whiteBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/whiteBirdIcon.png";
 const blackBird = nginxAssetServerBaseUrl + "spriteSheets/birds/blackBird.png";
+const blackBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/blackBirdIcon.png";
 const fireBird = nginxAssetServerBaseUrl + "spriteSheets/birds/fireBird.png";
+const fireBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/fireBirdIcon.png";
 const flameBird = nginxAssetServerBaseUrl + "spriteSheets/birds/flameBird.png";
+const flameBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/flameBirdIcon.png";
 const sickBird = nginxAssetServerBaseUrl + "spriteSheets/birds/sickBird.png";
+const sickBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/sickBirdIcon.png";
 const deadBird = nginxAssetServerBaseUrl + "spriteSheets/birds/deadBird.png";
+const deadBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/deadBirdIcon.png";
 const technoBird =
   nginxAssetServerBaseUrl + "spriteSheets/birds/technoBird.png";
+const technoBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/technoBirdIcon.png";
 const redBird = nginxAssetServerBaseUrl + "spriteSheets/birds/redBird.png";
+const redBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/redBirdIcon.png";
 const rainbowBird =
   nginxAssetServerBaseUrl + "spriteSheets/birds/rainbowBird.png";
+const rainbowBirdIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/birds/rainbowBirdIcon.png";
 const angel = nginxAssetServerBaseUrl + "spriteSheets/angel/angel.png";
+const angelIcon = nginxAssetServerBaseUrl + "spriteSheets/angel/angelIcon.png";
 const redDemon = nginxAssetServerBaseUrl + "spriteSheets/redDemon/redDemon.png";
+const redDemonIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/redDemon/redDemonIcon.png";
 const whiteDemon =
   nginxAssetServerBaseUrl + "spriteSheets/whiteDemon/whiteDemon.png";
+const whiteDemonIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/whiteDemon/whiteDemonIcon.png";
 const chicken = nginxAssetServerBaseUrl + "spriteSheets/chicken/chicken.png";
+const chickenIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/chicken/chickenIcon.png";
 const pig = nginxAssetServerBaseUrl + "spriteSheets/pig/pig.png";
+const pigIcon = nginxAssetServerBaseUrl + "spriteSheets/pig/pigIcon.png";
 const boar = nginxAssetServerBaseUrl + "spriteSheets/boar/boar.png";
+const boarIcon = nginxAssetServerBaseUrl + "spriteSheets/boar/boarIcon.png";
 const bunny = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunny.png";
+const bunnyIcon = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunnyIcon.png";
 
 export const coreAnimations = ["walk", "idle"];
 
@@ -112,7 +158,9 @@ export type MetaAnimation = {
 };
 
 export type SpriteMetadata = {
+  title: string;
   url: string;
+  iconUrl: string;
   frameHeight: number;
   frameWidth: number;
   walkSpeed: number;
@@ -138,7 +186,9 @@ export const spirteSheetsMeta: {
   [tableLittleBuddy in LittleBuddiesTypes]: SpriteMetadata;
 } = {
   horse: {
-    url: horseSheet,
+    title: "",
+    url: horse,
+    iconUrl: horseIcon,
     frameHeight: 33,
     frameWidth: 60,
     walkSpeed: 0.2,
@@ -172,7 +222,9 @@ export const spirteSheetsMeta: {
     },
   },
   poring: {
+    title: "",
     url: poring,
+    iconUrl: poringIcon,
     frameHeight: 372,
     frameWidth: 372,
     walkSpeed: 0.2,
@@ -197,14 +249,16 @@ export const spirteSheetsMeta: {
     },
   },
   toucan: {
+    title: "",
     url: toucan,
+    iconUrl: toucanIcon,
     frameHeight: 64,
     frameWidth: 64,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -238,7 +292,9 @@ export const spirteSheetsMeta: {
     },
   },
   wasp: {
+    title: "",
     url: wasp,
+    iconUrl: waspIcon,
     frameHeight: 96,
     frameWidth: 96,
     walkSpeed: 0.2,
@@ -258,7 +314,9 @@ export const spirteSheetsMeta: {
     },
   },
   leafBug: {
+    title: "",
     url: leafBug,
+    iconUrl: leafBugIcon,
     frameHeight: 64,
     frameWidth: 64,
     walkSpeed: 0.2,
@@ -285,7 +343,9 @@ export const spirteSheetsMeta: {
     },
   },
   skeleton: {
+    title: "",
     url: skeleton,
+    iconUrl: skeletonIcon,
     frameHeight: 72,
     frameWidth: 74,
     walkSpeed: 0.1,
@@ -305,7 +365,9 @@ export const spirteSheetsMeta: {
     },
   },
   blueBird: {
+    title: "",
     url: blueBird,
+    iconUrl: blueBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -325,7 +387,9 @@ export const spirteSheetsMeta: {
     },
   },
   greenBird: {
+    title: "",
     url: greenBird,
+    iconUrl: greenBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -345,7 +409,9 @@ export const spirteSheetsMeta: {
     },
   },
   blackBird: {
+    title: "",
     url: blackBird,
+    iconUrl: blackBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -365,7 +431,9 @@ export const spirteSheetsMeta: {
     },
   },
   whiteBird: {
+    title: "",
     url: whiteBird,
+    iconUrl: whiteBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -385,7 +453,9 @@ export const spirteSheetsMeta: {
     },
   },
   technoBird: {
+    title: "",
     url: technoBird,
+    iconUrl: technoBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -405,7 +475,9 @@ export const spirteSheetsMeta: {
     },
   },
   deadBird: {
+    title: "",
     url: deadBird,
+    iconUrl: deadBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -425,7 +497,9 @@ export const spirteSheetsMeta: {
     },
   },
   sickBird: {
+    title: "",
     url: sickBird,
+    iconUrl: sickBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -445,7 +519,9 @@ export const spirteSheetsMeta: {
     },
   },
   fireBird: {
+    title: "",
     url: fireBird,
+    iconUrl: fireBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -465,7 +541,9 @@ export const spirteSheetsMeta: {
     },
   },
   flameBird: {
+    title: "",
     url: flameBird,
+    iconUrl: flameBirdIcon,
     frameHeight: 27,
     frameWidth: 27,
     walkSpeed: 0.2,
@@ -485,7 +563,9 @@ export const spirteSheetsMeta: {
     },
   },
   redBird: {
+    title: "",
     url: redBird,
+    iconUrl: redBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -505,7 +585,9 @@ export const spirteSheetsMeta: {
     },
   },
   rainbowBird: {
+    title: "",
     url: rainbowBird,
+    iconUrl: rainbowBirdIcon,
     frameHeight: 16,
     frameWidth: 15,
     walkSpeed: 0.2,
@@ -525,7 +607,9 @@ export const spirteSheetsMeta: {
     },
   },
   angel: {
+    title: "",
     url: angel,
+    iconUrl: angelIcon,
     frameHeight: 256,
     frameWidth: 256,
     walkSpeed: 0.2,
@@ -554,7 +638,9 @@ export const spirteSheetsMeta: {
     },
   },
   redDemon: {
+    title: "",
     url: redDemon,
+    iconUrl: redDemonIcon,
     frameHeight: 330,
     frameWidth: 270,
     walkSpeed: 0.2,
@@ -577,7 +663,9 @@ export const spirteSheetsMeta: {
     },
   },
   whiteDemon: {
+    title: "",
     url: whiteDemon,
+    iconUrl: whiteDemonIcon,
     frameHeight: 330,
     frameWidth: 270,
     walkSpeed: 0.2,
@@ -600,7 +688,9 @@ export const spirteSheetsMeta: {
     },
   },
   chicken: {
+    title: "",
     url: chicken,
+    iconUrl: chickenIcon,
     frameHeight: 32,
     frameWidth: 32,
     walkSpeed: 0.2,
@@ -623,7 +713,9 @@ export const spirteSheetsMeta: {
     },
   },
   pig: {
+    title: "",
     url: pig,
+    iconUrl: pigIcon,
     frameHeight: 64,
     frameWidth: 64,
     walkSpeed: 0.2,
@@ -646,7 +738,9 @@ export const spirteSheetsMeta: {
     },
   },
   boar: {
+    title: "",
     url: boar,
+    iconUrl: boarIcon,
     frameHeight: 64,
     frameWidth: 64,
     walkSpeed: 0.2,
@@ -669,7 +763,9 @@ export const spirteSheetsMeta: {
     },
   },
   bunny: {
+    title: "",
     url: bunny,
+    iconUrl: bunnyIcon,
     frameHeight: 36,
     frameWidth: 36,
     walkSpeed: 0.2,

@@ -16,7 +16,7 @@ export default function BabylonLayer() {
 
   return (
     <canvas
-      className="pointer-events-auto absolute left-0 top-0 z-popup-labels h-full w-full"
+      className="pointer-events-auto absolute left-0 top-0 z-base-content h-full w-full"
       ref={tableBabylonCanvasRef}
     />
   );

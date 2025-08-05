@@ -17,6 +17,7 @@ import CaptureMediaPortal from "../elements/captureMediaPortal/CaptureMediaPorta
 import CaptureMedia from "../media/capture/CaptureMedia";
 import Deadbanding from "../babylon/Deadbanding";
 import TabledPortal from "../elements/tabledPortal/TabledPortal";
+import LittleBuddyPortal from "../elements/littleBuddyPortal/LittleBuddyPortal";
 
 export default function TableFunctions({
   tableFunctionsRef,
@@ -111,6 +112,8 @@ export default function TableFunctions({
   const [tabledActive, setTabledActive] = useState(false);
   const [dragging, setDragging] = useState(false);
 
+  const [littleBuddyActive, setLittleBuddyActive] = useState(false);
+
   const [moreTableFunctionsActive, setMoreTableFunctionsActive] =
     useState(false);
 
@@ -194,6 +197,8 @@ export default function TableFunctions({
           setCaptureMediaActive={setCaptureMediaActive}
           tabledActive={tabledActive}
           setTabledActive={setTabledActive}
+          littleBuddyActive={littleBuddyActive}
+          setLittleBuddyActive={setLittleBuddyActive}
           tableSidePanelActive={tableSidePanelActive}
           setTableSidePanelActive={setTableSidePanelActive}
           sidePanelPosition={sidePanelPosition}
@@ -241,6 +246,13 @@ export default function TableFunctions({
             dragging={dragging}
             setDragging={setDragging}
             setTabledActive={setTabledActive}
+          />
+        )}
+        {littleBuddyActive && (
+          <LittleBuddyPortal
+            dragging={dragging}
+            setDragging={setDragging}
+            setLittleBuddyActive={setLittleBuddyActive}
           />
         )}
       </div>

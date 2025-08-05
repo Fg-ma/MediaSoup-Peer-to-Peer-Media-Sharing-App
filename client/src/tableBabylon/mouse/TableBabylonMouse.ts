@@ -2,12 +2,26 @@ import {
   AbstractMesh,
   ActionManager,
   ExecuteCodeAction,
+  PointerEventTypes,
 } from "@babylonjs/core";
 import { MeshMetadata } from "../../../../universal/babylonTypeContant";
 import TableBabylonScene from "../TableBabylonScene";
 
 class TableBabylonMouse {
-  constructor(private tableBabylonScene: TableBabylonScene) {}
+  constructor(private tableBabylonScene: TableBabylonScene) {
+    this.tableBabylonScene.scene.onPointerObservable.add((pointerInfo) => {
+      if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+        const pickResult = this.tableBabylonScene.scene.pick(
+          this.tableBabylonScene.scene.pointerX,
+          this.tableBabylonScene.scene.pointerY,
+        );
+
+        if (!pickResult?.hit) {
+          this.clearSelected();
+        }
+      }
+    });
+  }
 
   applyMouseActions = (mesh: AbstractMesh, parentMesh?: AbstractMesh) => {
     let clickTimeout: NodeJS.Timeout | undefined; // To hold the timeout for single click
@@ -29,6 +43,8 @@ class TableBabylonMouse {
         clickTimeout = setTimeout(() => {
           // Only play animation if no double-click was registered
           if (!doubleClickRegistered) {
+            this.clearSelected();
+
             if (
               !this.tableBabylonScene.selectedMesh ||
               (this.tableBabylonScene.selectedMesh !== mesh &&
@@ -63,7 +79,7 @@ class TableBabylonMouse {
 
           // Reset the double-click registered flag
           doubleClickRegistered = false;
-        }, 250); // Small delay to check for double click (in milliseconds)
+        }, 150); // Small delay to check for double click (in milliseconds)
       }),
     );
 
@@ -148,6 +164,20 @@ class TableBabylonMouse {
         }
       }),
     );
+  };
+
+  clearSelected = () => {
+    for (const username in this.tableBabylonScene.littleBuddies) {
+      for (const littleBuddy in this.tableBabylonScene.littleBuddies[
+        username
+      ]) {
+        this.tableBabylonScene.littleBuddies[username][littleBuddy].setSelected(
+          false,
+        );
+      }
+    }
+
+    this.tableBabylonScene.selectedMesh = null;
   };
 }
 

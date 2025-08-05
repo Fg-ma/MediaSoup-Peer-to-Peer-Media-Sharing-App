@@ -23,6 +23,7 @@ import TableBabylonAudio from "./audio/TableBabylonAudio";
 import TableBabylonAnimations from "./animations/TableBabylonAnimations";
 import TableBabylonSelect from "./select/TableBabylonSelect";
 import TableBabylonMouse from "./mouse/TableBabylonMouse";
+import TableBabylonPhysics from "./physics/TableBabylonPhysics";
 
 class TableBabylonScene {
   twoDimMeshesZCoord = 90;
@@ -46,6 +47,7 @@ class TableBabylonScene {
   tableBabylonEffects: TableBabylonEffects;
   babylonShaderController: BabylonShaderController;
   tableBabylonKeyboard: TableBabylonKeyboard;
+  tableBabylonPhysics: TableBabylonPhysics;
 
   littleBuddies: {
     [username: string]: { [littleBuddyId: string]: LittleBuddy };
@@ -89,25 +91,7 @@ class TableBabylonScene {
     this.babylonShaderController = new BabylonShaderController(this);
     this.tableLittleBuddies = new LittleBuddies(this);
     this.tableBabylonKeyboard = new TableBabylonKeyboard(this);
-
-    this.scene.onPointerObservable.add((pointerInfo) => {
-      if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
-        const pickResult = this.scene.pick(
-          this.scene.pointerX,
-          this.scene.pointerY,
-        );
-
-        if (!pickResult?.hit) {
-          for (const username in this.littleBuddies) {
-            for (const littleBuddy in this.littleBuddies[username]) {
-              this.littleBuddies[username][littleBuddy].setSelected(false);
-            }
-          }
-
-          this.selectedMesh = null;
-        }
-      }
-    });
+    this.tableBabylonPhysics = new TableBabylonPhysics(this);
 
     this.engine.resize();
 

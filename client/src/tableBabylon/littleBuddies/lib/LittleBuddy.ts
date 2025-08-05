@@ -73,7 +73,7 @@ class LittleBuddy {
     const aspect = this.meta.frameWidth / this.meta.frameHeight;
 
     const positioning = {
-      position: { y: 50, x: 50 },
+      position: { y: Math.random() * 99, x: Math.random() * 99 },
       scale: {
         x: 10,
         y: 10 / aspect,
@@ -142,7 +142,7 @@ class LittleBuddy {
       {
         width: 1, // X-axis
         height: 1, // Y-axis
-        depth: 0.001, // Z-axis
+        depth: 1, // Z-axis
       },
       this.tableBabylonScene.scene,
     );
@@ -233,6 +233,8 @@ class LittleBuddy {
     this.tableBabylonScene.scene.onBeforeRenderObservable.add(() => {
       this.texture?.update();
     });
+
+    this.tableBabylonScene.tableBabylonPhysics.addMeshCollision(this.mesh);
   };
 
   private loadImage = (src: string): Promise<HTMLImageElement> => {

@@ -214,6 +214,7 @@ export default function Table({
                 <UploadTableLayer tableTopRef={tableTopRef} />
                 <NewInstancesLayer tableRef={tableRef} />
                 <LittleBuddiesLayer />
+                <LittleBuddiesLayer littleBuddy="toucan" />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}

@@ -13,6 +13,7 @@ import FgPanel from "../../../elements/fgPanel/FgPanel";
 import CaptureMediaButton from "../captureMediaButton/CaptureMediaButton";
 import TabledSection from "../tabledSection/TabledSection";
 import SidePanelButton from "../sidePanelButton/SidePanelButton";
+import LittleBuddySection from "../littleBuddySection/LittleBuddySection";
 
 const AudioEffectsButton = React.lazy(
   () => import("../../../audioEffectsButton/AudioEffectsButton"),
@@ -41,6 +42,8 @@ export default function MoreTableFunctionsSection({
   gridSizeSectionRef,
   tabledActive,
   setTabledActive,
+  littleBuddyActive,
+  setLittleBuddyActive,
   tableSidePanelActive,
   setTableSidePanelActive,
   sidePanelPosition,
@@ -76,6 +79,8 @@ export default function MoreTableFunctionsSection({
   gridSizeSectionRef: React.RefObject<HTMLDivElement>;
   tabledActive: boolean;
   setTabledActive: React.Dispatch<React.SetStateAction<boolean>>;
+  littleBuddyActive: boolean;
+  setLittleBuddyActive: React.Dispatch<React.SetStateAction<boolean>>;
   tableSidePanelActive: boolean;
   setTableSidePanelActive: React.Dispatch<React.SetStateAction<boolean>>;
   sidePanelPosition: "left" | "right";
@@ -122,7 +127,7 @@ export default function MoreTableFunctionsSection({
       content={
         <div className="small-vertical-scroll-bar h-full w-full overflow-y-auto">
           <div
-            className="my-2 grid h-max w-full gap-3"
+            className="grid my-2 h-max w-full gap-3"
             style={{
               gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 5rem))",
             }}
@@ -154,6 +159,10 @@ export default function MoreTableFunctionsSection({
               captureMediaActive={captureMediaActive}
               setCaptureMediaActive={setCaptureMediaActive}
               setMoreTableFunctionsActive={setMoreTableFunctionsActive}
+            />
+            <LittleBuddySection
+              littleBuddyActive={littleBuddyActive}
+              setLittleBuddyActive={setLittleBuddyActive}
             />
             <GamesSection gamesSectionRef={gamesSectionRef} />
             <TableGridButton
