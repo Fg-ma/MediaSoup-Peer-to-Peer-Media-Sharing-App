@@ -1,9 +1,9 @@
-import { TableSidePanels } from "../../../tableSidePanel/TableSidePanel";
 import {
   ContentTypes,
   StaticContentTypes,
 } from "../../../../../universal/contentTypeConstant";
 import { InstanceLayerModes } from "../../../tableLayers/newInstancesLayer/lib/typeConstant";
+import { LittleBuddiesTypes } from "../../../tableBabylon/littleBuddies/lib/typeConstant";
 
 export type GeneralSignals = onLocalMuteChangeType | onTableInfoSignalType;
 
@@ -17,6 +17,10 @@ export type NewInstanceSignals =
   | onStartInstancesDragType
   | onStopInstancesDragType
   | onInstancesLayerModeType;
+
+export type PlaceLittleBuddySignals =
+  | onStartPlaceLittleBuddyDragType
+  | onStopPlaceLittleBuddyDragType;
 
 export type GroupSignals =
   | onGroupDragStartType
@@ -93,6 +97,19 @@ export type onInstancesLayerModeType = {
   data: {
     mode: InstanceLayerModes;
   };
+};
+
+export type onStartPlaceLittleBuddyDragType = {
+  type: "startPlaceLittleBuddyDrag";
+  data: {
+    littleBuddy: LittleBuddiesTypes;
+    width: number;
+    height: number;
+  };
+};
+
+export type onStopPlaceLittleBuddyDragType = {
+  type: "stopPlaceLittleBuddyDrag";
 };
 
 export type onTableInfoSignalType = {

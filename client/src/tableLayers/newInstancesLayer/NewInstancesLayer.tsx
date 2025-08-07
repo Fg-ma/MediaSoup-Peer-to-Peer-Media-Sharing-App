@@ -163,13 +163,22 @@ export default function NewInstancesLayer({
                     media instanceof TableSvgMedia ||
                     media instanceof TableVideoMedia ||
                     media instanceof TableApplicationMedia) &&
-                  media.blobURL &&
                   media.loadingState === "downloaded" ? (
-                    <FgImageElement
-                      className="h-full w-full object-contain"
-                      src={media.blobURL}
-                      alt={media.filename}
-                    />
+                    media instanceof TableVideoMedia ? (
+                      <img
+                        src={media.thumbnail.src}
+                        alt={media.thumbnail.alt}
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      media.blobURL && (
+                        <FgImageElement
+                          className="h-full w-full object-contain"
+                          src={media.blobURL}
+                          alt={media.filename}
+                        />
+                      )
+                    )
                   ) : media.loadingState === "downloading" ? (
                     <LoadingElement className="h-full w-full rounded" />
                   ) : media.loadingState === "failed" ? (

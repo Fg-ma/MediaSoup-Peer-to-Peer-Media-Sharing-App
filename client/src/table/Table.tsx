@@ -6,6 +6,7 @@ import FgScrollbarElement from "../elements/fgScrollbarElement/FgScrollbarElemen
 import TableGridOverlay from "./lib/TableGridOverlay";
 import UploadTableLayer from "../tableLayers/uploadTableLayer/UploadTableLayer";
 import NewInstancesLayer from "../tableLayers/newInstancesLayer/NewInstancesLayer";
+import PlaceLittleBuddyLayer from "../tableLayers/placeLittleBuddyLayer/PlaceLittleBuddyLayer";
 import SelectTableLayer from "../tableLayers/selectTableLayer/SelectTableLayer";
 import LittleBuddiesLayer from "../tableLayers/littleBuddiesLayer/LittleBuddiesLayer";
 import BabylonLayer from "../tableLayers/babylonLayer/BabylonLayer";
@@ -213,8 +214,9 @@ export default function Table({
                 />
                 <UploadTableLayer tableTopRef={tableTopRef} />
                 <NewInstancesLayer tableRef={tableRef} />
-                <LittleBuddiesLayer />
-                <LittleBuddiesLayer littleBuddy="toucan" />
+                <PlaceLittleBuddyLayer tableRef={tableRef} />
+                <LittleBuddiesLayer littleBuddy="wasp" />
+                <LittleBuddiesLayer littleBuddy="redBat" />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}

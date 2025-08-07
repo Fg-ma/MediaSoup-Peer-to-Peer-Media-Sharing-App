@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import PositioningIndicator from "../positioningIndicator/PositioningIndicator";
-import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
 import AlignSection from "../alignSection/AlignSection";
-import { InstanceType } from "../../../TabledPortal";
-import TabledPortalController from "../../TabledPortalController";
 import XSection from "./lib/XSection";
 import YSection from "./lib/YSection";
 import ScaleSection from "./lib/ScaleSection";
+import { InstanceType } from "../../../../../elements/littleBuddyPortal/LittleBuddyPortal";
+import LittleBuddyPortalController from "../../LittleBuddyPortalController";
+import { LittleBuddiesTypes } from "../../../../../tableBabylon/littleBuddies/lib/typeConstant";
 
 export default function AdvancedSection({
   staticPlacement,
   selected,
   indicators,
-  tabledPortalController,
+  littleBuddyPortalController,
 }: {
   staticPlacement: React.MutableRefObject<{
     x: "default" | "hide" | number;
@@ -20,15 +20,14 @@ export default function AdvancedSection({
     scale: "hide" | number;
   }>;
   selected: React.MutableRefObject<
-    {
-      contentType: StaticContentTypes;
-      contentId: string;
-      aspect: number;
-      count: number | "zero";
-    }[]
+    | {
+        littleBuddy: LittleBuddiesTypes;
+        aspect: number;
+      }
+    | undefined
   >;
-  indicators: React.MutableRefObject<InstanceType[]>;
-  tabledPortalController: React.MutableRefObject<TabledPortalController>;
+  indicators: React.MutableRefObject<InstanceType | undefined>;
+  littleBuddyPortalController: React.MutableRefObject<LittleBuddyPortalController>;
 }) {
   const [_, setRerender] = useState(false);
 
@@ -44,7 +43,7 @@ export default function AdvancedSection({
         staticPlacement={staticPlacement}
         selected={selected}
         indicators={indicators}
-        tabledPortalController={tabledPortalController}
+        littleBuddyPortalController={littleBuddyPortalController}
         setRerender={setRerender}
       />
       <AlignSection

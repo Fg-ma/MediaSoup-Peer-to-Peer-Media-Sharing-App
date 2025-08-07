@@ -80,6 +80,11 @@ const boar = nginxAssetServerBaseUrl + "spriteSheets/boar/boar.png";
 const boarIcon = nginxAssetServerBaseUrl + "spriteSheets/boar/boarIcon.png";
 const bunny = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunny.png";
 const bunnyIcon = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunnyIcon.png";
+const redBat = nginxAssetServerBaseUrl + "spriteSheets/bats/redBat.png";
+const redBatIcon = nginxAssetServerBaseUrl + "spriteSheets/bats/redBatIcon.png";
+const purpleBat = nginxAssetServerBaseUrl + "spriteSheets/bats/purpleBat.png";
+const purpleBatIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/bats/purpleBatIcon.png";
 
 export const coreAnimations = ["walk", "idle"];
 
@@ -143,7 +148,39 @@ export type LittleBuddiesTypes =
   | "chicken"
   | "pig"
   | "boar"
-  | "bunny";
+  | "bunny"
+  | "redBat"
+  | "purpleBat";
+
+export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
+  {
+    horse: ["animal", "ride", "fast"],
+    poring: ["slime", "cute", "bouncy"],
+    toucan: ["bird", "colorful", "jungle"],
+    wasp: ["insect", "sting", "bug"],
+    leafBug: ["bug", "leaf", "green"],
+    skeleton: ["bones", "undead", "scary"],
+    blueBird: ["bird", "blue"],
+    greenBird: ["bird", "green"],
+    blackBird: ["bird", "black"],
+    whiteBird: ["bird", "white"],
+    sickBird: ["bird", "sick", "ill"],
+    deadBird: ["bird", "dead", "ghost"],
+    fireBird: ["bird", "fire", "flame", "red"],
+    flameBird: ["bird", "fire", "flame"],
+    technoBird: ["bird", "robot", "techno"],
+    redBird: ["bird", "red", "angry"],
+    rainbowBird: ["bird", "rainbow", "colorful"],
+    angel: ["holy", "wings", "heaven"],
+    redDemon: ["demon", "fire", "red", "evil"],
+    whiteDemon: ["demon", "white", "ghost", "evil"],
+    chicken: ["bird", "farm", "egg"],
+    pig: ["animal", "farm", "pink"],
+    boar: ["animal", "wild", "tusk"],
+    bunny: ["animal", "cute", "rabbit"],
+    redBat: ["animal", "bat"],
+    purpleBat: ["animal", "bat"],
+  };
 
 export type MetaAnimation = {
   core: number[];
@@ -186,7 +223,7 @@ export const spirteSheetsMeta: {
   [tableLittleBuddy in LittleBuddiesTypes]: SpriteMetadata;
 } = {
   horse: {
-    title: "",
+    title: "Horse",
     url: horse,
     iconUrl: horseIcon,
     frameHeight: 33,
@@ -222,7 +259,7 @@ export const spirteSheetsMeta: {
     },
   },
   poring: {
-    title: "",
+    title: "Poring",
     url: poring,
     iconUrl: poringIcon,
     frameHeight: 372,
@@ -231,7 +268,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -249,7 +286,7 @@ export const spirteSheetsMeta: {
     },
   },
   toucan: {
-    title: "",
+    title: "Toucan",
     url: toucan,
     iconUrl: toucanIcon,
     frameHeight: 64,
@@ -292,7 +329,7 @@ export const spirteSheetsMeta: {
     },
   },
   wasp: {
-    title: "",
+    title: "Wasp",
     url: wasp,
     iconUrl: waspIcon,
     frameHeight: 96,
@@ -314,7 +351,7 @@ export const spirteSheetsMeta: {
     },
   },
   leafBug: {
-    title: "",
+    title: "Leaf bug",
     url: leafBug,
     iconUrl: leafBugIcon,
     frameHeight: 64,
@@ -343,7 +380,7 @@ export const spirteSheetsMeta: {
     },
   },
   skeleton: {
-    title: "",
+    title: "Skeleton",
     url: skeleton,
     iconUrl: skeletonIcon,
     frameHeight: 72,
@@ -352,7 +389,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.1,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -365,7 +402,7 @@ export const spirteSheetsMeta: {
     },
   },
   blueBird: {
-    title: "",
+    title: "Blue bird",
     url: blueBird,
     iconUrl: blueBirdIcon,
     frameHeight: 16,
@@ -387,7 +424,7 @@ export const spirteSheetsMeta: {
     },
   },
   greenBird: {
-    title: "",
+    title: "Green bird",
     url: greenBird,
     iconUrl: greenBirdIcon,
     frameHeight: 16,
@@ -409,7 +446,7 @@ export const spirteSheetsMeta: {
     },
   },
   blackBird: {
-    title: "",
+    title: "Black bird",
     url: blackBird,
     iconUrl: blackBirdIcon,
     frameHeight: 16,
@@ -431,7 +468,7 @@ export const spirteSheetsMeta: {
     },
   },
   whiteBird: {
-    title: "",
+    title: "White bird",
     url: whiteBird,
     iconUrl: whiteBirdIcon,
     frameHeight: 16,
@@ -453,7 +490,7 @@ export const spirteSheetsMeta: {
     },
   },
   technoBird: {
-    title: "",
+    title: "Techno bird",
     url: technoBird,
     iconUrl: technoBirdIcon,
     frameHeight: 16,
@@ -475,7 +512,7 @@ export const spirteSheetsMeta: {
     },
   },
   deadBird: {
-    title: "",
+    title: "Dead bird",
     url: deadBird,
     iconUrl: deadBirdIcon,
     frameHeight: 16,
@@ -497,7 +534,7 @@ export const spirteSheetsMeta: {
     },
   },
   sickBird: {
-    title: "",
+    title: "Sick bird",
     url: sickBird,
     iconUrl: sickBirdIcon,
     frameHeight: 16,
@@ -519,7 +556,7 @@ export const spirteSheetsMeta: {
     },
   },
   fireBird: {
-    title: "",
+    title: "Fire bird",
     url: fireBird,
     iconUrl: fireBirdIcon,
     frameHeight: 16,
@@ -541,7 +578,7 @@ export const spirteSheetsMeta: {
     },
   },
   flameBird: {
-    title: "",
+    title: "Flame bird",
     url: flameBird,
     iconUrl: flameBirdIcon,
     frameHeight: 27,
@@ -563,7 +600,7 @@ export const spirteSheetsMeta: {
     },
   },
   redBird: {
-    title: "",
+    title: "Red bird",
     url: redBird,
     iconUrl: redBirdIcon,
     frameHeight: 16,
@@ -585,7 +622,7 @@ export const spirteSheetsMeta: {
     },
   },
   rainbowBird: {
-    title: "",
+    title: "Rainbow bird",
     url: rainbowBird,
     iconUrl: rainbowBirdIcon,
     frameHeight: 16,
@@ -607,7 +644,7 @@ export const spirteSheetsMeta: {
     },
   },
   angel: {
-    title: "",
+    title: "Angel",
     url: angel,
     iconUrl: angelIcon,
     frameHeight: 256,
@@ -638,7 +675,7 @@ export const spirteSheetsMeta: {
     },
   },
   redDemon: {
-    title: "",
+    title: "Red demon",
     url: redDemon,
     iconUrl: redDemonIcon,
     frameHeight: 330,
@@ -663,7 +700,7 @@ export const spirteSheetsMeta: {
     },
   },
   whiteDemon: {
-    title: "",
+    title: "White demon",
     url: whiteDemon,
     iconUrl: whiteDemonIcon,
     frameHeight: 330,
@@ -688,7 +725,7 @@ export const spirteSheetsMeta: {
     },
   },
   chicken: {
-    title: "",
+    title: "Chicken",
     url: chicken,
     iconUrl: chickenIcon,
     frameHeight: 32,
@@ -697,7 +734,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: false,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -713,7 +750,7 @@ export const spirteSheetsMeta: {
     },
   },
   pig: {
-    title: "",
+    title: "Pig",
     url: pig,
     iconUrl: pigIcon,
     frameHeight: 64,
@@ -738,7 +775,7 @@ export const spirteSheetsMeta: {
     },
   },
   boar: {
-    title: "",
+    title: "Boar",
     url: boar,
     iconUrl: boarIcon,
     frameHeight: 64,
@@ -763,7 +800,7 @@ export const spirteSheetsMeta: {
     },
   },
   bunny: {
-    title: "",
+    title: "Bunny",
     url: bunny,
     iconUrl: bunnyIcon,
     frameHeight: 36,
@@ -772,7 +809,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -782,6 +819,56 @@ export const spirteSheetsMeta: {
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6, 7],
           speed: 0.125,
+        },
+      },
+      alt: {},
+    },
+  },
+  redBat: {
+    title: "Red bat",
+    url: redBat,
+    iconUrl: redBatIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  purpleBat: {
+    title: "Purple bat",
+    url: purpleBat,
+    iconUrl: purpleBatIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
         },
       },
       alt: {},

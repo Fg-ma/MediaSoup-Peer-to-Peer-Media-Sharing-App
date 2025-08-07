@@ -10,7 +10,6 @@ import LittleBuddyPortalController from "../LittleBuddyPortalController";
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const checkIcon = nginxAssetServerBaseUrl + "svgs/checkIcon.svg";
-const paintBrushIcon = nginxAssetServerBaseUrl + "svgs/paintBrushIcon.svg";
 const closeIcon = nginxAssetServerBaseUrl + "svgs/closeIcon.svg";
 const moreIcon = nginxAssetServerBaseUrl + "svgs/moreIcon.svg";
 const moreOffIcon = nginxAssetServerBaseUrl + "svgs/moreOffIcon.svg";
@@ -31,22 +30,18 @@ export default function Tools({
   setSearchContent: React.Dispatch<
     React.SetStateAction<
       {
+        littleBuddy: LittleBuddiesTypes;
         score: number;
-        aid?: string;
-        iid?: string;
-        sid?: string;
-        xid?: string;
-        vid?: string;
       }[]
     >
   >;
   searchValue: React.MutableRefObject<string>;
   selected: React.MutableRefObject<
-    {
-      littleBuddy: LittleBuddiesTypes;
-      aspect: number;
-      count: number | "zero";
-    }[]
+    | {
+        littleBuddy: LittleBuddiesTypes;
+        aspect: number;
+      }
+    | undefined
   >;
 }) {
   const { sendNewInstanceSignal, sendGeneralSignal } = useSignalContext();
@@ -73,63 +68,6 @@ export default function Tools({
         hoverContent={
           <FgHoverContentStandard content="Place content on table" />
         }
-        options={{
-          hoverSpacing: 4,
-          hoverType: "above",
-          hoverTimeoutDuration: 1250,
-        }}
-      />
-      <FgButton
-        className="flex aspect-square h-full items-center justify-center rounded bg-fg-tone-black-8"
-        contentFunction={() => (
-          <FgSVGElement
-            src={paintBrushIcon}
-            className="aspect-square h-[70%] fill-fg-off-white stroke-fg-off-white"
-            attributes={[
-              { key: "width", value: "100%" },
-              { key: "height", value: "100%" },
-            ]}
-          />
-        )}
-        clickFunction={() => {
-          if (selected.current.length === 0) return;
-
-          sendNewInstanceSignal({
-            type: "instancesLayerMode",
-            data: {
-              mode: "paint",
-            },
-          });
-
-          sendNewInstanceSignal({
-            type: "startInstancesDrag",
-            data: {
-              instances: selected.current
-                .filter((sel) => sel.count !== "zero" && sel.count !== 0)
-                .map((sel) => ({
-                  littleBuddy: sel.littleBuddy,
-                  instances: Array.from({
-                    // @ts-expect-error "zero" was already filtered out
-                    length: sel.count,
-                  }).map(() => ({
-                    height: 15,
-                    width: 15 * sel.aspect,
-                  })),
-                })),
-            },
-          });
-
-          sendGeneralSignal({
-            type: "tableInfoSignal",
-            data: {
-              message: "Press esc/delete to exit",
-              timeout: 4000,
-            },
-          });
-
-          setLittleBuddyActive(false);
-        }}
-        hoverContent={<FgHoverContentStandard content="Paint content" />}
         options={{
           hoverSpacing: 4,
           hoverType: "above",

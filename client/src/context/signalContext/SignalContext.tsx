@@ -4,6 +4,7 @@ import {
   GroupSignals,
   MediaPositioningSignals,
   NewInstanceSignals,
+  PlaceLittleBuddySignals,
   SettingsSignals,
 } from "./lib/typeConstant";
 import { ContentTypes } from "../../../../universal/contentTypeConstant";
@@ -43,6 +44,13 @@ export interface SignalContextType {
     listener: (signal: NewInstanceSignals) => void,
   ) => void;
   sendNewInstanceSignal: (signal: NewInstanceSignals) => void;
+  addPlaceLittleBuddySignalListener: (
+    listener: (signal: PlaceLittleBuddySignals) => void,
+  ) => void;
+  removePlaceLittleBuddySignalListener: (
+    listener: (signal: PlaceLittleBuddySignals) => void,
+  ) => void;
+  sendPlaceLittleBuddySignal: (signal: PlaceLittleBuddySignals) => void;
   addGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
   removeGroupSignalListener: (listener: (signal: GroupSignals) => void) => void;
   sendGroupSignal: (signal: GroupSignals) => void;
@@ -86,6 +94,9 @@ export function SignalContextProvider({
     new Set();
   const newInstanceSignalListeners: Set<(signal: NewInstanceSignals) => void> =
     new Set();
+  const placeLittleBuddySignalListeners: Set<
+    (signal: PlaceLittleBuddySignals) => void
+  > = new Set();
   const groupSignalListeners: Set<(signal: GroupSignals) => void> = new Set();
   const mediaPositioningSignalListeners: Set<
     (signal: MediaPositioningSignals) => void
@@ -145,6 +156,24 @@ export function SignalContextProvider({
     });
   };
 
+  const addPlaceLittleBuddySignalListener = (
+    listener: (signal: PlaceLittleBuddySignals) => void,
+  ): void => {
+    placeLittleBuddySignalListeners.add(listener);
+  };
+
+  const removePlaceLittleBuddySignalListener = (
+    listener: (signal: PlaceLittleBuddySignals) => void,
+  ): void => {
+    placeLittleBuddySignalListeners.delete(listener);
+  };
+
+  const sendPlaceLittleBuddySignal = (signal: PlaceLittleBuddySignals) => {
+    placeLittleBuddySignalListeners.forEach((listener) => {
+      listener(signal);
+    });
+  };
+
   const addGroupSignalListener = (
     listener: (signal: GroupSignals) => void,
   ): void => {
@@ -198,6 +227,9 @@ export function SignalContextProvider({
         addNewInstanceSignalListener,
         removeNewInstanceSignalListener,
         sendNewInstanceSignal,
+        addPlaceLittleBuddySignalListener,
+        removePlaceLittleBuddySignalListener,
+        sendPlaceLittleBuddySignal,
         addGroupSignalListener,
         removeGroupSignalListener,
         sendGroupSignal,

@@ -84,12 +84,12 @@ import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useTableContext } from "../../context/tableContext/TableContext";
 import { useUserInfoContext } from "../../context/userInfoContext/UserInfoContext";
-import { LittleBuddiesTypes } from "./lib/typeConstant";
+import { LittleBuddiesTypes } from "../../tableBabylon/littleBuddies/lib/typeConstant";
 
 export default function LittleBuddiesLayer({
-  littleBuddy = "wasp",
+  littleBuddy,
 }: {
-  littleBuddy?: LittleBuddiesTypes;
+  littleBuddy: LittleBuddiesTypes;
 }) {
   const { tableBabylonScene } = useTableContext();
   const { userId } = useUserInfoContext();

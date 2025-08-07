@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import fuzzysort from "fuzzysort";
 import FgSVGElement from "../../../../fgSVGElement/FgSVGElement";
 import FgInput from "../../../../fgInput/FgInput";
-import { useSocketContext } from "../../../../../context/socketContext/SocketContext";
-import { IncomingTableStaticContentMessages } from "../../../../../serverControllers/tableStaticContentServer/lib/typeConstant";
-import { Categories } from "../../../TabledPortal";
+import {
+  LittleBuddiesTypes,
+  littleBuddySemanticKeywords,
+} from "../../../../../tableBabylon/littleBuddies/lib/typeConstant";
 
 const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
@@ -17,23 +19,41 @@ export default function SearchBar({
   setSearchContent: React.Dispatch<
     React.SetStateAction<
       {
+        littleBuddy: LittleBuddiesTypes;
         score: number;
-        aid?: string;
-        iid?: string;
-        sid?: string;
-        xid?: string;
-        vid?: string;
       }[]
     >
   >;
   advanced: boolean;
   searchValue: React.MutableRefObject<string>;
 }) {
-  const { tableStaticContentSocket } = useSocketContext();
-
   const [_, setRerender] = useState(false);
   const typingTimeout = useRef<undefined | NodeJS.Timeout>(undefined);
   const typingInterval = useRef<undefined | NodeJS.Timeout>(undefined);
+
+  const searchBuddiesFuzzysort = (
+    query: string,
+  ): { littleBuddy: LittleBuddiesTypes; score: number }[] => {
+    if (!query.trim()) return [];
+
+    const results: { littleBuddy: LittleBuddiesTypes; score: number }[] = [];
+
+    for (const buddy in littleBuddySemanticKeywords) {
+      const keywords = [
+        buddy,
+        ...littleBuddySemanticKeywords[buddy as LittleBuddiesTypes],
+      ];
+      const bestMatch = fuzzysort.go(query, keywords);
+      if (bestMatch.total > -Infinity) {
+        results.push({
+          littleBuddy: buddy as LittleBuddiesTypes,
+          score: bestMatch.total,
+        });
+      }
+    }
+
+    return results.sort((a, b) => b.score - a.score);
+  };
 
   return (
     <div className={`${advanced ? "mb-6 w-full pr-4" : "grow"} !h-12 pl-4`}>
@@ -75,11 +95,8 @@ export default function SearchBar({
 
             if (!typingInterval.current) {
               typingInterval.current = setInterval(() => {
-                tableStaticContentSocket.current?.searchTabledContent(
-                  activePage,
-                  searchValue.current,
-                );
-              }, 350);
+                setSearchContent(searchBuddiesFuzzysort(searchValue.current));
+              }, 150);
             }
 
             typingTimeout.current = setTimeout(() => {
@@ -87,7 +104,7 @@ export default function SearchBar({
                 clearInterval(typingInterval.current);
                 typingInterval.current = undefined;
               }
-            }, 400);
+            }, 200);
           }}
           options={{ submitButton: false }}
         />

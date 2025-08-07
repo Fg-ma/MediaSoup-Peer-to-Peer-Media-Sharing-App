@@ -1,22 +1,23 @@
-import { v4 as uuidv4 } from "uuid";
-import { InstanceType } from "../LittleBuddyPortal";
+import { LittleBuddyInstanceType } from "../LittleBuddyPortal";
 import TableStaticContentSocketController from "../../../serverControllers/tableStaticContentServer/TableStaticContentSocketController";
 import { LittleBuddiesTypes } from "src/tableBabylon/littleBuddies/lib/typeConstant";
 
 class LittleBuddyPortalController {
   constructor(
-    private indicators: React.MutableRefObject<InstanceType[]>,
+    private indicators: React.MutableRefObject<
+      LittleBuddyInstanceType | undefined
+    >,
     private staticPlacement: React.MutableRefObject<{
       x: "default" | "hide" | number;
       y: "default" | "hide" | number;
       scale: "hide" | number;
     }>,
     private selected: React.MutableRefObject<
-      {
-        littleBuddy: LittleBuddiesTypes;
-        aspect: number;
-        count: number | "zero";
-      }[]
+      | {
+          littleBuddy: LittleBuddiesTypes;
+          aspect: number;
+        }
+      | undefined
     >,
     private setRerender: React.Dispatch<React.SetStateAction<boolean>>,
     private tableStaticContentSocket: React.MutableRefObject<
@@ -27,86 +28,58 @@ class LittleBuddyPortalController {
     private setLittleBuddyActive: React.Dispatch<React.SetStateAction<boolean>>,
   ) {}
 
-  private tempInstances: InstanceType[] = [];
-
   placeInstances = () => {
     const sel = this.selected.current;
-    if (!sel.length) {
-      this.indicators.current = [];
+    if (!sel) {
+      this.indicators.current = undefined;
       return;
     }
 
     const { scale: rawScale, x, y } = this.staticPlacement.current;
     const scale = rawScale === "hide" ? 1 : (rawScale as number);
-    const GAP = 0.5;
-    const containerWidth = 100;
-    const gridLeft = x === "default" || x === "hide" ? 50 : (x as number);
-    let gridBottom = y === "default" || y === "hide" ? 50 : (y as number);
-    let currentX = gridLeft;
-    let currentRowMaxH = 0;
-    let currentRowTop = gridBottom;
 
-    // clear and reuse
-    this.tempInstances.length = 0;
+    const { aspect, littleBuddy } = sel;
 
-    for (let si = 0; si < sel.length; si++) {
-      const { count, aspect, littleBuddy } = sel[si];
-      if (count === "zero") continue;
+    const w = 15 * aspect * scale;
+    const h = 15 * scale;
 
-      const n = Number(count);
-      // reuse a small local array for this group
-      const group: { x: number; y: number; width: number; height: number }[] =
-        [];
-      for (let k = 0; k < n; k++) {
-        const w = 15 * aspect * scale;
-        const h = 15 * scale;
-        // wrap to next row?
-        if (currentX + w > containerWidth) {
-          currentX = gridLeft;
-          gridBottom = currentRowTop - GAP;
-          currentRowMaxH = 0;
-          currentRowTop = gridBottom;
-        }
+    const posX = Math.min(
+      100 - w,
+      x === "default" || x === "hide" ? 50 : (x as number),
+    );
+    const posY = Math.max(
+      0,
+      (y === "default" || y === "hide" ? 50 : (y as number)) - h,
+    );
 
-        const posX = Math.min(containerWidth - w, currentX);
-        const posY = Math.max(0, gridBottom - h);
-
-        group.push({ x: posX, y: posY, width: w, height: h });
-
-        currentX += w + GAP;
-        currentRowMaxH = Math.max(currentRowMaxH, h);
-        currentRowTop = gridBottom - currentRowMaxH;
-      }
-
-      this.tempInstances.push({ littleBuddy, instances: group });
-    }
-
-    // one final assignment
-    this.indicators.current = this.tempInstances;
+    this.indicators.current = {
+      littleBuddy,
+      x: posX,
+      y: posY,
+      width: w,
+      height: h,
+    };
   };
 
   uploadInstances = () => {
-    if (this.selected.current.length === 0) return;
+    if (!this.selected.current || !this.indicators.current) return;
 
     this.placeInstances();
 
-    const instancesToUpload = this.indicators.current.map((indicator) => ({
-      littleBuddy: indicator.littleBuddy,
-      instances: indicator.instances.map((ins) => ({
-        instanceId: uuidv4(),
-        positioning: {
-          position: {
-            left: ins.x,
-            top: ins.y,
-          },
-          scale: {
-            x: ins.width,
-            y: ins.height,
-          },
-          rotation: 0,
+    const instancesToUpload = {
+      littleBuddy: this.indicators.current.littleBuddy,
+      positioning: {
+        position: {
+          left: this.indicators.current.x,
+          top: this.indicators.current.y,
         },
-      })),
-    }));
+        scale: {
+          x: this.indicators.current.width,
+          y: this.indicators.current.height,
+        },
+        rotation: 0,
+      },
+    };
 
     this.tableStaticContentSocket.current?.createNewInstances(
       instancesToUpload,
@@ -114,8 +87,8 @@ class LittleBuddyPortalController {
   };
 
   reset = () => {
-    if (this.selected.current.length !== 0) {
-      this.selected.current = [];
+    if (this.selected.current) {
+      this.selected.current = undefined;
       this.staticPlacement.current = {
         x: "default",
         y: "default",

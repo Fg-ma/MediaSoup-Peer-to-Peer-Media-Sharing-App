@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
-import { useMediaContext } from "../../context/mediaContext/MediaContext";
 import { useSocketContext } from "../../context/socketContext/SocketContext";
 import FgPortal from "../fgPortal/FgPortal";
 import LazyScrollingContainer from "../lazyScrollingContainer/LazyScrollingContainer";
-import ScrollingContainer from "../scrollingContainer/ScrollingContainer";
-import ScrollingContainerButton from "../scrollingContainer/lib/ScrollingContainerButton";
 import Tools from "./lib/tools/Tools";
 import AdvancedSection from "./lib/tools/advancedSection/AdvancedSection";
 import LittleBuddyPortalController from "./lib/LittleBuddyPortalController";
@@ -15,14 +12,12 @@ import {
   spirteSheetsMeta,
 } from "../../tableBabylon/littleBuddies/lib/typeConstant";
 
-export type InstanceType = {
+export type LittleBuddyInstanceType = {
   littleBuddy: LittleBuddiesTypes;
-  instances: {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  }[];
+  width: number;
+  height: number;
+  x: number;
+  y: number;
 };
 
 export default function LittleBuddyPortal({
@@ -47,37 +42,23 @@ export default function LittleBuddyPortal({
     scale: 1,
   });
   const selected = useRef<
-    {
-      littleBuddy: LittleBuddiesTypes;
-      aspect: number;
-      count: number | "zero";
-    }[]
-  >([]);
-  const littleBuddySectionScrollingContainerRef = useRef<HTMLDivElement>(null);
-  const lastPressed = useRef<
     | {
         littleBuddy: LittleBuddiesTypes;
         aspect: number;
-        count: number;
       }
     | undefined
   >(undefined);
-  const indicators = useRef<InstanceType[]>([]);
+
+  const indicators = useRef<LittleBuddyInstanceType | undefined>(undefined);
   const [searchContent, setSearchContent] = useState<
     {
+      littleBuddy: LittleBuddiesTypes;
       score: number;
-      aid?: string;
-      iid?: string;
-      sid?: string;
-      xid?: string;
-      vid?: string;
     }[]
   >([]);
   const littleBuddyPortalRef = useRef<HTMLDivElement>(null);
   const littleBuddyContentRef = useRef<HTMLDivElement>(null);
   const searchValue = useRef("");
-  const holdTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-  const holdInterval = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const [_, setRerender] = useState(false);
 
@@ -118,26 +99,30 @@ export default function LittleBuddyPortal({
               }}
             >
               <LazyScrollingContainer
-                externalRef={littleBuddySectionScrollingContainerRef}
                 className={`${advanced ? "h-full" : "w-full"} small-vertical-scroll-bar grid grow gap-1 overflow-y-auto p-2`}
                 style={{
                   gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 6rem))",
                   gridAutoRows: "max-content",
                 }}
-                items={Object.keys(spirteSheetsMeta).map((littleBuddy) => (
-                  <LittleBuddyItems
-                    littleBuddy={littleBuddy as LittleBuddiesTypes}
-                    selected={selected}
-                    littleBuddySectionScrollingContainerRef={
-                      littleBuddySectionScrollingContainerRef
-                    }
-                    lastPressed={lastPressed}
-                    setDragging={setDragging}
-                    holdTimeout={holdTimeout}
-                    holdInterval={holdInterval}
-                    setExternalRerender={setRerender}
-                  />
-                ))}
+                items={
+                  searchContent.length > 0
+                    ? searchContent.map((content) => (
+                        <LittleBuddyItems
+                          littleBuddy={content.littleBuddy}
+                          selected={selected}
+                          setDragging={setDragging}
+                          setExternalRerender={setRerender}
+                        />
+                      ))
+                    : Object.keys(spirteSheetsMeta).map((littleBuddy) => (
+                        <LittleBuddyItems
+                          littleBuddy={littleBuddy as LittleBuddiesTypes}
+                          selected={selected}
+                          setDragging={setDragging}
+                          setExternalRerender={setRerender}
+                        />
+                      ))
+                }
               />
               {advanced && (
                 <SearchBar
@@ -167,7 +152,6 @@ export default function LittleBuddyPortal({
                 advanced={advanced}
                 setAdvanced={setAdvanced}
                 setLittleBuddyActive={setLittleBuddyActive}
-                activePage={activePage}
                 setSearchContent={setSearchContent}
                 searchValue={searchValue}
                 selected={selected}

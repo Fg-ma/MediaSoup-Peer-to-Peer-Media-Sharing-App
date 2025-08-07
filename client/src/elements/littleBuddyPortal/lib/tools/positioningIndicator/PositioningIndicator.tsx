@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import throttle from "lodash.throttle";
-import { StaticContentTypes } from "../../../../../../../universal/contentTypeConstant";
-import { useMediaContext } from "../../../../../context/mediaContext/MediaContext";
 import FgImageElement from "../../../../fgImageElement/FgImageElement";
 import LittleBuddyPortalController from "../../LittleBuddyPortalController";
 import { InstanceType } from "../../../../../elements/littleBuddyPortal/LittleBuddyPortal";
+import {
+  LittleBuddiesTypes,
+  spirteSheetsMeta,
+} from "../../../../../tableBabylon/littleBuddies/lib/typeConstant";
 
 export default function PositioningIndicator({
   staticPlacement,
@@ -19,19 +21,16 @@ export default function PositioningIndicator({
     scale: "hide" | number;
   }>;
   selected: React.MutableRefObject<
-    {
-      contentType: StaticContentTypes;
-      contentId: string;
-      aspect: number;
-      count: number | "zero";
-    }[]
+    | {
+        littleBuddy: LittleBuddiesTypes;
+        aspect: number;
+      }
+    | undefined
   >;
-  indicators: React.MutableRefObject<InstanceType[]>;
+  indicators: React.MutableRefObject<InstanceType | undefined>;
   littleBuddyPortalController: React.MutableRefObject<LittleBuddyPortalController>;
   setRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { staticContentMedia } = useMediaContext();
-
   const positioningIndicatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function PositioningIndicator({
       () => {
         setRerender((prev) => !prev);
       },
-      80,
+      20,
       { leading: true, trailing: true },
     ),
   ).current;
@@ -91,50 +90,30 @@ export default function PositioningIndicator({
       className="relative aspect-square w-full rounded border-2 border-fg-off-white bg-fg-white"
       onPointerDown={handlePointerDown}
     >
-      {indicators.current.map((instance) => {
-        let imgSrc: string | null = null;
-        let alt: string = "";
+      {indicators.current &&
+        (() => {
+          const meta = spirteSheetsMeta[indicators.current.littleBuddy];
 
-        if (
-          instance.contentType !== "text" &&
-          instance.contentType !== "soundClip"
-        ) {
-          const media =
-            staticContentMedia.current[instance.contentType].table[
-              instance.contentId
-            ];
-
-          if (media?.blobURL) {
-            imgSrc = media.blobURL;
-            alt = media.filename;
-          }
-        }
-
-        return (
-          <React.Fragment key={instance.contentId}>
-            {instance.instances.map((ins, i) => (
+          return (
+            <React.Fragment>
               <div
-                key={instance.contentId + "_" + i}
                 className="border absolute cursor-pointer select-none rounded border-dashed border-fg-red"
                 style={{
-                  width: `${ins.width}%`,
-                  height: `${ins.height}%`,
-                  left: `${ins.x}%`,
-                  top: `${ins.y}%`,
+                  width: `${indicators.current.width}%`,
+                  height: `${indicators.current.height}%`,
+                  left: `${indicators.current.x}%`,
+                  top: `${indicators.current.y}%`,
                 }}
               >
-                {imgSrc && (
-                  <FgImageElement
-                    className="h-full w-full object-contain"
-                    src={imgSrc}
-                    alt={alt}
-                  />
-                )}
+                <FgImageElement
+                  className="h-full w-full object-contain"
+                  src={meta.iconUrl}
+                  alt={meta.title}
+                />
               </div>
-            ))}
-          </React.Fragment>
-        );
-      })}
+            </React.Fragment>
+          );
+        })()}
     </div>
   );
 }
