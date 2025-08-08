@@ -14,6 +14,7 @@ export default function FgScrollbarElement({
   scrollbarSize = 10,
   gutterSize = 11,
   style,
+  hideScrollbar,
 }: {
   externalRef?: React.RefObject<HTMLDivElement>;
   externalContentContainerRef?: React.RefObject<HTMLDivElement>;
@@ -26,6 +27,7 @@ export default function FgScrollbarElement({
   scrollbarSize?: number;
   gutterSize?: number;
   style?: React.CSSProperties;
+  hideScrollbar?: boolean;
 }) {
   const scrollbarElementRef = externalRef
     ? externalRef
@@ -40,14 +42,16 @@ export default function FgScrollbarElement({
       className={`${className} hide-fg-scrollbar relative`}
       style={style}
     >
-      <Scrollbar
-        contentContainerRef={contentContainerRef}
-        direction={direction}
-        scrollingContentRef={scrollingContentRef}
-        scrollbarSize={scrollbarSize}
-        gutterSize={gutterSize}
-        scrollbarElementRef={scrollbarElementRef}
-      />
+      {!hideScrollbar && (
+        <Scrollbar
+          contentContainerRef={contentContainerRef}
+          direction={direction}
+          scrollingContentRef={scrollingContentRef}
+          scrollbarSize={scrollbarSize}
+          gutterSize={gutterSize}
+          scrollbarElementRef={scrollbarElementRef}
+        />
+      )}
       {outsideContent}
       <div className={contentContainerClassName} ref={contentContainerRef}>
         {content}

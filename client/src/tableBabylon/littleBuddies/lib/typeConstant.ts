@@ -76,8 +76,9 @@ const chickenIcon =
   nginxAssetServerBaseUrl + "spriteSheets/chicken/chickenIcon.png";
 const pig = nginxAssetServerBaseUrl + "spriteSheets/pig/pig.png";
 const pigIcon = nginxAssetServerBaseUrl + "spriteSheets/pig/pigIcon.png";
-const boar = nginxAssetServerBaseUrl + "spriteSheets/boar/boar.png";
-const boarIcon = nginxAssetServerBaseUrl + "spriteSheets/boar/boarIcon.png";
+const wildPig = nginxAssetServerBaseUrl + "spriteSheets/wildPig/wildPig.png";
+const wildPigIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildPig/wildPigIcon.png";
 const bunny = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunny.png";
 const bunnyIcon = nginxAssetServerBaseUrl + "spriteSheets/bunny/bunnyIcon.png";
 const redBat = nginxAssetServerBaseUrl + "spriteSheets/bats/redBat.png";
@@ -85,10 +86,117 @@ const redBatIcon = nginxAssetServerBaseUrl + "spriteSheets/bats/redBatIcon.png";
 const purpleBat = nginxAssetServerBaseUrl + "spriteSheets/bats/purpleBat.png";
 const purpleBatIcon =
   nginxAssetServerBaseUrl + "spriteSheets/bats/purpleBatIcon.png";
+const hero = nginxAssetServerBaseUrl + "spriteSheets/hero/hero.png";
+const heroIcon = nginxAssetServerBaseUrl + "spriteSheets/hero/heroIcon.png";
+const blackBeardDwarf =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/blackBeardDwarf.png";
+const blackBeardDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/blackBeardDwarfIcon.png";
+const blueDwarf =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/blueDwarf.png";
+const blueDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/blueDwarfIcon.png";
+const greenDwarf =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/greenDwarf.png";
+const greenDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/greenDwarfIcon.png";
+const lumberjackDwarf =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/lumberjackDwarf.png";
+const lumberjackDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/lumberjackDwarfIcon.png";
+const redBeardDwarf =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/redBeardDwarf.png";
+const redBeardDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/redBeardDwarfIcon.png";
+const redDwarf = nginxAssetServerBaseUrl + "spriteSheets/dwarves/redDwarf.png";
+const redDwarfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/dwarves/redDwarfIcon.png";
+const goblinAssassin =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinAssassin.png";
+const goblinAssassinIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinAssassinIcon.png";
+const goblinGuard =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinGuard.png";
+const goblinGuardIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinGuardIcon.png";
+const goblinLord =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinLord.png";
+const goblinLordIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinLordIcon.png";
+const goblinMage =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinMage.png";
+const goblinMageIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinMageIcon.png";
+const goblinPeasant =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinPeasant.png";
+const goblinPeasantIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinPeasantIcon.png";
+const goblinSamurai =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinSamurai.png";
+const goblinSamuraiIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinSamuraiIcon.png";
+const goblinSoldier =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinSoldier.png";
+const goblinSoldierIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/goblins/goblinSoldierIcon.png";
+const knight = nginxAssetServerBaseUrl + "spriteSheets/knight/knight.png";
+const knightIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/knight/knightIcon.png";
+const baldric =
+  nginxAssetServerBaseUrl + "spriteSheets/magicalCharacters/baldric.png";
+const baldricIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/magicalCharacters/baldricIcon.png";
+const mage =
+  nginxAssetServerBaseUrl + "spriteSheets/magicalCharacters/mage.png";
+const mageIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/magicalCharacters/mageIcon.png";
+const musketCaptain =
+  nginxAssetServerBaseUrl + "spriteSheets/musketCaptain/musketCaptain.png";
+const musketCaptainIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/musketCaptain/musketCaptainIcon.png";
+const ninja = nginxAssetServerBaseUrl + "spriteSheets/ninja/ninja.png";
+const ninjaIcon = nginxAssetServerBaseUrl + "spriteSheets/ninja/ninjaIcon.png";
+const orc = nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/orc.png";
+const orcIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/orcIcon.png";
+const soldier =
+  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/soldier.png";
+const soldierIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/soldierIcon.png";
+const shieldMaiden =
+  nginxAssetServerBaseUrl + "spriteSheets/shieldMaiden/shieldMaiden.png";
+const shieldMaidenIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/shieldMaiden/shieldMaidenIcon.png";
+const bear = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/bear.png";
+const bearIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/bearIcon.png";
+const boar = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/boar.png";
+const boarIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/boarIcon.png";
+const deer = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/deer.png";
+const deerIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/deerIcon.png";
+const fox = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/fox.png";
+const foxIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/foxIcon.png";
+const rabbit = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/rabbit.png";
+const rabbitIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/rabbitIcon.png";
+const wolf = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/wolf.png";
+const wolfIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/wolfIcon.png";
 
 export const coreAnimations = ["walk", "idle"];
 
-export type SpriteAnimationsTypes = "run" | "walk" | "idle";
+export type SpriteAnimationsTypes =
+  | "run"
+  | "walk"
+  | "idle"
+  | "jump"
+  | "swim"
+  | "attack"
+  | "damaged"
+  | "die";
 export type CoreSpriteAnimationsTypes = "walk" | "idle";
 export type AltSpriteAnimationsTypes = "run";
 
@@ -147,39 +255,123 @@ export type LittleBuddiesTypes =
   | "whiteDemon"
   | "chicken"
   | "pig"
-  | "boar"
+  | "wildPig"
   | "bunny"
   | "redBat"
-  | "purpleBat";
+  | "purpleBat"
+  | "hero"
+  | "blackBeardDwarf"
+  | "blueDwarf"
+  | "greenDwarf"
+  | "lumberjackDwarf"
+  | "redBeardDwarf"
+  | "redDwarf"
+  | "goblinAssassin"
+  | "goblinGuard"
+  | "goblinLord"
+  | "goblinMage"
+  | "goblinPeasant"
+  | "goblinSamurai"
+  | "goblinSoldier"
+  | "knight"
+  | "baldric"
+  | "mage"
+  | "musketCaptain"
+  | "ninja"
+  | "orc"
+  | "soldier"
+  | "shieldMaiden"
+  | "bear"
+  | "boar"
+  | "deer"
+  | "fox"
+  | "rabbit"
+  | "wolf";
 
 export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
   {
-    horse: ["animal", "ride", "fast"],
-    poring: ["slime", "cute", "bouncy"],
-    toucan: ["bird", "colorful", "jungle"],
-    wasp: ["insect", "sting", "bug"],
-    leafBug: ["bug", "leaf", "green"],
-    skeleton: ["bones", "undead", "scary"],
-    blueBird: ["bird", "blue"],
-    greenBird: ["bird", "green"],
-    blackBird: ["bird", "black"],
-    whiteBird: ["bird", "white"],
-    sickBird: ["bird", "sick", "ill"],
-    deadBird: ["bird", "dead", "ghost"],
-    fireBird: ["bird", "fire", "flame", "red"],
-    flameBird: ["bird", "fire", "flame"],
-    technoBird: ["bird", "robot", "techno"],
-    redBird: ["bird", "red", "angry"],
-    rainbowBird: ["bird", "rainbow", "colorful"],
-    angel: ["holy", "wings", "heaven"],
-    redDemon: ["demon", "fire", "red", "evil"],
-    whiteDemon: ["demon", "white", "ghost", "evil"],
-    chicken: ["bird", "farm", "egg"],
-    pig: ["animal", "farm", "pink"],
-    boar: ["animal", "wild", "tusk"],
-    bunny: ["animal", "cute", "rabbit"],
-    redBat: ["animal", "bat"],
-    purpleBat: ["animal", "bat"],
+    horse: ["animal", "ride", "fast", "mane", "hoof", "stable"],
+    poring: ["slime", "cute", "bouncy", "jelly", "simple", "blob"],
+    toucan: ["bird", "colorful", "jungle", "beak", "tropical", "loud"],
+    wasp: ["insect", "sting", "bug", "buzz", "aggressive", "flying"],
+    leafBug: ["bug", "leaf", "green", "camouflage", "insect", "nature"],
+    skeleton: ["bones", "undead", "scary", "death", "dark", "grave"],
+    blueBird: ["bird", "blue", "sky", "chirp", "small"],
+    greenBird: ["bird", "green", "forest", "feathers", "perch"],
+    blackBird: ["bird", "black", "ominous", "feathers", "mystery"],
+    whiteBird: ["bird", "white", "pure", "light", "graceful"],
+    sickBird: ["bird", "sick", "ill", "weak", "infected"],
+    deadBird: ["bird", "dead", "ghost", "spirit", "haunted"],
+    fireBird: ["bird", "fire", "flame", "red", "phoenix", "burning"],
+    flameBird: ["bird", "fire", "flame", "embers", "hot"],
+    technoBird: ["bird", "robot", "techno", "mechanical", "cyber", "wires"],
+    redBird: ["bird", "red", "angry", "bright", "loud"],
+    rainbowBird: ["bird", "rainbow", "colorful", "magical", "vibrant"],
+    angel: ["holy", "wings", "heaven", "light", "divine", "halo"],
+    redDemon: ["demon", "fire", "red", "evil", "horns", "hell"],
+    whiteDemon: ["demon", "white", "ghost", "evil", "phantom", "curse"],
+    chicken: ["bird", "farm", "egg", "cluck", "feathers", "coop"],
+    pig: ["animal", "farm", "pink", "mud", "snout", "oink"],
+    wildPig: ["animal", "wild", "tusk", "boar", "aggressive", "forest"],
+    bunny: ["animal", "cute", "rabbit", "ears", "hop", "soft"],
+    redBat: ["animal", "bat", "red", "nocturnal", "fangs", "cave"],
+    purpleBat: ["animal", "bat", "purple", "dark", "night", "wings"],
+    hero: ["brave", "leader", "fighter", "savior", "quest", "legend"],
+    blackBeardDwarf: [
+      "dwarf",
+      "black beard",
+      "miner",
+      "axe",
+      "bearded",
+      "stout",
+    ],
+    blueDwarf: ["dwarf", "blue", "armor", "miner", "sturdy", "clan"],
+    greenDwarf: ["dwarf", "green", "earth", "miner", "tough", "nature"],
+    lumberjackDwarf: ["dwarf", "lumberjack", "axe", "trees", "strong", "plaid"],
+    redBeardDwarf: [
+      "dwarf",
+      "red beard",
+      "warrior",
+      "hammer",
+      "gruff",
+      "stout",
+    ],
+    redDwarf: ["dwarf", "red", "fiery", "stubborn", "mountain", "strong"],
+    goblinAssassin: [
+      "goblin",
+      "stealth",
+      "dagger",
+      "sneaky",
+      "shadow",
+      "quick",
+    ],
+    goblinGuard: ["goblin", "guard", "armor", "patrol", "shield", "watchful"],
+    goblinLord: ["goblin", "lord", "leader", "crown", "evil", "command"],
+    goblinMage: ["goblin", "mage", "magic", "spell", "robe", "arcane"],
+    goblinPeasant: [
+      "goblin",
+      "peasant",
+      "simple",
+      "weak",
+      "villager",
+      "common",
+    ],
+    goblinSamurai: ["goblin", "samurai", "katana", "armor", "honor", "warrior"],
+    goblinSoldier: ["goblin", "soldier", "weapon", "battle", "grunt", "army"],
+    knight: ["armor", "sword", "chivalry", "shield", "honor", "battle"],
+    baldric: ["armor", "sash", "noble", "fighter", "hero", "regal"],
+    mage: ["magic", "staff", "robe", "arcane", "spell", "mana"],
+    musketCaptain: ["gun", "captain", "military", "powder", "command", "aim"],
+    ninja: ["stealth", "shuriken", "black", "agile", "silent", "assassin"],
+    orc: ["orc", "green", "brute", "strong", "warrior", "rage"],
+    soldier: ["army", "battle", "uniform", "march", "weapon", "combat"],
+    shieldMaiden: ["shield", "female", "warrior", "viking", "brave", "armor"],
+    bear: ["animal", "forest", "strong", "claws", "growl", "fur"],
+    boar: ["animal", "tusk", "wild", "charge", "forest", "gruff"],
+    deer: ["animal", "graceful", "antlers", "forest", "swift", "nature"],
+    fox: ["animal", "clever", "red", "sly", "forest", "tail"],
+    rabbit: ["animal", "cute", "ears", "hop", "burrow", "soft"],
+    wolf: ["animal", "howl", "pack", "fur", "predator", "forest"],
   };
 
 export type MetaAnimation = {
@@ -212,9 +404,12 @@ export type SpriteMetadata = {
     };
     alt: {
       run?: MetaAnimation;
-      death?: MetaAnimation;
+      die?: MetaAnimation;
       speak?: MetaAnimation;
       jump?: MetaAnimation;
+      swim?: MetaAnimation;
+      attack?: MetaAnimation;
+      damaged?: MetaAnimation;
     };
   };
 };
@@ -278,7 +473,7 @@ export const spirteSheetsMeta: {
         walk: { core: [22, 23, 24, 25, 26, 27, 28], speed: 0.2 },
       },
       alt: {
-        death: {
+        die: {
           core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
           speed: 0.1,
         },
@@ -360,7 +555,7 @@ export const spirteSheetsMeta: {
     runSpeed: 0.3,
     rotatable: false,
     flipTextures: true,
-    pixelated: false,
+    pixelated: true,
     animations: {
       core: {
         idle: {
@@ -774,10 +969,10 @@ export const spirteSheetsMeta: {
       alt: {},
     },
   },
-  boar: {
-    title: "Boar",
-    url: boar,
-    iconUrl: boarIcon,
+  wildPig: {
+    title: "Wild pig",
+    url: wildPig,
+    iconUrl: wildPigIcon,
     frameHeight: 64,
     frameWidth: 64,
     walkSpeed: 0.2,
@@ -872,6 +1067,810 @@ export const spirteSheetsMeta: {
         },
       },
       alt: {},
+    },
+  },
+  hero: {
+    title: "Hero",
+    url: hero,
+    iconUrl: heroIcon,
+    frameHeight: 16,
+    frameWidth: 16,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [6, 7, 8, 9, 10, 11],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  blackBeardDwarf: {
+    title: "Black beard dwarf",
+    url: blackBeardDwarf,
+    iconUrl: blackBeardDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  blueDwarf: {
+    title: "Blue dwarf",
+    url: blueDwarf,
+    iconUrl: blueDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  greenDwarf: {
+    title: "Green dwarf",
+    url: greenDwarf,
+    iconUrl: greenDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  lumberjackDwarf: {
+    title: "Lumberjack dwarf",
+    url: lumberjackDwarf,
+    iconUrl: lumberjackDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  redBeardDwarf: {
+    title: "Red beard dwarf",
+    url: redBeardDwarf,
+    iconUrl: redBeardDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  redDwarf: {
+    title: "Red dwarf",
+    url: redDwarf,
+    iconUrl: redDwarfIcon,
+    frameHeight: 64,
+    frameWidth: 48,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [7],
+          speed: null,
+        },
+        walk: {
+          core: [3, 4, 5],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinAssassin: {
+    title: "Goblin assassin",
+    url: goblinAssassin,
+    iconUrl: goblinAssassinIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinGuard: {
+    title: "Goblin Guard",
+    url: goblinGuard,
+    iconUrl: goblinGuardIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinLord: {
+    title: "Goblin lord",
+    url: goblinLord,
+    iconUrl: goblinLordIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinMage: {
+    title: "Goblin mage",
+    url: goblinMage,
+    iconUrl: goblinMageIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinPeasant: {
+    title: "Goblin peasant",
+    url: goblinPeasant,
+    iconUrl: goblinPeasantIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinSamurai: {
+    title: "Goblin samurai",
+    url: goblinSamurai,
+    iconUrl: goblinSamuraiIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  goblinSoldier: {
+    title: "Goblin soldier",
+    url: goblinSoldier,
+    iconUrl: goblinSoldierIcon,
+    frameHeight: 64,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+        },
+        walk: {
+          core: [0, 1, 2, 3, 4, 5, 6],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  knight: {
+    title: "Knight",
+    url: knight,
+    iconUrl: knightIcon,
+    frameHeight: 80,
+    frameWidth: 120,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [64, 65, 66, 67],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [80, 81, 82, 83],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  baldric: {
+    title: "Baldric",
+    url: baldric,
+    iconUrl: baldricIcon,
+    frameHeight: 64,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [23],
+          speed: null,
+        },
+        walk: {
+          core: [9, 10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  mage: {
+    title: "Mage",
+    url: mage,
+    iconUrl: mageIcon,
+    frameHeight: 64,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [23],
+          speed: null,
+        },
+        walk: {
+          core: [9, 10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  musketCaptain: {
+    title: "Musket captain",
+    url: musketCaptain,
+    iconUrl: musketCaptainIcon,
+    frameHeight: 28,
+    frameWidth: 20,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [6, 7, 8, 9, 10, 11, 12, 13],
+          speed: 0.1125,
+        },
+      },
+      alt: {},
+    },
+  },
+  ninja: {
+    title: "Ninja",
+    url: ninja,
+    iconUrl: ninjaIcon,
+    frameHeight: 29,
+    frameWidth: 40,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2, 3],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [4, 5, 6, 7, 8, 9],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        jump: { core: [10, 11, 12, 13], speed: 0.1125 },
+        attack: { core: [14, 15, 16], speed: 0.1125 },
+        swim: { core: [17, 18, 19, 20, 21, 22], speed: 0.1125 },
+      },
+    },
+  },
+  orc: {
+    title: "Orc",
+    url: orc,
+    iconUrl: orcIcon,
+    frameHeight: 50,
+    frameWidth: 50,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2, 3, 4],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [5, 6, 7, 8, 9, 10, 11, 12],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        attack: {
+          core: [13, 14, 15, 16, 17, 18, 19],
+          speed: 0.1125,
+        },
+        damaged: {
+          core: [27, 28, 29],
+          speed: 0.1125,
+        },
+        die: {
+          core: [30, 31, 32, 33],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  soldier: {
+    title: "Soldier",
+    url: soldier,
+    iconUrl: soldierIcon,
+    frameHeight: 60,
+    frameWidth: 60,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2, 3, 4],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [5, 6, 7, 8, 9, 10, 11, 12, 13],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        attack: {
+          core: [14, 15, 16, 17, 18, 19],
+          speed: 0.1125,
+        },
+        damaged: {
+          core: [36, 37, 38],
+          speed: 0.1125,
+        },
+        die: {
+          core: [39, 40, 41, 42],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  shieldMaiden: {
+    title: "Shield maiden",
+    url: shieldMaiden,
+    iconUrl: shieldMaidenIcon,
+    frameHeight: 29,
+    frameWidth: 40,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [3, 4, 5, 6],
+          speed: 0.1125,
+        },
+        walk: {
+          core: [13, 14, 15, 16, 17, 18],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        jump: {
+          core: [6, 7, 8, 9, 10, 11],
+          speed: 0.1125,
+        },
+        swim: {
+          core: [19, 20, 21, 22, 23, 24],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  bear: {
+    title: "Bear",
+    url: bear,
+    iconUrl: bearIcon,
+    frameHeight: 33,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            sniff: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [12, 13, 14, 15, 16, 17, 18, 19],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [20, 21, 22, 23, 24],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  boar: {
+    title: "Boar",
+    url: boar,
+    iconUrl: boarIcon,
+    frameHeight: 40,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            tailWag: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [8, 9, 10, 11, 12, 13, 14, 15],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [16, 17, 18, 19, 20, 21],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  deer: {
+    title: "Deer",
+    url: deer,
+    iconUrl: deerIcon,
+    frameHeight: 52,
+    frameWidth: 72,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            graze: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  fox: {
+    title: "Fox",
+    url: fox,
+    iconUrl: foxIcon,
+    frameHeight: 36,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.15,
+        },
+        walk: {
+          core: [6, 7, 8, 9, 10, 11, 12, 13],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [14, 15, 16, 17, 18, 19],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  rabbit: {
+    title: "Rabbit",
+    url: rabbit,
+    iconUrl: rabbitIcon,
+    frameHeight: 26,
+    frameWidth: 32,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            sniff: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [20, 21, 22, 23, 24, 25],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  wolf: {
+    title: "Wolf",
+    url: wolf,
+    iconUrl: wolfIcon,
+    frameHeight: 40,
+    frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
     },
   },
 };

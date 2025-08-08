@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useEffectsContext } from "../../context/effectsContext/EffectsContext";
 import { AudioEffectTypes } from "../../../../universal/effectsTypeConstant";
 import FgButton from "../../elements/fgButton/FgButton";

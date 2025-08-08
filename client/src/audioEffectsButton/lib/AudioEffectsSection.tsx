@@ -12,10 +12,10 @@ import { audioEffectTemplates } from "./typeConstant";
 import { IncomingMediasoupMessages } from "../../serverControllers/mediasoupServer/lib/typeConstant";
 import LazyScrollingContainer from "../../elements/lazyScrollingContainer/LazyScrollingContainer";
 
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
-
 import VolumeSVG from "../../elements/fgVolumeElement/lib/VolumeSVG";
 import volumeSVGPaths from "../../elements/fgVolumeElement/lib/volumeSVGPaths";
+
+const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 const mixAudioEffectsIcon =
   nginxAssetServerBaseUrl + "svgs/audioEffects/mixAudioEffectsIcon.svg";

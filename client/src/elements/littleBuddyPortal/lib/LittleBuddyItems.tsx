@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSignalContext } from "../../../context/signalContext/SignalContext";
 import FgButton from "../../fgButton/FgButton";
 import FgImageElement from "../../fgImageElement/FgImageElement";
@@ -7,8 +7,6 @@ import {
   LittleBuddiesTypes,
   spirteSheetsMeta,
 } from "../../../tableBabylon/littleBuddies/lib/typeConstant";
-
-const nginxAssetServerBaseUrl = process.env.NGINX_ASSET_SERVER_BASE_URL;
 
 export type MediaListenerTypes =
   | { type: "downloadComplete" }
@@ -34,15 +32,41 @@ export default function LittleBuddyItems({
   setDragging: React.Dispatch<React.SetStateAction<boolean>>;
   setExternalRerender: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { sendNewInstanceSignal } = useSignalContext();
-
-  const littleBuddyMeta = spirteSheetsMeta[littleBuddy];
+  const { sendPlaceLittleBuddySignal } = useSignalContext();
 
   const [_, setRerender] = useState(false);
+  const littleBuddyMeta = useRef(spirteSheetsMeta[littleBuddy]);
   const aspectRatio = useRef(
-    littleBuddyMeta.frameWidth / littleBuddyMeta.frameHeight,
+    littleBuddyMeta.current.frameWidth / littleBuddyMeta.current.frameHeight,
   );
+  const littleBuddyRef = useRef(littleBuddy);
   const perserveSelected = useRef(false);
+
+  useEffect(() => {
+    littleBuddyRef.current = littleBuddy;
+    littleBuddyMeta.current = spirteSheetsMeta[littleBuddy];
+    aspectRatio.current =
+      littleBuddyMeta.current.frameWidth / littleBuddyMeta.current.frameHeight;
+    setRerender((prev) => !prev);
+  }, [littleBuddy]);
+
+  const handleClick = () => {
+    if (perserveSelected.current) {
+      perserveSelected.current = false;
+      return;
+    }
+
+    selected.current =
+      selected.current?.littleBuddy === littleBuddyRef.current
+        ? undefined
+        : {
+            littleBuddy: littleBuddyRef.current,
+            aspect: aspectRatio.current,
+          };
+
+    setRerender((prev) => !prev);
+    setExternalRerender((prev) => !prev);
+  };
 
   return (
     <div
@@ -54,54 +78,29 @@ export default function LittleBuddyItems({
           <FgImageElement
             className={`${selected.current?.littleBuddy === littleBuddy ? "border-fg-red" : "border-transparent"} ${aspectRatio.current > 1 ? "w-full" : "h-full"} overflow-hidden rounded border-3 object-contain hover:border-fg-red`}
             imageClassName={`${aspectRatio.current > 1 ? "!w-full !h-auto" : "!h-full !w-auto"} object-contain`}
-            src={littleBuddyMeta.iconUrl}
-            alt={littleBuddyMeta.title}
+            src={littleBuddyMeta.current.iconUrl}
+            alt={littleBuddyMeta.current.title}
             style={{
-              imageRendering: littleBuddyMeta.pixelated
+              imageRendering: littleBuddyMeta.current.pixelated
                 ? "pixelated"
                 : undefined,
             }}
           />
         )}
-        clickFunction={() => {
-          if (perserveSelected.current) {
-            perserveSelected.current = false;
-            return;
-          }
-
-          selected.current =
-            selected.current?.littleBuddy === littleBuddy
-              ? undefined
-              : {
-                  littleBuddy,
-                  aspect: aspectRatio.current,
-                };
-
-          setRerender((prev) => !prev);
-          setExternalRerender((prev) => !prev);
-        }}
+        clickFunction={handleClick}
         startDragFunction={() => {
           setDragging(true);
 
           setRerender((prev) => !prev);
 
-          sendNewInstanceSignal({
-            type: "instancesLayerMode",
-            data: {
-              mode: "standard",
-            },
-          });
-
           if (!selected.current) return;
 
-          sendNewInstanceSignal({
-            type: "startInstancesDrag",
+          sendPlaceLittleBuddySignal({
+            type: "startPlaceLittleBuddyDrag",
             data: {
-              instance: {
-                littleBuddy: selected.current.littleBuddy,
-                height: 15,
-                width: 15 * selected.current.aspect,
-              },
+              littleBuddy: selected.current.littleBuddy,
+              height: 15,
+              width: 15 * selected.current.aspect,
             },
           });
         }}
@@ -110,20 +109,13 @@ export default function LittleBuddyItems({
 
           perserveSelected.current = true;
 
-          sendNewInstanceSignal({
-            type: "instancesLayerMode",
-            data: {
-              mode: "standard",
-            },
-          });
-
-          sendNewInstanceSignal({
-            type: "stopInstancesDrag",
+          sendPlaceLittleBuddySignal({
+            type: "stopPlaceLittleBuddyDrag",
           });
         }}
         hoverContent={
           <FgHoverContentStandard
-            content={littleBuddyMeta.title}
+            content={littleBuddyMeta.current.title}
             style="light"
           />
         }

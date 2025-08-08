@@ -126,9 +126,10 @@ export default function TabledPortal({
             className={`${advanced ? "flex-row-reverse" : "flex-col"} flex h-[80%] w-[80%] items-center justify-center overflow-hidden rounded-md border-2 border-fg-off-white bg-fg-tone-black-6`}
           >
             <div
-              className={`${advanced ? "h-full" : ""} flex grow flex-col`}
+              className="flex flex-col"
               style={{
                 width: advanced ? "calc(100% - 14.5rem)" : "100%",
+                height: advanced ? "100%" : "calc(100% - 5.25rem)",
               }}
             >
               <ScrollingContainer

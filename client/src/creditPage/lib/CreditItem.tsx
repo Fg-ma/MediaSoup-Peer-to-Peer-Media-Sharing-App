@@ -17,13 +17,20 @@ export default function CreditItem({
   hoverContent: string;
 }) {
   return (
-    <div className="flex h-8 items-center justify-start space-x-4 pl-[2%]">
+    <div className="flex h-max items-center justify-start space-x-4 pl-[2%] pr-8">
       <FgButton
+        className="flex items-center justify-start"
         clickFunction={() => {
           window.open(link, "_blank");
         }}
         contentFunction={() => (
-          <div className="font-K2D text-xl text-fg-white">{content}</div>
+          <div className="flex items-center justify-center text-left align-middle font-K2D text-xl text-fg-white">
+            <span className="mr-2 text-4xl font-bold text-fg-red-light">
+              {" "}
+              -{" "}
+            </span>
+            {content}
+          </div>
         )}
         hoverContent={
           <FgHoverContentStandard
@@ -44,7 +51,7 @@ export default function CreditItem({
         options={{ hoverSpacing: 4, hoverTimeoutDuration: 1500 }}
       />
       <FgButton
-        className="flex aspect-square h-full items-center justify-center rounded-full bg-fg-red-light"
+        className="flex aspect-square h-8 items-center justify-center rounded-full bg-fg-red-light"
         clickFunction={() => {
           window.open(link, "_blank");
         }}

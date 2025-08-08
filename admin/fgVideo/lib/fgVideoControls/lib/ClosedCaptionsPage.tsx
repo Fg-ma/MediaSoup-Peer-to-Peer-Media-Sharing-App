@@ -167,9 +167,9 @@ export default function ClosedCaptionsPage({
   };
 
   return (
-    <div className='w-full h-full flex flex-col justify-center items-center space-y-2'>
-      <div className='h-6 w-full flex justify-between'>
-        <div className='w-full flex space-x-1'>
+    <div className='flex w-full h-full flex-col justify-center items-center space-y-2'>
+      <div className='flex h-6 w-full justify-between'>
+        <div className='flex w-full space-x-1'>
           <FgButton
             className='h-full aspect-square'
             contentFunction={() => (
@@ -215,7 +215,7 @@ export default function ClosedCaptionsPage({
             <FgButton
               className='flex items-center justify-center grow'
               contentFunction={() => (
-                <div className='w-full bg-opacity-75 px-2 flex items-start'>
+                <div className='flex w-full bg-opacity-75 px-2 items-start'>
                   {lang}
                 </div>
               )}
@@ -226,7 +226,7 @@ export default function ClosedCaptionsPage({
               }
             />
             <FgButton
-              className='w-max flex items-center justify-center'
+              className='flex w-max items-center justify-center'
               contentFunction={() => (
                 <div className='w-full bg-opacity-75 px-2'>(AG)</div>
               )}
@@ -262,7 +262,7 @@ export default function ClosedCaptionsPage({
                 <FgButton
                   className='flex items-center justify-center grow'
                   contentFunction={() => (
-                    <div className='w-full bg-opacity-75 px-2 flex items-start'>
+                    <div className='flex w-full bg-opacity-75 px-2 items-start'>
                       {lang}
                     </div>
                   )}
@@ -273,7 +273,7 @@ export default function ClosedCaptionsPage({
                   }
                 />
                 <FgButton
-                  className='w-max flex items-center justify-center'
+                  className='flex w-max items-center justify-center'
                   contentFunction={() => (
                     <div className='w-full bg-opacity-75 px-2'>(AG)</div>
                   )}
@@ -310,7 +310,7 @@ export default function ClosedCaptionsPage({
                 <FgButton
                   className='flex items-center justify-center grow'
                   contentFunction={() => (
-                    <div className='w-full bg-opacity-75 px-2 flex items-start'>
+                    <div className='flex w-full bg-opacity-75 px-2 items-start'>
                       {lang}
                     </div>
                   )}
@@ -321,7 +321,7 @@ export default function ClosedCaptionsPage({
                   }
                 />
                 <FgButton
-                  className='w-max flex items-center justify-center'
+                  className='flex w-max items-center justify-center'
                   contentFunction={() => (
                     <div className='w-full bg-opacity-75 px-2'>(AG)</div>
                   )}
@@ -345,7 +345,7 @@ export default function ClosedCaptionsPage({
           )}
         <FgButton
           contentFunction={() => (
-            <div className='w-full bg-opacity-75 px-2 flex items-start hover:bg-gray-400 rounded'>
+            <div className='flex w-full bg-opacity-75 px-2 items-start hover:bg-gray-400 rounded'>
               {moreActive ? "Less..." : "More..."}
             </div>
           )}
