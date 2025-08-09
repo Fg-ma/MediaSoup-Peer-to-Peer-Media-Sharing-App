@@ -185,6 +185,111 @@ const rabbitIcon =
 const wolf = nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/wolf.png";
 const wolfIcon =
   nginxAssetServerBaseUrl + "spriteSheets/wildAnimals/wolfIcon.png";
+const beetle = nginxAssetServerBaseUrl + "spriteSheets/beetle/beetle.png";
+const beetleIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/beetle/beetleIcon.png";
+const armedBones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/armedBones.png";
+const armedBonesIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/armedBonesIcon.png";
+const bones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/bones.png";
+const bonesIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/bonesIcon.png";
+const eyeBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/eyeBat.png";
+const eyeBatIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/eyeBatIcon.png";
+const fang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/fang.png";
+const fangIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/fangIcon.png";
+const  giant= nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/giant.png";
+const giantIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/giantIcon.png";
+const goo = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/goo.png";
+const gooIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/gooIcon.png";
+const hoodfang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hoodfang.png";
+const hoodfangIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hoodfangIcon.png";
+const horns = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/horns.png";
+const hornsIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hornsIcon.png";
+const spider = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/spider.png";
+const spiderIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/spiderIcon.png";
+const vampireBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/vampireBat.png";
+const vampireBatIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/vampireBatIcon.png";
+const cow = nginxAssetServerBaseUrl + "spriteSheets/cow/cow.png";
+const cowIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/cow/cowIcon.png";
+const fly = nginxAssetServerBaseUrl + "spriteSheets/fly/fly.png";
+const flyIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/fly/flyIcon.png";
+const frogman = nginxAssetServerBaseUrl + "spriteSheets/frogman/frogman.png";
+const frogmanIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/frogman/frogmanIcon.png";
+const gumBotBlue = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotBlue.png";
+const gumBotBlueIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotBlueIcon.png";
+const gumBotGreen = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotGreen.png";
+const gumBotGreenIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotGreenIcon.png";
+const gumBotPink = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotPink.png";
+const gumBotPinkIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotPinkIcon.png";
+const gumBotRed = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotRed.png";
+const gumBotRedIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotRedIcon.png";
+const llama = nginxAssetServerBaseUrl + "spriteSheets/llama/llama.png";
+const llamaIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/llama/llamaIcon.png";
+const bee = nginxAssetServerBaseUrl + "spriteSheets/monsters/bee.png";
+const beeIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/beeIcon.png";
+const eyeball = nginxAssetServerBaseUrl + "spriteSheets/monsters/eyeball.png";
+const eyeballIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/eyeballIcon.png";
+const ghost = nginxAssetServerBaseUrl + "spriteSheets/monsters/ghost.png";
+const ghostIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/ghostIcon.png";
+const manEatingFlower = nginxAssetServerBaseUrl + "spriteSheets/monsters/manEatingFlower.png";
+const manEatingFlowerIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/manEatingFlowerIcon.png";
+const pumpking = nginxAssetServerBaseUrl + "spriteSheets/monsters/pumpking.png";
+const pumpkingIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/pumpkingIcon.png";
+const pirateCaptain = nginxAssetServerBaseUrl + "spriteSheets/pirates/pirateCaptain.png";
+const pirateCaptainIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/pirates/pirateCaptainIcon.png";
+const sheep = nginxAssetServerBaseUrl + "spriteSheets/sheep/sheep.png";
+const sheepIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/sheep/sheepIcon.png";
+const blueSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/blueSlime.png";
+const blueSlimeIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/slimes/blueSlimeIcon.png";
+const greenSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/greenSlime.png";
+const greenSlimeIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/slimes/greenSlimeIcon.png";
+const limeSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/limeSlime.png";
+const limeSlimeIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/slimes/limeSlimeIcon.png";
+const pinkSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/pinkSlime.png";
+const pinkSlimeIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/slimes/pinkSlimeIcon.png";
+const wizard = nginxAssetServerBaseUrl + "spriteSheets/wizard/wizard.png";
+const wizardIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/wizard/wizardIcon.png";
+const bloodyZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/bloodyZombie.png";
+const bloodyZombieIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/bloodyZombieIcon.png";
+const headlessZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/headlessZombie.png";
+const headlessZombieIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/headlessZombieIcon.png";
+const rottingZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/rottingZombie.png";
+const rottingZombieIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/rottingZombieIcon.png";
+const zombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/zombie.png";
+const zombieIcon =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/zombieIcon.png";
 
 export const coreAnimations = ["walk", "idle"];
 
@@ -286,7 +391,42 @@ export type LittleBuddiesTypes =
   | "deer"
   | "fox"
   | "rabbit"
-  | "wolf";
+  | "wolf"
+  | "beetle"
+  | "armedBones"
+  | "bones"
+  | "eyeBat"
+  | "fang"
+  | "giant"
+  | "goo"
+  | "hoodfang"
+  | "horns"
+  | "spider"
+  | "vampireBat"
+  | "cow"
+  | "fly"
+  | "frogman"
+  | "gumBotBlue"
+  | "gumBotGreen"
+  | "gumBotPink"
+  | "gumBotRed"
+  | "llama"
+  | "bee"
+  | "eyeball"
+  | "ghost"
+  | "manEatingFlower"
+  | "pumpking"
+  | "pirateCaptain"
+  | "sheep"
+  | "blueSlime"
+  | "greenSlime"
+  | "limeSlime"
+  | "pinkSlime"
+  | "wizard"
+  | "bloodyZombie"
+  | "headlessZombie"
+  | "rottingZombie"
+  | "zombie";
 
 export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
   {
@@ -372,6 +512,41 @@ export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
     fox: ["animal", "clever", "red", "sly", "forest", "tail"],
     rabbit: ["animal", "cute", "ears", "hop", "burrow", "soft"],
     wolf: ["animal", "howl", "pack", "fur", "predator", "forest"],
+    beetle: ["insect", "shell", "hard", "antennae", "crawl", "bug"],
+    armedBones: ["skeleton", "armor", "undead", "weapon", "bones", "warrior"],
+    bones: ["skeleton", "bones", "undead", "grave", "spooky", "death"],
+    eyeBat: ["bat", "eye", "flying", "creepy", "night", "monster"],
+    fang: ["tooth", "sharp", "bite", "predator", "beast", "danger"],
+    giant: ["huge", "tall", "strength", "monster", "colossus", "big"],
+    goo: ["slime", "sticky", "blob", "gelatinous", "ooze", "gross"],
+    hoodfang: ["wolf", "hood", "fangs", "predator", "mystery", "dark"],
+    horns: ["horns", "beast", "ram", "charge", "animal", "headbutt"],
+    spider: ["arachnid", "web", "eight legs", "crawl", "creepy", "fangs"],
+    vampireBat: ["bat", "vampire", "fangs", "blood", "night", "nocturnal"],
+    cow: ["animal", "farm", "milk", "moo", "pasture", "bovine"],
+    fly: ["insect", "wings", "buzz", "small", "pest", "air"],
+    frogman: ["amphibian", "frog", "humanoid", "swamp", "leap", "green"],
+    gumBotBlue: ["robot", "blue", "gum", "machine", "mechanical", "toy"],
+    gumBotGreen: ["robot", "green", "gum", "machine", "mechanical", "toy"],
+    gumBotPink: ["robot", "pink", "gum", "machine", "mechanical", "toy"],
+    gumBotRed: ["robot", "red", "gum", "machine", "mechanical", "toy"],
+    llama: ["animal", "wool", "spit", "mountain", "long neck", "pack"],
+    bee: ["insect", "hive", "honey", "sting", "buzz", "yellow"],
+    eyeball: ["eye", "floating", "creepy", "monster", "gaze", "pupil"],
+    ghost: ["spirit", "haunted", "invisible", "ethereal", "specter", "spooky"],
+    manEatingFlower: ["plant", "carnivorous", "teeth", "trap", "jungle", "danger"],
+    pumpking: ["pumpkin", "king", "halloween", "vine", "gourd", "scary"],
+    pirateCaptain: ["pirate", "captain", "ship", "treasure", "sword", "sea"],
+    sheep: ["animal", "wool", "farm", "flock", "baa", "pasture"],
+    blueSlime: ["slime", "blue", "blob", "jelly", "cute", "bounce"],
+    greenSlime: ["slime", "green", "blob", "jelly", "goo", "bounce"],
+    limeSlime: ["slime", "lime", "blob", "jelly", "goo", "springy"],
+    pinkSlime: ["slime", "pink", "blob", "jelly", "cute", "bounce"],
+    wizard: ["magic", "staff", "robe", "spell", "arcane", "sage"],
+    bloodyZombie: ["zombie", "blood", "undead", "gore", "horror", "rotting"],
+    headlessZombie: ["zombie", "headless", "undead", "scary", "decapitated", "horror"],
+    rottingZombie: ["zombie", "rotting", "decay", "undead", "smelly", "horror"],
+    zombie: ["zombie", "undead", "scary", "horror", "monster", "grave"],
   };
 
 export type MetaAnimation = {
@@ -933,11 +1108,18 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [10],
+          core: [8],
           speed: null,
+          alt: {
+            eat: {
+              animation: [20, 21, 23, 24],
+              loop: false,
+              speed: 0.15,
+            },
+          },
         },
         walk: {
-          core: [9, 10, 11],
+          core: [4, 5, 6, 7],
           speed: 0.1375,
         },
       },
@@ -958,11 +1140,18 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [10],
+          core: [8],
           speed: null,
+          alt: {
+            eat: {
+              animation: [20, 21, 23, 24],
+              loop: false,
+              speed: 0.15,
+            },
+          },
         },
         walk: {
-          core: [9, 10, 11],
+          core: [4, 5, 6, 7],
           speed: 0.1375,
         },
       },
@@ -1842,6 +2031,1267 @@ export const spirteSheetsMeta: {
     iconUrl: wolfIcon,
     frameHeight: 40,
     frameWidth: 64,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },
+  beetle: {
+    title: "Beetle",
+    url: beetle,
+    iconUrl: beetleIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },armedBones: {
+    title: "Armed bones",
+    url: armedBones,
+    iconUrl: armedBonesIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },bones: {
+    title: "Bones",
+    url: bones,
+    iconUrl: bonesIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },eyeBat: {
+    title: "Eyeball bat",
+    url: eyeBat,
+    iconUrl: eyeBatIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },fang: {
+    title: "Fang",
+    url: fang,
+    iconUrl: fangIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },giant: {
+    title: "Giant",
+    url: giant,
+    iconUrl: giantIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },goo: {
+    title: "Goo",
+    url: goo,
+    iconUrl: gooIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },hoodfang: {
+    title: "Hoodfang",
+    url: hoodfang,
+    iconUrl: hoodfangIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },horns: {
+    title: "Horns",
+    url: horns,
+    iconUrl: hornsIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },spider: {
+    title: "Spider",
+    url: spider,
+    iconUrl: spiderIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },vampireBat: {
+    title: "Vampire bat",
+    url: vampireBat,
+    iconUrl: vampireBatIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },cow: {
+    title: "Cow",
+    url: cow,
+    iconUrl: cowIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },fly: {
+    title: "Fly",
+    url: fly,
+    iconUrl: flyIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },frogman: {
+    title: "Frogman",
+    url: frogman,
+    iconUrl: frogmanIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },gumBotBlue: {
+    title: "Gum bot - blue",
+    url: gumBotBlue,
+    iconUrl: gumBotBlueIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },gumBotGreen: {
+    title: "Gum bot - green",
+    url: gumBotGreen,
+    iconUrl: gumBotGreenIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },gumBotPink: {
+    title: "Gum bot - pink",
+    url: gumBotPink,
+    iconUrl: gumBotPinkIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },gumBotRed: {
+    title: "Gum bot - red",
+    url: gumBotRed,
+    iconUrl: gumBotRedIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },llama: {
+    title: "Llama",
+    url: llama,
+    iconUrl: llamaIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },bee: {
+    title: "Bee",
+    url: bee,
+    iconUrl: beeIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },eyeball: {
+    title: "Eyeball",
+    url: eyeball,
+    iconUrl: eyeballIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },ghost: {
+    title: "Ghost",
+    url: ghost,
+    iconUrl: ghostIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },manEatingFlower: {
+    title: "Man eating flower",
+    url: manEatingFlower,
+    iconUrl: manEatingFlowerIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },pumpking: {
+    title: "Pumpking",
+    url: pumpking,
+    iconUrl: pumpkingIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },pirateCaptain: {
+    title: "Pirate captain",
+    url: pirateCaptain,
+    iconUrl: pirateCaptainIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },sheep: {
+    title: "Sheep",
+    url: sheep,
+    iconUrl: sheepIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },blueSlime: {
+    title: "Blue slime",
+    url: blueSlime,
+    iconUrl: blueSlimeIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },greenSlime: {
+    title: "Green slime",
+    url: greenSlime,
+    iconUrl: greenSlimeIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },limeSlime: {
+    title: "Lime slime",
+    url: limeSlime,
+    iconUrl: limeSlimeIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },pinkSlime: {
+    title: "Pink slime",
+    url: pinkSlime,
+    iconUrl: pinkSlimeIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },wizard: {
+    title: "Wizard",
+    url: wizard,
+    iconUrl: wizardIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },bloodyZombie: {
+    title: "Bloody zombie",
+    url: bloodyZombie,
+    iconUrl: bloodyZombieIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },headlessZombie: {
+    title: "Headless zombie",
+    url: headlessZombie,
+    iconUrl: headlessZombieIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },rottingZombie: {
+    title: "Rotting zombie",
+    url: rottingZombie,
+    iconUrl: rottingZombieIcon,
+    frameHeight: ,
+    frameWidth: ,
+    walkSpeed: 0.2,
+    runSpeed: 0.3,
+    rotatable: false,
+    flipTextures: false,
+    pixelated: true,
+    animations: {
+      core: {
+        idle: {
+          core: [0],
+          speed: null,
+          alt: {
+            howl: {
+              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+              loop: false,
+              speed: 0.15,
+            },
+          },
+        },
+        walk: {
+          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          speed: 0.1125,
+        },
+      },
+      alt: {
+        run: {
+          core: [18, 19, 20, 21, 22, 23],
+          speed: 0.1125,
+        },
+      },
+    },
+  },zombie: {
+    title: "Zombie",
+    url: zombie,
+    iconUrl: zombieIcon,
+    frameHeight: ,
+    frameWidth: ,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,

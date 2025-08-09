@@ -6,17 +6,10 @@ https://opengameart.org/content/bad-company-assorted-military-thugs-universal-pr
 *** https://www.kenney.nl/assets/category:2D?sort=update
 
 
-
-
-
-
-
-
-https://opengameart.org/node/11629 - animals
-https://opengameart.org/content/animated-slime - slime
-https://opengameart.org/content/lpc-beetle - beetle
-https://opengameart.org/content/animated-wizard - wizard
-https://opengameart.org/node/82939 - zombies
-https://opengameart.org/content/happy-fly-enemy-game-character - fly
-https://opengameart.org/content/lpc-frogman - frog man
-https://opengameart.org/content/sailors-pirates - Pirate / Sailor
+https://opengameart.org/content/ships-with-ripple-effect - ship
+https://opengameart.org/content/space-game-art-pack-extended - space
+https://opengameart.org/content/space-ship-building-bits-volume-1 - space ships
+https://opengameart.org/content/lpc-medieval-village-decorations - medieval
+https://opengameart.org/content/lpc-crops - crops
+https://opengameart.org/content/lpc-terrains - terrrain
+https://opengameart.org/content/16-planet-sprites - planets
