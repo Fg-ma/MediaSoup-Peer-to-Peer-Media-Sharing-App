@@ -156,13 +156,13 @@ const musketCaptainIcon =
   nginxAssetServerBaseUrl + "spriteSheets/musketCaptain/musketCaptainIcon.png";
 const ninja = nginxAssetServerBaseUrl + "spriteSheets/ninja/ninja.png";
 const ninjaIcon = nginxAssetServerBaseUrl + "spriteSheets/ninja/ninjaIcon.png";
-const orc = nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/orc.png";
+const orc = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters1/orc.png";
 const orcIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/orcIcon.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters1/orcIcon.png";
 const soldier =
-  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/soldier.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters1/soldier.png";
 const soldierIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/RPGCharacters/soldierIcon.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters1/soldierIcon.png";
 const shieldMaiden =
   nginxAssetServerBaseUrl + "spriteSheets/shieldMaiden/shieldMaiden.png";
 const shieldMaidenIcon =
@@ -188,36 +188,36 @@ const wolfIcon =
 const beetle = nginxAssetServerBaseUrl + "spriteSheets/beetle/beetle.png";
 const beetleIcon =
   nginxAssetServerBaseUrl + "spriteSheets/beetle/beetleIcon.png";
-const armedBones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/armedBones.png";
+const armedBones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/armedBones.png";
 const armedBonesIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/armedBonesIcon.png";
-const bones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/bones.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/armedBonesIcon.png";
+const bones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bones.png";
 const bonesIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/bonesIcon.png";
-const eyeBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/eyeBat.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bonesIcon.png";
+const eyeBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBat.png";
 const eyeBatIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/eyeBatIcon.png";
-const fang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/fang.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBatIcon.png";
+const fang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fang.png";
 const fangIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/fangIcon.png";
-const  giant= nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/giant.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fangIcon.png";
+const  giant= nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giant.png";
 const giantIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/giantIcon.png";
-const goo = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/goo.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giantIcon.png";
+const goo = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/goo.png";
 const gooIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/gooIcon.png";
-const hoodfang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hoodfang.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/gooIcon.png";
+const hoodfang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hoodfang.png";
 const hoodfangIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hoodfangIcon.png";
-const horns = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/horns.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hoodfangIcon.png";
+const horns = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/horns.png";
 const hornsIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/hornsIcon.png";
-const spider = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/spider.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hornsIcon.png";
+const spider = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spider.png";
 const spiderIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/spiderIcon.png";
-const vampireBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/vampireBat.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spiderIcon.png";
+const vampireBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/vampireBat.png";
 const vampireBatIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters/vampireBatIcon.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/vampireBatIcon.png";
 const cow = nginxAssetServerBaseUrl + "spriteSheets/cow/cow.png";
 const cowIcon =
   nginxAssetServerBaseUrl + "spriteSheets/cow/cowIcon.png";
