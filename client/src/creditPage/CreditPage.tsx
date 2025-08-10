@@ -23,7 +23,7 @@ export default function CreditPage() {
         contentContainerClassName="hide-scroll-bar w-screen h-screen flex flex-col space-y-[0.5%] p-[2%] overflow-y-auto overflow-x-hidden bg-fg-tone-black-2 items-center justify-start"
         content={
           <>
-            <div className="relative flex w-full items-center justify-center font-Josefin text-4xl text-fg-white">
+            <div className="flex relative w-full items-center justify-center font-Josefin text-4xl text-fg-white">
               Credit where credit is due
               <FgButton
                 className="absolute bottom-0 right-[5%] aspect-square h-12"
@@ -639,33 +639,33 @@ export default function CreditPage() {
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Black beard dwarf"'
-                    hoverContent='Sprite "Black beard dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Black beard dwarf"'
+                    hoverContent='Sprite "Black beard dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Blue dwarf"'
-                    hoverContent='Sprite "Blue dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Blue dwarf"'
+                    hoverContent='Sprite "Blue dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Green dwarf"'
-                    hoverContent='Sprite "Green dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Green dwarf"'
+                    hoverContent='Sprite "Green dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Lumberjack dwarf"'
-                    hoverContent='Sprite "Lumberjack dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Lumberjack dwarf"'
+                    hoverContent='Sprite "Lumberjack dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Red beard dwarf"'
-                    hoverContent='Sprite "Red beard dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Red beard dwarf"'
+                    hoverContent='Sprite "Red beard dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/dwarves-0"
-                    content='AntumDeluge - "Dwarves" used as "Red dwarf"'
-                    hoverContent='Sprite "Red dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                    content='AntumDeluge, Svetlana Kushnariova (Cabbit), diamonddmgirl, and GrumpyDiamond - "Dwarves" used as "Red dwarf"'
+                    hoverContent='Sprite "Red dwarf" -> This sprite is based on "Dwarves" by AntumDeluge (https://opengameart.org/users/antumdeluge); Svetlana Kushnariova (Cabbit) <lana-chan@yandex.ru> (https://opengameart.org/users/Cabbit); diamonddmgirl (https://opengameart.org/users/diamonddmgirl); and GrumpyDiamond (https://opengameart.org/users/GrumpyDiamond), originally available at https://opengameart.org/content/dwarves-0. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                   <CreditItem
                     link="https://opengameart.org/content/goblin-corps-mv-platformer-set"
@@ -771,6 +771,182 @@ export default function CreditPage() {
                     link="https://opengameart.org/content/animated-wild-animals"
                     content='ScratchIO - "Animated Wild Animals" used as "Wolf"'
                     hoverContent='Sprite "Wolf" -> This sprite is based on "Animated Wild Animals" by ScratchIO (https://opengameart.org/users/scratchio), originally available at https://opengameart.org/content/animated-wild-animals. Licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-beetle"
+                    content='Redshrike - "LPC beetle" used as "Beetle"'
+                    hoverContent='Sprite "Beetle" -> This sprite is based on "LPC beetle" by Redshrike (https://opengameart.org/users/redshrike), originally available at https://opengameart.org/content/lpc-beetle. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also CC-BY-SA-3.0, GPL-2.0, and OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Armed bones"'
+                    hoverContent='Sprite "Armed bones" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.
+'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Bones"'
+                    hoverContent='Sprite "Bones" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Eyeball bat"'
+                    hoverContent='Sprite "Eyeball bat" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Fang"'
+                    hoverContent='Sprite "Fang" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Giant"'
+                    hoverContent='Sprite "Giant" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Goo"'
+                    hoverContent='Sprite "Goo" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Hoodfang"'
+                    hoverContent='Sprite "Hoodfang" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Horns"'
+                    hoverContent='Sprite "Horns" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Spider"'
+                    hoverContent='Sprite "Spider" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/overhead-action-rpg-characters"
+                    content='LUNARSIGNALS - "Overhead Action RPG Characters" used as "Vampire bat"'
+                    hoverContent='Sprite "Vampire bat" -> This sprite is based on "Overhead Action RPG Characters" by LUNARSIGNALS (https://opengameart.org/users/lunarsignals), originally available at https://opengameart.org/content/overhead-action-rpg-characters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/11629"
+                    content='daneeklu - "LPC style farm animals" used as "Cow"'
+                    hoverContent='Sprite "Cow" -> This sprite is based on "LPC style farm animals" by daneeklu (https://opengameart.org/users/daneeklu), originally available at https://opengameart.org/node/11629. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also GPL-2.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/happy-fly-enemy-game-character"
+                    content='bevouliin.com - "Happy Fly Enemy Game Character" used as "Fly"'
+                    hoverContent='Sprite "Fly" -> This sprite is based on "Happy Fly Enemy Game Character" by bevouliin.com (https://opengameart.org/users/bevouliincom), originally available at https://opengameart.org/content/happy-fly-enemy-game-character. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also CC0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-frogman"
+                    content='Redshrike, Evert, and Puffolotti - "LPC Frogman" used as "Frogman"'
+                    hoverContent='Sprite "Frogman" -> This sprite is based on "LPC Frogman" by Stephen Challener (Redshrike) (https://opengameart.org/users/redshrike); Evert (https://opengameart.org/users/evert); and Puffolotti (https://opengameart.org/users/Puffolotti), originally available at https://opengameart.org/content/lpc-frogman. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/gum-bot-sprites"
+                    content='GrafxKid - "Gum Bot sprites" used as "Gum bot - blue"'
+                    hoverContent='Sprite "Gum bot - blue" -> This sprite is based on "Gum Bot sprites" by GrafxKid (https://opengameart.org/users/grafxkid), originally available at https://opengameart.org/content/gum-bot-sprites. Licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/gum-bot-sprites"
+                    content='GrafxKid - "Gum Bot sprites" used as "Gum bot - green"'
+                    hoverContent='Sprite "Gum bot - green" -> This sprite is based on "Gum Bot sprites" by GrafxKid (https://opengameart.org/users/grafxkid), originally available at https://opengameart.org/content/gum-bot-sprites. Licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/gum-bot-sprites"
+                    content='GrafxKid - "Gum Bot sprites" used as "Gum bot - pink"'
+                    hoverContent='Sprite "Gum bot - pink" -> This sprite is based on "Gum Bot sprites" by GrafxKid (https://opengameart.org/users/grafxkid), originally available at https://opengameart.org/content/gum-bot-sprites. Licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/gum-bot-sprites"
+                    content='GrafxKid - "Gum Bot sprites" used as "Gum bot - red"'
+                    hoverContent='Sprite "Gum bot - red" -> This sprite is based on "Gum Bot sprites" by GrafxKid (https://opengameart.org/users/grafxkid), originally available at https://opengameart.org/content/gum-bot-sprites. Licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/11629"
+                    content='daneeklu - "LPC style farm animals" used as "Llama"'
+                    hoverContent='Sprite "Llama" -> This sprite is based on "LPC style farm animals" by daneeklu (https://opengameart.org/users/daneeklu), originally available at https://opengameart.org/node/11629. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also GPL-2.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-monsters"
+                    content='bluecarrot16, bagzie, and CharlesGabriel - "[LPC] Monsters" used as "Bee"'
+                    hoverContent='Sprite "Bee" -> This sprite is based on "[LPC] Monsters" by bluecarrot16 (https://opengameart.org/users/bluecarrot16); bagzie (https://opengameart.org/users/bagzie); and CharlesGabriel (https://opengameart.org/users/CharlesGabriel), originally available at https://opengameart.org/content/lpc-monsters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/) (also GPL-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-monsters"
+                    content='bluecarrot16, bagzie, and CharlesGabriel - "[LPC] Monsters" used as "Eyeball"'
+                    hoverContent='Sprite "Eyeball" -> This sprite is based on "[LPC] Monsters" by bluecarrot16 (https://opengameart.org/users/bluecarrot16); bagzie (https://opengameart.org/users/bagzie); and CharlesGabriel (https://opengameart.org/users/CharlesGabriel), originally available at https://opengameart.org/content/lpc-monsters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/) (also GPL-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-monsters"
+                    content='bluecarrot16, bagzie, and CharlesGabriel - "[LPC] Monsters" used as "Ghost"'
+                    hoverContent='Sprite "Ghost" -> This sprite is based on "[LPC] Monsters" by bluecarrot16 (https://opengameart.org/users/bluecarrot16); bagzie (https://opengameart.org/users/bagzie); and CharlesGabriel (https://opengameart.org/users/CharlesGabriel), originally available at https://opengameart.org/content/lpc-monsters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/) (also GPL-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-monsters"
+                    content='bluecarrot16, bagzie, and CharlesGabriel - "[LPC] Monsters" used as "Man eating flower"'
+                    hoverContent='Sprite "Man eating flower" -> This sprite is based on "[LPC] Monsters" by bluecarrot16 (https://opengameart.org/users/bluecarrot16); bagzie (https://opengameart.org/users/bagzie); and CharlesGabriel (https://opengameart.org/users/CharlesGabriel), originally available at https://opengameart.org/content/lpc-monsters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/) (also GPL-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/lpc-monsters"
+                    content='bluecarrot16, bagzie, and CharlesGabriel - "[LPC] Monsters" used as "Pumpking"'
+                    hoverContent='Sprite "Pumpking" -> This sprite is based on "[LPC] Monsters" by bluecarrot16 (https://opengameart.org/users/bluecarrot16); bagzie (https://opengameart.org/users/bagzie); and CharlesGabriel (https://opengameart.org/users/CharlesGabriel), originally available at https://opengameart.org/content/lpc-monsters. Licensed under CC-BY-SA-3.0 (https://creativecommons.org/licenses/by-sa/3.0/) (also GPL-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/sailors-pirates"
+                    content='AntumDeluge and Cabbit - "Sailors & Pirates" used as "Pirate captain"'
+                    hoverContent='Sprite "Pirate captain" -> This sprite is based on "Sailors & Pirates" by AntumDeluge (https://opengameart.org/users/antumdeluge) and Cabbit (https://opengameart.org/users/Cabbit), originally available at https://opengameart.org/content/sailors-pirates. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/11629"
+                    content='daneeklu - "LPC style farm animals" used as "Sheep"'
+                    hoverContent='Sprite "Sheep" -> This sprite is based on "LPC style farm animals" by daneeklu (https://opengameart.org/users/daneeklu), originally available at https://opengameart.org/node/11629. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/) (also GPL-2.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/animated-slime"
+                    content='Calciumtrice - "Animated Slime" used as "Blue slime"'
+                    hoverContent='Sprite "Blue slime" -> This sprite is based on "Animated Slime" by Calciumtrice (https://opengameart.org/users/calciumtrice), originally available at https://opengameart.org/content/animated-slime. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/animated-slime"
+                    content='Calciumtrice - "Animated Slime" used as "Green slime"'
+                    hoverContent='Sprite "Green slime" -> This sprite is based on "Animated Slime" by Calciumtrice (https://opengameart.org/users/calciumtrice), originally available at https://opengameart.org/content/animated-slime. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/animated-slime"
+                    content='Calciumtrice - "Animated Slime" used as "Lime slime"'
+                    hoverContent='Sprite "Lime slime" -> This sprite is based on "Animated Slime" by Calciumtrice (https://opengameart.org/users/calciumtrice), originally available at https://opengameart.org/content/animated-slime. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/animated-slime"
+                    content='Calciumtrice - "Animated Slime" used as "Pink slime"'
+                    hoverContent='Sprite "Pink slime" -> This sprite is based on "Animated Slime" by Calciumtrice (https://opengameart.org/users/calciumtrice), originally available at https://opengameart.org/content/animated-slime. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/content/animated-wizard"
+                    content='Calciumtrice - "Animated Wizard" used as "Wizard"'
+                    hoverContent='Sprite "Wizard" -> This sprite is based on "Animated Wizard" by Calciumtrice (https://opengameart.org/users/calciumtrice), originally available at https://opengameart.org/content/animated-wizard. Licensed under CC-BY-3.0 (http://creativecommons.org/licenses/by/3.0/). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/82939"
+                    content='AntumDeluge and Cabbit - "Zombies" used as "Bloody zombie"'
+                    hoverContent='Sprite "Bloody zombie" -> This sprite is based on "Zombies" by AntumDeluge (https://opengameart.org/users/antumdeluge) and Cabbit (https://opengameart.org/users/Cabbit), originally available at https://opengameart.org/node/82939. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/82939"
+                    content='AntumDeluge and Cabbit - "Zombies" used as "Headless zombie"'
+                    hoverContent='Sprite "Headless zombie" -> This sprite is based on "Zombies" by AntumDeluge (https://opengameart.org/users/antumdeluge) and Cabbit (https://opengameart.org/users/Cabbit), originally available at https://opengameart.org/node/82939. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/82939"
+                    content='AntumDeluge and Cabbit - "Zombies" used as "Rotting zombie"'
+                    hoverContent='Sprite "Rotting zombie" -> This sprite is based on "Zombies" by AntumDeluge (https://opengameart.org/users/antumdeluge) and Cabbit (https://opengameart.org/users/Cabbit), originally available at https://opengameart.org/node/82939. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
+                  />,
+                  <CreditItem
+                    link="https://opengameart.org/node/82939"
+                    content='AntumDeluge and Cabbit - "Zombies" used as "Zombie"'
+                    hoverContent='Sprite "Zombie" -> This sprite is based on "Zombies" by AntumDeluge (https://opengameart.org/users/antumdeluge) and Cabbit (https://opengameart.org/users/Cabbit), originally available at https://opengameart.org/node/82939. Licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/) (also CC-BY-3.0 and OGA-BY-3.0). Modifications were made to the original.'
                   />,
                 ]}
               />

@@ -1,6 +1,10 @@
 import { KeyboardEventTypes, KeyboardInfo } from "@babylonjs/core";
 import { MeshMetadata } from "../../../../universal/babylonTypeContant";
 import TableBabylonScene from "../TableBabylonScene";
+import {
+  LittleBuddiesTypes,
+  spirteSheetsMeta,
+} from "../littleBuddies/lib/typeConstant";
 
 class TableBabylonKeyboard {
   constructor(private tableBabylonScene: TableBabylonScene) {
@@ -281,9 +285,15 @@ class TableBabylonKeyboard {
           const meta = selected.metadata as MeshMetadata;
 
           if (meta.type === "littleBuddy") {
-            this.tableBabylonScene.littleBuddies[meta.userId][
-              meta.meshLabel
-            ].littleBuddyMovement.updateSize("grow", shift ? "fast" : "slow");
+            const littleBuddy =
+              this.tableBabylonScene.littleBuddies[meta.userId][meta.meshLabel];
+            const littleBuddyMeta = spirteSheetsMeta[littleBuddy.littleBuddy];
+
+            littleBuddy.littleBuddyMovement.updateSize(
+              "grow",
+              shift ? "fast" : "slow",
+              littleBuddyMeta.frameWidth / littleBuddyMeta.frameHeight,
+            );
           }
         }
         break;
@@ -292,9 +302,15 @@ class TableBabylonKeyboard {
           const meta = selected.metadata as MeshMetadata;
 
           if (meta.type === "littleBuddy") {
-            this.tableBabylonScene.littleBuddies[meta.userId][
-              meta.meshLabel
-            ].littleBuddyMovement.updateSize("shrink", shift ? "fast" : "slow");
+            const littleBuddy =
+              this.tableBabylonScene.littleBuddies[meta.userId][meta.meshLabel];
+            const littleBuddyMeta = spirteSheetsMeta[littleBuddy.littleBuddy];
+
+            littleBuddy.littleBuddyMovement.updateSize(
+              "shrink",
+              shift ? "fast" : "slow",
+              littleBuddyMeta.frameWidth / littleBuddyMeta.frameHeight,
+            );
           }
         }
         break;

@@ -188,85 +188,100 @@ const wolfIcon =
 const beetle = nginxAssetServerBaseUrl + "spriteSheets/beetle/beetle.png";
 const beetleIcon =
   nginxAssetServerBaseUrl + "spriteSheets/beetle/beetleIcon.png";
-const armedBones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/armedBones.png";
+const armedBones =
+  nginxAssetServerBaseUrl +
+  "spriteSheets/rpgCharacters2/armedBones/armedBones.png";
 const armedBonesIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/armedBonesIcon.png";
-const bones = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bones.png";
+  nginxAssetServerBaseUrl +
+  "spriteSheets/rpgCharacters2/armedBones/armedBonesIcon.png";
+const bones =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bones/bones.png";
 const bonesIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bonesIcon.png";
-const eyeBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBat.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/bones/bonesIcon.png";
+const eyeBat =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBat/eyeBat.png";
 const eyeBatIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBatIcon.png";
-const fang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fang.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/eyeBat/eyeBatIcon.png";
+const fang =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fang/fang.png";
 const fangIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fangIcon.png";
-const  giant= nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giant.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/fang/fangIcon.png";
+const giant =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giant/giant.png";
 const giantIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giantIcon.png";
-const goo = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/goo.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/giant/giantIcon.png";
+const goo = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/goo/goo.png";
 const gooIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/gooIcon.png";
-const hoodfang = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hoodfang.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/goo/gooIcon.png";
+const hoodfang =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hoodfang/hoodfang.png";
 const hoodfangIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hoodfangIcon.png";
-const horns = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/horns.png";
+  nginxAssetServerBaseUrl +
+  "spriteSheets/rpgCharacters2/hoodfang/hoodfangIcon.png";
+const horns =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/horns/horns.png";
 const hornsIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/hornsIcon.png";
-const spider = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spider.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/horns/hornsIcon.png";
+const spider =
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spider/spider.png";
 const spiderIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spiderIcon.png";
-const vampireBat = nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/vampireBat.png";
+  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/spider/spiderIcon.png";
+const vampireBat =
+  nginxAssetServerBaseUrl +
+  "spriteSheets/rpgCharacters2/vampireBat/vampireBat.png";
 const vampireBatIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/rpgCharacters2/vampireBatIcon.png";
+  nginxAssetServerBaseUrl +
+  "spriteSheets/rpgCharacters2/vampireBat/vampireBatIcon.png";
 const cow = nginxAssetServerBaseUrl + "spriteSheets/cow/cow.png";
-const cowIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/cow/cowIcon.png";
+const cowIcon = nginxAssetServerBaseUrl + "spriteSheets/cow/cowIcon.png";
 const fly = nginxAssetServerBaseUrl + "spriteSheets/fly/fly.png";
-const flyIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/fly/flyIcon.png";
+const flyIcon = nginxAssetServerBaseUrl + "spriteSheets/fly/flyIcon.png";
 const frogman = nginxAssetServerBaseUrl + "spriteSheets/frogman/frogman.png";
 const frogmanIcon =
   nginxAssetServerBaseUrl + "spriteSheets/frogman/frogmanIcon.png";
-const gumBotBlue = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotBlue.png";
+const gumBotBlue =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotBlue.png";
 const gumBotBlueIcon =
   nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotBlueIcon.png";
-const gumBotGreen = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotGreen.png";
+const gumBotGreen =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotGreen.png";
 const gumBotGreenIcon =
   nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotGreenIcon.png";
-const gumBotPink = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotPink.png";
+const gumBotPink =
+  nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotPink.png";
 const gumBotPinkIcon =
   nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotPinkIcon.png";
 const gumBotRed = nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotRed.png";
 const gumBotRedIcon =
   nginxAssetServerBaseUrl + "spriteSheets/gumBot/gumBotRedIcon.png";
 const llama = nginxAssetServerBaseUrl + "spriteSheets/llama/llama.png";
-const llamaIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/llama/llamaIcon.png";
+const llamaIcon = nginxAssetServerBaseUrl + "spriteSheets/llama/llamaIcon.png";
 const bee = nginxAssetServerBaseUrl + "spriteSheets/monsters/bee.png";
-const beeIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/monsters/beeIcon.png";
+const beeIcon = nginxAssetServerBaseUrl + "spriteSheets/monsters/beeIcon.png";
 const eyeball = nginxAssetServerBaseUrl + "spriteSheets/monsters/eyeball.png";
 const eyeballIcon =
   nginxAssetServerBaseUrl + "spriteSheets/monsters/eyeballIcon.png";
 const ghost = nginxAssetServerBaseUrl + "spriteSheets/monsters/ghost.png";
 const ghostIcon =
   nginxAssetServerBaseUrl + "spriteSheets/monsters/ghostIcon.png";
-const manEatingFlower = nginxAssetServerBaseUrl + "spriteSheets/monsters/manEatingFlower.png";
+const manEatingFlower =
+  nginxAssetServerBaseUrl + "spriteSheets/monsters/manEatingFlower.png";
 const manEatingFlowerIcon =
   nginxAssetServerBaseUrl + "spriteSheets/monsters/manEatingFlowerIcon.png";
 const pumpking = nginxAssetServerBaseUrl + "spriteSheets/monsters/pumpking.png";
 const pumpkingIcon =
   nginxAssetServerBaseUrl + "spriteSheets/monsters/pumpkingIcon.png";
-const pirateCaptain = nginxAssetServerBaseUrl + "spriteSheets/pirates/pirateCaptain.png";
+const pirateCaptain =
+  nginxAssetServerBaseUrl + "spriteSheets/pirates/pirateCaptain.png";
 const pirateCaptainIcon =
   nginxAssetServerBaseUrl + "spriteSheets/pirates/pirateCaptainIcon.png";
 const sheep = nginxAssetServerBaseUrl + "spriteSheets/sheep/sheep.png";
-const sheepIcon =
-  nginxAssetServerBaseUrl + "spriteSheets/sheep/sheepIcon.png";
+const sheepIcon = nginxAssetServerBaseUrl + "spriteSheets/sheep/sheepIcon.png";
 const blueSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/blueSlime.png";
 const blueSlimeIcon =
   nginxAssetServerBaseUrl + "spriteSheets/slimes/blueSlimeIcon.png";
-const greenSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/greenSlime.png";
+const greenSlime =
+  nginxAssetServerBaseUrl + "spriteSheets/slimes/greenSlime.png";
 const greenSlimeIcon =
   nginxAssetServerBaseUrl + "spriteSheets/slimes/greenSlimeIcon.png";
 const limeSlime = nginxAssetServerBaseUrl + "spriteSheets/slimes/limeSlime.png";
@@ -278,13 +293,16 @@ const pinkSlimeIcon =
 const wizard = nginxAssetServerBaseUrl + "spriteSheets/wizard/wizard.png";
 const wizardIcon =
   nginxAssetServerBaseUrl + "spriteSheets/wizard/wizardIcon.png";
-const bloodyZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/bloodyZombie.png";
+const bloodyZombie =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/bloodyZombie.png";
 const bloodyZombieIcon =
   nginxAssetServerBaseUrl + "spriteSheets/zombies/bloodyZombieIcon.png";
-const headlessZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/headlessZombie.png";
+const headlessZombie =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/headlessZombie.png";
 const headlessZombieIcon =
   nginxAssetServerBaseUrl + "spriteSheets/zombies/headlessZombieIcon.png";
-const rottingZombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/rottingZombie.png";
+const rottingZombie =
+  nginxAssetServerBaseUrl + "spriteSheets/zombies/rottingZombie.png";
 const rottingZombieIcon =
   nginxAssetServerBaseUrl + "spriteSheets/zombies/rottingZombieIcon.png";
 const zombie = nginxAssetServerBaseUrl + "spriteSheets/zombies/zombie.png";
@@ -293,17 +311,21 @@ const zombieIcon =
 
 export const coreAnimations = ["walk", "idle"];
 
-export type SpriteAnimationsTypes =
+export type CoreSpriteAnimationsTypes = "walk" | "idle";
+export type AltSpriteAnimationsTypes =
   | "run"
-  | "walk"
-  | "idle"
+  | "run"
   | "jump"
   | "swim"
   | "attack"
   | "damaged"
-  | "die";
-export type CoreSpriteAnimationsTypes = "walk" | "idle";
-export type AltSpriteAnimationsTypes = "run";
+  | "die"
+  | "grab"
+  | "throw"
+  | "speak";
+export type SpriteAnimationsTypes =
+  | CoreSpriteAnimationsTypes
+  | AltSpriteAnimationsTypes;
 
 export type SpriteAnimations = {
   currentAnimation: { core: SpriteAnimationsTypes; alt: string | undefined };
@@ -534,7 +556,14 @@ export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
     bee: ["insect", "hive", "honey", "sting", "buzz", "yellow"],
     eyeball: ["eye", "floating", "creepy", "monster", "gaze", "pupil"],
     ghost: ["spirit", "haunted", "invisible", "ethereal", "specter", "spooky"],
-    manEatingFlower: ["plant", "carnivorous", "teeth", "trap", "jungle", "danger"],
+    manEatingFlower: [
+      "plant",
+      "carnivorous",
+      "teeth",
+      "trap",
+      "jungle",
+      "danger",
+    ],
     pumpking: ["pumpkin", "king", "halloween", "vine", "gourd", "scary"],
     pirateCaptain: ["pirate", "captain", "ship", "treasure", "sword", "sea"],
     sheep: ["animal", "wool", "farm", "flock", "baa", "pasture"],
@@ -544,7 +573,14 @@ export const littleBuddySemanticKeywords: Record<LittleBuddiesTypes, string[]> =
     pinkSlime: ["slime", "pink", "blob", "jelly", "cute", "bounce"],
     wizard: ["magic", "staff", "robe", "spell", "arcane", "sage"],
     bloodyZombie: ["zombie", "blood", "undead", "gore", "horror", "rotting"],
-    headlessZombie: ["zombie", "headless", "undead", "scary", "decapitated", "horror"],
+    headlessZombie: [
+      "zombie",
+      "headless",
+      "undead",
+      "scary",
+      "decapitated",
+      "horror",
+    ],
     rottingZombie: ["zombie", "rotting", "decay", "undead", "smelly", "horror"],
     zombie: ["zombie", "undead", "scary", "horror", "monster", "grave"],
   };
@@ -578,13 +614,7 @@ export type SpriteMetadata = {
       walk: MetaAnimation;
     };
     alt: {
-      run?: MetaAnimation;
-      die?: MetaAnimation;
-      speak?: MetaAnimation;
-      jump?: MetaAnimation;
-      swim?: MetaAnimation;
-      attack?: MetaAnimation;
-      damaged?: MetaAnimation;
+      [altSpriteAnimationsType in AltSpriteAnimationsTypes]?: MetaAnimation;
     };
   };
 };
@@ -1112,7 +1142,7 @@ export const spirteSheetsMeta: {
           speed: null,
           alt: {
             eat: {
-              animation: [20, 21, 23, 24],
+              animation: [24, 25, 26, 27, 8],
               loop: false,
               speed: 0.15,
             },
@@ -1120,7 +1150,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [4, 5, 6, 7],
-          speed: 0.1375,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1144,15 +1174,15 @@ export const spirteSheetsMeta: {
           speed: null,
           alt: {
             eat: {
-              animation: [20, 21, 23, 24],
+              animation: [24, 25, 26, 27, 8],
               loop: false,
-              speed: 0.15,
+              speed: 0.175,
             },
           },
         },
         walk: {
           core: [4, 5, 6, 7],
-          speed: 0.1375,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1199,10 +1229,17 @@ export const spirteSheetsMeta: {
         idle: {
           core: [0],
           speed: null,
+          alt: {
+            sniff: {
+              animation: [5, 6, 7, 7, 7, 6, 5, 0],
+              loop: false,
+              speed: 0.125,
+            },
+          },
         },
         walk: {
-          core: [0, 1, 2, 3, 4, 5, 6, 7],
-          speed: 0.125,
+          core: [0, 1, 2, 3, 4],
+          speed: 0.1,
         },
       },
       alt: {},
@@ -1267,13 +1304,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [0, 1, 2],
-          speed: 0.1125,
+          speed: 0.3,
         },
         walk: {
           core: [6, 7, 8, 9, 10, 11],
@@ -1292,7 +1329,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1302,7 +1339,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1317,7 +1354,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1327,7 +1364,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1342,7 +1379,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1352,7 +1389,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1367,7 +1404,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1377,7 +1414,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1392,7 +1429,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1402,7 +1439,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1417,7 +1454,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1427,7 +1464,7 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [3, 4, 5],
-          speed: 0.1125,
+          speed: 0.15,
         },
       },
       alt: {},
@@ -1437,12 +1474,12 @@ export const spirteSheetsMeta: {
     title: "Goblin assassin",
     url: goblinAssassin,
     iconUrl: goblinAssassinIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1452,22 +1489,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinGuard: {
     title: "Goblin Guard",
     url: goblinGuard,
     iconUrl: goblinGuardIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1477,22 +1519,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinLord: {
     title: "Goblin lord",
     url: goblinLord,
     iconUrl: goblinLordIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1502,22 +1549,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinMage: {
     title: "Goblin mage",
     url: goblinMage,
     iconUrl: goblinMageIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1527,22 +1579,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinPeasant: {
     title: "Goblin peasant",
     url: goblinPeasant,
     iconUrl: goblinPeasantIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1552,22 +1609,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinSamurai: {
     title: "Goblin samurai",
     url: goblinSamurai,
     iconUrl: goblinSamuraiIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1577,22 +1639,27 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   goblinSoldier: {
     title: "Goblin soldier",
     url: goblinSoldier,
     iconUrl: goblinSoldierIcon,
-    frameHeight: 64,
+    frameHeight: 42,
     frameWidth: 32,
-    walkSpeed: 0.2,
+    walkSpeed: 0.175,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1602,10 +1669,15 @@ export const spirteSheetsMeta: {
         },
         walk: {
           core: [0, 1, 2, 3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.175,
         },
       },
-      alt: {},
+      alt: {
+        attack: {
+          core: [10, 11, 12, 13],
+          speed: 1.75,
+        },
+      },
     },
   },
   knight: {
@@ -1617,7 +1689,7 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -1692,13 +1764,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [0, 1, 2],
-          speed: 0.1125,
+          speed: 0.25,
         },
         walk: {
           core: [6, 7, 8, 9, 10, 11, 12, 13],
@@ -1717,13 +1789,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [0, 1, 2, 3],
-          speed: 0.1125,
+          speed: 0.25,
         },
         walk: {
           core: [4, 5, 6, 7, 8, 9],
@@ -1746,13 +1818,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [0, 1, 2, 3, 4],
-          speed: 0.1125,
+          speed: 0.25,
         },
         walk: {
           core: [5, 6, 7, 8, 9, 10, 11, 12],
@@ -1784,13 +1856,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [0, 1, 2, 3, 4],
-          speed: 0.1125,
+          speed: 0.25,
         },
         walk: {
           core: [5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -1822,13 +1894,13 @@ export const spirteSheetsMeta: {
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
           core: [3, 4, 5, 6],
-          speed: 0.1125,
+          speed: 0.2,
         },
         walk: {
           core: [13, 14, 15, 16, 17, 18],
@@ -2045,7 +2117,7 @@ export const spirteSheetsMeta: {
             howl: {
               animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
               loop: false,
-              speed: 0.15,
+              speed: 0.25,
             },
           },
         },
@@ -2066,116 +2138,83 @@ export const spirteSheetsMeta: {
     title: "Beetle",
     url: beetle,
     iconUrl: beetleIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 48,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [10],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [10, 11, 12, 13, 14],
           speed: 0.1125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },armedBones: {
+  },
+  armedBones: {
     title: "Armed bones",
     url: armedBones,
     iconUrl: armedBonesIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [4, 5, 6, 7],
           speed: 0.1125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },bones: {
+  },
+  bones: {
     title: "Bones",
     url: bones,
     iconUrl: bonesIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [4, 5, 6, 7],
           speed: 0.1125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },eyeBat: {
+  },
+  eyeBat: {
     title: "Eyeball bat",
     url: eyeBat,
     iconUrl: eyeBatIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2184,106 +2223,82 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.1,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.1,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },fang: {
+  },
+  fang: {
     title: "Fang",
     url: fang,
     iconUrl: fangIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.15,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },giant: {
+  },
+  giant: {
     title: "Giant",
     url: giant,
     iconUrl: giantIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [0, 1, 2, 3],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7, 8, 9, 10, 11],
+          speed: 0.15,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        grab: {
+          core: [12, 13, 14, 15],
+          speed: 0.1125,
+        },
+        throw: {
+          core: [16, 17, 18, 19],
           speed: 0.1125,
         },
       },
     },
-  },goo: {
+  },
+  goo: {
     title: "Goo",
     url: goo,
     iconUrl: gooIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2292,106 +2307,73 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.125,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },hoodfang: {
+  },
+  hoodfang: {
     title: "Hoodfang",
     url: hoodfang,
     iconUrl: hoodfangIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.15,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },horns: {
+  },
+  horns: {
     title: "Horns",
     url: horns,
     iconUrl: hornsIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.175,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },spider: {
+  },
+  spider: {
     title: "Spider",
     url: spider,
     iconUrl: spiderIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2400,34 +2382,23 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.15,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [6, 7, 8, 9],
           speed: 0.1125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },vampireBat: {
+  },
+  vampireBat: {
     title: "Vampire bat",
     url: vampireBat,
     iconUrl: vampireBatIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2436,34 +2407,23 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.1,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [0, 1, 2, 3, 4, 5],
+          speed: 0.1,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },cow: {
+  },
+  cow: {
     title: "Cow",
     url: cow,
     iconUrl: cowIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 100,
+    frameWidth: 100,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2472,34 +2432,30 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [4],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            eat: {
+              animation: [20, 21, 22, 23, 4],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.25,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },fly: {
+  },
+  fly: {
     title: "Fly",
     url: fly,
     iconUrl: flyIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 256,
+    frameWidth: 317,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2508,34 +2464,23 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [0, 1],
+          speed: 0.05,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [0, 1],
+          speed: 0.05,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },frogman: {
+  },
+  frogman: {
     title: "Frogman",
     url: frogman,
     iconUrl: frogmanIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 96,
+    frameWidth: 80,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2544,38 +2489,32 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [39],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [30, 31, 32, 33, 34, 35],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        attack: {
+          core: [18, 19, 20, 21],
           speed: 0.1125,
         },
       },
     },
-  },gumBotBlue: {
+  },
+  gumBotBlue: {
     title: "Gum bot - blue",
     url: gumBotBlue,
     iconUrl: gumBotBlueIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -2583,35 +2522,36 @@ export const spirteSheetsMeta: {
           core: [0],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            spin: {
+              animation: [0, 1, 2, 3, 4, 5, 0],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [6, 7, 8, 9, 10, 11],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [12, 13, 14, 15, 16],
           speed: 0.1125,
         },
       },
     },
-  },gumBotGreen: {
+  },
+  gumBotGreen: {
     title: "Gum bot - green",
     url: gumBotGreen,
     iconUrl: gumBotGreenIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -2619,35 +2559,36 @@ export const spirteSheetsMeta: {
           core: [0],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            spin: {
+              animation: [0, 1, 2, 3, 4, 5, 0],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [6, 7, 8, 9, 10, 11],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [12, 13, 14, 15, 16],
           speed: 0.1125,
         },
       },
     },
-  },gumBotPink: {
+  },
+  gumBotPink: {
     title: "Gum bot - pink",
     url: gumBotPink,
     iconUrl: gumBotPinkIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -2655,35 +2596,36 @@ export const spirteSheetsMeta: {
           core: [0],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            spin: {
+              animation: [0, 1, 2, 3, 4, 5, 0],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [6, 7, 8, 9, 10, 11],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [12, 13, 14, 15, 16],
           speed: 0.1125,
         },
       },
     },
-  },gumBotRed: {
+  },
+  gumBotRed: {
     title: "Gum bot - red",
     url: gumBotRed,
     iconUrl: gumBotRedIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
@@ -2691,31 +2633,32 @@ export const spirteSheetsMeta: {
           core: [0],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            spin: {
+              animation: [0, 1, 2, 3, 4, 5, 0],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [6, 7, 8, 9, 10, 11],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [12, 13, 14, 15, 16],
           speed: 0.1125,
         },
       },
     },
-  },llama: {
+  },
+  llama: {
     title: "Llama",
     url: llama,
     iconUrl: llamaIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 80,
+    frameWidth: 80,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2724,70 +2667,60 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [20],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            eat: {
+              animation: [20, 21, 22, 23, 20],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },bee: {
+  },
+  bee: {
     title: "Bee",
     url: bee,
     iconUrl: beeIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [12, 13, 14],
+          speed: 0.25,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [18, 19, 20],
+          speed: 0.2,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        attack: {
+          core: [21, 22, 23],
           speed: 0.1125,
         },
       },
     },
-  },eyeball: {
+  },
+  eyeball: {
     title: "Eyeball",
     url: eyeball,
     iconUrl: eyeballIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 64,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2796,34 +2729,28 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [14, 15, 16],
+          speed: 0.25,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [7, 8, 9, 10],
+          speed: 0.2,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        attack: {
+          core: [11, 12],
           speed: 0.1125,
         },
       },
     },
-  },ghost: {
+  },
+  ghost: {
     title: "Ghost",
     url: ghost,
     iconUrl: ghostIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 64,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2832,34 +2759,30 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [12, 13, 14],
+          speed: 0.25,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            haunt: {
+              animation: [15, 16, 17],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [6, 7, 8],
+          speed: 0.2,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },manEatingFlower: {
+  },
+  manEatingFlower: {
     title: "Man eating flower",
     url: manEatingFlower,
     iconUrl: manEatingFlowerIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 128,
+    frameWidth: 128,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2868,34 +2791,30 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [12, 13, 14],
+          speed: 0.25,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            screech: {
+              animation: [15, 16, 17],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [11],
+          speed: null,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },pumpking: {
+  },
+  pumpking: {
     title: "Pumpking",
     url: pumpking,
     iconUrl: pumpkingIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 64,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2904,70 +2823,55 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [12, 13, 14],
+          speed: 0.25,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            fire: {
+              animation: [15, 16, 17],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [6, 7, 8],
+          speed: 0.2,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },pirateCaptain: {
+  },
+  pirateCaptain: {
     title: "Pirate captain",
     url: pirateCaptain,
     iconUrl: pirateCaptainIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [7],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [3, 4, 5],
           speed: 0.1125,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },sheep: {
+  },
+  sheep: {
     title: "Sheep",
     url: sheep,
     iconUrl: sheepIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 64,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -2976,34 +2880,30 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [20],
           speed: null,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            eat: {
+              animation: [20, 21, 22, 23, 20],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [4, 5, 6, 7],
+          speed: 0.2,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },blueSlime: {
+  },
+  blueSlime: {
     title: "Blue slime",
     url: blueSlime,
     iconUrl: blueSlimeIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -3012,34 +2912,39 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          speed: 0.1125,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            roll: {
+              animation: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+          speed: 0.1125,
+        },
+        attack: {
+          core: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
           speed: 0.1125,
         },
       },
     },
-  },greenSlime: {
+  },
+  greenSlime: {
     title: "Green slime",
     url: greenSlime,
     iconUrl: greenSlimeIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -3048,34 +2953,39 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          speed: 0.1125,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            roll: {
+              animation: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+          speed: 0.1125,
+        },
+        attack: {
+          core: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
           speed: 0.1125,
         },
       },
     },
-  },limeSlime: {
+  },
+  limeSlime: {
     title: "Lime slime",
     url: limeSlime,
     iconUrl: limeSlimeIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -3084,34 +2994,39 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          speed: 0.1125,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            roll: {
+              animation: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+          speed: 0.1125,
+        },
+        attack: {
+          core: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
           speed: 0.1125,
         },
       },
     },
-  },pinkSlime: {
+  },
+  pinkSlime: {
     title: "Pink slime",
     url: pinkSlime,
     iconUrl: pinkSlimeIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 16,
+    frameWidth: 16,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
@@ -3120,207 +3035,165 @@ export const spirteSheetsMeta: {
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
+          core: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          speed: 0.1125,
           alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            roll: {
+              animation: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
               loop: false,
               speed: 0.15,
             },
           },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+          speed: 0.1125,
+        },
+        attack: {
+          core: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
           speed: 0.1125,
         },
       },
     },
-  },wizard: {
+  },
+  wizard: {
     title: "Wizard",
     url: wizard,
     iconUrl: wizardIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 32,
+    frameWidth: 32,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
-          speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
+          core: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+          speed: 0.25,
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
+          core: [70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
           speed: 0.1125,
         },
       },
       alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
+        die: {
+          core: [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
+          speed: 0.1125,
+        },
+        attack: {
+          core: [80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
           speed: 0.1125,
         },
       },
     },
-  },bloodyZombie: {
+  },
+  bloodyZombie: {
     title: "Bloody zombie",
     url: bloodyZombie,
     iconUrl: bloodyZombieIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [7],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [3, 4, 5],
+          speed: 0.25,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },headlessZombie: {
+  },
+  headlessZombie: {
     title: "Headless zombie",
     url: headlessZombie,
     iconUrl: headlessZombieIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [7],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [3, 4, 5],
+          speed: 0.25,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },rottingZombie: {
+  },
+  rottingZombie: {
     title: "Rotting zombie",
     url: rottingZombie,
     iconUrl: rottingZombieIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [7],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [3, 4, 5],
+          speed: 0.25,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
-  },zombie: {
+  },
+  zombie: {
     title: "Zombie",
     url: zombie,
     iconUrl: zombieIcon,
-    frameHeight: ,
-    frameWidth: ,
+    frameHeight: 64,
+    frameWidth: 48,
     walkSpeed: 0.2,
     runSpeed: 0.3,
     rotatable: false,
-    flipTextures: false,
+    flipTextures: true,
     pixelated: true,
     animations: {
       core: {
         idle: {
-          core: [0],
+          core: [7],
           speed: null,
-          alt: {
-            howl: {
-              animation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-              loop: false,
-              speed: 0.15,
-            },
-          },
         },
         walk: {
-          core: [10, 11, 12, 13, 14, 15, 16, 17],
-          speed: 0.1125,
+          core: [3, 4, 5],
+          speed: 0.25,
         },
       },
-      alt: {
-        run: {
-          core: [18, 19, 20, 21, 22, 23],
-          speed: 0.1125,
-        },
-      },
+      alt: {},
     },
   },
 };

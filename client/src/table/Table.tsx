@@ -153,7 +153,7 @@ export default function Table({
       />
       <div
         ref={tableContainerRef}
-        className="flex table-container h-full flex-col"
+        className="table-container flex h-full flex-col"
         style={
           {
             "--dynamic-width": `calc(100%${tableSidePanelActive ? ` - ${Math.max(200, tableSidePanelWidth)}px - 1.75rem` : ""})`,
@@ -215,8 +215,12 @@ export default function Table({
                 <UploadTableLayer tableTopRef={tableTopRef} />
                 <NewInstancesLayer tableRef={tableRef} />
                 <PlaceLittleBuddyLayer tableRef={tableRef} />
-                <LittleBuddiesLayer littleBuddy="wasp" />
-                <LittleBuddiesLayer littleBuddy="redBat" />
+                <LittleBuddiesLayer littleBuddy="rottingZombie" />
+                <LittleBuddiesLayer littleBuddy="zombie" />
+                <LittleBuddiesLayer littleBuddy="pinkSlime" />
+                <LittleBuddiesLayer littleBuddy="wizard" />
+                <LittleBuddiesLayer littleBuddy="bloodyZombie" />
+                <LittleBuddiesLayer littleBuddy="headlessZombie" />
                 {gridActive && (
                   <TableGridOverlay
                     gridSize={gridSize}
