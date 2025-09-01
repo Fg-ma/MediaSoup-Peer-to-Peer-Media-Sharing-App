@@ -67,7 +67,7 @@ export default {
       fontFamily: {
         Josefin: ["Josefin", "sans"],
         K2D: ["K2D", "sans"],
-        B612Mono: ["B612Mono, monospace"],
+        B612Mono: ["B612Mono", "monospace"],
       },
       backgroundSize: {
         125: "125%",
